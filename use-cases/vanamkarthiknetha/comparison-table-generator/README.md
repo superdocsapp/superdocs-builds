@@ -24,8 +24,13 @@ config.json ──> branded HTML template (local, deterministic)
              verify (free HTML export, diffed cell-by-cell against the config;
                    │  one repair operation only if the AI drifted)
                    ▼
-             export .docx / .pdf (free, full styling fidelity)
+             brand pass (local, deterministic: the pipeline owns the look)
+                   │
+                   ▼
+             export .docx / .pdf  +  visibility check on the result
 ```
+
+![Generated comparison document](samples/preview-acme-vs-3.png)
 
 The verify step exists because LLM fills can drift in small ways (in testing, one
 run renamed the "Capability" header to "Feature" and swapped check-mark glyphs
@@ -33,6 +38,18 @@ between runs). The generator never trusts the fill blindly: every header, row
 label, and cell is compared against the config after applying, and a single
 targeted repair operation is issued if anything moved. A run only succeeds if the
 exported document provably matches the config.
+
+### Export fidelity: a gotcha worth knowing
+
+The .docx/.pdf converter honors `background-color:` on a cell but **drops the
+`background:` shorthand** (and `<thead>`-level fills, and the `bgcolor`
+attribute) — while preserving `color:`. White header text plus a dropped fill
+renders as an invisible header row: present in the file, blank on the page. This
+generator therefore (1) writes the longhand, (2) re-applies brand styling locally
+after the AI edit rather than trusting inline styles to survive a rewrite, and
+(3) runs `assert_visible()` on the exported .docx, failing the run if any header
+cell would render white-on-white. Content correctness and *visual* correctness
+are checked separately, because they fail separately.
 
 Configuration over code: **adding a competitor column or a capability row is a
 config edit + re-run.** No code changes. (`configs/acme-vs-2.json` vs

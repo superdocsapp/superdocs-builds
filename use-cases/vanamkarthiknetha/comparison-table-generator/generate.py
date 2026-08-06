@@ -20,6 +20,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -67,26 +68,37 @@ def call(method, path, body=None, retries=1, timeout=120):
 
 # ---------- template ----------
 
+ZEBRA = "#f5f7fa"
+
+
+def _header_style(accent):
+    # background-color (longhand) is deliberate: the docx/pdf exporter drops the
+    # `background:` shorthand while keeping `color`, which renders white header
+    # text on no fill - i.e. invisible. See README "Export fidelity".
+    return (f"background-color:{accent};color:#ffffff;padding:10px 14px;"
+            f"text-align:left;border:1px solid {accent};font-weight:700;")
+
+
+def _body_style(shade, label=False):
+    return (f"padding:9px 14px;border:1px solid #d9dee5;background-color:{shade};"
+            + ("font-weight:600;" if label else ""))
+
+
 def build_template_html(cfg):
     brand = cfg.get("brand", {})
     accent = brand.get("accent_color", "#1a4f8b")
     product = cfg["product"]
     columns = [product] + cfg["competitors"]
     header_cells = "".join(
-        f'<th style="background:{accent};color:#ffffff;padding:10px 14px;'
-        f'text-align:left;border:1px solid {accent};">{c}</th>'
+        f'<th style="{_header_style(accent)}">{c}</th>'
         for c in ["Capability"] + columns
     )
     rows = []
     for i, cap in enumerate(cfg["capabilities"]):
-        shade = "#f5f7fa" if i % 2 else "#ffffff"
-        empty = "".join(
-            f'<td style="padding:9px 14px;border:1px solid #d9dee5;background:{shade};"></td>'
-            for _ in columns
-        )
+        shade = ZEBRA if i % 2 else "#ffffff"
+        empty = "".join(f'<td style="{_body_style(shade)}"></td>' for _ in columns)
         rows.append(
-            f'<tr><td style="padding:9px 14px;border:1px solid #d9dee5;'
-            f'background:{shade};font-weight:600;">{cap["name"]}</td>{empty}</tr>'
+            f'<tr><td style="{_body_style(shade, label=True)}">{cap["name"]}</td>{empty}</tr>'
         )
     footer = brand.get(
         "footer",
@@ -128,6 +140,93 @@ def build_fill_message(cfg):
     )
 
 
+# ---------- deterministic branding pass ----------
+
+def _set_decls(style, overrides):
+    """Merge CSS declarations, dropping any prior background/background-color."""
+    decls = []
+    for part in (style or "").split(";"):
+        if ":" not in part:
+            continue
+        prop, _, val = part.partition(":")
+        prop = prop.strip()
+        if prop.lower() in ("background", "background-color") or prop.lower() in overrides:
+            continue
+        decls.append(f"{prop}:{val.strip()}")
+    decls.extend(f"{k}:{v}" for k, v in overrides.items())
+    return ";".join(decls) + ";"
+
+
+def enforce_branding(html, cfg):
+    """Re-apply the brand styling to the final table locally.
+
+    The AI owns the cell *content*; this pipeline owns the *look*. Doing it here
+    (rather than trusting the model to preserve inline styles through a rewrite)
+    makes the branding deterministic and immune to both model drift and the
+    exporter's shorthand-background gap.
+    """
+    accent = cfg.get("brand", {}).get("accent_color", "#1a4f8b")
+    table = re.search(r"<table\b[^>]*>.*?</table>", html, re.S)
+    if not table:
+        return html
+    body_row = [0]
+
+    def fix_row(m):
+        row = m.group(0)
+        if "<th" in row.lower():
+            return re.sub(
+                r"<th\b([^>]*)>",
+                lambda c: "<th" + _swap_style(c.group(1), _header_style(accent)) + ">",
+                row)
+        shade = ZEBRA if body_row[0] % 2 else "#ffffff"
+        body_row[0] += 1
+        first = [True]
+
+        def fix_cell(c):
+            style = _set_decls(_style_of(c.group(1)),
+                              {"background-color": shade,
+                               **({"font-weight": "600"} if first[0] else {})})
+            first[0] = False
+            return "<td" + _swap_style(c.group(1), style) + ">"
+
+        return re.sub(r"<td\b([^>]*)>", fix_cell, row)
+
+    fixed = re.sub(r"<tr\b[^>]*>.*?</tr>", fix_row, table.group(0), flags=re.S)
+    return html[:table.start()] + fixed + html[table.end():]
+
+
+def _style_of(attrs):
+    m = re.search(r'style\s*=\s*"([^"]*)"', attrs or "")
+    return m.group(1) if m else ""
+
+
+def _swap_style(attrs, style):
+    attrs = attrs or ""
+    if re.search(r'style\s*=\s*"[^"]*"', attrs):
+        return re.sub(r'style\s*=\s*"[^"]*"', f'style="{style}"', attrs)
+    return attrs + f' style="{style}"'
+
+
+def assert_visible(docx_path):
+    """Guard against the invisible-header failure mode ever shipping again."""
+    with zipfile.ZipFile(docx_path) as z:
+        xml = z.read("word/document.xml").decode("utf-8")
+    tbl = re.search(r"<w:tbl>.*?</w:tbl>", xml, re.S)
+    if not tbl:
+        return ["no table in exported docx"]
+    header = re.search(r"<w:tr[ >].*?</w:tr>", tbl.group(0), re.S).group(0)
+    problems = []
+    for cell in re.findall(r"<w:tc[ >].*?</w:tc>", header, re.S):
+        text = "".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", cell)).strip()
+        fill = re.findall(r'<w:shd[^>]*w:fill="([^"]*)"', cell)
+        color = re.findall(r'<w:color[^>]*w:val="([^"]*)"', cell)
+        white_text = color and color[0].upper() == "FFFFFF"
+        no_fill = not fill or fill[0].upper() in ("AUTO", "FFFFFF")
+        if text and white_text and no_fill:
+            problems.append(f"header cell '{text}' is white text on no fill (invisible)")
+    return problems
+
+
 # ---------- verification (free: html export + local diff) ----------
 
 def _cell_texts(row_html):
@@ -139,10 +238,15 @@ def expected_cell(value):
     return {"yes": "✓", "no": "✗", "partial": "Partial"}.get(value, value)
 
 
+def export_html(session):
+    """Free: the session's current document as html."""
+    blob = call("POST", "/v1/documents/export", {"session_id": session, "format": "html"})
+    return blob.decode("utf-8", errors="replace") if isinstance(blob, bytes) else json.dumps(blob)
+
+
 def verify(session, cfg):
     """Export html (free) and diff the table against the config. Returns mismatch list."""
-    blob = call("POST", "/v1/documents/export", {"session_id": session, "format": "html"})
-    html = blob.decode("utf-8", errors="replace") if isinstance(blob, bytes) else json.dumps(blob)
+    html = export_html(session)
     tbl = re.search(r"<table[ >].*?</table>", html, re.S)
     if not tbl:
         return ["no <table> found in exported html"]
@@ -269,11 +373,14 @@ def run(cfg_path, auto_yes, out_dir):
     else:
         print("   verified: headers, rows and every cell match the config")
 
+    print("5) re-apply brand styling locally (deterministic, free)")
+    branded = enforce_branding(export_html(session), cfg)
+
     usage = (j.get("result") or {}).get("usage") or {}
-    print(f"5) export ({', '.join(cfg.get('outputs', ['docx']))})  [ops used this run: "
+    print(f"6) export ({', '.join(cfg.get('outputs', ['docx']))})  [ops used this run: "
           f"{usage.get('operations', usage) or 'n/a'}]")
     for fmt in cfg.get("outputs", ["docx"]):
-        blob = call("POST", "/v1/documents/export", {"session_id": session, "format": fmt})
+        blob = call("POST", "/v1/documents/export", {"html": branded, "format": fmt})
         target = out_dir / f"{slug}.{fmt}"
         if isinstance(blob, bytes):
             target.write_bytes(blob)
@@ -281,6 +388,11 @@ def run(cfg_path, auto_yes, out_dir):
             b64 = blob.get("file_base64") or blob.get("content_base64")
             target.write_bytes(base64.b64decode(b64))
         print(f"   wrote {target} ({target.stat().st_size} bytes)")
+        if fmt == "docx":
+            invisible = assert_visible(target)
+            if invisible:
+                sys.exit("Export visibility check FAILED: " + "; ".join(invisible))
+            print("   visibility check passed (header cells render)")
     print("DONE")
 
 
