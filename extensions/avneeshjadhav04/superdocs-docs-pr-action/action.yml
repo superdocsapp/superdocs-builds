@@ -1,0 +1,81 @@
+name: "SuperDocs Docs PR"
+description: >-
+  On merge, drafts a documentation update with SuperDocs and opens a pull
+  request with the diff for human review. Skips entirely when nothing needs
+  saying.
+author: avneeshjadhav04
+branding:
+  icon: "file-text"
+  color: "blue"
+
+inputs:
+  superdocs_api_key:
+    description: >-
+      SuperDocs API key (sk_...). Create one at use.superdocs.app under
+      Settings -> API Keys. Store it as a repository secret named
+      SUPERDOCS_API_KEY and pass it in your workflow.
+    required: true
+  github_token:
+    description: >-
+      Token used to open the documentation pull request. Defaults to the
+      built-in GITHUB_TOKEN; use a PAT if you need the PR to trigger other
+      workflows.
+    required: false
+    default: ${{ github.token }}
+  doc_path:
+    description: >-
+      Path to the documentation file the action maintains, relative to the
+      repository root. Defaults to CHANGELOG.md.
+    required: false
+    default: "CHANGELOG.md"
+  base_branch:
+    description: >-
+      Branch the documentation pull request targets. Defaults to the branch
+      the merged pull request was merged into.
+    required: false
+    default: ""
+  skip_patterns:
+    description: >-
+      Comma-separated list of regex patterns. If the merged pull request's
+      title or body matches any of them, the action skips. Defaults to
+      skip-docs,no-docs.
+    required: false
+    default: "skip-docs,no-docs"
+  dry_run:
+    description: >-
+      When true, prints every decision the action would make and never calls
+      the SuperDocs API, never writes files, and never opens a pull request.
+      Use this to preview a run without spending operations.
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check out repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        python -m pip install --quiet --upgrade pip
+        python -m pip install --quiet requests
+
+    - name: Run SuperDocs Docs PR
+      shell: bash
+      env:
+        SUPERDOCS_API_KEY: ${{ inputs.superdocs_api_key }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        DOC_PATH: ${{ inputs.doc_path }}
+        BASE_BRANCH: ${{ inputs.base_branch }}
+        SKIP_PATTERNS: ${{ inputs.skip_patterns }}
+        DRY_RUN: ${{ inputs.dry_run }}
+      run: |
+        python "${{ github.action_path }}/src/main.py"
