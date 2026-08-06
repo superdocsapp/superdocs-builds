@@ -19,6 +19,8 @@ def verify_coverage(
     plan: CorrectivePlan,
 ) -> CoverageReport:
     items_by_code = {item.code: item for item in plan.items}
+    cited_codes = {violation.code for violation in violations}
+    uninvited_codes = tuple(item.code for item in plan.items if item.code not in cited_codes)
     action_counts = Counter(_fingerprint(item.corrective_action) for item in plan.items)
     owner_counts = Counter(_fingerprint(item.responsible_party) for item in plan.items)
 
@@ -59,7 +61,7 @@ def verify_coverage(
             )
         )
 
-    return CoverageReport(codes=tuple(code_reports))
+    return CoverageReport(codes=tuple(code_reports), uninvited_codes=uninvited_codes)
 
 
 def _fingerprint(value: str) -> str:
@@ -73,11 +75,7 @@ def _without_code(value: str, code: str) -> str:
 def _is_boilerplate(action: str, violation: Violation) -> bool:
     normalized = _without_code(action, violation.code)
     has_boilerplate = sum(1 for pattern in _BOILERPLATE_PATTERNS if pattern.search(normalized)) >= 2
-    has_domain_detail = any(
-        word in normalized
-        for word in _meaningful_terms(violation.description, violation.location)
-    )
-    return has_boilerplate and not has_domain_detail
+    return has_boilerplate and not _has_remedial_detail(normalized, violation)
 
 
 def _near_duplicate_action(action: str, code: str, plan: CorrectivePlan) -> bool:
@@ -114,3 +112,43 @@ def _meaningful_terms(description: str, location: str | None) -> set[str]:
     }
     return words
 
+
+def _has_remedial_detail(action: str, violation: Violation) -> bool:
+    removable = _meaningful_terms(violation.description, violation.location)
+    remaining_terms = [
+        word
+        for word in re.findall(r"[a-z][a-z0-9-]{3,}", action.lower())
+        if word
+        not in removable
+        and word
+        not in {
+            "code",
+            "correct",
+            "corrective",
+            "completion",
+            "document",
+            "food",
+            "inspector",
+            "requirements",
+            "violation",
+        }
+    ]
+    return any(
+        term
+        in {
+            "calibrate",
+            "clean",
+            "discard",
+            "install",
+            "log",
+            "monitor",
+            "record",
+            "repair",
+            "replace",
+            "restore",
+            "retrain",
+            "sanitize",
+            "verify",
+        }
+        for term in remaining_terms
+    )

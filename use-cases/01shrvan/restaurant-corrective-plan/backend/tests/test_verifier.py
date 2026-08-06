@@ -56,6 +56,32 @@ def test_individually_coded_boilerplate_plan_is_rejected() -> None:
         assert "corrective action is near-identical to another violation" in code_report.reasons
 
 
+def test_empty_violation_list_is_not_complete() -> None:
+    report = verify_coverage((), load_plan("good_plan.json"))
+
+    assert not report.is_complete
+
+
+def test_uncited_plan_items_make_report_incomplete() -> None:
+    report = verify_coverage(load_violations(), load_plan("invented_code_plan.json"))
+
+    assert not report.is_complete
+    assert report.uninvited_codes == ("9-999.99",)
+
+
+def test_location_only_boilerplate_plan_is_rejected() -> None:
+    report = verify_coverage(
+        load_violations(), load_plan("location_only_boilerplate_plan.json")
+    )
+
+    assert not report.is_complete
+    for code_report in report.codes:
+        assert (
+            "corrective action is boilerplate and not specific to the violation"
+            in code_report.reasons
+        )
+
+
 def test_missing_violation_code_or_description_names_field() -> None:
     with pytest.raises(ValidationError) as missing_code:
         Violation(code="", description="A valid finding")
@@ -77,4 +103,3 @@ def test_corrective_item_without_action_or_owner_cannot_construct() -> None:
     message = str(error.value)
     assert "corrective_action" in message
     assert "responsible_party" in message
-

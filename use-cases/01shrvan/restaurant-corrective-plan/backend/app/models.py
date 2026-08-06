@@ -97,10 +97,13 @@ class CoverageReport(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     codes: tuple[CodeCoverage, ...]
+    uninvited_codes: tuple[str, ...] = ()
 
     @property
     def is_complete(self) -> bool:
-        return all(code.is_complete for code in self.codes)
+        return bool(self.codes) and not self.uninvited_codes and all(
+            code.is_complete for code in self.codes
+        )
 
     @property
     def missing_codes(self) -> tuple[str, ...]:
@@ -109,4 +112,3 @@ class CoverageReport(BaseModel):
             for code in self.codes
             if any(reason.startswith("code not present") for reason in code.reasons)
         )
-

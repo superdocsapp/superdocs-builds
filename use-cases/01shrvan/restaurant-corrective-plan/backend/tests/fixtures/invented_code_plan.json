@@ -1,0 +1,32 @@
+{
+  "restaurant": "The Copper Kettle",
+  "inspection_date": "2026-08-03",
+  "health_department": "Riverside County Environmental Health",
+  "items": [
+    {
+      "code": "5-202.11",
+      "finding": "Handwashing sink in the prep area is not supplied with hot water at 100 F minimum.",
+      "corrective_action": "Restore the prep-area handwashing sink hot-water supply to at least 100 F, verify the faucet temperature at opening and mid-shift, and keep a signed temperature log at the prep station.",
+      "responsible_party": "Facilities Lead"
+    },
+    {
+      "code": "3-501.16",
+      "finding": "Cooked rice held at 118 F in the steam well, below the 135 F hot-holding requirement.",
+      "corrective_action": "Discard rice held below temperature, recalibrate the line steam well to hold cooked rice at 135 F or above, and require the line cook to record hot-holding temperatures every two hours.",
+      "responsible_party": "Kitchen Manager"
+    },
+    {
+      "code": "6-501.12",
+      "finding": "Accumulated grease and debris beneath the fryer line.",
+      "corrective_action": "Pull the fryer bank out of service for deep cleaning beneath and behind the line, add the fry station floor area to the nightly closing checklist, and photograph the cleaned area after each closing shift for one week.",
+      "responsible_party": "Closing Supervisor"
+    },
+    {
+      "code": "9-999.99",
+      "finding": "Invented violation not present in the citation list.",
+      "corrective_action": "Create a new corrective action for an uncited inspection item.",
+      "responsible_party": "General Manager"
+    }
+  ]
+}
+
