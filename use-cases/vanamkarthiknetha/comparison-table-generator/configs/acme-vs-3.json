@@ -1,0 +1,41 @@
+{
+  "title": "Acme Docs — Feature Comparison",
+  "intro": "A capability-by-capability look at how Acme Docs compares to the alternatives your team may be evaluating.",
+  "product": "Acme Docs",
+  "competitors": ["DocuFlow", "PaperTrail AI", "Scrivena"],
+  "brand": {
+    "accent_color": "#1a4f8b",
+    "footer": "All competitor names are fictional; this document was generated for a product demonstration."
+  },
+  "capabilities": [
+    {
+      "name": "Section-precise AI edits",
+      "values": {"Acme Docs": "yes", "DocuFlow": "partial", "PaperTrail AI": "no", "Scrivena": "partial"}
+    },
+    {
+      "name": "Tracked-changes approval flow",
+      "values": {"Acme Docs": "yes", "DocuFlow": "no", "PaperTrail AI": "partial", "Scrivena": "no"}
+    },
+    {
+      "name": "Native .docx / PDF export",
+      "values": {"Acme Docs": "yes", "DocuFlow": "yes", "PaperTrail AI": "no", "Scrivena": "yes"}
+    },
+    {
+      "name": "Multi-document sessions",
+      "values": {"Acme Docs": "yes", "DocuFlow": "no", "PaperTrail AI": "no", "Scrivena": "no"}
+    },
+    {
+      "name": "Maximum document size",
+      "values": {"Acme Docs": "100+ pages", "DocuFlow": "40 pages", "PaperTrail AI": "25 pages", "Scrivena": "60 pages"}
+    },
+    {
+      "name": "API + MCP for agents",
+      "values": {"Acme Docs": "yes", "DocuFlow": "no", "PaperTrail AI": "partial", "Scrivena": "no"}
+    },
+    {
+      "name": "On-brand template reuse",
+      "values": {"Acme Docs": "yes", "DocuFlow": "partial", "PaperTrail AI": "no", "Scrivena": "yes"}
+    }
+  ],
+  "outputs": ["docx", "pdf"]
+}
