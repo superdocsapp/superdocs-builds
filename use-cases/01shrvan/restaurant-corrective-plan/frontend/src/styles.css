@@ -1,0 +1,325 @@
+:root {
+  color: #171512;
+  background: #f4f1eb;
+  font-family: "Aptos", "Segoe UI", sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  align-items: center;
+  background: #17261f;
+  border: 1px solid #17261f;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 13px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+button.secondary {
+  background: #fffdfa;
+  color: #17261f;
+}
+
+button svg {
+  height: 17px;
+  width: 17px;
+}
+
+.shell {
+  min-height: 100vh;
+  padding: 18px;
+}
+
+.workspace {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(330px, 420px) minmax(0, 1fr);
+  min-height: calc(100vh - 36px);
+}
+
+.panel,
+.review-card,
+.toolbar,
+.empty-state,
+.notice {
+  border: 1px solid #d8d0c2;
+  background: #fffdfa;
+}
+
+.panel {
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.input-panel {
+  align-self: start;
+  position: sticky;
+  top: 18px;
+}
+
+.panel-title {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.panel-title svg {
+  color: #a6532f;
+  height: 24px;
+  width: 24px;
+}
+
+h1,
+h2 {
+  letter-spacing: 0;
+  line-height: 1.05;
+  margin: 0;
+}
+
+h1 {
+  font-size: 25px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.form-stack,
+.violation-editor {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  color: #5f584d;
+  display: grid;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 6px;
+}
+
+input,
+textarea {
+  background: #faf8f3;
+  border: 1px solid #cfc6b7;
+  border-radius: 6px;
+  color: #171512;
+  min-width: 0;
+  padding: 9px 10px;
+}
+
+textarea {
+  min-height: 74px;
+  resize: vertical;
+}
+
+.violation-row {
+  border-top: 1px solid #e3dccf;
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button-row.compact {
+  justify-content: flex-end;
+}
+
+.review-surface {
+  display: grid;
+  gap: 14px;
+  grid-template-rows: auto auto 1fr;
+  min-width: 0;
+}
+
+.toolbar {
+  align-items: center;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px;
+}
+
+.eyebrow {
+  color: #84694f;
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.notice {
+  border-color: #c58652;
+  border-radius: 8px;
+  color: #653713;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.cards {
+  align-content: start;
+  display: grid;
+  gap: 12px;
+}
+
+.review-card {
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+}
+
+.review-card.approved {
+  border-color: #5f8f64;
+}
+
+.review-card.rejected {
+  border-color: #b8614d;
+}
+
+.review-card header,
+.review-card footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.code {
+  color: #17261f;
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.owner {
+  background: #edf3ed;
+  border: 1px solid #cddfcc;
+  border-radius: 999px;
+  color: #24442d;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 5px 9px;
+}
+
+.finding {
+  color: #514a40;
+  margin: 0;
+}
+
+.action-block {
+  background: #f7f2e7;
+  border-left: 4px solid #a6532f;
+  border-radius: 6px;
+  line-height: 1.5;
+  padding: 12px;
+}
+
+dl {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+}
+
+dt {
+  color: #73685b;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+dd {
+  margin: 3px 0 0;
+}
+
+.empty-state {
+  border-radius: 8px;
+  color: #6e665b;
+  padding: 28px;
+}
+
+.spin {
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .input-panel {
+    position: static;
+  }
+
+  .toolbar,
+  .review-card header,
+  .review-card footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .button-row.compact {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .shell {
+    padding: 10px;
+  }
+
+  .workspace {
+    min-height: calc(100vh - 20px);
+  }
+
+  dl {
+    grid-template-columns: 1fr;
+  }
+
+  button {
+    justify-content: center;
+    width: 100%;
+  }
+}

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, computed_field, field_validator
 
 
 def _require_non_empty(value: str, field_name: str) -> str:
@@ -88,6 +88,7 @@ class CodeCoverage(BaseModel):
     status: Literal["covered", "incomplete"]
     reasons: tuple[str, ...] = ()
 
+    @computed_field
     @property
     def is_complete(self) -> bool:
         return self.status == "covered"
@@ -99,12 +100,14 @@ class CoverageReport(BaseModel):
     codes: tuple[CodeCoverage, ...]
     uninvited_codes: tuple[str, ...] = ()
 
+    @computed_field
     @property
     def is_complete(self) -> bool:
         return bool(self.codes) and not self.uninvited_codes and all(
             code.is_complete for code in self.codes
         )
 
+    @computed_field
     @property
     def missing_codes(self) -> tuple[str, ...]:
         return tuple(
