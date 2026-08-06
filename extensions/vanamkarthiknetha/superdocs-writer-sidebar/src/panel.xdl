@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog"
+            xmlns:script="http://openoffice.org/2000/script"
+            dlg:id="SuperDocsPanel" dlg:left="0" dlg:top="0"
+            dlg:width="130" dlg:height="240" dlg:withtitlebar="false">
+  <dlg:bulletinboard>
+    <dlg:text dlg:id="lblTitle" dlg:left="4" dlg:top="4" dlg:width="122" dlg:height="10"
+              dlg:value="Edit with SuperDocs AI"/>
+    <dlg:text dlg:id="lblHint" dlg:left="4" dlg:top="16" dlg:width="122" dlg:height="18"
+              dlg:multiline="true"
+              dlg:value="Select the passage to edit, then describe the change:"/>
+    <dlg:textfield dlg:id="txtInstruction" dlg:left="4" dlg:top="36" dlg:width="122" dlg:height="48"
+                   dlg:multiline="true" dlg:vscroll="true"/>
+    <dlg:button dlg:id="btnSend" dlg:left="4" dlg:top="88" dlg:width="122" dlg:height="14"
+                dlg:value="Send to SuperDocs"/>
+    <dlg:text dlg:id="lblPreview" dlg:left="4" dlg:top="106" dlg:width="122" dlg:height="64"
+              dlg:multiline="true" dlg:value=""/>
+    <dlg:button dlg:id="btnApprove" dlg:left="4" dlg:top="174" dlg:width="58" dlg:height="14"
+                dlg:value="Apply" dlg:enabled="false"/>
+    <dlg:button dlg:id="btnReject" dlg:left="68" dlg:top="174" dlg:width="58" dlg:height="14"
+                dlg:value="Reject" dlg:enabled="false"/>
+    <dlg:text dlg:id="lblStatus" dlg:left="4" dlg:top="192" dlg:width="122" dlg:height="40"
+              dlg:multiline="true" dlg:value="Ready."/>
+  </dlg:bulletinboard>
+</dlg:window>
