@@ -1,0 +1,23 @@
+{
+  "restaurant": "The Copper Kettle",
+  "inspection_date": "2026-08-03",
+  "health_department": "Riverside County Environmental Health",
+  "violations": [
+    {
+      "code": "5-202.11",
+      "description": "Handwashing sink in the prep area is not supplied with hot water at 100 F minimum.",
+      "location": "Prep area"
+    },
+    {
+      "code": "3-501.16",
+      "description": "Cooked rice held at 118 F in the steam well, below the 135 F hot-holding requirement.",
+      "location": "Line steam well"
+    },
+    {
+      "code": "6-501.12",
+      "description": "Accumulated grease and debris beneath the fryer line.",
+      "location": "Fry station"
+    }
+  ]
+}
+

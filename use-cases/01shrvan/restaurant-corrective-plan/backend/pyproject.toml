@@ -1,0 +1,18 @@
+[project]
+name = "restaurant-corrective-plan"
+version = "0.1.0"
+description = "SuperDocs restaurant inspection corrective-plan build"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.8,<3",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.3,<9",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
