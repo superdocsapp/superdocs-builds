@@ -1,0 +1,153 @@
+# German strings for the Halyard M1. Human-supplied; nothing here is machine
+# translated at build time.
+#
+# This file can only supply strings for ids the spec already has. It cannot add
+# a step, drop a warning, or rename an id -- `localize.py` refuses that, because
+# a locale that changes structure is a locale that repaginates, and the whole
+# point is that the German manual breaks pages where the English one does.
+#
+# German runs roughly a third longer than English. That is expected and fine:
+# the structural assertion counts headings, figures and tables, not characters.
+
+language: de
+
+product_name: Halyard M1
+tagline: Diodenlaser-Graviergerät für den Werktisch
+
+footer: >
+  Vollständiges Handbuch, Fehlerbehebung und Materialeinstellungen:
+  halyard.example/m1
+
+specifications:
+  Work area: Arbeitsfläche
+  Laser source: Laserquelle
+  Enclosure class: Gehäuseklasse
+  Maximum feed rate: Maximale Vorschubgeschwindigkeit
+  Input power: Eingangsleistung
+  Connectivity: Anschlüsse
+  "Mass, assembled": Masse, montiert
+  Extraction requirement: Absauganforderung
+
+parts:
+  base:
+    label: Grundrahmen
+    note: Wird montiert geliefert. Die vier Gummifüße sind unverlierbar.
+  rail_y_left:
+    label: Y-Schiene, links
+  rail_y_right:
+    label: Y-Schiene, rechts
+  gantry:
+    label: X-Portal
+    note: Überspannt beide Y-Schienen; zuerst auf der linken Schiene aufsetzen.
+  carriage:
+    label: Laserschlitten
+  laser_module:
+    label: Lasermodul, 10 W
+    note: Am Kühlkörper anfassen. Die Linse ist nicht vom Benutzer zu warten.
+  lens_cap:
+    label: Schutzkappe für Linse
+  controller:
+    label: Steuerplatine
+  lid:
+    label: Gehäusedeckel
+    note: >
+      Trägt den Verriegelungsmagneten. Bei geöffnetem Deckel zündet das Gerät
+      nicht.
+  duct:
+    label: Abluftschlauch, 60 mm
+  psu:
+    label: Netzteil, 24 V
+  hex_keys:
+    label: Innensechskantschlüssel, 2,5 / 3 / 4 mm
+
+steps:
+  unpack:
+    title: Auspacken und Lieferumfang prüfen
+    body: >
+      Heben Sie das Gerät am Grundrahmen heraus, nicht am Portal. Prüfen Sie die
+      Packliste gegen den Inhalt, bevor Sie Verpackungsmaterial entsorgen; die
+      Innensechskantschlüssel liegen im Schaumstoff unter dem Grundrahmen.
+  rails:
+    title: Y-Schienen montieren
+    body: >
+      Setzen Sie jede Y-Schiene in ihre Aufnahme am Grundrahmen und ziehen Sie
+      die vier M4-Schrauben handfest an, danach mit 1,2 N·m über den
+      2,5-mm-Schlüssel. Ziehen Sie keine Schiene vollständig fest, bevor die
+      andere sitzt, sonst verzieht sich der Rahmen.
+  gantry:
+    title: X-Portal aufsetzen
+    body: >
+      Setzen Sie das Portal zuerst auf der linken Y-Schiene ab und schwenken Sie
+      dann das rechte Ende herunter, bis beide Endblöcke bündig sitzen. Ziehen
+      Sie je Seite zwei M4-Schrauben mit 1,2 N·m an.
+  laser:
+    title: Lasermodul montieren
+    body: >
+      Schieben Sie den Schlitten auf das Portal und montieren Sie das Lasermodul
+      mit den zwei unverlierbaren Schrauben am Schlitten. Lassen Sie die
+      Schutzkappe auf der Linse, bis das Gerät vollständig montiert und der
+      Deckel aufgesetzt ist.
+  extraction:
+    title: Absaugung anschließen
+    body: >
+      Schieben Sie den 60-mm-Schlauch auf den hinteren Stutzen, bis der Wulst
+      einrastet, und führen Sie ihn nach außen oder zu einem für Ihr Material
+      geeigneten Filter. Gravieren ohne Absaugung schlägt Harz auf der Linse
+      nieder und füllt den Raum mit dem, was das Werkstück freisetzt.
+  power:
+    title: Einschalten und referenzieren
+    body: >
+      Setzen Sie den Deckel auf, schließen Sie das 24-V-Netzteil an, danach
+      USB-C. Das Gerät referenziert beim Einschalten nach vorne links; halten
+      Sie dabei die Hände vom Portal fern. Eine dauerhaft grüne LED an der
+      Steuerplatine bedeutet Betriebsbereitschaft.
+  first_burn:
+    title: Testmuster ausführen
+    body: >
+      Legen Sie den mitgelieferten Restkarton auf das Bett, laden Sie TEST.GC
+      von der microSD-Karte und starten Sie den Lauf. Das Muster dauert etwa
+      neunzig Sekunden. Bleiben Sie währenddessen beim Gerät.
+
+warnings:
+  eye_protection:
+    title: Laserstrahlung
+    body: >
+      Betreiben Sie das Modul niemals außerhalb des geschlossenen Gehäuses.
+      Direktes oder reflektiertes Licht bei 450 nm verursacht bleibende
+      Netzhautschäden, schneller als der Lidschlussreflex. Die mitgelieferte
+      Schutzbrille dient dem beiläufigen Schutz bei der Montage und ersetzt das
+      Gehäuse nicht.
+  fire_watch:
+    title: Brandgefahr
+    body: >
+      Schneiden und Gravieren erzeugen Bedingungen mit offener Flamme. Halten Sie
+      einen Feuerlöscher der Klasse ABC in Reichweite des Geräts bereit.
+  never_unattended:
+    title: Laufende Aufträge nie unbeaufsichtigt lassen
+    body: >
+      Lassen Sie das Gerät während eines laufenden Auftrags nicht unbeaufsichtigt,
+      auch nicht bei langen Aufträgen oder bei Wiederholungen bereits gelaufener
+      Aufträge.
+  ventilation:
+    title: Absaugung erforderlich
+    body: >
+      Beim Gravieren entstehen Feinstaub und je nach Material reizende oder
+      giftige Gase. Schneiden Sie niemals PVC oder andere chlorhaltige
+      Kunststoffe: dabei entsteht Chlorwasserstoff, der Sie verletzt und das
+      Gerät zerstört.
+  interlock:
+    title: Verriegelung nicht überbrücken
+    body: >
+      Die Deckelverriegelung ist der Grund, weshalb dies ein Produkt der Klasse 1
+      ist. Ihre Überbrückung macht das Gerät zu einem Laser der Klasse 4 und hebt
+      sowohl die Garantie als auch die CE-Erklärung auf.
+  no_lens_touch:
+    title: Modul am Kühlkörper anfassen
+    body: >
+      Hautfett auf der Linse brennt beim ersten Einsatz ein und streut den Strahl
+      dauerhaft. Die Linse ist nicht vom Benutzer zu warten.
+  square_frame:
+    title: Schienen gleichmäßig anziehen
+    body: >
+      Wird eine Schiene vollständig angezogen, bevor die andere sitzt, verzieht
+      sich der Rahmen, und jede folgende Gravur wird zum Parallelogramm.
