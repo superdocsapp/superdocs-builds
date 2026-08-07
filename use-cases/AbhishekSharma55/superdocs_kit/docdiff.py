@@ -200,18 +200,6 @@ def diff_chunks(before_html: str, after_html: str, *, own_bytes_only: bool = Tru
 _TAG_NAME = re.compile(r"^<\s*([a-zA-Z0-9]+)")
 
 
-def top_level_chunks(html: str) -> list[str]:
-    """Chunk ids that are not nested inside another chunk, in document order."""
-    chunks = chunk_map(html)
-    order = chunk_order(html)
-    tops = []
-    for cid in order:
-        own = chunks[cid]
-        if not any(cid != other and own in html_other for other, html_other in chunks.items()):
-            tops.append(cid)
-    return tops
-
-
 @dataclass
 class Section:
     """A heading and everything under it, up to the next heading of the same
@@ -222,10 +210,6 @@ class Section:
     level: int
     heading_chunk: str
     chunk_ids: list[str] = field(default_factory=list)
-
-    @property
-    def body_chunk_ids(self) -> list[str]:
-        return [c for c in self.chunk_ids if c != self.heading_chunk]
 
 
 def sections(html: str) -> list[Section]:

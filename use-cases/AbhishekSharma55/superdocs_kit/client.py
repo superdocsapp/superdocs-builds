@@ -117,6 +117,17 @@ class SuperDocs:
 
     # ------------------------------------------------------------------
     # sessions and multi-document
+    #
+    # NOTHING IN EITHER BUILD CALLS THESE. They are kept because they are how I
+    # established bugs.md B10 - open three documents into one session and the
+    # roster comes back with one entry, every document carrying the id
+    # "doc_primary", and a different document on each identical GET. With no
+    # per-document id there is no way to target an edit, so build #2 gives each
+    # document its own session instead.
+    #
+    # Kept rather than deleted so the finding is reproducible from this client
+    # and not only from the curl script in repro/. If B10 is fixed, this is the
+    # surface build #2 should move back to.
     # ------------------------------------------------------------------
     def init_session(self, *, session_id: str | None = None, document_ids: list[str] | None = None):
         body: dict[str, Any] = {}

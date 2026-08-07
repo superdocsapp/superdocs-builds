@@ -113,10 +113,6 @@ class ArchivePlan:
     rollup_from: int | None = None   # inclusive week number
     rollup_to: int | None = None
 
-    @property
-    def rolls_up(self) -> bool:
-        return self.rollup_from is not None
-
 
 def archive_plan(week: int) -> ArchivePlan:
     """Decide, purely from the week number, what happens to the archive.
