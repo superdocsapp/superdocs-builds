@@ -152,6 +152,33 @@ def test_archive_deduplicates_a_week_that_appears_twice():
     assert labels == ["Week 3", "Week 2", "Week 1"]
 
 
+def test_the_new_archive_row_is_given_the_text_it_must_summarise(weeks):
+    """Measured failure: the row for week 5 described what week 6 shipped.
+
+    The instruction used to say "summarise the bullets currently under 'What
+    changed'" - true when the archive step runs, false by the end of the same
+    instruction, because step 3 replaces those bullets. Three of seven live
+    rows summarised the incoming week instead of the outgoing one, and no
+    structural invariant could see it.
+
+    So the text to summarise is handed over literally, and the instruction must
+    contain it: the model's job is to compress this text, not to go and find it
+    in a document the same turn is rewriting.
+    """
+    html = _render([])
+    rows, rollup = plan_rows(html, weeks[4])          # filing week 5
+    block = render_instruction_block(rows, rollup)
+
+    for bullet in weeks[4]["shipped"]:
+        assert bullet in block, f"week 5's own bullet is not in the instruction: {bullet}"
+    for risk in weeks[4]["risks"]:
+        assert risk["risk"] in block
+    # and nothing from the week that is about to overwrite the document
+    for bullet in weeks[5]["shipped"]:
+        assert bullet not in block, "the incoming week's content must not be in the archive step"
+    assert "currently under" not in block
+
+
 def test_rollup_instruction_lists_the_rows_being_folded(weeks):
     html = _render([])
     for n in range(2, 12):

@@ -45,6 +45,11 @@ class ArchiveRow:
     shipped: str
     risks: str
     source_rows: list[list[str]] = field(default_factory=list)
+    # The text the model must summarise for this row, handed over literally.
+    # It used to say "summarise the bullets currently under 'What changed'" -
+    # see the note above plan_rows() for why that was wrong.
+    shipped_source: str = ""
+    risks_source: str = ""
 
     @property
     def needs_authoring(self) -> bool:
@@ -84,6 +89,23 @@ def plan_rows(before_html: str, prev_week: dict) -> tuple[list[ArchiveRow], Arch
     """The exact archive body for this week, newest first.
 
     Returns (rows, rollup_row_or_None).
+
+    NEVER ASK A MODEL TO SUMMARISE STATE THE SAME TURN IS CHANGING.
+
+    The new row used to be specified as *"your own summary of the bullets
+    currently under 'What changed'"*. Those bullets are correct at the moment
+    the archive step runs - they are last week's - and step 3 of the same
+    instruction replaces them with this week's. Measured over seven live weeks,
+    the model summarised the incoming bullets instead of the outgoing ones in
+    **three of seven** rows: the row labelled "Week 5" described what week 6
+    shipped. Structure, coverage and bounds all passed, because none of them
+    read the summary. The archive - the digest's historical record - was
+    quietly wrong about history.
+
+    "Currently" is not a defensible word in an instruction whose other steps
+    change what "currently" means. So the text to summarise is now handed over
+    literally in `shipped_source` / `risks_source`, and the model's job is what
+    it should always have been: compress this text, not go and find it.
     """
     existing = parse_existing(before_html)
     seen: set[int] = set()
@@ -94,7 +116,13 @@ def plan_rows(before_html: str, prev_week: dict) -> tuple[list[ArchiveRow], Arch
         seen |= row.covered_weeks
         deduped.append(row)
 
-    new_row = ArchiveRow(f"Week {prev_week['week']}", prev_week["dates"], AUTHOR, AUTHOR)
+    new_row = ArchiveRow(
+        f"Week {prev_week['week']}", prev_week["dates"], AUTHOR, AUTHOR,
+        shipped_source="; ".join(prev_week.get("shipped") or [])[:420],
+        risks_source="; ".join(
+            r["risk"] for r in (prev_week.get("risks") or [])
+        )[:260],
+    )
     rows = [new_row] + deduped
 
     detail = [r for r in rows if _WEEK_RE.match(r.label)]
@@ -144,10 +172,12 @@ def render_instruction_block(rows: list[ArchiveRow], rollup: ArchiveRow | None) 
         elif row.needs_authoring:
             lines.append(
                 f"  Row '{row.label}' is NEW. Its Dates cell is '{row.dates}'. Its "
-                f"Shipped cell is your own summary, at most 20 words, of the bullets "
-                f"currently under 'What changed'. Its Risks carried cell is your own "
-                f"summary, at most 15 words, of the rows currently in the 'What is at "
-                f"risk' table."
+                f"Shipped cell is your own summary, at most 20 words, of EXACTLY this "
+                f"text and nothing else in the document: \"{row.shipped_source}\". Its "
+                f"Risks carried cell is your own summary, at most 15 words, of exactly "
+                f"these risks: \"{row.risks_source}\". Summarise the quoted text only - "
+                f"other steps in this instruction change the document, and this row "
+                f"must describe {row.label}, not the week replacing it."
             )
     lines.append(
         "  Every other row keeps its existing cell contents exactly as they are - "

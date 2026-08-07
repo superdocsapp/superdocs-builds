@@ -4,11 +4,11 @@
   "path": "/v1/documents/export",
   "request": {
     "format": "markdown",
-    "session_id": "nebula-digest-v1-arm-a-a0011e544a"
+    "session_id": "nebula-digest-v1-arm-a-f1077da61b"
   },
   "status": 200,
   "response": null,
-  "elapsed_s": 0.889,
+  "elapsed_s": 0.664,
   "content_type": "text/markdown; charset=utf-8",
   "response_text": "# Nebula Drift - Weekly Production Digest\n\n**Week 1 · 2026-01-05 to 2026-01-11 · Phase: Pre-production**\n\nVantage Nine Studios · internal · standing document, edited in place every Monday\n\n## What changed\n\n* Art style exploration narrowed to two directions\n* Nav-mesh generation for the Drift Belt sector\n\n## What is at risk\n\n| Risk | Owner | Area | Severity | Trend |\n| --- | --- | --- | --- | --- |\n| Save-game format still unversioned | Dev H. | Engineering | Medium | steady |\n| Boss encounter difficulty untuned for controller | Ana F. | Design | Low | steady |\n| Outsourced character art slipping two weeks | Priya N. | Art | Medium | steady |\n\n## What is next\n\n* Stand up the automated build farm\n* Decide Wwise vs FMOD\n* Lock the art direction to one of the two candidates\n\n## Archive\n\nNewest first. Detail rows older than\n8 weeks are folded into a single rolled-up row so this\nsection stays readable at 52 weeks.\n\n| Week | Dates | Shipped | Risks carried |\n| --- | --- | --- | --- |\n| - | - | Digest opened. No prior weeks. | - |\n"
 }

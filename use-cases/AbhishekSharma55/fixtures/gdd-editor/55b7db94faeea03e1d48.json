@@ -1,0 +1,91 @@
+{
+  "key": "POST /v1/chat b9ab08a0f73a6fa8",
+  "method": "POST",
+  "path": "/v1/chat",
+  "request": {
+    "session_id": "nebula-gdd-9c9b432e56-grapple-rework",
+    "message": "Fill in this design spike. Under 'Problem' explain in 2-3 sentences that the 8 s grapple cooldown is the longest in the game and that playtests show players stop moving while they wait for it. Under 'Proposed change' explain in 2-3 sentences that the cooldown drops and the recovery is moved into the animation instead. Under 'Parameters' put a bordered table with a shaded header row, columns Parameter / Current / Proposed / Rationale, and exactly two rows: 'Cooldown' with current '8 s' and proposed '5 s'; 'Recovery animation' with current '0.2 s' and proposed '0.5 s'. Under 'Risks' put two bullets about level pacing being tuned around 8 s. Change nothing else and keep all existing headings and formatting.",
+    "response_mode": "full",
+    "document_html": "<h1 data-chunk-id=\"d76cc582-ba26-4321-8e14-4d7010dc8ca0\" style=\"color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px\">Nebula Drift - Grapple Rework (design spike)</h1>\n<p data-chunk-id=\"cf4e2c75-5a8f-41dd-920c-b18e30366609\" style=\"background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt\">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section \"Traversal - Grapple Rework\".</p>\n<h2 data-chunk-id=\"6bb327a2-fd08-4bbc-9d37-a1efa69ac821\" style=\"color:#0d47a1\">Problem</h2>\n<p data-chunk-id=\"da22ca94-0142-452a-86c1-5275cf32ac18\">To be written.</p>\n<h2 data-chunk-id=\"15dee67b-007e-486b-9ffc-615f23a0b52d\" style=\"color:#0d47a1\">Proposed change</h2>\n<p data-chunk-id=\"01e23afe-2931-45a1-be15-2a202163f78d\">To be written.</p>\n<h2 data-chunk-id=\"178008c3-c428-4280-b97b-7d4367781ac0\" style=\"color:#0d47a1\">Parameters</h2>\n<p data-chunk-id=\"d6dca87b-f7f3-47e0-a904-2b218d6c2eef\">To be written.</p>\n<h2 data-chunk-id=\"202dfb36-37ff-4920-832f-32fed0d46afa\" style=\"color:#0d47a1\">Risks</h2>\n<p data-chunk-id=\"4d02ecc4-8780-4714-adb6-e4fa654d0318\">To be written.</p>",
+    "model_tier": "pro",
+    "thinking_depth": "deep"
+  },
+  "status": 200,
+  "response": {
+    "response": "✅ Successfully updated all 4 sections. Parallel edit: Update this section only. Replace the existing placeholder text with the exact…",
+    "session_id": "nebula-gdd-9c9b432e56-grapple-rework",
+    "document_changes": {
+      "updated_html": "<h1 data-chunk-id=\"d76cc582-ba26-4321-8e14-4d7010dc8ca0\" style=\"color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px\">Nebula Drift - Grapple Rework (design spike)</h1>\n<p data-chunk-id=\"cf4e2c75-5a8f-41dd-920c-b18e30366609\" style=\"background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt\">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section \"Traversal - Grapple Rework\".</p>\n<h2 data-chunk-id=\"6bb327a2-fd08-4bbc-9d37-a1efa69ac821\" style=\"color:#0d47a1\">Problem</h2>\n<p data-chunk-id=\"da22ca94-0142-452a-86c1-5275cf32ac18\">The 8 s grapple cooldown is the longest in the game, and playtests show players stop moving while they wait for it. That pause makes traversal feel sluggish compared with the rest of the kit.</p>\n<h2 data-chunk-id=\"15dee67b-007e-486b-9ffc-615f23a0b52d\" style=\"color:#0d47a1\">Proposed change</h2>\n<p data-chunk-id=\"01e23afe-2931-45a1-be15-2a202163f78d\">Drop the cooldown and move the recovery into the animation instead, so the ability becomes available sooner while the end of the move still carries some commitment. This keeps the feel of recovery without forcing a long dead stop after each grapple.</p>\n<h2 data-chunk-id=\"178008c3-c428-4280-b97b-7d4367781ac0\" style=\"color:#0d47a1\">Parameters</h2>\n<table border=\"1\" data-chunk-id=\"d6dca87b-f7f3-47e0-a904-2b218d6c2eef\" style=\"border-collapse: collapse; width: 100%;\">\n<thead>\n<tr style=\"background-color: #f2f2f2;\">\n<th style=\"padding: 8px; border: 1px solid #000;\">Parameter</th>\n<th style=\"padding: 8px; border: 1px solid #000;\">Current</th>\n<th style=\"padding: 8px; border: 1px solid #000;\">Proposed</th>\n<th style=\"padding: 8px; border: 1px solid #000;\">Rationale</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td style=\"padding: 8px; border: 1px solid #000;\">Cooldown</td>\n<td style=\"padding: 8px; border: 1px solid #000;\">8 s</td>\n<td style=\"padding: 8px; border: 1px solid #000;\">5 s</td>\n<td style=\"padding: 8px; border: 1px solid #000;\">Shortens the longest cooldown in the game to keep movement flowing</td>\n</tr>\n<tr>\n<td style=\"padding: 8px; border: 1px solid #000;\">Recovery animation</td>\n<td style=\"padding: 8px; border: 1px solid #000;\">0.2 s</td>\n<td style=\"padding: 8px; border: 1px solid #000;\">0.5 s</td>\n<td style=\"padding: 8px; border: 1px solid #000;\">Moves the recovery beat into the animation instead of the post-use wait</td>\n</tr>\n</tbody>\n</table>\n<h2 data-chunk-id=\"202dfb36-37ff-4920-832f-32fed0d46afa\" style=\"color:#0d47a1\">Risks</h2>\n<ul data-chunk-id=\"4d02ecc4-8780-4714-adb6-e4fa654d0318\">\n<li>Level design is optimized for an 8-second pacing cadence.</li>\n<li>This 8-second interval ensures consistent player engagement throughout the stage.</li>\n</ul>",
+      "version_id": "e8c30a81-28b5-46ce-b195-f91931afecbe",
+      "changes_summary": "4 sections edited, rest untouched",
+      "requires_approval": null,
+      "pending_changes": null,
+      "changes": [
+        {
+          "change_id": "25c7b022-0d3f-4214-a176-bead13ccd3af",
+          "operation": "edit",
+          "chunk_id": "da22ca94-0142-452a-86c1-5275cf32ac18",
+          "status": "auto_approved",
+          "old_html": "<p data-chunk-id=\"da22ca94-0142-452a-86c1-5275cf32ac18\">To be written.</p>",
+          "new_html": "<p data-chunk-id=\"da22ca94-0142-452a-86c1-5275cf32ac18\">The 8 s grapple cooldown is the longest in the game, and playtests show players stop moving while they wait for it. That pause makes traversal feel sluggish compared with the rest of the kit.</p>",
+          "ai_explanation": "Parallel edit: Update this section only. Replace the existing placeholder text with the exact…",
+          "document_id": "doc_primary"
+        },
+        {
+          "change_id": "62e10c08-6c2b-41c2-a8af-4a571132713c",
+          "operation": "edit",
+          "chunk_id": "01e23afe-2931-45a1-be15-2a202163f78d",
+          "status": "auto_approved",
+          "old_html": "<p data-chunk-id=\"01e23afe-2931-45a1-be15-2a202163f78d\">To be written.</p>",
+          "new_html": "<p data-chunk-id=\"01e23afe-2931-45a1-be15-2a202163f78d\">Drop the cooldown and move the recovery into the animation instead, so the ability becomes available sooner while the end of the move still carries some commitment. This keeps the feel of recovery without forcing a long dead stop after each grapple.</p>",
+          "ai_explanation": "Parallel edit: Update this section only. Replace the existing placeholder text with the exact…",
+          "document_id": "doc_primary"
+        },
+        {
+          "change_id": "e7b6a510-be21-4fe1-86d7-5de8ff1f8ca4",
+          "operation": "edit",
+          "chunk_id": "d6dca87b-f7f3-47e0-a904-2b218d6c2eef",
+          "status": "auto_approved",
+          "old_html": "<p data-chunk-id=\"d6dca87b-f7f3-47e0-a904-2b218d6c2eef\">To be written.</p>",
+          "new_html": "<table data-chunk-id=\"d6dca87b-f7f3-47e0-a904-2b218d6c2eef\" border=\"1\" style=\"border-collapse: collapse; width: 100%;\">\n  <thead>\n    <tr style=\"background-color: #f2f2f2;\">\n      <th style=\"padding: 8px; border: 1px solid #000;\">Parameter</th>\n      <th style=\"padding: 8px; border: 1px solid #000;\">Current</th>\n      <th style=\"padding: 8px; border: 1px solid #000;\">Proposed</th>\n      <th style=\"padding: 8px; border: 1px solid #000;\">Rationale</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td style=\"padding: 8px; border: 1px solid #000;\">Cooldown</td>\n      <td style=\"padding: 8px; border: 1px solid #000;\">8 s</td>\n      <td style=\"padding: 8px; border: 1px solid #000;\">5 s</td>\n      <td style=\"padding: 8px; border: 1px solid #000;\">Shortens the longest cooldown in the game to keep movement flowing</td>\n    </tr>\n    <tr>\n      <td style=\"padding: 8px; border: 1px solid #000;\">Recovery animation</td>\n      <td style=\"padding: 8px; border: 1px solid #000;\">0.2 s</td>\n      <td style=\"padding: 8px; border: 1px solid #000;\">0.5 s</td>\n      <td style=\"padding: 8px; border: 1px solid #000;\">Moves the recovery beat into the animation instead of the post-use wait</td>\n    </tr>\n  </tbody>\n</table>",
+          "ai_explanation": "Parallel edit: Update this section only. Replace the existing placeholder text with the exact…",
+          "document_id": "doc_primary"
+        },
+        {
+          "change_id": "fb7b147e-bdf6-45b7-816b-ea5687c8da1b",
+          "operation": "edit",
+          "chunk_id": "4d02ecc4-8780-4714-adb6-e4fa654d0318",
+          "status": "auto_approved",
+          "old_html": "<p data-chunk-id=\"4d02ecc4-8780-4714-adb6-e4fa654d0318\">To be written.</p>",
+          "new_html": "<ul data-chunk-id=\"4d02ecc4-8780-4714-adb6-e4fa654d0318\">\n  <li>Level design is optimized for an 8-second pacing cadence.</li>\n  <li>This 8-second interval ensures consistent player engagement throughout the stage.</li>\n</ul>",
+          "ai_explanation": "Parallel edit: Update this section only. Replace the existing placeholder text with the exact…",
+          "document_id": "doc_primary"
+        }
+      ],
+      "chunk_diffs": null,
+      "concurrent_merges": null,
+      "focused_document_id": "doc_primary"
+    },
+    "usage": {
+      "monthly_used": 176,
+      "monthly_limit": 500,
+      "monthly_remaining": 324,
+      "was_billable": true,
+      "ops_charged": 1,
+      "quota_exhausted": false,
+      "subscription_tier": "free",
+      "bucket_used": "tier",
+      "redemption_id": null,
+      "promotions": [],
+      "agent_handoff_hint": null
+    },
+    "hint": {
+      "hint_code": "prefer_chat_async_for_large_generations",
+      "message": "This request took 323s synchronously. Requests over ~300s hit the platform gateway timeout (504) with no result returned.",
+      "suggested_action": "Submit document-scale generations via POST /v1/chat/async (chat_async): it returns a job_id immediately, has no gateway ceiling, and reports progress via get_job.",
+      "elapsed_seconds": 323.8
+    }
+  },
+  "elapsed_s": 324.274,
+  "content_type": "application/json"
+}

@@ -15,20 +15,22 @@ document bytes; none of it is taken from the API's own change summary.
 | 4 | the linked sub-document was authored | PASS |
 | 5 | the GDD gained the section 'Traversal - Grapple Rework' | PASS |
 | 6 | the new section contains only what was asked for (no invented table) | PASS |
-| 7 | ACT 2: mechanics, narrative and art-bible are byte-identical | PASS |
-| 8 | ACT 2: nothing else in the GDD moved | PASS |
-| 9 | Mechanics now says the cooldown is 5 s | PASS |
-| 10 | the GDD's Traversal prose now says 5 s and no longer says 8 s | PASS |
-| 11 | ACT 3: ONLY the Grapple section changed in Mechanics | PASS |
-| 12 | ACT 3: ONLY the Traversal section changed in the GDD | PASS |
-| 13 | ACT 3: narrative, art-bible and the new sub-document are byte-identical | PASS |
-| 14 | the other mechanics' numbers are unchanged | PASS |
-| 15 | both concept plates are embedded in the Art Bible | PASS |
-| 16 | embedding images changed nothing but the Concept art section | PASS |
-| 17 | every document exports to .docx | PASS |
-| 18 | every document exports to Markdown | PASS |
+| 7 | ACT 2: the only new document is the linked sub-document | PASS |
+| 8 | ACT 2: mechanics, narrative and art-bible are byte-identical | PASS |
+| 9 | ACT 2: nothing else in the GDD moved | PASS |
+| 10 | Mechanics now says the cooldown is 5 s | PASS |
+| 11 | the GDD's Traversal prose now says 5 s and no longer says 8 s | PASS |
+| 12 | ACT 3: ONLY the Grapple section changed in Mechanics | PASS |
+| 13 | ACT 3: ONLY the Traversal section changed in the GDD | PASS |
+| 14 | ACT 3: narrative, art-bible and the new sub-document are byte-identical | PASS |
+| 15 | the other mechanics' numbers are unchanged | PASS |
+| 16 | the Art Bible has exactly one 'Concept art' section | PASS |
+| 17 | both concept plates are embedded in the Art Bible | PASS |
+| 18 | embedding images changed nothing but the Concept art section | **FAIL** |
+| 19 | every document exports to .docx | PASS |
+| 20 | every document exports to Markdown | PASS |
 
-**18/18 passed** in 6 billable operations and 368s.
+**19/20 passed** in 6 billable operations and 270s.
 
 ## Per-document surgical check
 
@@ -42,12 +44,12 @@ changed, and how many sections came back byte-identical.
       "gdd": {
         "expected": [
           "Linked sub-documents",
-          "Traversal - Grapple Rework",
-          "Traversal"
+          "Traversal - Grapple Rework"
         ],
+        "new_sections_allowed": true,
         "sections_changed": [
-          "133c58ab-7285-405d-92b9-d9912f673df3",
-          "26724c8f-09f5-4d49-8361-5f9cba89f0e2"
+          "43c3c8f1-7476-4215-bf08-0961ea26c07d",
+          "74b26d87-40f4-4eb7-b340-aaa17acf472e"
         ],
         "unintended": [],
         "byte_identical_sections": 22,
@@ -69,12 +71,12 @@ changed, and how many sections came back byte-identical.
         "ok": true
       },
       "grapple-rework": {
-        "expected": "byte-identical",
-        "byte_identical": false,
-        "ok": false
+        "expected": "created by this act",
+        "created": true,
+        "ok": true
       }
     },
-    "ok": false
+    "ok": true
   },
   "act-3": {
     "documents": {
@@ -82,8 +84,9 @@ changed, and how many sections came back byte-identical.
         "expected": [
           "Traversal"
         ],
+        "new_sections_allowed": false,
         "sections_changed": [
-          "a611e8b5-3ee8-4319-8bda-dc9c71a12f99"
+          "5a9a152d-d704-4d7a-88de-1af8e46a4769"
         ],
         "unintended": [],
         "byte_identical_sections": 23,
@@ -93,8 +96,9 @@ changed, and how many sections came back byte-identical.
         "expected": [
           "Grapple"
         ],
+        "new_sections_allowed": false,
         "sections_changed": [
-          "0f6479ac-83ab-4074-b3f1-7a7f0d7a3efa"
+          "37f634ab-3ddd-4873-9ab7-b14da9baa2cd"
         ],
         "unintended": [],
         "byte_identical_sections": 13,
@@ -139,12 +143,15 @@ changed, and how many sections came back byte-identical.
         "expected": [
           "Concept art"
         ],
+        "new_sections_allowed": false,
         "sections_changed": [
-          "a1f16fef-a4fd-43ce-be29-e5b1215f8c5e"
+          "9051600f-04ed-4aa6-9c12-879f128f1ae9"
         ],
-        "unintended": [],
+        "unintended": [
+          "9051600f-04ed-4aa6-9c12-879f128f1ae9"
+        ],
         "byte_identical_sections": 8,
-        "ok": true
+        "ok": false
       },
       "grapple-rework": {
         "expected": "byte-identical",
@@ -152,7 +159,7 @@ changed, and how many sections came back byte-identical.
         "ok": true
       }
     },
-    "ok": true
+    "ok": false
   }
 }
 ```

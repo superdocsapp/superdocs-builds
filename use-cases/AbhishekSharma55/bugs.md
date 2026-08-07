@@ -12,13 +12,13 @@ Anything I could not reproduce is marked **UNCONFIRMED** and stays in the list
 anyway, because a flake an integrator hits once still costs them an afternoon.
 
 **B1 is mine, not yours.** It is in the list because it is still a rough edge —
-I hit it by reading the docs correctly and guessing wrong anyway. Six further
+I hit it by reading the docs correctly and guessing wrong anyway. Seven further
 mistakes that were entirely my own are in **"My own bugs"** at the end, because
-a bug log that only contains other people's bugs is a marketing document. Two of
-those six are checks of mine that passed a document they should have failed —
-they are the ones I would read first if I were reviewing this.
+a bug log that only contains other people's bugs is a marketing document. Three
+of those seven are places where my own checking passed a document it should have
+failed — they are the ones I would read first if I were reviewing this.
 
-**Fifteen SuperDocs entries (B1–B15) and six of my own (M1–M6).** The table
+**Fifteen SuperDocs entries (B1–B15) and seven of my own (M1–M7).** The table
 below is all fifteen, worst first.
 
 | # | Severity | One line |
@@ -710,8 +710,8 @@ turn — counted, like every other operation.
 
 Not SuperDocs' fault. Here because they cost real time or real money, and
 because the same hours that found fifteen bugs in someone else's product
-should be honest about the six they created - including the two that were
-checks certifying their own mistakes.
+should be honest about the seven they created - including the three where my own
+checking certified a document it should have failed.
 
 ## M1 — I committed a live API key as a test fixture
 
@@ -816,3 +816,40 @@ the act may not add anything, and a new chunk is unintended. Acts 3 and 4 both
 still pass on the snapshots they passed before, so the check got stricter
 without being bent to fit — and the scenario now meets the duplicate heading
 with a targeted repair, counted like every other operation.
+
+## M7 — The archive summarised the wrong week, and no invariant could see it
+
+The digest files one archive row per week: advancing to week N writes a row for
+week N-1, summarising what that week shipped. The instruction said:
+
+> *"Its Shipped cell is your own summary, at most 20 words, of the bullets
+> currently under 'What changed'."*
+
+Which is true when the archive step runs — those bullets are week N-1's — and
+false by the end of the same instruction, because step 3 replaces them with
+week N's. **Measured over seven live weeks, three of the seven rows summarised
+the incoming week instead of the outgoing one.** The row labelled `Week 5`
+described what week 6 shipped.
+
+**Why nothing caught it.** Every invariant on the archive is structural:
+coverage, bounds, no stray header row, no unreadable label. All four passed.
+The one thing none of them read is the sentence the model wrote — and the
+archive is the digest's historical record, so being quietly wrong about which
+week did what is the worst place in this document for a silent error.
+
+**How I found it.** Not from a verdict. Reading a committed week-over-week diff
+by eye, the archive row for week 5 was visibly week 6's bullet list. Then a
+similarity score of each row against its own week versus the following week
+turned a hunch into 3/7.
+
+**Fixed by removing the word "currently".** The text to summarise is now handed
+over literally in the instruction — the outgoing week's bullets and risks, in
+quotes — and the model is told to summarise the quoted text and nothing else in
+the document. The model still authors the sentence, which is the part only a
+model can do; it no longer has to go and find the source in a document that the
+same turn is rewriting. A test asserts the instruction contains the outgoing
+week's bullets and does **not** contain the incoming week's.
+
+**The general rule this earns:** never ask a model to summarise state that the
+same turn is changing. "Currently" is not a defensible word in an instruction
+whose other steps change what "currently" means.
