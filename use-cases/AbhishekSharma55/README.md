@@ -23,7 +23,21 @@ make setup      # venv + install; works with pip or uv, no key needed
 make test       # 61 tests, no key, no network, ~0.05s   <- start here
 make demo       # re-verifies every saved week, shows a week-over-week diff,
                 # and prints the last graded-scenario result. Spends nothing.
+make replay     # re-runs the WHOLE 52-week digest from committed fixtures,
+                # no key and no network, reproducing the live run exactly.
 ```
+
+`make replay` is the one to try if you are sceptical. Every live call this repo
+made was recorded to `fixtures/` with the key redacted, so the run driver
+executes end to end on a machine with no key and no network.
+
+**What that does and does not prove, stated precisely.** It proves the code path
+runs offline and that every recorded response is committed. It does *not* prove
+a byte-identical re-run: the instruction for week N is built from week N-1's
+document, so the moment a replay diverges it asks for a request that was never
+recorded and stops with a `ReplayMiss` naming the missing call. That is the
+honest behaviour — a replay that silently substituted a near-miss would be worse
+than one that stops.
 
 Then, with a key in `.env` (see [`.env.example`](.env.example) — an agent can
 sign itself up in one `curl`):

@@ -25,11 +25,13 @@ OUT = HERE / "out"
 FIXTURES = HERE.parent / "fixtures" / "gdd-editor"
 
 
-def _workspace(max_ops: int, live: bool | None):
+def _workspace(max_ops: int, live):
     from .workspace import Workspace
 
+    # bool(live), not live: absence of --live must mean REPLAY, never
+    # "auto-detect a key and spend money". See the note in the digest CLI.
     budget = OpsBudget(OUT / "ledger.jsonl", max_ops=max_ops)
-    client = SuperDocs(budget=budget, cassette_dir=FIXTURES, live=live,
+    client = SuperDocs(budget=budget, cassette_dir=FIXTURES, live=bool(live),
                        log=lambda m: print(f"    {m}"))
     return Workspace(out_dir=OUT, budget=budget, client=client), budget
 

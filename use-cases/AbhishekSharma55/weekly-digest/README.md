@@ -34,10 +34,22 @@ make report     # the cost comparison
 Offline and free, no key needed:
 
 ```bash
+make replay              # re-run all 52 weeks from committed fixtures
 digest verify            # re-check every saved week from its bytes
 digest diff --week 30    # what changed between week 29 and week 30
 make test                # 61 tests, no key, no network, ~0.05s
 ```
+
+**`make replay` runs the whole driver with no key and no network**, from the
+calls recorded in `fixtures/` (key redacted). It writes to `--out /tmp/...` so it
+can never overwrite the committed artefacts of the live run.
+
+Precisely what it proves: the code path runs offline and every response is
+committed. It does not prove a byte-identical re-run — week N's instruction is
+built from week N-1's document, so a divergence asks for a call that was never
+recorded and the replay stops with a `ReplayMiss` naming it. Stopping loudly is
+the right failure: a replay that quietly served a near-miss would be worse than
+no replay.
 
 `digest run` is safe to re-run: it resumes from `state.json` and the ledger, and
 it stops cleanly on `--max-ops` rather than blowing a budget.

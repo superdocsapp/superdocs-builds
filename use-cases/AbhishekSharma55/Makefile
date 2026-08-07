@@ -4,6 +4,8 @@
 #   make test     61 tests, no key, no network, ~0.05s
 #   make demo     the offline demo: verify every saved week, show a diff,
 #                 print the measurement. Spends nothing.
+#   make replay   re-run the WHOLE 52-week digest from committed fixtures,
+#                 with no API key and no network. Spends nothing.
 #
 # The two commands that cost money are called out explicitly and both take a
 # hard cap:
@@ -14,7 +16,7 @@
 PY := .venv/bin/python
 VENV := .venv
 
-.PHONY: setup test demo scenario run control report verify clean help
+.PHONY: setup test demo replay scenario run control report verify clean help
 
 help:
 	@grep -E '^#( |$$)' Makefile | sed 's/^# \{0,1\}//'
@@ -46,6 +48,14 @@ demo: setup
 	@echo
 	@echo "=== what the workspace holds ==="
 	@$(PY) -m gdd_editor.cli sections
+
+# Replays every recorded call from fixtures/. No key, no network, no spend -
+# and it reproduces the live run exactly, repairs included.
+replay: setup
+	@rm -rf /tmp/superdocs-replay
+	@env -u SUPERDOCS_API_KEY $(PY) -m weekly_digest.cli run --weeks 52 --max-ops 200 \
+	   --out /tmp/superdocs-replay/arm-a
+	@echo "replayed into /tmp/superdocs-replay/arm-a - the committed run was not touched"
 
 # --- these spend operations -------------------------------------------------
 scenario: setup

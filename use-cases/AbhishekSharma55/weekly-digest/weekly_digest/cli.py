@@ -34,15 +34,26 @@ def load_weeks() -> list[dict]:
     return json.loads(DATA.read_text(encoding="utf-8"))
 
 
-def _client(budget: OpsBudget, live: bool, cassette: Path) -> SuperDocs:
-    return SuperDocs(budget=budget, cassette_dir=cassette, live=live, log=lambda m: print(f"  {m}"))
+def _client(budget: OpsBudget, live, cassette: Path) -> SuperDocs:
+    """`live` is coerced to a real bool on purpose.
+
+    It used to be passed through as None when --live was absent, which made
+    build_transport "auto-detect": it found a key in .env and went live. So a
+    command a reader would reasonably believe was a dry run spent five real
+    operations. Absence of --live now means REPLAY, unconditionally - the
+    expensive path has to be asked for by name.
+    """
+    return SuperDocs(budget=budget, cassette_dir=cassette, live=bool(live),
+                     log=lambda m: print(f"  {m}"))
 
 
 def cmd_run(args) -> int:
     from .runner import DigestRun
 
     weeks = load_weeks()
-    out = OUT / "arm-a-edit"
+    # --out lets a replay write somewhere else, so re-running from fixtures can
+    # never overwrite the committed artefacts of the live run it is replaying.
+    out = Path(args.out) if args.out else OUT / "arm-a-edit"
     budget = OpsBudget(out / "ledger.jsonl", max_ops=args.max_ops)
     client = _client(budget, args.live, FIXTURES / "arm-a")
     run = DigestRun(weeks=weeks, out_dir=out, budget=budget, client=client,
@@ -59,7 +70,7 @@ def cmd_regen(args) -> int:
     from .regenerate import RegenerateRun
 
     weeks = load_weeks()
-    out = OUT / "arm-b-regenerate"
+    out = Path(args.out) if args.out else OUT / "arm-b-regenerate"
     budget = OpsBudget(out / "ledger.jsonl", max_ops=args.max_ops)
     client = _client(budget, args.live, FIXTURES / "arm-b")
     run = RegenerateRun(weeks=weeks, out_dir=out, budget=budget, client=client, run_id=RUN_ID)
@@ -120,12 +131,17 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--max-ops", type=int, default=70,
                    help="hard cap on billable operations for this arm")
     r.add_argument("--live", action="store_true", default=None)
+    r.add_argument("--out", default=None,
+                   help="write artefacts here instead of out/arm-a-edit. Use it for "
+                        "replays, so re-running from fixtures can never overwrite the "
+                        "committed artefacts of the live run it is replaying.")
     r.set_defaults(func=cmd_run)
 
     g = sub.add_parser("regen", help="arm B: regenerate the digest weekly (the control)")
     g.add_argument("--weeks", type=int, default=12)
     g.add_argument("--max-ops", type=int, default=40)
     g.add_argument("--live", action="store_true", default=None)
+    g.add_argument("--out", default=None)
     g.set_defaults(func=cmd_regen)
 
     for name, fn, helptext in (
