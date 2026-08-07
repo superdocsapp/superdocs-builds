@@ -29,9 +29,10 @@ document revised in place week after week instead of a fresh file each week, so
 the reader always opens the same familiar document. Each week is a
 single billable operation covering the status line, three standing sections, and
 an archive that folds old weeks into rolled-up rows so it stays navigable (18
-rows at week 52 rather than 51). Fourteen invariants are re-derived from the
-document's own bytes after every week; a week that fails is repaired with a
-second operation or rolled back, and every repair is counted. A control arm
+rows at week 52 rather than 51, with 11 rollups). Fourteen invariants are
+re-derived from the document's own bytes after every week; a week that fails is
+repaired by decomposing it into two simpler turns, or rolled back so the document
+is never left corrupt, and every repair operation is counted. A control arm
 regenerates the same digest from the same inputs so the cost claim has a number
 behind it — the method, including what would falsify it, is committed in
 `METHOD.md` before the results.
@@ -42,20 +43,22 @@ editor for long game design documents split across linked sub-documents
 scenario it is built to pass — *a reviewer asks for a new GDD section plus one
 linked sub-document, then requests a revision to one mechanic, and only the
 correct section changes across both documents* — is executable as
-`gdd scenario --live` and passes 18/18 checks in 6 operations. The proof is
+`gdd scenario --live` and passes 20/20 checks in 6 operations. The proof is
 re-derived from each document's bytes, not read from the API's change summary.
 
 Both run on a shared client layer (`superdocs_kit/`) that keeps a durable ledger
-of every operation spent, records every live call as a fixture so the 62 tests
-run with no key and no network in about 0.05 s, and proves "nothing else changed" from
+of every operation spent, records every live call as a fixture so the 64 tests
+run with no key and no network in 0.04 s, and proves "nothing else changed" from
 the document rather than from a success message.
 
-`bugs.md` has twelve entries found while building — the highest-value one being
-that `changes_summary` reported `"1 section edited, rest untouched"` for a turn
-that had destroyed a table. `repro/B10-multidoc-roster.sh` reproduces a
-multi-document session returning a one-entry roster with every document sharing
-`document_id: "doc_primary"`. Two of the twelve are my own mistakes and are in
-the list anyway.
+`bugs.md` has fifteen SuperDocs entries found while building — the highest-value
+one being that `changes_summary` reported `"1 section edited, rest untouched"`
+for a turn that had destroyed a table. Two of them are runnable for zero
+operations: `repro/B10-multidoc-roster.sh` and `gdd probe-multidoc --live` both
+reproduce a multi-document session returning a one-entry roster with every
+document sharing `document_id: "doc_primary"`. Eight further entries are my own
+mistakes and are in the same file, four of them cases where my own checking said
+a document was fine when it was not.
 
 Corpora are synthetic — the studio, the game and the people are fictional.
 
