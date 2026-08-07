@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "provenance": "contract-derived from public SuperDocs documentation; not live-recorded",
+  "constraints": {
+    "potentiallyBillableEditCap": 1,
+    "signedStorageRecorded": false,
+    "rawDocumentBytesRecorded": false
+  },
+  "interactions": [
+    {
+      "request": { "method": "POST", "path": "/v1/chat/async", "body": { "session_id": "<session-1>", "message": "<synthetic-message>", "approval_mode": "ask_every_time" } },
+      "response": { "status": 200, "headers": { "content-type": "application/json" }, "body": { "job_id": "<job-1>", "session_id": "<session-1>", "status": "pending", "message": "<synthetic-message>" } }
+    },
+    {
+      "request": { "method": "GET", "path": "/v1/jobs/<job-1>", "body": null },
+      "response": { "status": 200, "headers": { "content-type": "application/json" }, "body": { "job_id": "<job-1>", "session_id": "<session-1>", "job_type": "chat", "status": "pending", "created_at": "<timestamp>", "updated_at": "<timestamp>", "progress": 5, "result": null, "error": null, "metadata": null } }
+    },
+    {
+      "request": { "method": "GET", "path": "/v1/jobs/<job-1>", "body": null },
+      "response": { "status": 200, "headers": { "content-type": "application/json" }, "body": { "job_id": "<job-1>", "session_id": "<session-1>", "job_type": "chat", "status": "awaiting_approval", "created_at": "<timestamp>", "updated_at": "<timestamp>", "progress": 75, "result": null, "error": null, "metadata": { "awaiting_kind": "change_review", "pending_changes": [{ "change_id": "<change-1>", "operation": "edit", "old_html": "<synthetic-old-html>", "new_html": "<synthetic-new-html>", "ai_explanation": "Synthetic fixture explanation" }] } } }
+    }
+  ]
+}
