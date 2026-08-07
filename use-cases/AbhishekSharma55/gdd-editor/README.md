@@ -196,6 +196,13 @@ use the real multi-document session and let the model see the whole workspace.
 
 ## Files
 
+One note on reading `out/`: **`out/docs/` is the workspace's *current* state**,
+which includes the `gdd review` demo run after the scenario (so Mechanics shows
+`Dash 1.5 s`). The scenario's own record is `out/snapshots/` — the byte-exact
+before and after of every act — plus `SCENARIO-RESULT.md` and
+`out/scenario-report.json`. The snapshots are what the surgical checks were
+computed against.
+
 ```
 gdd_editor/corpus.py      the four seed documents + the link graph (data)
 gdd_editor/workspace.py   multi-document workspace: sessions, edits, snapshots
