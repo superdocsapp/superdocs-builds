@@ -29,7 +29,7 @@ from superdocs_kit import OpsBudget, SuperDocs, sha, text_diff, verify_surgical
 from superdocs_kit.errors import BudgetExceeded, QuotaExhausted
 
 from .document import ARCHIVE_SECTION, STANDING_SECTIONS, archive_plan, seed_html
-from .prompts import weekly_instruction
+from .prompts import archive_step, standing_step, weekly_instruction
 from .verify import WeekReport, check_week, drift_table
 
 # Model settings, measured - and the honest version of the story includes the
@@ -213,7 +213,7 @@ class DigestRun:
             # the right price for that guarantee, and the double charge is
             # visible in the ledger rather than hidden.
             try:
-                self.budget.check(label, 2)  # attempt + possible repair
+                self.budget.check(label, 3)  # attempt + a two-turn repair
             except BudgetExceeded as exc:
                 self.log(f"\nSTOPPING CLEANLY at week {n}: {exc}")
                 break
@@ -277,22 +277,54 @@ class DigestRun:
 
         for attempt in range(1, 3):
             attempts = attempt
-            # Every attempt re-asserts the last known-good document verbatim,
-            # so one operation both guarantees the starting state and does the
-            # week's work. See the note above _run_week's class about why the
-            # client, not the session, holds the document of record.
-            res = self.client.chat(
-                session_id=self.session_id,
-                message=instruction,
-                label=f"w{n:02d}" if attempt == 1 else f"w{n:02d}-repair",
-                response_mode="full",
-                document_html=before,
-                model_tier=MODEL_TIER if attempt == 1 else REPAIR_MODEL_TIER,
-                thinking_depth=THINKING_DEPTH if attempt == 1 else REPAIR_THINKING_DEPTH,
-                timeout=900,
-            )
-            total_ops += res.ops_charged
-            after = res.updated_html or after
+            if attempt == 1:
+                # One operation: the whole week in a single instruction.
+                res = self.client.chat(
+                    session_id=self.session_id, message=instruction, label=f"w{n:02d}",
+                    response_mode="full", document_html=before,
+                    model_tier=MODEL_TIER, thinking_depth=THINKING_DEPTH, timeout=900,
+                )
+                total_ops += res.ops_charged
+                after = res.updated_html or after
+            else:
+                # THE REPAIR IS A DECOMPOSITION, NOT A RETRY.
+                #
+                # Re-sending the same instruction was the first design and it was
+                # wrong: when a week failed, the cause was usually that ONE turn
+                # was carrying too much - five targeted edits including two large
+                # literal-HTML blobs - and the model cross-wired them. Twice I
+                # watched it drop the risk table's rows into the "What changed"
+                # bullet list, and once invent a table with column headers from
+                # nowhere. Repeating an instruction that confused the model
+                # mostly reproduces the confusion.
+                #
+                # So the repair splits the week in two: the archive turn (the one
+                # genuinely generative part) and the standing-sections turn (all
+                # literal HTML). Each is simpler than the combined instruction and
+                # names what it must not touch. It costs two more operations on a
+                # bad week - reported, never hidden - and it is escalation by
+                # decomposition rather than by model size, which is the cheaper
+                # axis to escalate on.
+                arch = archive_step(week, plan, prev, before)
+                if arch:
+                    r1 = self.client.chat(
+                        session_id=self.session_id, message=arch,
+                        label=f"w{n:02d}-repair-archive", response_mode="full",
+                        document_html=before, model_tier=REPAIR_MODEL_TIER,
+                        thinking_depth=REPAIR_THINKING_DEPTH, timeout=900,
+                    )
+                    total_ops += r1.ops_charged
+                    after = r1.updated_html or before
+                r2 = self.client.chat(
+                    session_id=self.session_id, message=standing_step(week),
+                    label=f"w{n:02d}-repair-standing", response_mode="full",
+                    document_html=after, model_tier=REPAIR_MODEL_TIER,
+                    thinking_depth=REPAIR_THINKING_DEPTH, timeout=900,
+                )
+                total_ops += r2.ops_charged
+                after = r2.updated_html or after
+                res = r2
+
             verdict = verify_surgical(before, after, expected_sections=intended)
             unintended = [c for c in verdict.unintended if c not in status_chunks]
             rep = check_week(after, week, published)
@@ -302,15 +334,13 @@ class DigestRun:
                 first_failures = [c.name for c in rep.failures] + (
                     ["unintended section changed"] if unintended else []
                 )
-                # Keep the corrupted output. A failure we cannot look at later
-                # is a failure we cannot report, and bug reports need bytes.
                 bad = self.out / "failed-attempts"
                 bad.mkdir(exist_ok=True)
                 (bad / f"week-{n:02d}-attempt-1.html").write_text(after, encoding="utf-8")
                 (bad / f"week-{n:02d}-instruction.txt").write_text(instruction, encoding="utf-8")
                 self.log(
                     f"week {n:02d}  attempt 1 FAILED verification "
-                    f"({', '.join(first_failures)}) - reloading last good doc and retrying"
+                    f"({', '.join(first_failures)}) - splitting into two turns"
                 )
 
         rolled_back = False

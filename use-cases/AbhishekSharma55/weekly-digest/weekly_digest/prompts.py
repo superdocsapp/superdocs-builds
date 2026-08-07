@@ -152,3 +152,45 @@ def regenerate_instruction(week: dict, archive_rows: list[dict]) -> str:
         f"Use the same visual style throughout: dark blue headings, a bordered "
         f"table with a dark shaded header row and alternating light row shading."
     )
+
+
+def archive_step(week: dict, plan: ArchivePlan, prev_week: dict | None,
+                 before_html: str) -> str:
+    """Just the archive. The one genuinely generative part of the week."""
+    if not (plan.add_row_for_week and prev_week):
+        return ""
+    rows, rollup = plan_rows(before_html, prev_week)
+    return (
+        f"In this document's 'Archive' table, the data rows must end up being "
+        f"EXACTLY these {len(rows)} rows, in exactly this order, top to bottom. "
+        f"Keep the table's header row and all of its formatting. Cells shown in "
+        f"quotes are literal - copy them exactly. Cells described in angle "
+        f"brackets are for you to write.\n"
+        f"{render_instruction_block(rows, rollup)}\n\n"
+        f"Change NOTHING else in the document. Do not touch the status line, the "
+        f"'What changed' list, the 'What is at risk' table or the 'What is next' "
+        f"list.\n{PRESERVE}"
+    )
+
+
+def standing_step(week: dict) -> str:
+    """Status line plus the three factual sections, all as literal HTML."""
+    return (
+        f"Update this weekly digest to Week {week['week']}. Make exactly these "
+        f"four changes and nothing else.\n\n"
+        f"STEP 1 - STATUS LINE. The bold status line directly under the document "
+        f"title must read exactly:\n"
+        f"  Week {week['week']} · {week['dates']} · Phase: {week['phase']}\n"
+        f"Leave the smaller grey line beneath it unchanged.\n\n"
+        f"STEP 2 - the bullet list in the 'What changed' section. Replace that "
+        f"<ul> element with exactly this HTML, character for character:\n"
+        f"{bullets_html(week['shipped'])}\n\n"
+        f"STEP 3 - the 'What is at risk' table. Replace the ENTIRE contents of "
+        f"that table's <tbody> with exactly these {len(week['risks'])} rows, "
+        f"character for character. Keep its <thead> header row exactly as it is:\n"
+        f"{risk_rows_html(week['risks'])}\n\n"
+        f"STEP 4 - the bullet list in the 'What is next' section. Replace that "
+        f"<ul> element with exactly this HTML, character for character:\n"
+        f"{bullets_html(week['next'])}\n\n"
+        f"Do not touch the 'Archive' section at all.\n{PRESERVE}"
+    )
