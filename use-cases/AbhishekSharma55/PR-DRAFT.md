@@ -46,8 +46,8 @@ correct section changes across both documents* — is executable as
 re-derived from each document's bytes, not read from the API's change summary.
 
 Both run on a shared client layer (`superdocs_kit/`) that keeps a durable ledger
-of every operation spent, records every live call as a fixture so the 52 tests
-run with no key and no network in 0.04 s, and proves "nothing else changed" from
+of every operation spent, records every live call as a fixture so the 61 tests
+run with no key and no network in about 0.05 s, and proves "nothing else changed" from
 the document rather than from a success message.
 
 `bugs.md` has twelve entries found while building — the highest-value one being
