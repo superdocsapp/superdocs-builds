@@ -84,7 +84,7 @@ def test_summary_reports_what_a_reader_needs(tmp_path):
 
 # ---------------------------------------------------------------- secrets
 @pytest.mark.parametrize("text,expected_absent", [
-    ("Authorization: Bearer sk_0000000000000000000000000000fake", "fb362893"),
+    ("Authorization: Bearer sk_0000000000000000000000000000fake", "0000000000"),
     ("key is sk_abcdef0123456789 ok", "abcdef0123456789"),
     ("curl -H 'Authorization: Bearer tok_averylongtokenvalue123'", "averylongtokenvalue123"),
 ])

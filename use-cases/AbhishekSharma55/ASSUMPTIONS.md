@@ -65,3 +65,38 @@ untouched". That is the system under test grading its own homework. Every
 "only the intended section changed" claim in this repo is re-derived from the
 document bytes by `superdocs_kit/docdiff.py`, independently. Where the two
 disagree, the bytes win and it goes in `bugs.md`.
+
+## 2026-08-07 — A7. A key leaked into a test fixture, was caught, and the history was rewritten
+
+Recording this because the alternative is pretending it did not happen.
+
+Writing the redaction tests, I used the **live API key** as one of the
+"credential-shaped strings that must be redacted" fixtures. It was committed in
+`tests/test_budget_and_secrets.py`, in four local commits.
+
+Caught by running the pre-PR check in `PR-DRAFT.md` (`git log -p --all | grep -E
+'sk_[a-z0-9]{8}'`) rather than by noticing at the time — which is the argument
+for having that check written down as a step instead of trusting a habit.
+
+Fixed: the fixture is now an obviously fake constant, the four commits were
+rewritten with `git filter-branch`, the `refs/original` backups and the stash
+were deleted, the reflog expired and the objects pruned. Verified with
+`git cat-file --batch-all-objects --batch | grep` — **zero occurrences in any
+git object.** Nothing had been pushed, so no remote ever saw it.
+
+**Still outstanding, and it is Abhishek's call because it is his account:**
+rotate the key anyway. A secret that touched a file on disk should be treated as
+exposed even when the exposure was local.
+
+```bash
+# list, create a replacement, then revoke the old one
+curl -s https://api.superdocs.app/v1/users/me/api-keys -H "Authorization: Bearer $KEY"
+curl -s -X POST https://api.superdocs.app/v1/users/me/api-keys -H "Authorization: Bearer $KEY" \
+     -H 'Content-Type: application/json' -d '{"name":"round-2-builder"}'
+curl -s -X DELETE https://api.superdocs.app/v1/users/me/api-keys/<old_key_id> -H "Authorization: Bearer $NEW"
+```
+
+The lesson that went back into the code: `superdocs_kit/secrets.py` redacts
+anything key-shaped before it can reach a fixture, and there is a test asserting
+it — but neither helps against a key a human types into a source file. The only
+defence there is the grep, so it is now step 1 of the PR checklist.
