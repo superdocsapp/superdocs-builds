@@ -107,10 +107,18 @@ shading, alternating rows), growth (archive coverage and bounds).
 **None of them ask the API whether it did the right thing.** That matters,
 because the API said it had. See §6, question 2.
 
-When a week fails, the runner spends a second operation re-issuing the same
-instruction on a reloaded copy of the last known-good document. If that fails
-too, the week rolls back rather than being left corrupt. Every repair is counted
-in the cost measurement.
+**When a week fails, the repair is a decomposition, not a retry** — this is
+the bit to say out loud, because it is the difference between engineering and
+hoping. Re-sending the same instruction was the first design. It failed for a
+reason worth knowing: when a week broke, the cause was almost always that one
+turn was carrying too much, and the model cross-wired the pieces — twice it put
+the risk table's rows into the *What changed* bullet list, once it invented a
+table with headers from nowhere. Repeating an instruction that confused the model
+mostly reproduces the confusion.
+
+The repair now splits the week into two simpler turns, each naming what it must
+not touch. If that also fails the week rolls back rather than being left corrupt.
+Every repair operation is counted in the cost measurement.
 
 ---
 

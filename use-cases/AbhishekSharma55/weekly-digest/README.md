@@ -104,11 +104,24 @@ week. None of them ask the API whether it did the right thing.
 | **formatting** | the risk table still bordered, its header still shaded, rows still alternating |
 | **growth** | the archive accounts for every published week exactly once and stays inside its row budget |
 
-When a week fails, the runner spends **a second operation** re-issuing the same
-instruction on a reloaded copy of the last known-good document. If that also
-fails, the week is rolled back rather than left corrupt. **Every repair is
-counted in the cost measurement**, because reporting arm A's cost without its
-failures would be measuring a system that does not exist.
+**When a week fails, the repair is a decomposition, not a retry.** That
+distinction is the most useful thing this build learned. Re-sending the same
+instruction was the first design and it was wrong: when a week failed, the cause
+was usually that one turn carried too much — five targeted edits including two
+large literal-HTML blobs — and the model cross-wired them. Twice it dropped the
+risk table's rows into the *What changed* bullet list; once it invented a table
+with column headers from nowhere. Repeating an instruction that confused the
+model mostly reproduces the confusion.
+
+So the repair splits the week into two simpler turns — the archive turn (the one
+generative part) and the standing-sections turn (all literal HTML) — each naming
+what it must not touch. If that still fails, the week is rolled back rather than
+left corrupt, so the document is never in a broken state.
+
+Escalation by decomposition rather than by model size, which is the cheaper axis.
+**Every repair operation is counted in the cost measurement**, because reporting
+arm A's cost without its failures would be measuring a system that does not
+exist.
 
 Results: [`out/arm-a-edit/drift-report.md`](out/arm-a-edit/drift-report.md),
 per-week documents in `out/arm-a-edit/html/`, free Markdown exports in
