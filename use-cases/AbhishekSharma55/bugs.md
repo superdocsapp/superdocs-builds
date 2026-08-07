@@ -566,6 +566,52 @@ and, here, delivers.
 
 ---
 
+## B14 — Inside one multi-step instruction, content from one step landed in another step's target
+
+**Severity: medium-high.** Same family as B2 and B12 — a chunk gets a
+replacement that is not the shape it should be — but the mechanism is different
+and worth separating: this is *cross-wiring between steps of a single
+instruction*, not a malformed fragment.
+
+**What I did.** One `POST /v1/chat` turn, `pro`/`deep`, carrying five targeted
+edits against a formatted digest. Two of them supply literal HTML:
+
+- STEP 3: *"Replace the `<ul>` element in the 'What changed' section with exactly
+  this HTML"* — followed by `<ul><li>…</li></ul>`.
+- STEP 4: *"Replace the entire contents of that table's `<tbody>` with exactly
+  these rows"* — followed by `<tr><td…>` rows for the risk table.
+
+**What happened, twice, non-deterministically.** The `<ul>` in *What changed* was
+replaced by a `<div>` wrapping a **`<table>`** — and on one occasion a table with
+invented column headers (`Issue | Owner | Department | Risk | Status`) that
+appear nowhere in the instruction or the document. The bullet list was gone; the
+document grew from 5.1 KB to 7.9 KB. The `What is at risk` table and the
+`What is next` list were also left unchanged, so the turn applied roughly one of
+its five steps and mixed two others together.
+
+**Why this one is worth separating from B2.** B2 is "the replacement fragment was
+structurally invalid". This is "step 3's target received something derived from
+step 4", which is a *routing* failure inside a batched request. It matters
+because batching is the documented, encouraged shape — up to 25 sections in one
+operation — and the more steps a caller batches, the more surface this has.
+
+**Suggested fix:** bind each instructed edit to a resolved target *before* any
+content is generated, and validate the replacement against that target's element
+type. A `<ul>` target may only receive a `<ul>`. That single check closes B2,
+B12 and B14 together — it is the whole class rather than three cases.
+
+**How I worked around it, and it changed the design rather than adding a retry.**
+The runner verifies every week from the document bytes, and on failure it
+**decomposes** rather than repeating: one turn for the archive, one for the
+status line and the three factual sections, each naming what it must not touch.
+Re-sending the same instruction was the original repair and it mostly reproduced
+the same confusion — which is the general lesson here. If a batched instruction
+confuses the model, the fix is fewer things per turn, not the same things again.
+Failed attempts are kept in `weekly-digest/out/arm-a-edit/failed-attempts/`
+with the exact instruction that produced them.
+
+---
+
 # My own bugs
 
 Not SuperDocs' fault. Here because they cost real time or real money, and
