@@ -1,0 +1,32 @@
+Update this standing weekly production digest to Week 6. This is the same document every week - edit it in place. Make exactly the changes below and nothing else.
+
+STEP 1 - STATUS LINE. The bold status line directly under the document title must read exactly:
+  Week 6 · 2026-02-09 to 2026-02-15 · Phase: Pre-production
+Leave the smaller grey line beneath it unchanged.
+
+STEP 2 - ARCHIVE. The 'Archive' table's data rows must end up being EXACTLY these 5 rows, in exactly this order, top to bottom. Keep the table's header row and all of its formatting. Cells shown in quotes are literal - copy them exactly. Cells shown in angle brackets are for you to write.
+  The rows, top to bottom, must be exactly: 'Week 5', 'Week 4', 'Week 3', 'Week 2', 'Week 1'.
+  Row 'Week 5' is NEW. Its Dates cell is '2026-02-02 to 2026-02-08'. Its Shipped cell is your own summary, at most 20 words, of the bullets currently under 'What changed'. Its Risks carried cell is your own summary, at most 15 words, of the rows currently in the 'What is at risk' table.
+  Every other row keeps its existing cell contents exactly as they are - do not rewrite, reword or re-summarise them.
+
+STEP 3 - 'What changed'. DELETE the entire existing bullet list in that section, then write a new list containing only these 4 bullets, verbatim, in this order. The section must end with exactly 4 bullets - not more:
+  - Engine upgrade to 5.4 merged; build times down 31%
+  - Art style exploration narrowed to two directions
+  - Nav-mesh generation for the Drift Belt sector
+  - First pass on the Salvage economy spreadsheet
+
+STEP 4 - 'What is at risk' table. After this edit the table's data rows must be EXACTLY these 2 rows, in this order, and no others. Delete any row not listed. Each cell holds ONE value: overwrite the old value, never write the old and new value together (never write 'Medium / Low' or 'steady / worsening'). Keep the header row and the table styling untouched.
+  | Risk | Owner | Area | Severity | Trend |
+  | Boss encounter difficulty untuned for controller | Ana F. | Design | Low | steady |
+  | Save-game format still unversioned | Dev H. | Engineering | Low | steady |
+ Risks closed this week and therefore absent from the list above: Outsourced character art slipping two weeks.
+
+STEP 5 - 'What is next'. DELETE the entire existing bullet list in that section, then write a new list containing only these 3 bullets, verbatim, in this order. The section must end with exactly 3 bullets - not more:
+  - Lock the art direction to one of the two candidates
+  - Scope the vertical slice level list
+  - Stand up the automated build farm
+
+REPLACEMENT MEANS REPLACEMENT: where this instruction lists what a section must contain, the section must end up containing exactly that and nothing else. Delete what is not on the list rather than keeping it alongside.
+Preserve all existing formatting exactly: the document title, every section heading, table borders, header-row shading, alternating row colours, fonts, font sizes and colours. Do not restyle anything. Do not add, remove or rename any heading. Do not reorder the sections.
+Copy every quoted or listed value character for character. Do not add a full stop to a bullet that has none, and do not reword anything.
+STRUCTURAL RULE: both tables must remain <table> elements with their header rows intact. Never replace a table with a single row, a div or a list. Never drop a table's header row.
