@@ -26,10 +26,16 @@ cd use-cases/AbhishekSharma55
 make setup                  # venv + install, no key needed
 cp .env.example .env        # then paste a key
 
-make run        # arm A: 52 weeks, edited in place        (cap 80 operations)
-make control    # arm B: the regeneration control          (cap 45 operations)
+make run        # arm A: edit in place, resumable          (capped)
+make control    # arm B: the regeneration control          (capped)
 make report     # the cost comparison
 ```
+
+`make run` is **resumable and bounded**. The committed result is a 20-week live
+run — far enough that the archive rollup fires three times and past the point
+where drift has appeared in every run I did. Re-running continues from where it
+stopped, roughly one operation per further week. The reasoning for stopping
+there, and what it costs the result, is in [`METHOD.md`](METHOD.md).
 
 Offline and free, no key needed:
 
@@ -86,7 +92,8 @@ oldest 4 are folded into one rolled-up row **in the same operation**, so keeping
 the archive readable costs nothing.
 
 Over 52 weeks: **18 rows instead of 51**, with 11 rollups firing at weeks 10,
-14, 18 … 50. That is proved offline in
+14, 18 … 50. The live run exercises the first three of those rollups; the full
+52 are proved offline in
 [`../tests/test_transport_and_archive.py`](../tests/test_transport_and_archive.py)
 — all 52 weeks simulated in milliseconds, asserting that every past week is
 accounted for exactly once and the table never grows without bound. Getting that

@@ -1,2 +1,2 @@
-{"ts": "2026-08-07T18:05:09+00:00", "label": "upload:nebula-drift-weekly-digest.html", "ops": 0, "seconds": 1.33, "monthly_used": null, "note": "/v1/documents/upload-base64"}
-{"ts": "2026-08-07T18:05:09+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.682, "monthly_used": null, "note": "/v1/documents/export"}
+{"ts": "2026-08-07T18:07:06+00:00", "label": "upload:nebula-drift-weekly-digest.html", "ops": 0, "seconds": 1.066, "monthly_used": null, "note": "/v1/documents/upload-base64"}
+{"ts": "2026-08-07T18:07:07+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.889, "monthly_used": null, "note": "/v1/documents/export"}

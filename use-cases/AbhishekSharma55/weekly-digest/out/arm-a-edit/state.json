@@ -1,6 +1,6 @@
 {
   "seeded": true,
-  "session_id": "nebula-digest-v1-arm-a-3d6daadf69",
+  "session_id": "nebula-digest-v1-arm-a-a0011e544a",
   "records": [
     {
       "week": 1,
@@ -11,7 +11,7 @@
       "unintended_chunks": [],
       "byte_identical_chunks": 0,
       "doc_bytes": 5081,
-      "doc_sha": "e5aa2038946bbf03",
+      "doc_sha": "23b7289b918feac1",
       "invariants_ok": true,
       "invariant_failures": [],
       "api_summary": "seed upload",
