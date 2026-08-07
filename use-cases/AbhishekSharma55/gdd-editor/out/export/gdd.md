@@ -34,11 +34,7 @@ Full parameters live in the Mechanics sub-document, section "Grapple".
 
 ## Traversal - Grapple Rework
 
-A design spike is open to reduce the grapple cooldown, and the full spike lives in the linked sub-document 'Nebula Drift - Grapple Rework (design spike)'.
-
-| Document Title | Description | Reference Section |
-| --- | --- | --- |
-| Grapple Rework | The grapple cooldown spike | Traversal - Grapple Rework |
+A design spike is open to reduce the grapple cooldown, and the full spike lives in the linked sub-document "Nebula Drift - Grapple Rework (design spike)".
 
 ## Combat
 
@@ -66,9 +62,9 @@ and characters live in the Narrative sub-document.
 | Sub-document | Owns | Sections in this GDD that depend on it |
 | --- | --- | --- |
 | Mechanics | Every tunable number | Traversal, Combat, Progression |
-| Grapple Rework | The grapple cooldown spike | Traversal - Grapple Rework |
 | Narrative | Acts, beats, characters | Narrative |
 | Art Bible | Palette, silhouette rules, concept art | Art direction |
+| Grapple Rework | The grapple cooldown spike | Traversal - Grapple Rework |
 
 ## Open questions
 

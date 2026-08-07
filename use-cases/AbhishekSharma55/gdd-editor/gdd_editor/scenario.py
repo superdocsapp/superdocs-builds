@@ -176,8 +176,28 @@ def run(
             ws.has_section("gdd", NEW_SECTION),
             f"sections now: {ws.section_names('gdd')}")
 
+    # Over-delivery is a real failure mode, not a nicety: the first time this
+    # ran, the model added the requested heading and paragraph AND invented a
+    # whole table with columns nobody asked for (bugs.md B12). "Change nothing
+    # else" has to include "and do not add anything else".
+    new_frag = section_html(ws.docs["gdd"].html, NEW_SECTION)
+    if "<table" in new_frag:
+        log("  the new section arrived with an unrequested table - repairing")
+        r_fix = ws.edit(
+            "gdd",
+            f"In the '{NEW_SECTION}' section ONLY, delete the table. That section "
+            f"must contain exactly its heading and one short paragraph, nothing "
+            f"else. Do not touch any other section of this document.",
+            label="act2-gdd-repair",
+            expect_sections=[NEW_SECTION],
+        )
+        rep.ops += r_fix.ops
+        new_frag = section_html(ws.docs["gdd"].html, NEW_SECTION)
+    rep.add("the new section contains only what was asked for (no invented table)",
+            "<table" not in new_frag, new_frag[:300])
+
     act2 = ws.untouched_report(snap_a, {
-        "gdd": ["Linked sub-documents", NEW_SECTION],
+        "gdd": ["Linked sub-documents", NEW_SECTION, "Traversal"],
     })
     rep.untouched["act-2"] = act2
     rep.add("ACT 2: mechanics, narrative and art-bible are byte-identical",

@@ -5,19 +5,19 @@
   "request": {
     "filename": "grapple-rework.html",
     "file_base64": "PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PG1ldGEgY2hhcnNldD0idXRmLTgiPjx0aXRsZT5OZWJ1bGEgRHJpZnQgLSBHcmFwcGxlIFJld29yayAoZGVzaWduIHNwaWtlKTwvdGl0bGU+PC9oZWFkPjxib2R5IHN0eWxlPSJmb250LWZhbWlseTpJbnRlcixDYWxpYnJpLEFyaWFsLHNhbnMtc2VyaWY7Y29sb3I6IzIxMjEyMSI+PGgxIHN0eWxlPSJjb2xvcjojMGQ0N2ExO2JvcmRlci1ib3R0b206M3B4IHNvbGlkICMwZDQ3YTE7cGFkZGluZy1ib3R0b206NnB4Ij5OZWJ1bGEgRHJpZnQgLSBHcmFwcGxlIFJld29yayAoZGVzaWduIHNwaWtlKTwvaDE+PHAgc3R5bGU9ImJhY2tncm91bmQtY29sb3I6I2UzZjJmZDtib3JkZXItbGVmdDo0cHggc29saWQgIzE1NjVjMDtwYWRkaW5nOjhweCAxMHB4O2ZvbnQtc2l6ZTo5cHQiPlZhbnRhZ2UgTmluZSBTdHVkaW9zIC0gaW50ZXJuYWwgLSBsaW5rZWQgc3ViLWRvY3VtZW50IG9mIHRoZSBOZWJ1bGEgRHJpZnQgR0RELCBzZWN0aW9uICJUcmF2ZXJzYWwgLSBHcmFwcGxlIFJld29yayIuPC9wPjxoMiBzdHlsZT0iY29sb3I6IzBkNDdhMSI+UHJvYmxlbTwvaDI+PHA+VG8gYmUgd3JpdHRlbi48L3A+PGgyIHN0eWxlPSJjb2xvcjojMGQ0N2ExIj5Qcm9wb3NlZCBjaGFuZ2U8L2gyPjxwPlRvIGJlIHdyaXR0ZW4uPC9wPjxoMiBzdHlsZT0iY29sb3I6IzBkNDdhMSI+UGFyYW1ldGVyczwvaDI+PHA+VG8gYmUgd3JpdHRlbi48L3A+PGgyIHN0eWxlPSJjb2xvcjojMGQ0N2ExIj5SaXNrczwvaDI+PHA+VG8gYmUgd3JpdHRlbi48L3A+PC9ib2R5PjwvaHRtbD4=",
-    "session_id": "nebula-gdd-5f05a3fe54-grapple-rework",
+    "session_id": "nebula-gdd-1d7c7d3993-grapple-rework",
     "return_html": true
   },
   "status": 200,
   "response": {
-    "html": "<h1 data-chunk-id=\"42f74847-acc3-4e6c-bcb8-c42a8f90f655\" style=\"color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px\">Nebula Drift - Grapple Rework (design spike)</h1>\n<p data-chunk-id=\"6fb181ee-5bdc-44d5-9af2-959afff37af8\" style=\"background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt\">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section \"Traversal - Grapple Rework\".</p>\n<h2 data-chunk-id=\"963f1a26-50a5-4154-a8e1-50eaec43310f\" style=\"color:#0d47a1\">Problem</h2>\n<p data-chunk-id=\"0b9e694d-9146-43e0-bec4-fe41c221f5bd\">To be written.</p>\n<h2 data-chunk-id=\"f8dc6f54-012c-4617-8825-81618b910e0b\" style=\"color:#0d47a1\">Proposed change</h2>\n<p data-chunk-id=\"528184a4-0e30-4944-b2e1-550ca103b67d\">To be written.</p>\n<h2 data-chunk-id=\"21792b73-7ace-4562-a1cf-fb11149b2e86\" style=\"color:#0d47a1\">Parameters</h2>\n<p data-chunk-id=\"8dd648d6-231f-4521-9ddc-35ee53b78ba7\">To be written.</p>\n<h2 data-chunk-id=\"bfacbc81-871d-4874-aabe-c9f5b333dcc9\" style=\"color:#0d47a1\">Risks</h2>\n<p data-chunk-id=\"6bac2124-c4dd-4c78-afe5-ea3be20d8c6d\">To be written.</p>",
-    "session_id": "nebula-gdd-5f05a3fe54-grapple-rework",
+    "html": "<h1 data-chunk-id=\"5bc6bcce-e4c9-496e-a89d-32b379a33151\" style=\"color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px\">Nebula Drift - Grapple Rework (design spike)</h1>\n<p data-chunk-id=\"8043defc-e1a5-404c-a549-22630d35f277\" style=\"background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt\">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section \"Traversal - Grapple Rework\".</p>\n<h2 data-chunk-id=\"5f316921-8ad1-4390-905d-985d5817bd2a\" style=\"color:#0d47a1\">Problem</h2>\n<p data-chunk-id=\"d5b3eab3-ed74-47cf-8e04-9b90e6d43bc3\">To be written.</p>\n<h2 data-chunk-id=\"c858785f-ef58-470e-a510-109050d0151d\" style=\"color:#0d47a1\">Proposed change</h2>\n<p data-chunk-id=\"eb56cdbf-1a9a-47ae-872e-7530bd04f8bf\">To be written.</p>\n<h2 data-chunk-id=\"9e500a61-0819-4775-bd5f-5c7c6af726ac\" style=\"color:#0d47a1\">Parameters</h2>\n<p data-chunk-id=\"c806dd10-f817-41c6-b775-3699e6b801c0\">To be written.</p>\n<h2 data-chunk-id=\"af56032d-d6a2-46ed-b539-ae770d886876\" style=\"color:#0d47a1\">Risks</h2>\n<p data-chunk-id=\"bf2d2141-7fea-4eef-9099-d646aafcdaab\">To be written.</p>",
+    "session_id": "nebula-gdd-1d7c7d3993-grapple-rework",
     "filename": "grapple-rework.html",
     "chunks_count": 10,
-    "version_id": "0ce3eec9-3f2d-49e9-be14-004a095ac9ed",
+    "version_id": "a9d89d2a-6af6-41bc-80ba-ccef494a7ecc",
     "page_setup": null,
     "persisted": true
   },
-  "elapsed_s": 1.012,
+  "elapsed_s": 1.006,
   "content_type": "application/json"
 }

@@ -4,14 +4,14 @@
   "path": "/v1/documents/export",
   "request": {
     "format": "docx",
-    "session_id": "nebula-gdd-5f05a3fe54-narrative",
+    "session_id": "nebula-gdd-1d7c7d3993-narrative",
     "options": {
       "filename": "Nebula Drift - Narrative"
     }
   },
   "status": 200,
   "response": null,
-  "elapsed_s": 0.907,
+  "elapsed_s": 0.702,
   "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "response_bytes_len": 37658
 }

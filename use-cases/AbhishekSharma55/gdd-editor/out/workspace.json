@@ -1,40 +1,40 @@
 {
-  "workspace_id": "nebula-gdd-5f05a3fe54",
+  "workspace_id": "nebula-gdd-1d7c7d3993",
   "docs": {
     "gdd": {
       "key": "gdd",
       "title": "Nebula Drift - Game Design Document",
-      "session_id": "nebula-gdd-5f05a3fe54-gdd",
-      "version": 3,
-      "doc_sha": "b208b3723fb51e47"
+      "session_id": "nebula-gdd-1d7c7d3993-gdd",
+      "version": 4,
+      "doc_sha": "f2c5ccaeaef0c593"
     },
     "mechanics": {
       "key": "mechanics",
       "title": "Nebula Drift - Mechanics",
-      "session_id": "nebula-gdd-5f05a3fe54-mechanics",
+      "session_id": "nebula-gdd-1d7c7d3993-mechanics",
       "version": 2,
-      "doc_sha": "735017009ba8f7c3"
+      "doc_sha": "1ef8a26d36f08400"
     },
     "narrative": {
       "key": "narrative",
       "title": "Nebula Drift - Narrative",
-      "session_id": "nebula-gdd-5f05a3fe54-narrative",
+      "session_id": "nebula-gdd-1d7c7d3993-narrative",
       "version": 1,
-      "doc_sha": "36f438d554889120"
+      "doc_sha": "241218b63070e5e5"
     },
     "art-bible": {
       "key": "art-bible",
       "title": "Nebula Drift - Art Bible",
-      "session_id": "nebula-gdd-5f05a3fe54-art-bible",
+      "session_id": "nebula-gdd-1d7c7d3993-art-bible",
       "version": 2,
-      "doc_sha": "727189a974e31421"
+      "doc_sha": "137e60ab577083aa"
     },
     "grapple-rework": {
       "key": "grapple-rework",
       "title": "Nebula Drift - Grapple Rework (design spike)",
-      "session_id": "nebula-gdd-5f05a3fe54-grapple-rework",
+      "session_id": "nebula-gdd-1d7c7d3993-grapple-rework",
       "version": 2,
-      "doc_sha": "33f957bf0475a981"
+      "doc_sha": "1f9d4751d7bd22ad"
     }
   },
   "links": {
@@ -64,7 +64,7 @@
       "doc": "grapple-rework",
       "label": "act2-subdoc",
       "ops": 1,
-      "seconds": 89.5,
+      "seconds": 99.7,
       "changed": 4,
       "unchanged": 6,
       "ok": true,
@@ -74,17 +74,27 @@
       "doc": "gdd",
       "label": "act2-gdd",
       "ops": 1,
-      "seconds": 84.5,
+      "seconds": 99.8,
       "changed": 2,
       "unchanged": 22,
       "ok": true,
       "api_summary": "1 section edited, 1 added, rest untouched"
     },
     {
+      "doc": "gdd",
+      "label": "act2-gdd-repair",
+      "ops": 1,
+      "seconds": 51.6,
+      "changed": 1,
+      "unchanged": 23,
+      "ok": true,
+      "api_summary": "1 section edited, rest untouched"
+    },
+    {
       "doc": "mechanics",
       "label": "act3-mechanics",
       "ops": 1,
-      "seconds": 24.6,
+      "seconds": 31.2,
       "changed": 1,
       "unchanged": 13,
       "ok": true,
@@ -94,7 +104,7 @@
       "doc": "gdd",
       "label": "act3-gdd",
       "ops": 1,
-      "seconds": 8.9,
+      "seconds": 12.1,
       "changed": 1,
       "unchanged": 23,
       "ok": true,
@@ -104,7 +114,7 @@
       "doc": "art-bible",
       "label": "act4-images",
       "ops": 1,
-      "seconds": 52.6,
+      "seconds": 59.7,
       "changed": 1,
       "unchanged": 8,
       "ok": false,

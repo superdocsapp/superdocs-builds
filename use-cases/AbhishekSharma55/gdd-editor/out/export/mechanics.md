@@ -29,7 +29,7 @@ appears in two places, this one wins.
 | Parameter | Value | Design note |
 | --- | --- | --- |
 | Range | 18 m | Reads at speed; longer felt like teleporting. |
-| Cooldown | 5 s | It is now paced against the overheat pulse. |
+| Cooldown | 5 s | Now paced against the overheat pulse. |
 | Speed on release | 140% | The only system that converts height into speed. |
 | Attach angle | 60 deg cone | Forgiving, because the camera is not. |
 

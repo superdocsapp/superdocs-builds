@@ -9,11 +9,11 @@
   },
   "status": 200,
   "response": {
-    "url": "https://storage.googleapis.com/superdocs-document-images/img/e84c6e0f5492477ba8bcb02d4078f04e.png",
-    "view_url": "https://storage.googleapis.com/superdocs-document-images/img/e84c6e0f5492477ba8bcb02d4078f04e.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260807%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260807T165429Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=9ffa31992f1c29afd9d076ad224811a244dbc294f5d5c24c658d92e4c85642b6f0449ac5cf86380f85e9ea636f12e353e04c3d8e6614cf1a9c2d9714392ddf0883d6152ee6fe7d0f33e71b3b9e3f568ab623462d28e15dd43da4727c5c019cab3011c6642cd6c1eb09919b0e3feb8d8833adf0232a02c1048162f0232b7f06de2257f2e5656eb88221954a5d73bc3d279b5b460165812fd8b650242b74315ccdbefa1d309cc8cdca6161c179bf6826f49552fbf107c1ad35adc0abf52abd5c923e6683a35fd889617cc47533d7e8bb6f52c1483e4cafe833d1a8c9bc18f7c1a0cf0149f3c363a06f4464ced356f02b1951ac4900ae582a28dbf2633ce248ba29",
+    "url": "https://storage.googleapis.com/superdocs-document-images/img/07a25b1643dd464a933ee4f1dcb7fdc0.png",
+    "view_url": "https://storage.googleapis.com/superdocs-document-images/img/07a25b1643dd464a933ee4f1dcb7fdc0.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260807%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260807T172355Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=97f3773503e76695c68c63f3aaf9aadb6389c183537261a60652b6eb3dde54494a2bc56c359d2eab6cc0c7282b01bdea26a862115eb60ddaff078c4af8728b84b907c33c76bd526123c1c217076186d4e2f05a1f65447bb85df6bfcd66335e174c712f6038db41469f7cdec6b899d7e80cd5acaf77dfb0f14681d7969f4c25f2b4638dd10e190fec58d83f2e502ee7762fb2be9f15163551026f143500da1af340c68d212064e985e3262157ccdc7f5ad676896f3c34b60671f07fb2df3858e4d670a8e32e8225d4d3b3dfa47d596870335e5b1467a40904ed35eae5f78c8a1dfba0d0ffed92d4c981371f8b78b8dfb3fa612fb97dff84a855696ca20953499e",
     "content_type": "image/png",
     "size": 1061
   },
-  "elapsed_s": 0.885,
+  "elapsed_s": 0.616,
   "content_type": "application/json"
 }

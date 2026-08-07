@@ -22,8 +22,13 @@
     },
     {
       "name": "the GDD gained the section 'Traversal - Grapple Rework'",
-      "ok": false,
-      "detail": "sections now: ['Overview', 'Design pillars', 'Core loop', 'Traversal', 'Combat', 'Progression', 'Art direction', 'Narrative', 'Linked sub-documents', 'Open questions']"
+      "ok": true,
+      "detail": "sections now: ['Overview', 'Design pillars', 'Core loop', 'Traversal', 'Traversal - Grapple Rework', 'Combat', 'Progression', 'Art direction', 'Narrative', 'Linked sub-documents', 'Open questions']"
+    },
+    {
+      "name": "the new section contains only what was asked for (no invented table)",
+      "ok": true,
+      "detail": "<h2>Traversal - Grapple Rework</h2>\n<p>A design spike is open to reduce the grapple cooldown, and the full spike lives in the linked sub-document \"Nebula Drift - Grapple Rework (design spike)\".</p></div>\n"
     },
     {
       "name": "ACT 2: mechanics, narrative and art-bible are byte-identical",
@@ -73,7 +78,7 @@
     {
       "name": "embedding images changed nothing but the Concept art section",
       "ok": true,
-      "detail": "{\"gdd\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"mechanics\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"narrative\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"art-bible\": {\"expected\": [\"Concept art\"], \"sections_changed\": [\"6a2e5064-11b6-43fb-b6d7-cdfc4d284825\"], \"unintended\": [], \"byte_identical_sections\": 8, \"ok\": tru"
+      "detail": "{\"gdd\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"mechanics\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"narrative\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"art-bible\": {\"expected\": [\"Concept art\"], \"sections_changed\": [\"a1f16fef-a4fd-43ce-be29-e5b1215f8c5e\"], \"unintended\": [], \"byte_identical_sections\": 8, \"ok\": tru"
     },
     {
       "name": "every document exports to .docx",
@@ -86,19 +91,20 @@
       "detail": ""
     }
   ],
-  "ops": 5,
-  "seconds": 276.5,
+  "ops": 6,
+  "seconds": 368.3,
   "untouched": {
     "act-2": {
       "documents": {
         "gdd": {
           "expected": [
             "Linked sub-documents",
-            "Traversal - Grapple Rework"
+            "Traversal - Grapple Rework",
+            "Traversal"
           ],
           "sections_changed": [
-            "40120a2e-0f5e-4087-a3ac-64db214e98a1",
-            "6e39411d-af8e-403b-9706-7a3407ca5968"
+            "133c58ab-7285-405d-92b9-d9912f673df3",
+            "26724c8f-09f5-4d49-8361-5f9cba89f0e2"
           ],
           "unintended": [],
           "byte_identical_sections": 22,
@@ -134,7 +140,7 @@
             "Traversal"
           ],
           "sections_changed": [
-            "c9c72155-affd-416f-8b0b-3db6528af4a7"
+            "a611e8b5-3ee8-4319-8bda-dc9c71a12f99"
           ],
           "unintended": [],
           "byte_identical_sections": 23,
@@ -145,7 +151,7 @@
             "Grapple"
           ],
           "sections_changed": [
-            "06f09bdd-ff90-446c-b44f-b75b5e2b802d"
+            "0f6479ac-83ab-4074-b3f1-7a7f0d7a3efa"
           ],
           "unintended": [],
           "byte_identical_sections": 13,
@@ -191,7 +197,7 @@
             "Concept art"
           ],
           "sections_changed": [
-            "6a2e5064-11b6-43fb-b6d7-cdfc4d284825"
+            "a1f16fef-a4fd-43ce-be29-e5b1215f8c5e"
           ],
           "unintended": [],
           "byte_identical_sections": 8,
