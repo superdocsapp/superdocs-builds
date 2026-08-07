@@ -185,7 +185,7 @@ REST throughout. Both builds hit the four-call minimum contract.
 |---|---|---|
 | `POST /v1/agents/signup` | got the key; the account is Abhishek's | no |
 | `POST /v1/documents/upload-base64` | every seed, both builds — verbatim, no model | no |
-| `POST /v1/chat` | every edit, `response_mode: full`. Digest: `core`/`balanced`, escalating to `pro`/`deep` only on a repair. GDD editor: `pro`/`deep`, because it authors prose | **yes** |
+| `POST /v1/chat` | every edit, `response_mode: full`, `pro`/`deep` in both builds. The digest ran on the default tier for a while and had to go back — §6, question 4 | **yes** |
 | `POST /v1/documents/images/upload-base64` | concept plates → stable URLs | no |
 | `POST /v1/documents/export` | Markdown + `.docx`, constantly | no |
 | `POST /v1/chat/async` + `GET /v1/jobs/{id}` + `POST /v1/chat/{id}/approve` | in `client.py`: the human-gated path, and the automatic fallback when a sync turn hits a gateway timeout | yes |

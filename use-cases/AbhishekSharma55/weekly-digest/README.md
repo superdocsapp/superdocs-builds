@@ -155,7 +155,7 @@ the instruction and output of every failed attempt in `out/arm-a-edit/failed-att
 | Call | Used for | Billable |
 |---|---|---|
 | `POST /v1/documents/upload-base64` | seed week 1 verbatim | no |
-| `POST /v1/chat` (`core`/`balanced`, escalating to `pro`/`deep` on a repair, `response_mode: full`) | one edit per week | **yes** |
+| `POST /v1/chat` (`pro`/`deep`, `response_mode: full`) | one edit per week | **yes** |
 | `POST /v1/documents/export` | Markdown + `.docx` every week | no |
 | `POST /v1/chat/async`, `GET /v1/jobs/{id}`, `POST /v1/chat/{id}/approve` | the human-gated path in `superdocs_kit/client.py`; the fallback when a sync turn hits a gateway timeout | yes |
 

@@ -150,11 +150,40 @@ and `pro`/`deep` fixed it — at ~195 s a week against ~43 s. After A9 removed t
 ambiguity, the **default tier passed the same week that had failed four times**,
 4.5x faster.
 
-**Assumption:** the right place for the expensive model is the repair path, not
-every turn. Attempt 1 runs on `core`/`balanced`; a week that fails verification
-is retried on `pro`/`deep`. Tier does not change what SuperDocs bills, so this
-trades latency, not money — and both arms of the measurement use the same policy,
-including the control arm, so the comparison stays symmetric.
+**Assumption at the time:** the right place for the expensive model is the repair
+path, not every turn. Attempt 1 on `core`/`balanced`, escalating to `pro`/`deep`.
+
+**Disproved, and the code says so.** Over weeks 4–7 the default tier failed
+first-attempt verification roughly 60% of the time, on the same checks. One
+passing week was not evidence (`bugs.md` M4). Attempt 1 is back on `pro`/`deep`
+in `runner.py` and in both READMEs. Tier does not change what SuperDocs bills, so
+all of this was latency, never money — and both arms of the measurement use the
+same policy, including the control arm, so the comparison stays symmetric.
 
 **The general lesson, and the one worth carrying:** when a model gets something
-wrong, look for the ambiguity before reaching for a bigger model.
+wrong, look for the ambiguity before reaching for a bigger model. It was the
+right first move — the literal-HTML change is what made the *content* correct and
+it stayed — it just did not remove the need for the stronger model.
+
+## 2026-08-08 — A11. A verification pass by a second pair of eyes, and what it changed
+
+The brief recommends letting someone who did not write the code check it. Doing
+that against this repo found three things the author's own checks had passed,
+and they are worth logging because two of them were checks, not code:
+
+1. **`bugs.md` M5** — the archive parser skipped rows it could not read, so a
+   duplicated archive row passed an invariant named *"covers every past week
+   exactly once"*. Fixed with a fourteenth invariant plus an instruction that
+   names the label format. Weeks that had needed a two-turn repair every time
+   now pass first attempt at one operation each.
+2. **`bugs.md` M6** — the cross-document check treated added content as never
+   unintended, so *"only the Concept art section changed"* passed a turn that
+   appended a **second** Concept art section (now `bugs.md` B15).
+3. **Counts in prose** — invariants, tests and bug totals had drifted apart from
+   the code. Every number in these documents is now derived from something on
+   disk, and the ones that could not be reproduced were removed rather than
+   softened.
+
+**Assumption going forward:** any number in a README is a claim, and a claim
+needs a command that reproduces it. Where this repo states a number, the command
+that produces it is next to it.

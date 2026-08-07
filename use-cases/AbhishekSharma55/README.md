@@ -6,7 +6,7 @@ Two projects, one shared client layer, one fictional universe.
 |---|---|
 | **[weekly-digest/](weekly-digest/)** | One standing document, revised in place week after week instead of regenerated. One billable operation per week. Fourteen invariants, re-derived from the document's bytes, catch drift; a control arm regenerates the same digest from the same inputs, with the method committed before the result. |
 | **[gdd-editor/](gdd-editor/)** | A chat-driven editor for long, linked game design documents — mechanics, narrative and art bible as sub-documents, with image support. The graded scenario runs as one command and is asserted from the documents' own bytes. |
-| **[bugs.md](bugs.md)** | Fifteen SuperDocs bugs and rough edges found against the live API, with reproduction steps and two runnable repros — plus four of my own. |
+| **[bugs.md](bugs.md)** | Fifteen SuperDocs bugs and rough edges found against the live API, with reproduction steps and two runnable repros — plus six of my own. |
 | **[Makefile](Makefile)** | `make setup` · `make test` (no key) · `make demo` (no spend) · `make scenario` / `make run` / `make control` (capped). |
 | **[WALKTHROUGH.md](WALKTHROUGH.md)** | What each build does, the decisions behind it, where it is weakest, and the answers to the questions those invite. |
 
@@ -94,11 +94,41 @@ differences it is looking for. On top of that:
   Nothing is estimated.
 - Raw data is committed: both ledgers, every week's document, every export,
   every diff, and the instruction and output of every failed attempt.
-- `bugs.md` ends with four bugs of **my own**, kept in the same file, because a
-  bug log that only contains other people's bugs is a marketing document. One
-  of them — a check of mine that ignored what it could not parse — is why the
-  digest's invariant list grew from thirteen to fourteen.
+- `bugs.md` ends with six bugs of **my own**, kept in the same file, because a
+  bug log that only contains other people's bugs is a marketing document. Two of
+  the six (M5, M6) are checks of mine that certified documents they should have
+  failed — the archive parser skipping a row it could not read, and the surgical
+  check waving new content through. Both were found by re-reading the committed
+  artefacts rather than the verdicts, both are fixed, and both have a regression
+  test. They are the two I would read first.
 - Where a build has a limitation, it is in that build's README under *"What is
   honestly absent"* rather than left for a reader to discover.
+
+## Multi-document: what is here, and what is honestly absent
+
+Build #2 is a **multi-document** editor and the multi-document behaviour is
+real: a GDD plus three linked sub-documents, a fourth created at runtime, edits
+addressed to one named document, and a cross-document proof that the documents
+nobody named came back **byte-identical, whole**. The link graph is data
+(`corpus.LINKS`).
+
+**What is absent is SuperDocs' own multi-document session, and the reason is
+`bugs.md` B10.** Open three documents into one session and the roster comes back
+with **one** entry, every document carrying `document_id: "doc_primary"`, and a
+different document on each identical GET. `focus` then rejects the durable id it
+was opened with. There is no id that addresses a specific open document, so a
+targeted cross-document edit has nowhere to land.
+
+So this build gives **each document its own session** and holds the link graph
+itself. Two runnable, zero-operation reproductions are committed, and both were
+re-run against the live API while writing this:
+`repro/B10-multidoc-roster.sh` (curl) and `gdd probe-multidoc --live` (the same
+sequence through this client, ending in a printed verdict).
+
+**What that costs, said before anyone asks:** the model never sees two documents
+in one turn, so a cross-document request is decomposed by my code into one
+targeted edit per document rather than reasoned about in a single turn. That is
+why the graded scenario's ACT 2 and ACT 3 are two operations each. If B10 were
+fixed, the right architecture is different and I would change it.
 
 MIT, per this repository. Built with Claude Code.
