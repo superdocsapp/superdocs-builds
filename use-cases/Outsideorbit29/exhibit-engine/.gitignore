@@ -1,0 +1,17 @@
+# Secrets — never commit.
+.env
+
+# Local artifacts.
+packet-out/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+build/
+
+# Virtualenvs.
+.venv/
+.venv-exhibit/
+
+# The API key is a secret; this is a hard block in case it is ever pasted here.
+*sk_2[0-9a-f]*.txt

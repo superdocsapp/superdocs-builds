@@ -1,0 +1,19 @@
+JOINT BANK STATEMENT (SAMPLE)
+Account: Sharma-SHARMA, Joint Checking, XXXXXX4821
+Bank: First National Bank of Austin
+Period: January 2026 - June 2026
+
+1 Jan 2026  Opening balance                $4,120.00
+15 Jan 2026 Direct deposit (Meera)          $3,400.00
+20 Jan 2026 Rent transfer                   -$1,750.00
+14 Feb 2026 Direct deposit (Meera)          $3,400.00
+20 Feb 2026 Rent transfer                   -$1,750.00
+5 Mar 2026  Transfer (Reyansh)              $1,900.00
+20 Mar 2026 Rent transfer                   -$1,750.00
+10 Apr 2026 Direct deposit (Meera)          $3,400.00
+20 Apr 2026 Rent transfer                   -$1,750.00
+2 May 2026  Transfer (Reyansh)              $1,900.00
+20 May 2026 Rent transfer                   -$1,750.00
+15 Jun 2026 Direct deposit (Meera)          $3,400.00
+20 Jun 2026 Rent transfer                   -$1,750.00
+30 Jun 2026 Closing balance                 $6,520.00
