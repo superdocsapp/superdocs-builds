@@ -134,6 +134,38 @@ def test_the_real_corrupted_document_is_detected():
     assert "<table" in before and "<table" not in section_html(after, "Archive")
 
 
+def test_content_added_to_a_named_section_passes_but_a_duplicate_heading_does_not():
+    """The line between "add to this section" and "add another section".
+
+    Both shapes come back from the live API. Putting two images into the
+    'Concept art' section produces chunks that cannot exist in the before
+    document, so judging additions only against the before document called a
+    correct edit unintended. Hanging the same images off a SECOND
+    <h2>Concept art</h2> is bugs.md B15, and it must still fail.
+
+    `allow_new=False` plus resolving the named section in BOTH documents
+    separates them: content under the first heading of that name is intended,
+    content under a second heading of the same name is not.
+    """
+    before = ('<h1>Art bible</h1><h2 data-chunk-id="h-p">Palette</h2>'
+              '<p data-chunk-id="p1">warm</p>'
+              '<h2 data-chunk-id="h-c">Concept art</h2><p data-chunk-id="c1">boards</p>')
+
+    added_inside = before.replace('<p data-chunk-id="c1">boards</p>',
+                                  '<p data-chunk-id="c1">boards</p>'
+                                  '<div data-chunk-id="c2"><img src="a"><img src="b"></div>')
+    v = verify_surgical(before, added_inside,
+                        expected_sections=["Concept art"], allow_new=False)
+    assert v.ok, f"images added inside the named section are the edit: {v.unintended}"
+
+    duplicated = before + ('<h2 data-chunk-id="h-c2">Concept art</h2>'
+                           '<div data-chunk-id="c3"><img src="a"></div>')
+    v2 = verify_surgical(before, duplicated,
+                         expected_sections=["Concept art"], allow_new=False)
+    assert not v2.ok, "a second section with the same heading must not pass"
+    assert set(v2.unintended) == {"h-c2", "c3"}
+
+
 def test_text_diff_is_human_readable():
     d = text_diff("a\nb\nc", "a\nB\nc", label_a="w1", label_b="w2")
     assert "-b" in d and "+B" in d and "w1" in d

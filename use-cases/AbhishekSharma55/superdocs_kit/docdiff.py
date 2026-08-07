@@ -381,6 +381,16 @@ def verify_surgical(
     intended: set[str] = set(expected_chunk_ids or ())
     if expected_sections:
         intended |= chunks_of_sections(before_html, expected_sections)
+        # ALSO resolve the named sections in the AFTER document. Adding content
+        # to a section is a normal edit - "put these two images in Concept art"
+        # produces chunks that cannot exist in the before document - and judging
+        # additions only against the before document would call every one of
+        # them unintended. Resolving in the after document keeps the check
+        # strict where it matters: `section_named` returns the FIRST section
+        # with that name, so content appended under a DUPLICATE heading of the
+        # same name is still outside the intended set and still fails. That is
+        # bugs.md B15, and it is the case this line must not let through.
+        intended |= chunks_of_sections(after_html, expected_sections)
     if expected_text:
         needles = [t.lower() for t in expected_text]
         for cid, residue in residue_map(before_html).items():
