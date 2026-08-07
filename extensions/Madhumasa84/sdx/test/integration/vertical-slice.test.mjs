@@ -9,11 +9,14 @@ import { startFixtureServer } from '../fixtures/server.mjs';
 
 const cliPath = new URL('../../dist/cli.js', import.meta.url).pathname;
 
-function runCli(args, { baseUrl, key = 'fixture-api-key', input = '', omitKey = false }) {
+function runCli(args, { baseUrl, key = 'fixture-api-key', input = '', omitKey = false, home }) {
   return new Promise((resolve, reject) => {
     const env = { ...process.env, SDX_API_BASE_URL: baseUrl };
     if (omitKey) {
       delete env.SUPERDOCS_API_KEY;
+      // Isolate HOME so that a real ~/.sdx/credentials.json on the developer
+      // machine cannot satisfy the missing-credential check.
+      env.HOME = home ?? '/tmp/sdx-no-home-isolated';
     } else {
       env.SUPERDOCS_API_KEY = key;
     }

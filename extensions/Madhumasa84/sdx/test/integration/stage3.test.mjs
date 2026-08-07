@@ -14,15 +14,27 @@ function runCli(args, options = {}) {
     const env = { ...process.env, HOME: options.home, SDX_API_BASE_URL: options.baseUrl, SUPERDOCS_API_KEY: options.key ?? 'fixture-api-key', ...options.env };
     if (options.omitKey) delete env.SUPERDOCS_API_KEY;
     const child = spawn(process.execPath, [cliPath, ...args], { env, cwd: options.cwd });
-    let stdout = ''; let stderr = '';
+    let stdout = ''; let stderr = ''; let triggered = false;
     child.stdout.setEncoding('utf8'); child.stderr.setEncoding('utf8');
-    child.stdout.on('data', (chunk) => (stdout += chunk)); child.stderr.on('data', (chunk) => (stderr += chunk));
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk;
+      // Condition-based SIGINT: fire only after the trigger line appears in stderr,
+      // guaranteeing the async-edit HTTP call has returned and activeJobId is set.
+      if (!triggered && options.stderrTrigger && stderr.includes(options.stderrTrigger)) {
+        triggered = true;
+        child.kill('SIGINT');
+      }
+    });
     child.on('error', reject);
     const timer = setTimeout(() => { child.kill('SIGKILL'); reject(new Error('Stage 3 CLI run timed out.')); }, options.timeout ?? 10_000);
     child.on('close', (status, signal) => { clearTimeout(timer); resolve({ status, signal, stdout, stderr }); });
     if (options.keepInputOpen) {
       child.stdin.write(options.input ?? 'streaming content');
-      setTimeout(() => child.kill('SIGINT'), options.interruptAfter ?? 150);
+      if (!options.stderrTrigger) {
+        // Fall back to timer-based interrupt only when no condition trigger is supplied.
+        setTimeout(() => { if (!triggered) { triggered = true; child.kill('SIGINT'); } }, options.interruptAfter ?? 150);
+      }
     } else child.stdin.end(options.input ?? '');
   });
 }
@@ -236,7 +248,15 @@ test('Ctrl+C returns 130 and removes streamed-new temporary input', async () => 
 test('Ctrl+C reports a possibly-running remote edit job without claiming cancellation', async () => {
   const fixture = await startFixtureServer({ mode: 'stuck' }); const files = await workspace();
   try {
-    const result = await runCli(editArgs(files.source, 'keep waiting', ['--timeout', '30']), { baseUrl: fixture.baseUrl, home: files.home, keepInputOpen: true, input: '', interruptAfter: 250 });
+    // Use condition-based synchronisation: send SIGINT only after the first poll
+    // result appears in stderr, guaranteeing onJobStarted has set activeJobId.
+    // The 'stuck' fixture always responds 'pending', so 'Job pending' is the
+    // earliest safe marker that proves startAsyncEdit succeeded.
+    const result = await runCli(
+      editArgs(files.source, 'keep waiting', ['--timeout', '30']),
+      { baseUrl: fixture.baseUrl, home: files.home, keepInputOpen: true, input: '',
+        stderrTrigger: 'Job pending' },
+    );
     assert.equal(result.status, 130, result.stderr);
     assert.match(result.stderr, /Remote job job-1 may still be running/);
     assert.match(result.stderr, /not cancelled/);

@@ -63,7 +63,16 @@ export async function withFileLock<T>(targetPath: string, action: () => Promise<
   await mkdir(dirname(targetPath), { recursive: true, mode: 0o700 }); await chmod(dirname(targetPath), 0o700);
   while (true) {
     try {
-      await mkdir(lockPath, { mode: 0o700 }); await chmod(lockPath, 0o700);
+      await mkdir(lockPath, { mode: 0o700 });
+      // chmod is umask-safety only; if the lock dir was already removed by a
+      // concurrent locker that finished instantly (ENOENT), fall through to
+      // contention handling rather than crashing.
+      try { await chmod(lockPath, 0o700); }
+      catch (chmodError) {
+        if ((chmodError as NodeJS.ErrnoException).code !== 'ENOENT') throw chmodError;
+        // Dir is gone — treat as contention and retry.
+        continue;
+      }
       await writeFile(join(lockPath, 'owner.json'), `${JSON.stringify({ pid: process.pid, createdAt: new Date(clock()).toISOString(), nonce: randomUUID() })}\n`, { mode: 0o600, flag: 'wx' });
       break;
     } catch (error) {
