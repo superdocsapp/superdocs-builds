@@ -260,26 +260,27 @@ failures than a demo that only goes one way.
 
 **4. "Are you just throwing a bigger model at it?"**
 
-I was, and then I stopped — and this is the answer I would most want to give.
+I was, then I stopped, then I had to partly go back — and the third part is the
+one worth telling.
 
 On the default tier the five-step weekly instruction was applied *partially*:
 the archive done, the four steps after it silently dropped, four weeks running
-(bug B9). The obvious fix was `pro`/`deep`, and it worked — at ~195 s a week
-instead of ~43 s. But the reason the model was dropping steps was that the
-instruction *described* the target ("replace all bullets with exactly these
-four") and description is ambiguous: measured, it was read as *append* often
-enough to matter — week 7 came back holding the five old bullets plus the four
-new ones.
+(bug B9). The reason was that the instruction *described* its target ("replace
+all bullets with exactly these four"), and description is ambiguous — measured,
+it was read as *append* often enough to matter.
 
-Once the factual sections are handed over as **literal HTML**, the *default*
-tier gets every step right and does it 4.5× faster, on the exact document that
-had failed four times. So the strong model moved to the repair path: attempt 1
-is cheap, and only a week that fails verification escalates.
+So I handed the factual sections over as **literal HTML**, re-tested the default
+tier on the exact week that had failed four times, watched it pass 4.5× faster,
+and moved attempt 1 to the cheap tier.
 
-The general version, and the thing to say out loud: **the fix for a model
-getting something wrong is usually to remove the ambiguity, not to buy a bigger
-model.** Both tiers bill one operation, so the expensive one was never cheaper —
-only slower.
+**Over a longer run it failed first-attempt verification about 60% of the time.**
+One passing week was not evidence. Attempt 1 is back on `pro`/`deep`, and the
+comment in `runner.py` says so, including the part where I was wrong.
+
+The lesson that survives: on the first failure, removing the ambiguity beat
+buying a bigger model — the literal-HTML change is what made the *content*
+correct, and it stayed. It just did not remove the need for the stronger model
+entirely. Both tiers bill one operation, so none of this was ever about money.
 
 **5. "You are re-sending the whole document on every turn. Isn't that fighting
 the product?"**

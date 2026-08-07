@@ -158,20 +158,26 @@ large to fit in a request body you would invert this.
 one more operation — deliberately, because a week nobody verified is a week that
 is not done. The double charge is visible in the ledger rather than hidden.
 
-**The model tier story is the one I would most want you to read.** On the
-default tier, the five-step weekly instruction was applied *partially* — the
+**The model tier story, including the part where I got it wrong.** On the
+default tier the five-step weekly instruction was applied *partially* — the
 archive done, the four steps after it silently dropped, four weeks running
-([`bugs.md` B9](../bugs.md)). The obvious fix was a bigger model, and
-`pro`/`deep` did fix it — at ~195 s a week instead of ~43 s.
+([`bugs.md` B9](../bugs.md)). `pro`/`deep` fixed it, at ~190 s a week against
+~25 s.
 
-The better fix was to stop being ambiguous. Once the factual sections are handed
-over as **literal HTML** instead of described in prose, the *default* tier gets
-every step right, 4.5× faster, measured on the exact document that had failed
-four times. So the strong model moved to where it belongs: **attempt 1 runs on
-the default tier; only a week that fails verification is retried on
-`pro`/`deep`.** Paying for the strongest model on all 52 weeks to cover a low
-failure rate is the wrong trade — and tier does not change what SuperDocs bills
-either way, so this buys latency, not money.
+Then I removed the ambiguity — the factual sections became **literal HTML**
+instead of prose descriptions — and re-tested the default tier on the exact week
+that had failed four times. It passed, 4.5× faster, so I moved attempt 1 to the
+default tier and left the strong model for repairs.
+
+**Over a longer run that did not hold.** Across weeks 4–7 the default tier failed
+first-attempt verification roughly 60% of the time, on the same checks. One
+passing week was not evidence. Attempt 1 is back on `pro`/`deep`.
+
+What survives is the general lesson, and it is still the right one: on the first
+failure, removing the ambiguity beat buying a bigger model. It just did not
+remove the need for the bigger model entirely — and a single sample should not
+have convinced me that it had. Tier does not change what SuperDocs bills, so all
+of this is latency, not money.
 
 **One declared tolerance.** A single trailing full stop on a bullet is ignored
 in the fidelity check. SuperDocs adds one perhaps one bullet in twenty and

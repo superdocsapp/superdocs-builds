@@ -32,27 +32,30 @@ from .document import ARCHIVE_SECTION, STANDING_SECTIONS, archive_plan, seed_htm
 from .prompts import weekly_instruction
 from .verify import WeekReport, check_week, drift_table
 
-# Model settings, measured rather than chosen - and the history matters more
-# than the values.
+# Model settings, measured - and the honest version of the story includes the
+# time I got it wrong.
 #
-# When the weekly instruction DESCRIBED the target ("replace all bullets with
+# When the weekly instruction DESCRIBED its target ("replace all bullets with
 # exactly these four"), the default tier applied step 2 and silently dropped
-# steps 1, 3, 4 and 5, four weeks running (bugs.md B9). The obvious fix was a
-# bigger model, and 'pro'/'deep' did fix it - at ~195s a week instead of ~43s.
+# steps 1, 3, 4 and 5, four weeks running (bugs.md B9). 'pro'/'deep' fixed it.
 #
-# The better fix was to stop being ambiguous. Once the factual sections are
-# handed over as literal HTML (see document.py: bullets_html), the DEFAULT tier
-# gets every step right and does it 4.5x faster. Measured on the same input
-# document that had failed four times: bullets, "what is next", risk rows and
-# alternating shading all exact.
+# Then I removed the ambiguity - the factual sections became literal HTML
+# (document.py: bullets_html) - and re-tested the default tier on the exact week
+# that had failed four times. It passed, 4.5x faster. I switched attempt 1 to
+# 'core' on the strength of that.
 #
-# So attempt 1 is cheap and fast. Escalation is what the repair is for: a week
-# that fails verification is retried on the strongest settings. Paying for the
-# strongest model on every one of 52 weeks to cover a failure rate in the low
-# single digits is the wrong trade, and tier does not change what SuperDocs
-# bills either way - so this buys latency, not money.
-MODEL_TIER = "core"
-THINKING_DEPTH = "balanced"
+# Over a longer run it did not hold: across weeks 4-7 the default tier failed
+# first-attempt verification roughly 60% of the time, on the same checks
+# (verbatim bullets, verbatim risk rows). ONE PASSING WEEK WAS NOT EVIDENCE. So
+# attempt 1 is back on 'pro'/'deep', which costs latency (~100-190s a week
+# against ~25s) and not operations - tier does not change what SuperDocs bills.
+#
+# What survives from the experiment is the general lesson, which is still right:
+# removing ambiguity beat buying a bigger model on the *first* failure. It just
+# did not remove the need for the bigger model entirely, and a single sample
+# should not have been enough to convince me that it had.
+MODEL_TIER = "pro"
+THINKING_DEPTH = "deep"
 REPAIR_MODEL_TIER = "pro"
 REPAIR_THINKING_DEPTH = "deep"
 
