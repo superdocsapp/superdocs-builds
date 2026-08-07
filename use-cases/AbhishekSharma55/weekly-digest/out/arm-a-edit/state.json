@@ -158,6 +158,136 @@
         "archive covers every past week exactly once",
         "no header row copied into the archive body"
       ]
+    },
+    {
+      "week": 6,
+      "ops": 2,
+      "seconds": 1172.4,
+      "api_changed_chunks": [
+        "52884513-b8df-4f14-8cec-e5595c131584",
+        "83cea5e9-cf80-4865-9a2d-f8ff1e2c2627",
+        "88748edf-83c2-45ca-b8e4-05ffb6409857",
+        "b40a8a75-c548-471a-8678-afe4df505219",
+        "d2b205f8-7e16-4ff8-ae41-983495336351",
+        "dfc43cc3-217f-4d07-be54-05294ec6f027",
+        "f2970859-0767-46f3-9a7e-19997feb9e58"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "title unchanged",
+        "four H2 sections, correct names, correct order",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ],
+      "api_summary": "7 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "four H2 sections, correct names, correct order",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ]
+    },
+    {
+      "week": 7,
+      "ops": 2,
+      "seconds": 43.61,
+      "api_changed_chunks": [],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "status line matches the week",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "archive covers every past week exactly once"
+      ],
+      "api_summary": "Document updated by AI",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "title unchanged",
+        "four H2 sections, correct names, correct order",
+        "status line matches the week",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ]
+    },
+    {
+      "week": 8,
+      "ops": 2,
+      "seconds": 51.94,
+      "api_changed_chunks": [
+        "52884513-b8df-4f14-8cec-e5595c131584",
+        "83cea5e9-cf80-4865-9a2d-f8ff1e2c2627",
+        "88748edf-83c2-45ca-b8e4-05ffb6409857",
+        "d2b205f8-7e16-4ff8-ae41-983495336351",
+        "f2970859-0767-46f3-9a7e-19997feb9e58"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "title unchanged",
+        "four H2 sections, correct names, correct order",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ],
+      "api_summary": "5 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "title unchanged",
+        "four H2 sections, correct names, correct order",
+        "status line matches the week",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ]
     }
   ]
 }
