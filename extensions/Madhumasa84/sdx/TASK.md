@@ -36,8 +36,8 @@
 - [ ] Measure rendered 120-page count (trustworthy renderer unavailable; structural OOXML count passed).
 - [ ] Prove broader OS/environment locking and permission behavior (deferred to Stage 5 matrix).
 
-## Stage 5 — Release and submission (not started)
+## Stage 5 — Release and submission (complete)
 
-- [ ] Finalize versioning/changelog/release evidence.
-- [ ] Run authorized production smoke and publish submission materials.
-- [ ] Verify a clean published install.
+- [x] Finalize versioning/changelog/release evidence.
+- [x] Run authorized production smoke and publish submission materials.
+- [x] Verify a clean published install.

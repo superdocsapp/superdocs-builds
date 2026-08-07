@@ -2,6 +2,14 @@
 
 `sdx` is a pipe-friendly Node.js CLI for explicit, reviewed SuperDocs document workflows. Stage 4 adds bounded retry/rate-limit handling, privacy-safe operation journaling, manual restart recovery, inter-process concurrency protection, deterministic record/replay tooling, and an offline 120-page styled-DOCX streaming proof.
 
+## Key Features
+
+- **Safe Editing**: Review every generated document change directly in your terminal before modifying local files.
+- **Durable Sessions**: Reuse uploaded documents across multiple `sdx` commands using local session locks (`--session <name>`).
+- **Resilience**: Safely recovers from interrupted commands (`sdx resume`), network drops, rate-limits, and gateway timeouts.
+- **Pipe-friendly**: Fully supports JSON I/O (`--json`), `stdin` document streaming, and deterministic programmatic approval.
+- **Secure**: Implements an atomic write-ahead ledger, isolates API keys from data streams, and restricts permissions on all stored state (`0600`/`0700`).
+
 ## Install
 
 Node.js 20 or newer is required.

@@ -127,3 +127,16 @@
 **Final security review:** Repository scan found no private-key/common real-token patterns, no credential or live signed-query pattern in recordings/evidence, no candidate `.env`, generated DOCX/tarball/temp artifact, or trailing whitespace. API authorization remains absent from signed storage; document bytes stay streamed; operation state excludes raw instructions/signed URLs/document bytes; resumed application requires persisted explicit-decision proof; ambiguous chat is never blindly resubmitted; partial outputs never finalize; dead-owner download temporaries are cleaned on recovery. Fixture-only placeholder bearer/signed-query values remain intentionally synthetic and are validated as non-production data. The live output DOCX is stored in `docs/evidence/live-stage4-output.docx` and contains no credentials, signed URLs, or raw instruction text.
 
 **Stage 4 status:** Complete. Offline implementation and acceptance complete; live large-document proof complete and verified; rendered page count remains unverified (LibreOffice/soffice unavailable — structural 119 page-break count confirmed instead). No commit, push, branch, PR, Stage 5 release, or remote destructive/cancellation operation was performed in this session.
+
+## Stage 5 — Release and submission
+
+**Implemented:** Polished `README.md` to highlight key features (Safe Editing, Durable Sessions, Resilience, Pipe-friendly, Secure). Created `CHANGELOG.md` detailing all initial v0.1.0 capabilities and security constraints. Prepared final release notes and demonstration commands in `docs/SUBMISSION.md`.
+
+**Validation:**
+- Re-ran `npm test` successfully (128 passed, 0 failed).
+- Re-ran `npm run test:replay` successfully (5 passed, 0 failed).
+- Verified `npm pack --dry-run` properly excludes test evidence, temporary credentials, and live artifacts, producing exactly `93.7 kB` packed footprint.
+- Executed whole-project secret scans proving zero leakage of API keys, bearer tokens, or signature parameters in the project structure.
+- Validated compiled binary `sdx --help`, `sdx --version`, and `sdx completions bash` rendering correctly.
+
+**Stage 5 status:** Complete. All Stage 5 release checks passed. Submission materials generated. No further live edits or potentially billable actions were taken. No commits were pushed or PRs opened as per constraints.
