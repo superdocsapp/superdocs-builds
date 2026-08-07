@@ -1,0 +1,42 @@
+--- week-01
++++ week-02
+@@ -1,5 +1,5 @@
+ # Nebula Drift - Weekly Production Digest
+ 
+-**Week 1 · 2026-01-05 to 2026-01-11 · Phase: Pre-production**
++**Week 2 · 2026-01-12 to 2026-01-18 · Phase: Pre-production**
+ 
+ Vantage Nine Studios · internal · standing document, edited in place every Monday
+@@ -7,6 +7,7 @@
+ ## What changed
+ 
+-* Art style exploration narrowed to two directions
+-* Nav-mesh generation for the Drift Belt sector
++* Hired a second combat designer (starts week 9)
++* Perforce to Git LFS migration completed for the audio depot
++* Grapple traversal prototype playable end to end on the test level
+ 
+ ## What is at risk
+@@ -14,13 +15,13 @@
+ | Risk | Owner | Area | Severity | Trend |
+ | --- | --- | --- | --- | --- |
+-| Save-game format still unversioned | Dev H. | Engineering | Medium | steady |
+-| Boss encounter difficulty untuned for controller | Ana F. | Design | Low | steady |
++| Save-game format still unversioned | Dev H. | Engineering | Low | improving |
++| Boss encounter difficulty untuned for controller | Ana F. | Design | Low | improving |
+ | Outsourced character art slipping two weeks | Priya N. | Art | Medium | steady |
+ 
+ ## What is next
+ 
++* Lock the art direction to one of the two candidates
++* Scope the vertical slice level list
+ * Stand up the automated build farm
+-* Decide Wwise vs FMOD
+-* Lock the art direction to one of the two candidates
+ 
+ ## Archive
+@@ -32,3 +33,3 @@
+ | Week | Dates | Shipped | Risks carried |
+ | --- | --- | --- | --- |
+-| - | - | Digest opened. No prior weeks. | - |
++| Week 1 | 2026-01-05 to 2026-01-11 | Narrowed art style to two directions and completed nav-mesh generation for Drift Belt sector. | Unversioned save format, boss encounter difficulty issues, and character art delivery delay. |

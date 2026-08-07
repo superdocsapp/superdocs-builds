@@ -356,9 +356,18 @@ model's own list of which instructed steps it applied, so a caller can assert.
 At minimum, the `/v1/chat` docs should say that multi-section batching is
 unreliable on `core` and name the tier it needs.
 
-**How I worked around it:** the runner pins `model_tier="pro"`,
-`thinking_depth="deep"` for both arms of the measurement, and still verifies
-every turn from the document bytes rather than trusting it.
+**How I worked around it, and the second half is the interesting half.** First
+I pinned `model_tier="pro"`, `thinking_depth="deep"`, which fixed it. Then I
+removed the ambiguity that was causing it — the factual sections are now handed
+over as literal HTML rather than described in prose (see B11) — and with that,
+**the default tier gets every step right and does it 4.5x faster.** The strong
+model is now used only on the repair path, for a week that failed verification.
+
+Which suggests the underlying issue is less "core is too weak" and more "a
+described replacement is ambiguous, and the weaker model resolves the ambiguity
+differently". That is worth knowing on your side too: an integrator who writes
+the natural instruction will hit this, and the docs give them no reason to
+suspect the tier.
 
 ## B10 — Three documents opened into one session return a roster of ONE, all sharing `document_id: "doc_primary"`, and the answer changes between identical GETs
 
@@ -454,10 +463,10 @@ who writes "replace" will hit it and most will not be diffing hard enough to
 notice. A system-level rule that a targeted replacement must end with the target
 containing only what was specified would close it for everyone.
 
-**How I worked around it:** the instruction now states what the section must
-contain *after* the edit, says to delete anything not on the list, and says
-explicitly that one cell holds one value and never both. That fixed both
-instances on the next run. It also stays verified — the runner re-derives the
+**How I worked around it:** wording fixes helped and did not finish the job -
+three rewordings reduced the rate without removing it. What removed it was
+giving the exact replacement HTML instead of describing it, so there is nothing
+left to interpret. It also stays verified — the runner re-derives the
 bullets and every table row from the document bytes and compares them to the
 week's input, so a recurrence fails the week rather than shipping.
 

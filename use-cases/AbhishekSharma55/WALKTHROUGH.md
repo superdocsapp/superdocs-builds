@@ -258,15 +258,28 @@ live in fifteen seconds. And one of the tests loads the real corrupted document
 and asserts that the surgical check rejects it. I would rather hand over the
 failures than a demo that only goes one way.
 
-**4. "Why `pro` and not the default tier? Are you just throwing compute at it?"**
+**4. "Are you just throwing a bigger model at it?"**
 
-Measured, not assumed. On the default tier the five-step weekly instruction was
-applied *partially* — the archive done, the four steps after it silently dropped
-— four weeks running. Identical instruction, identical input document, `pro` and
-`deep`: all thirteen invariants passed first time. **Both bill one operation**,
-so the default is not cheaper, only faster. That is bug B9 and I think it is a
-docs problem more than a model problem: nothing tells an integrator that
-multi-section batching needs a tier.
+I was, and then I stopped — and this is the answer I would most want to give.
+
+On the default tier the five-step weekly instruction was applied *partially*:
+the archive done, the four steps after it silently dropped, four weeks running
+(bug B9). The obvious fix was `pro`/`deep`, and it worked — at ~195 s a week
+instead of ~43 s. But the reason the model was dropping steps was that the
+instruction *described* the target ("replace all bullets with exactly these
+four") and description is ambiguous: measured, it was read as *append* often
+enough to matter — week 7 came back holding the five old bullets plus the four
+new ones.
+
+Once the factual sections are handed over as **literal HTML**, the *default*
+tier gets every step right and does it 4.5× faster, on the exact document that
+had failed four times. So the strong model moved to the repair path: attempt 1
+is cheap, and only a week that fails verification escalates.
+
+The general version, and the thing to say out loud: **the fix for a model
+getting something wrong is usually to remove the ambiguity, not to buy a bigger
+model.** Both tiers bill one operation, so the expensive one was never cheaper —
+only slower.
 
 **5. "You are re-sending the whole document on every turn. Isn't that fighting
 the product?"**

@@ -147,11 +147,20 @@ large to fit in a request body you would invert this.
 one more operation — deliberately, because a week nobody verified is a week that
 is not done. The double charge is visible in the ledger rather than hidden.
 
-**`model_tier` is pinned to `pro`.** On the default tier the five-step weekly
-instruction was applied *partially* — the archive done, the four steps after it
-silently dropped, four weeks running ([`bugs.md` B9](../bugs.md)). Both tiers
-bill one operation, so this costs latency (~85 s vs ~20 s a week) and not money,
-and both arms of the measurement use the same setting.
+**The model tier story is the one I would most want you to read.** On the
+default tier, the five-step weekly instruction was applied *partially* — the
+archive done, the four steps after it silently dropped, four weeks running
+([`bugs.md` B9](../bugs.md)). The obvious fix was a bigger model, and
+`pro`/`deep` did fix it — at ~195 s a week instead of ~43 s.
+
+The better fix was to stop being ambiguous. Once the factual sections are handed
+over as **literal HTML** instead of described in prose, the *default* tier gets
+every step right, 4.5× faster, measured on the exact document that had failed
+four times. So the strong model moved to where it belongs: **attempt 1 runs on
+the default tier; only a week that fails verification is retried on
+`pro`/`deep`.** Paying for the strongest model on all 52 weeks to cover a low
+failure rate is the wrong trade — and tier does not change what SuperDocs bills
+either way, so this buys latency, not money.
 
 **One declared tolerance.** A single trailing full stop on a bullet is ignored
 in the fidelity check. SuperDocs adds one perhaps one bullet in twenty and
