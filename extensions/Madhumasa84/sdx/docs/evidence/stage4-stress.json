@@ -98,5 +98,44 @@
       "populationStandardDeviation": 225.85
     }
   },
-  "failures": []
+  "failures": [],
+  "liveVerification": {
+    "performedAt": "2026-08-07T16:47:44Z",
+    "stage2Prerequisite": {
+      "description": "npm run test:live \u2014 Stage 2 live smoke",
+      "result": "awaiting_approval",
+      "exitCode": 3,
+      "potentiallyBillableEdits": 1,
+      "approvalOrExportPerformed": false,
+      "passed": true
+    },
+    "stage4LargeDocumentProof": {
+      "jobId": "74c1257e-82ae-438b-a356-460b210ce111",
+      "sessionId": "sdx-live-stage4-06c42e8e-ecb5-4db8-8dae-8de06a0eb552",
+      "changeId": "56daf0c4-8c7c-4978-bbf5-2fd4b708ba1f",
+      "changeOperation": "edit",
+      "oldMarker": "SDX_TARGET_PAGE_120_ORIGINAL",
+      "newMarker": "SDX_TARGET_PAGE_120_EDITED",
+      "approvalDecision": "explicitly approved by human operator",
+      "jobStatus": "completed",
+      "progress": 100,
+      "potentiallyBillableEdits": 1,
+      "outputBytes": 228906,
+      "outputSha256": "18fb807cedd4db429153accd5b11b7c4cbff4750fe6fe1a8cf44c483dcf51779",
+      "outputFile": "docs/evidence/live-stage4-output.docx",
+      "ooxml": {
+        "validZip": true,
+        "contentTypesPresent": true,
+        "explicitPageBreaks": 119,
+        "editedMarkerPresent": true,
+        "editedMarkerCount": 1,
+        "originalMarkerAbsent": true
+      },
+      "temporaryFilesRemain": false,
+      "resubmitted": false,
+      "cancelled": false
+    },
+    "totalPotentiallyBillableEdits": 2,
+    "liveCassetteRecorded": false
+  }
 }
