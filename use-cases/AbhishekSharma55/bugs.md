@@ -300,3 +300,47 @@ signup response is the first place the number appears. An agent planning a
 accounts too (I found it in the OpenAPI spec, not the docs).
 
 ---
+
+## B9 — On the default model tier, a multi-step instruction is applied partially, and reported as done
+
+**Severity: HIGH for anyone driving the API programmatically.**
+
+The endpoint sells "up to 25 sections of targeted edits in a single request",
+and that is the shape any batching integrator will reach for. On the default
+tier (`model_tier` unset, i.e. `core`) a five-step instruction was, in four
+consecutive weeks, applied **partially**:
+
+- STEP 2 (rewrite the Archive table) — done.
+- STEPS 1, 3, 4, 5 (status line, two bullet lists, the risk table) — **not done**,
+  no error, no mention in the response text.
+
+Worse, in one of those turns the model *created a second table* with invented
+column headers (`Date Range`, `Completed`, `Issues/Notes` instead of `Dates`,
+`Shipped`, `Risks carried`) and left the original table in place below it.
+
+**Repro:** `repro/B9-instruction.txt` against `repro/B9-before.html`, sent as
+`POST /v1/chat` with `response_mode: full` and no `model_tier`.
+Compare `repro/B9-after-core-PARTIAL.html` with `repro/B9-after-pro-OK.html`.
+
+**The isolating variable is the tier.** The *identical* instruction against the
+*identical* input document with `model_tier: "pro"`, `thinking_depth: "deep"`
+passed all thirteen of my structural and fidelity checks on the first attempt:
+
+| tier | thinking | ops charged | seconds | result |
+|---|---|---|---|---|
+| `core` (default) | default | 1 | ~20 | 4 of 5 steps dropped, 4 weeks running |
+| `pro` | `deep` | 1 | ~86 | all 5 steps applied, first attempt |
+
+**Both cost one operation.** The cheaper tier is not cheaper in operations — it
+is only faster — so the default is strictly worse for multi-section work, and
+nothing in the docs says so.
+
+**Suggested fix:** either scale the default tier with the number of distinct
+changes an instruction asks for, or — cheaper and more honest — return the
+model's own list of which instructed steps it applied, so a caller can assert.
+At minimum, the `/v1/chat` docs should say that multi-section batching is
+unreliable on `core` and name the tier it needs.
+
+**How I worked around it:** the runner pins `model_tier="pro"`,
+`thinking_depth="deep"` for both arms of the measurement, and still verifies
+every turn from the document bytes rather than trusting it.

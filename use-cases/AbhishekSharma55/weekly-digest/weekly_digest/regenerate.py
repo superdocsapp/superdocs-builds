@@ -39,6 +39,7 @@ from superdocs_kit import OpsBudget, SuperDocs, sha
 from superdocs_kit.errors import BudgetExceeded, QuotaExhausted
 
 from .prompts import regenerate_instruction
+from .runner import MODEL_TIER, THINKING_DEPTH
 
 
 @dataclass
@@ -111,6 +112,9 @@ class RegenerateRun:
                     message=instruction,
                     label=label,
                     response_mode="full",
+                    model_tier=MODEL_TIER,
+                    thinking_depth=THINKING_DEPTH,
+                    timeout=900,
                 )
             except QuotaExhausted as exc:
                 self.log(f"\nSTOPPING CLEANLY at regen week {n}: {exc}")
