@@ -78,11 +78,35 @@ def propose(
         job_id, stop_on=("awaiting_approval", "completed", "failed"), timeout=900
     )
     if paused.get("status") == "completed":
+        # It ran to completion without pausing, so this is the only place the
+        # charge can be recorded. See settle() for why that matters.
+        settle(client, paused, label=label)
         log("  the model applied the change without pausing - nothing to review")
         return job_id, []
     changes = client.pending_changes(paused)
     log(f"  {len(changes)} change(s) proposed, awaiting a human")
     return job_id, changes
+
+
+def settle(client: SuperDocs, job: dict, *, label: str, seconds: float = 0.0) -> int:
+    """Put the async turn's charge on the ledger. Returns ops recorded.
+
+    THE GUARANTEE THIS RESTORES. `superdocs_kit` claims, in its own module
+    docstring, that an operation is never spent without a durable ledger line.
+    That was true of every synchronous path and **false of this one**:
+    `chat_async` submits the turn - which is when SuperDocs bills it - and
+    returns the job envelope, which carries no usage yet. The usage arrives on
+    the job when it finishes, and nothing was reading it. So the human-gated
+    path, the one place a reviewer is told an operation costs money even when
+    they deny the change, spent an operation off the books and reported
+    `0 operation(s)`.
+
+    Found by running the review demo and noticing the ledger did not move while
+    the server's `monthly_used` did. A guarantee with one unguarded path is not
+    a guarantee; it is a habit.
+    """
+    ops = client.budget.record(label, job, seconds, note="chat_async")
+    return ops
 
 
 def render_diff(changes: list[Change]) -> str:
@@ -106,8 +130,8 @@ def decide(
     job_id: str,
     changes: list[Change],
     accept: Callable[[Change], bool],
+    label: str,
     feedback: str = "",
-    ops: int = 0,
     log: Callable[[str], None] = print,
 ) -> ReviewOutcome:
     """Apply per-change decisions and wait for the job to finish."""
@@ -118,6 +142,10 @@ def decide(
             f"{c.change_id[:8]}  {visible_text(c.new_html or '')[:60]}")
     client.approve(session_id, job_id, decisions=decisions, feedback=feedback or None)
     final = client.wait_for_job(job_id, timeout=900)
+    # The turn was billed when it was SUBMITTED - approving is free - but the
+    # usage only appears on the finished job, so this is where it goes on the
+    # ledger. A denied change still costs, and the ledger has to say so.
+    ops = settle(client, final, label=label, seconds=time.monotonic() - started)
     result = final.get("result") or {}
     html = (result.get("document_changes") or {}).get("updated_html") or ""
     if not html:
@@ -126,7 +154,7 @@ def decide(
         proposed=changes,
         approved=[cid for cid, ok in decisions.items() if ok],
         denied=[cid for cid, ok in decisions.items() if not ok],
-        ops=ops,  # charged when the turn was SUBMITTED; approving is free
+        ops=ops,
         seconds=round(time.monotonic() - started, 1),
         final_html=html,
     )

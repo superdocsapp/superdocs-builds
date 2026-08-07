@@ -120,7 +120,6 @@ def cmd_review(args) -> int:
         print(f"no document {args.doc!r}. have: {sorted(ws.docs)}")
         return 1
     state = ws.docs[args.doc]
-    spent_before = budget.spent
     job_id, changes = review.propose(
         ws.client, session_id=state.session_id, document_html=state.html,
         instruction=args.instruction, label=f"review:{args.doc}",
@@ -145,7 +144,7 @@ def cmd_review(args) -> int:
     outcome = review.decide(
         ws.client, session_id=state.session_id, job_id=job_id, changes=changes,
         accept=lambda c: index[c.change_id] in keep,
-        feedback=args.feedback or "", ops=budget.spent - spent_before,
+        label=f"review:{args.doc}", feedback=args.feedback or "",
         log=lambda m: print(f"  {m}"),
     )
     if outcome.final_html:

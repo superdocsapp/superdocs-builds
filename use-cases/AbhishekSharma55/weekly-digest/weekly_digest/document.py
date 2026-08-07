@@ -179,10 +179,14 @@ def expected_archive_rows(week: int) -> tuple[int, int]:
 #
 # This is the build's thesis at its purest - FACTS ARE TRANSPORTED, PROSE IS
 # GENERATED - and it is a narrowing of the model's job, done on evidence. The
-# model still writes every archive summary and every quarterly rollup from what
-# the document says, which is the part that genuinely needs a model. And because
-# the alternating row shading is generated here rather than hoped for, formatting
-# preservation stops depending on the model noticing.
+# model still WRITES every archive summary and every quarterly rollup, which is
+# the part that genuinely needs a model. What it no longer has to do is go and
+# find the source: the outgoing week's bullets and risks are handed to the
+# archive step in quotes, because asking a model to summarise "the bullets
+# currently under 'What changed'" in the same turn that replaces those bullets
+# produced rows describing the wrong week, three times in seven (bugs.md M7).
+# And because the alternating row shading is generated here rather than hoped
+# for, formatting preservation stops depending on the model noticing.
 
 
 def bullets_html(items: list[str]) -> str:

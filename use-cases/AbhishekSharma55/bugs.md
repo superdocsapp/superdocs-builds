@@ -12,13 +12,14 @@ Anything I could not reproduce is marked **UNCONFIRMED** and stays in the list
 anyway, because a flake an integrator hits once still costs them an afternoon.
 
 **B1 is mine, not yours.** It is in the list because it is still a rough edge —
-I hit it by reading the docs correctly and guessing wrong anyway. Seven further
+I hit it by reading the docs correctly and guessing wrong anyway. Eight further
 mistakes that were entirely my own are in **"My own bugs"** at the end, because
-a bug log that only contains other people's bugs is a marketing document. Three
-of those seven are places where my own checking passed a document it should have
-failed — they are the ones I would read first if I were reviewing this.
+a bug log that only contains other people's bugs is a marketing document. Four
+of those eight (M5–M8) are places where my own checking or accounting said a
+thing was fine when it was not — they are the ones I would read first if I were
+reviewing this.
 
-**Fifteen SuperDocs entries (B1–B15) and seven of my own (M1–M7).** The table
+**Fifteen SuperDocs entries (B1–B15) and eight of my own (M1–M8).** The table
 below is all fifteen, worst first.
 
 | # | Severity | One line |
@@ -600,6 +601,16 @@ the Overheat pulse cooldown to 7 s. Make these two separate changes. Change
 nothing else." --accept 1 --live` — against
 `gdd-editor/out/snapshots/before-act-3/mechanics.html`.
 
+**⚠️ NOT REPRODUCED on two later attempts, and that is part of the report.**
+Running the same instruction against the same document twice more on
+2026-08-08, both turns proposed the two changes **correctly** — `Dash` and
+`Overheat pulse`, with `Grapple` untouched. So this is intermittent like B2, not
+deterministic, and the honest strength of the claim is *"observed once,
+transcript below, twice not reproduced"*. It does not weaken the argument for
+the gate: a failure mode that fires occasionally and silently is the one you
+most need a human for, and a review UI cannot be designed on the assumption that
+it fires every time.
+
 **The upside, and the reason the build works this way.** This is precisely what
 the human gate is for. The reviewer saw two changes, approved the correct one,
 denied the wrong one — and the resulting document has `Dash 1.5 s`,
@@ -710,8 +721,8 @@ turn — counted, like every other operation.
 
 Not SuperDocs' fault. Here because they cost real time or real money, and
 because the same hours that found fifteen bugs in someone else's product
-should be honest about the seven they created - including the three where my own
-checking certified a document it should have failed.
+should be honest about the eight they created - including the four where my own
+checking or accounting certified something it should have caught.
 
 ## M1 — I committed a live API key as a test fixture
 
@@ -853,3 +864,28 @@ week's bullets and does **not** contain the incoming week's.
 **The general rule this earns:** never ask a model to summarise state that the
 same turn is changing. "Currently" is not a defensible word in an instruction
 whose other steps change what "currently" means.
+
+## M8 — An operation was spent without a ledger line, on the one path the guarantee names
+
+`superdocs_kit`'s own module docstring makes four promises. The first is:
+
+> *an operation is never spent without a durable ledger line*
+
+True of every synchronous path. **False of the human-gated one.**
+`chat_async` submits the turn — which is when SuperDocs bills it — and returns
+a job envelope carrying no usage. The usage appears on the *finished* job, and
+nothing was reading it. So `gdd review` printed `0 operation(s)` and the ledger
+did not move, while the server's `monthly_used` went up by one.
+
+**How it surfaced.** Running the review demo and comparing the ledger against
+`GET /v1/agents/whoami` afterwards. The ledger said 6, the account said 7.
+
+**Fixed** in `review.settle()`: the finished job is handed to
+`budget.record()`, which already knows how to read `result.usage.ops_charged`.
+The review now reports `1 operation(s)`, and a denied change is visibly charged
+— which is the thing a reviewer most needs to know before building a UI that
+proposes speculatively.
+
+**The lesson, and it is the same one as M5 and M6:** a guarantee with one
+unguarded path is not a guarantee, it is a habit. All three were found the same
+way — by comparing what the system *said* against something outside it.

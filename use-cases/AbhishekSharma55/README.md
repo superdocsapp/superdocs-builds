@@ -6,7 +6,7 @@ Two projects, one shared client layer, one fictional universe.
 |---|---|
 | **[weekly-digest/](weekly-digest/)** | One standing document, revised in place week after week instead of regenerated. One billable operation per week. Fourteen invariants, re-derived from the document's bytes, catch drift; a control arm regenerates the same digest from the same inputs, with the method committed before the result. |
 | **[gdd-editor/](gdd-editor/)** | A chat-driven editor for long, linked game design documents — mechanics, narrative and art bible as sub-documents, with image support. The graded scenario runs as one command and is asserted from the documents' own bytes. |
-| **[bugs.md](bugs.md)** | Fifteen SuperDocs bugs and rough edges found against the live API, with reproduction steps and two runnable repros — plus seven of my own. |
+| **[bugs.md](bugs.md)** | Fifteen SuperDocs bugs and rough edges found against the live API, with reproduction steps and two runnable repros — plus eight of my own. |
 | **[Makefile](Makefile)** | `make setup` · `make test` (no key) · `make demo` (no spend) · `make scenario` / `make run` / `make control` (capped). |
 | **[WALKTHROUGH.md](WALKTHROUGH.md)** | What each build does, the decisions behind it, where it is weakest, and the answers to the questions those invite. |
 
@@ -94,15 +94,16 @@ differences it is looking for. On top of that:
   Nothing is estimated.
 - Raw data is committed: both ledgers, every week's document, every export,
   every diff, and the instruction and output of every failed attempt.
-- `bugs.md` ends with seven bugs of **my own**, kept in the same file, because a
-  bug log that only contains other people's bugs is a marketing document. Three
-  of the seven (M5, M6, M7) are places where my own checking passed a document
-  it should have failed — an archive parser that skipped a row it could not
-  read, a surgical check that waved new content through, and an archive summary
-  that described the wrong week while every structural invariant said clean.
-  All three were found by re-reading committed artefacts rather than verdicts,
-  all three are fixed, all three have a regression test. They are the ones I
-  would read first.
+- `bugs.md` ends with eight bugs of **my own**, kept in the same file, because
+  a bug log that only contains other people's bugs is a marketing document. Four
+  of the eight (M5–M8) are places where my own checking or accounting said a
+  thing was fine when it was not: an archive parser that skipped a row it could
+  not read, a surgical check that waved new content through, an archive summary
+  that described the wrong week while every structural invariant said clean, and
+  an operation spent without a ledger line on the one path this README promises
+  is always on the ledger. All four were found the same way — comparing what the
+  system said against something outside it — all four are fixed. They are the
+  ones I would read first.
 - Where a build has a limitation, it is in that build's README under *"What is
   honestly absent"* rather than left for a reader to discover.
 
