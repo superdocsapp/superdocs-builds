@@ -41,7 +41,6 @@ class _ChunkParser(HTMLParser):
             if ch == "\n":
                 self._line_starts.append(i + 1)
         self.chunks: dict[str, str] = {}
-        self.order: list[str] = []
         self._stack: list[tuple[str, str | None, int]] = []  # tag, chunk_id, start_offset
 
     def _offset(self) -> int:
@@ -79,8 +78,6 @@ class _ChunkParser(HTMLParser):
                 return
 
     def _store(self, chunk_id: str, html: str) -> None:
-        if chunk_id not in self.chunks:
-            self.order.append(chunk_id)
         self.chunks[chunk_id] = html
 
 
@@ -93,13 +90,6 @@ def chunk_map(html: str) -> dict[str, str]:
     parser.feed(html)
     parser.close()
     return parser.chunks
-
-
-def chunk_order(html: str) -> list[str]:
-    parser = _ChunkParser(html)
-    parser.feed(html)
-    parser.close()
-    return parser.order
 
 
 _WS = re.compile(r"\s+")
@@ -195,9 +185,6 @@ def diff_chunks(before_html: str, after_html: str, *, own_bytes_only: bool = Tru
     out.removed = [cid for cid in before if cid not in after]
     out.added.sort(); out.modified.sort(); out.removed.sort()
     return out
-
-
-_TAG_NAME = re.compile(r"^<\s*([a-zA-Z0-9]+)")
 
 
 @dataclass

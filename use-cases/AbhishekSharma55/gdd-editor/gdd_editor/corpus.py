@@ -31,8 +31,7 @@ GAME = "Nebula Drift"
 
 _H1 = "color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px"
 _H2 = "color:#0d47a1;margin-top:18px"
-_H3 = "color:#1565c0"
-_TABLE = ("width:100%;border-collapse:collapse;border:1px solid #37474f;"
+_TABLE =("width:100%;border-collapse:collapse;border:1px solid #37474f;"
           "font-family:Inter,Calibri,Arial,sans-serif;font-size:10pt")
 _TH = ("border:1px solid #37474f;background-color:#0d47a1;color:#ffffff;"
        "padding:6px 8px;text-align:left;font-weight:bold")

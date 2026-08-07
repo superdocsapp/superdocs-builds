@@ -8,8 +8,10 @@
     gdd review <doc> "instruction" # HITL: propose, show the diff, approve/deny
     gdd export --format docx       # export every document (free)
     gdd verify                     # re-check the last scenario offline, no key
+    gdd probe-multidoc --live      # re-check bugs.md B10 against the API (0 ops)
 
-`scenario` and `ask` spend operations. Everything else is free or offline.
+`scenario`, `ask` and `review` spend operations. Everything else is free or
+offline - including `probe-multidoc`, which is live but non-billable.
 """
 
 from __future__ import annotations
@@ -172,6 +174,116 @@ def cmd_export(args) -> int:
     return 0
 
 
+def cmd_probe_multidoc(args) -> int:
+    """Reproduce bugs.md B10 through the Python client. Zero billable operations.
+
+    This build works around SuperDocs' multi-document session rather than using
+    it, and a worked-around bug that nobody can re-check is just an assertion.
+    So the claim is executable: upload three documents, open all three into one
+    session, read the roster four times, and print what came back.
+
+    Everything here is free - uploads, session init, roster reads and document
+    reads are all non-billable. It needs a live key because replaying a
+    recorded roster would prove nothing about the server's behaviour today.
+    """
+    import time
+    import uuid
+
+    if not args.live:
+        print("probe-multidoc needs --live: it is a claim about the server's "
+              "behaviour right now, and a replayed fixture cannot re-check that.")
+        return 2
+
+    from superdocs_kit.errors import SuperDocsError
+
+    # Its own ledger, and a cap of zero. Its own, so a free diagnostic never
+    # dilutes the scenario's cost record; zero, so the first call that turned
+    # out to be billable would raise instead of quietly spending.
+    budget = OpsBudget(OUT / "probe-ledger.jsonl", max_ops=0)
+    client = SuperDocs(budget=budget, cassette_dir=None, live=True,
+                       log=lambda m: print(f"    {m}"))
+    stamp = f"{int(time.time())}-{uuid.uuid4().hex[:4]}"
+    seeds = {
+        "gdd": "<h1>GDD</h1><h2>Overview</h2><p>ov</p>",
+        "mechanics": "<h1>Mechanics</h1><h2>Dash</h2><p>d</p>",
+        "narrative": "<h1>Narrative</h1><h2>Act I</h2><p>a</p>",
+    }
+
+    print("1. upload three documents, each into its own session (free)")
+    for name, html in seeds.items():
+        client.upload_document(filename=f"b10-{name}-{stamp}.html", content=html,
+                               session_id=f"b10-{stamp}-{name}")
+        print(f"   uploaded b10-{name}-{stamp}")
+
+    print("\n2. collect their durable ids from GET /v1/documents")
+    wanted = {f"b10-{name}-{stamp}" for name in seeds}
+    ids: list[str] = []
+    for doc in client.list_documents():
+        title = (doc.get("title") or doc.get("filename") or "").removesuffix(".html")
+        if title in wanted:
+            ids.append(doc.get("document_id") or doc.get("id"))
+    print(f"   {len(ids)} found: {[i[:8] for i in ids if i]}")
+    if len(ids) != 3:
+        print("   could not find all three uploads - the probe cannot continue.")
+        return 1
+
+    print("\n3. each id resolves on its own, so all three exist:")
+    for doc_id in ids:
+        try:
+            got = client.get_document(doc_id)
+            print(f"   {doc_id[:8]} -> {got.get('title') or got.get('filename') or 'ok'}")
+        except SuperDocsError as exc:
+            print(f"   {doc_id[:8]} -> {exc}")
+
+    sid = f"b10-session-{stamp}"
+    print(f"\n4. open all three into ONE session ({sid})")
+    opened = client.init_session(session_id=sid, document_ids=ids)
+    roster = opened.get("documents") or []
+    print(f"   opened={len(opened.get('opened') or [])}  roster_size={len(roster)}")
+
+    print("\n5. read the roster four times, no writes in between:")
+    seen: list[tuple[str, str]] = []
+    for i in range(1, 5):
+        docs = client.list_session_documents(sid)
+        row = [(d.get("document_id"), (d.get("durable_document_id") or "")[:8],
+                d.get("title")) for d in docs]
+        seen.extend((str(d.get("document_id")), str(d.get("title"))) for d in docs)
+        print(f"   read {i}: {row}")
+
+    # bugs.md B10 suggests "focus + one document at a time" as the workaround.
+    # Claiming a workaround without running it is exactly what this probe is
+    # here to stop, so run it and print what the server says.
+    print("\n6. the suggested workaround: focus one document, then read the roster")
+    for candidate, why in ((ids[0], "durable id"), ("doc_primary", "roster id")):
+        try:
+            client.focus_document(sid, candidate)
+            after = client.list_session_documents(sid)
+            titles_now = [d.get("title") for d in after]
+            print(f"   focus({why} {candidate[:12]}) -> ok, roster now {titles_now}")
+        except SuperDocsError as exc:
+            print(f"   focus({why} {candidate[:12]}) -> {str(exc).splitlines()[0]}")
+
+    per_doc_ids = {doc_id for doc_id, _ in seen}
+    titles = {title for _, title in seen}
+    print("\nVERDICT")
+    print(f"  distinct document_id values across all reads : {sorted(per_doc_ids)}")
+    print(f"  distinct titles across all reads             : {sorted(titles)}")
+    incomplete = len(roster) < 3
+    shared_id = len(per_doc_ids) == 1 and len(titles) > 1
+    unstable = len(titles) > 1
+    if incomplete or shared_id or unstable:
+        print("  B10 REPRODUCES. The roster cannot address a document, so build #2's\n"
+              "  one-session-per-document design is still the right one.")
+    else:
+        print("  B10 does NOT reproduce - the roster looks correct now. If this holds,\n"
+              "  build #2 should move to the real multi-document session and bugs.md\n"
+              "  B10 should be marked fixed.")
+    print(f"\nthis probe spent {budget.spent} operations "
+          f"(it must be 0; every call it makes is free). "
+          f"Calls logged to {budget.path.name}.")
+    return 0
+
+
 def cmd_verify(args) -> int:
     """Offline: re-read the committed report and the snapshots, no key needed."""
     path = OUT / "scenario-report.json"
@@ -233,6 +345,11 @@ def main(argv: list[str] | None = None) -> int:
                    choices=["docx", "pdf", "markdown", "html", "txt"])
     s.add_argument("--live", action="store_true", default=None)
     s.set_defaults(func=cmd_export)
+
+    s = sub.add_parser("probe-multidoc",
+                       help="re-check bugs.md B10 against the live API (free, 0 ops)")
+    s.add_argument("--live", action="store_true", default=None)
+    s.set_defaults(func=cmd_probe_multidoc)
 
     s = sub.add_parser("verify", help="re-check the last scenario offline")
     s.set_defaults(func=cmd_verify)

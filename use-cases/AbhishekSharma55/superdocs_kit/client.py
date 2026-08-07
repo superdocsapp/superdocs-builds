@@ -118,17 +118,24 @@ class SuperDocs:
     # ------------------------------------------------------------------
     # sessions and multi-document
     #
-    # NOTHING IN EITHER BUILD CALLS THESE. They are kept because they are how I
-    # established bugs.md B10 - open three documents into one session and the
-    # roster comes back with one entry, every document carrying the id
-    # "doc_primary", and a different document on each identical GET. With no
-    # per-document id there is no way to target an edit, so build #2 gives each
-    # document its own session instead.
+    # NEITHER BUILD EDITS THROUGH THIS SURFACE, and that is a finding rather
+    # than an omission: open three documents into one session and the roster
+    # comes back with one entry, every document carrying the id "doc_primary",
+    # and a different document on each identical GET (bugs.md B10). With no
+    # per-document id there is nothing for a targeted edit to address, so
+    # build #2 gives each document its own session instead.
     #
-    # Kept rather than deleted so the finding is reproducible from this client
-    # and not only from the curl script in repro/. If B10 is fixed, this is the
-    # surface build #2 should move back to.
+    # These methods are not dead code. `gdd probe-multidoc` drives exactly this
+    # path and prints the roster the server returns, so the finding is
+    # reproducible from the client and not only from the curl script in repro/.
+    # It costs zero operations - every call below is free. If B10 is fixed, the
+    # probe says so, and this is the surface build #2 should move back to.
     # ------------------------------------------------------------------
+    def list_documents(self) -> list[dict[str, Any]]:
+        out = self._free("GET", "/v1/documents", None, "list-documents")
+        docs = out.get("documents") if isinstance(out, dict) else out
+        return docs or []
+
     def init_session(self, *, session_id: str | None = None, document_ids: list[str] | None = None):
         body: dict[str, Any] = {}
         if session_id:
@@ -148,11 +155,6 @@ class SuperDocs:
             f"/v1/sessions/{session_id}/documents/open",
             {"document_ids": document_ids},
             "open-docs",
-        )
-
-    def blank_document(self, session_id: str) -> dict[str, Any]:
-        return self._free(
-            "POST", f"/v1/sessions/{session_id}/documents/blank", {}, "blank-doc"
         )
 
     def focus_document(self, session_id: str, document_id: str) -> dict[str, Any]:
@@ -386,13 +388,6 @@ class SuperDocs:
 
     def export_text(self, **kw: Any) -> str:
         return self.export(**kw).decode("utf-8", errors="replace")
-
-    def export_to(self, path: Path, **kw: Any) -> Path:
-        data = self.export(**kw)
-        path = Path(path)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(data)
-        return path
 
     def _fetch_url(self, url: str) -> bytes:
         import httpx
