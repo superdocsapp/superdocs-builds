@@ -25,7 +25,9 @@ existing paragraph/character styles are respected.
 > paragraphs, not table-cell content (those changes are reported as skipped,
 > and the approved SuperDocs copy still has them).
 
-## Screenshots (Linux, WSLg)
+## Screenshots
+
+**Selection mode (Linux, WSLg):**
 
 | Sending a selection | Applied in place |
 |---|---|
@@ -33,6 +35,24 @@ existing paragraph/character styles are respected.
 
 A `Heading 1` paragraph edited via the sidebar: the text changed, the heading
 style survived untouched.
+
+**Whole-document + drafting modes (Windows):**
+
+| Draft requested | Draft gated, then inserted at the cursor |
+|---|---|
+| ![Requesting](screenshots/windows-draft-requesting.png) | ![Inserted](screenshots/windows-draft-inserted.png) |
+
+"create a fitness plan" on a near-empty document: SuperDocs *creates* content
+(zero pending changes server-side — the approval-gate bypass described above),
+the sidebar gates it locally, and Apply inserts 27 paragraphs at the cursor —
+the pre-existing sentence at the top is untouched, and the status line says
+exactly what happened.
+
+![Proposals](screenshots/windows-wholedoc-proposals.png)
+
+A follow-up whole-document *edit* on that same draft ("Add some styles to it
+like Markdown."): 22 proposed changes come back as a reviewable proposal with
+the actual proposed text quoted — nothing lands until Apply.
 
 ## Build
 

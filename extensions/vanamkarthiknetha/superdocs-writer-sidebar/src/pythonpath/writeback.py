@@ -13,6 +13,8 @@ import html as _html
 import re
 
 _BLOCK_BREAK = re.compile(r"</(?:p|h[1-6]|li|div|tr)\s*>|<br\s*/?>", re.I)
+_CELL_END = re.compile(r"</t[dh]\s*>", re.I)  # cell boundary -> space, or
+# "Monday</td><td>Strength" flattens to "MondayStrength" in drafted tables
 _TAG = re.compile(r"<[^>]+>")
 
 
@@ -24,7 +26,7 @@ def _norm(text):
 def html_paragraphs(markup):
     """Plain-text paragraphs of a block-level HTML fragment, in order."""
     paras = []
-    for chunk in _BLOCK_BREAK.split(markup or ""):
+    for chunk in _BLOCK_BREAK.split(_CELL_END.sub(" ", markup or "")):
         # inline tags (<b>, <span>...) vanish without leaving a space -
         # "<b>Friday</b>." must yield "Friday.", not "Friday ."; paragraph
         # boundaries were already handled by the block split above
