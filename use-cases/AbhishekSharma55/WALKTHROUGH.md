@@ -399,7 +399,11 @@ diff without spending anything.
 | Bugs found and logged | **12**, with repro steps; one with a runnable script |
 | Free-tier budget | **500 operations a month** — which is why everything that loops has a cap and a stopping rule |
 
-Two of the twelve bugs are mine, not theirs, and they are in the log anyway
-(B1 and the test that built a petabyte string). If he notices, that is the
-answer: I logged my own mistakes in the same list, because a bug log that only
-contains other people's bugs is a marketing document.
+`bugs.md` also ends with a section headed **"My own bugs"** — four of them: a
+live key committed as a test fixture (caught by my own pre-PR check, history
+rewritten), a CLI default that spent money on what looked like a dry run, a test
+that hung building its own input, and the time I treated one passing week as
+evidence and had to revert. If he notices them, that is the answer: the same
+hours that found twelve bugs in someone else's product should be honest about
+the ones they created. A bug log containing only other people's bugs is a
+marketing document.

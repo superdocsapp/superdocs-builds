@@ -11,9 +11,10 @@ Environment unless stated otherwise: agent account created via
 Anything I could not reproduce is marked **UNCONFIRMED** and stays in the list
 anyway, because a flake an integrator hits once still costs them an afternoon.
 
-**Two of these are mine, not yours** (B1, B7). They are in the list because
-they are still rough edges — I hit them by reading the docs correctly and
-still guessing wrong.
+**B1 is mine, not yours.** It is in the list because it is still a rough edge —
+I hit it by reading the docs correctly and guessing wrong anyway. Three further
+mistakes that were entirely my own are in **"My own bugs"** at the end, because
+a bug log that only contains other people's bugs is a marketing document.
 
 | # | Severity | One line |
 |---|---|---|
@@ -510,3 +511,65 @@ also fix the `<div><tr>` case in B2.
 the bytes, so a heading nested in a div, or three levels deep, is still a
 section. The invented table is caught by an explicit check in the scenario and
 repaired in a follow-up operation that is counted like any other.
+
+
+---
+
+# My own bugs
+
+Not SuperDocs' fault. Here because they cost real time or real money, and
+because the same four hours that found twelve bugs in someone else's product
+should be honest about the ones it created.
+
+## M1 — I committed a live API key as a test fixture
+
+Writing the redaction tests, I used the **real key** as one of the
+"credential-shaped strings that must be redacted". It went into
+`tests/test_budget_and_secrets.py` and four local commits.
+
+Caught by running the pre-PR check written down in `PR-DRAFT.md`
+(`git log -p --all | grep -E 'sk_[a-z0-9]{8}'`) — not by noticing at the time,
+which is the entire argument for having the check be a written step rather than
+a habit. Fixed: fake constant, four commits rewritten, `refs/original` and the
+stash deleted, reflog expired, objects pruned, verified zero occurrences across
+every git object. Nothing had been pushed. Full account in `ASSUMPTIONS.md` A7,
+including the rotation command, because a secret that touched disk should be
+rotated even when the exposure was local.
+
+The uncomfortable part: `superdocs_kit/secrets.py` redacts anything key-shaped
+before it can reach a fixture, and there is a test asserting it. None of that
+helps against a key a human types into a source file.
+
+## M2 — Omitting `--live` spent five real operations
+
+`build_transport` treated `live=None` as "decide for me": no explicit flag,
+so look for a key — and it found one in `.env`. A command a reader would
+reasonably take for a dry run therefore ran against the live API and spent five
+operations before I noticed.
+
+Fixed by making absence of `--live` mean **replay, unconditionally**. The
+expensive path has to be asked for by name. Also added `--out`, so a replay
+writes elsewhere and can never overwrite the committed artefacts of the run it
+is replaying.
+
+The general shape of this mistake is worth naming: a default that is convenient
+when you have credentials is a trap for everyone who does not, and "helpful
+auto-detection" on the path that costs money is the wrong kind of clever.
+
+## M3 — A test that hung by building its own input
+
+`test_deep_parse_is_bounded` nested `json.dumps` fifty deep to check the parser
+terminates. Each pass roughly doubles the escaping, so the *test* was building a
+petabyte-scale string and the suite hung — in the one file whose job was to
+prove a pathological input terminates. Twelve levels proves the same thing in
+microseconds. The comment in the test says so.
+
+## M4 — I assumed one passing week was evidence
+
+Having made the weekly instruction unambiguous, I re-tested the cheap model tier
+on the week that had been failing, watched it pass, and switched the whole run
+to it. Over the next four weeks it failed first-attempt verification about 60%
+of the time. n=1 is not a measurement, and I of all people should not have
+treated it as one in a repo whose entire argument is that claims need numbers.
+Reverted, and the reasoning — including the error — is in `runner.py` where the
+setting lives.
