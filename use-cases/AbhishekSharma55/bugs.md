@@ -12,16 +12,26 @@ Anything I could not reproduce is marked **UNCONFIRMED** and stays in the list
 anyway, because a flake an integrator hits once still costs them an afternoon.
 
 **B1 is mine, not yours.** It is in the list because it is still a rough edge —
-I hit it by reading the docs correctly and guessing wrong anyway. Three further
+I hit it by reading the docs correctly and guessing wrong anyway. Four further
 mistakes that were entirely my own are in **"My own bugs"** at the end, because
 a bug log that only contains other people's bugs is a marketing document.
+
+**Fourteen SuperDocs entries (B1–B14) and four of my own (M1–M4).** The table
+below is all fourteen, worst first.
 
 | # | Severity | One line |
 |---|---|---|
 | B2 | **High — silent data loss** | A multi-section edit replaced a `<table>` with a `<div><tr>…`, destroying the header row and every prior row. Non-deterministic. |
 | B3 | **High — false success** | The same turn reported `"1 section edited, rest untouched"` while having destroyed a table and skipped an instructed change. |
+| B8 | **High — silent duplication** | After a re-upload into a live session, the next turn returned the whole document twice. **UNCONFIRMED** at small scale. |
+| B9 | **High for programmatic use** | On the default tier a multi-step instruction is applied partially and reported as done. |
+| B10 | **High — surface unusable** | Three documents opened into one session return a roster of one, all sharing `document_id: "doc_primary"`, and the answer changes between identical GETs. |
+| B11 | Medium-high | "Replace ALL X with Y" executed as "append Y"; a changed cell came back holding both the old and the new value. |
+| B13 | Medium-high | A two-part instruction edited the wrong section and reported the right one. Caught only by the human gate. |
+| B14 | Medium-high | Inside one multi-step instruction, content from one step landed in another step's target. |
 | B4 | Medium | An instructed step was silently skipped; no error, no mention in the response text. |
 | B5 | Medium — blocks round-tripping | HTML export drops every `data-chunk-id`, so exported HTML cannot be re-uploaded and diffed at section level. |
+| B12 | Medium | "Add a new section" returned it wrapped in a `<div>`, and brought an entire table nobody asked for. |
 | B6 | Low — formatting not byte-preserved | `font-family:Inter,Calibri` is stored as `Inter , Calibri`. Happens on upload, no AI involved. |
 | B1 | Docs / DX | `/v1/documents/export` returns the raw file, not a JSON envelope, unlike every other endpoint. |
 | B7 | Docs / DX | Free-tier agent accounts get 500 ops, not the 10,000 the task PDF implies; there is no documented way for an agent to learn its cap before signing up. |
@@ -378,7 +388,17 @@ edits, which is the reason the surface exists.
 **This is server-side, not my client.** The transcript below is raw `curl` +
 `jq`, no code of mine involved.
 
-**Repro** — `repro/B10-multidoc-roster.sh` (runnable; needs `SUPERDOCS_API_KEY`):
+**Two repros, because a worked-around bug nobody can re-check is just an
+assertion.** Both cost **zero operations** — uploads, `sessions/init`, roster
+reads and document reads are all free:
+
+- `repro/B10-multidoc-roster.sh` — `curl` + `jq`, no code of mine.
+- `gdd probe-multidoc --live` — the same sequence through
+  `superdocs_kit/client.py`, ending in a printed verdict that says whether B10
+  still reproduces or has been fixed.
+
+Re-run three times on 2026-08-07 after this entry was first written. It
+reproduces every time, with fresh documents and a fresh session each run.
 
 ```bash
 # 1. upload three documents, each into its own session (they become saved docs)
@@ -421,10 +441,29 @@ found."}`. The same ids worked moments later and every time since, so I could
 not reproduce the 404 and I am not claiming it as a separate bug — but it
 happened, and it is in this log because it cost me twenty minutes.
 
+**A fourth problem, and it closes the last exit.** This entry originally
+suggested `focus` + one-document-at-a-time as the workaround. Running it proved
+that wrong, so here is what actually happens:
+
+```
+POST /v1/sessions/{sid}/documents/{durable_id}/focus
+-> 404 {"detail":"Document 'f7442986-…' is not open in this session."}
+
+POST /v1/sessions/{sid}/documents/doc_primary/focus
+-> 200, and the roster afterwards is still whichever document it felt like
+```
+
+The session **rejects the very id it was opened with**, and accepts only the id
+that cannot distinguish one document from another. So there is no id that
+addresses a specific open document: not the durable one, not the roster one.
+That is why build #2 does not use this surface at all rather than using it
+carefully.
+
 **Suggested fix:** give each open document a stable per-session id, return all
-of them in the roster, and make `/v1/chat`'s `document_id` accept the durable id
-as well. Until then, `focus` + one-document-at-a-time is the only reliable path
-and the docs should say so.
+of them in the roster, make `focus` accept the durable id it was opened with,
+and make `/v1/chat`'s `document_id` accept the durable id as well. Until then
+the honest documentation is "one document per session"; that is what an
+integrator will end up doing anyway.
 
 **How I worked around it:** build #2 gives every document its own session and
 holds the link graph itself (`gdd-editor/gdd_editor/workspace.py`). Every edit
@@ -615,8 +654,8 @@ with the exact instruction that produced them.
 # My own bugs
 
 Not SuperDocs' fault. Here because they cost real time or real money, and
-because the same four hours that found twelve bugs in someone else's product
-should be honest about the ones it created.
+because the same hours that found fourteen bugs in someone else's product
+should be honest about the four they created.
 
 ## M1 — I committed a live API key as a test fixture
 
