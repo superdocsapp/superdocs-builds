@@ -137,6 +137,19 @@ be rediscovered:
 - Deep operations run 30 s to several minutes with no visible progress. That is
   still processing.
 
+### What is verified against the live service, and what is not
+
+The four-call spine — upload, chat, approve, export — and both proposed-change
+reply shapes are verified. The REST paths for **image upload, templates and job
+polling are inferred**: the documented interface names those capabilities as MCP
+tools without naming their REST paths, so this client guesses the convention the
+verified four follow. They are isolated in their own methods, so a wrong guess
+changes four short methods and nothing else.
+
+No offline test depends on those paths, and `check` and `build` never call
+them — a wrong guess there cannot make a passing test lie about the parts that
+are actually proven.
+
 ## Layout
 
 ```

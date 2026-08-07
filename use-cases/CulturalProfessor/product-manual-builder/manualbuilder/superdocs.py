@@ -23,6 +23,26 @@ below handles both so no caller has to know which one it got.
 
 **Deep operations take minutes with no visible progress.** That is still
 processing. The poll loop waits rather than treating a long job as a failure.
+
+## Which endpoints are verified, and which are not
+
+Stated here because the difference matters to whoever runs this next.
+
+*Verified against the live service:* the four-call spine --
+`POST /v1/documents/upload`, `POST /v1/chat`, `POST /v1/chat/{id}/approve`,
+`POST /v1/documents/export` -- and the two reply shapes for proposed changes.
+
+*Inferred, not yet exercised:* the paths for image upload, templates and job
+polling. The documented interface names those capabilities as MCP tools
+(`upload_image_base64`, `upload_template_base64`, `list_user_templates`) without
+naming their REST paths, so `/v1/images/upload`, `/v1/templates/upload`,
+`/v1/templates` and `/v1/jobs/{id}` are this client's guess at the convention the
+verified four follow. They are isolated in their own methods for that reason: if
+the convention is different, four short methods change and nothing else does.
+
+Nothing in the offline test suite depends on those paths being right, and
+`check` and `build` never call them -- so a wrong guess here cannot make a
+passing test lie about the parts of this project that are actually proven.
 """
 from __future__ import annotations
 
