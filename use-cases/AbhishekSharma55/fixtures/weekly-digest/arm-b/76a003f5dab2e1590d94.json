@@ -3,7 +3,7 @@
   "method": "POST",
   "path": "/v1/chat",
   "request": {
-    "session_id": "nebula-digest-v1-regen-w07-dc641faf",
+    "session_id": "nebula-digest-v1-regen-w07-cbdc2a65",
     "message": "Produce the complete Week 7 production digest for Nebula Drift (Vantage Nine Studios) as the whole document, replacing whatever is there. Use exactly this structure and content.\n\nTITLE (Heading 1): Nebula Drift - Weekly Production Digest\nSTATUS LINE (bold, directly under the title): Week 7 · 2026-02-16 to 2026-02-22 · Phase: Vertical Slice\nBelow it, smaller grey text: Vantage Nine Studios · internal · standing document, edited in place every Monday\n\nSECTION 'What changed' (Heading 2), as bullets, verbatim:\n  - Grapple cooldown retuned from 8s to 5s after playtest data\n  - Cinematic camera rig handed to the animation team\n  - Localisation pipeline stubbed for 6 languages\n  - Vertical slice level greyboxed and playable start to finish\n\nSECTION 'What is at risk' (Heading 2), as a bordered table with a shaded header row and alternating row shading, columns Risk / Owner / Area / Severity / Trend:\n  | Save-game format still unversioned | Dev H. | Engineering | Medium | improving |\n  | Matchmaking backend untested above 5k CCU | Yuki T. | Backend | High | steady |\n  | Second combat designer starts late | Marcus O. | Production | Medium | steady |\n\nSECTION 'What is next' (Heading 2), as bullets, verbatim:\n  - Instrument the traversal funnel\n  - Close the audio licence\n  - Get the slice in front of the publisher\n\nSECTION 'Archive' (Heading 2), a bordered table with a shaded header row, columns Week / Dates / Shipped / Risks carried, newest first:\n  | Week 6 | 2026-02-09 to 2026-02-15 | Engine upgrade to 5.4 merged; build times down 31%; Art style exploration narrowed to two directions; Nav-mesh generatio | Boss encounter difficulty untuned for controller; Save-game format still unversioned |\n  | Week 5 | 2026-02-02 to 2026-02-08 | Perforce to Git LFS migration completed for the audio depot; Grapple traversal prototype playable end to end on the test | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 4 | 2026-01-26 to 2026-02-01 | Nav-mesh generation for the Drift Belt sector; First pass on the Salvage economy spreadsheet | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 3 | 2026-01-19 to 2026-01-25 | Core loop pitch deck signed off by the publisher; Engine upgrade to 5.4 merged; build times down 31%; Art style explorat | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 2 | 2026-01-12 to 2026-01-18 | Hired a second combat designer (starts week 9); Perforce to Git LFS migration completed for the audio depot; Grapple tra | Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs |\n  | Week 1 | 2026-01-05 to 2026-01-11 | Art style exploration narrowed to two directions; Nav-mesh generation for the Drift Belt sector | Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs |\n\nUse the same visual style throughout: dark blue headings, a bordered table with a dark shaded header row and alternating light row shading.",
     "response_mode": "full",
     "model_tier": "pro",
@@ -11,43 +11,29 @@
   },
   "status": 200,
   "response": {
-    "response": "✅ I have replaced the document with the Week 7 production digest in the exact structure and content you provided.",
-    "session_id": "nebula-digest-v1-regen-w07-dc641faf",
-    "document_changes": {
-      "updated_html": "<h1 data-chunk-id=\"52e97a08-a41c-482d-ad1d-ec9beb5c8f42\" style=\"color:#1e3a8a\">Nebula Drift - Weekly Production Digest</h1>\n<p data-chunk-id=\"f4988979-2531-47e3-8880-ed98192a8eff\"><strong>Week 7 · 2026-02-16 to 2026-02-22 · Phase: Vertical Slice</strong></p>\n<p data-chunk-id=\"48b2517c-828f-41c3-84c8-c8956dc7fcdb\" style=\"color:#6b7280;font-size:0.95em\">Vantage Nine Studios · internal · standing document, edited in place every Monday</p>\n<h2 data-chunk-id=\"287f3525-408b-4ee2-963b-866a552af941\" style=\"color:#1e3a8a\">What changed</h2>\n<ul data-chunk-id=\"e4279621-86e4-412c-9efe-8474f2ca35dc\"><li>Grapple cooldown retuned from 8s to 5s after playtest data</li><li>Cinematic camera rig handed to the animation team</li><li>Localisation pipeline stubbed for 6 languages</li><li>Vertical slice level greyboxed and playable start to finish</li></ul>\n<h2 data-chunk-id=\"479ca192-c707-4125-8cca-0fa16bd5802a\" style=\"color:#1e3a8a\">What is at risk</h2>\n<table data-chunk-id=\"90328f82-1b9f-41de-8f9f-2190eee265fb\" style=\"width:100%;border-collapse:collapse;border:1px solid #cbd5e1\"><tbody><tr style=\"background-color:#1e3a8a;color:white\"><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Risk</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Owner</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Area</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Severity</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Trend</th></tr><tr style=\"background-color:#f8fafc\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Save-game format still unversioned</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Dev H.</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Engineering</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Medium</td><td style=\"padding:8px;border:1px solid #cbd5e1\">improving</td></tr><tr style=\"background-color:#ffffff\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Matchmaking backend untested above 5k CCU</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Yuki T.</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Backend</td><td style=\"padding:8px;border:1px solid #cbd5e1\">High</td><td style=\"padding:8px;border:1px solid #cbd5e1\">steady</td></tr><tr style=\"background-color:#f8fafc\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Second combat designer starts late</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Marcus O.</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Production</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Medium</td><td style=\"padding:8px;border:1px solid #cbd5e1\">steady</td></tr></tbody></table>\n<h2 data-chunk-id=\"360839dc-bd7c-4f71-bf43-4ac8b79deb86\" style=\"color:#1e3a8a\">What is next</h2>\n<ul data-chunk-id=\"dfa7d932-86ac-4e32-ac90-b1d4a8672c67\"><li>Instrument the traversal funnel</li><li>Close the audio licence</li><li>Get the slice in front of the publisher</li></ul>\n<h2 data-chunk-id=\"e95cb8df-ce16-45e8-8671-90e17b5cc7b8\" style=\"color:#1e3a8a\">Archive</h2>\n<table data-chunk-id=\"f7afa980-8e28-4390-b541-a7bac5a41e39\" style=\"width:100%;border-collapse:collapse;border:1px solid #cbd5e1\"><tbody><tr style=\"background-color:#1e3a8a;color:white\"><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Week</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Dates</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Shipped</th><th style=\"padding:8px;border:1px solid #cbd5e1;text-align:left\">Risks carried</th></tr><tr style=\"background-color:#f8fafc\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Week 6</td><td style=\"padding:8px;border:1px solid #cbd5e1\">2026-02-09 to 2026-02-15</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Engine upgrade to 5.4 merged; build times down 31%; Art style exploration narrowed to two directions; Nav-mesh generatio</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Boss encounter difficulty untuned for controller; Save-game format still unversioned</td></tr><tr style=\"background-color:#ffffff\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Week 5</td><td style=\"padding:8px;border:1px solid #cbd5e1\">2026-02-02 to 2026-02-08</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Perforce to Git LFS migration completed for the audio depot; Grapple traversal prototype playable end to end on the test</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Boss encounter difficulty untuned for controller; Outsourced character art slipping two we</td></tr><tr style=\"background-color:#f8fafc\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Week 4</td><td style=\"padding:8px;border:1px solid #cbd5e1\">2026-01-26 to 2026-02-01</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Nav-mesh generation for the Drift Belt sector; First pass on the Salvage economy spreadsheet</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Boss encounter difficulty untuned for controller; Outsourced character art slipping two we</td></tr><tr style=\"background-color:#ffffff\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Week 3</td><td style=\"padding:8px;border:1px solid #cbd5e1\">2026-01-19 to 2026-01-25</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Core loop pitch deck signed off by the publisher; Engine upgrade to 5.4 merged; build times down 31%; Art style explorat</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Boss encounter difficulty untuned for controller; Outsourced character art slipping two we</td></tr><tr style=\"background-color:#f8fafc\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Week 2</td><td style=\"padding:8px;border:1px solid #cbd5e1\">2026-01-12 to 2026-01-18</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Hired a second combat designer (starts week 9); Perforce to Git LFS migration completed for the audio depot; Grapple tra</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs</td></tr><tr style=\"background-color:#ffffff\"><td style=\"padding:8px;border:1px solid #cbd5e1\">Week 1</td><td style=\"padding:8px;border:1px solid #cbd5e1\">2026-01-05 to 2026-01-11</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Art style exploration narrowed to two directions; Nav-mesh generation for the Drift Belt sector</td><td style=\"padding:8px;border:1px solid #cbd5e1\">Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs</td></tr></tbody></table>",
-      "version_id": "ac7ee590-fa1e-4810-ab93-a00835d93649",
-      "changes_summary": "Document replaced in full",
-      "requires_approval": null,
-      "pending_changes": null,
-      "changes": [
-        {
-          "change_id": "a025ca61-6606-4d36-bbd4-0e2698165050",
-          "operation": "create_full_document",
-          "chunk_id": "full",
-          "document_id": "doc_primary",
-          "status": "auto_approved",
-          "ai_explanation": "Created the full document (6 sections)"
-        }
-      ],
-      "chunk_diffs": null,
-      "concurrent_merges": null,
-      "focused_document_id": "doc_primary"
-    },
+    "response": "I had trouble processing your request about \"Produce the complete Week 7 production digest for Nebula Drift (Vantage Nine…\". Could you try rephrasing it, or break it into a simpler step?",
+    "session_id": "nebula-digest-v1-regen-w07-cbdc2a65",
+    "document_changes": null,
     "usage": {
-      "monthly_used": 200,
+      "monthly_used": 202,
       "monthly_limit": 500,
-      "monthly_remaining": 300,
-      "was_billable": true,
-      "ops_charged": 1,
+      "monthly_remaining": 298,
+      "was_billable": false,
+      "ops_charged": 0,
       "quota_exhausted": false,
       "subscription_tier": "free",
-      "bucket_used": "tier",
+      "bucket_used": null,
       "redemption_id": null,
       "promotions": [],
       "agent_handoff_hint": null
     },
-    "hint": null
+    "hint": {
+      "hint_code": "prefer_chat_async_for_large_generations",
+      "message": "This request took 453s synchronously. Requests over ~300s hit the platform gateway timeout (504) with no result returned.",
+      "suggested_action": "Submit document-scale generations via POST /v1/chat/async (chat_async): it returns a job_id immediately, has no gateway ceiling, and reports progress via get_job.",
+      "elapsed_seconds": 453.3
+    }
   },
-  "elapsed_s": 24.858,
+  "elapsed_s": 453.768,
   "content_type": "application/json"
 }

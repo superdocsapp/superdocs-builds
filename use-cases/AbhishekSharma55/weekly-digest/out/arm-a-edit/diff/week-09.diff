@@ -1,0 +1,39 @@
+--- week-08
++++ week-09
+@@ -1,5 +1,5 @@
+ # Nebula Drift - Weekly Production Digest
+ 
+-**Week 8 · 2026-02-23 to 2026-03-01 · Phase: Vertical Slice**
++**Week 9 · 2026-03-02 to 2026-03-08 · Phase: Vertical Slice**
+ 
+ Vantage Nine Studios · internal · standing document, edited in place every Monday
+@@ -7,6 +7,7 @@
+ ## What changed
+ 
+-* Vertical slice level greyboxed and playable start to finish
+-* Combat prototype merged to main behind a feature flag
++* First playtest with eight external players (avg session 41 min)
++* Audio middleware spike finished; Wwise selected over FMOD
++* Grapple cooldown retuned from 8s to 5s after playtest data
+ 
+ ## What is at risk
+@@ -16,9 +17,11 @@
+ | Crash rate above the cert threshold | Dev H. | QA | Medium | steady |
+ | No accessibility sign-off for subtitle sizing | Ana F. | Design | Low | steady |
++| Publisher marketing beats not aligned with content lock | Marcus O. | Production | High | steady |
++| Streaming budget overrun on the Drift Belt | Yuki T. | Engineering | High | steady |
+ 
+ ## What is next
+ 
+-* Get the slice in front of the publisher
+-* Second external playtest, 20 players
++* Instrument the traversal funnel
++* Close the audio licence
+ 
+ ## Archive
+@@ -30,4 +33,5 @@
+ | Week | Dates | Shipped | Risks carried |
+ | --- | --- | --- | --- |
++| Week 8 | 2026-02-23 to 2026-03-01 | Vertical slice greyboxed and playable; combat prototype merged behind a feature flag | Crash rate above cert threshold; subtitle sizing lacks accessibility sign-off |
+ | Week 7 | 2026-02-16 to 2026-02-22 | Grapple cooldown retuned, camera rig handed off, localisation stubbed for six languages, slice playable start to finish | Controller boss tuning, save-game versioning, matchmaking above 5k CCU, second designer delay |
+ | Week 6 | 2026-02-09 to 2026-02-15 | Engine 5.4 merged; build times down 31%; art style narrowed to two directions; Drift Belt nav-mesh; Salvage spreadsheet first pass. | Boss difficulty untuned for controller; save-game format still unversioned. |

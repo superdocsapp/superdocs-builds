@@ -1,0 +1,43 @@
+--- week-15
++++ week-16
+@@ -1,5 +1,5 @@
+ # Nebula Drift - Weekly Production Digest
+ 
+-**Week 15 · 2026-04-13 to 2026-04-19 · Phase: Alpha**
++**Week 16 · 2026-04-20 to 2026-04-26 · Phase: Alpha**
+ 
+ Vantage Nine Studios · internal · standing document, edited in place every Monday
+@@ -7,8 +7,6 @@
+ ## What changed
+ 
+-* Crash rate down to 0.9% of sessions from 4.2%
+-* Photo mode shipped to the internal branch
+-* Accessibility pass one: remappable controls, colourblind palettes
+ * Console TRC pre-check dry run completed
++* Weapon balance pass across all 9 archetypes
+ 
+ ## What is at risk
+@@ -16,12 +14,13 @@
+ | Risk | Owner | Area | Severity | Trend |
+ | --- | --- | --- | --- | --- |
+-| Publisher marketing beats not aligned with content lock | Marcus O. | Production | Low | worsening |
+-| Matchmaking backend untested above 5k CCU | Yuki T. | Backend | Critical | steady |
++| Matchmaking backend untested above 5k CCU | Yuki T. | Backend | Critical | worsening |
+ | Localisation vendor has no gaming glossary | Sana R. | Localisation | Medium | steady |
++| Day-one patch size above the platform cap | Dev H. | Engineering | Medium | steady |
++| Save-game format still unversioned | Dev H. | Engineering | Low | steady |
+ 
+ ## What is next
+ 
+-* Finish the accessibility pass two
+-* Lock the weapon archetype list
++* Alpha feature freeze review on Thursday
++* Drive crash rate below 0.5%
+ 
+ ## Archive
+@@ -33,4 +32,5 @@
+ | Week | Dates | Shipped | Risks carried |
+ | --- | --- | --- | --- |
++| Week 15 | 2026-04-13 to 2026-04-19 | Crash rate down to 0.9%; photo mode internal branch; accessibility pass one; console TRC dry run completed; Publisher marketing, matchmaking, and localisation risks remained open. | Crash rate down to 0.9%; photo mode internal branch; accessibility pass one; console TRC dry run completed; Publisher marketing, matchmaking, and localisation risks remained open. |
+ | Week 14 | 2026-04-06 to 2026-04-12 | Enemy AI flocking landed for Scrapper swarms; first eight-player playtest ran 41 minutes; audio middleware spike finished; Wwise beat FMOD | Crash rate above cert threshold; publisher marketing beats misaligned; matchmaking backend untested above 5k CCU |
+ | Week 13 | 2026-03-30 to 2026-04-05 | Localisation stubbed for 6 languages; vertical slice greyboxed and playable; combat merged; Scrapper swarms gained flocking AI | Crash rate above threshold; marketing beats misaligned with content lock; matchmaking untested above 5k CCU |

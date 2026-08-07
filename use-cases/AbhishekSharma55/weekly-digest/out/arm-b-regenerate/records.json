@@ -108,5 +108,37 @@
       "risk table keeps borders and header shading",
       "risk table keeps alternating row shading"
     ]
+  },
+  {
+    "week": 7,
+    "ops": 1,
+    "seconds": 478.64,
+    "doc_bytes": 6478,
+    "doc_sha": "4d47011b86c89502",
+    "sections_created": 0,
+    "instruction_chars": 3079,
+    "api_summary": null,
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "risk table keeps borders and header shading",
+      "risk table keeps alternating row shading"
+    ]
+  },
+  {
+    "week": 8,
+    "ops": 2,
+    "seconds": 87.41,
+    "doc_bytes": 7232,
+    "doc_sha": "c602a9393883f4e2",
+    "sections_created": 1,
+    "instruction_chars": 3109,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "risk table keeps borders and header shading",
+      "risk table keeps alternating row shading"
+    ]
   }
 ]

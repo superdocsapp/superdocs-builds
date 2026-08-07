@@ -1,0 +1,26 @@
+Update this standing weekly production digest to Week 14. This is the same document every week - edit it in place. Make exactly the changes below and nothing else.
+
+STEP 1 - STATUS LINE. The bold status line directly under the document title must read exactly:
+  Week 14 · 2026-04-06 to 2026-04-12 · Phase: Vertical Slice
+Leave the smaller grey line beneath it unchanged.
+
+STEP 2 - ARCHIVE. The 'Archive' table's data rows must end up being EXACTLY these 7 rows, in exactly this order, top to bottom. Keep the table's header row and all of its formatting. Cells shown in quotes are literal - copy them exactly. Cells shown in angle brackets are for you to write.
+  The rows, top to bottom, must be exactly: 'Week 13', 'Week 12', 'Week 11', 'Week 10', 'Week 9', 'Weeks 5-8 (rolled up)', 'Weeks 1-4 (rolled up)'.
+  The first cell of each of those rows must read exactly as quoted, INCLUDING the word 'Week' - write 'Week 3', never '3'. The column is headed 'Week'; that heading is not a substitute for the label.
+  Row 'Week 13' is NEW. Its Dates cell is '2026-03-30 to 2026-04-05'. Its Shipped cell is your own summary, at most 20 words, of EXACTLY this text and nothing else in the document: "Localisation pipeline stubbed for 6 languages; Vertical slice level greyboxed and playable start to finish; Combat prototype merged to main behind a feature flag; Enemy AI flocking behaviour landed for Scrapper swarms". Its Risks carried cell is your own summary, at most 15 words, of exactly these risks: "Crash rate above the cert threshold; Publisher marketing beats not aligned with content lock; Matchmaking backend untested above 5k CCU". Summarise the quoted text only - other steps in this instruction change the document, and this row must describe Week 13, not the week replacing it.
+  Row 'Weeks 5-8 (rolled up)' is NEW and REPLACES the rows 'Week 8', 'Week 7', 'Week 6', 'Week 5'. Its Dates cell is '2026-02-02 to 2026-03-01'. Its Shipped cell is one sentence of at most 25 words summarising those 4 rows together. Its Risks carried cell is at most 10 words. Delete those rows.
+  Every other row keeps its existing cell contents exactly as they are - do not rewrite, reword or re-summarise them.
+
+STEP 3 - 'What changed'. Replace the ENTIRE <ul> element in that section with exactly this HTML, character for character:
+<ul><li>Enemy AI flocking behaviour landed for Scrapper swarms</li><li>First playtest with eight external players (avg session 41 min)</li><li>Audio middleware spike finished; Wwise selected over FMOD</li></ul>
+
+STEP 4 - 'What is at risk' table. Replace the ENTIRE contents of that table's <tbody> with exactly these 3 rows, character for character. Keep the <thead> header row exactly as it is:
+<tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Crash rate above the cert threshold</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Dev H.</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">QA</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Low</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">worsening</td></tr><tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Publisher marketing beats not aligned with content lock</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Marcus O.</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Production</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Low</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">worsening</td></tr><tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Matchmaking backend untested above 5k CCU</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Yuki T.</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Backend</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Critical</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">steady</td></tr>
+
+STEP 5 - 'What is next'. Replace the ENTIRE <ul> element in that section with exactly this HTML, character for character:
+<ul><li>Get the slice in front of the publisher</li><li>Second external playtest, 20 players</li><li>Instrument the traversal funnel</li></ul>
+
+REPLACEMENT MEANS REPLACEMENT: where this instruction lists what a section must contain, the section must end up containing exactly that and nothing else. Delete what is not on the list rather than keeping it alongside.
+Preserve all existing formatting exactly: the document title, every section heading, table borders, header-row shading, alternating row colours, fonts, font sizes and colours. Do not restyle anything. Do not add, remove or rename any heading. Do not reorder the sections.
+Copy every quoted or listed value character for character. Do not add a full stop to a bullet that has none, and do not reword anything.
+STRUCTURAL RULE: both tables must remain <table> elements with their header rows intact. Never replace a table with a single row, a div or a list. Never drop a table's header row.
