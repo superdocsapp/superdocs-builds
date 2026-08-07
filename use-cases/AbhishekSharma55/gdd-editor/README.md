@@ -29,7 +29,7 @@ That sentence is executable:
 gdd scenario --live
 ```
 
-**Result on the live API: 18/18 checks, 6 billable operations, 368 seconds.**
+**Result on the live API: 20/20 checks, 6 billable operations, 542 seconds.**
 The full transcript is in [`SCENARIO-RESULT.md`](SCENARIO-RESULT.md), the raw
 per-check data in `out/scenario-report.json`, and the documents themselves —
 before and after every act — in `out/snapshots/`.
@@ -39,7 +39,8 @@ ACT 1  seed 4 documents, verbatim, no model involved            free
 ACT 2  "add a Traversal - Grapple Rework section, and a
         linked sub-document for it"                             2 ops (+1 repair)
 ACT 3  "change the Grapple cooldown from 8 s to 5 s"            2 ops
-ACT 4  prove only the intended sections moved, across all 5     free
+ACT 4  concept plates into the art bible                        1 op
+       prove only the intended sections moved, across all 5     free
 ACT 5  export every document to .docx and Markdown              free
 ```
 
@@ -50,6 +51,25 @@ per document. A document nobody named must come back **byte-identical, whole**.
 In ACT 3 that meant: the Grapple section changed in Mechanics, the Traversal
 paragraph changed in the GDD, and `narrative`, `art-bible` and the new
 sub-document were byte-for-byte what they had been.
+
+**Two of those twenty checks exist because an earlier version of this file was
+wrong**, and they are the two worth reading:
+
+- *"the Art Bible has exactly one 'Concept art' section"* — asked to put two
+  images **in** that section, the API once appended a **second section with the
+  same heading** and hung the images off it ([`bugs.md` B15](../bugs.md)). Every
+  surface check passed: images present, captions right, no existing section
+  modified. The scenario now meets that with a targeted repair turn and counts
+  the operation.
+- *"ACT 2: the only new document is the linked sub-document"* — the
+  cross-document report used to fail a newly created document against a snapshot
+  that predated it, so `act-2` recorded `"ok": false` underneath a headline that
+  said everything passed. A document that appears is now checked against the
+  list of documents the act was allowed to create.
+
+And the check underneath all of them got stricter: an act that names only
+sections which already exist is no longer allowed to **add** anything either.
+Both fixes are in [`bugs.md` M6](../bugs.md), with regression tests.
 
 ---
 
@@ -71,6 +91,7 @@ Everything else is free or offline:
 gdd sections               # what the workspace holds right now  (offline)
 gdd verify                 # re-check the last scenario          (offline, no key)
 gdd export --format docx   # export every document               (free)
+gdd probe-multidoc --live  # re-check bugs.md B10 against the API (live, 0 ops)
 gdd ask mechanics "raise the Dash cooldown to 1.5 s" --only Dash   # 1 operation
 ```
 
@@ -81,22 +102,32 @@ command.
 ### The human gate
 
 ```bash
-gdd review mechanics "raise the Dash cooldown to 1.5 s and the Overheat pulse to 7 s" --live
+gdd review mechanics "raise the Dash cooldown to 1.8 s and the Overheat pulse to 7 s" \
+    --accept "1" --live
 ```
 
 Proposes the changes, pauses, prints the diff, and takes a decision **per
 change** — `--accept "1"`, `--accept all`, `--accept none`, or interactively.
 This is the third call of the four-call contract
-(`chat_async` → `jobs/{id}` → `approve` → `jobs/{id}`), and it earns its place:
-running exactly that instruction, the model proposed the Dash change correctly
-and proposed the second one **against the Grapple section instead of Overheat
-pulse** ([`bugs.md` B13](../bugs.md)). The reviewer approved the first, denied
-the second, and the document came out with `Dash 1.5 s`, `Grapple 5 s`
-untouched, `Overheat pulse 6 s` untouched.
+(`chat_async` → `jobs/{id}` → `approve` → `jobs/{id}`).
 
-Two things that verifies: denying one change does not discard the others, and
-the gate is not ceremony — it caught a wrong edit that `approve_all` would have
-shipped with a success message.
+**What it verified, and how strong each claim is:**
+
+- **Denying one change does not discard the others.** Reproduced every time.
+  Two changes proposed, one approved, one denied, and the document came out with
+  the approved edit applied and the denied one absent. That is the behaviour the
+  approve endpoint promises, and it delivers.
+- **The gate caught a genuinely mis-targeted edit — once.** Asked to change the
+  Dash and **Overheat pulse** cooldowns, the model once proposed the second
+  change against the **Grapple** section instead, with a confident explanation
+  ([`bugs.md` B13](../bugs.md)). Every section in that document has a row
+  labelled `Cooldown`, so the wrong one looked right. **Two later runs of the
+  same instruction targeted correctly**, so it is intermittent — the entry says
+  so, and a review UI cannot be designed assuming it fires every time.
+- **A denied change still costs an operation**, because the turn is billed when
+  it is submitted. This path spent that operation without a ledger line until a
+  verification pass caught it ([`bugs.md` M8](../bugs.md)); `gdd review` now
+  reports it.
 
 ---
 
@@ -132,7 +163,7 @@ summary.
 | `POST /v1/chat` (`pro` / `deep`, `response_mode: full`) | every edit | **yes** |
 | `POST /v1/documents/images/upload-base64` | concept plates → stable URLs | no |
 | `POST /v1/documents/export` | `.docx` + Markdown of every document | no |
-| `GET /v1/documents`, `POST /v1/sessions/init`, `GET /v1/sessions/{id}/documents` | explored for the multi-document session; **not used** — see below | no |
+| `GET /v1/documents`, `POST /v1/sessions/init`, `GET /v1/sessions/{id}/documents`, `.../focus` | the multi-document session — **not used for editing**; driven by `gdd probe-multidoc --live`, which re-checks bugs.md B10 for zero operations. See below | no |
 
 The four-call minimum contract — upload → chat → approve → export — is all
 here and all exercised live. `gdd review` runs the approval path end to end:
@@ -155,13 +186,31 @@ the surface this build should have used.
 
 I could not make it hold. Opening three documents into one session returns a
 roster of **one**, every entry carries the same `document_id: "doc_primary"`,
-and four identical GETs returned a *different* document each time. There is a
-runnable repro at [`../repro/B10-multidoc-roster.sh`](../repro/B10-multidoc-roster.sh)
-and the write-up is [`bugs.md` B10](../bugs.md). With every document sharing one
-id there is nowhere for "change the Grapple cooldown in Mechanics and nothing
-else" to land.
+and four identical GETs returned a *different* document each time. The suggested
+escape — `focus` one document, then work on it — does not exist either: `focus`
+**404s on the durable id the session was just opened with** ("not open in this
+session"), and accepts only `doc_primary`, which cannot distinguish one document
+from another.
+
+So there is no id that addresses a specific open document, and "change the
+Grapple cooldown in Mechanics and nothing else" has nowhere to land.
+
+**Both claims are runnable, and both cost zero operations:**
+
+```bash
+gdd probe-multidoc --live                 # this client, ending in a verdict
+../repro/B10-multidoc-roster.sh           # the same sequence in curl + jq
+```
+
+Re-run three times while writing this; it reproduces every time, with fresh
+documents and a fresh session. The write-up is [`bugs.md` B10](../bugs.md).
 
 So every document gets **its own session**, and this code holds the link graph.
+That is the difference worth being precise about: **multi-document is present
+and working here** — four documents, a fifth created at runtime, per-document
+edits, byte-identical proof for the ones nobody named — and it is implemented
+in this repo rather than by SuperDocs' multi-document session, which is absent
+for the reason above.
 
 **What that buys:** every edit is addressed to exactly one document by
 construction — a cross-document instruction cannot smear across files by
@@ -198,7 +247,7 @@ use the real multi-document session and let the model see the whole workspace.
 
 One note on reading `out/`: **`out/docs/` is the workspace's *current* state**,
 which includes the `gdd review` demo run after the scenario (so Mechanics shows
-`Dash 1.5 s`). The scenario's own record is `out/snapshots/` — the byte-exact
+`Dash 1.8 s`, and `Overheat pulse 6 s` because that change was denied). The scenario's own record is `out/snapshots/` — the byte-exact
 before and after of every act — plus `SCENARIO-RESULT.md` and
 `out/scenario-report.json`. The snapshots are what the surgical checks were
 computed against.
@@ -213,5 +262,5 @@ gdd_editor/cli.py         the `gdd` command
 out/                      every artefact the last run produced, committed
 ```
 
-Tests for the machinery underneath live in [`../tests/`](../tests/) — 61 of
-them, no key and no network, ~0.05 s.
+Tests for the machinery underneath live in [`../tests/`](../tests/) — 64 of
+them, no key and no network, 0.04 s by pytest's own clock.
