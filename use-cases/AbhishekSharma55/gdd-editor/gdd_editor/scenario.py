@@ -36,7 +36,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
-from superdocs_kit.docdiff import section_html, table_rows, visible_text
+from superdocs_kit.docdiff import section_html, sections, table_rows, visible_text
 
 from .corpus import DOCUMENTS
 from .images import ensure_demo_images
@@ -196,10 +196,19 @@ def run(
     rep.add("the new section contains only what was asked for (no invented table)",
             "<table" not in new_frag, new_frag[:300])
 
-    act2 = ws.untouched_report(snap_a, {
-        "gdd": ["Linked sub-documents", NEW_SECTION, "Traversal"],
-    })
+    # NEW_SECTION is not a section of the snapshot, so this act is allowed to
+    # add - and grapple-rework is declared as the one document it may create.
+    # Every other act names only sections that already exist, which is what
+    # forbids it from adding anything at all.
+    act2 = ws.untouched_report(
+        snap_a,
+        {"gdd": ["Linked sub-documents", NEW_SECTION]},
+        created=[NEW_SUBDOC_KEY],
+    )
     rep.untouched["act-2"] = act2
+    rep.add("ACT 2: the only new document is the linked sub-document",
+            act2["documents"][NEW_SUBDOC_KEY]["ok"],
+            json.dumps(act2["documents"][NEW_SUBDOC_KEY]))
     rep.add("ACT 2: mechanics, narrative and art-bible are byte-identical",
             all(act2["documents"][k]["ok"] for k in ("mechanics", "narrative", "art-bible")),
             json.dumps({k: act2["documents"][k] for k in
@@ -288,6 +297,32 @@ def run(
             image_urls=urls,
         )
         rep.ops += r_img.ops
+
+        # SAME FAILURE MODE AS ACT 2, DIFFERENT DISGUISE, AND IT GOT PAST AN
+        # EARLIER VERSION OF THIS FILE. Asked to put images "in the 'Concept
+        # art' section only", the model appended a SECOND <h2>Concept art</h2>
+        # and hung the images off that. Every image was present, the section
+        # name was right, and the document had quietly grown a duplicate
+        # heading - which is drift, and is what this build exists to catch
+        # (bugs.md B15). The check that let it through waved new chunks
+        # through; that is fixed in workspace.untouched_report. This is the
+        # other half: meet the failure with a targeted repair, and count it.
+        if [s.heading for s in sections(ws.docs["art-bible"].html)].count("Concept art") > 1:
+            log("  the images arrived under a duplicate heading - repairing")
+            r_img_fix = ws.edit(
+                "art-bible",
+                "This document now has TWO 'Concept art' headings. Merge them into "
+                "ONE section: keep the first heading, move both images and their "
+                "italic captions under it, and delete the second heading entirely. "
+                "Change nothing else in the document.",
+                label="act4-images-repair",
+                expect_sections=["Concept art"],
+            )
+            rep.ops += r_img_fix.ops
+        rep.add("the Art Bible has exactly one 'Concept art' section",
+                [s.heading for s in sections(ws.docs["art-bible"].html)].count("Concept art") == 1,
+                f"headings: {[s.heading for s in sections(ws.docs['art-bible'].html)]}")
+
         embedded = ws.docs["art-bible"].html.count("<img")
         rep.add("both concept plates are embedded in the Art Bible", embedded >= 2,
                 f"found {embedded} <img> tags")

@@ -303,16 +303,44 @@ class Workspace:
     # ------------------------------------------------------------------
     # cross-document checks
     # ------------------------------------------------------------------
-    def untouched_report(self, snapshot_tag: str, allowed: dict[str, list[str]]) -> dict:
+    def untouched_report(
+        self,
+        snapshot_tag: str,
+        allowed: dict[str, list[str]],
+        *,
+        created: list[str] | None = None,
+    ) -> dict:
         """Prove that across EVERY document, only the allowed sections moved.
 
         `allowed` maps doc key -> section names that were meant to change.
         A document absent from `allowed` must be byte-identical, whole.
+        `created` names documents that did not exist when the snapshot was
+        taken. A document that appears without being named there is a failure -
+        creating a file nobody asked for is exactly as wrong as editing one.
+
+        **Additions are policed, not waved through.** For each document, a name
+        in `allowed` that is not a section of the *snapshot* is a section this
+        edit was allowed to create; if every allowed name already existed, then
+        this edit was not allowed to add anything either, and a new chunk counts
+        as unintended. Without that, "only the Grapple section changed" was
+        satisfied by a turn that also appended a section nobody asked for -
+        which is bugs.md B12, and it is not hypothetical.
         """
         before = self.load_snapshot(snapshot_tag)
+        expected_new = set(created or ())
         report: dict = {"documents": {}, "ok": True}
         for key, state in self.docs.items():
             prev = before.get(key, "")
+            if key not in before:
+                was_expected = key in expected_new
+                report["documents"][key] = {
+                    "expected": ("created by this act" if was_expected
+                                 else "not to exist"),
+                    "created": True,
+                    "ok": was_expected,
+                }
+                report["ok"] &= was_expected
+                continue
             if key not in allowed:
                 identical = prev == state.html
                 report["documents"][key] = {
@@ -322,10 +350,14 @@ class Workspace:
                 }
                 report["ok"] &= identical
                 continue
-            verdict = verify_surgical(prev, state.html, expected_sections=allowed[key])
+            may_add = any(section_named(prev, name) is None for name in allowed[key])
+            verdict = verify_surgical(
+                prev, state.html, expected_sections=allowed[key], allow_new=may_add,
+            )
             unexpected_docs = sorted(verdict.unintended)
             report["documents"][key] = {
                 "expected": allowed[key],
+                "new_sections_allowed": may_add,
                 "sections_changed": sorted(
                     set(verdict.detail["modified"]) | set(verdict.detail["added"])
                 ),
