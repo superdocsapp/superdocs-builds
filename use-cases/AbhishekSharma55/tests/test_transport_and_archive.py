@@ -30,6 +30,7 @@ from weekly_digest.archive import (
 from weekly_digest.document import (
     ARCHIVE_MAX_DETAIL_ROWS,
     ARCHIVE_ROLLUP_SIZE,
+    TITLE,
     archive_plan,
     seed_html,
 )
@@ -170,6 +171,57 @@ def test_rollup_instruction_lists_the_rows_being_folded(weeks):
             return
         html = _render(rows)
     pytest.fail("no rollup fired in the first ten weeks")
+
+
+def test_a_mangled_archive_label_fails_the_week_instead_of_being_ignored(weeks):
+    """The regression that closed a hole in the checker itself.
+
+    Live, week 2 came back with the archive label written as "1" instead of
+    "Week 1". `parse_existing` cannot read that row, so the coverage check could
+    not see it, the repair turn added a *second* row with the right label, and
+    the week passed its invariants carrying a visible duplicate. A check that
+    silently ignores what it cannot parse is not a check.
+
+    Both shapes must now fail: the mangled row on its own, and the mangled row
+    sitting next to the correct one - the exact document the live run produced.
+    """
+    from weekly_digest.verify import check_week
+
+    def doc(archive_rows: str) -> str:
+        w = weeks[1]
+        bullets = "".join(f"<li>{s}</li>" for s in w["shipped"])
+        nxt = "".join(f"<li>{s}</li>" for s in w["next"])
+        risks = "".join(
+            "<tr>" + "".join(
+                f'<td style="background-color:#eceff1">{r[k]}</td>'
+                for k in ("risk", "owner", "area", "severity", "trend")
+            ) + "</tr>" for r in w["risks"]
+        )
+        return (
+            f"<h1>{TITLE}</h1><p>Week {w['week']} &middot; {w['dates']} &middot; "
+            f"Phase: {w['phase']}</p>"
+            f"<h2>What changed</h2><ul>{bullets}</ul>"
+            '<h2>What is at risk</h2><table style="border-collapse:collapse">'
+            '<thead><tr><th style="background-color:#263238">Risk</th>'
+            '<th>Owner</th><th>Area</th><th>Severity</th><th>Trend</th></tr></thead>'
+            f"<tbody>{risks}</tbody></table>"
+            f"<h2>What is next</h2><ul>{nxt}</ul>"
+            "<h2>Archive</h2><table><thead><tr><th>Week</th><th>Dates</th>"
+            "<th>Shipped</th><th>Risks carried</th></tr></thead>"
+            f"<tbody>{archive_rows}</tbody></table>"
+        )
+
+    good = "<tr><td>Week 1</td><td>d1</td><td>s</td><td>r</td></tr>"
+    mangled = "<tr><td>1</td><td>d1</td><td>s</td><td>r</td></tr>"
+    named = "every archive row is a row this system can read"
+
+    clean = check_week(doc(good), weeks[1], {1})
+    assert [c.ok for c in clean.checks if c.name == named] == [True]
+
+    for archive in (mangled, mangled + good, good + mangled):
+        rep = check_week(doc(archive), weeks[1], {1})
+        assert not rep.ok, f"a document with a mangled archive label passed: {archive}"
+        assert named in [c.name for c in rep.failures]
 
 
 def test_week_one_seed_is_well_formed(weeks):

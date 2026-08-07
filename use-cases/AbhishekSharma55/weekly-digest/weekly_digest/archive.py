@@ -127,7 +127,10 @@ def render_instruction_block(rows: list[ArchiveRow], rollup: ArchiveRow | None) 
     """
     lines = [
         "  The rows, top to bottom, must be exactly: "
-        + ", ".join(f"'{r.label}'" for r in rows) + "."
+        + ", ".join(f"'{r.label}'" for r in rows) + ".",
+        "  The first cell of each of those rows must read exactly as quoted, "
+        "INCLUDING the word 'Week' - write 'Week 3', never '3'. The column is "
+        "headed 'Week'; that heading is not a substitute for the label.",
     ]
     for row in rows:
         if row is rollup:

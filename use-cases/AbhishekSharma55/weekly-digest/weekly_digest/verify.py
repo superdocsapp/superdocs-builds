@@ -1,6 +1,6 @@
 """Drift detection: what "the document is still clean after 52 weeks" means.
 
-Thirteen invariants, checked against the document's own bytes after every single
+Fourteen invariants, checked against the document's own bytes after every single
 week. None of them ask the API whether it did the right thing; all of them
 read the document.
 
@@ -16,9 +16,12 @@ They are grouped by what kind of drift they catch:
 * FORMATTING - the table is still bordered, its header still shaded, its rows
                still alternating. This catches the slow bleaching of style
                that happens when a model rewrites a table instead of editing it.
-* GROWTH     - the archive accounts for every past week exactly once and stays
-               inside its row budget. This catches both the archive silently
-               becoming unbounded and a week's row being quietly dropped.
+* GROWTH     - the archive accounts for every past week exactly once, stays
+               inside its row budget, and contains no row this system cannot
+               read. This catches the archive silently becoming unbounded, a
+               week's row being quietly dropped, and - the one that got past an
+               earlier version - a row whose label is mangled badly enough that
+               the coverage check cannot see it at all.
 """
 
 from __future__ import annotations
@@ -180,7 +183,41 @@ def check_week(
     )
     add("no header row copied into the archive body", "structure", not stray_header)
 
+    # A CHECK THAT IGNORES WHAT IT CANNOT PARSE IS NOT A CHECK.
+    #
+    # `parse_existing` drops any row it does not recognise, which is right for
+    # PLANNING (a junk row should not be propagated into next week's archive)
+    # and was silently wrong for VERIFYING. It cost a real week: the model wrote
+    # the label as "1" instead of "Week 1", the coverage check could not see the
+    # row at all, the repair added a second row with the correct label, and the
+    # week passed carrying BOTH - a visible duplicate in the reader's document,
+    # under an invariant whose name is "covers every past week exactly once".
+    #
+    # So the archive body is now checked twice: for what it covers, and for
+    # whether every row in it is a row this system understands. The second one
+    # closes the whole class - a mangled label, a merged row, a stray sentence -
+    # rather than the one label that surfaced it.
+    unreadable = [
+        r[0] for r in all_rows[1:]
+        if len(r) >= 4 and not _recognisable_archive_label(r[0])
+    ]
+    add("every archive row is a row this system can read", "growth",
+        not unreadable or week["week"] <= 1,
+        f"unreadable labels: {unreadable[:4]}")
+
     return rep
+
+
+def _recognisable_archive_label(label: str) -> bool:
+    """A row the archive planner would carry forward: 'Week 7', 'Weeks 3-6 …'.
+
+    The seed placeholder ('-') is exempt only at week 1, which is why the check
+    above is skipped there; from week 2 the placeholder must have been replaced.
+    """
+    from .archive import _ROLLUP_RE, _WEEK_RE
+
+    text = (label or "").strip()
+    return bool(_WEEK_RE.match(text) or _ROLLUP_RE.match(text))
 
 
 def drift_table(reports: list[WeekReport]) -> str:
