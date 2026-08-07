@@ -329,7 +329,17 @@ class SuperDocs:
         fmt: str = "markdown",
         filename: str | None = None,
         options: dict[str, Any] | None = None,
-    ) -> Any:
+    ) -> bytes:
+        """Export the document. Returns the FILE BYTES.
+
+        The REST endpoint answers with the file itself (``text/markdown``,
+        ``text/html``, or the docx media type) plus a Content-Disposition
+        header - not a JSON envelope. Assuming JSON here is what made my first
+        exports look empty; see bugs.md B1.
+
+        Exports are not billable, which is why the builds in this folder
+        export on every single week and use the exported bytes as evidence.
+        """
         body: dict[str, Any] = {"format": fmt}
         if session_id:
             body["session_id"] = session_id
@@ -340,33 +350,44 @@ class SuperDocs:
             opts["filename"] = filename
         if opts:
             body["options"] = opts
-        return self._free("POST", "/v1/documents/export", body, f"export:{fmt}", quiet=True)
 
-    def export_text(self, **kw: Any) -> str:
-        """Export a text format and return the bytes as a string, whatever
-        envelope the API wraps them in."""
-        out = self.export(**kw)
-        if isinstance(out, str):
-            return out
-        if isinstance(out, dict):
-            for key in ("content", "text", "html", "markdown", "data", "body", "file_content"):
-                val = out.get(key)
-                if isinstance(val, str) and val.strip():
-                    return val
-            url = out.get("download_url") or out.get("url")
+        started = time.monotonic()
+        resp = self.transport.request("POST", "/v1/documents/export", body, timeout=300)
+        seconds = resp.elapsed_s or (time.monotonic() - started)
+
+        if resp.is_json:
+            payload = resp.json_body or {}
+            # The MCP surface wraps binary formats in a JSON envelope with a
+            # short-lived signed URL. REST does not, but handle both.
+            url = payload.get("download_url") or payload.get("url")
             if url:
                 return self._fetch_url(url)
-        raise SuperDocsError(
-            f"Export returned an unrecognised envelope: {type(out).__name__} "
-            f"keys={sorted(out) if isinstance(out, dict) else ''}",
-            "Print the raw body and add its content field to export_text().",
-        )
+            for key in ("content", "text", "html", "markdown", "data", "file_content"):
+                val = payload.get(key)
+                if isinstance(val, str):
+                    return val.encode("utf-8")
+            raise SuperDocsError(
+                f"Export returned a JSON envelope with no file in it: keys={sorted(payload)}",
+                "Print the raw body and add its content field to export().",
+            )
+        self.budget.record_free(f"export:{fmt}", seconds, note="/v1/documents/export")
+        return resp.content or b""
 
-    def _fetch_url(self, url: str) -> str:
+    def export_text(self, **kw: Any) -> str:
+        return self.export(**kw).decode("utf-8", errors="replace")
+
+    def export_to(self, path: Path, **kw: Any) -> Path:
+        data = self.export(**kw)
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        return path
+
+    def _fetch_url(self, url: str) -> bytes:
         import httpx
 
         with httpx.Client(timeout=120) as c:
-            return c.get(url).text
+            return c.get(url).content
 
     # ------------------------------------------------------------------
     def _free(self, method: str, path: str, body, label: str, quiet: bool = False):

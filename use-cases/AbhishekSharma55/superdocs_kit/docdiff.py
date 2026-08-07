@@ -255,6 +255,71 @@ def section_named(html: str, name: str) -> Section | None:
     return best
 
 
+_HEADING_RE = re.compile(r"<h([1-6])\b[^>]*>(.*?)</h\1\s*>", re.S | re.I)
+
+
+def _section_html_no_chunks(html: str, name: str) -> str:
+    """Fallback for HTML that carries no chunk ids - an exported file, a
+    hand-written fixture, or anything that did not come from a chat turn.
+    Chunk-level precision is impossible here, but section slicing is not, so
+    the caller degrades to a coarser answer instead of getting nothing."""
+    needle = name.strip().lower()
+    matches = list(_HEADING_RE.finditer(html or ""))
+    for i, m in enumerate(matches):
+        if visible_text(m.group(2)).strip().lower() != needle:
+            continue
+        level = int(m.group(1))
+        end = len(html)
+        for later in matches[i + 1:]:
+            if int(later.group(1)) <= level:
+                end = later.start()
+                break
+        return html[m.start():end]
+    return ""
+
+
+def section_html(html: str, name: str) -> str:
+    """The raw bytes of one section: its heading plus everything until the next
+    heading of the same or higher level."""
+    secs = sections(html)
+    chunks = chunk_map(html)
+    if not chunks:
+        return _section_html_no_chunks(html, name)
+    for i, sec in enumerate(secs):
+        if sec.heading.strip().lower() != name.strip().lower():
+            continue
+        start = html.find(chunks[sec.heading_chunk])
+        end = len(html)
+        for later in secs[i + 1:]:
+            if later.level <= sec.level:
+                pos = html.find(chunks[later.heading_chunk])
+                if pos > start:
+                    end = pos
+                break
+        return html[start:end]
+    return ""
+
+
+def table_rows(html_fragment: str) -> list[list[str]]:
+    """Every <tr> in a fragment as a list of cell texts. Deliberately naive -
+    it is used to check content, and the byte-level checks live elsewhere."""
+    rows = []
+    for tr in re.findall(r"<tr\b[^>]*>(.*?)</tr>", html_fragment or "", re.S | re.I):
+        cells = [
+            visible_text(c) for c in re.findall(r"<t[dh]\b[^>]*>(.*?)</t[dh]>", tr, re.S | re.I)
+        ]
+        if cells:
+            rows.append(cells)
+    return rows
+
+
+def list_items(html_fragment: str) -> list[str]:
+    return [
+        visible_text(li)
+        for li in re.findall(r"<li\b[^>]*>(.*?)</li>", html_fragment or "", re.S | re.I)
+    ]
+
+
 def chunks_of_sections(html: str, names: list[str]) -> set[str]:
     out: set[str] = set()
     for name in names:

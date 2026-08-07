@@ -1,0 +1,2014 @@
+[
+  {
+    "week": 1,
+    "dates": "2026-01-05 to 2026-01-11",
+    "phase": "Pre-production",
+    "shipped": [
+      "Art style exploration narrowed to two directions",
+      "Nav-mesh generation for the Drift Belt sector"
+    ],
+    "risks": [
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Boss encounter difficulty untuned for controller",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Stand up the automated build farm",
+      "Decide Wwise vs FMOD",
+      "Lock the art direction to one of the two candidates"
+    ]
+  },
+  {
+    "week": 2,
+    "dates": "2026-01-12 to 2026-01-18",
+    "phase": "Pre-production",
+    "shipped": [
+      "Hired a second combat designer (starts week 9)",
+      "Perforce to Git LFS migration completed for the audio depot",
+      "Grapple traversal prototype playable end to end on the test level"
+    ],
+    "risks": [
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Low",
+        "trend": "improving"
+      },
+      {
+        "risk": "Boss encounter difficulty untuned for controller",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "improving"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Lock the art direction to one of the two candidates",
+      "Scope the vertical slice level list",
+      "Stand up the automated build farm"
+    ]
+  },
+  {
+    "week": 3,
+    "dates": "2026-01-19 to 2026-01-25",
+    "phase": "Pre-production",
+    "shipped": [
+      "Core loop pitch deck signed off by the publisher",
+      "Engine upgrade to 5.4 merged; build times down 31%",
+      "Art style exploration narrowed to two directions",
+      "Nav-mesh generation for the Drift Belt sector"
+    ],
+    "risks": [
+      {
+        "risk": "Boss encounter difficulty untuned for controller",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Save-game format still unversioned"
+    ],
+    "next": [
+      "Stand up the automated build farm",
+      "Decide Wwise vs FMOD",
+      "Lock the art direction to one of the two candidates"
+    ]
+  },
+  {
+    "week": 4,
+    "dates": "2026-01-26 to 2026-02-01",
+    "phase": "Pre-production",
+    "shipped": [
+      "Nav-mesh generation for the Drift Belt sector",
+      "First pass on the Salvage economy spreadsheet"
+    ],
+    "risks": [
+      {
+        "risk": "Boss encounter difficulty untuned for controller",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Low",
+        "trend": "worsening"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Lock the art direction to one of the two candidates",
+      "Scope the vertical slice level list"
+    ]
+  },
+  {
+    "week": 5,
+    "dates": "2026-02-02 to 2026-02-08",
+    "phase": "Pre-production",
+    "shipped": [
+      "Perforce to Git LFS migration completed for the audio depot",
+      "Grapple traversal prototype playable end to end on the test level"
+    ],
+    "risks": [
+      {
+        "risk": "Boss encounter difficulty untuned for controller",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Stand up the automated build farm",
+      "Decide Wwise vs FMOD"
+    ]
+  },
+  {
+    "week": 6,
+    "dates": "2026-02-09 to 2026-02-15",
+    "phase": "Pre-production",
+    "shipped": [
+      "Engine upgrade to 5.4 merged; build times down 31%",
+      "Art style exploration narrowed to two directions",
+      "Nav-mesh generation for the Drift Belt sector",
+      "First pass on the Salvage economy spreadsheet"
+    ],
+    "risks": [
+      {
+        "risk": "Boss encounter difficulty untuned for controller",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Outsourced character art slipping two weeks"
+    ],
+    "next": [
+      "Lock the art direction to one of the two candidates",
+      "Scope the vertical slice level list",
+      "Stand up the automated build farm"
+    ]
+  },
+  {
+    "week": 7,
+    "dates": "2026-02-16 to 2026-02-22",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Grapple cooldown retuned from 8s to 5s after playtest data",
+      "Cinematic camera rig handed to the animation team",
+      "Localisation pipeline stubbed for 6 languages",
+      "Vertical slice level greyboxed and playable start to finish"
+    ],
+    "risks": [
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "improving"
+      },
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Boss encounter difficulty untuned for controller"
+    ],
+    "next": [
+      "Instrument the traversal funnel",
+      "Close the audio licence",
+      "Get the slice in front of the publisher"
+    ]
+  },
+  {
+    "week": 8,
+    "dates": "2026-02-23 to 2026-03-01",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Vertical slice level greyboxed and playable start to finish",
+      "Combat prototype merged to main behind a feature flag"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Save-game format still unversioned",
+      "Matchmaking backend untested above 5k CCU",
+      "Second combat designer starts late"
+    ],
+    "next": [
+      "Get the slice in front of the publisher",
+      "Second external playtest, 20 players"
+    ]
+  },
+  {
+    "week": 9,
+    "dates": "2026-03-02 to 2026-03-08",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "First playtest with eight external players (avg session 41 min)",
+      "Audio middleware spike finished; Wwise selected over FMOD",
+      "Grapple cooldown retuned from 8s to 5s after playtest data"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Instrument the traversal funnel",
+      "Close the audio licence"
+    ]
+  },
+  {
+    "week": 10,
+    "dates": "2026-03-09 to 2026-03-15",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Cinematic camera rig handed to the animation team",
+      "Localisation pipeline stubbed for 6 languages",
+      "Vertical slice level greyboxed and playable start to finish"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "No accessibility sign-off for subtitle sizing"
+    ],
+    "next": [
+      "Get the slice in front of the publisher",
+      "Second external playtest, 20 players"
+    ]
+  },
+  {
+    "week": 11,
+    "dates": "2026-03-16 to 2026-03-22",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Combat prototype merged to main behind a feature flag",
+      "Enemy AI flocking behaviour landed for Scrapper swarms",
+      "First playtest with eight external players (avg session 41 min)",
+      "Audio middleware spike finished; Wwise selected over FMOD"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Medium",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Instrument the traversal funnel",
+      "Close the audio licence",
+      "Get the slice in front of the publisher"
+    ]
+  },
+  {
+    "week": 12,
+    "dates": "2026-03-23 to 2026-03-29",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Audio middleware spike finished; Wwise selected over FMOD",
+      "Grapple cooldown retuned from 8s to 5s after playtest data",
+      "Cinematic camera rig handed to the animation team",
+      "Localisation pipeline stubbed for 6 languages"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "improving"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Streaming budget overrun on the Drift Belt"
+    ],
+    "next": [
+      "Get the slice in front of the publisher",
+      "Second external playtest, 20 players"
+    ]
+  },
+  {
+    "week": 13,
+    "dates": "2026-03-30 to 2026-04-05",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Localisation pipeline stubbed for 6 languages",
+      "Vertical slice level greyboxed and playable start to finish",
+      "Combat prototype merged to main behind a feature flag",
+      "Enemy AI flocking behaviour landed for Scrapper swarms"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "Critical",
+        "trend": "worsening"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Instrument the traversal funnel",
+      "Close the audio licence"
+    ]
+  },
+  {
+    "week": 14,
+    "dates": "2026-04-06 to 2026-04-12",
+    "phase": "Vertical Slice",
+    "shipped": [
+      "Enemy AI flocking behaviour landed for Scrapper swarms",
+      "First playtest with eight external players (avg session 41 min)",
+      "Audio middleware spike finished; Wwise selected over FMOD"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "Critical",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Get the slice in front of the publisher",
+      "Second external playtest, 20 players",
+      "Instrument the traversal funnel"
+    ]
+  },
+  {
+    "week": 15,
+    "dates": "2026-04-13 to 2026-04-19",
+    "phase": "Alpha",
+    "shipped": [
+      "Crash rate down to 0.9% of sessions from 4.2%",
+      "Photo mode shipped to the internal branch",
+      "Accessibility pass one: remappable controls, colourblind palettes",
+      "Console TRC pre-check dry run completed"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Crash rate above the cert threshold"
+    ],
+    "next": [
+      "Finish the accessibility pass two",
+      "Lock the weapon archetype list"
+    ]
+  },
+  {
+    "week": 16,
+    "dates": "2026-04-20 to 2026-04-26",
+    "phase": "Alpha",
+    "shipped": [
+      "Console TRC pre-check dry run completed",
+      "Weapon balance pass across all 9 archetypes"
+    ],
+    "risks": [
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Day-one patch size above the platform cap",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Publisher marketing beats not aligned with content lock"
+    ],
+    "next": [
+      "Alpha feature freeze review on Thursday",
+      "Drive crash rate below 0.5%"
+    ]
+  },
+  {
+    "week": 17,
+    "dates": "2026-04-27 to 2026-05-03",
+    "phase": "Alpha",
+    "shipped": [
+      "Save/load system passes the 500-cycle soak test",
+      "Boss encounter 'The Cartographer' first playable"
+    ],
+    "risks": [
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Day-one patch size above the platform cap"
+    ],
+    "next": [
+      "Finish the accessibility pass two",
+      "Lock the weapon archetype list",
+      "Alpha feature freeze review on Thursday"
+    ]
+  },
+  {
+    "week": 18,
+    "dates": "2026-05-04 to 2026-05-10",
+    "phase": "Alpha",
+    "shipped": [
+      "Analytics events wired for the first-hour funnel",
+      "Crash rate down to 0.9% of sessions from 4.2%",
+      "Photo mode shipped to the internal branch",
+      "Accessibility pass one: remappable controls, colourblind palettes"
+    ],
+    "risks": [
+      {
+        "risk": "Matchmaking backend untested above 5k CCU",
+        "owner": "Yuki T.",
+        "area": "Backend",
+        "severity": "High",
+        "trend": "improving"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Localisation vendor has no gaming glossary",
+      "Save-game format still unversioned"
+    ],
+    "next": [
+      "Alpha feature freeze review on Thursday",
+      "Drive crash rate below 0.5%",
+      "Finish the accessibility pass two"
+    ]
+  },
+  {
+    "week": 19,
+    "dates": "2026-05-11 to 2026-05-17",
+    "phase": "Alpha",
+    "shipped": [
+      "Accessibility pass one: remappable controls, colourblind palettes",
+      "Console TRC pre-check dry run completed"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Matchmaking backend untested above 5k CCU",
+      "Second combat designer starts late"
+    ],
+    "next": [
+      "Finish the accessibility pass two",
+      "Lock the weapon archetype list",
+      "Alpha feature freeze review on Thursday"
+    ]
+  },
+  {
+    "week": 20,
+    "dates": "2026-05-18 to 2026-05-24",
+    "phase": "Alpha",
+    "shipped": [
+      "All 12 alpha levels blocked out and in the build",
+      "Save/load system passes the 500-cycle soak test",
+      "Boss encounter 'The Cartographer' first playable"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "improving"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "Low",
+        "trend": "improving"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Alpha feature freeze review on Thursday",
+      "Drive crash rate below 0.5%"
+    ]
+  },
+  {
+    "week": 21,
+    "dates": "2026-05-25 to 2026-05-31",
+    "phase": "Alpha",
+    "shipped": [
+      "Steam Deck build boots and holds 30 fps on medium",
+      "Analytics events wired for the first-hour funnel",
+      "Crash rate down to 0.9% of sessions from 4.2%"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "Medium",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Critical",
+        "trend": "improving"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Finish the accessibility pass two",
+      "Lock the weapon archetype list",
+      "Alpha feature freeze review on Thursday"
+    ]
+  },
+  {
+    "week": 22,
+    "dates": "2026-06-01 to 2026-06-07",
+    "phase": "Alpha",
+    "shipped": [
+      "Photo mode shipped to the internal branch",
+      "Accessibility pass one: remappable controls, colourblind palettes",
+      "Console TRC pre-check dry run completed",
+      "Weapon balance pass across all 9 archetypes"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "improving"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Alpha feature freeze review on Thursday",
+      "Drive crash rate below 0.5%"
+    ]
+  },
+  {
+    "week": 23,
+    "dates": "2026-06-08 to 2026-06-14",
+    "phase": "Alpha",
+    "shipped": [
+      "Weapon balance pass across all 9 archetypes",
+      "All 12 alpha levels blocked out and in the build",
+      "Save/load system passes the 500-cycle soak test",
+      "Boss encounter 'The Cartographer' first playable"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Medium",
+        "trend": "improving"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "High",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Finish the accessibility pass two",
+      "Lock the weapon archetype list"
+    ]
+  },
+  {
+    "week": 24,
+    "dates": "2026-06-15 to 2026-06-21",
+    "phase": "Alpha",
+    "shipped": [
+      "Boss encounter 'The Cartographer' first playable",
+      "Steam Deck build boots and holds 30 fps on medium"
+    ],
+    "risks": [
+      {
+        "risk": "Crash rate above the cert threshold",
+        "owner": "Dev H.",
+        "area": "QA",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "worsening"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Alpha feature freeze review on Thursday",
+      "Drive crash rate below 0.5%",
+      "Finish the accessibility pass two"
+    ]
+  },
+  {
+    "week": 25,
+    "dates": "2026-06-22 to 2026-06-28",
+    "phase": "Content Lock",
+    "shipped": [
+      "Narrative branch pruning: 14 dead-end nodes removed",
+      "Level streaming budget met on all platforms",
+      "Marketing beauty-shot capture session completed",
+      "Achievement list finalised at 42 entries"
+    ],
+    "risks": [
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Console devkit shortage",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Crash rate above the cert threshold",
+      "Narrative branch count above the VO budget",
+      "Art bible drifting from the shipped material shaders"
+    ],
+    "next": [
+      "Hand the store page to the publisher",
+      "Start the cert pre-check checklist"
+    ]
+  },
+  {
+    "week": 26,
+    "dates": "2026-06-29 to 2026-07-05",
+    "phase": "Content Lock",
+    "shipped": [
+      "Achievement list finalised at 42 entries",
+      "Store page assets delivered to the publisher",
+      "Content lock declared for levels 1-9"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Medium",
+        "trend": "improving"
+      },
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Art bible drifting from the shipped material shaders",
+      "Console devkit shortage"
+    ],
+    "next": [
+      "Declare content lock for levels 10-12",
+      "Freeze the narrative graph",
+      "Hand the store page to the publisher"
+    ]
+  },
+  {
+    "week": 27,
+    "dates": "2026-07-06 to 2026-07-12",
+    "phase": "Content Lock",
+    "shipped": [
+      "Final voice-over recorded for the main campaign (2,140 lines)",
+      "Art bible frozen at v3.1 and distributed to outsourcers"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Localisation vendor has no gaming glossary"
+    ],
+    "next": [
+      "Hand the store page to the publisher",
+      "Start the cert pre-check checklist"
+    ]
+  },
+  {
+    "week": 28,
+    "dates": "2026-07-13 to 2026-07-19",
+    "phase": "Content Lock",
+    "shipped": [
+      "Level streaming budget met on all platforms",
+      "Marketing beauty-shot capture session completed",
+      "Achievement list finalised at 42 entries",
+      "Store page assets delivered to the publisher"
+    ],
+    "risks": [
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Publisher marketing beats not aligned with content lock",
+      "Audio middleware licence not signed"
+    ],
+    "next": [
+      "Declare content lock for levels 10-12",
+      "Freeze the narrative graph",
+      "Hand the store page to the publisher"
+    ]
+  },
+  {
+    "week": 29,
+    "dates": "2026-07-20 to 2026-07-26",
+    "phase": "Content Lock",
+    "shipped": [
+      "Store page assets delivered to the publisher",
+      "Content lock declared for levels 1-9",
+      "Final voice-over recorded for the main campaign (2,140 lines)"
+    ],
+    "risks": [
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Low",
+        "trend": "improving"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Hand the store page to the publisher",
+      "Start the cert pre-check checklist",
+      "Declare content lock for levels 10-12"
+    ]
+  },
+  {
+    "week": 30,
+    "dates": "2026-07-27 to 2026-08-02",
+    "phase": "Content Lock",
+    "shipped": [
+      "Art bible frozen at v3.1 and distributed to outsourcers",
+      "Narrative branch pruning: 14 dead-end nodes removed",
+      "Level streaming budget met on all platforms"
+    ],
+    "risks": [
+      {
+        "risk": "Save-game format still unversioned",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "improving"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Declare content lock for levels 10-12",
+      "Freeze the narrative graph"
+    ]
+  },
+  {
+    "week": 31,
+    "dates": "2026-08-03 to 2026-08-09",
+    "phase": "Content Lock",
+    "shipped": [
+      "Marketing beauty-shot capture session completed",
+      "Achievement list finalised at 42 entries"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Save-game format still unversioned",
+      "Outsourced character art slipping two weeks"
+    ],
+    "next": [
+      "Hand the store page to the publisher",
+      "Start the cert pre-check checklist",
+      "Declare content lock for levels 10-12"
+    ]
+  },
+  {
+    "week": 32,
+    "dates": "2026-08-10 to 2026-08-16",
+    "phase": "Content Lock",
+    "shipped": [
+      "Content lock declared for levels 1-9",
+      "Final voice-over recorded for the main campaign (2,140 lines)",
+      "Art bible frozen at v3.1 and distributed to outsourcers",
+      "Narrative branch pruning: 14 dead-end nodes removed"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Day-one patch size above the platform cap",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Declare content lock for levels 10-12",
+      "Freeze the narrative graph",
+      "Hand the store page to the publisher"
+    ]
+  },
+  {
+    "week": 33,
+    "dates": "2026-08-17 to 2026-08-23",
+    "phase": "Beta",
+    "shipped": [
+      "Performance pass: 99th percentile frame time under 22ms",
+      "Full localisation QA pass for FIGS complete"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Critical",
+        "trend": "improving"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Day-one patch size above the platform cap"
+    ],
+    "next": [
+      "Close the top 10 community bugs",
+      "Finish the localisation QA for CJK",
+      "Grow the beta to 5,000 players"
+    ]
+  },
+  {
+    "week": 34,
+    "dates": "2026-08-24 to 2026-08-30",
+    "phase": "Beta",
+    "shipped": [
+      "Day-one patch scoped and branched",
+      "Refund-risk audit on the first-hour experience",
+      "Closed beta opened to 2,000 players",
+      "Beta week-one retention measured at 38% D1"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Outsourced character art slipping two weeks",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Grow the beta to 5,000 players",
+      "Land the day-one patch branch",
+      "Close the top 10 community bugs"
+    ]
+  },
+  {
+    "week": 35,
+    "dates": "2026-08-31 to 2026-09-06",
+    "phase": "Beta",
+    "shipped": [
+      "Beta week-one retention measured at 38% D1",
+      "Top 20 community-reported bugs triaged and 14 fixed",
+      "Performance pass: 99th percentile frame time under 22ms"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "improving"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "improving"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Outsourced character art slipping two weeks"
+    ],
+    "next": [
+      "Close the top 10 community bugs",
+      "Finish the localisation QA for CJK",
+      "Grow the beta to 5,000 players"
+    ]
+  },
+  {
+    "week": 36,
+    "dates": "2026-09-07 to 2026-09-13",
+    "phase": "Beta",
+    "shipped": [
+      "Full localisation QA pass for FIGS complete",
+      "Matchmaking backend load-tested to 12k concurrent",
+      "Day-one patch scoped and branched"
+    ],
+    "risks": [
+      {
+        "risk": "Publisher marketing beats not aligned with content lock",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Streaming budget overrun on the Drift Belt"
+    ],
+    "next": [
+      "Grow the beta to 5,000 players",
+      "Land the day-one patch branch"
+    ]
+  },
+  {
+    "week": 37,
+    "dates": "2026-09-14 to 2026-09-20",
+    "phase": "Beta",
+    "shipped": [
+      "Refund-risk audit on the first-hour experience",
+      "Closed beta opened to 2,000 players",
+      "Beta week-one retention measured at 38% D1",
+      "Top 20 community-reported bugs triaged and 14 fixed"
+    ],
+    "risks": [
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Steam Deck thermal throttling in the Foundry level",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Publisher marketing beats not aligned with content lock",
+      "Art bible drifting from the shipped material shaders",
+      "Streaming budget overrun on the Drift Belt"
+    ],
+    "next": [
+      "Close the top 10 community bugs",
+      "Finish the localisation QA for CJK",
+      "Grow the beta to 5,000 players"
+    ]
+  },
+  {
+    "week": 38,
+    "dates": "2026-09-21 to 2026-09-27",
+    "phase": "Beta",
+    "shipped": [
+      "Top 20 community-reported bugs triaged and 14 fixed",
+      "Performance pass: 99th percentile frame time under 22ms"
+    ],
+    "risks": [
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "Critical",
+        "trend": "improving"
+      }
+    ],
+    "risks_closed": [
+      "Steam Deck thermal throttling in the Foundry level"
+    ],
+    "next": [
+      "Grow the beta to 5,000 players",
+      "Land the day-one patch branch"
+    ]
+  },
+  {
+    "week": 39,
+    "dates": "2026-09-28 to 2026-10-04",
+    "phase": "Beta",
+    "shipped": [
+      "Matchmaking backend load-tested to 12k concurrent",
+      "Day-one patch scoped and branched"
+    ],
+    "risks": [
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "High",
+        "trend": "improving"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Close the top 10 community bugs",
+      "Finish the localisation QA for CJK",
+      "Grow the beta to 5,000 players"
+    ]
+  },
+  {
+    "week": 40,
+    "dates": "2026-10-05 to 2026-10-11",
+    "phase": "Beta",
+    "shipped": [
+      "Closed beta opened to 2,000 players",
+      "Beta week-one retention measured at 38% D1",
+      "Top 20 community-reported bugs triaged and 14 fixed",
+      "Performance pass: 99th percentile frame time under 22ms"
+    ],
+    "risks": [
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Grow the beta to 5,000 players",
+      "Land the day-one patch branch"
+    ]
+  },
+  {
+    "week": 41,
+    "dates": "2026-10-12 to 2026-10-18",
+    "phase": "Certification",
+    "shipped": [
+      "Age rating received: PEGI 12 / ESRB T",
+      "Gold master candidate 3 built and archived"
+    ],
+    "risks": [
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Audio middleware licence not signed",
+        "owner": "Priya N.",
+        "area": "Audio",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Freeze the gold master candidate",
+      "Brief the community team on launch-day comms"
+    ]
+  },
+  {
+    "week": 42,
+    "dates": "2026-10-19 to 2026-10-25",
+    "phase": "Certification",
+    "shipped": [
+      "First cert submission sent to platform holder A",
+      "Cert failure on TRC 0350 fixed and resubmitted"
+    ],
+    "risks": [
+      {
+        "risk": "Localisation vendor has no gaming glossary",
+        "owner": "Sana R.",
+        "area": "Localisation",
+        "severity": "High",
+        "trend": "improving"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Audio middleware licence not signed"
+    ],
+    "next": [
+      "Resubmit to platform holder A",
+      "Rehearse the launch runbook end to end"
+    ]
+  },
+  {
+    "week": 43,
+    "dates": "2026-10-26 to 2026-11-01",
+    "phase": "Certification",
+    "shipped": [
+      "Age rating received: PEGI 12 / ESRB T",
+      "Gold master candidate 3 built and archived",
+      "Launch-day runbook rehearsed with the live-ops team",
+      "First cert submission sent to platform holder A"
+    ],
+    "risks": [
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Localisation vendor has no gaming glossary"
+    ],
+    "next": [
+      "Freeze the gold master candidate",
+      "Brief the community team on launch-day comms"
+    ]
+  },
+  {
+    "week": 44,
+    "dates": "2026-11-02 to 2026-11-08",
+    "phase": "Certification",
+    "shipped": [
+      "First cert submission sent to platform holder A",
+      "Cert failure on TRC 0350 fixed and resubmitted",
+      "Platform holder B cert passed on first submission"
+    ],
+    "risks": [
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "worsening"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Resubmit to platform holder A",
+      "Rehearse the launch runbook end to end"
+    ]
+  },
+  {
+    "week": 45,
+    "dates": "2026-11-09 to 2026-11-15",
+    "phase": "Certification",
+    "shipped": [
+      "Age rating received: PEGI 12 / ESRB T",
+      "Gold master candidate 3 built and archived"
+    ],
+    "risks": [
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Freeze the gold master candidate",
+      "Brief the community team on launch-day comms"
+    ]
+  },
+  {
+    "week": 46,
+    "dates": "2026-11-16 to 2026-11-22",
+    "phase": "Certification",
+    "shipped": [
+      "First cert submission sent to platform holder A",
+      "Cert failure on TRC 0350 fixed and resubmitted",
+      "Platform holder B cert passed on first submission"
+    ],
+    "risks": [
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Second combat designer starts late",
+      "Streaming budget overrun on the Drift Belt"
+    ],
+    "next": [
+      "Resubmit to platform holder A",
+      "Rehearse the launch runbook end to end",
+      "Freeze the gold master candidate"
+    ]
+  },
+  {
+    "week": 47,
+    "dates": "2026-11-23 to 2026-11-29",
+    "phase": "Launch",
+    "shipped": [
+      "Launch-day hotfix deployed within 6 hours of a save-corruption report",
+      "Shipped. 84k units sold in the first 72 hours"
+    ],
+    "risks": [
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "High",
+        "trend": "improving"
+      },
+      {
+        "risk": "Streaming budget overrun on the Drift Belt",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Medium",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Narrative branch count above the VO budget"
+    ],
+    "next": [
+      "Watch the first-hour funnel hourly",
+      "Ship the first hotfix if crash rate exceeds 1%"
+    ]
+  },
+  {
+    "week": 48,
+    "dates": "2026-11-30 to 2026-12-06",
+    "phase": "Launch",
+    "shipped": [
+      "Shipped. 84k units sold in the first 72 hours",
+      "Launch-day hotfix deployed within 6 hours of a save-corruption report"
+    ],
+    "risks": [
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Critical",
+        "trend": "improving"
+      },
+      {
+        "risk": "Steam Deck thermal throttling in the Foundry level",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Day-one patch size above the platform cap",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Streaming budget overrun on the Drift Belt"
+    ],
+    "next": [
+      "Watch the first-hour funnel hourly",
+      "Ship the first hotfix if crash rate exceeds 1%"
+    ]
+  },
+  {
+    "week": 49,
+    "dates": "2026-12-07 to 2026-12-13",
+    "phase": "Live Ops",
+    "shipped": [
+      "Roadmap for the first paid expansion approved",
+      "Post-mortem published internally",
+      "Server costs reduced 27% by shrinking the telemetry payload",
+      "Patch 1.0.2: 31 community bugs closed"
+    ],
+    "risks": [
+      {
+        "risk": "No accessibility sign-off for subtitle sizing",
+        "owner": "Ana F.",
+        "area": "Design",
+        "severity": "Critical",
+        "trend": "steady"
+      },
+      {
+        "risk": "Steam Deck thermal throttling in the Foundry level",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Day-one patch size above the platform cap",
+        "owner": "Dev H.",
+        "area": "Engineering",
+        "severity": "Low",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Scope the paid expansion vertical slice",
+      "Cut telemetry cost by a further 15%",
+      "Ship patch 1.0.3"
+    ]
+  },
+  {
+    "week": 50,
+    "dates": "2026-12-14 to 2026-12-20",
+    "phase": "Live Ops",
+    "shipped": [
+      "Patch 1.0.2: 31 community bugs closed",
+      "First seasonal event 'Ion Storm' live",
+      "Player retention D30 measured at 19%"
+    ],
+    "risks": [
+      {
+        "risk": "Steam Deck thermal throttling in the Foundry level",
+        "owner": "Yuki T.",
+        "area": "Engineering",
+        "severity": "Critical",
+        "trend": "worsening"
+      },
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "No accessibility sign-off for subtitle sizing",
+      "Day-one patch size above the platform cap"
+    ],
+    "next": [
+      "Ship patch 1.0.3",
+      "Design the second seasonal event"
+    ]
+  },
+  {
+    "week": 51,
+    "dates": "2026-12-21 to 2026-12-27",
+    "phase": "Live Ops",
+    "shipped": [
+      "Roadmap for the first paid expansion approved",
+      "Post-mortem published internally"
+    ],
+    "risks": [
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "Low",
+        "trend": "steady"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Console devkit shortage",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [
+      "Steam Deck thermal throttling in the Foundry level"
+    ],
+    "next": [
+      "Scope the paid expansion vertical slice",
+      "Cut telemetry cost by a further 15%"
+    ]
+  },
+  {
+    "week": 52,
+    "dates": "2026-12-28 to 2027-01-03",
+    "phase": "Live Ops",
+    "shipped": [
+      "Patch 1.0.2: 31 community bugs closed",
+      "First seasonal event 'Ion Storm' live"
+    ],
+    "risks": [
+      {
+        "risk": "Second combat designer starts late",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      },
+      {
+        "risk": "Narrative branch count above the VO budget",
+        "owner": "Sana R.",
+        "area": "Narrative",
+        "severity": "Low",
+        "trend": "improving"
+      },
+      {
+        "risk": "Art bible drifting from the shipped material shaders",
+        "owner": "Priya N.",
+        "area": "Art",
+        "severity": "Medium",
+        "trend": "steady"
+      },
+      {
+        "risk": "Console devkit shortage",
+        "owner": "Marcus O.",
+        "area": "Production",
+        "severity": "High",
+        "trend": "steady"
+      }
+    ],
+    "risks_closed": [],
+    "next": [
+      "Ship patch 1.0.3",
+      "Design the second seasonal event",
+      "Scope the paid expansion vertical slice"
+    ]
+  }
+]

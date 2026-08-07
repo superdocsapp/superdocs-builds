@@ -1,0 +1,163 @@
+{
+  "seeded": true,
+  "session_id": "nebula-digest-v1-arm-a-fbb0939229",
+  "records": [
+    {
+      "week": 1,
+      "ops": 0,
+      "seconds": 0.0,
+      "api_changed_chunks": [],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 0,
+      "doc_bytes": 5081,
+      "doc_sha": "a3589967a6d43e89",
+      "invariants_ok": true,
+      "invariant_failures": [],
+      "api_summary": "seed upload",
+      "attempts": 1,
+      "repaired": false,
+      "rolled_back": false,
+      "first_attempt_failures": []
+    },
+    {
+      "week": 2,
+      "ops": 1,
+      "seconds": 25.72,
+      "api_changed_chunks": [
+        "52884513-b8df-4f14-8cec-e5595c131584",
+        "83cea5e9-cf80-4865-9a2d-f8ff1e2c2627",
+        "88748edf-83c2-45ca-b8e4-05ffb6409857",
+        "d2b205f8-7e16-4ff8-ae41-983495336351",
+        "f2970859-0767-46f3-9a7e-19997feb9e58"
+      ],
+      "measured_changed_chunks": [
+        "52884513-b8df-4f14-8cec-e5595c131584",
+        "83cea5e9-cf80-4865-9a2d-f8ff1e2c2627",
+        "88748edf-83c2-45ca-b8e4-05ffb6409857",
+        "d2b205f8-7e16-4ff8-ae41-983495336351",
+        "f2970859-0767-46f3-9a7e-19997feb9e58"
+      ],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 6,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": true,
+      "invariant_failures": [],
+      "api_summary": "5 sections edited, rest untouched",
+      "attempts": 1,
+      "repaired": false,
+      "rolled_back": false,
+      "first_attempt_failures": []
+    },
+    {
+      "week": 3,
+      "ops": 2,
+      "seconds": 42.7,
+      "api_changed_chunks": [
+        "52884513-b8df-4f14-8cec-e5595c131584",
+        "83cea5e9-cf80-4865-9a2d-f8ff1e2c2627",
+        "88748edf-83c2-45ca-b8e4-05ffb6409857",
+        "d2b205f8-7e16-4ff8-ae41-983495336351",
+        "dfc43cc3-217f-4d07-be54-05294ec6f027"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ],
+      "api_summary": "5 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "status line matches the week",
+        "'What changed' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)",
+        "no header row copied into the archive body"
+      ]
+    },
+    {
+      "week": 4,
+      "ops": 2,
+      "seconds": 34.2,
+      "api_changed_chunks": [
+        "d2b205f8-7e16-4ff8-ae41-983495336351"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "archive covers every past week exactly once",
+        "no header row copied into the archive body"
+      ],
+      "api_summary": "1 section edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "archive covers every past week exactly once",
+        "no header row copied into the archive body"
+      ]
+    },
+    {
+      "week": 5,
+      "ops": 2,
+      "seconds": 19.39,
+      "api_changed_chunks": [
+        "52884513-b8df-4f14-8cec-e5595c131584",
+        "83cea5e9-cf80-4865-9a2d-f8ff1e2c2627",
+        "88748edf-83c2-45ca-b8e4-05ffb6409857",
+        "d2b205f8-7e16-4ff8-ae41-983495336351"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5300,
+      "doc_sha": "f7df08ea3593cef2",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "four H2 sections, correct names, correct order",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "no header row copied into the archive body"
+      ],
+      "api_summary": "4 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "four H2 sections, correct names, correct order",
+        "status line matches the week",
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table header intact",
+        "risk table rows match the week exactly",
+        "risk table keeps borders and header shading",
+        "archive covers every past week exactly once",
+        "no header row copied into the archive body"
+      ]
+    }
+  ]
+}

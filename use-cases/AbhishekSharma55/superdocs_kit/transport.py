@@ -46,6 +46,16 @@ class Response:
     json_body: Any
     elapsed_s: float = 0.0
     content: bytes | None = None
+    content_type: str = ""
+
+    @property
+    def is_json(self) -> bool:
+        return self.json_body is not None
+
+    def text(self) -> str:
+        if self.content is None:
+            return ""
+        return self.content.decode("utf-8", errors="replace")
 
 
 class Transport:
@@ -116,9 +126,13 @@ class HttpTransport(Transport):
                 raise ApiError(resp.status_code, path, resp.text)
 
             ctype = resp.headers.get("content-type", "")
+            # /v1/documents/export answers with the FILE, not a JSON envelope
+            # (text/markdown, text/html, or the docx media type). Treating
+            # every 200 as JSON is what made my first export attempts return
+            # an empty dict - see bugs.md B1, which was my bug, not theirs.
             if "application/json" in ctype:
-                return Response(resp.status_code, resp.json(), elapsed, resp.content)
-            return Response(resp.status_code, None, elapsed, resp.content)
+                return Response(resp.status_code, resp.json(), elapsed, resp.content, ctype)
+            return Response(resp.status_code, None, elapsed, resp.content, ctype)
 
         raise last or TransportError(f"{path} failed with no recorded error", "Retry.")
 
@@ -154,7 +168,13 @@ class RecordingTransport(Transport):
             "status": resp.status,
             "response": redact(resp.json_body),
             "elapsed_s": round(resp.elapsed_s, 3),
+            "content_type": resp.content_type,
         }
+        if resp.json_body is None and resp.content is not None:
+            if resp.content_type.startswith("text/") or "json" in resp.content_type:
+                record["response_text"] = redact(resp.text())
+            else:
+                record["response_bytes_len"] = len(resp.content)
         (self.cassette_dir / name).write_text(
             json.dumps(record, indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -190,7 +210,14 @@ class ReplayTransport(Transport):
         rec = hits[0] if len(hits) == 1 else hits.pop(0)
         if rec["status"] >= 400:
             raise ApiError(rec["status"], path, json.dumps(rec["response"]))
-        return Response(rec["status"], rec["response"], rec.get("elapsed_s", 0.0))
+        text = rec.get("response_text")
+        return Response(
+            rec["status"],
+            rec["response"],
+            rec.get("elapsed_s", 0.0),
+            content=text.encode("utf-8") if isinstance(text, str) else None,
+            content_type=rec.get("content_type", ""),
+        )
 
 
 def build_transport(

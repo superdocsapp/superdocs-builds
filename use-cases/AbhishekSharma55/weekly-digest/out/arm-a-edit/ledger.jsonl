@@ -1,0 +1,14 @@
+{"ts": "2026-08-07T14:58:30+00:00", "label": "upload:nebula-drift-weekly-digest.html", "ops": 0, "seconds": 1.396, "monthly_used": null, "note": "/v1/documents/upload-base64"}
+{"ts": "2026-08-07T14:58:30+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.48, "monthly_used": null, "note": "/v1/documents/export"}
+{"ts": "2026-08-07T14:58:56+00:00", "label": "w02", "ops": 1, "seconds": 25.083, "monthly_used": 42, "note": "chat"}
+{"ts": "2026-08-07T14:58:56+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.589, "monthly_used": null, "note": "/v1/documents/export"}
+{"ts": "2026-08-07T14:59:15+00:00", "label": "w03", "ops": 1, "seconds": 18.453, "monthly_used": 43, "note": "chat"}
+{"ts": "2026-08-07T14:59:38+00:00", "label": "w03-repair", "ops": 1, "seconds": 23.429, "monthly_used": 44, "note": "chat"}
+{"ts": "2026-08-07T14:59:39+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.739, "monthly_used": null, "note": "/v1/documents/export"}
+{"ts": "2026-08-07T14:59:54+00:00", "label": "w04", "ops": 1, "seconds": 15.596, "monthly_used": 45, "note": "chat"}
+{"ts": "2026-08-07T15:00:12+00:00", "label": "w04-repair", "ops": 1, "seconds": 17.809, "monthly_used": 46, "note": "chat"}
+{"ts": "2026-08-07T15:00:13+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.708, "monthly_used": null, "note": "/v1/documents/export"}
+{"ts": "2026-08-07T15:00:35+00:00", "label": "w05", "ops": 1, "seconds": 16.029, "monthly_used": 47, "note": "chat"}
+{"ts": "2026-08-07T15:01:39+00:00", "label": "w05-repair", "ops": 1, "seconds": 2.418, "monthly_used": 48, "note": "chat"}
+{"ts": "2026-08-07T15:01:40+00:00", "label": "export:markdown", "ops": 0, "seconds": 0.902, "monthly_used": null, "note": "/v1/documents/export"}
+{"ts": "2026-08-07T15:02:50+00:00", "label": "w06", "ops": 1, "seconds": 7.503, "monthly_used": 49, "note": "chat"}
