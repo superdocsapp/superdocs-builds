@@ -513,6 +513,57 @@ section. The invented table is caught by an explicit check in the scenario and
 repaired in a follow-up operation that is counted like any other.
 
 
+## B13 — A two-part instruction edited the wrong section, and said it was doing the right one
+
+**Severity: medium-high.** It is silent, it is plausible-looking, and the only
+thing that caught it was a human gate.
+
+**What I did.** One `POST /v1/chat/async` turn, `approval_mode:
+"ask_every_time"`, `pro`/`deep`, against a mechanics document whose sections are
+`Dash`, `Wall-run`, `Grapple`, `Overheat pulse`, `Salvage economy` — each with a
+parameter table containing a `Cooldown` row:
+
+> "Change the Dash cooldown to 1.5 s AND change the **Overheat pulse** cooldown
+> to 7 s. Make these two separate changes. Change nothing else."
+
+**What I expected.** Two proposed changes: one in `Dash`, one in `Overheat pulse`.
+
+**What happened.** Two proposed changes: one in `Dash` (correct), and one in
+**`Grapple`** — identifiable from the diff, whose `before` text is
+`Range 18 m … Cooldown 5 s`, which is the Grapple table. It proposed setting
+*Grapple's* cooldown to 7 s. `Overheat pulse` was never touched.
+
+The `ai_explanation` on that change read:
+
+> *"Parallel edit: Change only this row's Cooldown value to the requested number.
+> Preserve every…"*
+
+— confident, and about the wrong section.
+
+**Why it is worth a report rather than a shrug.** Every section in that document
+has a row labelled `Cooldown`, which is exactly the shape of a real design
+document, and the section names were given explicitly. If this had run under
+`approval_mode: "approve_all"` — the default — the wrong number would have
+landed in the shipped document with a success message, and the only way to
+notice would be a reader who happened to know Grapple's cooldown.
+
+**Suggested fix:** when an instruction names a section explicitly, resolve the
+target section *before* the edit and either apply it there or say it could not
+be found. A section name in the instruction is the strongest signal available
+and it is currently being outvoted by row-label similarity.
+
+**Repro:** `gdd review mechanics "Change the Dash cooldown to 1.5 s AND change
+the Overheat pulse cooldown to 7 s. Make these two separate changes. Change
+nothing else." --accept 1 --live` — against
+`gdd-editor/out/snapshots/before-act-3/mechanics.html`.
+
+**The upside, and the reason the build works this way.** This is precisely what
+the human gate is for. The reviewer saw two changes, approved the correct one,
+denied the wrong one — and the resulting document has `Dash 1.5 s`,
+`Grapple 5 s` (untouched), `Overheat pulse 6 s` (untouched). Denying one change
+did not discard the other, which is the behaviour the approve endpoint promises
+and, here, delivers.
+
 ---
 
 # My own bugs

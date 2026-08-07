@@ -5,6 +5,7 @@
     gdd scenario --live --quick    # same, without the image act (5 ops not 7)
     gdd ask <doc> "instruction"    # one chat-driven edit against one document
     gdd sections [<doc>]           # what the workspace currently holds
+    gdd review <doc> "instruction" # HITL: propose, show the diff, approve/deny
     gdd export --format docx       # export every document (free)
     gdd verify                     # re-check the last scenario offline, no key
 
@@ -106,6 +107,54 @@ def cmd_ask(args) -> int:
     return 0
 
 
+def cmd_review(args) -> int:
+    """The human gate, driven from a terminal. Proposes changes, prints the
+    diff, takes a decision per change, and proves that denying one does not
+    discard the others."""
+    from . import review
+
+    ws, budget = _workspace(args.max_ops, args.live)
+    if args.doc not in ws.docs:
+        print(f"no document {args.doc!r}. have: {sorted(ws.docs)}")
+        return 1
+    state = ws.docs[args.doc]
+    spent_before = budget.spent
+    job_id, changes = review.propose(
+        ws.client, session_id=state.session_id, document_html=state.html,
+        instruction=args.instruction, label=f"review:{args.doc}",
+        log=lambda m: print(f"  {m}"),
+    )
+    if not changes:
+        return 0
+    print("\nProposed changes:\n" + review.render_diff(changes))
+
+    if args.accept is None:
+        raw = input("\nApprove which? (numbers, 'all', 'none'): ").strip().lower()
+    else:
+        raw = args.accept
+    if raw in ("all", "*"):
+        keep = set(range(1, len(changes) + 1))
+    elif raw in ("none", ""):
+        keep = set()
+    else:
+        keep = {int(x) for x in raw.replace(",", " ").split() if x.isdigit()}
+    index = {c.change_id: i for i, c in enumerate(changes, 1)}
+
+    outcome = review.decide(
+        ws.client, session_id=state.session_id, job_id=job_id, changes=changes,
+        accept=lambda c: index[c.change_id] in keep,
+        feedback=args.feedback or "", ops=budget.spent - spent_before,
+        log=lambda m: print(f"  {m}"),
+    )
+    if outcome.final_html:
+        state.html = outcome.final_html
+        ws._write(args.doc, outcome.final_html)
+        ws.save()
+    print(f"\n{outcome.summary}")
+    print(f"ledger: {json.dumps(budget.summary())}")
+    return 0
+
+
 def cmd_sections(args) -> int:
     ws, _ = _workspace(0, False)
     keys = [args.doc] if args.doc else sorted(ws.docs)
@@ -162,6 +211,18 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--live", action="store_true", default=None)
     s.add_argument("--max-ops", type=int, default=2)
     s.set_defaults(func=cmd_ask)
+
+    s = sub.add_parser("review", help="propose changes, review the diff, approve or deny")
+    s.add_argument("doc")
+    s.add_argument("instruction")
+    s.add_argument("--accept", default=None,
+                   help="non-interactive: 'all', 'none', or change numbers e.g. '1 3'")
+    s.add_argument("--feedback", default=None, help="why a change was denied")
+    s.add_argument("--live", action="store_true", default=None)
+    s.add_argument("--max-ops", type=int, default=12,
+                   help="CUMULATIVE cap across this project's whole ledger, not "
+                        "per invocation - the ledger persists between runs")
+    s.set_defaults(func=cmd_review)
 
     s = sub.add_parser("sections", help="what the workspace holds (offline)")
     s.add_argument("doc", nargs="?")

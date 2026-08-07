@@ -19,6 +19,39 @@
       "repaired": false,
       "rolled_back": false,
       "first_attempt_failures": []
+    },
+    {
+      "week": 2,
+      "ops": 2,
+      "seconds": 315.82,
+      "api_changed_chunks": [
+        "08eb73e1-8a3d-4cac-b583-896396031aa5",
+        "276e5696-f6b3-423d-a905-a91e7c11748f",
+        "d39058be-6e68-47ae-8cf8-574833b71b1c",
+        "e663c434-44a0-466f-8d85-044d86b5f53a",
+        "ed8fc10e-b042-4b97-a4c0-d6e06b4637bc"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 5081,
+      "doc_sha": "0ccfe2b082a672c3",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "no header row copied into the archive body"
+      ],
+      "api_summary": "5 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "no header row copied into the archive body"
+      ]
     }
   ]
 }

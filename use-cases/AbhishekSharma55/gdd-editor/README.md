@@ -74,9 +74,29 @@ gdd export --format docx   # export every document               (free)
 gdd ask mechanics "raise the Dash cooldown to 1.5 s" --only Dash   # 1 operation
 ```
 
-`gdd ask --only <sections>` is the interesting one: it names the sections the
-edit is allowed to touch, and prints a PASS/FAIL derived from the bytes. That is
-the whole product in one command.
+`gdd ask --only <sections>` names the sections an edit is allowed to touch and
+prints a PASS/FAIL derived from the bytes. That is the whole product in one
+command.
+
+### The human gate
+
+```bash
+gdd review mechanics "raise the Dash cooldown to 1.5 s and the Overheat pulse to 7 s" --live
+```
+
+Proposes the changes, pauses, prints the diff, and takes a decision **per
+change** — `--accept "1"`, `--accept all`, `--accept none`, or interactively.
+This is the third call of the four-call contract
+(`chat_async` → `jobs/{id}` → `approve` → `jobs/{id}`), and it earns its place:
+running exactly that instruction, the model proposed the Dash change correctly
+and proposed the second one **against the Grapple section instead of Overheat
+pulse** ([`bugs.md` B13](../bugs.md)). The reviewer approved the first, denied
+the second, and the document came out with `Dash 1.5 s`, `Grapple 5 s`
+untouched, `Overheat pulse 6 s` untouched.
+
+Two things that verifies: denying one change does not discard the others, and
+the gate is not ceremony — it caught a wrong edit that `approve_all` would have
+shipped with a success message.
 
 ---
 
@@ -115,9 +135,15 @@ summary.
 | `GET /v1/documents`, `POST /v1/sessions/init`, `GET /v1/sessions/{id}/documents` | explored for the multi-document session; **not used** — see below | no |
 
 The four-call minimum contract — upload → chat → approve → export — is all
-here. The approval path (`chat_async` + `POST /v1/chat/{id}/approve`) lives in
-`superdocs_kit/client.py` and is exercised by the sibling build; this one runs
-`approve_all` because a design reviewer typing in a chat *is* the human gate.
+here and all exercised live. `gdd review` runs the approval path end to end:
+`POST /v1/chat/async` with `approval_mode: "ask_every_time"`, poll
+`GET /v1/jobs/{id}` to `awaiting_approval`, `POST /v1/chat/{session}/approve`
+with per-change decisions, poll to `completed`. The scenario itself runs
+`approve_all`, because a reviewer typing an instruction *is* the gate there.
+
+One thing worth knowing before building a review UI: **the operation is billed
+when the turn is submitted, not when it is approved**, so a denied change still
+costs.
 
 ---
 
@@ -174,6 +200,7 @@ use the real multi-document session and let the model see the whole workspace.
 gdd_editor/corpus.py      the four seed documents + the link graph (data)
 gdd_editor/workspace.py   multi-document workspace: sessions, edits, snapshots
 gdd_editor/scenario.py    the graded scenario, executable and asserted
+gdd_editor/review.py      the human gate: propose, diff, approve/deny per change
 gdd_editor/images.py      pure-python PNG concept plates
 gdd_editor/cli.py         the `gdd` command
 out/                      every artefact the last run produced, committed

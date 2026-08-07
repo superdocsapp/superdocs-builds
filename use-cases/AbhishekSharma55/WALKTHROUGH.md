@@ -128,6 +128,24 @@ The demo-able moment: `gdd ask mechanics "raise the Dash cooldown to 1.5 s"
 --only Dash` prints a PASS/FAIL computed from the document. That is the product
 in one command, and it is the thing to type if he says "change something."
 
+### The human gate, and the story that comes with it
+
+`gdd review <doc> "<instruction>"` runs the full approval path — propose, pause,
+print the diff, decide per change. Have this story ready, because it is the best
+one in the repo:
+
+I asked it to change **two** cooldowns — Dash to 1.5 s, **Overheat pulse** to
+7 s. It proposed the Dash change correctly, and proposed the second one against
+the **Grapple** section instead. Every section in that document has a row
+labelled `Cooldown`, so the wrong one looked right. I approved the first, denied
+the second, and the document came out with Dash at 1.5 s and Grapple and Overheat
+untouched.
+
+That is bug B13, and it is also the argument for the gate existing: under the
+default `approve_all` the wrong number lands in the document with a success
+message, and the only person who catches it is a reader who happens to know what
+Grapple's cooldown should be.
+
 ### The architectural decision he will ask about
 
 SuperDocs has a multi-document session. I did not use it, because opening three

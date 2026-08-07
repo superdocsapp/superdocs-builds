@@ -1,0 +1,28 @@
+{
+  "key": "POST /v1/chat/nebula-gdd-1d7c7d3993-mechanics/approve 0800ade4cd9e6795",
+  "method": "POST",
+  "path": "/v1/chat/nebula-gdd-1d7c7d3993-mechanics/approve",
+  "request": {
+    "job_id": "33af885d-adf1-4e43-a286-1f62c5937494",
+    "changes": [
+      {
+        "change_id": "09d15bc9-28b0-4355-b0fe-3aa533e5d925",
+        "approved": true
+      },
+      {
+        "change_id": "c43abb37-9305-43b3-b326-878e9f6c8191",
+        "approved": false
+      }
+    ],
+    "approved": true,
+    "feedback": "Overheat stays at 6 s until the next balance pass."
+  },
+  "status": 200,
+  "response": {
+    "status": "ok",
+    "message": "Approval processed",
+    "batch_complete": true
+  },
+  "elapsed_s": 0.411,
+  "content_type": "application/json"
+}
