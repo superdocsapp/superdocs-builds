@@ -1,0 +1,17 @@
+{
+  "key": "POST /v1/documents/export 080a775a1bc8fa45",
+  "method": "POST",
+  "path": "/v1/documents/export",
+  "request": {
+    "format": "docx",
+    "session_id": "nebula-gdd-5f05a3fe54-gdd",
+    "options": {
+      "filename": "Nebula Drift - Game Design Document"
+    }
+  },
+  "status": 200,
+  "response": null,
+  "elapsed_s": 0.841,
+  "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "response_bytes_len": 38670
+}

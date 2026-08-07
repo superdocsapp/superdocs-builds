@@ -1,0 +1,17 @@
+{
+  "key": "POST /v1/documents/export 7aab44167bf6f74a",
+  "method": "POST",
+  "path": "/v1/documents/export",
+  "request": {
+    "format": "docx",
+    "session_id": "nebula-gdd-5f05a3fe54-grapple-rework",
+    "options": {
+      "filename": "Nebula Drift - Grapple Rework (design spike)"
+    }
+  },
+  "status": 200,
+  "response": null,
+  "elapsed_s": 1.105,
+  "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "response_bytes_len": 37636
+}

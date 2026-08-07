@@ -1,0 +1,17 @@
+{
+  "key": "POST /v1/documents/export 394b692fe2ecb2aa",
+  "method": "POST",
+  "path": "/v1/documents/export",
+  "request": {
+    "format": "markdown",
+    "session_id": "nebula-gdd-5f05a3fe54-gdd",
+    "options": {
+      "filename": "Nebula Drift - Game Design Document"
+    }
+  },
+  "status": 200,
+  "response": null,
+  "elapsed_s": 0.483,
+  "content_type": "text/markdown; charset=utf-8",
+  "response_text": "# Nebula Drift - Game Design Document\n\nVantage Nine Studios - internal - the spine. Numbers live in Mechanics; do not duplicate them here except as prose.\n\n## Overview\n\nNebula Drift is a single-player momentum-platformer set in the wreckage of a\ncollapsed orbital shipyard. The player is a salvager who cannot fight most of\nwhat lives there and must out-move it instead.\n\n## Design pillars\n\n* **Momentum is the reward.** Every system either preserves speed or\n  explains clearly why it took it away.\n* **The wreck remembers.** Sections the player has stripped stay stripped.\n* **Legibility over spectacle.** If a hazard cannot be read in one frame at\n  speed, it is cut.\n\n## Core loop\n\n1. Enter a sector and read its silhouette for salvage.\n2. Route through it without stopping.\n3. Strip what you reached; lose what you did not.\n4. Spend salvage on traversal upgrades, never on combat.\n\n## Traversal\n\nTraversal is the game. The player has a dash, a wall-run and a grapple. The\ngrapple is the only tool that converts height into speed, so it carries the\nlongest cooldown in the game at **5 s**, and every level is paced\naround that number.\n\nFull parameters live in the Mechanics sub-document, section \"Grapple\".\n\n## Traversal - Grapple Rework\n\nA design spike is open to reduce the grapple cooldown, and the full spike lives in the linked sub-document 'Nebula Drift - Grapple Rework (design spike)'.\n\n| Document Title | Description | Reference Section |\n| --- | --- | --- |\n| Grapple Rework | The grapple cooldown spike | Traversal - Grapple Rework |\n\n## Combat\n\nCombat exists to make traversal mistakes expensive. The player has one\ndefensive tool - an overheat pulse - and no weapons.\n\n## Progression\n\nSalvage buys traversal upgrades in a flat, non-branching order. No skill tree:\nthe team has shipped one before and it cost six weeks of tuning for no measured\nretention gain.\n\n## Art direction\n\nReadable-industrial. Detail lives in silhouette, not surface. Full rules,\npalette and reference boards live in the Art Bible sub-document.\n\n## Narrative\n\nTold through the wreck itself and one voice on a dying channel. Beat sheet\nand characters live in the Narrative sub-document.\n\n## Linked sub-documents\n\n| Sub-document | Owns | Sections in this GDD that depend on it |\n| --- | --- | --- |\n| Mechanics | Every tunable number | Traversal, Combat, Progression |\n| Grapple Rework | The grapple cooldown spike | Traversal - Grapple Rework |\n| Narrative | Acts, beats, characters | Narrative |\n| Art Bible | Palette, silhouette rules, concept art | Art direction |\n\n## Open questions\n\n* Does the overheat pulse need a resource cost, or is the cooldown enough?\n* Can a sector be re-entered after it is stripped, and does that break pillar 2?\n"
+}

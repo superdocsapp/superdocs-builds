@@ -1,0 +1,114 @@
+{
+  "workspace_id": "nebula-gdd-5f05a3fe54",
+  "docs": {
+    "gdd": {
+      "key": "gdd",
+      "title": "Nebula Drift - Game Design Document",
+      "session_id": "nebula-gdd-5f05a3fe54-gdd",
+      "version": 3,
+      "doc_sha": "b208b3723fb51e47"
+    },
+    "mechanics": {
+      "key": "mechanics",
+      "title": "Nebula Drift - Mechanics",
+      "session_id": "nebula-gdd-5f05a3fe54-mechanics",
+      "version": 2,
+      "doc_sha": "735017009ba8f7c3"
+    },
+    "narrative": {
+      "key": "narrative",
+      "title": "Nebula Drift - Narrative",
+      "session_id": "nebula-gdd-5f05a3fe54-narrative",
+      "version": 1,
+      "doc_sha": "36f438d554889120"
+    },
+    "art-bible": {
+      "key": "art-bible",
+      "title": "Nebula Drift - Art Bible",
+      "session_id": "nebula-gdd-5f05a3fe54-art-bible",
+      "version": 2,
+      "doc_sha": "727189a974e31421"
+    },
+    "grapple-rework": {
+      "key": "grapple-rework",
+      "title": "Nebula Drift - Grapple Rework (design spike)",
+      "session_id": "nebula-gdd-5f05a3fe54-grapple-rework",
+      "version": 2,
+      "doc_sha": "33f957bf0475a981"
+    }
+  },
+  "links": {
+    "mechanics": {
+      "owns": "Every tunable number",
+      "gdd_sections": [
+        "Traversal",
+        "Combat",
+        "Progression"
+      ]
+    },
+    "narrative": {
+      "owns": "Acts, beats, characters",
+      "gdd_sections": [
+        "Narrative"
+      ]
+    },
+    "art-bible": {
+      "owns": "Palette, silhouette rules, concept art",
+      "gdd_sections": [
+        "Art direction"
+      ]
+    }
+  },
+  "history": [
+    {
+      "doc": "grapple-rework",
+      "label": "act2-subdoc",
+      "ops": 1,
+      "seconds": 89.5,
+      "changed": 4,
+      "unchanged": 6,
+      "ok": true,
+      "api_summary": "4 sections edited, rest untouched"
+    },
+    {
+      "doc": "gdd",
+      "label": "act2-gdd",
+      "ops": 1,
+      "seconds": 84.5,
+      "changed": 2,
+      "unchanged": 22,
+      "ok": true,
+      "api_summary": "1 section edited, 1 added, rest untouched"
+    },
+    {
+      "doc": "mechanics",
+      "label": "act3-mechanics",
+      "ops": 1,
+      "seconds": 24.6,
+      "changed": 1,
+      "unchanged": 13,
+      "ok": true,
+      "api_summary": "1 section edited, rest untouched"
+    },
+    {
+      "doc": "gdd",
+      "label": "act3-gdd",
+      "ops": 1,
+      "seconds": 8.9,
+      "changed": 1,
+      "unchanged": 23,
+      "ok": true,
+      "api_summary": "1 section edited, rest untouched"
+    },
+    {
+      "doc": "art-bible",
+      "label": "act4-images",
+      "ops": 1,
+      "seconds": 52.6,
+      "changed": 1,
+      "unchanged": 8,
+      "ok": false,
+      "api_summary": "1 added, rest untouched"
+    }
+  ]
+}

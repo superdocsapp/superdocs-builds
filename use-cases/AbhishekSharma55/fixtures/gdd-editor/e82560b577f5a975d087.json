@@ -1,0 +1,19 @@
+{
+  "key": "POST /v1/documents/images/upload-base64 e0de40b1aafa65eb",
+  "method": "POST",
+  "path": "/v1/documents/images/upload-base64",
+  "request": {
+    "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAUAAAAC0CAIAAABqhmJGAAAD7ElEQVR42u3XWVKTQRSG4V6HV14piqIMMocZEoIDqPtw2y7DXHlp1SlzSJ/0U/Us4Pu7+8XYXu0cAkU1RwACBlYS8O4RUFR7vXsEFCVgKB3w3jFQlIChcsAbe8dAUW3j0wlQlIChdsCnQFHtzf4pUJSAoXbAE6Co9uZgAhTV3h5MgKIWAZ8BRbW3h2dAUYuAz4Gi2ubhOVBU2zw6B4paBHwBFCVgqBzwu+MLoKhFwJdAUQKG0gGfXAJFtfcnV/DX5NfvECe2WgJGwKUDPr1OFX4QyXv4txcvX4c4sdUSMAKuHPDW6XWq6IPI3oP7Widta3KTKvwgkvew3vcV/cVX/b4EjIAF7EGsy4Oofl+j/YPRPpzdpooeaPaeqGjAve0f7b6q748SsAfhvmoHfJcqfqB3Xam+333V2h/9xdc+nt+lih5o9p7R9ruvWvsFbP9/PQj3VWv/IuBpqviBTrtSfX9+wO5rlfvbx4tpSPqDCO7JNtp+91Vrf9u+mIZkBxzdk220/e6r1v5FwLOQ/Acx68po+91Xrf1t+3IWkv4ggnuyjba/t+9N/8VX/L4ELGABVw545/I+JPtBRPdEZT+I7P2j3Vf1/dnf23au7kPSDzS4Jyo94OT9o91X9f3Z37sIeB6Sf6DzVNX3uy/3JWAPwn090/7sX3xt93oekn2g0T2j7XdftfY/Q8APIfkH+pCq+v7sB+G+au0XsIDdV+WAu3sQNw+p7Pe967S/u4D3bj6nst/3rtP+5kHY774EvLwDvf2Syv7Vfm93v/iK35eA7RewgJfn0+2XkN4eRHR/VPX7qr6/t+/tL+C7ryHdBRzcH1X9vqrv7+17mwfhQbgvAXsQAh5if2+/+LoLeH/6LaT6/tG+t/p+AXsQXT8I91Vrv4AF7L4EvMQDnT2G2O97R97fXcAHs8cQ+33vyPs7DPgpxH7fO/L+/gK+fwqxf7Wq/x+++n0J2H4BC3h5Du+/h9jPyPfV/EVf8oOYfw+RkPsSsAeBgFmGo/mPECfmHwwB9xTww48QJyZgAXcV8M8QJ4aA/UVHwAgYAQMCBgQMAgYEDAgYEDAIGBAwIGAQMCBgQMCAgEHAgIABAQMCBgEDAgYEDAIGBAwIGBAwCBgQMCBgEDAgYEDAgIBBwICAAQEDAgYBAwIGBAwCBgQMCBgQMAgYEDAgYEDAIGBAwICAQcCAgAEBAwIGAQMCBgQMAnYEIGBAwICAQcCAgAEBAwIGAQMCBgQMAgYEDAgYEDAIGBAwIGBAwCBgQMCAgEHAgIABAQMCBgEDAgYEDAgYBAwIGBAwCBgQMCBgQMAgYEDAgIBBwE4BBAwIGBAwDOEPEJlSdy2auqYAAAAASUVORK5CYII=",
+    "filename": "concept-foundry.png",
+    "content_type": "image/png"
+  },
+  "status": 200,
+  "response": {
+    "url": "https://storage.googleapis.com/superdocs-document-images/img/e84c6e0f5492477ba8bcb02d4078f04e.png",
+    "view_url": "https://storage.googleapis.com/superdocs-document-images/img/e84c6e0f5492477ba8bcb02d4078f04e.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260807%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260807T165429Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=9ffa31992f1c29afd9d076ad224811a244dbc294f5d5c24c658d92e4c85642b6f0449ac5cf86380f85e9ea636f12e353e04c3d8e6614cf1a9c2d9714392ddf0883d6152ee6fe7d0f33e71b3b9e3f568ab623462d28e15dd43da4727c5c019cab3011c6642cd6c1eb09919b0e3feb8d8833adf0232a02c1048162f0232b7f06de2257f2e5656eb88221954a5d73bc3d279b5b460165812fd8b650242b74315ccdbefa1d309cc8cdca6161c179bf6826f49552fbf107c1ad35adc0abf52abd5c923e6683a35fd889617cc47533d7e8bb6f52c1483e4cafe833d1a8c9bc18f7c1a0cf0149f3c363a06f4464ced356f02b1951ac4900ae582a28dbf2633ce248ba29",
+    "content_type": "image/png",
+    "size": 1061
+  },
+  "elapsed_s": 0.885,
+  "content_type": "application/json"
+}

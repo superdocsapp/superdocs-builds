@@ -1,0 +1,57 @@
+<h1 data-chunk-id="e905f4b1-171c-4929-bc0f-525ea69c4dd1" style="color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px">Nebula Drift - Game Design Document</h1>
+<p data-chunk-id="ddf1e100-b665-4dff-84b9-c6e31731d63d" style="background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt;color:#37474f">Vantage Nine Studios - internal - the spine. Numbers live in Mechanics; do not duplicate them here except as prose.</p>
+<h2 data-chunk-id="78431d2a-784c-4023-80a9-8d792053192d" style="color:#0d47a1;margin-top:18px">Overview</h2>
+<p data-chunk-id="09aee084-b2be-4bc0-8d8e-8a40785dd069">Nebula Drift is a single-player momentum-platformer set in the wreckage of a
+collapsed orbital shipyard. The player is a salvager who cannot fight most of
+what lives there and must out-move it instead.</p>
+<h2 data-chunk-id="8966c268-3d2b-4dbf-bf16-0126c4c3166f" style="color:#0d47a1;margin-top:18px">Design pillars</h2>
+<ul data-chunk-id="9b64c762-4adb-4d7b-9d71-92165409a061">
+<li><strong>Momentum is the reward.</strong> Every system either preserves speed or
+explains clearly why it took it away.</li>
+<li><strong>The wreck remembers.</strong> Sections the player has stripped stay stripped.</li>
+<li><strong>Legibility over spectacle.</strong> If a hazard cannot be read in one frame at
+speed, it is cut.</li>
+</ul>
+<h2 data-chunk-id="b3897696-a342-47e3-b981-f6013a7e5006" style="color:#0d47a1;margin-top:18px">Core loop</h2>
+<ol data-chunk-id="19394cef-9fea-4466-9f6e-5cf71eb691c9">
+<li>Enter a sector and read its silhouette for salvage.</li>
+<li>Route through it without stopping.</li>
+<li>Strip what you reached; lose what you did not.</li>
+<li>Spend salvage on traversal upgrades, never on combat.</li>
+</ol>
+<h2 data-chunk-id="06c53ef5-4930-4f8e-9bfc-db72fb9536de" style="color:#0d47a1;margin-top:18px">Traversal</h2>
+<p data-chunk-id="c9c72155-affd-416f-8b0b-3db6528af4a7">Traversal is the game. The player has a dash, a wall-run and a grapple. The
+grapple is the only tool that converts height into speed, so it carries the
+longest cooldown in the game at <strong>8 s</strong>, and every level is paced
+around that number.</p>
+<p data-chunk-id="883206d0-a929-4e4a-824e-a6f45d530fe0">Full parameters live in the Mechanics sub-document, section "Grapple".</p>
+<h2 data-chunk-id="5fe89b16-9697-4544-8ef5-b70c14d85296" style="color:#0d47a1;margin-top:18px">Combat</h2>
+<p data-chunk-id="414472cd-d833-4d19-9c47-bfc585a11d06">Combat exists to make traversal mistakes expensive. The player has one
+defensive tool - an overheat pulse - and no weapons.</p>
+<h2 data-chunk-id="5cc1af2a-5153-494a-b490-b027d5352e8d" style="color:#0d47a1;margin-top:18px">Progression</h2>
+<p data-chunk-id="b165343a-99ad-4c97-a8ea-d87f9b700d0a">Salvage buys traversal upgrades in a flat, non-branching order. No skill tree:
+the team has shipped one before and it cost six weeks of tuning for no measured
+retention gain.</p>
+<h2 data-chunk-id="fbded2bf-b1a8-449a-b1a2-e373c1d62373" style="color:#0d47a1;margin-top:18px">Art direction</h2>
+<p data-chunk-id="83b4849f-a191-474a-9296-3f1580785533">Readable-industrial. Detail lives in silhouette, not surface. Full rules,
+palette and reference boards live in the Art Bible sub-document.</p>
+<h2 data-chunk-id="f4bad83b-94f5-4de9-88f5-cc143366b09d" style="color:#0d47a1;margin-top:18px">Narrative</h2>
+<p data-chunk-id="e69490da-350e-499c-a17c-ab159dc7afe1">Told through the wreck itself and one voice on a dying channel. Beat sheet
+and characters live in the Narrative sub-document.</p>
+<h2 data-chunk-id="55fc9029-daf4-495b-b536-ed205f128cd1" style="color:#0d47a1;margin-top:18px">Linked sub-documents</h2>
+<table data-chunk-id="6e39411d-af8e-403b-9706-7a3407ca5968" style="width:100%;border-collapse:collapse;border:1px solid #37474f;font-family:Inter , Calibri , Arial , sans-serif;font-size:10pt"><thead><tr>
+<th style="border:1px solid #37474f;background-color:#0d47a1;color:#ffffff;padding:6px 8px;text-align:left;font-weight:bold">Sub-document</th><th style="border:1px solid #37474f;background-color:#0d47a1;color:#ffffff;padding:6px 8px;text-align:left;font-weight:bold">Owns</th>
+<th style="border:1px solid #37474f;background-color:#0d47a1;color:#ffffff;padding:6px 8px;text-align:left;font-weight:bold">Sections in this GDD that depend on it</th>
+</tr></thead><tbody>
+<tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Mechanics</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Every tunable number</td>
+<td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Traversal, Combat, Progression</td></tr>
+<tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Narrative</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Acts, beats, characters</td>
+<td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Narrative</td></tr>
+<tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Art Bible</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Palette, silhouette rules, concept art</td>
+<td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Art direction</td></tr>
+</tbody></table>
+<h2 data-chunk-id="d2a7c515-a3b1-4763-9d71-884e868b3410" style="color:#0d47a1;margin-top:18px">Open questions</h2>
+<ul data-chunk-id="5ac2507a-afa9-4f60-a054-470128c03e7d">
+<li>Does the overheat pulse need a resource cost, or is the cooldown enough?</li>
+<li>Can a sector be re-entered after it is stripped, and does that break pillar 2?</li>
+</ul>

@@ -215,31 +215,69 @@ class Section:
 
 
 def sections(html: str) -> list[Section]:
+    """Split a document into reader-visible sections, driven by HEADINGS.
+
+    The first version of this walked top-level chunks and treated a chunk whose
+    element was an ``<h2>`` as a section start. That broke the day SuperDocs
+    answered a "add a new section" instruction by emitting
+    ``<div data-chunk-id="..."><h2>New section</h2><p>...</p></div>`` - one
+    chunk, containing the heading, so the heading had no chunk id of its own and
+    the document appeared not to have gained a section at all. The section was
+    plainly there; my model of a section was wrong.
+
+    Driving off heading *positions* in the raw bytes and then assigning chunks
+    to whichever heading precedes them fixes that case and every sibling of it:
+    it does not care whether a heading is a chunk, is inside a chunk, or is
+    inside three nested chunks.
+    """
     chunks = chunk_map(html)
+    headings = list(_HEADING_RE.finditer(html or ""))
+    if not headings:
+        return []
+
+    # Where each chunk starts, so it can be attributed to a heading.
+    starts: list[tuple[int, str]] = []
+    for cid, own in chunks.items():
+        pos = html.find(own)
+        if pos >= 0:
+            starts.append((pos, cid))
+    starts.sort()
+
+    bounds = [
+        (m.start(), headings[i + 1].start() if i + 1 < len(headings) else len(html))
+        for i, m in enumerate(headings)
+    ]
+    owned: list[list[str]] = [[] for _ in headings]
+    for pos, cid in starts:
+        own = chunks[cid]
+        span = (pos, pos + len(own))
+        # A chunk that CONTAINS a heading belongs to that heading's section, not
+        # to the section it happens to start inside. This is the div-wrapping
+        # case: <div><h2>New</h2>...</div> begins inside the previous section
+        # but is the new one.
+        contained = next(
+            (i for i, (b, _e) in enumerate(bounds) if span[0] <= b < span[1]), None
+        )
+        if contained is not None:
+            owned[contained].append(cid)
+            continue
+        idx = None
+        for i, (b, e) in enumerate(bounds):
+            if b <= pos < e:
+                idx = i
+        if idx is not None:
+            owned[idx].append(cid)
+
     result: list[Section] = []
-    current: Section | None = None
-    for cid in top_level_chunks(html):
-        m = _TAG_NAME.match(chunks[cid].lstrip())
-        tag = (m.group(1).lower() if m else "")
-        if len(tag) == 2 and tag[0] == "h" and tag[1].isdigit():
-            level = int(tag[1])
-            while result and current and current.level >= level and current is not result[-1]:
-                break
-            current = Section(visible_text(chunks[cid]), level, cid, [cid])
-            result.append(current)
-        elif current is not None:
-            current.chunk_ids.append(cid)
-    # descendants of each top-level chunk belong to the same section
-    for sec in result:
-        expanded: list[str] = []
-        for cid in sec.chunk_ids:
-            expanded.append(cid)
-            own = chunks[cid]
-            expanded.extend(
-                other for other, oh in chunks.items() if other != cid and oh in own
-            )
-        seen: set[str] = set()
-        sec.chunk_ids = [c for c in expanded if not (c in seen or seen.add(c))]
+    for i, m in enumerate(headings):
+        heading_chunk = next(
+            (cid for pos, cid in starts
+             if pos == m.start() and chunks[cid].startswith(m.group(0)[:4])),
+            "",
+        )
+        result.append(
+            Section(visible_text(m.group(2)), int(m.group(1)), heading_chunk, owned[i])
+        )
     return result
 
 
@@ -281,23 +319,7 @@ def _section_html_no_chunks(html: str, name: str) -> str:
 def section_html(html: str, name: str) -> str:
     """The raw bytes of one section: its heading plus everything until the next
     heading of the same or higher level."""
-    secs = sections(html)
-    chunks = chunk_map(html)
-    if not chunks:
-        return _section_html_no_chunks(html, name)
-    for i, sec in enumerate(secs):
-        if sec.heading.strip().lower() != name.strip().lower():
-            continue
-        start = html.find(chunks[sec.heading_chunk])
-        end = len(html)
-        for later in secs[i + 1:]:
-            if later.level <= sec.level:
-                pos = html.find(chunks[later.heading_chunk])
-                if pos > start:
-                    end = pos
-                break
-        return html[start:end]
-    return ""
+    return _section_html_no_chunks(html, name)
 
 
 def table_rows(html_fragment: str) -> list[list[str]]:

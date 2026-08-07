@@ -1,0 +1,33 @@
+<h1 data-chunk-id="42f74847-acc3-4e6c-bcb8-c42a8f90f655" style="color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px">Nebula Drift - Grapple Rework (design spike)</h1>
+<p data-chunk-id="6fb181ee-5bdc-44d5-9af2-959afff37af8" style="background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section "Traversal - Grapple Rework".</p>
+<h2 data-chunk-id="963f1a26-50a5-4154-a8e1-50eaec43310f" style="color:#0d47a1">Problem</h2>
+<p data-chunk-id="0b9e694d-9146-43e0-bec4-fe41c221f5bd">The 8 s grapple cooldown is the longest in the game, and playtests show players stop moving while they wait for it. That pause breaks momentum and makes the grapple feel slower than the rest of the movement kit.</p>
+<h2 data-chunk-id="f8dc6f54-012c-4617-8825-81618b910e0b" style="color:#0d47a1">Proposed change</h2>
+<p data-chunk-id="528184a4-0e30-4944-b2e1-550ca103b67d">Reduce the cooldown and move the recovery into the animation instead, so the grapple still feels committed without leaving players idle. This keeps the action readable while getting players back into movement sooner.</p>
+<h2 data-chunk-id="21792b73-7ace-4562-a1cf-fb11149b2e86" style="color:#0d47a1">Parameters</h2>
+<div data-chunk-id="8dd648d6-231f-4521-9ddc-35ee53b78ba7"><table border="1" style="border-collapse: collapse; width: 100%;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 8px; border: 1px solid #ddd;">Parameter</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Current</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Proposed</th>
+      <th style="padding: 8px; border: 1px solid #ddd;">Rationale</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">Cooldown</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">8 s</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">5 s</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Reduces idle waiting without losing commitment.</td>
+    </tr>
+    <tr>
+      <td style="padding: 8px; border: 1px solid #ddd;">Recovery animation</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">0.2 s</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">0.5 s</td>
+      <td style="padding: 8px; border: 1px solid #ddd;">Moves the pause into the animation so flow resumes sooner.</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2 data-chunk-id="bfacbc81-871d-4874-aabe-c9f5b333dcc9" style="color:#0d47a1">Risks</h2>
+<ul data-chunk-id="6bac2124-c4dd-4c78-afe5-ea3be20d8c6d"><li>Level pacing may need retuning because some spaces were tuned around the current 8 s wait.</li><li>Traversal and combat spacing may feel denser because the level rhythm was built around that 8 s cooldown.</li></ul>

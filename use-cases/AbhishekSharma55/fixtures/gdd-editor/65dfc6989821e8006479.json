@@ -1,0 +1,17 @@
+{
+  "key": "POST /v1/documents/export 98267d8ae4e0a559",
+  "method": "POST",
+  "path": "/v1/documents/export",
+  "request": {
+    "format": "docx",
+    "session_id": "nebula-gdd-5f05a3fe54-art-bible",
+    "options": {
+      "filename": "Nebula Drift - Art Bible"
+    }
+  },
+  "status": 200,
+  "response": null,
+  "elapsed_s": 2.079,
+  "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "response_bytes_len": 39977
+}
