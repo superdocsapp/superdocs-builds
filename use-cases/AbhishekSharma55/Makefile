@@ -1,7 +1,7 @@
 # Fresh clone to working, in one command each.
 #
 #   make setup    create the venv and install (no key needed)
-#   make test     61 tests, no key, no network, ~0.05s
+#   make test     64 tests, no key, no network, 0.04s
 #   make demo     the offline demo: verify every saved week, show a diff,
 #                 print the measurement. Spends nothing.
 #   make replay   re-run the digest driver from committed fixtures, with no
@@ -10,13 +10,14 @@
 # The two commands that cost money are called out explicitly and both take a
 # hard cap:
 #   make scenario   the graded GDD scenario, live      (~6 operations)
-#   make run        arm A, 20 weeks, live, resumable   (<=45 operations)
-#   make control    the regeneration control arm, live (<=30 operations)
+#   make run        arm A, up to 20 weeks, resumable  (<=32 operations)
+#   make control    the regeneration control arm, live (<=20 operations)
+#   make probe      re-check bugs.md B10 against the API (live, 0 operations)
 
 PY := .venv/bin/python
 VENV := .venv
 
-.PHONY: setup test demo replay scenario run control report verify clean help
+.PHONY: setup test demo replay scenario run control probe report verify clean help
 
 help:
 	@grep -E '^#( |$$)' Makefile | sed 's/^# \{0,1\}//'
@@ -65,10 +66,14 @@ scenario: setup
 	@$(PY) -m gdd_editor.cli scenario --live --max-ops 14
 
 run: setup
-	@$(PY) -m weekly_digest.cli run --weeks 20 --max-ops 45 --live
+	@$(PY) -m weekly_digest.cli run --weeks 20 --max-ops 32 --live
 
 control: setup
-	@$(PY) -m weekly_digest.cli regen --weeks 8 --max-ops 30 --live
+	@$(PY) -m weekly_digest.cli regen --weeks 8 --max-ops 20 --live
+
+# Live but non-billable: uploads, session init and roster reads are all free.
+probe: setup
+	@$(PY) -m gdd_editor.cli probe-multidoc --live
 
 report: setup
 	@$(PY) -m weekly_digest.cli report
