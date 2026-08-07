@@ -21,12 +21,15 @@ rolled back, so the document is never left corrupt. A control arm regenerates th
 same digest from the same inputs so the cost claim has a number behind it, with
 the method committed before the result.
 
-The live run is **bounded at 20 weeks and resumable** — far enough that the
-archive rollup fires three times and past the point where drift appeared in every
-run. The 52-week archive property is proved offline in a millisecond test rather
-than an hour of API calls. The reasoning, and what the cut costs, is in
-`weekly-digest/METHOD.md`. **Say this before he asks**: it is a defended cut, not
-an unfinished run.
+The live run is **bounded and resumable** — it stops at week 20 or its operation
+cap, whichever comes first, and picks up where it left off. Week 20 is chosen
+because the archive rollup fires at weeks 10, 14 and 18, so the growth policy is
+exercised three times and the archive ends in the steady state it holds for the
+rest of the year. **How far it actually got is in
+`weekly-digest/MEASUREMENT.md`, generated from the ledger** — read the number off
+that file rather than off memory. The 52-week archive property is proved offline
+in a millisecond test rather than an hour of API calls. **Say this before he
+asks**: it is a defended cut with a written stopping rule, not an unfinished run.
 
 **Build 2 — GDD editor.** A game design document plus linked sub-documents
 (mechanics, narrative, art bible), edited by chat, with image support. The
@@ -427,9 +430,10 @@ Ordered by how likely they are to work first time.
    demo of the whole idea. If he wants to see the gate instead, use
    `gdd review` — and have the B13 story ready, because it is likely to
    mis-target something again and that is the point.
-2. **`digest diff --week 14`** — free, instant. Week 14 is a rollup week, so the
-   diff shows the standing sections turning over *and* four old archive rows
-   folding into one, in a single operation. `digest verify` prints the whole
+2. **`digest diff --week 14`** — free, instant, *if the committed run reached
+   week 14; check `digest verify` first, it lists every week there is.* Week 14
+   is a rollup week, so the diff shows the standing sections turning over *and*
+   four old archive rows folding into one, in a single operation. `digest verify` prints the whole
    drift table in the same breath.
 3. **Add a sub-document**: add an entry to `corpus.LINKS` and a `DOCUMENTS` key.
    Configuration over code — a new sub-document is a dict entry.

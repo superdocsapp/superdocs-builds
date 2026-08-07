@@ -1,0 +1,19 @@
+{
+  "key": "POST /v1/documents/images/upload-base64 1a6e0f02674689cb",
+  "method": "POST",
+  "path": "/v1/documents/images/upload-base64",
+  "request": {
+    "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAUAAAAC0CAIAAABqhmJGAAADyElEQVR42u3YSVIVQRCA4boAzvO88xSu61QOqKiIiIA44RhezmPYy+emI9Loel3Z74v4DpBVWT80lK36C0iqbNWfQFIChtwB/wCSEjBkDvhM/Q4kJWDIHfA3ICkBQ+aAz9avQFIChtwBnwJJCRgyB3yungJJDQF/AZISMOQO+DOQlIAhc8Dn6ycgKQFD7oA/AkkJGDIHfKF+AJISMAgYmCngEyCpcrGeAEkNAb+Htfnz+0GIGxsnYAScO+Dj1OIP4pgZ3bh3P8SNjSuX6nFq0YCznze7aMBubNwQ8FFq8QdxhH0thoCxr4D4F1/zgA9Tiz+IQ+zrv8UDbjuPgD0I+0o8f7lc36UWvdDe5o8GbF/mXyVg8zuvgF2ogO1rpoAPUotfqPmddznzlyv1ILXohZp/WtG/4e1rWkPAb1OLX6j5p9Q+YPsaI2Dzr3V++5o84P2utP+J3td5N21++5pWuVr3u9I64N7Ou2nz29e0hoDfdKX9g8h9XvuaVvtfGG3nF7CABZw74L2utH8Quc9rX+ZfVa7Vva60vtDW87f+iW5f5l8lYAELOHfAr7vS/kLN77zLmV/A5rev3AHvdqX9hZrfeZczf7led7vS+kLNP6713/D2Na0h4FddaX+h5h/TX8D2NaZ4EB7EOue3r8kDftlUfwG3Pa/5nXed85cbwxma6uxBpD+vfdnXiiHgF2119yCSn9e+RvX2xdd6XwIWsIBzB7zTVncPIjZ/fw/CvhY9f1C5WXea6u1Co/P3FrB9LXv+KAF7EPaVO+DnTfV3oZs1v33lmj/6xSdgAdtX5oBv1WdN9XahmzZ/d/+Es69J5xewgAWcO+CnIfkfROy85nfenucXsAch4NwBb4fkfxC5z2tf9vVPwLfrdkj2B5H9vJu2r+xffK33NQT8JCR/wLnPu2n7yh9w230VD8KDQMACFjBzBHynPg6xknnZl30J2INgIV98Q8CPQqxk7oDtS8AC9iBYhHK3PgxxZQKmo4A9CBAwMEfArgAEDAgYEDAIGBAwIGBAwCBgQMCAgEHAgIABAQMCBgEDAgYEDAgYBAwIGBAwCBgQMCBgQMAgYEDAgIABAYOAAQEDAgYBAwIGBAwIGAQMCBgQMAjYLYCAAQEDAgYBAwIGBAwIGAQMCBgQMAgYEDAgYEDAIGBAwICAAQGDgAEBAwIGAQMCBgQMCBgEDAgYEDAgYBAwIGBAwCBgQMCAgAEBg4ABAQMCBgEDAgYEDAgYBAwIGBAwIGAQMCBgQMAgYEDAgIABAYOAAQEDAgYEDAIGZvQX5Gm5RJIEyWEAAAAASUVORK5CYII=",
+    "filename": "concept-drift-belt.png",
+    "content_type": "image/png"
+  },
+  "status": 200,
+  "response": {
+    "url": "https://storage.googleapis.com/superdocs-document-images/img/ee07cd5e1af64ce68997462d63fce21c.png",
+    "view_url": "https://storage.googleapis.com/superdocs-document-images/img/ee07cd5e1af64ce68997462d63fce21c.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260807%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260807T185104Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=0c810a4c2899ea50868753408d498ccc995d612ad7c1e5d351f1f426862b69b4ebeeeef70a60d302e5fec2b9d36f12aeaec7e01be6080934712a6f01dd8790496b14b6ec2c6d681f1112886691167c3c9b38e63ca0e034d6635b1c6f34e77c9acae86c6f7b497592020a873b7eef2b035eaa91b3f642a898879db34b9a9a8cfa62adef09b164afa9f5320671d5520ba1df5e7034c994513de766d12b6387271a71bc2cc73302cb31185ea2fb281b18db924b1368a5a57a1c988f7ec5f09c75ecabd3ee793fcc4a07cf464767c149de9a170ffcb561374b396397e55976070c6eaf0a1d5a6624a11e37f0e55b10c69eb5b881c16189c3933a89d60dd458298dda",
+    "content_type": "image/png",
+    "size": 1025
+  },
+  "elapsed_s": 0.684,
+  "content_type": "application/json"
+}

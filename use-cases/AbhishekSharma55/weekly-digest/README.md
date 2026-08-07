@@ -31,19 +31,22 @@ make control    # arm B: the regeneration control          (capped)
 make report     # the cost comparison
 ```
 
-`make run` is **resumable and bounded**. The committed result is a 20-week live
-run — far enough that the archive rollup fires three times and past the point
-where drift has appeared in every run I did. Re-running continues from where it
-stopped, roughly one operation per further week. The reasoning for stopping
-there, and what it costs the result, is in [`METHOD.md`](METHOD.md).
+`make run` is **resumable and bounded**: it stops at week 20 or at its operation
+cap, whichever comes first, and continues from where it stopped when you run it
+again — roughly one operation per further week. **How far the committed run
+actually got, and what every week of it cost, is in
+[`MEASUREMENT.md`](MEASUREMENT.md), which is generated from the ledger.** No
+number about this run is typed by hand anywhere; if a sentence and that file ever
+disagree, that file is right. The reasoning for the stopping rule, and what it
+costs the result, is in [`METHOD.md`](METHOD.md).
 
 Offline and free, no key needed:
 
 ```bash
-make replay              # re-run all 52 weeks from committed fixtures
+make replay              # re-run the recorded weeks from committed fixtures
 digest verify            # re-check every saved week from its bytes
-digest diff --week 30    # what changed between week 29 and week 30
-make test                # 62 tests, no key, no network, ~0.05s
+digest diff --week 14    # what changed between week 13 and 14 (a rollup week)
+make test                # 64 tests, no key, no network, 0.04s
 ```
 
 **`make replay` runs the whole driver with no key and no network**, from the
@@ -79,11 +82,17 @@ next — is passed through verbatim from the week's input record. The model is
 never asked to recall or paraphrase a fact, because a paraphrased fact is a
 fabricated fact and somebody makes schedule decisions off this document.
 
-What *is* delegated to the model is the genuinely generative part: reading the
-sections the document currently holds and compressing them into one archive row,
-and folding four old archive rows into one. Those are summarisation tasks with
-the source material right there in the document, and they are exactly what a
-word processor cannot do.
+What *is* delegated to the model is the genuinely generative part: compressing
+the outgoing week into one archive row, and folding four old archive rows into
+one. Those are summarisation tasks, and they are exactly what a word processor
+cannot do.
+
+**The source material is handed to it, not pointed at.** The archive step used to
+say *"summarise the bullets currently under 'What changed'"* — true when that step
+runs, false by the end of the same instruction, because a later step replaces
+those bullets. Three archive rows in seven described the wrong week before that
+was caught ([`bugs.md` M7](../bugs.md)). The text to summarise is now quoted into
+the instruction. Never ask a model to summarise state the same turn is changing.
 
 ## The archive stays navigable
 
@@ -92,8 +101,8 @@ oldest 4 are folded into one rolled-up row **in the same operation**, so keeping
 the archive readable costs nothing.
 
 Over 52 weeks: **18 rows instead of 51**, with 11 rollups firing at weeks 10,
-14, 18 … 50. The live run exercises the first three of those rollups; the full
-52 are proved offline in
+14, 18 … 50. How many of those the live run reached is in
+[`MEASUREMENT.md`](MEASUREMENT.md); the full 52 are proved offline in
 [`../tests/test_transport_and_archive.py`](../tests/test_transport_and_archive.py)
 — all 52 weeks simulated in milliseconds, asserting that every past week is
 accounted for exactly once and the table never grows without bound. Getting that

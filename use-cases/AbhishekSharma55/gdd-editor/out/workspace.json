@@ -5,15 +5,15 @@
       "key": "gdd",
       "title": "Nebula Drift - Game Design Document",
       "session_id": "nebula-gdd-9c9b432e56-gdd",
-      "version": 1,
-      "doc_sha": "dacd8193791b1c7b"
+      "version": 4,
+      "doc_sha": "b05d1c0b1e74fa56"
     },
     "mechanics": {
       "key": "mechanics",
       "title": "Nebula Drift - Mechanics",
       "session_id": "nebula-gdd-9c9b432e56-mechanics",
-      "version": 1,
-      "doc_sha": "b0eaf9eb934a651f"
+      "version": 2,
+      "doc_sha": "c23575e17b2c763f"
     },
     "narrative": {
       "key": "narrative",
@@ -26,8 +26,8 @@
       "key": "art-bible",
       "title": "Nebula Drift - Art Bible",
       "session_id": "nebula-gdd-9c9b432e56-art-bible",
-      "version": 1,
-      "doc_sha": "aa565b1bc66a78c4"
+      "version": 2,
+      "doc_sha": "1e18026d45e462c3"
     },
     "grapple-rework": {
       "key": "grapple-rework",
@@ -69,6 +69,56 @@
       "unchanged": 6,
       "ok": true,
       "api_summary": "4 sections edited, rest untouched"
+    },
+    {
+      "doc": "gdd",
+      "label": "act2-gdd",
+      "ops": 1,
+      "seconds": 87.7,
+      "changed": 2,
+      "unchanged": 22,
+      "ok": true,
+      "api_summary": "1 section edited, 1 added, rest untouched"
+    },
+    {
+      "doc": "gdd",
+      "label": "act2-gdd-repair",
+      "ops": 1,
+      "seconds": 52.9,
+      "changed": 1,
+      "unchanged": 23,
+      "ok": true,
+      "api_summary": "1 section edited, rest untouched"
+    },
+    {
+      "doc": "mechanics",
+      "label": "act3-mechanics",
+      "ops": 1,
+      "seconds": 24.4,
+      "changed": 1,
+      "unchanged": 13,
+      "ok": true,
+      "api_summary": "1 section edited, rest untouched"
+    },
+    {
+      "doc": "gdd",
+      "label": "act3-gdd",
+      "ops": 1,
+      "seconds": 22.6,
+      "changed": 1,
+      "unchanged": 23,
+      "ok": true,
+      "api_summary": "1 section edited, rest untouched"
+    },
+    {
+      "doc": "art-bible",
+      "label": "act4-images",
+      "ops": 1,
+      "seconds": 17.3,
+      "changed": 1,
+      "unchanged": 8,
+      "ok": true,
+      "api_summary": "1 added, rest untouched"
     }
   ]
 }

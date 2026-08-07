@@ -1,0 +1,17 @@
+{
+  "key": "POST /v1/documents/export aa67bcda2fadac43",
+  "method": "POST",
+  "path": "/v1/documents/export",
+  "request": {
+    "format": "markdown",
+    "session_id": "nebula-gdd-9c9b432e56-grapple-rework",
+    "options": {
+      "filename": "Nebula Drift - Grapple Rework (design spike)"
+    }
+  },
+  "status": 200,
+  "response": null,
+  "elapsed_s": 0.439,
+  "content_type": "text/markdown; charset=utf-8",
+  "response_text": "# Nebula Drift - Grapple Rework (design spike)\n\nVantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section \"Traversal - Grapple Rework\".\n\n## Problem\n\nThe 8 s grapple cooldown is the longest in the game, and playtests show players stop moving while they wait for it. That pause makes traversal feel sluggish compared with the rest of the kit.\n\n## Proposed change\n\nDrop the cooldown and move the recovery into the animation instead, so the ability becomes available sooner while the end of the move still carries some commitment. This keeps the feel of recovery without forcing a long dead stop after each grapple.\n\n## Parameters\n\n| Parameter | Current | Proposed | Rationale |\n| --- | --- | --- | --- |\n| Cooldown | 8 s | 5 s | Shortens the longest cooldown in the game to keep movement flowing |\n| Recovery animation | 0.2 s | 0.5 s | Moves the recovery beat into the animation instead of the post-use wait |\n\n## Risks\n\n* Level design is optimized for an 8-second pacing cadence.\n* This 8-second interval ensures consistent player engagement throughout the stage.\n"
+}

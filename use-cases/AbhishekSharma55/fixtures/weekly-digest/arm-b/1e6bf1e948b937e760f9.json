@@ -1,0 +1,66 @@
+{
+  "key": "POST /v1/chat eb6e8f90a68d820f",
+  "method": "POST",
+  "path": "/v1/chat",
+  "request": {
+    "session_id": "nebula-digest-v1-regen-w06-ac553593",
+    "message": "Produce the complete Week 6 production digest for Nebula Drift (Vantage Nine Studios) as the whole document, replacing whatever is there. Use exactly this structure and content.\n\nTITLE (Heading 1): Nebula Drift - Weekly Production Digest\nSTATUS LINE (bold, directly under the title): Week 6 · 2026-02-09 to 2026-02-15 · Phase: Pre-production\nBelow it, smaller grey text: Vantage Nine Studios · internal · standing document, edited in place every Monday\n\nSECTION 'What changed' (Heading 2), as bullets, verbatim:\n  - Engine upgrade to 5.4 merged; build times down 31%\n  - Art style exploration narrowed to two directions\n  - Nav-mesh generation for the Drift Belt sector\n  - First pass on the Salvage economy spreadsheet\n\nSECTION 'What is at risk' (Heading 2), as a bordered table with a shaded header row and alternating row shading, columns Risk / Owner / Area / Severity / Trend:\n  | Boss encounter difficulty untuned for controller | Ana F. | Design | Low | steady |\n  | Save-game format still unversioned | Dev H. | Engineering | Low | steady |\n\nSECTION 'What is next' (Heading 2), as bullets, verbatim:\n  - Lock the art direction to one of the two candidates\n  - Scope the vertical slice level list\n  - Stand up the automated build farm\n\nSECTION 'Archive' (Heading 2), a bordered table with a shaded header row, columns Week / Dates / Shipped / Risks carried, newest first:\n  | Week 5 | 2026-02-02 to 2026-02-08 | Perforce to Git LFS migration completed for the audio depot; Grapple traversal prototype playable end to end on the test | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 4 | 2026-01-26 to 2026-02-01 | Nav-mesh generation for the Drift Belt sector; First pass on the Salvage economy spreadsheet | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 3 | 2026-01-19 to 2026-01-25 | Core loop pitch deck signed off by the publisher; Engine upgrade to 5.4 merged; build times down 31%; Art style explorat | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 2 | 2026-01-12 to 2026-01-18 | Hired a second combat designer (starts week 9); Perforce to Git LFS migration completed for the audio depot; Grapple tra | Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs |\n  | Week 1 | 2026-01-05 to 2026-01-11 | Art style exploration narrowed to two directions; Nav-mesh generation for the Drift Belt sector | Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs |\n\nUse the same visual style throughout: dark blue headings, a bordered table with a dark shaded header row and alternating light row shading.",
+    "response_mode": "full",
+    "model_tier": "pro",
+    "thinking_depth": "deep"
+  },
+  "status": 200,
+  "response": {
+    "response": "✅ I replaced the document with the complete Week 6 production digest and preserved the requested styling.",
+    "session_id": "nebula-digest-v1-regen-w06-ac553593",
+    "document_changes": {
+      "updated_html": "<h1 data-chunk-id=\"a28f13e1-b9f7-4e68-8efb-a6dbd2fcf0b7\" style=\"color:#1e3a8a\">Nebula Drift - Weekly Production Digest</h1>\n<p data-chunk-id=\"f13f692d-c820-40d6-bf7f-353f2cb3317d\"><strong>Week 6 · 2026-02-09 to 2026-02-15 · Phase: Pre-production</strong></p>\n<p data-chunk-id=\"3cce3924-f830-4330-9a69-67e9b1485486\" style=\"color:#6b7280;font-size:0.9em\">Vantage Nine Studios · internal · standing document, edited in place every Monday</p>\n<h2 data-chunk-id=\"1a2b46db-951f-4390-8d71-468fcbbd9daa\" style=\"color:#1e3a8a\">What changed</h2>\n<ul data-chunk-id=\"48961c86-3b25-4f61-b179-cc9f5fbf31e2\"><li>Engine upgrade to 5.4 merged; build times down 31%</li><li>Art style exploration narrowed to two directions</li><li>Nav-mesh generation for the Drift Belt sector</li><li>First pass on the Salvage economy spreadsheet</li></ul>\n<h2 data-chunk-id=\"68d4f657-da21-420d-87e1-1d4c7d870624\" style=\"color:#1e3a8a\">What is at risk</h2>\n<table data-chunk-id=\"17cb854a-59a8-44e6-b9ba-4d7c42a8dcd1\" style=\"width:100%;border-collapse:collapse;border:1px solid #9ca3af\"><thead><tr style=\"background-color:#1f3a5f;color:#ffffff\"><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Risk</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Owner</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Area</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Severity</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Trend</th></tr></thead><tbody><tr style=\"background-color:#f3f4f6\"><td style=\"padding:8px;border:1px solid #9ca3af\">Boss encounter difficulty untuned for controller</td><td style=\"padding:8px;border:1px solid #9ca3af\">Ana F.</td><td style=\"padding:8px;border:1px solid #9ca3af\">Design</td><td style=\"padding:8px;border:1px solid #9ca3af\">Low</td><td style=\"padding:8px;border:1px solid #9ca3af\">steady</td></tr><tr><td style=\"padding:8px;border:1px solid #9ca3af\">Save-game format still unversioned</td><td style=\"padding:8px;border:1px solid #9ca3af\">Dev H.</td><td style=\"padding:8px;border:1px solid #9ca3af\">Engineering</td><td style=\"padding:8px;border:1px solid #9ca3af\">Low</td><td style=\"padding:8px;border:1px solid #9ca3af\">steady</td></tr></tbody></table>\n<h2 data-chunk-id=\"d66ee109-b6ce-4695-8a9b-865597d62791\" style=\"color:#1e3a8a\">What is next</h2>\n<ul data-chunk-id=\"47ae57aa-d5b8-4ccc-afe0-1cac44b49973\"><li>Lock the art direction to one of the two candidates</li><li>Scope the vertical slice level list</li><li>Stand up the automated build farm</li></ul>\n<h2 data-chunk-id=\"9303225f-97ac-4df9-a92b-f7e207352e37\" style=\"color:#1e3a8a\">Archive</h2>\n<table data-chunk-id=\"bdc00e49-0cee-450e-a936-c7094d909dfe\" style=\"width:100%;border-collapse:collapse;border:1px solid #9ca3af\"><thead><tr style=\"background-color:#1f3a5f;color:#ffffff\"><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Week</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Dates</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Shipped</th><th style=\"padding:8px;border:1px solid #9ca3af;text-align:left\">Risks carried</th></tr></thead><tbody><tr style=\"background-color:#f3f4f6\"><td style=\"padding:8px;border:1px solid #9ca3af\">Week 5</td><td style=\"padding:8px;border:1px solid #9ca3af\">2026-02-02 to 2026-02-08</td><td style=\"padding:8px;border:1px solid #9ca3af\">Perforce to Git LFS migration completed for the audio depot; Grapple traversal prototype playable end to end on the test</td><td style=\"padding:8px;border:1px solid #9ca3af\">Boss encounter difficulty untuned for controller; Outsourced character art slipping two we</td></tr><tr><td style=\"padding:8px;border:1px solid #9ca3af\">Week 4</td><td style=\"padding:8px;border:1px solid #9ca3af\">2026-01-26 to 2026-02-01</td><td style=\"padding:8px;border:1px solid #9ca3af\">Nav-mesh generation for the Drift Belt sector; First pass on the Salvage economy spreadsheet</td><td style=\"padding:8px;border:1px solid #9ca3af\">Boss encounter difficulty untuned for controller; Outsourced character art slipping two we</td></tr><tr style=\"background-color:#f3f4f6\"><td style=\"padding:8px;border:1px solid #9ca3af\">Week 3</td><td style=\"padding:8px;border:1px solid #9ca3af\">2026-01-19 to 2026-01-25</td><td style=\"padding:8px;border:1px solid #9ca3af\">Core loop pitch deck signed off by the publisher; Engine upgrade to 5.4 merged; build times down 31%; Art style explorat</td><td style=\"padding:8px;border:1px solid #9ca3af\">Boss encounter difficulty untuned for controller; Outsourced character art slipping two we</td></tr><tr><td style=\"padding:8px;border:1px solid #9ca3af\">Week 2</td><td style=\"padding:8px;border:1px solid #9ca3af\">2026-01-12 to 2026-01-18</td><td style=\"padding:8px;border:1px solid #9ca3af\">Hired a second combat designer (starts week 9); Perforce to Git LFS migration completed for the audio depot; Grapple tra</td><td style=\"padding:8px;border:1px solid #9ca3af\">Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs</td></tr><tr style=\"background-color:#f3f4f6\"><td style=\"padding:8px;border:1px solid #9ca3af\">Week 1</td><td style=\"padding:8px;border:1px solid #9ca3af\">2026-01-05 to 2026-01-11</td><td style=\"padding:8px;border:1px solid #9ca3af\">Art style exploration narrowed to two directions; Nav-mesh generation for the Drift Belt sector</td><td style=\"padding:8px;border:1px solid #9ca3af\">Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs</td></tr></tbody></table>",
+      "version_id": "dbffe103-e577-4fba-bff0-29c2e84b161d",
+      "changes_summary": "Document replaced in full",
+      "requires_approval": null,
+      "pending_changes": null,
+      "changes": [
+        {
+          "change_id": "430210e6-e355-4438-9605-455ac44023cb",
+          "operation": "create_full_document",
+          "chunk_id": "full",
+          "document_id": "doc_primary",
+          "status": "auto_approved",
+          "ai_explanation": "Created the full document (6 sections)"
+        },
+        {
+          "change_id": "f8b80e02-35f5-44ad-867c-5c29e0a86353",
+          "operation": "create_full_document",
+          "chunk_id": "full",
+          "document_id": "doc_primary",
+          "status": "auto_approved",
+          "ai_explanation": "Created the full document (6 sections)"
+        }
+      ],
+      "chunk_diffs": null,
+      "concurrent_merges": null,
+      "focused_document_id": "doc_primary"
+    },
+    "usage": {
+      "monthly_used": 198,
+      "monthly_limit": 500,
+      "monthly_remaining": 302,
+      "was_billable": true,
+      "ops_charged": 1,
+      "quota_exhausted": false,
+      "subscription_tier": "free",
+      "bucket_used": "tier",
+      "redemption_id": null,
+      "promotions": [],
+      "agent_handoff_hint": null
+    },
+    "hint": {
+      "hint_code": "prefer_chat_async_for_large_generations",
+      "message": "This request took 106s synchronously. Requests over ~300s hit the platform gateway timeout (504) with no result returned.",
+      "suggested_action": "Submit document-scale generations via POST /v1/chat/async (chat_async): it returns a job_id immediately, has no gateway ceiling, and reports progress via get_job.",
+      "elapsed_seconds": 106.7
+    }
+  },
+  "elapsed_s": 107.153,
+  "content_type": "application/json"
+}

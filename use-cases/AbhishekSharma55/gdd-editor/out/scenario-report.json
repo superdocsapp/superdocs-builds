@@ -1,0 +1,228 @@
+{
+  "checks": [
+    {
+      "name": "workspace seeded with the GDD and three linked sub-documents",
+      "ok": true,
+      "detail": "have ['art-bible', 'gdd', 'mechanics', 'narrative']"
+    },
+    {
+      "name": "the Grapple cooldown starts at 8 s in Mechanics",
+      "ok": true,
+      "detail": "found '8 s'"
+    },
+    {
+      "name": "the GDD's Traversal section also says 8 s",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the linked sub-document was authored",
+      "ok": true,
+      "detail": "unintended: []"
+    },
+    {
+      "name": "the GDD gained the section 'Traversal - Grapple Rework'",
+      "ok": true,
+      "detail": "sections now: ['Overview', 'Design pillars', 'Core loop', 'Traversal', 'Traversal - Grapple Rework', 'Combat', 'Progression', 'Art direction', 'Narrative', 'Linked sub-documents', 'Open questions']"
+    },
+    {
+      "name": "the new section contains only what was asked for (no invented table)",
+      "ok": true,
+      "detail": "<h2 style=\"border-bottom: 2px solid #2c3e50; padding-bottom: 5px; color: #2c3e50; font-family: sans-serif;\">Traversal - Grapple Rework</h2>\n<p style=\"font-family: sans-serif; line-height: 1.5; color: #333;\">A design spike is open to reduce the grapple cooldown. The full spike lives in the linked sub"
+    },
+    {
+      "name": "ACT 2: the only new document is the linked sub-document",
+      "ok": true,
+      "detail": "{\"expected\": \"created by this act\", \"created\": true, \"ok\": true}"
+    },
+    {
+      "name": "ACT 2: mechanics, narrative and art-bible are byte-identical",
+      "ok": true,
+      "detail": "{\"mechanics\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"narrative\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"art-bible\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}}"
+    },
+    {
+      "name": "ACT 2: nothing else in the GDD moved",
+      "ok": true,
+      "detail": "unintended: []"
+    },
+    {
+      "name": "Mechanics now says the cooldown is 5 s",
+      "ok": true,
+      "detail": "found '5 s'"
+    },
+    {
+      "name": "the GDD's Traversal prose now says 5 s and no longer says 8 s",
+      "ok": true,
+      "detail": "Traversal Traversal is the game. The player has a dash, a wall-run and a grapple. The grapple is the only tool that converts height into speed, so it carries the longest cooldown in the game at 5 s , "
+    },
+    {
+      "name": "ACT 3: ONLY the Grapple section changed in Mechanics",
+      "ok": true,
+      "detail": "unintended: []"
+    },
+    {
+      "name": "ACT 3: ONLY the Traversal section changed in the GDD",
+      "ok": true,
+      "detail": "unintended: []"
+    },
+    {
+      "name": "ACT 3: narrative, art-bible and the new sub-document are byte-identical",
+      "ok": true,
+      "detail": "{\"narrative\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"art-bible\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"grapple-rework\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}}"
+    },
+    {
+      "name": "the other mechanics' numbers are unchanged",
+      "ok": true,
+      "detail": "got {'Dash': '1.2 s', 'Wall-run': '2.0 s', 'Overheat pulse': '6 s'}, wanted {'Dash': '1.2 s', 'Wall-run': '2.0 s', 'Overheat pulse': '6 s'}"
+    },
+    {
+      "name": "the Art Bible has exactly one 'Concept art' section",
+      "ok": true,
+      "detail": "headings: ['Nebula Drift - Art Bible', 'Silhouette rules', 'Palette', 'Concept art']"
+    },
+    {
+      "name": "both concept plates are embedded in the Art Bible",
+      "ok": true,
+      "detail": "found 2 <img> tags"
+    },
+    {
+      "name": "embedding images changed nothing but the Concept art section",
+      "ok": true,
+      "detail": "{\"gdd\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"mechanics\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"narrative\": {\"expected\": \"byte-identical\", \"byte_identical\": true, \"ok\": true}, \"art-bible\": {\"expected\": [\"Concept art\"], \"new_sections_allowed\": false, \"sections_changed\": [\"07dfa5f7-79cb-4737-b248-830b86536a0a\"], \"unintended\": [], \"byte_id"
+    },
+    {
+      "name": "every document exports to .docx",
+      "ok": true,
+      "detail": "exported 5 of 5"
+    },
+    {
+      "name": "every document exports to Markdown",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "ops": 6,
+  "seconds": 542.1,
+  "untouched": {
+    "act-2": {
+      "documents": {
+        "gdd": {
+          "expected": [
+            "Linked sub-documents",
+            "Traversal - Grapple Rework"
+          ],
+          "new_sections_allowed": true,
+          "sections_changed": [
+            "05c3fbbf-2cc7-4510-bd49-35cf3dc82f85",
+            "18b90591-cc3e-4764-84c5-a529c10c7618"
+          ],
+          "unintended": [],
+          "byte_identical_sections": 22,
+          "ok": true
+        },
+        "mechanics": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "narrative": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "art-bible": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "grapple-rework": {
+          "expected": "created by this act",
+          "created": true,
+          "ok": true
+        }
+      },
+      "ok": true
+    },
+    "act-3": {
+      "documents": {
+        "gdd": {
+          "expected": [
+            "Traversal"
+          ],
+          "new_sections_allowed": false,
+          "sections_changed": [
+            "d89ecf30-9600-4981-8c99-e67073aec372"
+          ],
+          "unintended": [],
+          "byte_identical_sections": 23,
+          "ok": true
+        },
+        "mechanics": {
+          "expected": [
+            "Grapple"
+          ],
+          "new_sections_allowed": false,
+          "sections_changed": [
+            "214b47df-2cd4-4cfa-9e2c-8df39c391577"
+          ],
+          "unintended": [],
+          "byte_identical_sections": 13,
+          "ok": true
+        },
+        "narrative": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "art-bible": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "grapple-rework": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        }
+      },
+      "ok": true
+    },
+    "images": {
+      "documents": {
+        "gdd": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "mechanics": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "narrative": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        },
+        "art-bible": {
+          "expected": [
+            "Concept art"
+          ],
+          "new_sections_allowed": false,
+          "sections_changed": [
+            "07dfa5f7-79cb-4737-b248-830b86536a0a"
+          ],
+          "unintended": [],
+          "byte_identical_sections": 8,
+          "ok": true
+        },
+        "grapple-rework": {
+          "expected": "byte-identical",
+          "byte_identical": true,
+          "ok": true
+        }
+      },
+      "ok": true
+    }
+  }
+}

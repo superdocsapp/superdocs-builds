@@ -1,0 +1,112 @@
+[
+  {
+    "week": 1,
+    "ops": 2,
+    "seconds": 69.2,
+    "doc_bytes": 1567,
+    "doc_sha": "346facfe55028739",
+    "sections_created": 1,
+    "instruction_chars": 1536,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "four H2 sections, correct names, correct order",
+      "'What changed' bullets are verbatim",
+      "'What is next' bullets are verbatim",
+      "risk table header intact",
+      "risk table rows match the week exactly",
+      "risk table keeps borders and header shading"
+    ]
+  },
+  {
+    "week": 2,
+    "ops": 2,
+    "seconds": 44.44,
+    "doc_bytes": 4421,
+    "doc_sha": "412f080380ed1296",
+    "sections_created": 1,
+    "instruction_chars": 1818,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "'What changed' bullets are verbatim",
+      "'What is next' bullets are verbatim",
+      "risk table rows match the week exactly",
+      "risk table keeps borders and header shading",
+      "archive covers every past week exactly once",
+      "every archive row is a row this system can read"
+    ]
+  },
+  {
+    "week": 3,
+    "ops": 2,
+    "seconds": 43.31,
+    "doc_bytes": 4106,
+    "doc_sha": "385f19f3a794ec92",
+    "sections_created": 1,
+    "instruction_chars": 2000,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "risk table keeps borders and header shading",
+      "risk table keeps alternating row shading"
+    ]
+  },
+  {
+    "week": 4,
+    "ops": 2,
+    "seconds": 81.17,
+    "doc_bytes": 5738,
+    "doc_sha": "506b6944942b073c",
+    "sections_created": 1,
+    "instruction_chars": 2122,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "'What changed' bullets are verbatim",
+      "risk table keeps borders and header shading",
+      "risk table keeps alternating row shading"
+    ]
+  },
+  {
+    "week": 5,
+    "ops": 2,
+    "seconds": 47.48,
+    "doc_bytes": 1292,
+    "doc_sha": "51694e34f1144de0",
+    "sections_created": 1,
+    "instruction_chars": 2351,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "four H2 sections, correct names, correct order",
+      "'What changed' bullets are verbatim",
+      "'What is next' bullets are verbatim",
+      "risk table header intact",
+      "risk table rows match the week exactly",
+      "risk table keeps borders and header shading",
+      "archive covers every past week exactly once"
+    ]
+  },
+  {
+    "week": 6,
+    "ops": 2,
+    "seconds": 125.34,
+    "doc_bytes": 5544,
+    "doc_sha": "4be8692fca91d126",
+    "sections_created": 2,
+    "instruction_chars": 2746,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "risk table keeps borders and header shading",
+      "risk table keeps alternating row shading"
+    ]
+  }
+]

@@ -26,11 +26,11 @@ document bytes; none of it is taken from the API's own change summary.
 | 15 | the other mechanics' numbers are unchanged | PASS |
 | 16 | the Art Bible has exactly one 'Concept art' section | PASS |
 | 17 | both concept plates are embedded in the Art Bible | PASS |
-| 18 | embedding images changed nothing but the Concept art section | **FAIL** |
+| 18 | embedding images changed nothing but the Concept art section | PASS |
 | 19 | every document exports to .docx | PASS |
 | 20 | every document exports to Markdown | PASS |
 
-**19/20 passed** in 6 billable operations and 270s.
+**20/20 passed** in 6 billable operations and 542s.
 
 ## Per-document surgical check
 
@@ -48,8 +48,8 @@ changed, and how many sections came back byte-identical.
         ],
         "new_sections_allowed": true,
         "sections_changed": [
-          "43c3c8f1-7476-4215-bf08-0961ea26c07d",
-          "74b26d87-40f4-4eb7-b340-aaa17acf472e"
+          "05c3fbbf-2cc7-4510-bd49-35cf3dc82f85",
+          "18b90591-cc3e-4764-84c5-a529c10c7618"
         ],
         "unintended": [],
         "byte_identical_sections": 22,
@@ -86,7 +86,7 @@ changed, and how many sections came back byte-identical.
         ],
         "new_sections_allowed": false,
         "sections_changed": [
-          "5a9a152d-d704-4d7a-88de-1af8e46a4769"
+          "d89ecf30-9600-4981-8c99-e67073aec372"
         ],
         "unintended": [],
         "byte_identical_sections": 23,
@@ -98,7 +98,7 @@ changed, and how many sections came back byte-identical.
         ],
         "new_sections_allowed": false,
         "sections_changed": [
-          "37f634ab-3ddd-4873-9ab7-b14da9baa2cd"
+          "214b47df-2cd4-4cfa-9e2c-8df39c391577"
         ],
         "unintended": [],
         "byte_identical_sections": 13,
@@ -145,13 +145,11 @@ changed, and how many sections came back byte-identical.
         ],
         "new_sections_allowed": false,
         "sections_changed": [
-          "9051600f-04ed-4aa6-9c12-879f128f1ae9"
+          "07dfa5f7-79cb-4737-b248-830b86536a0a"
         ],
-        "unintended": [
-          "9051600f-04ed-4aa6-9c12-879f128f1ae9"
-        ],
+        "unintended": [],
         "byte_identical_sections": 8,
-        "ok": false
+        "ok": true
       },
       "grapple-rework": {
         "expected": "byte-identical",
@@ -159,7 +157,7 @@ changed, and how many sections came back byte-identical.
         "ok": true
       }
     },
-    "ok": false
+    "ok": true
   }
 }
 ```

@@ -1,0 +1,28 @@
+{
+  "key": "POST /v1/chat/nebula-gdd-9c9b432e56-mechanics/approve b955cf1485b20640",
+  "method": "POST",
+  "path": "/v1/chat/nebula-gdd-9c9b432e56-mechanics/approve",
+  "request": {
+    "job_id": "7cadf680-0f25-4d39-9a1a-b7045f8f40dc",
+    "changes": [
+      {
+        "change_id": "ef0955fa-4bcb-4e30-8a6c-4c335a9b6750",
+        "approved": true
+      },
+      {
+        "change_id": "4756ee5d-05a4-4522-9eea-bf9a313308e7",
+        "approved": false
+      }
+    ],
+    "approved": true,
+    "feedback": "the Overheat pulse change was not approved this round"
+  },
+  "status": 200,
+  "response": {
+    "status": "ok",
+    "message": "Approval processed",
+    "batch_complete": true
+  },
+  "elapsed_s": 0.601,
+  "content_type": "application/json"
+}
