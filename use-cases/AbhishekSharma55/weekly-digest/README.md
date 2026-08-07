@@ -23,13 +23,12 @@ Built on the SuperDocs REST API. Synthetic corpus — a fictional game studio,
 
 ```bash
 cd use-cases/AbhishekSharma55
-python -m venv .venv && . .venv/bin/activate      # or: uv venv && . .venv/bin/activate
-pip install -e ".[dev]"                            # or: uv pip install -e ".[dev]"
-cp .env.example .env                               # paste a key
+make setup                  # venv + install, no key needed
+cp .env.example .env        # then paste a key
 
-digest run   --weeks 52 --max-ops 90 --live        # arm A: edit in place
-digest regen --weeks 12 --max-ops 40 --live        # arm B: the control
-digest report                                      # the cost comparison
+make run        # arm A: 52 weeks, edited in place        (cap 80 operations)
+make control    # arm B: the regeneration control          (cap 45 operations)
+make report     # the cost comparison
 ```
 
 Offline and free, no key needed:
@@ -37,7 +36,7 @@ Offline and free, no key needed:
 ```bash
 digest verify            # re-check every saved week from its bytes
 digest diff --week 30    # what changed between week 29 and week 30
-pytest                   # 52 tests, no key, no network, 0.04s
+make test                # 61 tests, no key, no network, ~0.05s
 ```
 
 `digest run` is safe to re-run: it resumes from `state.json` and the ledger, and
@@ -124,7 +123,7 @@ the instruction and output of every failed attempt in `out/arm-a-edit/failed-att
 | Call | Used for | Billable |
 |---|---|---|
 | `POST /v1/documents/upload-base64` | seed week 1 verbatim | no |
-| `POST /v1/chat` (`pro`/`deep`, `response_mode: full`) | one edit per week | **yes** |
+| `POST /v1/chat` (`core`/`balanced`, escalating to `pro`/`deep` on a repair, `response_mode: full`) | one edit per week | **yes** |
 | `POST /v1/documents/export` | Markdown + `.docx` every week | no |
 | `POST /v1/chat/async`, `GET /v1/jobs/{id}`, `POST /v1/chat/{id}/approve` | the human-gated path in `superdocs_kit/client.py`; the fallback when a sync turn hits a gateway timeout | yes |
 

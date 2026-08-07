@@ -39,7 +39,7 @@ use-cases/AbhishekSharma55/
 ├── superdocs_kit/        the shared layer both builds sit on
 ├── weekly-digest/        build 1
 ├── gdd-editor/           build 2
-├── tests/                52 tests, no key, no network, 0.04s
+├── tests/                61 tests, no key, no network, ~0.05s
 ├── repro/                minimal reproductions for the bug log
 ├── bugs.md               12 bugs, with repro steps
 ├── ASSUMPTIONS.md        decisions logged as they were made
@@ -152,7 +152,7 @@ REST throughout. Both builds hit the four-call minimum contract.
 |---|---|---|
 | `POST /v1/agents/signup` | got the key; the account is Abhishek's | no |
 | `POST /v1/documents/upload-base64` | every seed, both builds — verbatim, no model | no |
-| `POST /v1/chat` | every edit, `pro`/`deep`, `response_mode: full` | **yes** |
+| `POST /v1/chat` | every edit, `response_mode: full`. Digest: `core`/`balanced`, escalating to `pro`/`deep` only on a repair. GDD editor: `pro`/`deep`, because it authors prose | **yes** |
 | `POST /v1/documents/images/upload-base64` | concept plates → stable URLs | no |
 | `POST /v1/documents/export` | Markdown + `.docx`, constantly | no |
 | `POST /v1/chat/async` + `GET /v1/jobs/{id}` + `POST /v1/chat/{id}/approve` | in `client.py`: the human-gated path, and the automatic fallback when a sync turn hits a gateway timeout | yes |
@@ -314,7 +314,7 @@ section, using the exact shape the API returned. That the budget cap raises
 *before* spending and the ledger survives a restart. That a recorded fixture
 never contains a key. And 52 weeks of archive growth simulated offline. The
 record/replay transport means anyone can run the suite on a fresh clone with no
-key in 0.04 s.
+key in about 0.05 s — `make setup && make test`.
 
 **8. "What would you build next on SuperDocs, if you joined?"**
 
@@ -380,7 +380,9 @@ Ordered by how likely they are to work first time.
 5. **Break it on purpose**: hand-edit a saved week's HTML to rename a heading,
    then `digest verify`. The invariant fires and names the section.
 
-Have `pytest` ready as the zero-risk opener — 52 tests, 0.04 s, no key.
+Have `make test` ready as the zero-risk opener — 61 tests, ~0.05 s, no key.
+Then `make demo`, which re-verifies every saved week and prints a week-over-week
+diff without spending anything.
 
 ---
 
@@ -392,7 +394,7 @@ Have `pytest` ready as the zero-risk opener — 52 tests, 0.04 s, no key.
 | Digest, per week | **1 operation** (2 when a week needs repair) |
 | Archive at week 52 | **18 rows instead of 51** |
 | Invariants per week | **13**, re-derived from the bytes |
-| Tests | **52**, no key, no network, **0.04 s** |
+| Tests | **61**, no key, no network, **~0.05 s** |
 | Bugs found and logged | **12**, with repro steps; one with a runnable script |
 | Free-tier budget | **500 operations a month** — which is why everything that loops has a cap and a stopping rule |
 

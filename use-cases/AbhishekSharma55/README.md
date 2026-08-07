@@ -7,6 +7,7 @@ Two projects, one shared client layer, one fictional universe.
 | **[weekly-digest/](weekly-digest/)** | One document, fifty-two weeks, **edited** every week and never regenerated. One billable operation per week. Thirteen invariants catch drift; a companion measurement compares it against regenerating the same digest, with the method committed before the result. |
 | **[gdd-editor/](gdd-editor/)** | A chat-driven editor for long, linked game design documents — mechanics, narrative and art bible as sub-documents, with image support. The graded scenario runs as one command and **passes 18/18 in 6 operations**. |
 | **[bugs.md](bugs.md)** | Twelve bugs and rough edges found against the live API, with reproduction steps and one runnable repro script. |
+| **[Makefile](Makefile)** | `make setup` · `make test` (no key) · `make demo` (no spend) · `make scenario` / `make run` / `make control` (capped). |
 | **[WALKTHROUGH.md](WALKTHROUGH.md)** | What each build does, the decisions behind it, where it is weakest, and the answers to the questions those invite. |
 
 Both corpora are **synthetic**. *Nebula Drift* and Vantage Nine Studios do not
@@ -18,10 +19,10 @@ exist, nor do the people in them.
 
 ```bash
 cd use-cases/AbhishekSharma55
-python -m venv .venv && . .venv/bin/activate      # or: uv venv && . .venv/bin/activate
-pip install -e ".[dev]"                            # or: uv pip install -e ".[dev]"
-
-pytest                          # 52 tests, no key, no network, 0.04s  <- start here
+make setup      # venv + install; works with pip or uv, no key needed
+make test       # 61 tests, no key, no network, ~0.05s   <- start here
+make demo       # re-verifies every saved week, shows a week-over-week diff,
+                # and prints the last graded-scenario result. Spends nothing.
 ```
 
 Then, with a key in `.env` (see [`.env.example`](.env.example) — an agent can

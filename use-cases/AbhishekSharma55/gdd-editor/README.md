@@ -57,13 +57,12 @@ sub-document were byte-for-byte what they had been.
 
 ```bash
 cd use-cases/AbhishekSharma55
-python -m venv .venv && . .venv/bin/activate      # or: uv venv && . .venv/bin/activate
-pip install -e ".[dev]"                            # or: uv pip install -e ".[dev]"
+make setup                # venv + install, no key needed
+cp .env.example .env      # then paste a key — .env.example shows both ways to get one
 
-cp .env.example .env      # then paste a key — see .env.example for both ways to get one
-
-gdd scenario --live       # the graded scenario, end to end        (~6 operations)
-gdd scenario --live --quick   # same without the image act         (~5 operations)
+make scenario             # the graded scenario, end to end   (~6 operations)
+# or, without the image act (~5 operations):
+gdd scenario --live --quick
 ```
 
 Everything else is free or offline:
@@ -163,9 +162,11 @@ use the real multi-document session and let the model see the whole workspace.
   is not.
 - **The scenario is one path.** `gdd ask` is general, but only the scripted
   scenario is asserted end to end.
-- **Model tier is pinned to `pro`/`deep`** because the default drops steps of a
-  multi-part instruction ([`bugs.md` B9](../bugs.md)). That costs latency, not
-  operations, and it is a workaround for someone else's default.
+- **Model tier is pinned to `pro`/`deep` here**, unlike the sibling build. The
+  sibling could drop to the default tier once its instructions became literal
+  HTML; this one asks the model to *author* prose, so the ambiguity cannot be
+  removed the same way and the stronger tier stays. It costs latency, not
+  operations ([`bugs.md` B9](../bugs.md)).
 
 ## Files
 
@@ -178,5 +179,5 @@ gdd_editor/cli.py         the `gdd` command
 out/                      every artefact the last run produced, committed
 ```
 
-Tests for the machinery underneath live in [`../tests/`](../tests/) — 52 of
-them, no key and no network, 0.04 s.
+Tests for the machinery underneath live in [`../tests/`](../tests/) — 61 of
+them, no key and no network, ~0.05 s.
