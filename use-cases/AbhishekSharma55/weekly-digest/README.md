@@ -43,7 +43,7 @@ Offline and free, no key needed:
 make replay              # re-run all 52 weeks from committed fixtures
 digest verify            # re-check every saved week from its bytes
 digest diff --week 30    # what changed between week 29 and week 30
-make test                # 61 tests, no key, no network, ~0.05s
+make test                # 62 tests, no key, no network, ~0.05s
 ```
 
 **`make replay` runs the whole driver with no key and no network**, from the
@@ -101,7 +101,7 @@ wrong on the live API would have cost 52 operations to discover.
 
 ## Drift, and how it is caught
 
-Thirteen invariants, re-derived from the document's own bytes after **every**
+Fourteen invariants, re-derived from the document's own bytes after **every**
 week. None of them ask the API whether it did the right thing.
 
 | Group | Catches |
@@ -230,6 +230,6 @@ weekly_digest/archive.py     what the archive should hold, computed from what it
 weekly_digest/prompts.py     the weekly instruction and the control-arm instruction
 weekly_digest/runner.py      arm A: the loop, the verification, the repair, the resume
 weekly_digest/regenerate.py  arm B: the control
-weekly_digest/verify.py      the thirteen invariants
+weekly_digest/verify.py      the fourteen invariants
 weekly_digest/measure.py     method + results -> MEASUREMENT.md
 ```

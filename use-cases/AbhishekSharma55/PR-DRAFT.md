@@ -29,7 +29,7 @@ document revised in place week after week instead of a fresh file each week, so
 the reader always opens the same familiar document. Each week is a
 single billable operation covering the status line, three standing sections, and
 an archive that folds old weeks into rolled-up rows so it stays navigable (18
-rows at week 52 rather than 51). Thirteen invariants are re-derived from the
+rows at week 52 rather than 51). Fourteen invariants are re-derived from the
 document's own bytes after every week; a week that fails is repaired with a
 second operation or rolled back, and every repair is counted. A control arm
 regenerates the same digest from the same inputs so the cost claim has a number
@@ -46,7 +46,7 @@ correct section changes across both documents* — is executable as
 re-derived from each document's bytes, not read from the API's change summary.
 
 Both run on a shared client layer (`superdocs_kit/`) that keeps a durable ledger
-of every operation spent, records every live call as a fixture so the 61 tests
+of every operation spent, records every live call as a fixture so the 62 tests
 run with no key and no network in about 0.05 s, and proves "nothing else changed" from
 the document rather than from a success message.
 

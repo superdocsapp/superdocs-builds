@@ -4,9 +4,9 @@ Two projects, one shared client layer, one fictional universe.
 
 | | |
 |---|---|
-| **[weekly-digest/](weekly-digest/)** | One standing document, revised in place week after week instead of regenerated. One billable operation per week. Thirteen invariants, re-derived from the document's bytes, catch drift; a control arm regenerates the same digest from the same inputs, with the method committed before the result. |
-| **[gdd-editor/](gdd-editor/)** | A chat-driven editor for long, linked game design documents — mechanics, narrative and art bible as sub-documents, with image support. The graded scenario runs as one command and **passes 18/18 in 6 operations**. |
-| **[bugs.md](bugs.md)** | Twelve bugs and rough edges found against the live API, with reproduction steps and one runnable repro script. |
+| **[weekly-digest/](weekly-digest/)** | One standing document, revised in place week after week instead of regenerated. One billable operation per week. Fourteen invariants, re-derived from the document's bytes, catch drift; a control arm regenerates the same digest from the same inputs, with the method committed before the result. |
+| **[gdd-editor/](gdd-editor/)** | A chat-driven editor for long, linked game design documents — mechanics, narrative and art bible as sub-documents, with image support. The graded scenario runs as one command and is asserted from the documents' own bytes. |
+| **[bugs.md](bugs.md)** | Fifteen SuperDocs bugs and rough edges found against the live API, with reproduction steps and two runnable repros — plus four of my own. |
 | **[Makefile](Makefile)** | `make setup` · `make test` (no key) · `make demo` (no spend) · `make scenario` / `make run` / `make control` (capped). |
 | **[WALKTHROUGH.md](WALKTHROUGH.md)** | What each build does, the decisions behind it, where it is weakest, and the answers to the questions those invite. |
 
@@ -20,7 +20,7 @@ exist, nor do the people in them.
 ```bash
 cd use-cases/AbhishekSharma55
 make setup      # venv + install; works with pip or uv, no key needed
-make test       # 61 tests, no key, no network, ~0.05s   <- start here
+make test       # 62 tests, no key, no network, ~0.05s   <- start here
 make demo       # re-verifies every saved week, shows a week-over-week diff,
                 # and prints the last graded-scenario result. Spends nothing.
 make replay     # re-runs the WHOLE 52-week digest from committed fixtures,
@@ -94,9 +94,10 @@ differences it is looking for. On top of that:
   Nothing is estimated.
 - Raw data is committed: both ledgers, every week's document, every export,
   every diff, and the instruction and output of every failed attempt.
-- Two of the twelve bugs in `bugs.md` are mine, not SuperDocs'. They are in the
-  list because a bug log that only contains other people's bugs is a marketing
-  document.
+- `bugs.md` ends with four bugs of **my own**, kept in the same file, because a
+  bug log that only contains other people's bugs is a marketing document. One
+  of them — a check of mine that ignored what it could not parse — is why the
+  digest's invariant list grew from thirteen to fourteen.
 - Where a build has a limitation, it is in that build's README under *"What is
   honestly absent"* rather than left for a reader to discover.
 

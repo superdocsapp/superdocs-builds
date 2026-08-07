@@ -14,7 +14,7 @@ Read it once end to end. Then re-read **§6 (the eight questions)** and
 Two builds on the SuperDocs REST API, in one folder, on one shared client layer.
 
 **Build 1 — weekly digest.** One standing document, revised in place week after
-week instead of regenerated. One billable operation per week. Thirteen invariants
+week instead of regenerated. One billable operation per week. Fourteen invariants
 re-derived from the document's own bytes after every week catch drift; a failed
 week is repaired by *decomposing* the instruction into two simpler turns, or
 rolled back, so the document is never left corrupt. A control arm regenerates the
@@ -46,7 +46,7 @@ use-cases/AbhishekSharma55/
 ├── superdocs_kit/        the shared layer both builds sit on
 ├── weekly-digest/        build 1
 ├── gdd-editor/           build 2
-├── tests/                61 tests, no key, no network, ~0.05s
+├── tests/                62 tests, no key, no network, ~0.05s
 ├── repro/                minimal reproductions for the bug log
 ├── bugs.md               12 bugs, with repro steps
 ├── ASSUMPTIONS.md        decisions logged as they were made
@@ -106,7 +106,7 @@ bug in it on the live API would have cost 52 operations.
 
 ### The drift check, and why it is the interesting part
 
-Thirteen invariants, re-derived from the document's own bytes after every week:
+Fourteen invariants, re-derived from the document's own bytes after every week:
 structure (headings not renamed, duplicated or reordered), fidelity (bullets and
 every table cell verbatim against the input), formatting (borders, header
 shading, alternating rows), growth (archive coverage and bounds).
@@ -369,7 +369,7 @@ unlocks a whole workflow.
 
 **The archive summaries are not fact-checked.** The model writes a 20-word
 summary of the outgoing week; I verify the structure and the coverage, not
-whether the summary is a fair précis. A wrong summary would pass all thirteen
+whether the summary is a fair précis. A wrong summary would pass all fourteen
 invariants. Honest answer: checking it needs a second model call and a rubric,
 and I would rather ship a verified structure with an unverified sentence than
 claim both.
@@ -421,7 +421,7 @@ Ordered by how likely they are to work first time.
 5. **Break it on purpose**: hand-edit a saved week's HTML to rename a heading,
    then `digest verify`. The invariant fires and names the section.
 
-Have `make test` ready as the zero-risk opener — 61 tests, ~0.05 s, no key.
+Have `make test` ready as the zero-risk opener — 62 tests, ~0.05 s, no key.
 Then `make demo`, which re-verifies every saved week and prints a week-over-week
 diff without spending anything.
 
@@ -435,7 +435,7 @@ diff without spending anything.
 | Digest, per week | **1 operation** (2 when a week needs repair) |
 | Archive at week 52 | **18 rows instead of 51** |
 | Invariants per week | **13**, re-derived from the bytes |
-| Tests | **61**, no key, no network, **~0.05 s** |
+| Tests | **62**, no key, no network, **~0.05 s** |
 | Bugs found and logged | **12**, with repro steps; one with a runnable script |
 | Free-tier budget | **500 operations a month** — which is why everything that loops has a cap and a stopping rule |
 

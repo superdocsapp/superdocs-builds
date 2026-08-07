@@ -12,12 +12,14 @@ Anything I could not reproduce is marked **UNCONFIRMED** and stays in the list
 anyway, because a flake an integrator hits once still costs them an afternoon.
 
 **B1 is mine, not yours.** It is in the list because it is still a rough edge —
-I hit it by reading the docs correctly and guessing wrong anyway. Four further
+I hit it by reading the docs correctly and guessing wrong anyway. Six further
 mistakes that were entirely my own are in **"My own bugs"** at the end, because
-a bug log that only contains other people's bugs is a marketing document.
+a bug log that only contains other people's bugs is a marketing document. Two of
+those six are checks of mine that passed a document they should have failed —
+they are the ones I would read first if I were reviewing this.
 
-**Fourteen SuperDocs entries (B1–B14) and four of my own (M1–M4).** The table
-below is all fourteen, worst first.
+**Fifteen SuperDocs entries (B1–B15) and six of my own (M1–M6).** The table
+below is all fifteen, worst first.
 
 | # | Severity | One line |
 |---|---|---|
@@ -32,6 +34,7 @@ below is all fourteen, worst first.
 | B4 | Medium | An instructed step was silently skipped; no error, no mention in the response text. |
 | B5 | Medium — blocks round-tripping | HTML export drops every `data-chunk-id`, so exported HTML cannot be re-uploaded and diffed at section level. |
 | B12 | Medium | "Add a new section" returned it wrapped in a `<div>`, and brought an entire table nobody asked for. |
+| B15 | Medium | "Add these images in the 'Concept art' section only" appended a *second* section with the same heading. Every surface check passes. |
 | B6 | Low — formatting not byte-preserved | `font-family:Inter,Calibri` is stored as `Inter , Calibri`. Happens on upload, no AI involved. |
 | B1 | Docs / DX | `/v1/documents/export` returns the raw file, not a JSON envelope, unlike every other endpoint. |
 | B7 | Docs / DX | Free-tier agent accounts get 500 ops, not the 10,000 the task PDF implies; there is no documented way for an agent to learn its cap before signing up. |
@@ -118,11 +121,12 @@ than wrapping the fragment in a `<div>` and reporting success. That one check
 would also catch the `<li>`-replacing-a-`<ul>` version of the same mistake.
 
 **How I worked around it:** I did not remove the multi-section edit — it is the
-whole cost argument for the build. Instead the runner validates nine structural
-and fidelity invariants from the document bytes after every turn, and on failure
-re-sends the same instruction with `document_html` set to the last known-good
-version (a verbatim reload plus the edit, in one operation). If that also fails
-the week is rolled back to the last good state rather than left corrupt. Every
+whole cost argument for the build. Instead the runner validates fourteen
+structural, fidelity, formatting and growth invariants from the document bytes
+after every turn, and on failure **decomposes** the week into two simpler turns
+against the last known-good document rather than re-sending the instruction that
+confused the model. If that also fails the week is rolled back rather than left
+corrupt. Every
 repair is counted as a real operation in the cost measurement, because it is one.
 
 ---
@@ -350,7 +354,7 @@ prose form, which is the form most integrators will write first.*
 
 **The isolating variable is the tier.** The *identical* instruction against the
 *identical* input document with `model_tier: "pro"`, `thinking_depth: "deep"`
-passed all thirteen of my structural and fidelity checks on the first attempt:
+passed every one of my structural and fidelity checks on the first attempt:
 
 | tier | thinking | ops charged | seconds | result |
 |---|---|---|---|---|
@@ -651,11 +655,63 @@ with the exact instruction that produced them.
 
 ---
 
+## B15 — "Add these images in the 'Concept art' section only" appended a second section with the same heading
+
+**Severity: medium.** Same family as B12 — the request is satisfied *and* the
+document is quietly wrong — but this one is the most deceptive shape yet,
+because every surface check passes.
+
+**What I did.** Build #2, `pro`/`deep`, one turn against the art bible, with two
+image URLs already uploaded and a section named `Concept art` already present:
+
+> *"In the 'Concept art' section only, add the two images below as an image
+> each, one after the other, every image followed by a small italic caption …
+> Change no other section."*
+
+**What I expected.** Two `<img>` tags inside the existing `Concept art` section.
+
+**What happened.** Both images landed, with the right captions — under a
+**second `<h2>Concept art</h2>`** appended after the first. The document now has
+two sections with the same name:
+
+```
+$ gdd sections art-bible
+art-bible  (4520B)
+   - Silhouette rules
+   - Palette
+   - Concept art
+   - Concept art
+```
+
+**Why it is worth its own entry.** Every check an integrator would naturally
+write says this turn succeeded: the images are present, the captions are right,
+the section named in the instruction exists, no existing section was modified,
+and `changes_summary` reports an edit to `Concept art`. The only thing wrong is
+that the document grew a duplicate heading — and in a 300-page GDD split across
+sub-documents, a duplicated heading is exactly the kind of rot nobody notices
+until the table of contents is wrong.
+
+**Suggested fix:** when an instruction names an existing section, resolve it to
+that section's chunk and edit in place; creating a new section with a name the
+document already has should require the caller to ask for it. The same
+resolve-the-target-first fix suggested for B2/B12/B14 covers this too.
+
+**How I worked around it, and what it cost me to find.** It got past my own
+checker first, which is the part worth reporting: `verify_surgical` treats a
+new chunk as an addition rather than an unintended change, so "only the Concept
+art section changed" was satisfied by a turn that added one. The check is now
+strict about additions unless the act was explicitly allowed to create a
+section, and the scenario meets the duplicate heading with a targeted repair
+turn — counted, like every other operation.
+
+---
+
 # My own bugs
 
 Not SuperDocs' fault. Here because they cost real time or real money, and
-because the same hours that found fourteen bugs in someone else's product
-should be honest about the four they created.
+because the same hours that found fifteen bugs in someone else's product
+should be honest about the six they created - including the two that were
+checks certifying their own mistakes.
 
 ## M1 — I committed a live API key as a test fixture
 
@@ -709,3 +765,54 @@ of the time. n=1 is not a measurement, and I of all people should not have
 treated it as one in a repo whose entire argument is that claims need numbers.
 Reverted, and the reasoning — including the error — is in `runner.py` where the
 setting lives.
+
+## M5 — My drift checker ignored the row it could not read, and passed a document that had drifted
+
+The digest verifies every week against invariants derived from the document
+bytes. One of them is *"the archive covers every past week exactly once"*.
+
+Live, week 2 came back with the archive label written as `1` instead of
+`Week 1`. My archive parser drops rows it does not recognise — correct when
+*planning* next week's archive, because a junk row should not be carried
+forward, and silently wrong when *verifying*, because the row it could not read
+was invisible to the coverage check. The repair turn then added a second row
+with the correct label, and the week **passed** its invariants with the reader's
+document holding both rows.
+
+So the check that exists to catch drift certified a document that had drifted.
+That is worse than having no check, because I believed it.
+
+**Fixed on both sides.** A fourteenth invariant now fails any archive row this
+system cannot read — the whole class, not the one label. And the weekly
+instruction now says the first cell must include the word "Week", because the
+column is headed `Week` and that invites the bare number. With both in place,
+weeks 2, 3 and 4 passed **on the first attempt, one operation each**, where
+before every week needed a two-turn repair and week 3 rolled back.
+
+**The lesson, and it generalises past this repo:** a parser that skips what it
+does not understand must never be the thing that decides whether output is
+correct. Skipping is a *planning* policy; verification has to treat
+"unrecognised" as a failure.
+
+## M6 — "Only this section changed" was waving new content through
+
+`verify_surgical` classifies a chunk that did not exist in the "before"
+document as an *addition* rather than an unintended change, and defaults to
+allowing it. Build #2's cross-document proof never overrode that default.
+
+So *"in the 'Concept art' section only, add these two images"* was reported as
+a pass by a turn that appended a **second** `<h2>Concept art</h2>` and hung the
+images off it (`bugs.md` B15). The scenario said 18/18 over a document that had
+grown a duplicate heading, and the duplicate is visible in the committed
+artefacts — `gdd sections` prints `Concept art` twice.
+
+This is the same shape as M5: the check had a blind spot, so the strongest claim
+in the build — *nothing else moved* — was weaker than it read.
+
+**Fixed:** the cross-document report now decides per document whether additions
+are legal. A section named in the "allowed" list that does not exist in the
+snapshot means this act may create it; if every allowed name already existed,
+the act may not add anything, and a new chunk is unintended. Acts 3 and 4 both
+still pass on the snapshots they passed before, so the check got stricter
+without being bent to fit — and the scenario now meets the duplicate heading
+with a targeted repair, counted like every other operation.

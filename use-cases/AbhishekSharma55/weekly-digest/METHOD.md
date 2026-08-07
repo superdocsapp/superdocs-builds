@@ -60,7 +60,7 @@ of the control arm is that it does not.
 
 ## Both arms are verified, and both may retry
 
-Arm A verifies every week against thirteen invariants derived from the document
+Arm A verifies every week against fourteen invariants derived from the document
 bytes and, on failure, spends a second operation retrying on stronger model
 settings. **Arm B gets exactly the same treatment** — the same invariants, the
 same escalation, the same accounting. Giving my own build a repair budget and
@@ -75,7 +75,7 @@ Both arms run attempt 1 on `core`/`balanced` and escalate to `pro`/`deep`.
 ## What counts as a cost in arm A
 
 Everything arm A spends, including its failures. Arm A verifies every week
-against thirteen invariants derived from the document bytes and, when a week fails,
+against fourteen invariants derived from the document bytes and, when a week fails,
 spends **a second operation** re-issuing the instruction on a reloaded copy of
 the last known-good document. Those repair operations are billed by SuperDocs
 and are counted in arm A's total. Reporting arm A's cost without its repairs

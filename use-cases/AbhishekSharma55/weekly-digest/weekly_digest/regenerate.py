@@ -17,7 +17,7 @@ Fairness rules, fixed before any number was collected:
 * Each week of arm B runs in its own fresh session, because that is what
   "regenerated" means. Arm A runs in one session for all 52 weeks, because that
   is what "edited" means.
-* Arm B is verified against the SAME thirteen invariants as arm A, and gets the
+* Arm B is verified against the SAME fourteen invariants as arm A, and gets the
   SAME escalation budget when a week fails. Giving my own build a repair path
   and not giving one to the control would be rigging the measurement.
 

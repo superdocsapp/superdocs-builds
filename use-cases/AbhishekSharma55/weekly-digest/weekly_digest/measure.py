@@ -130,7 +130,7 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
             w(f"- **Like for like**, over the {len(overlap)} weeks both arms ran: "
               f"arm A **{a_over} ops**, arm B **{b_over} ops** "
               f"({(b_over / a_over) if a_over else 0:.2f}x).")
-    w(f"- Arm A's document passed all thirteen invariants in **{len(clean)}/{arm_a.n}** weeks; "
+    w(f"- Arm A's document passed all fourteen invariants in **{len(clean)}/{arm_a.n}** weeks; "
       f"**{len(repairs)}** week(s) needed a repair operation, "
       f"**{len(rollbacks)}** ended rolled back.")
 
@@ -159,7 +159,7 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
         b_clean = [r for r in b_recs if r.get("invariants_ok")]
         w(f"\nArm B needed a repair operation in **{len(b_repairs)}/{len(b_recs)}** weeks "
           f"and ended valid in **{len(b_clean)}/{len(b_recs)}**, checked against the same "
-          f"thirteen invariants as arm A.")
+          f"fourteen invariants as arm A.")
 
     # ---- distribution -------------------------------------------------
     w("\n## Distribution, both arms\n")
@@ -213,7 +213,7 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
          "**Partly falsified — repairs are common enough to matter; the per-week "
          "figure above already includes them.**"))
     w(f"3. *The cheaper arm produced a worse document.* "
-      f"{len(clean)}/{arm_a.n} weeks passed all thirteen invariants; see "
+      f"{len(clean)}/{arm_a.n} weeks passed all fourteen invariants; see "
       f"`out/arm-a-edit/drift-report.md` for the week-by-week evidence.")
 
     path = HERE / "MEASUREMENT.md"

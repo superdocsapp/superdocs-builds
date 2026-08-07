@@ -249,7 +249,7 @@ class DigestRun:
         The repair path exists because a five-section edit occasionally comes
         back with a destroyed table and a success message (bugs.md B2/B3). It
         is not a retry-on-exception - nothing throws. It is a retry on
-        *evidence*: the thirteen invariants are re-derived from the document
+        *evidence*: the fourteen invariants are re-derived from the document
         and only they decide whether the week is good.
 
         Repair is one extra operation and it is charged, logged and reported
