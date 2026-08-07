@@ -344,3 +344,145 @@ unreliable on `core` and name the tier it needs.
 **How I worked around it:** the runner pins `model_tier="pro"`,
 `thinking_depth="deep"` for both arms of the measurement, and still verifies
 every turn from the document bytes rather than trusting it.
+
+## B10 — Three documents opened into one session return a roster of ONE, all sharing `document_id: "doc_primary"`, and the answer changes between identical GETs
+
+**Severity: HIGH.** It makes the multi-document surface unusable for targeted
+edits, which is the reason the surface exists.
+
+**This is server-side, not my client.** The transcript below is raw `curl` +
+`jq`, no code of mine involved.
+
+**Repro** — `repro/B10-multidoc-roster.sh` (runnable; needs `SUPERDOCS_API_KEY`):
+
+```bash
+# 1. upload three documents, each into its own session (they become saved docs)
+# 2. open all three into ONE new session
+curl -X POST https://api.superdocs.app/v1/sessions/init \
+  -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' \
+  -d '{"session_id":"'$SID'","document_ids":["<gdd>","<mechanics>","<narrative>"]}'
+```
+Response — three opened, **one** in the roster:
+```json
+{"opened": 3, "documents": [{"document_id":"doc_primary","title":"gdd","focused":true}]}
+```
+
+Then four **identical** GETs of the roster, one after the other:
+
+```
+GET /v1/sessions/$SID/documents
+-> documents:[{document_id:"doc_primary", durable_document_id:"e8457b79…", title:"mechanics"}]
+-> documents:[{document_id:"doc_primary", durable_document_id:"ad71a352…", title:"gdd"}]
+-> documents:[{document_id:"doc_primary", durable_document_id:"e8457b79…", title:"mechanics"}]
+-> documents:[{document_id:"doc_primary", durable_document_id:"ad71a352…", title:"gdd"}]
+```
+
+Three problems in one response:
+
+1. **The roster is incomplete** — one document, never three, even though
+   `opened` lists all three and `/v1/documents/{id}` finds each of them.
+2. **`document_id` is the constant string `"doc_primary"` for every document.**
+   `/v1/chat` takes a `document_id` "to target a specific open document", and
+   `PendingChange.document_id` exists so an integrator can attribute each diff
+   to the right document. Neither can work when the id is the same for all of
+   them. The real identity is in `durable_document_id`, which chat does not take.
+3. **It is not deterministic.** Two identical GETs, seconds apart, no writes in
+   between, returned different documents. That reads like a race over which
+   document is "primary" rather than a stable roster.
+
+**One earlier oddity, honestly unresolved:** my very first `sessions/init` with
+these three ids returned `404 {"detail":"None of the requested documents were
+found."}`. The same ids worked moments later and every time since, so I could
+not reproduce the 404 and I am not claiming it as a separate bug — but it
+happened, and it is in this log because it cost me twenty minutes.
+
+**Suggested fix:** give each open document a stable per-session id, return all
+of them in the roster, and make `/v1/chat`'s `document_id` accept the durable id
+as well. Until then, `focus` + one-document-at-a-time is the only reliable path
+and the docs should say so.
+
+**How I worked around it:** build #2 gives every document its own session and
+holds the link graph itself (`gdd-editor/gdd_editor/workspace.py`). Every edit
+is addressed to exactly one document by construction. The cost is that the model
+never sees two documents at once, so a cross-document request is decomposed into
+one targeted edit per document by my code rather than reasoned about in one turn.
+
+---
+
+## B11 — "Replace ALL X with Y" is executed as "append Y", and a changed cell can come back holding BOTH values
+
+**Severity: medium-high.** Silent, and it corrupts data rather than failing.
+
+Two instances from the same instruction, on the default and on the `pro` tier:
+
+**(a) Replace read as append.** Instruction: *"Replace ALL bullets in that
+section with exactly these 2 bullets, verbatim, in this order"* followed by two
+bullets. Result: the three existing bullets were **kept**, and the two new ones
+appended — five bullets where two were asked for.
+
+**(b) A cell holding the old and the new value at once.** Instruction: a table
+row whose Severity should become `Low` and Trend `worsening`. Result:
+
+| Risk | … | Severity | Trend |
+|---|---|---|---|
+| Outsourced character art slipping two weeks | … | `Medium / Low` | `steady / worsening` |
+
+The model wrote a *changelog* into the cell instead of changing it. Nothing in
+the instruction asked for history, and a digest that says a risk is
+"`Medium / Low`" is worse than useless to the person reading it on a Monday.
+
+**Repro:** `repro/B11-instruction.txt` against `repro/B11-before.html`.
+
+**Suggested fix:** this is a prompting-layer behaviour rather than an API defect,
+which is exactly why it should be fixed *inside* the product — every integrator
+who writes "replace" will hit it and most will not be diffing hard enough to
+notice. A system-level rule that a targeted replacement must end with the target
+containing only what was specified would close it for everyone.
+
+**How I worked around it:** the instruction now states what the section must
+contain *after* the edit, says to delete anything not on the list, and says
+explicitly that one cell holds one value and never both. That fixed both
+instances on the next run. It also stays verified — the runner re-derives the
+bullets and every table row from the document bytes and compares them to the
+week's input, so a recurrence fails the week rather than shipping.
+
+---
+
+## B12 — "Add a new section" returns the section wrapped in a `<div>`, and brought an entire table nobody asked for
+
+**Severity: medium.** Same class as B2 — a chunk replacement that is not the
+shape it should be — plus unrequested content.
+
+Instruction (build #2, `pro`/`deep`): add one `<h2>` reading
+`Traversal - Grapple Rework`, one short paragraph under it, and one row to an
+existing table. Explicitly: *"Do not change any other section."*
+
+What came back:
+
+```html
+<div data-chunk-id="40120a2e-…">
+  <h2>Traversal - Grapple Rework</h2>
+  <p>A design spike is open to reduce the grapple cooldown…</p>
+  <table style="width: 100%; …"><thead><tr …><th>Document Title</th>…
+</div>
+```
+
+1. The new heading and paragraph are **wrapped in a `<div>`**, and the `<h2>`
+   inside it carries **no `data-chunk-id`**. Every other heading in the document
+   has one. So to any integrator addressing sections by chunk id, the document
+   did not gain a section — the content is visibly there and structurally
+   invisible.
+2. It also invented **a whole extra table** with columns `Document Title …` that
+   nothing in the instruction asked for, in a turn that was told to change
+   nothing else.
+
+**Suggested fix:** when new block-level content is inserted, emit it as sibling
+blocks each carrying its own chunk id, the same as every block already in the
+document — do not wrap it in an anonymous container. That single change would
+also fix the `<div><tr>` case in B2.
+
+**How I worked around it:** I fixed my own section model rather than the symptom
+— `superdocs_kit/docdiff.py` now derives sections from heading *positions* in
+the bytes, so a heading nested in a div, or three levels deep, is still a
+section. The invented table is caught by an explicit check in the scenario and
+repaired in a follow-up operation that is counted like any other.
