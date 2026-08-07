@@ -32,17 +32,29 @@ from .document import ARCHIVE_SECTION, STANDING_SECTIONS, archive_plan, seed_htm
 from .prompts import weekly_instruction
 from .verify import WeekReport, check_week, drift_table
 
-# Model settings, and this is a measured decision rather than a preference.
-# On the default tier ('core') the five-step weekly instruction was applied
-# only PARTIALLY: week after week the model performed step 2 (the archive) and
-# silently dropped steps 1, 3, 4 and 5 - four of five weeks failed verification
-# and had to be repaired or rolled back. The identical instruction on the same
-# input document at 'pro'/'deep' passed all thirteen invariants first time.
-# See bugs.md B9. The cost is latency (~85s vs ~20s a week), not operations:
-# tier does not change what SuperDocs bills, so the cost comparison is
-# unaffected. Both arms use the same settings.
-MODEL_TIER = "pro"
-THINKING_DEPTH = "deep"
+# Model settings, measured rather than chosen - and the history matters more
+# than the values.
+#
+# When the weekly instruction DESCRIBED the target ("replace all bullets with
+# exactly these four"), the default tier applied step 2 and silently dropped
+# steps 1, 3, 4 and 5, four weeks running (bugs.md B9). The obvious fix was a
+# bigger model, and 'pro'/'deep' did fix it - at ~195s a week instead of ~43s.
+#
+# The better fix was to stop being ambiguous. Once the factual sections are
+# handed over as literal HTML (see document.py: bullets_html), the DEFAULT tier
+# gets every step right and does it 4.5x faster. Measured on the same input
+# document that had failed four times: bullets, "what is next", risk rows and
+# alternating shading all exact.
+#
+# So attempt 1 is cheap and fast. Escalation is what the repair is for: a week
+# that fails verification is retried on the strongest settings. Paying for the
+# strongest model on every one of 52 weeks to cover a failure rate in the low
+# single digits is the wrong trade, and tier does not change what SuperDocs
+# bills either way - so this buys latency, not money.
+MODEL_TIER = "core"
+THINKING_DEPTH = "balanced"
+REPAIR_MODEL_TIER = "pro"
+REPAIR_THINKING_DEPTH = "deep"
 
 
 @dataclass
@@ -272,8 +284,8 @@ class DigestRun:
                 label=f"w{n:02d}" if attempt == 1 else f"w{n:02d}-repair",
                 response_mode="full",
                 document_html=before,
-                model_tier=MODEL_TIER,
-                thinking_depth=THINKING_DEPTH,
+                model_tier=MODEL_TIER if attempt == 1 else REPAIR_MODEL_TIER,
+                thinking_depth=THINKING_DEPTH if attempt == 1 else REPAIR_THINKING_DEPTH,
                 timeout=900,
             )
             total_ops += res.ops_charged

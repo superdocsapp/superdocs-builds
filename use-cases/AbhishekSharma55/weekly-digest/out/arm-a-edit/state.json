@@ -1,6 +1,6 @@
 {
   "seeded": true,
-  "session_id": "nebula-digest-v1-arm-a-cb989f0f7e",
+  "session_id": "nebula-digest-v1-arm-a-832016fe8e",
   "records": [
     {
       "week": 1,
@@ -11,7 +11,7 @@
       "unintended_chunks": [],
       "byte_identical_chunks": 0,
       "doc_bytes": 5081,
-      "doc_sha": "8baa3f7482185be3",
+      "doc_sha": "6cd2e8350ccc9844",
       "invariants_ok": true,
       "invariant_failures": [],
       "api_summary": "seed upload",
@@ -19,191 +19,6 @@
       "repaired": false,
       "rolled_back": false,
       "first_attempt_failures": []
-    },
-    {
-      "week": 2,
-      "ops": 1,
-      "seconds": 151.41,
-      "api_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "measured_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "unintended_chunks": [],
-      "byte_identical_chunks": 6,
-      "doc_bytes": 5402,
-      "doc_sha": "9f219292bc7a3a3f",
-      "invariants_ok": true,
-      "invariant_failures": [],
-      "api_summary": "5 sections edited, rest untouched",
-      "attempts": 1,
-      "repaired": false,
-      "rolled_back": false,
-      "first_attempt_failures": []
-    },
-    {
-      "week": 3,
-      "ops": 1,
-      "seconds": 98.48,
-      "api_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "measured_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "unintended_chunks": [],
-      "byte_identical_chunks": 6,
-      "doc_bytes": 5487,
-      "doc_sha": "0dedd77028655f1b",
-      "invariants_ok": true,
-      "invariant_failures": [],
-      "api_summary": "5 sections edited, rest untouched",
-      "attempts": 1,
-      "repaired": false,
-      "rolled_back": false,
-      "first_attempt_failures": []
-    },
-    {
-      "week": 4,
-      "ops": 1,
-      "seconds": 21.02,
-      "api_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "measured_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "unintended_chunks": [],
-      "byte_identical_chunks": 6,
-      "doc_bytes": 5894,
-      "doc_sha": "5018eefe48579a42",
-      "invariants_ok": true,
-      "invariant_failures": [],
-      "api_summary": "5 sections edited, rest untouched",
-      "attempts": 1,
-      "repaired": false,
-      "rolled_back": false,
-      "first_attempt_failures": []
-    },
-    {
-      "week": 5,
-      "ops": 1,
-      "seconds": 125.43,
-      "api_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "measured_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "unintended_chunks": [],
-      "byte_identical_chunks": 6,
-      "doc_bytes": 6366,
-      "doc_sha": "182fdc291e91aa26",
-      "invariants_ok": true,
-      "invariant_failures": [],
-      "api_summary": "5 sections edited, rest untouched",
-      "attempts": 1,
-      "repaired": false,
-      "rolled_back": false,
-      "first_attempt_failures": []
-    },
-    {
-      "week": 6,
-      "ops": 2,
-      "seconds": 133.73,
-      "api_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "measured_changed_chunks": [],
-      "unintended_chunks": [],
-      "byte_identical_chunks": 11,
-      "doc_bytes": 6366,
-      "doc_sha": "182fdc291e91aa26",
-      "invariants_ok": false,
-      "invariant_failures": [
-        "'What changed' bullets are verbatim",
-        "'What is next' bullets are verbatim"
-      ],
-      "api_summary": "5 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
-      "attempts": 2,
-      "repaired": false,
-      "rolled_back": true,
-      "first_attempt_failures": [
-        "'What changed' bullets are verbatim",
-        "'What is next' bullets are verbatim"
-      ]
-    },
-    {
-      "week": 7,
-      "ops": 2,
-      "seconds": 276.53,
-      "api_changed_chunks": [
-        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
-        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
-        "886d1670-c09e-415f-ae40-8a3442113b69",
-        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
-        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
-      ],
-      "measured_changed_chunks": [],
-      "unintended_chunks": [],
-      "byte_identical_chunks": 11,
-      "doc_bytes": 6366,
-      "doc_sha": "182fdc291e91aa26",
-      "invariants_ok": false,
-      "invariant_failures": [
-        "'What changed' bullets are verbatim",
-        "'What is next' bullets are verbatim",
-        "risk table rows match the week exactly",
-        "archive covers every past week exactly once",
-        "archive stays bounded (growth policy)"
-      ],
-      "api_summary": "5 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
-      "attempts": 2,
-      "repaired": false,
-      "rolled_back": true,
-      "first_attempt_failures": [
-        "'What changed' bullets are verbatim",
-        "'What is next' bullets are verbatim",
-        "risk table rows match the week exactly",
-        "archive covers every past week exactly once"
-      ]
     }
   ]
 }
