@@ -149,11 +149,17 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
 
     if b_recs:
         w("\n## Arm B — every week, no rows omitted\n")
-        w("| Week | ops | seconds | doc bytes | sections created | instruction chars |")
-        w("|---|---|---|---|---|---|")
+        w("| Week | ops | attempts | seconds | doc bytes | instruction chars | verdict |")
+        w("|---|---|---|---|---|---|---|")
         for r in b_recs:
-            w(f"| {r['week']} | {r['ops']} | {r['seconds']:.1f} | {r['doc_bytes']} "
-              f"| {r['sections_created']} | {r['instruction_chars']} |")
+            w(f"| {r['week']} | {r['ops']} | {r.get('attempts', 1)} | {r['seconds']:.1f} "
+              f"| {r['doc_bytes']} | {r['instruction_chars']} "
+              f"| {'clean' if r.get('invariants_ok') else 'FAILED'} |")
+        b_repairs = [r for r in b_recs if r.get("attempts", 1) > 1]
+        b_clean = [r for r in b_recs if r.get("invariants_ok")]
+        w(f"\nArm B needed a repair operation in **{len(b_repairs)}/{len(b_recs)}** weeks "
+          f"and ended valid in **{len(b_clean)}/{len(b_recs)}**, checked against the same "
+          f"thirteen invariants as arm A.")
 
     # ---- distribution -------------------------------------------------
     w("\n## Distribution, both arms\n")

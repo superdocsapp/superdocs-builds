@@ -58,6 +58,20 @@ is given exactly the information arm A's document already contains.
 server carry document state across turns, which is *editing*. The whole point
 of the control arm is that it does not.
 
+## Both arms are verified, and both may retry
+
+Arm A verifies every week against thirteen invariants derived from the document
+bytes and, on failure, spends a second operation retrying on stronger model
+settings. **Arm B gets exactly the same treatment** — the same invariants, the
+same escalation, the same accounting. Giving my own build a repair budget and
+not giving one to the control would rig the measurement, and this is the axis
+where it would have mattered most: regenerating a whole document gets harder as
+the archive it must re-emit grows, and on the default tier week 8 of arm B came
+back as a 1.2 KB document containing one of the four sections. That truncation
+is a real cost of regenerating, and it is counted rather than hidden.
+
+Both arms run attempt 1 on `core`/`balanced` and escalate to `pro`/`deep`.
+
 ## What counts as a cost in arm A
 
 Everything arm A spends, including its failures. Arm A verifies every week

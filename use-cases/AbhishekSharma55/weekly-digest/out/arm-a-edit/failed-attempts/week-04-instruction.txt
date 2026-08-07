@@ -1,0 +1,24 @@
+Update this standing weekly production digest to Week 4. This is the same document every week - edit it in place. Make exactly the changes below and nothing else.
+
+STEP 1 - STATUS LINE. The bold status line directly under the document title must read exactly:
+  Week 4 · 2026-01-26 to 2026-02-01 · Phase: Pre-production
+Leave the smaller grey line beneath it unchanged.
+
+STEP 2 - ARCHIVE. The 'Archive' table's data rows must end up being EXACTLY these 3 rows, in exactly this order, top to bottom. Keep the table's header row and all of its formatting. Cells shown in quotes are literal - copy them exactly. Cells shown in angle brackets are for you to write.
+  The rows, top to bottom, must be exactly: 'Week 3', 'Week 2', 'Week 1'.
+  Row 'Week 3' is NEW. Its Dates cell is '2026-01-19 to 2026-01-25'. Its Shipped cell is your own summary, at most 20 words, of the bullets currently under 'What changed'. Its Risks carried cell is your own summary, at most 15 words, of the rows currently in the 'What is at risk' table.
+  Every other row keeps its existing cell contents exactly as they are - do not rewrite, reword or re-summarise them.
+
+STEP 3 - 'What changed'. Replace the ENTIRE <ul> element in that section with exactly this HTML, character for character:
+<ul><li>Nav-mesh generation for the Drift Belt sector</li><li>First pass on the Salvage economy spreadsheet</li></ul>
+
+STEP 4 - 'What is at risk' table. Replace the ENTIRE contents of that table's <tbody> with exactly these 2 rows, character for character. Keep the <thead> header row exactly as it is:
+<tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Boss encounter difficulty untuned for controller</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Ana F.</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Design</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">Low</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top">steady</td></tr><tr><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Outsourced character art slipping two weeks</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Priya N.</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Art</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">Low</td><td style="border:1px solid #90a4ae;padding:6px 8px;vertical-align:top;background-color:#eceff1">worsening</td></tr>
+
+STEP 5 - 'What is next'. Replace the ENTIRE <ul> element in that section with exactly this HTML, character for character:
+<ul><li>Lock the art direction to one of the two candidates</li><li>Scope the vertical slice level list</li></ul>
+
+REPLACEMENT MEANS REPLACEMENT: where this instruction lists what a section must contain, the section must end up containing exactly that and nothing else. Delete what is not on the list rather than keeping it alongside.
+Preserve all existing formatting exactly: the document title, every section heading, table borders, header-row shading, alternating row colours, fonts, font sizes and colours. Do not restyle anything. Do not add, remove or rename any heading. Do not reorder the sections.
+Copy every quoted or listed value character for character. Do not add a full stop to a bullet that has none, and do not reword anything.
+STRUCTURAL RULE: both tables must remain <table> elements with their header rows intact. Never replace a table with a single row, a div or a list. Never drop a table's header row.
