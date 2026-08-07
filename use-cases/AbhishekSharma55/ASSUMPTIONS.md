@@ -100,3 +100,61 @@ The lesson that went back into the code: `superdocs_kit/secrets.py` redacts
 anything key-shaped before it can reach a fixture, and there is a test asserting
 it — but neither helps against a key a human types into a source file. The only
 defence there is the grep, so it is now step 1 of the PR checklist.
+
+## 2026-08-07 — A8. Each GDD document gets its own session
+
+SuperDocs' multi-document session returns a one-entry roster with every document
+carrying `document_id: "doc_primary"`, non-deterministically (bugs.md B10,
+`repro/B10-multidoc-roster.sh`). Since `/v1/chat`'s `document_id` is how you
+target one document, and every document has the same one, targeted
+cross-document editing has nowhere to land.
+
+**Assumption:** the durable document id is the real identity and the session is
+just a conversation handle. So build #2 gives each document its own session and
+holds the link graph itself (`corpus.LINKS`, as data).
+
+**What it costs, and I would say this before being asked:** the model never sees
+two documents in one turn, so a cross-document request is decomposed by my code
+rather than reasoned about by the model. If B10 were fixed I would use the real
+multi-document session.
+
+## 2026-08-07 — A9. The factual sections are handed over as literal HTML
+
+Decided on evidence, and it is the biggest single change to the design.
+
+The weekly instruction originally *described* the target — "replace all bullets
+with exactly these four". Over seven live weeks that was read as **append** often
+enough to matter: week 7 came back holding the five old bullets plus the four new
+ones. Three rewordings reduced the rate without removing it. A severity cell came
+back reading `Medium / Low` — both values at once.
+
+So the three factual sections are now built as exact HTML by `document.py` and
+spliced in. The model is not asked to author, re-type or reason about a fact.
+
+**Why this is a narrowing and not a retreat:** it is the build's thesis at its
+purest — facts transported, prose generated. The model still writes every archive
+summary and every quarterly rollup *from what the document says*, which is the
+part that genuinely needs a model and cannot be precomputed. And because the
+alternating row shading is now generated rather than hoped for, formatting
+preservation stops depending on the model noticing.
+
+**The honest cost:** less of the document's content passes through the model, so
+this build demonstrates *surgical editing* more than it demonstrates *authoring*.
+Build #2 is where authoring is demonstrated, and there the instructions are prose
+and the model does write the words.
+
+## 2026-08-07 — A10. Escalate the model tier on failure rather than paying for it every week
+
+When the instruction was ambiguous, the default tier dropped four of five steps
+and `pro`/`deep` fixed it — at ~195 s a week against ~43 s. After A9 removed the
+ambiguity, the **default tier passed the same week that had failed four times**,
+4.5x faster.
+
+**Assumption:** the right place for the expensive model is the repair path, not
+every turn. Attempt 1 runs on `core`/`balanced`; a week that fails verification
+is retried on `pro`/`deep`. Tier does not change what SuperDocs bills, so this
+trades latency, not money — and both arms of the measurement use the same policy,
+including the control arm, so the comparison stays symmetric.
+
+**The general lesson, and the one worth carrying:** when a model gets something
+wrong, look for the ambiguity before reaching for a bigger model.
