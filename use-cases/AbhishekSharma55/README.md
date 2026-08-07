@@ -20,16 +20,17 @@ exist, nor do the people in them.
 ```bash
 cd use-cases/AbhishekSharma55
 make setup      # venv + install; works with pip or uv, no key needed
-make test       # 62 tests, no key, no network, ~0.05s   <- start here
+make test       # 64 tests, no key, no network, 0.04s   <- start here
 make demo       # re-verifies every saved week, shows a week-over-week diff,
                 # and prints the last graded-scenario result. Spends nothing.
-make replay     # re-runs the WHOLE 52-week digest from committed fixtures,
-                # no key and no network, reproducing the live run exactly.
+make replay     # re-runs the committed weeks of the digest from fixtures,
+                # with no key and no network.
 ```
 
 `make replay` is the one to try if you are sceptical. Every live call this repo
 made was recorded to `fixtures/` with the key redacted, so the run driver
-executes end to end on a machine with no key and no network.
+executes end to end on a machine with no key and no network — every week that
+was actually run, repairs included.
 
 **What that does and does not prove, stated precisely.** It proves the code path
 runs offline and that every recorded response is committed. It does *not* prove
@@ -44,8 +45,9 @@ sign itself up in one `curl`):
 
 ```bash
 gdd scenario --live                          # build 2, the graded scenario   ~6 ops
-digest run   --weeks 52 --max-ops 90 --live  # build 1, arm A
-digest regen --weeks 12 --max-ops 40 --live  # build 1, the control arm
+gdd probe-multidoc --live                    # re-check bugs.md B10           0 ops
+digest run   --weeks 20 --max-ops 32 --live  # build 1, arm A   (resumable)
+digest regen --weeks  8 --max-ops 20 --live  # build 1, the control arm
 digest report                                # the cost comparison
 ```
 
