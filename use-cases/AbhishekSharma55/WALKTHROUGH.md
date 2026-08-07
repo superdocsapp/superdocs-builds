@@ -32,10 +32,11 @@ an unfinished run.
 (mechanics, narrative, art bible), edited by chat, with image support. The
 graded scenario — *new section plus one linked sub-document, then revise one
 mechanic, and only the correct section changes across both documents* — runs as
-one command and **passes 18/18 in 6 operations.**
+one command and **passes 20/20 in 6 operations.**
 
-**And a bug log with twelve entries**, several of them found by refusing to
-believe the API's own success messages.
+**And a bug log with fifteen SuperDocs entries and eight of my own**, several of
+them found by refusing to believe the API's own success messages — and four of
+mine found by refusing to believe my own checks.
 
 ---
 
@@ -46,9 +47,9 @@ use-cases/AbhishekSharma55/
 ├── superdocs_kit/        the shared layer both builds sit on
 ├── weekly-digest/        build 1
 ├── gdd-editor/           build 2
-├── tests/                62 tests, no key, no network, ~0.05s
+├── tests/                64 tests, no key, no network, 0.04s
 ├── repro/                minimal reproductions for the bug log
-├── bugs.md               12 bugs, with repro steps
+├── bugs.md               15 SuperDocs bugs + 8 of mine, with repro steps
 ├── ASSUMPTIONS.md        decisions logged as they were made
 └── WALKTHROUGH.md        this file
 ```
@@ -134,7 +135,7 @@ Every repair operation is counted in the cost measurement.
 Four seed documents; a fifth created at runtime by the scenario. The link graph
 is **data** (`corpus.LINKS`) — adding an audio bible is a dict entry.
 
-The graded scenario is `gdd scenario --live`. 18/18, 6 operations. The proof
+The graded scenario is `gdd scenario --live`. 20/20, 6 operations. The proof
 step is the one to demo: before each act every document's bytes are snapshotted;
 afterwards the changed sections are re-derived per document, and a document
 nobody named must come back **byte-identical, whole**.
@@ -156,6 +157,15 @@ labelled `Cooldown`, so the wrong one looked right. I approved the first, denied
 the second, and the document came out with Dash at 1.5 s and Grapple and Overheat
 untouched.
 
+**Tell the rest of it, because he will ask whether it always does that.** It does
+not. Two later runs of the same instruction against the same document targeted
+both sections correctly. So B13 is intermittent, the entry says so, and the
+argument for the gate is the stronger one anyway: a failure that fires
+occasionally and silently is exactly the one a human has to be there for. The
+same demo also surfaced a bug of mine — the async path was spending an operation
+without writing a ledger line (M8), on the one path this repo's own docstring
+promises is always on the ledger.
+
 That is bug B13, and it is also the argument for the gate existing: under the
 default `approve_all` the wrong number lands in the document with a success
 message, and the only person who catches it is a reader who happens to know what
@@ -167,7 +177,11 @@ SuperDocs has a multi-document session. I did not use it, because opening three
 documents into one session returns a roster of **one**, every entry carries
 `document_id: "doc_primary"`, and four identical GETs return a different
 document each time. `repro/B10-multidoc-roster.sh` reproduces it in about
-fifteen seconds against a fresh session, with `curl` and no code of mine.
+fifteen seconds against a fresh session, with `curl` and no code of mine, and
+`gdd probe-multidoc --live` does the same through the client and prints a
+verdict. Both cost zero operations; both were re-run while preparing this. The
+probe also killed the workaround the bug report originally suggested: `focus`
+404s on the durable id the session was just opened with.
 
 So each document gets its own session and this code holds the link graph.
 **Say the cost out loud before he finds it:** the model never sees two documents
@@ -286,8 +300,8 @@ computed, do not assert it.
 
 `out/arm-a-edit/failed-attempts/` has the instruction and the output of every
 week that failed verification, kept on purpose. `repro/B2-after-week-03-CORRUPTED.html`
-is the destroyed table. `repro/B10-multidoc-roster.sh` reproduces the roster bug
-live in fifteen seconds. And one of the tests loads the real corrupted document
+is the destroyed table. `repro/B10-multidoc-roster.sh` and `gdd probe-multidoc --live` reproduce the
+roster bug live, for nothing. And one of the tests loads the real corrupted document
 and asserts that the surgical check rejects it. I would rather hand over the
 failures than a demo that only goes one way.
 
@@ -374,11 +388,18 @@ invariants. Honest answer: checking it needs a second model call and a rubric,
 and I would rather ship a verified structure with an unverified sentence than
 claim both.
 
-**Arm B is a bounded sample.** The agent account has 500 operations a month, arm
-A had to run in full, so the control arm runs a prefix of weeks and the 52-week
-figure is an extrapolation — labelled as one everywhere. If he only trusts
-measured values, point him at the like-for-like line, which compares only the
-weeks both arms actually ran.
+**Arm B is a bounded sample.** The agent account has 500 operations a month, so
+the control arm runs a prefix of weeks and any 52-week figure for it is an
+extrapolation — labelled as one everywhere. If he only trusts measured values,
+point him at the like-for-like line, which compares only the weeks both arms
+actually ran.
+
+**The archive summaries are the softest part of the measurement, and they were
+wrong once.** For seven weeks the row for week N-1 sometimes described week N,
+because the instruction pointed at document state that the same turn was
+rewriting (M7). Structure, coverage and bounds all passed throughout. It is fixed
+— the text to summarise is handed over literally now — but the general point
+stands: no invariant in this build reads the sentence the model wrote.
 
 **There is no cross-document consistency engine in build 2.** Change the cooldown
 in Mechanics and never mention the GDD, and the GDD keeps the old number. The
@@ -421,7 +442,7 @@ Ordered by how likely they are to work first time.
 5. **Break it on purpose**: hand-edit a saved week's HTML to rename a heading,
    then `digest verify`. The invariant fires and names the section.
 
-Have `make test` ready as the zero-risk opener — 62 tests, ~0.05 s, no key.
+Have `make test` ready as the zero-risk opener — 64 tests, 0.04 s, no key.
 Then `make demo`, which re-verifies every saved week and prints a week-over-week
 diff without spending anything.
 
@@ -431,19 +452,36 @@ diff without spending anything.
 
 | | |
 |---|---|
-| Graded scenario (build 2) | **18/18 checks, 6 operations, 368 s** |
-| Digest, per week | **1 operation** (2 when a week needs repair) |
-| Archive at week 52 | **18 rows instead of 51** |
-| Invariants per week | **13**, re-derived from the bytes |
-| Tests | **62**, no key, no network, **~0.05 s** |
-| Bugs found and logged | **12**, with repro steps; one with a runnable script |
+| Graded scenario (build 2) | **20/20 checks, 6 operations, 542 s** |
+| Digest, per week | **1 operation** (3 on a week that needs the two-turn repair) |
+| Archive at week 52 | **18 rows instead of 51** (11 rollups, at weeks 10, 14 … 50) |
+| Invariants per week | **14**, re-derived from the bytes |
+| Tests | **64**, no key, no network, **0.04 s** by pytest's own clock |
+| Bugs found and logged | **15** SuperDocs, **8** mine; two runnable repros |
 | Free-tier budget | **500 operations a month** — which is why everything that loops has a cap and a stopping rule |
 
-`bugs.md` also ends with a section headed **"My own bugs"** — four of them: a
-live key committed as a test fixture (caught by my own pre-PR check, history
-rewritten), a CLI default that spent money on what looked like a dry run, a test
-that hung building its own input, and the time I treated one passing week as
-evidence and had to revert. If he notices them, that is the answer: the same
-hours that found twelve bugs in someone else's product should be honest about
-the ones they created. A bug log containing only other people's bugs is a
-marketing document.
+Every one of those is reproducible from a command in the repo. The digest's
+per-week figure and the run length live in `weekly-digest/MEASUREMENT.md`, which
+is **generated** from the ledgers — if a number here ever disagrees with that
+file, that file is right.
+
+`bugs.md` ends with a section headed **"My own bugs"** — eight of them, and the
+last four are the ones to volunteer:
+
+- **M5** — my archive parser skipped a row it could not read, so a duplicated
+  row passed an invariant called *"covers every past week exactly once"*.
+- **M6** — my surgical check treated added content as never unintended, so
+  *"only the Concept art section changed"* passed a turn that added a second
+  Concept art section.
+- **M7** — the archive summary described the wrong week, three times in seven,
+  because the instruction said *"summarise the bullets currently under What
+  changed"* in the same turn that replaced those bullets. Every structural
+  invariant said clean.
+- **M8** — an operation was spent without a ledger line on the human-gated path,
+  which is the one path the kit's own docstring promises is always on the ledger.
+
+The line to say: *the same hours that found fifteen bugs in someone else's
+product should be honest about the eight they created — and four of those eight
+were my own checking telling me a thing was fine when it was not.* All four were
+found the same way, by comparing what the system said against something outside
+it. A bug log containing only other people's bugs is a marketing document.

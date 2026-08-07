@@ -61,16 +61,18 @@ of the control arm is that it does not.
 ## Both arms are verified, and both may retry
 
 Arm A verifies every week against fourteen invariants derived from the document
-bytes and, on failure, spends a second operation retrying on stronger model
-settings. **Arm B gets exactly the same treatment** — the same invariants, the
-same escalation, the same accounting. Giving my own build a repair budget and
-not giving one to the control would rig the measurement, and this is the axis
-where it would have mattered most: regenerating a whole document gets harder as
-the archive it must re-emit grows, and on the default tier week 8 of arm B came
-back as a 1.2 KB document containing one of the four sections. That truncation
-is a real cost of regenerating, and it is counted rather than hidden.
+bytes and, on failure, decomposes the week into two simpler turns. **Arm B gets
+the same treatment** — the same invariants, a second attempt on the same
+escalation, the same accounting. Giving my own build a repair budget and not
+giving one to the control would rig the measurement, and this is the axis where
+it matters most: regenerating a whole document gets harder as the archive it
+must re-emit grows. The per-week arm-B table in the Results section shows how
+often its second attempt was needed and how often the result was still invalid;
+the document sizes in that table are worth reading next to arm A's, because a
+regenerated week that comes back a third of the expected size has dropped
+sections rather than saved money.
 
-Both arms run attempt 1 on `core`/`balanced` and escalate to `pro`/`deep`.
+Both arms run on `pro`/`deep`.
 
 ## What counts as a cost in arm A
 
@@ -85,17 +87,20 @@ would be measuring a system that does not exist.
 
 The account this was run on is a free agent account with **500 operations per
 month** (`bugs.md` B7), and a week on the settings that pass reliably takes
-100–300 seconds of wall clock. A full 52-week arm A is therefore about 55
-operations and **two and a half to four hours** of continuous running, with arm B
-on top.
+20–300 seconds of wall clock. A full 52-week arm A is therefore around 55
+operations and **two to four hours** of continuous running, with arm B on top.
 
-**So the live run is bounded, and here is the reasoning rather than an excuse.**
+**So the live run is bounded by an explicit rule rather than by whenever I got
+bored.** The rule, fixed before the run:
 
-- **Arm A runs 20 weeks live.** Twenty is not arbitrary: the archive rollup fires
-  at weeks 10, 14 and 18, so a 20-week run exercises the growth policy **three
-  times** and ends with the archive in its steady state (detail rows plus rolled
-  up rows). Drift, when it appears at all, has appeared by week 7 in every run I
-  have done. Twenty weeks is past the point where the interesting things happen.
+- **Arm A runs until `--max-ops` or week 20, whichever comes first**, and the
+  week it actually reached is in the Results section below — generated from the
+  ledger, not typed by me. If those two numbers ever disagree, believe the
+  ledger.
+- **Week 20 is not arbitrary.** The archive rollup fires at weeks 10, 14 and 18,
+  so a 20-week run exercises the growth policy **three times** and ends with the
+  archive in its steady state — detail rows plus rolled-up rows, which is the
+  shape it holds for the rest of the year.
 - **The 52-week behaviour is proved offline, not asserted.** The archive policy
   is simulated for all 52 weeks in
   `tests/test_transport_and_archive.py::test_fifty_two_weeks_of_archive_growth_offline`,
@@ -107,16 +112,24 @@ on top.
   `make run` continues from `state.json` and the ledger; the remaining weeks cost
   roughly one operation each. Anyone who wants the full 52 can have them.
 - **Arm B runs a bounded prefix** for the same reason. Its per-week cost is
-  measured and the 52-week figure is an **extrapolation**, labelled as one
+  measured and any 52-week figure for it is an **extrapolation**, labelled as one
   everywhere it appears, fitted against week number rather than averaged —
   because arm B's cost is expected to grow with the archive it must re-emit while
   arm A's is not, and averaging would hide exactly the effect being measured.
 - Both arms stop cleanly on `--max-ops` and resume from their ledgers.
 
-**What this costs the result, stated plainly:** a 20-week arm A cannot show a
-slow degradation that only appears at week 40. If one exists, this measurement
+**What this costs the result, stated plainly:** a run of this length cannot show
+a slow degradation that only appears at week 40. If one exists, this measurement
 would miss it. What it can show — and does — is whether the per-week cost is flat
 and whether the document survives the archive growth policy firing repeatedly.
+
+**One thing this measurement is NOT.** It is not a claim that the archive
+*summaries* are correct. Every invariant on the archive is structural — coverage,
+bounds, labels, no stray header row — and none of them reads the sentence the
+model wrote. That gap let a real defect through for seven weeks and is written up
+as `bugs.md` M7; the fix was to hand the model the text to summarise instead of
+naming a place in a document the same turn was rewriting. If you want to attack
+this measurement, that is still the softest part of it.
 
 ## What would falsify the claim
 

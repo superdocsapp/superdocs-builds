@@ -147,8 +147,13 @@ tokens, not wall-clock, not my estimate — the number the customer is invoiced
 in, reported by the server.
 
 Raw data committed: both ledgers (`ledger.jsonl`, every call with its ops and
-seconds), both `records.json`, every week's HTML, every export, every diff, and
-the instruction and output of every failed attempt in `out/arm-a-edit/failed-attempts/`.
+seconds), both `records.json`, every week's HTML, every free Markdown export,
+every week-over-week diff, and the drift report. When a week fails its first
+attempt, the exact instruction and the exact output are written to
+`out/arm-a-edit/failed-attempts/` and committed — that directory is empty when a
+run has no failures, which is a fact about the run rather than a tidy-up. Earlier
+failures that shaped the design are preserved separately in
+[`../repro/`](../repro/), because they belong to the bug reports.
 
 ## SuperDocs surface used
 
