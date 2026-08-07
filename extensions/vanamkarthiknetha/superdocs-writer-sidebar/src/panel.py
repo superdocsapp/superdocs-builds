@@ -1,21 +1,26 @@
 # SuperDocs Writer Sidebar - UNO component.
-# v0.2: selection round-trip. Send selection + instruction -> SuperDocs proposes
-# an edit -> preview in the panel -> Apply writes the approved text back into
-# the exact selected range (styles of the range are preserved; whole-document
-# mode is the v0.3 milestone).
+# v0.3: selection round-trip + whole-document mode. Selection: approved text is
+# written back into the exact selected range. Whole document: the doc is
+# exported as .docx and uploaded; each approved change is located by its
+# original text and replaced range by range (writeback.py) - unmatched changes
+# are skipped and reported, never guessed at.
+import os
 import re
+import tempfile
 import threading
 import traceback
 
 import unohelper
 
 from com.sun.star.awt import XActionListener, XCallback
+from com.sun.star.beans import PropertyValue
 from com.sun.star.container import NoSuchElementException
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.ui import XSidebarPanel, XToolPanel, XUIElement, XUIElementFactory, LayoutSize
 from com.sun.star.ui.UIElementType import TOOLPANEL
 
 import superdocs_client
+import writeback
 
 EXT_ID = "app.superdocs.writer.sidebar.vanamkarthiknetha"
 RESOURCE_PREFIX = "private:resource/toolpanel/SuperDocsPanelFactory"
@@ -91,8 +96,10 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
         self._parent = parent_window
         self._window = None
         self._main = _MainThread(ctx)
-        self._edit = None          # dict from superdocs_client.request_edit
-        self._target_range = None  # XTextRange the edit applies to
+        self._edit = None          # dict from superdocs_client.request_*edit
+        self._mode = None          # "sel" or "doc"
+        self._target_range = None  # XTextRange (selection mode)
+        self._doc = None           # text-document model (whole-doc mode)
         self._busy = False
 
     # ---- XUIElement ----
@@ -152,6 +159,23 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
         except Exception as exc:
             self._fail(exc)
 
+    def _export_docx(self, model):
+        """Export the live document as .docx bytes via the host's own filter."""
+        fd, path = tempfile.mkstemp(suffix=".docx")
+        os.close(fd)
+        try:
+            prop = PropertyValue()
+            prop.Name = "FilterName"
+            prop.Value = "MS Word 2007 XML"
+            model.storeToURL(unohelper.systemPathToFileUrl(path), (prop,))
+            with open(path, "rb") as f:
+                return f.read()
+        finally:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+
     def _on_send(self):
         if self._busy:
             return
@@ -159,24 +183,43 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
         if not instruction:
             self._ui(status="Type an instruction first.")
             return
-        controller = self.Frame.getController()
-        selection = controller.getSelection()
-        if (selection is None
-                or not selection.supportsService("com.sun.star.text.TextRanges")
-                or selection.getCount() == 0
-                or not selection.getByIndex(0).getString().strip()):
-            self._ui(status="Select the passage to edit first "
-                            "(whole-document mode arrives in v0.3).")
-            return
-        self._target_range = selection.getByIndex(0)
-        passage = self._target_range.getString()
+        whole_doc = self._window.getControl("chkWholeDoc").getModel().State == 1
+        if whole_doc:
+            model = self.Frame.getController().getModel()
+            if model is None or not model.supportsService("com.sun.star.text.TextDocument"):
+                self._ui(status="Open a Writer text document first.")
+                return
+            self._mode = "doc"
+            self._doc = model
+            self._target_range = None
+            self._ui(status="Exporting document...", preview="",
+                     decisions_enabled=False, send_enabled=False)
+            docx_bytes = self._export_docx(model)
+            request = lambda: superdocs_client.request_doc_edit(
+                docx_bytes, instruction, self._progress)
+        else:
+            controller = self.Frame.getController()
+            selection = controller.getSelection()
+            if (selection is None
+                    or not selection.supportsService("com.sun.star.text.TextRanges")
+                    or selection.getCount() == 0
+                    or not selection.getByIndex(0).getString().strip()):
+                self._ui(status="Select a passage to edit, "
+                                "or tick 'Whole document'.")
+                return
+            self._mode = "sel"
+            self._doc = None
+            self._target_range = selection.getByIndex(0)
+            passage = self._target_range.getString()
+            request = lambda: superdocs_client.request_edit(
+                passage, instruction, self._progress)
         self._busy = True
         self._ui(status="Contacting SuperDocs...", preview="",
                  decisions_enabled=False, send_enabled=False)
 
         def work():
             try:
-                edit = superdocs_client.request_edit(passage, instruction, self._progress)
+                edit = request()
                 self._edit = edit
                 if edit["state"] == "completed":
                     # nothing needed approval (e.g. no-op); report honestly
@@ -186,7 +229,8 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
                              send_enabled=True)
                     return
                 self._busy = False
-                self._ui(status="Proposal ready - review and Apply or Reject.",
+                self._ui(status=f"{len(edit['pending'])} proposed change(s) - "
+                                "review and Apply or Reject.",
                          preview=_proposal_preview(edit),
                          decisions_enabled=True, send_enabled=False)
             except Exception as exc:
@@ -205,6 +249,27 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
             return
         self._busy = True
         self._ui(status="Applying...", decisions_enabled=False)
+        if self._mode == "doc":
+            pending = self._edit["pending"]
+
+            def work_doc():
+                try:
+                    superdocs_client.finalize(self._edit, True, self._progress,
+                                              want_text=False)
+
+                    def write_back():
+                        results = writeback.apply_changes(self._doc, pending)
+                        self._edit = None
+                        self._doc = None
+                        self._busy = False
+                        self._ui(status=writeback.summarize(results) + " (1 operation)",
+                                 preview="", send_enabled=True)
+                    self._main.post(write_back)
+                except Exception as exc:
+                    self._fail(exc)
+
+            threading.Thread(target=work_doc, daemon=True).start()
+            return
 
         def work():
             try:
@@ -242,6 +307,7 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
                 superdocs_client.finalize(self._edit, False, self._progress)
                 self._edit = None
                 self._target_range = None
+                self._doc = None
                 self._busy = False
                 self._ui(status="Rejected. Document untouched, nothing billed.",
                          preview="", send_enabled=True)

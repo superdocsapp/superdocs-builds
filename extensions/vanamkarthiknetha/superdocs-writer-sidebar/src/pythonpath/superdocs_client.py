@@ -77,8 +77,26 @@ def _poll(job_id, until_states, progress):
     raise SuperDocsError("Timed out waiting for SuperDocs job")
 
 
+def _open_edit(session, message, progress):
+    """Shared tail: async chat -> poll -> pending changes. Returns edit dict."""
+    progress("Requesting edit...")
+    job = _call("POST", "/v1/chat/async", {
+        "session_id": session,
+        "message": message,
+        "approval_mode": "ask_every_time",
+    })
+    state, job_data = _poll(job["job_id"], ("awaiting_approval", "completed"), progress)
+    if state == "failed":
+        raise SuperDocsError("SuperDocs reported the edit failed")
+    pending = (job_data.get("metadata") or {}).get("pending_changes") or []
+    parts = [c["ai_explanation"] for c in pending if c.get("ai_explanation")]
+    summary = " | ".join(parts) if parts else f"{len(pending)} proposed change(s)"
+    return {"session": session, "job_id": job["job_id"], "pending": pending,
+            "state": state, "summary": summary}
+
+
 def request_edit(passage_text, instruction, progress=lambda m: None):
-    """Returns dict: session, job_id, pending (list), summary (str for preview)."""
+    """Selection mode. Returns dict: session, job_id, pending, state, summary."""
     session = "sdext-" + time.strftime("%Y%m%d-%H%M%S")
     progress("Uploading passage...")
     _call("POST", "/v1/documents/upload-base64", {
@@ -86,30 +104,33 @@ def request_edit(passage_text, instruction, progress=lambda m: None):
         "file_base64": base64.b64encode(_passage_to_html(passage_text).encode()).decode(),
         "session_id": session,
     })
-    progress("Requesting edit...")
-    job = _call("POST", "/v1/chat/async", {
+    return _open_edit(
+        session,
+        instruction + "\n\nEdit only this passage; do not add commentary or metadata.",
+        progress)
+
+
+def request_doc_edit(docx_bytes, instruction, progress=lambda m: None):
+    """Whole-document mode: upload the exported .docx, then one chat request.
+    Same return shape as request_edit; pending[].old_html anchors write-back."""
+    session = "sdext-doc-" + time.strftime("%Y%m%d-%H%M%S")
+    progress("Uploading document...")
+    _call("POST", "/v1/documents/upload-base64", {
+        "filename": "document.docx",
+        "file_base64": base64.b64encode(docx_bytes).decode(),
         "session_id": session,
-        "message": (instruction
-                    + "\n\nEdit only this passage; do not add commentary or metadata."),
-        "approval_mode": "ask_every_time",
     })
-    state, job_data = _poll(job["job_id"], ("awaiting_approval", "completed"), progress)
-    if state == "failed":
-        raise SuperDocsError("SuperDocs reported the edit failed")
-    pending = (job_data.get("metadata") or {}).get("pending_changes") or []
-    parts = []
-    for change in pending:
-        note = change.get("ai_explanation")
-        if note:
-            parts.append(note)
-    summary = " | ".join(parts) if parts else f"{len(pending)} proposed change(s)"
-    return {"session": session, "job_id": job["job_id"], "pending": pending,
-            "state": state, "summary": summary}
+    return _open_edit(
+        session,
+        instruction + "\n\nApply targeted edits to this document; change only what "
+                      "the instruction requires; do not add commentary or metadata.",
+        progress)
 
 
-def finalize(edit, approve, progress=lambda m: None):
+def finalize(edit, approve, progress=lambda m: None, want_text=True):
     """Approve or reject all pending changes. On approve, returns the final
-    passage text (plain-text export); on reject, returns None."""
+    passage text (plain-text export), or None when want_text=False (whole-doc
+    mode writes back from the changes themselves); on reject, returns None."""
     decisions = [{"change_id": c["change_id"], "approved": bool(approve)}
                  for c in edit["pending"]]
     if not approve:
@@ -129,6 +150,8 @@ def finalize(edit, approve, progress=lambda m: None):
     state, _ = _poll(edit["job_id"], ("completed",), progress)
     if state != "completed":
         raise SuperDocsError(f"Job ended in state {state}")
+    if not want_text:
+        return None
     progress("Fetching result...")
     blob = _call("POST", "/v1/documents/export",
                  {"session_id": edit["session"], "format": "txt"})
