@@ -75,7 +75,15 @@ def _norm(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "")).replace("·", "·").strip().lower()
 
 
-def check_week(html: str, week: dict) -> WeekReport:
+def check_week(
+    html: str, week: dict, published_weeks: set[int] | None = None
+) -> WeekReport:
+    """`published_weeks` is the set of weeks that actually reached the document
+    before this one. It is NOT always {1..N-1}: if a week failed verification
+    twice and was rolled back, it was never published and its row was never
+    archived, so demanding it would make the invariant unsatisfiable forever
+    after. The runner passes what really happened; the default keeps the strict
+    reading for anyone checking a clean run offline."""
     rep = WeekReport(week=week["week"])
     add = lambda n, g, ok, d="": rep.checks.append(Check(n, g, ok, d))  # noqa: E731
 
@@ -136,7 +144,7 @@ def check_week(html: str, week: dict) -> WeekReport:
     # the content was wrong. Coverage is the honest invariant.
     arch = parse_existing(html)
     covered: list[int] = [w for row in arch for w in sorted(row.covered_weeks)]
-    want = expected_coverage(week["week"])
+    want = expected_coverage(week["week"]) if published_weeks is None else set(published_weeks)
     dupes = sorted({w for w in covered if covered.count(w) > 1})
     add("archive covers every past week exactly once", "growth",
         set(covered) == want and not dupes,

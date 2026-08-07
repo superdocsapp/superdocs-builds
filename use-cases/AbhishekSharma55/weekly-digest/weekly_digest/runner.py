@@ -211,6 +211,23 @@ class DigestRun:
         self._write_reports()
         return self.records
 
+
+    def _archived_after(self, week: int) -> set[int]:
+        """Which weeks the archive should hold once week N's edit has landed.
+
+        Each successful week K files ONE row: the week before it. So the set is
+        every K-1 for the weeks K < N that were published, plus N-1 for the week
+        about to land. A week that was rolled back never filed its row, so
+        demanding {1..N-1} unconditionally would make the invariant impossible
+        to satisfy for the rest of the year after a single bad week - the check
+        would be measuring the past instead of the present.
+        """
+        archived = {
+            r.week - 1 for r in self.records
+            if r.week >= 2 and r.week < week and not r.rolled_back
+        }
+        return archived | {week - 1}
+
     def _run_week(self, week: dict) -> None:
         """One week. Attempt, verify from the bytes, and repair if it drifted.
 
@@ -232,6 +249,7 @@ class DigestRun:
         instruction = weekly_instruction(week, plan, prev, before_html=before)
         intended = list(STANDING_SECTIONS) + ([ARCHIVE_SECTION] if plan.add_row_for_week else [])
         status_chunks = self._status_chunk_ids(before)
+        published = self._archived_after(n)
 
         started = time.monotonic()
         total_ops = 0
@@ -262,7 +280,7 @@ class DigestRun:
             after = res.updated_html or after
             verdict = verify_surgical(before, after, expected_sections=intended)
             unintended = [c for c in verdict.unintended if c not in status_chunks]
-            rep = check_week(after, week)
+            rep = check_week(after, week, published)
             if rep.ok and not unintended:
                 break
             if attempt == 1:
@@ -336,7 +354,8 @@ class DigestRun:
         for rec in self.records:
             html = self._read_html(rec.week)
             if html:
-                reports.append(check_week(html, self.weeks[rec.week - 1]))
+                reports.append(check_week(html, self.weeks[rec.week - 1],
+                                          self._archived_after(rec.week)))
         (self.out / "drift-report.md").write_text(
             "# Drift report - arm A (edited in place)\n\n"
             "Every row is an independent re-derivation from that week's document\n"

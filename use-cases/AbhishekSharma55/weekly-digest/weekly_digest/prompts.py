@@ -30,6 +30,9 @@ from .archive import plan_rows, render_instruction_block
 from .document import ArchivePlan
 
 PRESERVE = (
+    "REPLACEMENT MEANS REPLACEMENT: where this instruction lists what a section "
+    "must contain, the section must end up containing exactly that and nothing "
+    "else. Delete what is not on the list rather than keeping it alongside.\n"
     "Preserve all existing formatting exactly: the document title, every "
     "section heading, table borders, header-row shading, alternating row "
     "colours, fonts, font sizes and colours. Do not restyle anything. Do not "
@@ -73,8 +76,10 @@ def weekly_instruction(
 
     shipped = "\n".join(f"  - {s}" for s in week["shipped"])
     steps.append(
-        f"STEP 3 - 'What changed'. Replace ALL bullets in that section with exactly "
-        f"these {len(week['shipped'])} bullets, verbatim, in this order:\n{shipped}"
+        f"STEP 3 - 'What changed'. After this edit that section must contain EXACTLY "
+        f"these {len(week['shipped'])} bullets, verbatim, in this order, and NO others. "
+        f"DELETE every bullet currently in that section that is not in this list. Do "
+        f"not append to the existing bullets and do not keep any of them:\n{shipped}"
     )
 
     header = "  | Risk | Owner | Area | Severity | Trend |"
@@ -88,16 +93,20 @@ def weekly_instruction(
         if week.get("risks_closed") else ""
     )
     steps.append(
-        f"STEP 4 - 'What is at risk' table. The data rows must end up being exactly "
-        f"these {len(week['risks'])} rows, in this order. Update, add or delete rows "
-        f"as needed; keep the header row and the table styling untouched.\n"
+        f"STEP 4 - 'What is at risk' table. After this edit the table's data rows "
+        f"must be EXACTLY these {len(week['risks'])} rows, in this order, and no "
+        f"others. Delete any row not listed. Each cell holds ONE value: overwrite "
+        f"the old value, never write the old and new value together (never write "
+        f"'Medium / Low' or 'steady / worsening'). Keep the header row and the "
+        f"table styling untouched.\n"
         f"{header}\n{rows}\n{closed}"
     )
 
     nxt = "\n".join(f"  - {s}" for s in week["next"])
     steps.append(
-        f"STEP 5 - 'What is next'. Replace ALL bullets in that section with exactly "
-        f"these {len(week['next'])} bullets, verbatim, in this order:\n{nxt}"
+        f"STEP 5 - 'What is next'. After this edit that section must contain EXACTLY "
+        f"these {len(week['next'])} bullets, verbatim, in this order, and NO others. "
+        f"DELETE every bullet currently there that is not in this list:\n{nxt}"
     )
 
     body = "\n\n".join(steps)
