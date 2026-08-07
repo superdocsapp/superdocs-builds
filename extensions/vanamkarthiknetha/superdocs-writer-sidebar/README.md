@@ -6,18 +6,24 @@ instruction, reviewing the proposed changes, and applying approved ones back
 into the document **range by range** — untouched text is never rewritten, and
 existing paragraph/character styles are respected.
 
-> **Status: v0.3 — selection AND whole-document modes, validated on Linux and
-> Windows.** Selection mode: select a passage, describe the edit, review, Apply
-> → only the selected range changes, styles intact. Whole-document mode (tick
-> the checkbox): the doc is exported as .docx through the host's own filter and
-> uploaded; every approved change is located by its original text in the live
-> document and replaced range by range — a change that can't be found, or that
-> matches more than one place, is **skipped and reported, never guessed at**.
-> Current limits, stated honestly: write-back is plain text into the styled
-> range (formatting *inside* a proposal isn't carried yet); whole-doc write-back
-> covers body paragraphs, not table-cell content (those changes are reported as
-> skipped, and the approved SuperDocs copy still has them); drafting-at-cursor
-> is not built.
+> **Status: v0.3.1 — selection, whole-document, and drafting modes, validated
+> on Linux and Windows.** Selection mode: select a passage, describe the edit,
+> review, Apply → only the selected range changes, styles intact.
+> Whole-document mode (tick the checkbox): the doc is exported as .docx through
+> the host's own filter and uploaded; every approved change is located by its
+> original text in the live document and replaced range by range — a change
+> that can't be found, or that matches more than one place, is **skipped and
+> reported, never guessed at**. Drafting: when the instruction makes SuperDocs
+> *create* content instead of editing ("create a gym plan"), the API applies it
+> server-side with **zero pending changes** — creation bypasses the
+> `ask_every_time` approval gate entirely (reported as a bug during this
+> project). The sidebar closes that gap locally: the draft becomes a reviewable
+> proposal, Apply inserts it at the cursor, Reject discards it — nothing lands
+> in your document without a decision. Current limits, stated honestly:
+> write-back and draft insertion are plain text into styled ranges (formatting
+> *inside* a proposal isn't carried yet); whole-doc write-back covers body
+> paragraphs, not table-cell content (those changes are reported as skipped,
+> and the approved SuperDocs copy still has them).
 
 ## Screenshots (Linux, WSLg)
 
@@ -92,6 +98,12 @@ profile; they never touch your normal LibreOffice or its profile.
   real API: UNO doc → .docx export → `request_doc_edit` → approve → write-back
   from the actual returned `old_html`/`new_html`. Costs 1 operation. Ends with
   `WHOLE-DOC LIVE TEST: ALL PASS`.
+- `tests/draft_live_test.py` — plain HTTP, no LibreOffice needed, ≤1 operation.
+  Sends a drafting instruction and verifies the client surfaces the created
+  content as `draft_html` on a completed zero-pending job (the approval-gate
+  bypass). If the model happens to propose in-place edits instead, they are
+  rejected (free) and the run reports SKIPPED honestly — model choice between
+  editing and creating is nondeterministic.
 
 (Portability note discovered by this test: LibreOffice 26 dropped the classic
 "List Bullet" paragraph-style family — bullets are now "List 1".."List 5" — so
@@ -108,7 +120,7 @@ the test discovers style names at runtime instead of assuming them.)
 | `src/panel.py` | UNO component: panel factory, panel, threading, both modes |
 | `src/panel.xdl` | Panel UI (whole-doc checkbox, instruction box, Send, preview, Apply/Reject, status) |
 | `src/pythonpath/superdocs_client.py` | Stdlib SuperDocs client (upload → async chat → approve → export) |
-| `src/pythonpath/writeback.py` | Whole-doc write-back: HTML→paragraphs, unique-run matching, range-by-range apply |
+| `src/pythonpath/writeback.py` | Whole-doc write-back: HTML→paragraphs, unique-run matching, range-by-range apply, draft insertion |
 | `src/icons/superdocs_24.png` | Sidebar deck icon |
 
 Built by Karthik Vanam for the SuperDocs hiring round, with AI-assisted

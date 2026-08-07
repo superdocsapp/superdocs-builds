@@ -81,6 +81,34 @@ def apply_changes(doc, pending):
             for applied, reason in [apply_change(doc, change)]]
 
 
+PARAGRAPH_BREAK = 0  # com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK
+
+
+def insert_paragraphs(doc, paras, at_range=None):
+    """Insert plain-text paragraphs at at_range (default: end of document).
+
+    Existing content is never modified: if the insertion point sits in a
+    non-empty paragraph, a paragraph break is opened first. Returns the number
+    of paragraphs inserted.
+    """
+    text = at_range.getText() if at_range is not None else doc.getText()
+    if at_range is not None:
+        cursor = text.createTextCursorByRange(at_range.getEnd())
+    else:
+        cursor = text.createTextCursor()
+        cursor.gotoEnd(False)
+    probe = text.createTextCursorByRange(cursor)
+    probe.gotoStartOfParagraph(False)
+    probe.gotoEndOfParagraph(True)
+    if probe.getString().strip():
+        text.insertControlCharacter(cursor, PARAGRAPH_BREAK, False)
+    for i, para in enumerate(paras):
+        if i:
+            text.insertControlCharacter(cursor, PARAGRAPH_BREAK, False)
+        text.insertString(cursor, para, False)
+    return len(paras)
+
+
 def summarize(results):
     """One status line, honest about anything skipped."""
     done = sum(1 for r in results if r["applied"])

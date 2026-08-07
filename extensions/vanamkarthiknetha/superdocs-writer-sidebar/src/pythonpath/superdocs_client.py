@@ -91,8 +91,19 @@ def _open_edit(session, message, progress):
     pending = (job_data.get("metadata") or {}).get("pending_changes") or []
     parts = [c["ai_explanation"] for c in pending if c.get("ai_explanation")]
     summary = " | ".join(parts) if parts else f"{len(pending)} proposed change(s)"
+    # Drafting instructions ("create X") bypass the approval gate entirely: the
+    # job completes with NO pending changes and the created content rides
+    # result.document_changes (observed 2026-08-07, logged as BUGS B6). Expose
+    # it so the panel can gate the draft locally instead of dropping it.
+    result = job_data.get("result") or {}
+    draft_html = ""
+    response_text = ""
+    if isinstance(result, dict):
+        draft_html = (result.get("document_changes") or {}).get("updated_html") or ""
+        response_text = result.get("response") or ""
     return {"session": session, "job_id": job["job_id"], "pending": pending,
-            "state": state, "summary": summary}
+            "state": state, "summary": summary,
+            "draft_html": draft_html, "response": response_text}
 
 
 def request_edit(passage_text, instruction, progress=lambda m: None):

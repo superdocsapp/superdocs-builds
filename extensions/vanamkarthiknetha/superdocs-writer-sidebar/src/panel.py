@@ -1,9 +1,12 @@
 # SuperDocs Writer Sidebar - UNO component.
-# v0.3: selection round-trip + whole-document mode. Selection: approved text is
-# written back into the exact selected range. Whole document: the doc is
-# exported as .docx and uploaded; each approved change is located by its
-# original text and replaced range by range (writeback.py) - unmatched changes
-# are skipped and reported, never guessed at.
+# v0.3.x: selection round-trip + whole-document mode + drafting. Selection:
+# approved text is written back into the exact selected range. Whole document:
+# the doc is exported as .docx and uploaded; each approved change is located by
+# its original text and replaced range by range (writeback.py) - unmatched
+# changes are skipped and reported, never guessed at. Drafting: when SuperDocs
+# CREATES content instead of editing (which bypasses the API's approval gate,
+# BUGS B6), the draft becomes a local proposal - Apply inserts it at the
+# cursor, Reject discards it; nothing lands without a decision.
 import os
 import re
 import tempfile
@@ -97,9 +100,10 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
         self._window = None
         self._main = _MainThread(ctx)
         self._edit = None          # dict from superdocs_client.request_*edit
-        self._mode = None          # "sel" or "doc"
+        self._mode = None          # "sel", "doc", or "draft"
         self._target_range = None  # XTextRange (selection mode)
-        self._doc = None           # text-document model (whole-doc mode)
+        self._doc = None           # text-document model
+        self._draft_paras = None   # drafted paragraphs awaiting the local gate
         self._busy = False
 
     # ---- XUIElement ----
@@ -192,6 +196,7 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
             self._mode = "doc"
             self._doc = model
             self._target_range = None
+            base_text = model.getText().getString()
             self._ui(status="Exporting document...", preview="",
                      decisions_enabled=False, send_enabled=False)
             docx_bytes = self._export_docx(model)
@@ -208,9 +213,10 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
                                 "or tick 'Whole document'.")
                 return
             self._mode = "sel"
-            self._doc = None
+            self._doc = controller.getModel()
             self._target_range = selection.getByIndex(0)
             passage = self._target_range.getString()
+            base_text = passage
             request = lambda: superdocs_client.request_edit(
                 passage, instruction, self._progress)
         self._busy = True
@@ -222,7 +228,25 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
                 edit = request()
                 self._edit = edit
                 if edit["state"] == "completed":
-                    # nothing needed approval (e.g. no-op); report honestly
+                    # Drafting instructions bypass the API's approval gate
+                    # entirely (BUGS B6): the job completes with no pending
+                    # changes and the created content rides result.
+                    # document_changes. Gate that draft HERE instead.
+                    draft_paras = writeback.html_paragraphs(edit.get("draft_html"))
+                    if draft_paras and (" ".join(draft_paras)
+                                        != writeback._norm(base_text)):
+                        self._mode = "draft"
+                        self._draft_paras = draft_paras
+                        joined = " ".join(draft_paras)
+                        clipped = joined[:300] + ("..." if len(joined) > 300 else "")
+                        self._busy = False
+                        self._ui(status="SuperDocs drafted NEW content (no in-place "
+                                        "edits). Apply inserts it at the cursor; "
+                                        "Reject discards it.",
+                                 preview=f'Draft: "{clipped}"',
+                                 decisions_enabled=True, send_enabled=False)
+                        return
+                    # genuinely nothing to review; report honestly
                     self._busy = False
                     self._ui(status="SuperDocs made no reviewable proposal "
                                     "(request may already be satisfied). Nothing changed.",
@@ -249,6 +273,26 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
             return
         self._busy = True
         self._ui(status="Applying...", decisions_enabled=False)
+        if self._mode == "draft":
+            # already billed and committed server-side (B6); the gate is local.
+            paras = self._draft_paras
+
+            def insert_draft():
+                at_range = None
+                try:
+                    at_range = self._doc.getCurrentController().getViewCursor()
+                except Exception:
+                    pass  # fall back to end of document
+                count = writeback.insert_paragraphs(self._doc, paras, at_range)
+                self._edit = None
+                self._doc = None
+                self._draft_paras = None
+                self._busy = False
+                self._ui(status=f"Draft inserted at the cursor ({count} paragraph(s)). "
+                                "Existing text untouched.",
+                         preview="", send_enabled=True)
+            self._main.post(insert_draft)
+            return
         if self._mode == "doc":
             pending = self._edit["pending"]
 
@@ -298,6 +342,16 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
 
     def _on_reject(self):
         if self._busy or not self._edit:
+            return
+        if self._mode == "draft":
+            # nothing to reject server-side - the job already completed (B6);
+            # discarding is purely local
+            self._edit = None
+            self._doc = None
+            self._draft_paras = None
+            self._ui(status="Draft discarded; document untouched. "
+                            "(It still exists in your SuperDocs session.)",
+                     preview="", decisions_enabled=False, send_enabled=True)
             return
         self._busy = True
         self._ui(status="Rejecting...", decisions_enabled=False)

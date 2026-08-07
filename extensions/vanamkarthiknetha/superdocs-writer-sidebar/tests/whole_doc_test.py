@@ -123,6 +123,43 @@ checks = [
     ("nothing bogus landed", "should never land" not in texts),
 ]
 
+# ---- draft insertion (v0.3.1): insert_paragraphs never touches existing text ----
+before_texts = list(texts)
+n_end = writeback.insert_paragraphs(doc, ["Draft alpha.", "Draft beta."])       # at end
+heading_para = None
+enum = text.createEnumeration()
+while enum.hasMoreElements():
+    p = enum.nextElement()
+    if p.supportsService("com.sun.star.text.Paragraph") and p.getString() == "Contract Summary":
+        heading_para = p
+        break
+n_mid = writeback.insert_paragraphs(doc, ["Inserted after heading."], heading_para)
+
+paras2 = []
+enum = text.createEnumeration()
+while enum.hasMoreElements():
+    p = enum.nextElement()
+    if p.supportsService("com.sun.star.text.Paragraph"):
+        paras2.append((p.ParaStyleName, p.getString()))
+texts2 = [t for _, t in paras2]
+nonempty2 = [t for t in texts2 if t.strip()]
+
+checks += [
+    ("insert at end returned 2", n_end == 2),
+    ("draft paragraphs landed at end", nonempty2[-2:] == ["Draft alpha.", "Draft beta."]),
+    ("insert at range returned 1", n_mid == 1),
+    ("mid insert landed right after heading",
+     texts2[texts2.index("Contract Summary") + 1] == "Inserted after heading."),
+    ("heading text/style survived insertion", paras2[0] == ("Heading 1", "Contract Summary")),
+    # non-empty only: inserting at the end legitimately consumes the trailing
+    # EMPTY paragraph (writing into an empty paragraph touches no content)
+    ("every pre-insert non-empty paragraph still present in order",
+     [t for t in texts2 if t.strip() and t in before_texts]
+     == [t for t in before_texts if t.strip()]),
+    ("table survived insertion",
+     [table.getCellByName(n).getString() for n in ("A1", "B1")] == ["Owner", "Legal team"]),
+]
+
 ok = True
 for name, passed in checks:
     print(("PASS " if passed else "FAIL ") + name)
