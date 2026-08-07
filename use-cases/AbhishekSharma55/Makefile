@@ -4,14 +4,14 @@
 #   make test     61 tests, no key, no network, ~0.05s
 #   make demo     the offline demo: verify every saved week, show a diff,
 #                 print the measurement. Spends nothing.
-#   make replay   re-run the WHOLE 52-week digest from committed fixtures,
-#                 with no API key and no network. Spends nothing.
+#   make replay   re-run the digest driver from committed fixtures, with no
+#                 API key and no network. Spends nothing.
 #
 # The two commands that cost money are called out explicitly and both take a
 # hard cap:
 #   make scenario   the graded GDD scenario, live      (~6 operations)
-#   make run        the 52-week digest, live           (<=80 operations)
-#   make control    the regeneration control arm, live (<=45 operations)
+#   make run        arm A, 20 weeks, live, resumable   (<=45 operations)
+#   make control    the regeneration control arm, live (<=30 operations)
 
 PY := .venv/bin/python
 VENV := .venv
@@ -62,10 +62,10 @@ scenario: setup
 	@$(PY) -m gdd_editor.cli scenario --live --max-ops 14
 
 run: setup
-	@$(PY) -m weekly_digest.cli run --weeks 52 --max-ops 80 --live
+	@$(PY) -m weekly_digest.cli run --weeks 20 --max-ops 45 --live
 
 control: setup
-	@$(PY) -m weekly_digest.cli regen --weeks 12 --max-ops 45 --live
+	@$(PY) -m weekly_digest.cli regen --weeks 8 --max-ops 30 --live
 
 report: setup
 	@$(PY) -m weekly_digest.cli report
