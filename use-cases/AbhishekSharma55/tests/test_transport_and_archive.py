@@ -161,7 +161,12 @@ def test_rollup_instruction_lists_the_rows_being_folded(weeks):
         if rollup:
             block = render_instruction_block(rows, rollup)
             assert "rolled up" in block
-            assert block.count("        - Week") == ARCHIVE_ROLLUP_SIZE
+            # the rollup row must name every row it replaces, and say to delete them
+            assert block.count("'Week ") >= ARCHIVE_ROLLUP_SIZE
+            assert "REPLACES" in block and "Delete those rows." in block
+            # and the block must stay short: it is what pushed the instruction
+            # past the length where the model started dropping later steps
+            assert len(block) < 1200, f"archive block grew to {len(block)} chars"
             return
         html = _render(rows)
     pytest.fail("no rollup fired in the first ten weeks")

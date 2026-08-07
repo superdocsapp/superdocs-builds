@@ -37,6 +37,8 @@ PRESERVE = (
     "section heading, table borders, header-row shading, alternating row "
     "colours, fonts, font sizes and colours. Do not restyle anything. Do not "
     "add, remove or rename any heading. Do not reorder the sections.\n"
+    "Copy every quoted or listed value character for character. Do not add a "
+    "full stop to a bullet that has none, and do not reword anything.\n"
     "STRUCTURAL RULE: both tables must remain <table> elements with their "
     "header rows intact. Never replace a table with a single row, a div or a "
     "list. Never drop a table's header row."
@@ -76,10 +78,10 @@ def weekly_instruction(
 
     shipped = "\n".join(f"  - {s}" for s in week["shipped"])
     steps.append(
-        f"STEP 3 - 'What changed'. After this edit that section must contain EXACTLY "
-        f"these {len(week['shipped'])} bullets, verbatim, in this order, and NO others. "
-        f"DELETE every bullet currently in that section that is not in this list. Do "
-        f"not append to the existing bullets and do not keep any of them:\n{shipped}"
+        f"STEP 3 - 'What changed'. DELETE the entire existing bullet list in that "
+        f"section, then write a new list containing only these {len(week['shipped'])} "
+        f"bullets, verbatim, in this order. The section must end with exactly "
+        f"{len(week['shipped'])} bullets - not more:\n{shipped}"
     )
 
     header = "  | Risk | Owner | Area | Severity | Trend |"
@@ -104,9 +106,10 @@ def weekly_instruction(
 
     nxt = "\n".join(f"  - {s}" for s in week["next"])
     steps.append(
-        f"STEP 5 - 'What is next'. After this edit that section must contain EXACTLY "
-        f"these {len(week['next'])} bullets, verbatim, in this order, and NO others. "
-        f"DELETE every bullet currently there that is not in this list:\n{nxt}"
+        f"STEP 5 - 'What is next'. DELETE the entire existing bullet list in that "
+        f"section, then write a new list containing only these {len(week['next'])} "
+        f"bullets, verbatim, in this order. The section must end with exactly "
+        f"{len(week['next'])} bullets - not more:\n{nxt}"
     )
 
     body = "\n\n".join(steps)

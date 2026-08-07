@@ -116,31 +116,40 @@ def plan_rows(before_html: str, prev_week: dict) -> tuple[list[ArchiveRow], Arch
 
 
 def render_instruction_block(rows: list[ArchiveRow], rollup: ArchiveRow | None) -> str:
-    """Enumerate the desired archive body as an instruction."""
-    lines = []
-    for i, row in enumerate(rows, 1):
+    """Enumerate the desired archive body as an instruction.
+
+    Deliberately terse. The first version restated every existing row's full
+    text, and by week 6 the archive block alone was most of a 5 KB instruction -
+    at which point the model reliably did the archive and dropped the four steps
+    after it. Naming the rows in order and saying "leave the others exactly as
+    they are" carries the same information in a tenth of the characters, and the
+    ordering is still fully determined.
+    """
+    lines = [
+        "  The rows, top to bottom, must be exactly: "
+        + ", ".join(f"'{r.label}'" for r in rows) + "."
+    ]
+    for row in rows:
         if row is rollup:
-            src = "\n".join(
-                f"        - {c[0]} | {c[1]} | {c[2]} | {c[3]}" for c in row.source_rows
-            )
+            src = ", ".join(f"'{c[0]}'" for c in row.source_rows)
             lines.append(
-                f"  Row {i}: '{row.label}' | '{row.dates}' | "
-                f"<one sentence of at most 25 words summarising ALL of the "
-                f"{len(row.source_rows)} rows listed below together> | "
-                f"<at most 10 words on the risks they carried>\n"
-                f"      The rows being folded into Row {i} are:\n{src}"
+                f"  Row '{row.label}' is NEW and REPLACES the rows {src}. Its Dates "
+                f"cell is '{row.dates}'. Its Shipped cell is one sentence of at most "
+                f"25 words summarising those {len(row.source_rows)} rows together. Its "
+                f"Risks carried cell is at most 10 words. Delete those rows."
             )
         elif row.needs_authoring:
             lines.append(
-                f"  Row {i}: '{row.label}' | '{row.dates}' | "
-                f"<your own summary, at most 20 words, of the bullets currently under "
-                f"'What changed'> | <your own summary, at most 15 words, of the rows "
-                f"currently in the 'What is at risk' table>"
+                f"  Row '{row.label}' is NEW. Its Dates cell is '{row.dates}'. Its "
+                f"Shipped cell is your own summary, at most 20 words, of the bullets "
+                f"currently under 'What changed'. Its Risks carried cell is your own "
+                f"summary, at most 15 words, of the rows currently in the 'What is at "
+                f"risk' table."
             )
-        else:
-            lines.append(
-                f"  Row {i}: '{row.label}' | '{row.dates}' | '{row.shipped}' | '{row.risks}'"
-            )
+    lines.append(
+        "  Every other row keeps its existing cell contents exactly as they are - "
+        "do not rewrite, reword or re-summarise them."
+    )
     return "\n".join(lines)
 
 

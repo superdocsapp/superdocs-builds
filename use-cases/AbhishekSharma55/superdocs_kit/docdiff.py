@@ -25,6 +25,7 @@ import difflib
 import hashlib
 import re
 from dataclasses import dataclass, field
+from html import unescape as _unescape
 from html.parser import HTMLParser
 
 VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -106,7 +107,20 @@ _TAG = re.compile(r"<[^>]+>")
 
 
 def visible_text(html: str) -> str:
-    return _WS.sub(" ", _TAG.sub(" ", html or "")).strip()
+    """Text a reader would see, with entities decoded.
+
+    The unescape is not cosmetic. SuperDocs re-serialises edited text with
+    ``&nbsp;`` between words - so a status line the model got exactly right came
+    back as ``Week&nbsp;6&nbsp;·&nbsp;...`` and every content check that compared
+    it to ``Week 6 · ...`` failed. That was my bug: I was comparing markup to
+    prose. Decoding entities and folding the non-breaking space into an ordinary
+    one compares what the reader actually sees, which is what the check meant
+    all along.
+    """
+    text = _TAG.sub(" ", html or "")
+    if "&" in text:
+        text = _unescape(text)
+    return _WS.sub(" ", text.replace("\xa0", " ")).strip()
 
 
 def residue_map(html: str) -> dict[str, str]:
