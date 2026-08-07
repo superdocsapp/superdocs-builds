@@ -402,15 +402,22 @@ per-call seconds are in the raw data; no argument is built on them.
 Ordered by how likely they are to work first time.
 
 1. **`gdd ask narrative "give Vex a reason to lie in Act I" --only "Act I"`** —
-   one operation, ~30 s, and it prints a PASS/FAIL from the bytes. Best single
-   demo of the whole idea.
-2. **`digest diff --week 30`** — free, instant, shows week-over-week change with
-   only the intended sections moving.
+   one operation, and it prints a PASS/FAIL derived from the bytes. Best single
+   demo of the whole idea. If he wants to see the gate instead, use
+   `gdd review` — and have the B13 story ready, because it is likely to
+   mis-target something again and that is the point.
+2. **`digest diff --week 14`** — free, instant. Week 14 is a rollup week, so the
+   diff shows the standing sections turning over *and* four old archive rows
+   folding into one, in a single operation. `digest verify` prints the whole
+   drift table in the same breath.
 3. **Add a sub-document**: add an entry to `corpus.LINKS` and a `DOCUMENTS` key.
    Configuration over code — a new sub-document is a dict entry.
 4. **Change the archive policy**: `ARCHIVE_MAX_DETAIL_ROWS` and
-   `ARCHIVE_ROLLUP_SIZE` in `document.py`, then run the offline archive test and
-   watch it re-verify all 52 weeks in milliseconds.
+   `ARCHIVE_ROLLUP_SIZE` in `document.py`, then run
+   `pytest tests/test_transport_and_archive.py -k fifty_two` and watch it
+   re-verify all 52 weeks of growth in milliseconds. This is the best
+   demonstration of *configuration over code* in the repo: a policy change is
+   two numbers, and the proof it still holds is instant and free.
 5. **Break it on purpose**: hand-edit a saved week's HTML to rename a heading,
    then `digest verify`. The invariant fires and names the section.
 
