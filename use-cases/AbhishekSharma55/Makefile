@@ -39,9 +39,10 @@ demo: setup
 	@echo "=== every saved week, re-verified from its own bytes ==="
 	@$(PY) -m weekly_digest.cli verify
 	@echo
-	@echo "=== week 29 -> week 30, only the intended changes ==="
-	@$(PY) -m weekly_digest.cli diff --week 30 2>/dev/null || \
-	 $(PY) -m weekly_digest.cli diff --week 3
+	@echo "=== week 13 -> week 14, only the intended changes ==="
+	@echo "    (14 is a rollup week: the standing sections turn over AND four"
+	@echo "     old archive rows fold into one, inside the same operation)"
+	@$(PY) -m weekly_digest.cli diff --week 14
 	@echo
 	@echo "=== the last graded-scenario result ==="
 	@$(PY) -m gdd_editor.cli verify
@@ -49,11 +50,13 @@ demo: setup
 	@echo "=== what the workspace holds ==="
 	@$(PY) -m gdd_editor.cli sections
 
-# Replays every recorded call from fixtures/. No key, no network, no spend -
-# and it reproduces the live run exactly, repairs included.
+# Replays every recorded call from fixtures/. No key, no network, no spend.
+# --weeks matches the committed live run: asking for a week that was never
+# recorded is a ReplayMiss by design, not a bug, and there is no point making
+# the demo command end in one.
 replay: setup
 	@rm -rf /tmp/superdocs-replay
-	@env -u SUPERDOCS_API_KEY $(PY) -m weekly_digest.cli run --weeks 52 --max-ops 200 \
+	@env -u SUPERDOCS_API_KEY $(PY) -m weekly_digest.cli run --weeks 20 --max-ops 200 \
 	   --out /tmp/superdocs-replay/arm-a
 	@echo "replayed into /tmp/superdocs-replay/arm-a - the committed run was not touched"
 

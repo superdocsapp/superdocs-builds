@@ -223,25 +223,27 @@ class ReplayTransport(Transport):
 def build_transport(
     *, cassette_dir: Path | None = None, live: bool | None = None, on_event: Any = None
 ) -> Transport:
-    """One place that decides live vs replay.
+    """One place that decides live vs replay. **Spending has to be asked for.**
 
-    Default is REPLAY unless a key is present and ``live`` is not False, so
-    an accidental import in a test never spends an operation.
+    ``live`` must be truthy to reach the network. It used to be three-valued -
+    ``None`` meant "decide for me", which meant "look for a key", which meant a
+    command a reader would take for a dry run spent five real operations
+    (bugs.md M2). Both CLIs were fixed by coercing to ``bool``; this closes the
+    same hole for anyone importing the library directly, which is the class
+    rather than the two callers that surfaced it.
     """
     from .secrets import api_key, base_url
 
-    if live is False:
+    if not live:
         return ReplayTransport(cassette_dir or Path("fixtures"))
     key = api_key(required=False)
     if not key:
-        if live:
-            from .errors import AuthError
+        from .errors import AuthError
 
-            raise AuthError(
-                "live=True was requested but SUPERDOCS_API_KEY is empty.",
-                "Put a key in .env, or drop live=True to replay fixtures.",
-            )
-        return ReplayTransport(cassette_dir or Path("fixtures"))
+        raise AuthError(
+            "live=True was requested but SUPERDOCS_API_KEY is empty.",
+            "Put a key in .env, or drop live=True to replay fixtures.",
+        )
     http = HttpTransport(api_key=key, base_url=base_url(), on_event=on_event)
     if cassette_dir and os.environ.get("SUPERDOCS_RECORD", "1") != "0":
         return RecordingTransport(http, cassette_dir)
