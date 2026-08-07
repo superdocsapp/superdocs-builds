@@ -169,6 +169,41 @@
         "'What changed' bullets are verbatim",
         "'What is next' bullets are verbatim"
       ]
+    },
+    {
+      "week": 7,
+      "ops": 2,
+      "seconds": 276.53,
+      "api_changed_chunks": [
+        "06b3efb8-2d1d-4c3c-9125-5e30412866b7",
+        "5973bd27-8e4c-4a5f-bb98-183190daa4f9",
+        "886d1670-c09e-415f-ae40-8a3442113b69",
+        "8c5c5db5-7c2e-49f8-8750-c667bec3682e",
+        "aaedaa9a-8914-4693-ba76-4aa20a8aa237"
+      ],
+      "measured_changed_chunks": [],
+      "unintended_chunks": [],
+      "byte_identical_chunks": 11,
+      "doc_bytes": 6366,
+      "doc_sha": "182fdc291e91aa26",
+      "invariants_ok": false,
+      "invariant_failures": [
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "archive covers every past week exactly once",
+        "archive stays bounded (growth policy)"
+      ],
+      "api_summary": "5 sections edited, rest untouched \u2014 merged with a concurrent edit from another session",
+      "attempts": 2,
+      "repaired": false,
+      "rolled_back": true,
+      "first_attempt_failures": [
+        "'What changed' bullets are verbatim",
+        "'What is next' bullets are verbatim",
+        "risk table rows match the week exactly",
+        "archive covers every past week exactly once"
+      ]
     }
   ]
 }

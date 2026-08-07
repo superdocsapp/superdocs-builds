@@ -161,3 +161,45 @@ def expected_archive_rows(week: int) -> tuple[int, int]:
         detail -= ARCHIVE_ROLLUP_SIZE
         rolled += 1
     return (detail, rolled)
+
+
+# ---------------------------------------------------------------------------
+# Exact replacement HTML for the factual sections.
+#
+# WHY THIS EXISTS, because it is the decision most worth defending.
+#
+# The weekly instruction originally DESCRIBED what the standing sections should
+# contain: "replace all bullets with exactly these four". Measured over the
+# first seven weeks, that was read as *append* often enough to matter - week 7
+# came back with the five old bullets kept and the four new ones added, nine
+# where four were asked for. Rewording it three times ("delete the list, then
+# write a new one", "the section must end with exactly four bullets - not
+# more") reduced the rate and did not remove it.
+#
+# So the factual sections are now handed over as literal HTML. The model is not
+# asked to author, re-type or reason about a fact; it is asked to splice a known
+# fragment into the right place in a formatted document, which is exactly what a
+# document editor is for.
+#
+# This is the build's thesis at its purest - FACTS ARE TRANSPORTED, PROSE IS
+# GENERATED - and it is a narrowing of the model's job, done on evidence. The
+# model still writes every archive summary and every quarterly rollup from what
+# the document says, which is the part that genuinely needs a model. And because
+# the alternating row shading is generated here rather than hoped for, formatting
+# preservation stops depending on the model noticing.
+
+
+def bullets_html(items: list[str]) -> str:
+    return "<ul>" + "".join(f"<li>{_esc(i)}</li>" for i in items) + "</ul>"
+
+
+def risk_rows_html(risks: list[dict]) -> str:
+    """The table BODY rows only, with the seed's alternating shading preserved."""
+    return "".join(
+        f'<tr><td style="{_td(i)}">{_esc(r["risk"])}</td>'
+        f'<td style="{_td(i)}">{_esc(r["owner"])}</td>'
+        f'<td style="{_td(i)}">{_esc(r["area"])}</td>'
+        f'<td style="{_td(i)}">{_esc(r["severity"])}</td>'
+        f'<td style="{_td(i)}">{_esc(r["trend"])}</td></tr>'
+        for i, r in enumerate(risks)
+    )

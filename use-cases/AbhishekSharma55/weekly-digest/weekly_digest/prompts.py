@@ -12,10 +12,17 @@ The split that matters, and the one to defend out loud:
     FACTS ARE TRANSPORTED. PROSE IS GENERATED.
 
 Everything the digest asserts about the week - what shipped, which risks are
-open, what is next - is passed through verbatim from the week's input record.
-The model is never asked to recall, infer or paraphrase a fact, because a
-paraphrased fact is a fabricated fact and this document is read by people
-making schedule decisions.
+open, what is next - is handed over as **literal HTML** built from the week's
+input record. The model is never asked to recall, infer, paraphrase or re-type
+a fact, because a paraphrased fact is a fabricated fact and this document is
+read by people making schedule decisions.
+
+That is stricter than it started. The first version *described* the target
+("replace all bullets with exactly these four") and, measured over seven weeks,
+was read as *append* often enough to matter - week 7 came back holding the five
+old bullets plus the four new ones. Three rewordings reduced the rate without
+removing it, so the factual sections became literal fragments. The full
+reasoning is in document.py above bullets_html().
 
 What IS delegated to the model is the genuinely generative part: reading the
 sections the document currently holds and compressing them into one archive
@@ -27,7 +34,7 @@ they are exactly what a word processor cannot do.
 from __future__ import annotations
 
 from .archive import plan_rows, render_instruction_block
-from .document import ArchivePlan
+from .document import ArchivePlan, bullets_html, risk_rows_html
 
 PRESERVE = (
     "REPLACEMENT MEANS REPLACEMENT: where this instruction lists what a section "
@@ -76,40 +83,28 @@ def weekly_instruction(
             f"are for you to write.\n{block}"
         )
 
-    shipped = "\n".join(f"  - {s}" for s in week["shipped"])
     steps.append(
-        f"STEP 3 - 'What changed'. DELETE the entire existing bullet list in that "
-        f"section, then write a new list containing only these {len(week['shipped'])} "
-        f"bullets, verbatim, in this order. The section must end with exactly "
-        f"{len(week['shipped'])} bullets - not more:\n{shipped}"
+        f"STEP 3 - 'What changed'. Replace the ENTIRE <ul> element in that section "
+        f"with exactly this HTML, character for character:\n"
+        f"{bullets_html(week['shipped'])}"
     )
 
-    header = "  | Risk | Owner | Area | Severity | Trend |"
-    rows = "\n".join(
-        f"  | {r['risk']} | {r['owner']} | {r['area']} | {r['severity']} | {r['trend']} |"
-        for r in week["risks"]
-    )
     closed = (
-        f" Risks closed this week and therefore absent from the list above: "
-        f"{'; '.join(week['risks_closed'])}."
+        f"\n(Context only, do not put this in the document: risks closed this week "
+        f"and therefore absent from the rows above: {'; '.join(week['risks_closed'])}.)"
         if week.get("risks_closed") else ""
     )
     steps.append(
-        f"STEP 4 - 'What is at risk' table. After this edit the table's data rows "
-        f"must be EXACTLY these {len(week['risks'])} rows, in this order, and no "
-        f"others. Delete any row not listed. Each cell holds ONE value: overwrite "
-        f"the old value, never write the old and new value together (never write "
-        f"'Medium / Low' or 'steady / worsening'). Keep the header row and the "
-        f"table styling untouched.\n"
-        f"{header}\n{rows}\n{closed}"
+        f"STEP 4 - 'What is at risk' table. Replace the ENTIRE contents of that "
+        f"table's <tbody> with exactly these {len(week['risks'])} rows, character "
+        f"for character. Keep the <thead> header row exactly as it is:\n"
+        f"{risk_rows_html(week['risks'])}{closed}"
     )
 
-    nxt = "\n".join(f"  - {s}" for s in week["next"])
     steps.append(
-        f"STEP 5 - 'What is next'. DELETE the entire existing bullet list in that "
-        f"section, then write a new list containing only these {len(week['next'])} "
-        f"bullets, verbatim, in this order. The section must end with exactly "
-        f"{len(week['next'])} bullets - not more:\n{nxt}"
+        f"STEP 5 - 'What is next'. Replace the ENTIRE <ul> element in that section "
+        f"with exactly this HTML, character for character:\n"
+        f"{bullets_html(week['next'])}"
     )
 
     body = "\n\n".join(steps)
