@@ -318,9 +318,24 @@ Worse, in one of those turns the model *created a second table* with invented
 column headers (`Date Range`, `Completed`, `Issues/Notes` instead of `Dates`,
 `Shipped`, `Risks carried`) and left the original table in place below it.
 
-**Repro:** `repro/B9-instruction.txt` against `repro/B9-before.html`, sent as
-`POST /v1/chat` with `response_mode: full` and no `model_tier`.
-Compare `repro/B9-after-core-PARTIAL.html` with `repro/B9-after-pro-OK.html`.
+**Repro.** Input document: `repro/B9-before.html`. Instruction: the five-step
+weekly instruction, regenerable exactly with
+
+```python
+from weekly_digest.prompts import weekly_instruction
+from weekly_digest.document import archive_plan
+weekly_instruction(weeks[2], archive_plan(3), weeks[1], before_html=open("repro/B9-before.html").read())
+```
+
+Send it as `POST /v1/chat` with `response_mode: "full"` and no `model_tier`, then
+again with `model_tier: "pro"`, `thinking_depth: "deep"`. Outputs from both are
+committed: `repro/B9-after-core-PARTIAL.html` (3 of 4 bullets, later steps
+dropped) and `repro/B9-after-pro-OK.html` (all steps applied).
+
+*Note for honesty: `weekly_instruction` has since been changed - the factual
+sections are now handed over as literal HTML rather than described in prose
+(see bugs.md B11). The partial-application behaviour above was observed with the
+prose form, which is the form most integrators will write first.*
 
 **The isolating variable is the tier.** The *identical* instruction against the
 *identical* input document with `model_tier: "pro"`, `thinking_depth: "deep"`
