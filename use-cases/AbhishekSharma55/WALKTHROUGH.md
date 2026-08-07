@@ -13,13 +13,20 @@ Read it once end to end. Then re-read **§6 (the eight questions)** and
 
 Two builds on the SuperDocs REST API, in one folder, on one shared client layer.
 
-**Build 1 — weekly digest.** One document, fifty-two weeks, *edited* every week
-and never regenerated. One billable operation per week. Thirteen invariants
+**Build 1 — weekly digest.** One standing document, revised in place week after
+week instead of regenerated. One billable operation per week. Thirteen invariants
 re-derived from the document's own bytes after every week catch drift; a failed
-week is repaired with a second operation or rolled back so the document is never
-left corrupt. A control arm regenerates the same digest from the same inputs so
-the cost claim has a number behind it, with the method committed before the
-result.
+week is repaired by *decomposing* the instruction into two simpler turns, or
+rolled back, so the document is never left corrupt. A control arm regenerates the
+same digest from the same inputs so the cost claim has a number behind it, with
+the method committed before the result.
+
+The live run is **bounded at 20 weeks and resumable** — far enough that the
+archive rollup fires three times and past the point where drift appeared in every
+run. The 52-week archive property is proved offline in a millisecond test rather
+than an hour of API calls. The reasoning, and what the cut costs, is in
+`weekly-digest/METHOD.md`. **Say this before he asks**: it is a defended cut, not
+an unfinished run.
 
 **Build 2 — GDD editor.** A game design document plus linked sub-documents
 (mechanics, narrative, art bible), edited by chat, with image support. The

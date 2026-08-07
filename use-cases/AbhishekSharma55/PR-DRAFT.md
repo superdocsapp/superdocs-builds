@@ -25,8 +25,8 @@ use-cases/AbhishekSharma55: a weekly digest that is edited not regenerated, and 
 Two projects in `use-cases/AbhishekSharma55/`, built on the REST API.
 
 **[`weekly-digest/`](use-cases/AbhishekSharma55/weekly-digest/)** — one standing
-document revised in place every week for a year instead of a fresh file each
-week, so the reader always opens the same familiar document. Each week is a
+document revised in place week after week instead of a fresh file each week, so
+the reader always opens the same familiar document. Each week is a
 single billable operation covering the status line, three standing sections, and
 an archive that folds old weeks into rolled-up rows so it stays navigable (18
 rows at week 52 rather than 51). Thirteen invariants are re-derived from the

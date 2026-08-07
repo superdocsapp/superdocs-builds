@@ -1,4 +1,4 @@
-# Weekly digest — one document, fifty-two weeks, edited and never regenerated
+# Weekly digest — one standing document, edited every week, never regenerated
 
 Every team with a recurring written update has the same problem. Week 1 you
 write a nice document. Week 30 you are copying last week's file, deleting the
