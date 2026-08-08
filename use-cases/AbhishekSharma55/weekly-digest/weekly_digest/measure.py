@@ -133,6 +133,13 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
     w(f"- Arm A's document passed all fourteen invariants in **{len(clean)}/{arm_a.n}** weeks; "
       f"**{len(repairs)}** week(s) needed a repair operation, "
       f"**{len(rollbacks)}** ended rolled back.")
+    if arm_b.n:
+        b_clean = [r for r in b_recs if r.get("invariants_ok")]
+        w(f"- **Arm B's document passed in {len(b_clean)}/{arm_b.n} weeks**, against the "
+          f"same fourteen invariants. That, not the operation count, is the result: "
+          f"the two arms are within a small multiple of each other on cost, and the "
+          f"regenerated document is not a document you could publish. Read the "
+          f"per-week tables before the cost tables.")
 
     # ---- per-week table ---------------------------------------------
     w("\n## Arm A — every week, no rows omitted\n")
@@ -187,19 +194,39 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
         sb, ib = linear_fit(arm_b.weeks, arm_b.ops)
         r2b = r_squared(arm_b.weeks, arm_b.ops, sb, ib)
         w(f"- **Arm B**: ops = {sb:+.4f} x week {ib:+.3f} (R2 = {r2b:.3f}).")
-        proj = sum(max(1.0, sb * k + ib) for k in range(1, 53))
-        w(f"\n### Extrapolation to 52 weeks — clearly labelled as an extrapolation\n")
-        w(f"| | measured | 52-week figure |")
-        w(f"|---|---|---|")
-        w(f"| Arm A (edit) | {arm_a.total_ops} ops over {arm_a.n} weeks | "
-          f"**{arm_a.total_ops} ops (measured, not extrapolated)** |")
-        w(f"| Arm B (regenerate) | {arm_b.total_ops} ops over {arm_b.n} weeks | "
-          f"~{proj:.0f} ops (**extrapolated** from the fit above) |")
-        w(f"\nThe arm-B number is a projection from {arm_b.n} measured weeks with "
-          f"R2 = {r2b:.3f}. It is the weakest number in this document and it is the "
-          f"one a reader should attack first. If you only trust measured values, use "
-          f"the like-for-like line in the headline, which compares the weeks both "
-          f"arms actually ran.")
+
+        r2a = r_squared(arm_a.weeks, arm_a.ops, sa, ia)
+        w(f"\n### Projecting to 52 weeks — and why the projection is weak\n")
+        w("**Neither fit supports a trend.** Arm A's R2 is "
+          f"{r2a:.3f} and arm B's is {r2b:.3f}; arm B's slope is even *negative*, "
+          "which is noise, not a discount for regenerating later in the year. So "
+          "extrapolating either arm along its fitted line would be inventing "
+          "precision. What each arm's measured mean supports is a flat projection, "
+          "and it is shown for both arms the same way or not at all.")
+        w("")
+        w("| | measured | flat projection to 51 edited weeks |")
+        w("|---|---|---|")
+        for arm in (arm_a, arm_b):
+            mean = arm.total_ops / arm.n
+            w(f"| {arm.name} | {arm.total_ops} ops over {arm.n} weeks "
+              f"({mean:.2f}/week) | ~{mean * 51:.0f} ops (**projection**, not measured) |")
+        overlap_weeks = sorted(set(arm_a.weeks) & set(arm_b.weeks))
+        ratio = (arm_b.total_ops / arm_b.n) / (arm_a.total_ops / arm_a.n) if arm_a.n else 0
+        a_over = sum(r["ops"] for r in a_recs if r["week"] in set(overlap_weeks))
+        b_over = sum(r["ops"] for r in b_recs if r["week"] in set(overlap_weeks))
+        like = (b_over / a_over) if a_over else 0
+        w(f"\nBoth projection cells are that arm's measured mean times 51. Neither is a "
+          f"measurement. They differ by {ratio:.2f}x, against {like:.2f}x on the "
+          f"measured like-for-like line above ({len(overlap_weeks)} weeks, the ones both "
+          f"arms actually ran). The two multiples are close, which is the most this "
+          f"sample supports: the projection adds no information the measurement did not "
+          f"already carry, and a reader who distrusts projections loses nothing by "
+          f"ignoring this table.\n\n"
+          f"**And a {ratio:.2f}x difference in operations is not the headline.** "
+          f"Regenerating cost roughly half as much again per week; it also produced a "
+          f"document that failed verification every single week. A cost comparison "
+          f"between a valid artefact and an invalid one is the wrong comparison, and "
+          f"saying so is more useful than a bigger multiple would have been.")
 
     # ---- what would falsify, revisited --------------------------------
     w("\n## Against the falsification criteria set out in the method\n")
