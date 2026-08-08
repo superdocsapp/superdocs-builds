@@ -13,17 +13,17 @@
     "mean_doc_bytes": 8474
   },
   "arm_b": {
-    "n": 8,
-    "total_ops": 15,
-    "mean_ops": 1.875,
+    "n": 18,
+    "total_ops": 35,
+    "mean_ops": 1.944,
     "median_ops": 2.0,
     "min_ops": 1,
     "max_ops": 2,
-    "stdev_ops": 0.331,
-    "mean_seconds": 122.1,
-    "median_seconds": 75.2,
+    "stdev_ops": 0.229,
+    "mean_seconds": 138.4,
+    "median_seconds": 94.6,
     "max_seconds": 478.6,
-    "mean_doc_bytes": 4547
+    "mean_doc_bytes": 7070
   },
   "arm_a_weeks": [
     2,
@@ -73,7 +73,17 @@
     5,
     6,
     7,
-    8
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
   ],
   "arm_b_ops": [
     2,
@@ -83,6 +93,16 @@
     2,
     2,
     1,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
     2
   ]
 }

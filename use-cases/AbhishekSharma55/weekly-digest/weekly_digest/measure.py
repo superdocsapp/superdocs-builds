@@ -197,12 +197,16 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
 
         r2a = r_squared(arm_a.weeks, arm_a.ops, sa, ia)
         w(f"\n### Projecting to 52 weeks — and why the projection is weak\n")
-        w("**Neither fit supports a trend.** Arm A's R2 is "
-          f"{r2a:.3f} and arm B's is {r2b:.3f}; arm B's slope is even *negative*, "
-          "which is noise, not a discount for regenerating later in the year. So "
-          "extrapolating either arm along its fitted line would be inventing "
-          "precision. What each arm's measured mean supports is a flat projection, "
-          "and it is shown for both arms the same way or not at all.")
+        weak = [f"arm A R2 {r2a:.3f}", f"arm B R2 {r2b:.3f}"]
+        signs = ", ".join(
+            f"{name} slope {slope:+.4f}"
+            for name, slope in (("arm A", sa), ("arm B", sb))
+        )
+        w(f"**Neither fit supports a trend** ({', '.join(weak)}). {signs} — both "
+          "close enough to zero, at these R2 values, to be noise rather than a "
+          "direction. So extrapolating either arm along its fitted line would be "
+          "inventing precision. What each arm's measured mean supports is a flat "
+          "projection, and it is shown for both arms the same way or not at all.")
         w("")
         w("| | measured | flat projection to 51 edited weeks |")
         w("|---|---|---|")
@@ -239,9 +243,18 @@ def write_report(out_dir: Path, weeks: list[dict]) -> Path:
       + ("Not falsified." if repair_rate < 0.25 else
          "**Partly falsified — repairs are common enough to matter; the per-week "
          "figure above already includes them.**"))
-    w(f"3. *The cheaper arm produced a worse document.* "
-      f"{len(clean)}/{arm_a.n} weeks passed all fourteen invariants; see "
-      f"`out/arm-a-edit/drift-report.md` for the week-by-week evidence.")
+    b_clean_n = len([r for r in b_recs if r.get("invariants_ok")]) if b_recs else 0
+    w(f"3. *The cheaper arm is cheaper because it produced a worse artefact.* "
+      f"Arm A: **{len(clean)}/{arm_a.n}** weeks valid. Arm B: "
+      f"**{b_clean_n}/{arm_b.n}** weeks valid. "
+      + ("**Not falsified — and it landed the other way up.** The cheaper arm is "
+         "the valid one and the dearer arm is the invalid one, so the cost "
+         "comparison understates the difference rather than flattering it. "
+         if arm_b.n and b_clean_n < len(clean) else
+         "The two arms are comparable on validity, so the cost comparison stands "
+         "on its own. ")
+      + "See `out/arm-a-edit/drift-report.md` for arm A week by week, and the "
+        "arm-B table above for the control.")
 
     path = HERE / "MEASUREMENT.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
