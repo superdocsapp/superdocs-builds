@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Payer Appeals — draft, review, export</title>
+<style>
+  :root {
+    --ink: #17202a; --muted: #5b6b7c; --line: #dfe6ee; --bg: #f6f8fa;
+    --ok: #0b7a3e; --warn: #a35b00; --bad: #b3261e; --accent: #1e4fa3;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+
+  .banner {
+    background: #fff4e5; border: 1px solid #ffd8a8; color: #8a4b00;
+    padding: 10px 14px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;
+  }
+  .card {
+    background: #fff; border: 1px solid var(--line); border-radius: 10px;
+    padding: 18px; margin-bottom: 16px;
+  }
+  label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 14px; }
+  .hint { font-weight: 400; color: var(--muted); font-size: 13px; }
+  textarea, input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px;
+    font: inherit; background: #fff; color: var(--ink);
+  }
+  textarea { min-height: 76px; resize: vertical; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  button {
+    font: inherit; font-weight: 600; padding: 10px 16px; border-radius: 8px;
+    border: 1px solid transparent; cursor: pointer;
+  }
+  .primary { background: var(--accent); color: #fff; }
+  .primary:disabled { background: #9fb4d6; cursor: not-allowed; }
+  .ghost { background: #fff; border-color: var(--line); }
+  .approve { background: #e7f5ec; border-color: #b7dfc6; color: var(--ok); }
+  .reject  { background: #fdecea; border-color: #f5c6c2; color: var(--bad); }
+  .chosen  { outline: 2px solid currentColor; }
+
+  .verdict { padding: 12px 14px; border-radius: 8px; margin: 14px 0; font-size: 14px; }
+  .v-ok   { background: #e7f5ec; border: 1px solid #b7dfc6; color: #0b5c31; }
+  .v-warn { background: #fff4e5; border: 1px solid #ffd8a8; color: #8a4b00; }
+  .v-bad  { background: #fdecea; border: 1px solid #f5c6c2; color: #8c1d18; }
+
+  .change { border: 1px solid var(--line); border-radius: 8px; margin: 12px 0; overflow: hidden; }
+  .change header {
+    background: #f2f5f8; padding: 8px 12px; font-size: 13px; color: var(--muted);
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  }
+  .diff { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .diff > div { padding: 12px; font-size: 14px; overflow-x: auto; }
+  .before { background: #fdf3f2; border-right: 1px solid var(--line); }
+  .after  { background: #f2fbf5; }
+  .diff h4 { margin: 0 0 6px; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .why { padding: 10px 12px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); }
+  .actions { padding: 10px 12px; display: flex; gap: 8px; border-top: 1px solid var(--line); }
+  .status { color: var(--muted); font-size: 14px; margin: 10px 0; }
+  .err { color: var(--bad); }
+  code { background: #eef2f6; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  @media (max-width: 640px) { .diff { grid-template-columns: 1fr; } .before { border-right: 0; border-bottom: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Payer appeals</h1>
+  <p class="sub">One denial reason, one clinical fact, one reviewed letter.</p>
+
+  <div class="banner">
+    <strong>Everything here is fictional.</strong> This is a demo built on the SuperDocs API.
+    Do not enter real patient information, real member IDs, or anything covered by HIPAA.
+  </div>
+
+  <div class="card">
+    <label for="denial">Denial reason <span class="hint">— as the payer stated it</span></label>
+    <textarea id="denial" placeholder="CARC 197 — prior authorization/precertification absent. Our records indicate no prior authorization was obtained before the date of service."></textarea>
+
+    <label for="fact">Clinical fact <span class="hint">— the single fact offered in rebuttal</span></label>
+    <textarea id="fact" placeholder="Prior authorization PA-2026-8823 was obtained on 2026-02-19 and was valid on the date of service."></textarea>
+
+    <details style="margin-top:14px">
+      <summary class="hint" style="cursor:pointer">Claim details (all fictional, prefilled)</summary>
+      <div class="row" style="margin-top:10px">
+        <div><label for="patient">Patient</label><input id="patient" value="Dolores Ashby" /></div>
+        <div><label for="member">Member ID</label><input id="member" value="MHP-4471902" /></div>
+        <div><label for="claim">Claim</label><input id="claim" value="CLM-2026-0417" /></div>
+        <div><label for="payer">Payer</label><input id="payer" value="Meridian Health Plan" /></div>
+      </div>
+    </details>
+
+    <p style="margin:18px 0 0">
+      <button id="draft" class="primary">Draft the appeal</button>
+      <span id="status" class="status"></span>
+    </p>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => (s || "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+let draftId = null;
+const decisions = new Map();
+
+function setStatus(text, isError) {
+  $("status").textContent = text;
+  $("status").className = "status" + (isError ? " err" : "");
+}
+
+$("draft").onclick = async () => {
+  const denial = $("denial").value.trim();
+  const fact = $("fact").value.trim();
+  if (!denial || !fact) { setStatus("Both fields are required.", true); return; }
+
+  $("draft").disabled = true;
+  setStatus("Drafting… large edits can take a minute or two.");
+  $("result").innerHTML = "";
+  decisions.clear();
+
+  try {
+    const res = await fetch("/api/drafts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        denial_reason: denial, clinical_fact: fact,
+        patient_name: $("patient").value, member_id: $("member").value,
+        claim_id: $("claim").value, payer_name: $("payer").value,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+    draftId = data.draft_id;
+    render(data);
+    setStatus("");
+  } catch (e) {
+    setStatus(e.message, true);
+  } finally {
+    $("draft").disabled = false;
+  }
+};
+
+function render(data) {
+  const v = data.relevance;
+  const cls = v.verdict === "addresses" ? "v-ok" : v.verdict === "partial" ? "v-warn" : "v-bad";
+  let html = `<div class="card">
+    <h3 style="margin-top:0">Before you read the letter</h3>
+    <div class="verdict ${cls}"><strong>Relevance:</strong> ${esc(v.reason)}</div>`;
+
+  if (data.unsupported_specifics && data.unsupported_specifics.length) {
+    html += `<div class="verdict v-bad"><strong>Specifics not present in your inputs:</strong>
+      ${data.unsupported_specifics.map((s) => `<code>${esc(s)}</code>`).join(" ")}
+      <br/>These appear in the drafted letter but in nothing you supplied. Verify each one
+      before sending — a payer will.</div>`;
+  }
+  html += `</div>`;
+
+  if (!data.changes.length) {
+    html += `<div class="card"><p>No changes were proposed.</p></div>`;
+  } else {
+    html += `<div class="card"><h3 style="margin-top:0">
+      ${data.changes.length} proposed change${data.changes.length === 1 ? "" : "s"} — decide on each</h3>
+      <p class="hint">Nothing is applied until you decide. Rejecting one leaves the rest untouched.</p>`;
+    for (const c of data.changes) {
+      html += `<div class="change" id="c-${c.change_id}">
+        <header><span>${esc(c.operation)}</span><span>${esc(c.change_id.slice(0, 8))}</span></header>
+        <div class="diff">
+          <div class="before"><h4>Before</h4>${c.old_html || "<em>(new section)</em>"}</div>
+          <div class="after"><h4>After</h4>${c.new_html || "<em>(removed)</em>"}</div>
+        </div>
+        ${c.explanation ? `<div class="why">${esc(c.explanation)}</div>` : ""}
+        <div class="actions">
+          <button class="approve" onclick="decide('${c.change_id}', true)">Approve</button>
+          <button class="reject" onclick="decide('${c.change_id}', false)">Reject</button>
+        </div>
+      </div>`;
+    }
+    html += `<p style="margin-top:16px">
+      <button id="submit" class="primary" disabled>Apply decisions</button>
+      <span id="dstatus" class="status"></span></p></div>`;
+  }
+  $("result").innerHTML = html;
+  window.total = data.changes.length;
+  if ($("submit")) $("submit").onclick = submitDecisions;
+}
+
+window.decide = (id, approved) => {
+  decisions.set(id, approved);
+  const card = document.getElementById("c-" + id);
+  card.querySelectorAll("button").forEach((b) => b.classList.remove("chosen"));
+  card.querySelector(approved ? ".approve" : ".reject").classList.add("chosen");
+  const btn = $("submit");
+  btn.disabled = decisions.size !== window.total;
+  btn.textContent = decisions.size === window.total
+    ? `Apply ${decisions.size} decision${decisions.size === 1 ? "" : "s"}`
+    : `Decide on all ${window.total} (${decisions.size} done)`;
+};
+
+async function submitDecisions() {
+  $("submit").disabled = true;
+  $("dstatus").textContent = "Applying…";
+  try {
+    const res = await fetch(`/api/drafts/${draftId}/decide`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        decisions: [...decisions].map(([change_id, approved]) => ({ change_id, approved })),
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || JSON.stringify(data));
+
+    if (data.further_review_required) {
+      // A large edit arrives in several rounds. Saying "done" here would let a reviewer
+      // believe they had seen the whole letter when they had seen part of it.
+      $("dstatus").textContent = "";
+      decisions.clear();
+      render({ relevance: { verdict: "partial", reason:
+        `Round complete — ${data.approved} approved, ${data.rejected} rejected. ` +
+        `More changes were proposed and still need your decision.` },
+        unsupported_specifics: [], changes: data.changes });
+      return;
+    }
+
+    $("result").insertAdjacentHTML("beforeend", `<div class="card">
+      <h3 style="margin-top:0">Reviewed</h3>
+      <p>${data.approved} approved, ${data.rejected} rejected. Only approved changes were applied.</p>
+      <p><a href="/api/drafts/${draftId}/export?fmt=docx"><button class="primary">Download .docx</button></a>
+         <a href="/api/drafts/${draftId}/export?fmt=pdf"><button class="ghost">PDF</button></a></p>
+    </div>`);
+    $("dstatus").textContent = "";
+  } catch (e) {
+    $("dstatus").textContent = e.message;
+    $("dstatus").className = "status err";
+    $("submit").disabled = false;
+  }
+}
+</script>
+</body>
+</html>
