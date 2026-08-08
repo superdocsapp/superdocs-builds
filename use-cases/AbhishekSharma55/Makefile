@@ -52,13 +52,26 @@ demo: setup
 	@$(PY) -m gdd_editor.cli sections
 
 # Replays every recorded call from fixtures/. No key, no network, no spend.
-# --weeks matches the committed live run: asking for a week that was never
-# recorded is a ReplayMiss by design, not a bug, and there is no point making
-# the demo command end in one.
+#
+# --weeks is COUNTED from the committed artefacts rather than typed. Asking for
+# a week that was never recorded is a ReplayMiss by design - correct behaviour,
+# but a demo command should not end in one, and a hardcoded number here goes
+# stale the first time the run is extended.
 replay: setup
 	@rm -rf /tmp/superdocs-replay
-	@env -u SUPERDOCS_API_KEY $(PY) -m weekly_digest.cli run --weeks 20 --max-ops 200 \
-	   --out /tmp/superdocs-replay/arm-a
+	@env -u SUPERDOCS_API_KEY $(PY) -m weekly_digest.cli run \
+	   --weeks $$(ls weekly-digest/out/arm-a-edit/html/week-*.html | wc -l | tr -d ' ') \
+	   --max-ops 200 --out /tmp/superdocs-replay/arm-a
+	@echo
+	@echo "=== byte-comparing the replay against the committed live run ==="
+	@same=0; differ=0; \
+	 for f in weekly-digest/out/arm-a-edit/html/week-*.html; do \
+	   if cmp -s "$$f" "/tmp/superdocs-replay/arm-a/html/$$(basename $$f)"; \
+	     then same=$$((same+1)); \
+	     else differ=$$((differ+1)); echo "  DIFFERS: $$(basename $$f)"; fi; \
+	 done; \
+	 echo "  $$same week(s) byte-identical, $$differ differing"; \
+	 test $$differ -eq 0 || exit 1
 	@echo "replayed into /tmp/superdocs-replay/arm-a - the committed run was not touched"
 
 # --- these spend operations -------------------------------------------------

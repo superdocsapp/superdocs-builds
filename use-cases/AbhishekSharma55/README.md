@@ -32,13 +32,20 @@ made was recorded to `fixtures/` with the key redacted, so the run driver
 executes end to end on a machine with no key and no network — every week that
 was actually run, repairs included.
 
-**What that does and does not prove, stated precisely.** It proves the code path
-runs offline and that every recorded response is committed. It does *not* prove
-a byte-identical re-run: the instruction for week N is built from week N-1's
-document, so the moment a replay diverges it asks for a request that was never
-recorded and stops with a `ReplayMiss` naming the missing call. That is the
-honest behaviour — a replay that silently substituted a near-miss would be worse
-than one that stops.
+**What that proves, and how the command proves it rather than asserting it.**
+`make replay` re-runs the driver from the fixtures and then **byte-compares every
+replayed week against the committed live run**, failing if any week differs. On
+the committed run it reports `19 week(s) byte-identical, 0 differing`. The number
+of weeks is counted from the artefacts on disk, not typed into the Makefile, so
+it cannot go stale.
+
+It is a real reproduction rather than a recording being played back at you: the
+instruction for week N is built from week N-1's document, so a divergence
+anywhere would ask for a request that was never recorded and stop with a
+`ReplayMiss` naming the missing call. Stopping loudly is the right failure — a
+replay that silently substituted a near-miss would be worse than one that stops
+— and the byte-comparison is there so that "it ran" can never be mistaken for
+"it reproduced".
 
 Then, with a key in `.env` (see [`.env.example`](.env.example) — an agent can
 sign itself up in one `curl`):
