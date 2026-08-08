@@ -373,6 +373,15 @@ never contains a key. And 52 weeks of archive growth simulated offline. The
 record/replay transport means anyone can run the suite on a fresh clone with no
 key in 0.04 s — `make setup && make test`.
 
+**And three of them are regressions for bugs of mine, which is the better
+answer to this question.** A mangled archive label must fail the week instead of
+being ignored (M5). Content added *inside* a named section must pass while the
+same content under a duplicate heading of that name must fail (M6/B15) — both
+sides asserted, because a check that only fails is as useless as one that only
+passes. And the archive instruction must contain the outgoing week's bullets and
+must *not* contain the incoming week's (M7). Each of those tests exists because
+the thing it tests went wrong on the live API first.
+
 **8. "What would you build next on SuperDocs, if you joined?"**
 
 Three, in order. First, **structural validation on chunk replacement** — a
