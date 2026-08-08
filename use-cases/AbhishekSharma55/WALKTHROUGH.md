@@ -406,11 +406,12 @@ invariants. Honest answer: checking it needs a second model call and a rubric,
 and I would rather ship a verified structure with an unverified sentence than
 claim both.
 
-**Arm B is a bounded sample.** The agent account has 500 operations a month, so
-the control arm runs a prefix of weeks and any 52-week figure for it is an
-extrapolation — labelled as one everywhere. If he only trusts measured values,
-point him at the like-for-like line, which compares only the weeks both arms
-actually ran.
+**Both arms are bounded at 18 weeks, not 52** — identically, because a control
+that stops earlier than the treatment is not a control. Any 52-week number for
+either arm is a projection and is labelled as one. If he only trusts measured
+values, point him at the like-for-like line: 17 overlapping weeks, arm A 21
+operations, arm B 33. What 18 weeks cannot rule out is a degradation that first
+appears at week 40; say that before he does.
 
 **The archive summaries are the softest part of the measurement, and they were
 wrong once.** For seven weeks the row for week N-1 sometimes described week N,

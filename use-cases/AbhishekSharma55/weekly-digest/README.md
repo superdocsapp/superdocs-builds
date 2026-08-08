@@ -53,14 +53,18 @@ make test                # 64 tests, no key, no network, 0.04s
 
 **`make replay` runs the whole driver with no key and no network**, from the
 calls recorded in `fixtures/` (key redacted). It writes to `--out /tmp/...` so it
-can never overwrite the committed artefacts of the live run.
+can never overwrite the committed artefacts of the live run — and then it
+**byte-compares every replayed week against those artefacts and fails if any week
+differs.** On the committed run: `19 week(s) byte-identical, 0 differing`, and
+the same 22 operations. The week count is derived from the files on disk, so it
+cannot go stale.
 
-Precisely what it proves: the code path runs offline and every response is
-committed. It does not prove a byte-identical re-run — week N's instruction is
-built from week N-1's document, so a divergence asks for a call that was never
-recorded and the replay stops with a `ReplayMiss` naming it. Stopping loudly is
-the right failure: a replay that quietly served a near-miss would be worse than
-no replay.
+It is a real reproduction rather than a tape being played at you: week N's
+instruction is built from week N-1's document, so a divergence anywhere would ask
+for a call that was never recorded and stop with a `ReplayMiss` naming it.
+Stopping loudly is the right failure — a replay that quietly served a near-miss
+would be worse than no replay — and the byte-comparison exists so that "it ran"
+can never be mistaken for "it reproduced".
 
 `digest run` is safe to re-run: it resumes from `state.json` and the ledger, and
 it stops cleanly on `--max-ops` rather than blowing a budget.
@@ -80,9 +84,9 @@ live weeks. Sixteen weeks cost one operation; two needed the two-turn repair and
 cost three; none was rolled back. The per-week table is in
 [`MEASUREMENT.md`](MEASUREMENT.md) with no rows omitted.
 
-**And the cost is not actually the argument.** The control arm cost 1.88
-operations a week — a real gap, but a modest one — and produced a document that
-failed verification in **every single week it ran**. A cost comparison between a
+**And the cost is not actually the argument.** The control arm cost 1.94
+operations a week over the same 18 weeks — a real gap, but a modest one — and
+produced a document that failed verification in **all 18 of them**. A cost comparison between a
 publishable artefact and an unpublishable one is the wrong comparison, and the
 measurement says so rather than quoting the flattering multiple.
 
@@ -249,9 +253,12 @@ bug.
   rubric.
 - **One digest, one shape.** The sections are configuration (`document.py`), but
   a genuinely different digest — different columns, a chart — would need work.
-- **Arm B is a bounded sample**, extrapolated to 52 weeks and labelled as an
-  extrapolation everywhere it appears. The account has 500 operations a month
-  ([`bugs.md` B7](../bugs.md)) and arm A had to be run in full.
+- **Both arms are bounded at 18 weeks, not 52.** They are bounded identically —
+  a control that stops earlier than the treatment is not a control — and any
+  52-week number for either arm is a projection, labelled as one. What 18 weeks
+  cannot show is a degradation that only appears at week 40. What it does show is
+  three archive rollups, a flat per-week cost, and every week of both arms in a
+  table with no rows omitted.
 - **Latency is not a headline.** One machine, one broadband connection, a few
   hours. The numbers are in the raw data; I do not build an argument on them.
 

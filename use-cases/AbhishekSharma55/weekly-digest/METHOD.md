@@ -111,11 +111,11 @@ bored.** The rule, fixed before the run:
 - **The run is resumable, so this is a stopping point rather than a limit.**
   `make run` continues from `state.json` and the ledger; the remaining weeks cost
   roughly one operation each. Anyone who wants the full 52 can have them.
-- **Arm B runs a bounded prefix** for the same reason. Its per-week cost is
-  measured and any 52-week figure for it is an **extrapolation**, labelled as one
-  everywhere it appears, fitted against week number rather than averaged —
-  because arm B's cost is expected to grow with the archive it must re-emit while
-  arm A's is not, and averaging would hide exactly the effect being measured.
+- **Arm B runs the same number of weeks as arm A.** A control that stops earlier
+  than the treatment is not a control, it is an anecdote with a table. Both arms
+  are bounded by the same rule, and any 52-week figure for *either* arm is a
+  **projection**, labelled as one wherever it appears and computed the same way
+  for both.
 - Both arms stop cleanly on `--max-ops` and resume from their ledgers.
 
 **What this costs the result, stated plainly:** a run of this length cannot show
