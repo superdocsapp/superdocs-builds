@@ -4,7 +4,16 @@
 > Abhishek's call, not the agent's. Nothing here has been pushed.
 >
 > **Before opening it:**
-> 1. `git log -p --all | grep -iE 'sk_[a-z0-9]{8}'` returns nothing (checked; re-check after any new commits).
+> 1. **Secret check — re-run after any new commit.** Three greps, not one:
+>    ```bash
+>    git log -p --all | grep -iE 'sk_[a-z0-9]{8}'          # history
+>    K=$(grep SUPERDOCS_API_KEY .env | cut -d= -f2)
+>    git cat-file --batch-all-objects --batch | grep -c "$K"  # every object: must be 0
+>    git check-ignore .env                                  # must print .env
+>    ```
+>    Last run on this tree: history clean, **0 occurrences in any git object**,
+>    `.env` ignored, no `refs/original`, no stash. The only key-shaped strings in
+>    the tree are the obvious fakes in `tests/` (`sk_deadbeef…`, `sk_cafebabe…`).
 > 2. Push the branch to the fork `AbhishekSharma55/superdocs-builds`.
 > 3. Open the PR against `superdocsapp/superdocs-builds`, `main`.
 > 4. Title and body below. **No email address** — CONTRIBUTING is explicit that
@@ -36,6 +45,14 @@ is never left corrupt, and every repair operation is counted. A control arm
 regenerates the same digest from the same inputs so the cost claim has a number
 behind it — the method, including what would falsify it, is committed in
 `METHOD.md` before the results.
+
+Measured over **18 live weeks per arm**: editing **1.22 operations/week, 18/18
+weeks passing all fourteen invariants**; regenerating **1.94/week, 0/18 passing**.
+The cost gap is real and modest (1.57x like-for-like over the 17 overlapping
+weeks); the validity gap is the actual result, and `MEASUREMENT.md` says so
+rather than quoting the flattering multiple. `make replay` re-runs all 19 saved
+weeks from committed fixtures with no key and no network and byte-compares them
+against the live run — 19 byte-identical, 0 differing.
 
 **[`gdd-editor/`](use-cases/AbhishekSharma55/gdd-editor/)** — a chat-driven
 editor for long game design documents split across linked sub-documents
