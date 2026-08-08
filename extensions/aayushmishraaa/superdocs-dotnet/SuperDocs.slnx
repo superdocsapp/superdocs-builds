@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/SuperDocs.Worker.Sample/SuperDocs.Worker.Sample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/SuperDocs.Client/SuperDocs.Client.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SuperDocs.Client.Tests/SuperDocs.Client.Tests.csproj" />
+  </Folder>
+</Solution>

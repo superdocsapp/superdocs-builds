@@ -1,0 +1,37 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Current LTS and the previous one. .NET 10 is supported to Nov 2028; .NET 8 to
+         Nov 10 2026. Multi-targeting rather than dropping net8.0 because enterprise
+         Microsoft-stack teams — the audience for this SDK — are frequently a release
+         behind, and that is exactly who cannot upgrade on our schedule. -->
+    <TargetFrameworks>net10.0;net8.0</TargetFrameworks>
+
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Analyzer-clean is enforced, not aspired to. Warnings-as-errors is what makes the
+         claim mean something in CI. -->
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsNotAsErrors></WarningsNotAsErrors>
+
+    <!-- Trim/AOT friendliness. Source-generated JSON means no reflection-based
+         serialization, so a trimmed or AOT-published host keeps working. -->
+    <IsTrimmable Condition="'$(TargetFramework)' != 'net8.0'">true</IsTrimmable>
+    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
+    <IsAotCompatible Condition="'$(TargetFramework)' != 'net8.0'">true</IsAotCompatible>
+
+    <!-- Deterministic, reproducible builds. ContinuousIntegrationBuild normalises the
+         paths embedded in the PDB so two builds of the same commit produce identical
+         output. -->
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CA1848;CA1031</NoWarn>
+  </PropertyGroup>
+
+</Project>
