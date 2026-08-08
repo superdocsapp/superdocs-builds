@@ -187,3 +187,36 @@ and they are worth logging because two of them were checks, not code:
 **Assumption going forward:** any number in a README is a claim, and a claim
 needs a command that reproduces it. Where this repo states a number, the command
 that produces it is next to it.
+
+## 2026-08-08 — A12. What the committed artefacts cost, and what is still bounded
+
+The four ledgers in this folder are the complete money record. They add up to
+**64 billable operations**:
+
+| Ledger | ops | what it bought |
+|---|---|---|
+| `weekly-digest/out/arm-a-edit/ledger.jsonl` | 22 | 18 live weeks of the digest, repairs included |
+| `weekly-digest/out/arm-b-regenerate/ledger.jsonl` | 35 | 18 live weeks of the regeneration control |
+| `gdd-editor/out/ledger.jsonl` | 7 | the graded scenario (6) and the human-gated review (1) |
+| `gdd-editor/out/probe-ledger.jsonl` | 0 | the B10 probe — every call it makes is free |
+
+**Assumption, and it is the one that shaped the sample size:** a control arm must
+run the same number of weeks as the treatment, and that is worth more than
+extending the treatment further. Arm B costs more per week than arm A, so
+matching the lengths was the expensive half of the budget — and a control that
+stops earlier than the treatment is not a control.
+
+**Still bounded, stated so nobody has to find it:**
+
+- **18 weeks, not 52.** Both arms. Three archive rollups fire (weeks 10, 14, 18),
+  which is the growth policy in its steady state, but a degradation that first
+  appears at week 40 would not show here. The 52-week archive property is proved
+  offline in a test; the 52-week *cost* is a projection and is labelled as one.
+- **One account, one machine, a few hours.** Latency numbers are recorded and are
+  not used to argue anything.
+- **The archive summaries are checked for attribution, not for truth.**
+  `digest archive-check` proves each row is about the week it names; nothing
+  proves the sentence is a fair précis. That needs a rubric and a second model
+  call, and it is not here.
+- **B13 is intermittent.** Observed once, not reproduced on two later attempts,
+  and the entry says so rather than implying it fires every time.
