@@ -112,6 +112,92 @@ def cmd_verify(args) -> int:
     return 0
 
 
+_ATTRIB_STOP = set(
+    "the a an and or of to in for with on at from is are was were shipped summary "
+    "risks carried remain open completed first pass one this that".split()
+)
+
+
+def _content_words(text: str) -> set[str]:
+    import re
+
+    return {
+        w for w in re.findall(r"[a-z0-9]+", (text or "").lower())
+        if w not in _ATTRIB_STOP and len(w) > 3
+    }
+
+
+def cmd_archive_check(args) -> int:
+    """Is each archive row about the week it is labelled with? Offline, free.
+
+    THE CHECK THAT EXISTS BECAUSE NO INVARIANT COULD DO IT (bugs.md M7).
+
+    Every invariant on the archive is structural - coverage, bounds, labels - and
+    none of them reads the sentence the model wrote. That is how, for seven
+    weeks, the row labelled "Week 5" came to describe what week 6 shipped: the
+    instruction said "summarise the bullets currently under 'What changed'" while
+    a later step of the same turn replaced those bullets.
+
+    This cannot be an invariant, because a summary is prose and grading prose
+    needs a rubric and a second model call. What it can be is a cheap, offline
+    attribution test with a stated method: take the distinctive content words of
+    each row and count how many belong to the week it claims to describe, versus
+    how many belong ONLY to the week after it. A row about the right week scores
+    zero on the second count.
+
+    Its limit, stated: it detects the off-by-one that actually happened. It does
+    not check that the summary is *true*, only that it is about the right week.
+    """
+    import re
+
+    weeks = load_weeks()
+    html_dir = OUT / "arm-a-edit" / "html"
+    saved = sorted(html_dir.glob("week-*.html"))
+    if not saved:
+        print(f"no saved weeks in {html_dir} - run `digest run --live` first")
+        return 1
+
+    print("Each archive row, at the moment it was filed.")
+    print("method: distinctive words of the row, matched against the week it names")
+    print("        versus words belonging only to the following week.\n")
+    print("| filed at | row | words from its own week | words only from the next week | verdict |")
+    print("|---|---|---|---|---|")
+    suspect = []
+    for path in saved:
+        n = int(path.stem.split("-")[1])
+        if n < 2 or n > len(weeks):
+            continue
+        block = re.search(r"<h2[^>]*>\s*Archive.*", path.read_text(encoding="utf-8"), re.S)
+        if not block:
+            continue
+        row_text = None
+        for raw in re.findall(r"<tr[^>]*>(.*?)</tr>", block.group(0), re.S):
+            cells = [
+                re.sub(r"<[^>]+>", "", c).strip()
+                for c in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", raw, re.S)
+            ]
+            if len(cells) >= 3 and cells[0] == f"Week {n - 1}":
+                row_text = cells[2]
+        if row_text is None:
+            continue
+        row_words = _content_words(row_text)
+        own = _content_words(" ".join(weeks[n - 2]["shipped"]))
+        nxt = _content_words(" ".join(weeks[n - 1]["shipped"]))
+        hits, strays = len(row_words & own), len(row_words & (nxt - own))
+        ok = hits > 0 and hits >= strays
+        if not ok:
+            suspect.append(n - 1)
+        print(f"| week {n} | Week {n - 1} | {hits} | {strays} | {'ok' if ok else '**SUSPECT**'} |")
+
+    total = len(saved) - 1
+    print(f"\n**{len(suspect)} row(s) describing the wrong week**, out of {total} filed.")
+    if suspect:
+        print(f"suspect rows: {suspect}")
+        print("  fix: check archive.plan_rows - the text to summarise must be handed "
+              "over literally, never named as a place in the document.")
+    return 0 if not suspect else 1
+
+
 def cmd_diff(args) -> int:
     p = OUT / "arm-a-edit" / "diff" / f"week-{args.week:02d}.diff"
     if not p.exists():
@@ -147,6 +233,8 @@ def main(argv: list[str] | None = None) -> int:
     for name, fn, helptext in (
         ("report", cmd_report, "write the cost comparison from the two ledgers"),
         ("verify", cmd_verify, "re-check every saved week offline"),
+        ("archive-check", cmd_archive_check,
+         "is each archive row about the week it names? (offline, bugs.md M7)"),
     ):
         s = sub.add_parser(name, help=helptext)
         s.set_defaults(func=fn)

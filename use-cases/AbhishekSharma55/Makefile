@@ -45,6 +45,9 @@ demo: setup
 	@echo "     old archive rows fold into one, inside the same operation)"
 	@$(PY) -m weekly_digest.cli diff --week 14
 	@echo
+	@echo "=== is every archive row about the week it names? (bugs.md M7) ==="
+	@$(PY) -m weekly_digest.cli archive-check | tail -3
+	@echo
 	@echo "=== the last graded-scenario result ==="
 	@$(PY) -m gdd_editor.cli verify
 	@echo

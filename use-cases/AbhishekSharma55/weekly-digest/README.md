@@ -43,8 +43,10 @@ costs the result, is in [`METHOD.md`](METHOD.md).
 Offline and free, no key needed:
 
 ```bash
-make replay              # re-run the recorded weeks from committed fixtures
+make replay              # re-run the recorded weeks from committed fixtures,
+                         # then byte-compare them against the live run
 digest verify            # re-check every saved week from its bytes
+digest archive-check     # is every archive row about the week it names?
 digest diff --week 14    # what changed between week 13 and 14 (a rollup week)
 make test                # 64 tests, no key, no network, 0.04s
 ```
@@ -90,9 +92,17 @@ cannot do.
 **The source material is handed to it, not pointed at.** The archive step used to
 say *"summarise the bullets currently under 'What changed'"* — true when that step
 runs, false by the end of the same instruction, because a later step replaces
-those bullets. Three archive rows in seven described the wrong week before that
-was caught ([`bugs.md` M7](../bugs.md)). The text to summarise is now quoted into
-the instruction. Never ask a model to summarise state the same turn is changing.
+those bullets. **Three archive rows in seven described the wrong week** before
+that was caught ([`bugs.md` M7](../bugs.md)). The text to summarise is now quoted
+into the instruction. Never ask a model to summarise state the same turn is
+changing.
+
+`digest archive-check` re-derives that result from the committed documents,
+offline and free, with its method printed above the table: **0 of 18 rows in the
+committed run describe the wrong week.** It is deliberately not an invariant —
+grading prose needs a rubric and a second model call — and its limit is stated in
+the command's own help: it catches the off-by-one that actually happened, not
+whether the summary is *true*.
 
 ## The archive stays navigable
 
