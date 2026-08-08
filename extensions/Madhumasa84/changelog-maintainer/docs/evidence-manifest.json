@@ -1,0 +1,18 @@
+{
+  "project": "superdocs-changelog-maintainer",
+  "provenance": "offline deterministic local fixtures",
+  "live_operations": 0,
+  "billable_operations": 0,
+  "external_network_calls": 0,
+  "classification_source": "structured release JSON",
+  "external_llm_or_mcp": false,
+  "authoritative_open_task_pdf_sha256": "14c183112a628948e5b5d97a8f38dee41c875ba0da805555eb61a5058ea04a43",
+  "page": 301,
+  "claims": [
+    "historical prefixes are byte-compared and hashed",
+    "ten sequential releases are deterministic fixtures",
+    "PDF and DOCX are local structural fixtures, not live SuperDocs proof",
+    "publication is dry-run only",
+    "classification is supplied by structured JSON; no external LLM or MCP is invoked"
+  ]
+}

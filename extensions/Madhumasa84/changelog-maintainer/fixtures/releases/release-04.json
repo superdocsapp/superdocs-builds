@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.04",
+  "title": "April 2026",
+  "date": "2026-04-15",
+  "items": [
+    {"id": "locks", "category": "Fixed", "title": "Concurrent updates", "body": "Serialize updates to one canonical changelog without blocking other files."}
+  ]
+}

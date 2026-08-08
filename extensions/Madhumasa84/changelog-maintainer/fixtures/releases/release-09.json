@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.09",
+  "title": "September 2026",
+  "date": "2026-09-15",
+  "items": [
+    {"id": "publication", "category": "Added", "title": "Publication dry run", "body": "See the intended pull-request actions without network access."}
+  ]
+}

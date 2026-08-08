@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.06",
+  "title": "June 2026",
+  "date": "2026-06-15",
+  "items": [
+    {"id": "origin", "category": "Added", "title": "Origin metadata", "body": "Derived exports identify their source and cannot trigger another update."}
+  ]
+}

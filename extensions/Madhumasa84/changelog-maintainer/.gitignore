@@ -1,0 +1,8 @@
+node_modules/
+.changelog-maintainer/
+*.tmp
+coverage/
+artifacts/
+.env
+.env.*
+!.env.example

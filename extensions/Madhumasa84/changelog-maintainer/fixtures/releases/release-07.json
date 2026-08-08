@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.07",
+  "title": "July 2026",
+  "date": "2026-07-15",
+  "items": [
+    {"id": "pdf", "category": "Added", "title": "Verified PDF", "body": "Export a structurally validated PDF from the canonical source."}
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "superdocs-changelog-maintainer",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Offline-first append-only public changelog maintainer using structured release input; no live API or publication",
+  "type": "module",
+  "bin": {
+    "sdx-changelog": "./src/cli.js"
+  },
+  "scripts": {
+    "build": "node --check src/*.js",
+    "typecheck": "node --check src/*.js",
+    "lint": "node --check src/*.js",
+    "test": "node --test test/*.test.mjs",
+    "smoke": "node src/cli.js --help",
+    "security-scan": "node --test test/security-scan.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.05",
+  "title": "May 2026",
+  "date": "2026-05-15",
+  "items": [
+    {"id": "style", "category": "Changed", "title": "House style inference", "body": "Keep new entries aligned with the established Markdown style."}
+  ]
+}

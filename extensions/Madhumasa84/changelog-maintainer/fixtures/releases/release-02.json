@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.02",
+  "title": "February 2026",
+  "date": "2026-02-15",
+  "items": [
+    {"id": "decisions", "category": "Added", "title": "Item decisions", "body": "Approve or reject each proposed changelog entry explicitly."}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.08",
+  "title": "August 2026",
+  "date": "2026-08-15",
+  "items": [
+    {"id": "docx", "category": "Added", "title": "Verified DOCX", "body": "Export an OOXML document while keeping Markdown authoritative."}
+  ]
+}
