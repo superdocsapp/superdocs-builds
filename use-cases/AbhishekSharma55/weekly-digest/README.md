@@ -69,11 +69,22 @@ it stops cleanly on `--max-ops` rather than blowing a budget.
 
 ## What one week costs, and what it does
 
-**One operation.** A SuperDocs operation covers up to 25 edited sections, so the
-whole week — status line, three standing sections, the new archive row, and a
-quarterly archive rollup when one is due — rides a single billable call. That is
-the entire cost argument, and it is why the archive policy folds rows *inside*
-the weekly edit rather than in a separate maintenance pass.
+**One operation in the week it goes right.** A SuperDocs operation covers up to
+25 edited sections, so the whole week — status line, three standing sections, the
+new archive row, and a quarterly archive rollup when one is due — rides a single
+billable call. That is why the archive policy folds rows *inside* the weekly edit
+rather than in a separate maintenance pass.
+
+**Measured, with the failures in the number: 1.22 operations per week** over 18
+live weeks. Sixteen weeks cost one operation; two needed the two-turn repair and
+cost three; none was rolled back. The per-week table is in
+[`MEASUREMENT.md`](MEASUREMENT.md) with no rows omitted.
+
+**And the cost is not actually the argument.** The control arm cost 1.88
+operations a week — a real gap, but a modest one — and produced a document that
+failed verification in **every single week it ran**. A cost comparison between a
+publishable artefact and an unpublishable one is the wrong comparison, and the
+measurement says so rather than quoting the flattering multiple.
 
 The instruction that does it splits responsibility on one line:
 

@@ -4,7 +4,7 @@ Two projects, one shared client layer, one fictional universe.
 
 | | |
 |---|---|
-| **[weekly-digest/](weekly-digest/)** | One standing document, revised in place week after week instead of regenerated. One billable operation per week. Fourteen invariants, re-derived from the document's bytes, catch drift; a control arm regenerates the same digest from the same inputs, with the method committed before the result. |
+| **[weekly-digest/](weekly-digest/)** | One standing document, revised in place week after week instead of regenerated. **One billable operation in the week it goes right, three in the week it does not** — measured at 1.22 per week over 18 live weeks, repairs included. Fourteen invariants, re-derived from the document's bytes, catch drift; a control arm regenerates the same digest from the same inputs, with the method committed before the result. |
 | **[gdd-editor/](gdd-editor/)** | A chat-driven editor for long, linked game design documents — mechanics, narrative and art bible as sub-documents, with image support. The graded scenario runs as one command and is asserted from the documents' own bytes. |
 | **[bugs.md](bugs.md)** | Fifteen SuperDocs bugs and rough edges found against the live API, with reproduction steps and two runnable repros — plus eight of my own. |
 | **[Makefile](Makefile)** | `make setup` · `make test` (no key) · `make demo` / `make replay` (no spend) · `make probe` (live, 0 ops) · `make scenario` / `make run` / `make control` (capped). |

@@ -14,7 +14,9 @@ Read it once end to end. Then re-read **§6 (the eight questions)** and
 Two builds on the SuperDocs REST API, in one folder, on one shared client layer.
 
 **Build 1 — weekly digest.** One standing document, revised in place week after
-week instead of regenerated. One billable operation per week. Fourteen invariants
+week instead of regenerated. One billable operation in a week that goes right,
+three in a week that needs the two-turn repair — **1.22 per week measured over 18
+live weeks, repairs included.** Fourteen invariants
 re-derived from the document's own bytes after every week catch drift; a failed
 week is repaired by *decomposing* the instruction into two simpler turns, or
 rolled back, so the document is never left corrupt. A control arm regenerates the
@@ -275,6 +277,10 @@ trying to detect.
 **1. "Your digest is one operation a week. What is the regeneration arm actually
 costing, and how do I know you did not pick a control that flatters you?"**
 
+First, correct the premise, because the honest number is better than the round
+one: **1.22 operations a week**, measured over 18 live weeks with every repair
+counted. Two of those weeks needed a repair; none had to be rolled back.
+
 The method is committed in `METHOD.md` before any number was collected — check
 `git log`. Both arms take the same 52 weeks of input in the same order and are
 asked for the same document with the same formatting brief. Arm B is *given* the
@@ -365,7 +371,7 @@ section, using the exact shape the API returned. That the budget cap raises
 *before* spending and the ledger survives a restart. That a recorded fixture
 never contains a key. And 52 weeks of archive growth simulated offline. The
 record/replay transport means anyone can run the suite on a fresh clone with no
-key in about 0.05 s — `make setup && make test`.
+key in 0.04 s — `make setup && make test`.
 
 **8. "What would you build next on SuperDocs, if you joined?"**
 

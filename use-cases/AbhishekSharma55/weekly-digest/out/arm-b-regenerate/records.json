@@ -156,5 +156,23 @@
       "risk table keeps borders and header shading",
       "risk table keeps alternating row shading"
     ]
+  },
+  {
+    "week": 10,
+    "ops": 2,
+    "seconds": 202.22,
+    "doc_bytes": 8377,
+    "doc_sha": "25f238a4f082a8dd",
+    "sections_created": 1,
+    "instruction_chars": 3762,
+    "api_summary": "Document replaced in full",
+    "attempts": 2,
+    "invariants_ok": false,
+    "invariant_failures": [
+      "'What changed' bullets are verbatim",
+      "risk table keeps borders and header shading",
+      "risk table keeps alternating row shading",
+      "archive stays bounded (growth policy)"
+    ]
   }
 ]
