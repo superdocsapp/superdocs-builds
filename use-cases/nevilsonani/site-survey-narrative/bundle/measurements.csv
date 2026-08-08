@@ -1,0 +1,12 @@
+item,value,unit,method
+roof_clear_length,9.2,m,tape
+roof_clear_width,6.4,m,tape
+parapet_height,0.9,m,tape
+roof_azimuth_long_edge,182,deg,compass app
+roof_tilt,0,deg,flat RCC slab
+tank_frame_height,2.1,m,tape
+tree_height_estimate,8,m,visual estimate
+cable_route_length,12,m,tape along wall
+service_phase,single,-,meter nameplate
+service_rating,63,A,meter nameplate
+spare_way_rating,32,A,DB inspection
