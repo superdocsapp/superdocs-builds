@@ -1,0 +1,5 @@
+bin/
+obj/
+artifacts/
+samples/SuperDocs.Worker.Sample/inbox/
+samples/SuperDocs.Worker.Sample/outbox/

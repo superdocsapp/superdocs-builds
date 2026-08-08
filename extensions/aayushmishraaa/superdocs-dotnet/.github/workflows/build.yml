@@ -1,0 +1,75 @@
+# Builds, tests and packs the SDK.
+#
+# Not wired to the repository root on purpose: this lives inside a contributor folder, so it
+# is here as the workflow a consumer would copy rather than something that runs on every
+# push to superdocs-builds.
+#
+# Packages are produced as ARTIFACTS and deliberately NOT published. Claiming a package id on
+# a public registry is not mine to do from a task submission.
+
+name: SuperDocs.Client
+
+on:
+  push:
+    paths: ['extensions/aayushmishraaa/superdocs-dotnet/**']
+  pull_request:
+    paths: ['extensions/aayushmishraaa/superdocs-dotnet/**']
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: extensions/aayushmishraaa/superdocs-dotnet
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # SourceLink needs full history to resolve commits; a shallow clone produces
+          # symbols that cannot be stepped into.
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          # Both targets must be installable, or "supports the previous LTS" is a claim
+          # nobody has checked.
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - run: dotnet restore
+
+      # -warnaserror is redundant with TreatWarningsAsErrors in Directory.Build.props and
+      # kept anyway: if someone relaxes the props file, CI still catches it.
+      - name: Build (analyzer-clean, both frameworks)
+        run: dotnet build --configuration Release --no-restore -warnaserror
+
+      # No API key is provided to this job, on purpose. If a test ever needs one, it fails
+      # here rather than passing quietly on a developer machine that happens to have one set.
+      - name: Test (no API key available)
+        run: dotnet test --configuration Release --no-build --verbosity normal
+
+      - name: Pack (deterministic, with symbols)
+        run: |
+          dotnet pack src/SuperDocs.Client/SuperDocs.Client.csproj \
+            --configuration Release --no-build \
+            -p:ContinuousIntegrationBuild=true \
+            --output ./artifacts
+
+      - name: Verify the package contains both frameworks and its symbols
+        run: |
+          set -e
+          nupkg=$(ls artifacts/*.nupkg | head -1)
+          snupkg=$(ls artifacts/*.snupkg | head -1)
+          echo "package: $nupkg"
+          echo "symbols: $snupkg"
+          unzip -l "$nupkg" | grep -q 'lib/net10.0/SuperDocs.Client.dll'
+          unzip -l "$nupkg" | grep -q 'lib/net8.0/SuperDocs.Client.dll'
+          unzip -l "$snupkg" | grep -q 'lib/net10.0/SuperDocs.Client.pdb'
+          echo "both target frameworks and symbols present"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: extensions/aayushmishraaa/superdocs-dotnet/artifacts/*

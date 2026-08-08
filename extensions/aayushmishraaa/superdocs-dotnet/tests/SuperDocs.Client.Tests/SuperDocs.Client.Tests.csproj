@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Tests run on the current LTS only; the library is what multi-targets. -->
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+    <!-- The trim and AOT analyzers exist to keep the SHIPPED library trim-friendly. A test
+         assembly is never trimmed or AOT-published, and applying those rules here would
+         force the tests to use source-generated serialization and reflection annotations
+         to assert things about... source-generated serialization. That is noise, and it
+         would make the tests harder to read for no safety gained. -->
+    <IsTrimmable>false</IsTrimmable>
+    <EnableTrimAnalyzer>false</EnableTrimAnalyzer>
+    <IsAotCompatible>false</IsAotCompatible>
+
+    <!-- CA2000: stub handlers are owned by the HttpClient that wraps them, whose lifetime is
+         the test method. Threading disposal through every test would obscure what each one
+         is actually asserting.
+         CA1707: underscores in test names are deliberate and conventional.
+         CA2007: no synchronization context in tests, so ConfigureAwait adds nothing. -->
+    <NoWarn>$(NoWarn);CS1591;CA1707;CA2007;CA2000;CA1861;CA5394;CA1515</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/SuperDocs.Client/SuperDocs.Client.csproj" />
+  </ItemGroup>
+
+</Project>

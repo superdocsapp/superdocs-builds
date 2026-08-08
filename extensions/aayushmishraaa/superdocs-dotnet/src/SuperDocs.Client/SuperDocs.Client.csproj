@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>SuperDocs.Client</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Aayush Mishra</Authors>
+    <Description>
+      .NET client for the SuperDocs document-editing API. Registers through
+      IHttpClientFactory so pooling, resilience and telemetry come from your host.
+      Source-generated JSON, cancellation throughout, and the proposed-change
+      double-encoding handled for you.
+    </Description>
+    <PackageTags>superdocs;documents;docx;ai;http;api-client</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/superdocsapp/superdocs-builds</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- Symbols shipped alongside the package, plus SourceLink so a debugger can step
+         into this library from a consuming application. -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- Catches breaking API changes against the previously published version, and
+         verifies every declared target framework actually has a matching assembly. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- So the tests can exercise internal validation without widening the public API
+         purely to make it testable. The public surface should be what consumers need, not
+         what the test project found convenient. -->
+    <InternalsVisibleTo Include="SuperDocs.Client.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- System.Text.Json ships in-box on net10.0; net8.0 needs the package for the
+       source-generator features used here. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>
