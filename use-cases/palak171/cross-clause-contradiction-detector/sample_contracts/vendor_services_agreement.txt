@@ -1,0 +1,84 @@
+VENDOR SERVICES AGREEMENT (SYNTHETIC — for demo purposes only)
+
+Clause 1. Definitions
+"Client" refers to Acme Retail Corp. "Vendor" refers to Northwind Logistics LLC.
+This Agreement governs the provision of warehousing and fulfillment services.
+
+Clause 2. Scope of Services
+Vendor shall provide warehousing, pick-and-pack, and last-mile delivery
+coordination for Client's e-commerce operations.
+
+Clause 3. Term
+This Agreement begins on the Effective Date and continues for an initial
+term of two (2) years.
+
+Clause 4. Service Levels
+Vendor shall fulfill 98% of orders within 24 hours of receipt.
+
+Clause 5. Confidentiality
+Each party shall keep the other's confidential information secret for a
+period of 3 years following termination of this Agreement.
+
+Clause 6. Data Protection
+Vendor shall process Client customer data solely for the purposes of this
+Agreement and in accordance with applicable data protection law.
+
+Clause 7. Payment Terms
+Client shall pay all undisputed invoices within 30 days of receipt.
+
+Clause 8. Late Fees
+Invoices unpaid after the due date accrue interest at 1.5% per month.
+
+Clause 9. Insurance
+Vendor shall maintain commercial general liability insurance with minimum
+coverage of $2,000,000 per occurrence throughout the Term.
+
+Clause 10. Indemnification
+Vendor shall indemnify Client against third-party claims arising from
+Vendor's negligence in performing the Services.
+
+Clause 11. Force Majeure
+Neither party is liable for delays caused by events beyond its reasonable
+control, including natural disasters, labor disputes, or government action.
+
+Clause 12. Late Payment
+Notwithstanding Clause 7, invoices disputed in good faith must instead be
+settled within 45 days of receipt, measured from the date the dispute is
+resolved.
+
+Clause 13. Termination for Convenience
+Either party may terminate this Agreement for convenience with 90 days'
+written notice to the other party.
+
+Clause 14. Termination for Cause
+Either party may terminate this Agreement immediately upon written notice
+if the other party materially breaches and fails to cure within 15 days.
+
+Clause 15. Governing Law
+This Agreement is governed by the laws of the State of Delaware, without
+regard to its conflict of laws principles.
+
+Clause 16. Limitation of Liability
+Neither party's aggregate liability under this Agreement shall exceed the
+total fees paid in the twelve (12) months preceding the claim.
+
+Clause 17. Notices
+All notices under this Agreement must be delivered in writing to the
+addresses set out in the signature block, by email or courier.
+
+Clause 18. Renewal
+This Agreement shall automatically renew for successive terms of twelve
+(12) months unless either party gives notice of non-renewal at least
+60 days before the end of the then-current term.
+
+Clause 19. Assignment
+Neither party may assign this Agreement without the prior written consent
+of the other party, not to be unreasonably withheld.
+
+Clause 20. Renewal Notice Period
+Notwithstanding Clause 18, either party may decline to renew this
+Agreement by giving 30 days' notice before the end of the then-current term.
+
+Clause 21. Entire Agreement
+This Agreement constitutes the entire agreement between the parties and
+supersedes all prior negotiations, representations, or agreements.

@@ -1,0 +1,18 @@
+[project]
+name = "cross-clause-contradiction-detector"
+version = "0.1.0"
+description = "Finds where one clause of a contract contradicts another, explains the conflict, and proposes a resolution as a reviewable edit — built on the SuperDocs API."
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "respx>=0.21",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
