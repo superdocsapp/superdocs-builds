@@ -2,6 +2,10 @@
 
 **Built ON SuperDocs** for the SuperDocs builder round, by **Nevil Sonani**.
 
+**▶ Demo video:** https://youtu.be/oR_Uz4R_7io
+
+![Exported assessment with evidence citations](docs/export-screenshot.png)
+
 A solar site survey comes back as a pile of photographs, a measurements sheet
 and a few voice notes. This app turns that pile into an engineering document a
 designer who never visited the site can actually use — with every observation
@@ -36,7 +40,7 @@ Visit"** instead of invented.
 ## Quickstart
 
 ```bash
-cd nevil-sonani-site-survey
+cd use-cases/nevilsonani/site-survey-narrative
 cp .env.example .env          # put your sk_ key in (or agent-signup: see docs)
 uv run python scripts/gen_bundle.py   # regenerate the synthetic bundle (committed)
 uv run s2n run --auto-approve         # full machine-driven run
@@ -95,4 +99,4 @@ in v1, and nothing here depends on them.)
 - One draft call per run keeps cost ~2-3 operations; iterative section-by-
   section refinement is a `--sections` flag away but costs more.
 
-*Built for the SuperDocs task; screenshot in `docs/` after the first run.*
+*Built for the SuperDocs task. Demo: https://youtu.be/oR_Uz4R_7io · export screenshot in `docs/`.*
