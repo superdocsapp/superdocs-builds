@@ -1,0 +1,10 @@
+node_modules/
+static/ui/node_modules/
+static/ui/build/
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+.forge/
+dist/
