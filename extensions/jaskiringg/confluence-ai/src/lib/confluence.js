@@ -1,12 +1,98 @@
-const fs = require("fs");
-const path = require("path");
-
 const DEMO_PAGE_ID = "demo-page";
 const DEMO_SPACE_ID = "demo-space";
 
+const DEMO_ADF = {
+  type: "doc",
+  version: 1,
+  content: [
+    {
+      type: "heading",
+      attrs: { level: 1 },
+      content: [{ type: "text", text: "IT Change Policy — North Region" }],
+    },
+    {
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "All production changes require a CAB ticket before cutover. Emergency changes still need a follow-up ticket within 24 hours.",
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Freeze windows" }],
+    },
+    {
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "North region freeze is 02:00-06:00 IST on release nights. No master-data edits during freeze.",
+        },
+      ],
+    },
+    {
+      type: "table",
+      attrs: { isNumberColumnEnabled: false, layout: "default" },
+      content: [
+        {
+          type: "tableRow",
+          content: [
+            {
+              type: "tableHeader",
+              attrs: {},
+              content: [{ type: "paragraph", content: [{ type: "text", text: "System" }] }],
+            },
+            {
+              type: "tableHeader",
+              attrs: {},
+              content: [{ type: "paragraph", content: [{ type: "text", text: "Owner" }] }],
+            },
+          ],
+        },
+        {
+          type: "tableRow",
+          content: [
+            {
+              type: "tableCell",
+              attrs: {},
+              content: [{ type: "paragraph", content: [{ type: "text", text: "Order API" }] }],
+            },
+            {
+              type: "tableCell",
+              attrs: {},
+              content: [{ type: "paragraph", content: [{ type: "text", text: "Platform" }] }],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      type: "heading",
+      attrs: { level: 2 },
+      content: [{ type: "text", text: "Rollback" }],
+    },
+    {
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "If error rate exceeds 2% after cutover, roll back within 15 minutes and page the on-call.",
+        },
+      ],
+    },
+    {
+      type: "codeBlock",
+      attrs: { language: "bash" },
+      content: [{ type: "text", text: "kubectl rollout undo deploy/order-api" }],
+    },
+  ],
+};
+
 function loadDemoAdf() {
-  const p = path.join(__dirname, "../../fixtures/demo-page.adf.json");
-  return JSON.parse(fs.readFileSync(p, "utf8"));
+  return JSON.parse(JSON.stringify(DEMO_ADF));
 }
 
 function authHeader(email, token) {
@@ -15,6 +101,29 @@ function authHeader(email, token) {
 
 function confluenceConfigured(env) {
   return !!(env.CONFLUENCE_BASE_URL && env.CONFLUENCE_EMAIL && env.CONFLUENCE_API_TOKEN);
+}
+
+function liveConfluence(env, id) {
+  if (id && String(id).startsWith("demo")) return false;
+  return !!(env.useForgeApi || confluenceConfigured(env));
+}
+
+async function forgeFetch(pathname, { method = "GET", body } = {}) {
+  const { asApp, assumeTrustedRoute } = require("@forge/api");
+  const res = await asApp().requestConfluence(assumeTrustedRoute(pathname), {
+    method,
+    headers: {
+      Accept: "application/json",
+      ...(body ? { "Content-Type": "application/json" } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await res.text();
+  const data = text ? JSON.parse(text) : null;
+  if (!res.ok) {
+    throw new Error(`Confluence ${res.status}: ${text.slice(0, 500)}`);
+  }
+  return data;
 }
 
 async function cfFetch(env, pathname, { method = "GET", body } = {}) {
@@ -36,6 +145,11 @@ async function cfFetch(env, pathname, { method = "GET", body } = {}) {
   return data;
 }
 
+async function productFetch(env, pathname, opts) {
+  if (env.useForgeApi) return forgeFetch(pathname, opts);
+  return cfFetch(env, pathname, opts);
+}
+
 function parseAdfFromPage(page) {
   const value =
     page?.body?.atlas_doc_format?.value ||
@@ -52,7 +166,7 @@ const DEMO_TITLES = {
 };
 
 async function getPage(env, pageId) {
-  if (!confluenceConfigured(env) || String(pageId).startsWith("demo")) {
+  if (!liveConfluence(env, pageId)) {
     const adf = loadDemoAdf();
     if (pageId === "demo-page-2") {
       adf.content[0] = {
@@ -78,7 +192,7 @@ async function getPage(env, pageId) {
       demo: true,
     };
   }
-  const page = await cfFetch(
+  const page = await productFetch(
     env,
     `/wiki/api/v2/pages/${encodeURIComponent(pageId)}?body-format=atlas_doc_format`
   );
@@ -94,7 +208,7 @@ async function getPage(env, pageId) {
 }
 
 async function updatePage(env, { pageId, title, adf, versionNumber, message }) {
-  if (!confluenceConfigured(env) || String(pageId).startsWith("demo")) {
+  if (!liveConfluence(env, pageId)) {
     return {
       id: DEMO_PAGE_ID,
       title,
@@ -103,7 +217,7 @@ async function updatePage(env, { pageId, title, adf, versionNumber, message }) {
       adf,
     };
   }
-  return cfFetch(env, `/wiki/api/v2/pages/${encodeURIComponent(pageId)}`, {
+  return productFetch(env, `/wiki/api/v2/pages/${encodeURIComponent(pageId)}`, {
     method: "PUT",
     body: {
       id: String(pageId),
@@ -122,14 +236,14 @@ async function updatePage(env, { pageId, title, adf, versionNumber, message }) {
 }
 
 async function listSpacePages(env, spaceId) {
-  if (!confluenceConfigured(env) || spaceId === DEMO_SPACE_ID) {
+  if (!liveConfluence(env, spaceId) || spaceId === DEMO_SPACE_ID) {
     return [
       { id: DEMO_PAGE_ID, title: "IT Change Policy — North Region", status: "current" },
       { id: "demo-page-2", title: "Go-live checklist (draft)", status: "current" },
       { id: "demo-page-3", title: "SIT notes — week 12", status: "current" },
     ];
   }
-  const data = await cfFetch(
+  const data = await productFetch(
     env,
     `/wiki/api/v2/spaces/${encodeURIComponent(spaceId)}/pages?limit=50&status=current`
   );
@@ -141,13 +255,13 @@ async function listSpacePages(env, spaceId) {
 }
 
 async function searchUsers(env, query) {
-  if (!confluenceConfigured(env)) {
+  if (!liveConfluence(env)) {
     return [
       { accountId: "demo-approver", displayName: "Priya Sharma (demo)", email: "priya@example.com" },
       { accountId: "demo-author", displayName: "Jaskirat Singh (demo)", email: "singhjass6404@gmail.com" },
     ].filter((u) => !query || u.displayName.toLowerCase().includes(query.toLowerCase()));
   }
-  const data = await cfFetch(
+  const data = await productFetch(
     env,
     `/wiki/rest/api/search/user?cql=${encodeURIComponent(`user.fullname~"${query}"`)}&limit=10`
   );
@@ -162,11 +276,11 @@ const PROPERTY_KEY = "superdocs-review";
 
 async function getReviewState(env, pageId, memory) {
   if (memory.has(pageId)) return memory.get(pageId);
-  if (!confluenceConfigured(env) || pageId === DEMO_PAGE_ID) {
+  if (!liveConfluence(env, pageId) || pageId === DEMO_PAGE_ID) {
     return { status: "draft" };
   }
   try {
-    const data = await cfFetch(
+    const data = await productFetch(
       env,
       `/wiki/rest/api/content/${encodeURIComponent(pageId)}/property/${PROPERTY_KEY}`
     );
@@ -178,15 +292,15 @@ async function getReviewState(env, pageId, memory) {
 
 async function setReviewState(env, pageId, value, memory) {
   memory.set(pageId, value);
-  if (!confluenceConfigured(env) || pageId === DEMO_PAGE_ID) return value;
+  if (!liveConfluence(env, pageId) || pageId === DEMO_PAGE_ID) return value;
   try {
-    await cfFetch(
+    await productFetch(
       env,
       `/wiki/rest/api/content/${encodeURIComponent(pageId)}/property/${PROPERTY_KEY}`,
       { method: "PUT", body: { key: PROPERTY_KEY, value } }
     );
   } catch {
-    await cfFetch(
+    await productFetch(
       env,
       `/wiki/rest/api/content/${encodeURIComponent(pageId)}/property`,
       { method: "POST", body: { key: PROPERTY_KEY, value } }

@@ -29,24 +29,22 @@ resources:
 
 app:
   runtime:
-    name: nodejs20.x
+    name: nodejs22.x
     memoryMB: 256
-  id: ari:cloud:ecosystem::app/00000000-0000-4000-8000-000000000001
+  id: ari:cloud:ecosystem::app/7f17f3ef-6f7f-4c69-a213-590e8cacdfcc
 
 permissions:
   scopes:
     - read:page:confluence
     - write:page:confluence
     - read:space:confluence
-    - read:confluence-user
+    - read:user:confluence
     - search:confluence
-    - write:confluence-content
-    - read:confluence-content.summary
+    - read:content.property:confluence
+    - write:content.property:confluence
   external:
     fetch:
       backend:
         - address: api.superdocs.app
-          category: analytics
-          inScopeEUD: false
       client:
         - address: api.superdocs.app

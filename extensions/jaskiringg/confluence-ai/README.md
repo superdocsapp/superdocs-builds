@@ -32,11 +32,13 @@ To hit a real Confluence Cloud site from the sidecar, set `CONFLUENCE_BASE_URL`,
 
 1. Create a free Confluence Cloud site.
 2. `npm i -g @forge/cli` then `forge login`.
-3. In this folder: `forge register` (replaces the placeholder `app.id` in `manifest.yml`).
-4. `forge variables set SUPERDOCS_API_KEY`
-5. `FORGE=1 npm --prefix static/ui run build && forge deploy && forge install`
+3. In this folder: `forge register` (writes a real `app.id` into `manifest.yml` — re-register if you fork).
+4. `forge variables set SUPERDOCS_API_KEY "$SUPERDOCS_API_KEY" --encrypt`
+5. `FORGE=1 npm --prefix static/ui run build && forge deploy && forge install --product Confluence --site YOUR-SITE.atlassian.net`
 
-Page action: **SuperDocs AI edit**. Space page: **SuperDocs space queue**.
+Page byline: **AI review**. Space page: **SuperDocs space queue**. Page menu → Apps → **SuperDocs AI edit**.
+
+This copy is sideloaded on `jaskiring.atlassian.net` (personal site, not public). Reviewers should run the sidecar or sideload their own site.
 
 Marketplace listing is out of scope; sideload is enough.
 

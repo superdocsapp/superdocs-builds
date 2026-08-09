@@ -35,7 +35,24 @@ function envFrom(ctx) {
     CONFLUENCE_BASE_URL: process.env.CONFLUENCE_BASE_URL,
     CONFLUENCE_EMAIL: process.env.CONFLUENCE_EMAIL,
     CONFLUENCE_API_TOKEN: process.env.CONFLUENCE_API_TOKEN,
+    useForgeApi: ctx.kind === "forge",
   };
+}
+
+function isDemoId(id) {
+  return !id || String(id).startsWith("demo");
+}
+
+function resolvePageId(payload, ctx) {
+  if (!isDemoId(payload.pageId)) return String(payload.pageId);
+  if (!isDemoId(ctx.pageId)) return String(ctx.pageId);
+  return payload.pageId || ctx.pageId || DEMO_PAGE_ID;
+}
+
+function resolveSpaceId(payload, ctx) {
+  if (!isDemoId(payload.spaceId)) return String(payload.spaceId);
+  if (!isDemoId(ctx.spaceId)) return String(ctx.spaceId);
+  return payload.spaceId || ctx.spaceId || DEMO_SPACE_ID;
 }
 
 function sessionKey(pageId) {
@@ -44,10 +61,23 @@ function sessionKey(pageId) {
 
 async function getContext(payload, ctx) {
   const env = envFrom(ctx);
-  const pageId = payload.pageId || ctx.pageId || DEMO_PAGE_ID;
-  const spaceId = payload.spaceId || ctx.spaceId || DEMO_SPACE_ID;
+  const pageId = resolvePageId(payload, ctx);
+  const spaceId = resolveSpaceId(payload, ctx);
+
+  if (env.useForgeApi && isDemoId(pageId) && !isDemoId(spaceId)) {
+    const pages = await listSpacePages(env, spaceId);
+    const first = pages[0];
+    if (first) return getContext({ ...payload, pageId: first.id, spaceId }, ctx);
+    return {
+      page: { id: null, title: "Space queue", version: 1, spaceId, demo: false },
+      sections: [],
+      review: { status: "draft" },
+      hasSuperDocsKey: !!env.SUPERDOCS_API_KEY,
+    };
+  }
+
   const page = await getPage(env, pageId);
-  const { sections, doc } = listSections(page.adf);
+  const { sections } = listSections(page.adf);
   const review = await getReviewState(env, pageId, reviewMemory);
   return {
     page: {
@@ -65,7 +95,7 @@ async function getContext(payload, ctx) {
 
 async function loadPageHtml(payload, ctx) {
   const env = envFrom(ctx);
-  const page = await getPage(env, payload.pageId);
+  const page = await getPage(env, resolvePageId(payload, ctx));
   const { start, end } = payload;
   if (start != null && end != null) {
     const sliced = sliceSectionHtml(page.adf, start, end);
@@ -79,7 +109,7 @@ async function loadPageHtml(payload, ctx) {
 
 async function startEdit(payload, ctx) {
   const env = envFrom(ctx);
-  const page = await getPage(env, payload.pageId);
+  const page = await getPage(env, resolvePageId(payload, ctx));
   const review = await getReviewState(env, page.id, reviewMemory);
   if (review.status === "awaiting_approver" && payload.role !== "approver") {
     throw new Error("This page is waiting on the named approver. Publish is blocked.");
@@ -230,7 +260,7 @@ async function sendToApprover(payload, ctx) {
 
 async function listPages(payload, ctx) {
   const env = envFrom(ctx);
-  const spaceId = payload.spaceId || DEMO_SPACE_ID;
+  const spaceId = resolveSpaceId(payload, ctx);
   const pages = await listSpacePages(env, spaceId);
   return { spaceId, pages };
 }

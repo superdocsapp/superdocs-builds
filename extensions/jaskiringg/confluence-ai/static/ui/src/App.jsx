@@ -24,20 +24,28 @@ export default function App() {
   const pageId = ctx?.page?.id || "demo-page";
   const spaceId = ctx?.page?.spaceId || "demo-space";
 
-  async function refresh() {
-    const data = await call("getContext", { pageId, spaceId });
+  async function refresh(nextPageId) {
+    const data = await call("getContext", {
+      pageId: nextPageId || (ctx?.page?.id && !String(ctx.page.id).startsWith("demo") ? ctx.page.id : undefined),
+      spaceId: ctx?.page?.spaceId && !String(ctx.page.spaceId).startsWith("demo") ? ctx.page.spaceId : undefined,
+    });
     setCtx(data);
     if (!section && data.sections?.[0]) setSection(data.sections[0]);
+    return data;
   }
 
   useEffect(() => {
-    refresh().catch((e) => setErr(e.message));
-    call("listPages", { spaceId: "demo-space" })
-      .then((d) => setQueue(d.pages || []))
-      .catch(() => {});
-    call("findUsers", { query: "" })
-      .then((d) => setUsers(d.users || []))
-      .catch(() => {});
+    (async () => {
+      try {
+        const data = await refresh();
+        const listed = await call("listPages", { spaceId: data.page?.spaceId });
+        setQueue(listed.pages || []);
+        const found = await call("findUsers", { query: "" });
+        setUsers(found.users || []);
+      } catch (e) {
+        setErr(e.message);
+      }
+    })();
   }, []);
 
   async function pollUntilSettled(jobId, sessionId) {
@@ -209,8 +217,12 @@ export default function App() {
               <li key={p.id} className={p.current ? "current" : ""}>
                 <button
                   onClick={() => {
-                    localStorage.setItem("pageId", p.id);
-                    window.location.reload();
+                    refresh(p.id)
+                      .then((data) => {
+                        setSection(data.sections?.[0] || null);
+                        setTab("edit");
+                      })
+                      .catch((e) => setErr(e.message));
                   }}
                 >
                   {p.title}

@@ -1,4 +1,4 @@
-const Resolver = require("@forge/resolver");
+const Resolver = require("@forge/resolver").default;
 const { handlers } = require("./handlers");
 
 const resolver = new Resolver();
