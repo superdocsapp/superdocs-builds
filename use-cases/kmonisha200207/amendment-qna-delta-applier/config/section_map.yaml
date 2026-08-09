@@ -1,0 +1,45 @@
+# Maps amendment/Q&A rule types to the proposal sections they directly affect,
+# and models second-order effects via section_dependencies.
+#
+# This file is the "configuration over code" surface: adding a new rule type,
+# a new proposal section, or a new dependency is a data change here, not a
+# code change in section_mapper.py.
+
+rule_section_map:
+  page_limit:
+    volume_I: ["SEC-VOL1-TECH"]
+  exec_summary_page_limit:
+    volume_I: ["SEC-EXEC-SUMMARY"]
+  due_date:
+    default: []   # logistics-only fact: logged in the amendment-response log, no proposal section edit required
+  submission_method:
+    default: []   # unchanged in our fixtures; present so a future real change has a mapping target
+  staffing:
+    default: []   # unchanged in our fixtures; present for the same reason
+  eval_weight:
+    Technical: ["SEC-VOL3-PRICE"]
+    Price: ["SEC-VOL3-PRICE"]
+    "Past Performance": []
+  requirement_added:
+    default: ["SEC-VOL1-TECH"]
+  requirement_deleted:
+    "C.2": ["SEC-VOL1-DR-PLAN", "SEC-VOL1-TECH"]
+
+# second-order impact: if a section on the left is directly impacted, every
+# section listed on the right is also impacted (second-order), because its
+# own text references or depends on the left section's content.
+section_dependencies:
+  SEC-VOL1-TECH: ["SEC-COMPLIANCE-MATRIX"]
+  SEC-VOL1-DR-PLAN: ["SEC-COMPLIANCE-MATRIX", "SEC-VOL1-TECH"]
+  SEC-VOL3-PRICE: []
+  SEC-EXEC-SUMMARY: []
+
+# every section id that exists in the proposal draft, used to compute the
+# "provably untouched" set (all known sections minus impacted ones).
+known_sections:
+  - SEC-EXEC-SUMMARY
+  - SEC-VOL1-TECH
+  - SEC-VOL1-DR-PLAN
+  - SEC-VOL2-PASTPERF
+  - SEC-VOL3-PRICE
+  - SEC-COMPLIANCE-MATRIX
