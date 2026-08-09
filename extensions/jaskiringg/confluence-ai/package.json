@@ -1,0 +1,21 @@
+{
+  "name": "confluence-ai-review",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Confluence Cloud in-page AI edit and review, built on SuperDocs.",
+  "scripts": {
+    "sidecar": "node sidecar/server.js",
+    "ui:dev": "npm --prefix static/ui run dev",
+    "ui:build": "npm --prefix static/ui run build",
+    "test": "node --test src/lib/*.test.js",
+    "start": "npm run ui:build && npm run sidecar"
+  },
+  "dependencies": {
+    "@forge/api": "^8.0.3",
+    "@forge/resolver": "^2.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "node-html-parser": "^7.0.1"
+  }
+}

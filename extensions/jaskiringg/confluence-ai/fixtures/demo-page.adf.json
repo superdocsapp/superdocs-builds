@@ -1,0 +1,89 @@
+{
+  "type": "doc",
+  "version": 1,
+  "content": [
+    {
+      "type": "heading",
+      "attrs": { "level": 1 },
+      "content": [{ "type": "text", "text": "IT Change Policy — North Region" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "All production changes require a CAB ticket before cutover. Emergency changes still need a follow-up ticket within 24 hours."
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "Freeze windows" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "North region freeze is 02:00-06:00 IST on release nights. No master-data edits during freeze."
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "attrs": { "isNumberColumnEnabled": false, "layout": "default" },
+      "content": [
+        {
+          "type": "tableRow",
+          "content": [
+            {
+              "type": "tableHeader",
+              "attrs": {},
+              "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "System" }] }]
+            },
+            {
+              "type": "tableHeader",
+              "attrs": {},
+              "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Owner" }] }]
+            }
+          ]
+        },
+        {
+          "type": "tableRow",
+          "content": [
+            {
+              "type": "tableCell",
+              "attrs": {},
+              "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Order API" }] }]
+            },
+            {
+              "type": "tableCell",
+              "attrs": {},
+              "content": [{ "type": "paragraph", "content": [{ "type": "text", "text": "Platform" }] }]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "attrs": { "level": 2 },
+      "content": [{ "type": "text", "text": "Rollback" }]
+    },
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "If error rate exceeds 2% after cutover, roll back within 15 minutes and page the on-call."
+        }
+      ]
+    },
+    {
+      "type": "codeBlock",
+      "attrs": { "language": "bash" },
+      "content": [{ "type": "text", "text": "kubectl rollout undo deploy/order-api" }]
+    }
+  ]
+}

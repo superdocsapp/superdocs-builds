@@ -1,0 +1,57 @@
+modules:
+  confluence:contentAction:
+    - key: ai-edit-review
+      resource: main
+      resolver:
+        function: resolver
+      title: SuperDocs AI edit
+      viewportSize: large
+  confluence:contentBylineItem:
+    - key: ai-review-status
+      resource: main
+      resolver:
+        function: resolver
+      title: SuperDocs AI edit
+  confluence:globalPage:
+    - key: superdocs-home
+      resource: main
+      resolver:
+        function: resolver
+      title: SuperDocs AI
+      route: superdocs-ai
+  confluence:spacePage:
+    - key: space-normalise
+      resource: main
+      resolver:
+        function: resolver
+      title: SuperDocs space queue
+      route: superdocs-queue
+  function:
+    - key: resolver
+      handler: index.handler
+
+resources:
+  - key: main
+    path: static/ui/build
+
+app:
+  runtime:
+    name: nodejs22.x
+    memoryMB: 256
+  id: ari:cloud:ecosystem::app/7f17f3ef-6f7f-4c69-a213-590e8cacdfcc
+
+permissions:
+  scopes:
+    - read:page:confluence
+    - write:page:confluence
+    - read:space:confluence
+    - read:user:confluence
+    - search:confluence
+    - read:content.property:confluence
+    - write:content.property:confluence
+  external:
+    fetch:
+      backend:
+        - address: api.superdocs.app
+      client:
+        - address: api.superdocs.app
