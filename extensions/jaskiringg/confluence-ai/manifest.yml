@@ -11,7 +11,14 @@ modules:
       resource: main
       resolver:
         function: resolver
-      title: AI review
+      title: SuperDocs AI edit
+  confluence:globalPage:
+    - key: superdocs-home
+      resource: main
+      resolver:
+        function: resolver
+      title: SuperDocs AI
+      route: superdocs-ai
   confluence:spacePage:
     - key: space-normalise
       resource: main

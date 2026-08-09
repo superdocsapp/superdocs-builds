@@ -180,11 +180,13 @@ export default function App() {
     <div className="shell">
       <header className="top">
         <div>
-          <div className="kicker">Confluence · SuperDocs</div>
+          <div className="kicker">
+            {ctx.page.demo ? "Sidecar demo page" : "Live Confluence page"}
+          </div>
           <h1>{ctx.page.title}</h1>
           <p className="meta">
             v{ctx.page.version}
-            {ctx.page.demo ? " · demo page (sidecar)" : ""}
+            {ctx.page.demo ? " · not writing to Confluence yet" : " · writes back to the wiki page"}
             {" · "}
             review: {ctx.review?.status || "draft"}
             {!ctx.hasSuperDocsKey ? " · missing SUPERDOCS_API_KEY" : ""}

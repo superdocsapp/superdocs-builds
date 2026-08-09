@@ -46,12 +46,14 @@ function isDemoId(id) {
 function resolvePageId(payload, ctx) {
   if (!isDemoId(payload.pageId)) return String(payload.pageId);
   if (!isDemoId(ctx.pageId)) return String(ctx.pageId);
+  if (process.env.CONFLUENCE_PAGE_ID) return String(process.env.CONFLUENCE_PAGE_ID);
   return payload.pageId || ctx.pageId || DEMO_PAGE_ID;
 }
 
 function resolveSpaceId(payload, ctx) {
   if (!isDemoId(payload.spaceId)) return String(payload.spaceId);
   if (!isDemoId(ctx.spaceId)) return String(ctx.spaceId);
+  if (process.env.CONFLUENCE_SPACE_ID) return String(process.env.CONFLUENCE_SPACE_ID);
   return payload.spaceId || ctx.spaceId || DEMO_SPACE_ID;
 }
 
@@ -66,7 +68,10 @@ async function getContext(payload, ctx) {
 
   if (env.useForgeApi && isDemoId(pageId) && !isDemoId(spaceId)) {
     const pages = await listSpacePages(env, spaceId);
-    const first = pages[0];
+    const first =
+      pages.find((p) => /IT Change Policy/i.test(p.title || "")) ||
+      pages.find((p) => !/^Overview$/i.test(p.title || "")) ||
+      pages[0];
     if (first) return getContext({ ...payload, pageId: first.id, spaceId }, ctx);
     return {
       page: { id: null, title: "Space queue", version: 1, spaceId, demo: false },
