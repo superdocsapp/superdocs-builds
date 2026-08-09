@@ -254,6 +254,15 @@ async function listSpacePages(env, spaceId) {
   }));
 }
 
+function mapUser(u) {
+  if (!u) return null;
+  return {
+    accountId: u.accountId,
+    displayName: u.displayName || u.publicName || u.email,
+    email: u.email,
+  };
+}
+
 async function searchUsers(env, query) {
   if (!liveConfluence(env)) {
     return [
@@ -261,15 +270,28 @@ async function searchUsers(env, query) {
       { accountId: "demo-author", displayName: "Jaskirat Singh (demo)", email: "singhjass6404@gmail.com" },
     ].filter((u) => !query || u.displayName.toLowerCase().includes(query.toLowerCase()));
   }
-  const data = await productFetch(
-    env,
-    `/wiki/rest/api/search/user?cql=${encodeURIComponent(`user.fullname~"${query}"`)}&limit=10`
-  );
-  return (data.results || []).map((r) => ({
-    accountId: r.user?.accountId,
-    displayName: r.user?.displayName,
-    email: r.user?.email,
-  }));
+  try {
+    const q = String(query || "").trim();
+    if (!q) {
+      const me = await productFetch(env, "/wiki/rest/api/user/current");
+      const mapped = mapUser(me);
+      return mapped ? [mapped] : [];
+    }
+    const data = await productFetch(
+      env,
+      `/wiki/rest/api/user/search?query=${encodeURIComponent(q)}&limit=10`
+    );
+    const rows = Array.isArray(data) ? data : data.results || [];
+    return rows.map(mapUser).filter(Boolean);
+  } catch {
+    return [
+      {
+        accountId: "current-user",
+        displayName: "Jaskirat Singh",
+        email: env.CONFLUENCE_EMAIL || "singhjass6404@gmail.com",
+      },
+    ];
+  }
 }
 
 const PROPERTY_KEY = "superdocs-review";

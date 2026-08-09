@@ -38,10 +38,18 @@ export default function App() {
     (async () => {
       try {
         const data = await refresh();
-        const listed = await call("listPages", { spaceId: data.page?.spaceId });
-        setQueue(listed.pages || []);
-        const found = await call("findUsers", { query: "" });
-        setUsers(found.users || []);
+        try {
+          const listed = await call("listPages", { spaceId: data.page?.spaceId });
+          setQueue(listed.pages || []);
+        } catch {
+          setQueue([]);
+        }
+        try {
+          const found = await call("findUsers", { query: "" });
+          setUsers(found.users || []);
+        } catch {
+          setUsers([]);
+        }
       } catch (e) {
         setErr(e.message);
       }
