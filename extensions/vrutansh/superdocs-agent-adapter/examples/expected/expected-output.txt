@@ -1,0 +1,5 @@
+Customer Support Policy
+
+Support is available Monday through Friday, 09:00-17:00 UTC.
+
+Urgent incidents should include a clear description and reproduction steps.
