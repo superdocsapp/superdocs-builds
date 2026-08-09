@@ -1,0 +1,9 @@
+[project]
+name = "amendment-qna-delta-applier"
+version = "0.1.0"
+description = "SuperDocs Round 2 build: Amendment and Q&A Delta Applier"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

@@ -1,0 +1,24 @@
+SOLICITATION NO. FA8750-26-R-0042
+"Enterprise Data Modernization Support Services"
+Issued by: Department of the Air Force, AFLCMC
+Original Issue Date: 2026-06-01
+
+SECTION C — DESCRIPTION / SPECIFICATIONS / STATEMENT OF WORK
+
+C.1 The Contractor shall provide data migration services for legacy enterprise systems.
+C.2 The Contractor shall provide a disaster recovery test plan, executed semi-annually.
+C.3 The Contractor shall maintain a helpdesk staffed 0600-1800 ET, Monday through Friday.
+
+SECTION L — INSTRUCTIONS, CONDITIONS, AND NOTICES TO OFFERORS
+
+L.3.2 Page Limit — Volume I (Technical Approach): 40 pages, single-spaced, 11pt font minimum.
+L.3.3 Page Limit — Volume II (Past Performance): 15 pages.
+L.4.1 Proposals are due no later than 2026-09-15 17:00 ET. Late proposals will not be considered.
+L.5.1 Offerors shall submit one electronic copy via the designated portal.
+
+SECTION M — EVALUATION FACTORS FOR AWARD
+
+M.2.1 Factor 1 — Technical Approach: weighted 40% of total evaluation score.
+M.2.2 Factor 2 — Past Performance: weighted 30% of total evaluation score.
+M.2.3 Factor 3 — Price: weighted 30% of total evaluation score.
+M.3.1 Award will be made to the offeror representing the best value to the Government.

@@ -1,0 +1,15 @@
+AMENDMENT OF SOLICITATION — AMENDMENT NO. 0001
+Solicitation No. FA8750-26-R-0042
+Amendment Issue Date: 2026-07-10
+
+The above-numbered solicitation is amended as follows. All other terms and conditions remain unchanged.
+
+PARA 1. Section L.3.2 is revised. The page limit for Volume I (Technical Approach) is reduced from 40 pages to 25 pages, single-spaced, 11pt font minimum.
+
+PARA 2. Section L.4.1 is revised. The proposal due date is extended from 2026-09-15 17:00 ET to 2026-09-29 17:00 ET.
+
+PARA 3. Section M.2.1 and M.2.3 are revised. Factor 1 (Technical Approach) weighting is increased from 40% to 50% of total evaluation score. Factor 3 (Price) weighting is decreased from 30% to 20% of total evaluation score. Factor 2 (Past Performance) is unchanged at 30%.
+
+PARA 4. Section C is revised to add a new requirement. C.4 The Contractor shall provide a cybersecurity incident response runbook, updated quarterly.
+
+PARA 5. Section C.2 is deleted in its entirety. The semi-annual disaster recovery test plan requirement no longer applies.

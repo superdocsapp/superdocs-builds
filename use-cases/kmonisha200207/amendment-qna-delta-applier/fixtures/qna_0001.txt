@@ -1,0 +1,12 @@
+RESPONSES TO OFFEROR QUESTIONS — SET 1
+Solicitation No. FA8750-26-R-0042
+Q&A Issue Date: 2026-07-18
+
+PARA 1. Question: Does the revised 25-page limit for Volume I (per Amendment 0001) include the Executive Summary?
+Answer: No. Section L.3.2 is further clarified: the Executive Summary is excluded from the 25-page Volume I limit and is capped separately at 2 pages.
+
+PARA 2. Question: Is the helpdesk staffing requirement in Section C.3 affected by any amendment?
+Answer: No. Section C.3 is unchanged; helpdesk staffing remains 0600-1800 ET, Monday through Friday.
+
+PARA 3. Question: Given the extended due date in Amendment 0001 PARA 2, will the Government accept proposals submitted through a secondary email address if the portal is unavailable?
+Answer: No. Section L.5.1 is unchanged: one electronic copy via the designated portal remains the only accepted submission method, regardless of the revised due date.
