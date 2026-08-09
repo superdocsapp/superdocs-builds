@@ -187,9 +187,11 @@ export default function App() {
   return (
     <div className="shell">
       <header className="top">
-        <div>
+        <div className="brand">
+          <div className="mark" aria-hidden>SD</div>
+          <div>
           <div className="kicker">
-            {ctx.page.demo ? "Sidecar demo page" : "Live Confluence page"}
+            {ctx.page.demo ? "Sidecar demo page" : "Live Confluence · SuperDocs"}
           </div>
           <h1>{ctx.page.title}</h1>
           <p className="meta">
@@ -199,6 +201,7 @@ export default function App() {
             review: {ctx.review?.status || "draft"}
             {!ctx.hasSuperDocsKey ? " · missing SUPERDOCS_API_KEY" : ""}
           </p>
+          </div>
         </div>
         <div className="tabs">
           <button className={tab === "edit" ? "on" : ""} onClick={() => setTab("edit")}>Page edit</button>
