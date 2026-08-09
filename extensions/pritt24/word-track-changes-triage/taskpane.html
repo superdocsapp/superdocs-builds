@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Track-Changes Triage</title>
+  <link rel="stylesheet" href="taskpane.css" />
+</head>
+<body>
+  <div id="root">Loading Office.js…</div>
+
+  <!-- Office.js must load before anything that touches Word. -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/htm@3/dist/htm.js"></script>
+  <script src="superdocs-client.js"></script>
+  <script src="word-changes.js"></script>
+  <script src="taskpane.js"></script>
+</body>
+</html>

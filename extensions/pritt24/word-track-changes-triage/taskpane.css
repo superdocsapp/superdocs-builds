@@ -1,0 +1,54 @@
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+  color: #1b1f23;
+}
+h1 { font-size: 16px; margin: 0 0 10px; }
+h4 { font-size: 12px; margin: 10px 0 6px; }
+
+.settings { border: 1px solid #e2e2e2; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; }
+.settings input { width: 60%; margin-right: 6px; }
+
+.muted { color: #777; font-size: 11px; }
+
+.error-banner { background: #fde2e1; border: 1px solid #f2b8b5; color: #86181d; padding: 6px 10px; border-radius: 6px; margin-bottom: 10px; cursor: pointer; font-size: 12px; }
+.error-banner .dismiss { font-size: 10px; opacity: 0.7; }
+
+.usage { font-size: 11px; color: #555; margin-bottom: 8px; }
+
+.tabs { display: flex; gap: 4px; margin-bottom: 10px; border-bottom: 1px solid #e2e2e2; }
+.tabs button { background: none; border: none; padding: 6px 10px; cursor: pointer; border-bottom: 2px solid transparent; }
+.tabs button.active { border-bottom-color: #0969da; font-weight: 600; }
+
+.toolbar { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+.toolbar button, .filters select, .instruction-bar button {
+  padding: 5px 8px; border: 1px solid #d0d7de; border-radius: 4px; background: #f6f8fa; cursor: pointer;
+}
+
+.filters { display: flex; gap: 6px; margin-bottom: 8px; }
+
+.instruction-bar { display: flex; gap: 6px; margin-bottom: 10px; }
+.instruction-bar input { flex: 1; padding: 5px 8px; border: 1px solid #d0d7de; border-radius: 4px; }
+
+.badge { color: white; font-size: 10px; padding: 1px 6px; border-radius: 10px; margin-left: 6px; }
+
+.changes-list, .comments-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.change-row, .comment-card { border: 1px solid #e2e2e2; border-radius: 6px; padding: 8px 10px; }
+.change-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; margin-bottom: 4px; }
+.reviewer { font-weight: 600; }
+.wordtype { color: #555; }
+.change-text { font-size: 12px; }
+.reason { margin-top: 3px; }
+
+.preview-batch { border: 1px solid #0969da; border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; background: #f0f7ff; }
+.preview-batch ul { list-style: none; padding: 0; margin: 6px 0; display: flex; flex-direction: column; gap: 6px; }
+.actions { display: flex; gap: 6px; margin-top: 6px; }
+.approve { background: #1a7f37; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; }
+.reject { background: #cf222e; color: white; border: none; border-radius: 4px; padding: 5px 10px; cursor: pointer; }
+
+.comment-content { margin: 4px 0; }
+.comment-reply { margin-left: 10px; }
+.comment-card textarea { width: 100%; margin-top: 6px; font-family: inherit; }
