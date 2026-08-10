@@ -1,0 +1,95 @@
+import json
+import os
+import time
+from pathlib import Path
+
+from dotenv import load_dotenv
+from techpack.generator import generate_tech_pack_html
+from techpack.superdocs_client import send_edit, approve_changes, export_document, SuperDocsError
+from techpack.verification import verify_measurement_table
+
+load_dotenv()
+
+STYLE_PATH = Path("styles/classic_crew_tee.json")
+OUTPUT_DIR = Path("output")
+
+
+def load_style(path: Path) -> dict:
+    with open(path) as f:
+        return json.load(f)
+
+
+def get_updated_html(result: dict, fallback_html: str) -> str:
+    """Returns the new HTML if the edit produced changes, otherwise falls
+    back to whatever HTML we already had — a no-op is not an error."""
+    changes = result.get("document_changes") or {}
+    updated = changes.get("updated_html")
+    if updated:
+        return updated
+    print("ℹ️  No changes returned (edit was a no-op) — keeping prior HTML state.")
+    return fallback_html
+
+
+def main():
+    style = load_style(STYLE_PATH)
+    session_id = f"techpack-{style['style_id']}-{int(time.time())}"
+
+    html = generate_tech_pack_html(style)
+    print(f"Generated HTML for {style['style_name']} ({len(html)} chars)")
+
+    # Step 1: load the pre-computed document into a SuperDocs session
+    result = send_edit(
+        session_id=session_id,
+        message="Format this document cleanly with a professional letterhead style. Do not change any numbers in the measurement table.",
+        document_html=html,
+    )
+    print("Chat response:", result.get("response"))
+
+    latest_html = get_updated_html(result, html)
+    is_valid, mismatches = verify_measurement_table(latest_html, style)
+    print("✅ Table verified after formatting" if is_valid else f"❌ Table mismatch after formatting: {mismatches}")
+
+    # Step 2: ask for flat sketch images
+    result = send_edit(
+        session_id=session_id,
+        message=(
+            "Generate a front-view and back-view black and white technical flat "
+            "sketch of a classic crew neck t-shirt and insert them at the top of "
+            "the document, above the measurement table."
+        ),
+    )
+    print("Chat response:", result.get("response"))
+
+    latest_html = get_updated_html(result, latest_html)
+    is_valid, mismatches = verify_measurement_table(latest_html, style)
+    print("✅ Table still verified after image insertion" if is_valid else f"❌ Table mismatch after images: {mismatches}")
+
+    if "<img" not in latest_html:
+        print("⚠️  No <img> tag found in returned HTML — images may not have actually been inserted despite the success message.")
+
+    changes = result.get("document_changes") or {}
+    version_id = changes.get("version_id")
+
+    # Step 3: approve if needed
+    if changes.get("requires_approval") or changes.get("pending_changes"):
+        try:
+            approve_changes(version_id=version_id, approve_all=True)
+            print("Changes approved.")
+        except SuperDocsError as e:
+            print(f"Approve step failed: {e}")
+    else:
+        print("No approval required — changes were auto-approved.")
+
+    # Step 4: export the actual latest state
+    OUTPUT_DIR.mkdir(exist_ok=True)
+    try:
+        file_bytes = export_document(html=latest_html, filename=style["style_id"])
+        out_path = OUTPUT_DIR / f"{style['style_id']}_techpack.docx"
+        out_path.write_bytes(file_bytes)
+        print(f"Exported to {out_path}")
+    except SuperDocsError as e:
+        print(f"Export step failed: {e}")
+
+
+if __name__ == "__main__":
+    main()

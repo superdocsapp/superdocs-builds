@@ -1,0 +1,14 @@
+# Environment
+.env
+venv/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Output
+output/
+
+# OS
+.DS_Store
