@@ -9,4 +9,5 @@ build/
 output/
 quickstarts/*/output/
 pytest-of-root/
+crewai:*.lock
 .env

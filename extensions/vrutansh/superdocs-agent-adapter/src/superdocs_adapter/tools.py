@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any
 
 from .adapter import SuperDocsAdapter
-from .models import ExportFormat
+from .checkpoints import checkpoint_name, operation_fingerprint
+from .models import ExportFormat, Job
 
 
 @dataclass(frozen=True)
@@ -23,9 +25,16 @@ class ToolSpec:
 class SuperDocsToolset:
     """Creates framework-neutral tools backed by one adapter instance."""
 
-    def __init__(self, adapter: SuperDocsAdapter, *, output_directory: str | Path = "output") -> None:
+    def __init__(
+        self,
+        adapter: SuperDocsAdapter,
+        *,
+        output_directory: str | Path = "output",
+        on_progress: Callable[[Job], None] | None = None,
+    ) -> None:
         self.adapter = adapter
         self.output_directory = Path(output_directory)
+        self.on_progress = on_progress
 
     def edit_document(
         self,
@@ -35,11 +44,21 @@ class SuperDocsToolset:
     ) -> dict[str, Any]:
         """Upload, edit with review, approve, export, and save one document."""
         export_format = ExportFormat(output_format)
+        fingerprint = operation_fingerprint(
+            file_path,
+            instruction,
+            export_format,
+            "core",
+            "balanced",
+        )
+        checkpoint_path = self.output_directory / ".superdocs-state" / checkpoint_name(fingerprint)
         result = self.adapter.edit_and_export(
             file_path,
             instruction,
             export_format=export_format,
             output_filename="superdocs-output",
+            checkpoint_path=checkpoint_path,
+            on_progress=self.on_progress,
         )
         saved_path = result.export.save(self.output_directory / result.export.filename)
         canonical = result.canonical()

@@ -2,8 +2,8 @@ from pathlib import Path
 
 from superdocs_adapter.adapter import SuperDocsAdapter
 from superdocs_adapter.models import (
-    ExportFormat,
     ExportedDocument,
+    ExportFormat,
     Job,
     JobStatus,
     ProposedChange,
@@ -70,4 +70,5 @@ def test_adapter_runs_four_call_contract_and_returns_canonical_result(tmp_path: 
         "export_format": "txt",
         "filename": "result.txt",
         "size_bytes": 16,
+        "resumed": False,
     }

@@ -1,6 +1,7 @@
 """Public package surface for the SuperDocs agent adapter."""
 
 from .adapter import SuperDocsAdapter
+from .checkpoints import FileCheckpointStore, RunCheckpoint, RunPhase
 from .client import SuperDocsClient
 from .errors import (
     ConfigurationError,
@@ -24,12 +25,15 @@ __all__ = [
     "ConfigurationError",
     "EditResult",
     "ExportFormat",
+    "FileCheckpointStore",
     "InvalidResponseError",
     "Job",
     "JobFailedError",
     "JobStatus",
     "JobTimeoutError",
     "ProposedChange",
+    "RunCheckpoint",
+    "RunPhase",
     "SuperDocsAPIError",
     "SuperDocsAdapter",
     "SuperDocsClient",

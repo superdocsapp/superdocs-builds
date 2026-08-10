@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 
 class JobStatus(str, Enum):
@@ -75,6 +76,7 @@ class EditResult:
     approved_change_ids: tuple[str, ...]
     export: ExportedDocument
     final_result: Mapping[str, Any] | None = None
+    resumed: bool = False
 
     def canonical(self) -> dict[str, Any]:
         """Stable result shape used by every framework binding."""
@@ -84,4 +86,5 @@ class EditResult:
             "export_format": self.export.format.value,
             "filename": self.export.filename,
             "size_bytes": len(self.export.content),
+            "resumed": self.resumed,
         }

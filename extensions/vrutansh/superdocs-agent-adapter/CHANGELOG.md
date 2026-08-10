@@ -5,11 +5,7 @@ project follows Semantic Versioning.
 
 ## [Unreleased]
 
-### Planned
-
-- First public release after live SuperDocs verification.
-
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-08-10
 
 ### Added
 
@@ -21,3 +17,8 @@ project follows Semantic Versioning.
 - Mocked framework-boundary parity test and opt-in live parity test.
 - Proposed-change double parsing, compact polling, timeouts, and typed failures.
 - Documentation for architecture, MCP trade-offs, and adding a fourth binding.
+- Atomic resumable checkpoints with input-fingerprint validation.
+- Recovery of accepted jobs through unique session history.
+- Pre-signed streaming uploads for documents above 20 MiB.
+- Native StateGraph, CrewAI Flow, and OpenAI Agent quickstart structures.
+- Explicit dependency-boundary, restart, failure, and large-upload tests.

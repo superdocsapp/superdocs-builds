@@ -1,97 +1,107 @@
 # SuperDocs Agent Adapter
 
-One maintained, framework-independent Python core for SuperDocs, with thin bindings
-and comparable quickstarts for LangGraph, CrewAI, and the OpenAI Agents SDK.
+One maintained Python core that exposes SuperDocs document editing to LangGraph,
+CrewAI, the OpenAI Agents SDK, and future agent frameworks through thin bindings.
 
-Every quickstart performs the same reviewed workflow:
+All three quickstarts run the same reviewed task against the same document and return
+the same canonical result. The framework changes; the SuperDocs behavior does not.
 
-1. Upload the same document.
-2. Send the same edit instruction.
-3. Wait for and approve the proposed changes.
-4. Export the finished document as text.
-5. Return the same canonical result shape.
+> Built by **Vrutansh Patel** for the SuperDocs engineering task.
 
-The adapter uses the SuperDocs REST API. Agent frameworks are optional integrations;
-none are imported by the core package.
+## Verified result
+
+| Proof | Result |
+|---|---:|
+| Framework-independent core | Verified by isolated import test |
+| Framework bindings | LangGraph, CrewAI, OpenAI Agents SDK |
+| Live output parity | 3/3 frameworks matched the expected export |
+| Non-live suite | 31 tests, no SuperDocs key required |
+| Coverage | 91% |
+| Clean-copy install/test/build | Passed |
+| Distribution | Wheel and source archive build successfully |
+| Live operation guard | Explicit opt-in; maximum three edits per parity run |
+
+### Framework parity proof
+
+![Framework parity and native binding verification](assets/framework-parity.png)
+
+The zero-operation verification crosses the LangGraph, CrewAI, and OpenAI Agents
+binding boundaries and validates their native framework shapes.
+
+The final hardened live parity run completed in **70.93 seconds on Windows/Python
+3.12.10**. This is one observed small-document run, not a general latency claim.
 
 ## Why this exists
 
-Framework-specific examples are useful, but separately implementing HTTP, polling,
-approval, parsing, and export for every framework creates drift. This project keeps
-that behavior in one core. A binding only translates the portable tool specification
-into a framework-native tool.
+Implementing upload, async polling, change parsing, approval, recovery, and export in
+every framework example creates drift. This adapter keeps those rules in one core and
+translates only the portable tool boundary.
 
 ```mermaid
 flowchart TD
-    LG[LangGraph binding] --> TS[Portable ToolSpec]
-    CR[CrewAI binding] --> TS
-    OA[OpenAI Agents binding] --> TS
-    TS --> AD[SuperDocsAdapter]
-    AD --> CL[SuperDocsClient]
-    CL --> SD[SuperDocs REST API]
+    LG["LangGraph StateGraph"] --> B["Thin bindings"]
+    CR["CrewAI Flow"] --> B
+    OA["OpenAI Agent"] --> B
+    B --> TS["Portable ToolSpec"]
+    TS --> A["Resumable SuperDocsAdapter"]
+    A --> C["SuperDocsClient"]
+    C --> SD["SuperDocs REST API"]
 ```
+
+The core package has no framework dependency. Installing another framework is an
+optional extra, and importing `superdocs_adapter` does not import `langgraph`,
+`crewai`, or `agents`.
 
 ## Assignment coverage
 
-| Requirement | Implementation |
+| Assignment requirement | Evidence |
 |---|---|
-| Framework-independent core | `src/superdocs_adapter/`; no framework dependencies |
-| Three popular frameworks | LangGraph, CrewAI, OpenAI Agents SDK |
-| Same task and output | Shared fixture/instruction plus `test_binding_parity.py` |
-| Clean-clone runnable | Locked dependencies and commands below |
-| Fourth binding process | [`docs/adding-a-binding.md`](docs/adding-a-binding.md) |
-| Hosted server vs wrapper note | [`docs/mcp-vs-wrapper.md`](docs/mcp-vs-wrapper.md) |
-| Versioned releases | Semantic version, lockfile, and [`CHANGELOG.md`](CHANGELOG.md) |
-| SuperDocs surfaces | Upload, async chat, approval, job polling, export |
+| One framework-agnostic adapter | `src/superdocs_adapter/` |
+| Three popular frameworks | Native quickstarts for LangGraph, CrewAI, OpenAI Agents |
+| Same task, identical output | Mock parity plus opt-in live parity test |
+| Clean-clone runnable | Locked dependencies and clean-copy verification |
+| Fourth binding in an afternoon | [`docs/adding-a-binding.md`](docs/adding-a-binding.md) |
+| Hosted server vs wrapper guidance | [`docs/mcp-vs-wrapper.md`](docs/mcp-vs-wrapper.md) |
+| Versioned releases | Semantic version, changelog, release procedure |
+| Four-call minimum contract | Upload, async chat, approval, export |
+| Proposed-change second parse | Isolated parser and contract test |
+| Long-operation handling | Compact polling, progress callback, timeout with resume guidance |
+| Operation budget | Checkpoints, re-entry, explicit live-test flag |
 
-## Repository layout
+## Framework comparison
 
-```text
-superdocs-agent-adapter/
-├── src/superdocs_adapter/       # Framework-free core
-│   └── bindings/                # Optional thin framework translations
-├── quickstarts/                 # Three comparable runnable examples
-├── examples/                    # Shared input and expected output
-├── tests/                       # Unit, HTTP contract, parity and live tests
-├── docs/                        # Decisions and extension instructions
-├── pyproject.toml               # Package metadata and optional extras
-└── uv.lock                      # Reproducible dependency lock
-```
+| Quickstart | Native shape | Best fit |
+|---|---|---|
+| LangGraph | Compiled `StateGraph` and `StructuredTool` | Stateful graphs, branching, interrupts |
+| CrewAI | Native deterministic `Flow` and CrewAI tool | Crew/flow-based applications |
+| OpenAI Agents | `Agent` with attached `FunctionTool` | SDK-managed tool loops and handoffs |
 
-## Requirements
-
-- Python 3.10+
-- [`uv`](https://docs.astral.sh/uv/) recommended
-- A SuperDocs API key for live runs
-
-The test suite does not require an API key unless live tests are explicitly enabled.
+The quickstarts invoke their native tool deterministically. This avoids requiring a
+second model-provider key and makes output parity a test of the adapter rather than a
+test of three different planners. The generated tools can still be attached to normal
+agent loops; each quickstart README shows the intended integration shape.
 
 ## Clean-clone setup
 
-From this project directory:
+Requirements: Python 3.10+, [`uv`](https://docs.astral.sh/uv/), and a SuperDocs API
+key only for live calls.
 
 ```bash
 uv sync --all-extras
 uv run pytest -m "not live"
 ```
 
-Set the live credential in your shell. Never add it to a file committed to Git.
+Set the key in the shell, never in committed source:
 
 ```bash
 export SUPERDOCS_API_KEY="your-key-here"
 ```
 
-PowerShell:
-
 ```powershell
 $env:SUPERDOCS_API_KEY="your-key-here"
 ```
 
-## Run the three quickstarts
-
-Each command uses the same `sample-policy.txt`, instruction, export format, and
-canonical response. It invokes the framework's native tool boundary directly, so no
-second model-provider key or additional agent-model call is required.
+## Run the quickstarts
 
 ```bash
 uv run --extra langgraph python -m quickstarts.langgraph.app
@@ -99,7 +109,9 @@ uv run --extra crewai python -m quickstarts.crewai.app
 uv run --extra openai-agents python -m quickstarts.openai_agents.app
 ```
 
-Each prints this stable shape (runtime paths and byte sizes reflect the actual run):
+Each uses `examples/input/sample-policy.txt`, the same exact instruction, review mode,
+and TXT export. Progress is printed only when status or percentage changes. A completed
+run returns:
 
 ```python
 {
@@ -108,31 +120,71 @@ Each prints this stable shape (runtime paths and byte sizes reflect the actual r
     "export_format": "txt",
     "filename": "superdocs-output.txt",
     "size_bytes": 161,
+    "resumed": False,
     "output_path": "quickstarts/<framework>/output/superdocs-output.txt",
 }
 ```
 
-## Verify identical output
+Runtime IDs are deliberately excluded from this public shape so framework results are
+comparable without hiding meaningful content differences.
 
-The default parity test uses a recorded core result and crosses each real framework
-tool boundary. It proves the bindings pass identical arguments into the core and
-write byte-identical exports without spending SuperDocs operations.
+## Prove identical output
+
+The default parity test crosses each installed framework's real tool boundary using a
+recorded core result. It spends no SuperDocs operations:
 
 ```bash
 uv run pytest tests/test_binding_parity.py -v
 ```
 
-The opt-in live parity test performs three small SuperDocs operations and compares
-normalized text exports with the checked-in expected file:
+The live test performs exactly one small edit per framework and compares all three
+normalized exports to `examples/expected/expected-output.txt`:
 
 ```bash
-RUN_LIVE_SUPERDOCS=1 uv run pytest -m live -v
+RUN_LIVE_SUPERDOCS=1 uv run pytest tests/test_live_parity.py -m live -v -s
 ```
 
-This explicit flag is the operation-budget stopping rule: live tests never run by
-accident, and one invocation performs at most one run per supported framework.
+Without `RUN_LIVE_SUPERDOCS=1`, it is skipped. Stop after one run unless runtime code
+changed; exports are free, but the three edits are not.
 
-## Use the core without a framework
+## Crash-safe re-entry
+
+Every high-level tool call writes a small atomic JSON checkpoint under its ignored
+output directory. The checkpoint contains only:
+
+- An input fingerprint (document bytes + instruction + settings)
+- Session and job IDs
+- Current phase
+- Approved change IDs
+
+It never stores the API key, document content, proposed content, or exported bytes.
+
+Recovery behavior:
+
+| Last durable phase | Re-entry action |
+|---|---|
+| Uploaded | Find the existing job in the unique session, or start one if none exists |
+| Editing | Resume compact polling of the same job |
+| Awaiting/approved | Continue the same approval lifecycle |
+| Completed | Repeat only export, which is non-billable |
+
+The checkpoint fingerprint prevents accidentally resuming a run with changed input.
+Atomic replace prevents readers from observing a partially written checkpoint.
+
+## Large documents
+
+Small documents stream through multipart upload. Files above 20 MiB automatically use
+the documented pre-signed upload flow:
+
+1. Request a short-lived upload URL.
+2. Stream the file directly to storage without loading it into memory.
+3. Ask SuperDocs to parse it into the unique session.
+4. Continue the same edit/review/export workflow.
+
+Inputs above SuperDocs' 100 MB limit fail locally with an actionable message before a
+network call.
+
+## Use the core directly
 
 ```python
 import os
@@ -145,50 +197,77 @@ with SuperDocsClient(os.environ["SUPERDOCS_API_KEY"]) as client:
         "contract.docx",
         "Change the governing law to Maharashtra. Do not change anything else.",
         export_format=ExportFormat.DOCX,
+        checkpoint_path="output/contract-run.json",
     )
     result.export.save("output/reviewed-contract.docx")
 ```
 
-## Core design choices
+## System invariants
 
-- `chat/async` with `approval_mode="ask_every_time"` preserves the required human
-  approval boundary.
-- Compact polling avoids repeatedly downloading large result bodies. A full job is
-  fetched only at approval and completion boundaries.
-- Proposed-change content receives the documented second JSON parse. Completed job
-  results remain objects and are not decoded a second time.
-- Timeouts and terminal failures are explicit exceptions; slow jobs are never treated
-  as crashed merely because they are still processing.
-- Unique session IDs prevent collisions between framework runs.
-- Binary exports support both direct bytes and SuperDocs signed download URLs.
-- Framework packages are optional extras and imported only inside binding modules.
+- Framework bindings never implement HTTP, polling, approval, or export logic.
+- A costly edit is associated with one unique session and durable checkpoint.
+- Re-entry never uploads again when a valid checkpoint exists.
+- Proposed-change content is parsed twice; completed results are parsed once.
+- Compact polling never mistakes slow processing for a crash.
+- Export failure never repeats the edit.
+- Credentials and document content never enter checkpoints or logs.
+- Large-file bytes stream through the upload path rather than agent context or memory.
 
-See [`docs/architecture.md`](docs/architecture.md) for boundaries and trade-offs.
+See [`docs/architecture.md`](docs/architecture.md) for detailed ownership and runtime
+sequences.
 
-## Tests
+## Honest limitations
+
+- The quickstarts auto-approve changes so their output is comparable. Applications
+  requiring a human decision should use the lower-level job and approval methods to
+  show each proposed change before submitting decisions.
+- A crash before the initial upload response cannot be resumed because no session ID
+  exists locally yet. Upload is non-billable, so retrying does not repeat an edit.
+- TXT parity proves content equality, not DOCX/PDF byte identity. Office containers can
+  differ in metadata while rendering identically.
+- The adapter intentionally exposes one guarded edit workflow, not all SuperDocs tools.
+- This project validates Python 3.10+ contracts; the recorded environment evidence is
+  Windows Python 3.12.10 and Linux Python 3.12.13.
+
+## Tests and package checks
 
 ```bash
 uv run pytest -m "not live" -v
-uv run pytest --cov=superdocs_adapter --cov-report=term-missing
+uv run pytest -m "not live" --cov=superdocs_adapter --cov-report=term-missing
+uv run ruff check .
+uv run ruff format --check .
 uv build
 ```
 
-Coverage includes orchestration, double parsing, portable tools, real framework
-bindings, HTTP error handling, signed-URL exports, and cross-framework parity.
+The suite covers parsing, HTTP contracts, native framework shapes, dependency
+isolation, resumability, operation recovery, large uploads, signed exports, timeouts,
+terminal failures, and framework parity.
+
+## Repository map
+
+```text
+superdocs-agent-adapter/
+├── src/superdocs_adapter/
+│   ├── client.py              # REST and large-upload transport
+│   ├── adapter.py             # Reviewed, resumable orchestration
+│   ├── checkpoints.py         # Atomic non-secret recovery journal
+│   ├── tools.py               # Portable tool specification
+│   └── bindings/              # Thin optional framework translations
+├── quickstarts/               # Three native framework examples
+├── examples/                  # Shared input and expected export
+├── tests/                     # Offline contracts and opt-in live parity
+├── docs/                      # Architecture and extension decisions
+├── TASK.md                    # Scope, invariants, and definition of done
+├── PROGRESS.md                # Assumptions and verified evidence
+├── pyproject.toml
+└── uv.lock
+```
 
 ## Release policy
 
-This project follows semantic versioning:
-
-- Patch: fixes that do not change tool schemas.
-- Minor: backward-compatible tools, bindings, or fields.
-- Major: incompatible tool schema or public Python API changes.
-
-See [`CHANGELOG.md`](CHANGELOG.md) for released behavior.
-
-## Author
-
-Built by **Vrutansh Patel** for the SuperDocs engineering build round.
+The project follows Semantic Versioning. A release requires the offline suite, package
+build, clean-copy verification, changelog update, Git tag, and GitHub release notes.
+See [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 

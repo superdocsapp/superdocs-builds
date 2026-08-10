@@ -13,10 +13,13 @@ SuperDocs operation.
 5. Delegate execution to `spec.handler`; do not add HTTP or polling code.
 6. Provide an `invoke(toolset, arguments)` helper that crosses the native framework
    tool boundary without requiring an extra LLM call.
-7. Copy a quickstart directory and change only the binding import and output path.
-8. Add the binding to `tests/test_binding_parity.py`.
-9. Run the clean-clone checks and, once, the opt-in live parity test.
-10. Update the compatibility table, changelog, and semantic version.
+7. Add the smallest native workflow/agent constructor that makes the framework shape
+   visible without moving core behavior into the binding.
+8. Copy a quickstart directory and change only the binding import and output path.
+9. Add the binding to `tests/test_binding_parity.py` and `test_framework_shapes.py`.
+10. Prove that importing the core still does not import the new framework.
+11. Run clean-clone checks and, once, the opt-in live parity test.
+12. Update the compatibility table, changelog, and semantic version.
 
 ## Binding contract
 
@@ -34,6 +37,7 @@ the binding must preserve:
 - Allowed export formats
 - The dictionary returned by `spec.handler`
 - Exceptions from the core unless the framework requires a documented wrapper
+- Checkpoint and recovery behavior through `spec.handler`
 
 ## Definition of done
 
@@ -42,4 +46,5 @@ the binding must preserve:
 - The native tool can be attached to an agent in that framework.
 - The quickstart runs from a clean clone.
 - Its canonical result and export match all existing bindings.
+- Re-running it adopts its checkpoint rather than repeating the edit.
 - The package builds successfully as both wheel and source distribution.

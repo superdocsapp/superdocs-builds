@@ -4,7 +4,7 @@ from pathlib import Path
 from superdocs_adapter.bindings.crewai import invoke as invoke_crewai
 from superdocs_adapter.bindings.langgraph import invoke as invoke_langgraph
 from superdocs_adapter.bindings.openai_agents import invoke as invoke_openai_agents
-from superdocs_adapter.models import EditResult, ExportFormat, ExportedDocument
+from superdocs_adapter.models import EditResult, ExportedDocument, ExportFormat
 from superdocs_adapter.tools import SuperDocsToolset
 
 
@@ -32,8 +32,10 @@ class RecordingAdapter:
 
 def test_all_framework_bindings_produce_identical_output(tmp_path: Path) -> None:
     expected = b"Customer Support Policy\n\nUpdated support hours.\n"
+    source = tmp_path / "sample-policy.txt"
+    source.write_text("Customer Support Policy", encoding="utf-8")
     arguments = {
-        "file_path": "sample-policy.txt",
+        "file_path": str(source),
         "instruction": "Make the canonical edit",
         "output_format": "txt",
     }
@@ -55,4 +57,13 @@ def test_all_framework_bindings_produce_identical_output(tmp_path: Path) -> None
     stripped = [json.loads(item) | {"output_path": "<normalized>"} for item in canonical]
     assert stripped[0] == stripped[1] == stripped[2]
     assert results[0][1] == results[1][1] == results[2][1] == expected
-    assert results[0][2] == results[1][2] == results[2][2]
+    normalized_calls = []
+    for calls in (results[0][2], results[1][2], results[2][2]):
+        args, kwargs = calls[0]
+        normalized_calls.append(
+            (
+                args,
+                kwargs | {"checkpoint_path": Path(kwargs["checkpoint_path"]).name},
+            )
+        )
+    assert normalized_calls[0] == normalized_calls[1] == normalized_calls[2]

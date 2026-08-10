@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from .errors import InvalidResponseError
 from .models import Job, JobStatus, ProposedChange, UploadResult
@@ -21,7 +22,7 @@ def parse_json_encoded(value: Any) -> Any:
     if not isinstance(value, str):
         return value
     stripped = value.strip()
-    if not stripped or stripped[0] not in "[{\"":
+    if not stripped or stripped[0] not in '[{"':
         return value
     try:
         return json.loads(stripped)

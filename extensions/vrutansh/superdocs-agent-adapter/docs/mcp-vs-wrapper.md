@@ -20,6 +20,7 @@ clients.
 - Multiple frameworks must share exactly the same behavior.
 - The application should expose one constrained workflow instead of every tool.
 - You need application-owned timeouts, retries, logging, approval policy, and tests.
+- You need crash recovery and an application-owned idempotency boundary.
 - Tool schemas and outputs must remain versioned even if a framework changes.
 - You want contract tests without connecting to a live hosted tool server.
 
@@ -28,3 +29,9 @@ clients.
 An application can use this adapter for its guarded production workflow while giving
 trusted developer agents direct MCP access for exploration. Both reach the same
 SuperDocs documents; the difference is control and integration shape, not capability.
+
+## Decision used here
+
+This project uses REST in the maintained core and exposes framework-native tools at
+the edge. That keeps recovery and parity testable across frameworks. It does not wrap
+MCP merely to recreate tools already available in a native MCP host.
