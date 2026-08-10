@@ -1,0 +1,16 @@
+# Secrets — never commit. See .env.example for the shape.
+.env
+
+# Local run state, caches and locks produced by docs-lint itself
+.docs-lint/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
