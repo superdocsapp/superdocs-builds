@@ -1,0 +1,5 @@
+Customer Support Policy
+
+Support is available on weekdays.
+
+Urgent incidents should include a clear description and reproduction steps.
