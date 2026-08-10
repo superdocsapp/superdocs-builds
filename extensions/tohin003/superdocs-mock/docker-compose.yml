@@ -1,0 +1,30 @@
+# One command to a working SuperDocs mock:
+#
+#     docker compose up -d
+#     curl -H "Authorization: Bearer sk_test_anything" http://localhost:8080/health
+#
+# No API key, no network, no quota. Point your integration's base URL at
+# http://localhost:8080 and both /v1/* and /mcp/ answer, exactly as api.superdocs.app
+# lays them out.
+
+services:
+  sdmock:
+    build: .
+    image: ghcr.io/tohin003/superdocs-mock:latest
+    ports:
+      - "8080:8080"
+    environment:
+      # Any bearer value is accepted; set this to false to drop the check entirely.
+      SDMOCK_REQUIRE_AUTH: "true"
+      # Which scenario answers when a request sends no X-Mock-Scenario header.
+      # SDMOCK_DEFAULT_SCENARIO: "styled-document"
+    # Mount your own recordings over the baked-in ones if you have captured more:
+    # volumes:
+    #   - ./cassettes:/app/cassettes:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/health',timeout=2).status==200 else 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 2s
+    restart: unless-stopped

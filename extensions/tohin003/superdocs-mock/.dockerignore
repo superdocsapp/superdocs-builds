@@ -1,0 +1,15 @@
+# Keep the build context small and the image free of anything that is not the mock.
+.git
+.venv
+.pytest_cache
+__pycache__
+*.pyc
+contract/
+corpus/
+docs/
+scripts/
+.github/
+TASK.md
+PROGRESS.md
+Dockerfile
+docker-compose.yml

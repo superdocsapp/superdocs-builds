@@ -1,0 +1,52 @@
+{
+  "covers": [
+    "B-019",
+    "B-064",
+    "B-065",
+    "B-067"
+  ],
+  "description": "Quota exhaustion on a chat turn: the application 429, carrying Retry-After and the X-Usage-* headers that only appear on this response.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 0,
+      "id": "i-001",
+      "note": "quota exhausted -- branch on the status and the headers, never the detail wording (B-067)",
+      "request": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "message": "Tighten the record-keeping clause.",
+          "session_id": "sdmock-ratelimit-001"
+        },
+        "method": "POST",
+        "path": "/v1/chat"
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json",
+          "retry-after": "1209600",
+          "x-usage-limit": "500",
+          "x-usage-remaining": "0",
+          "x-usage-used": "500"
+        },
+        "json_body": {
+          "detail": "Your monthly operation quota (500) is exhausted. Upgrade to Pro for uninterrupted pay-as-you-go overage."
+        },
+        "status": 429
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "n/a"
+  },
+  "recorded_at": "2026-08-10T00:00:00+00:00",
+  "scenario": "rate-limit",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "Reconstructed from /errors/rate-limits, which prints this response verbatim including its headers. Recording it live would mean spending the account's entire remaining operation balance to produce one fixture.",
+  "synthesised": true
+}

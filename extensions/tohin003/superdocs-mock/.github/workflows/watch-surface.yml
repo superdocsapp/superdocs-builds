@@ -1,0 +1,47 @@
+# Watch the surfaces this mock is pinned against.
+#
+# The REST spec lives in a public repository and has a git history anyone can read. The
+# MCP tool surface does not: it is served live from the SuperDocs backend, so tools and
+# arguments can change with no release anywhere and nothing local to diff. That surface
+# is why this job exists.
+name: watch-surface
+
+on:
+  schedule:
+    - cron: "23 7 * * *"        # daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e '.[test]'
+      - id: watch
+        continue-on-error: true
+        env:
+          SUPERDOCS_API_KEY: ${{ secrets.SUPERDOCS_API_KEY }}
+        run: |
+          python scripts/watch_surface.py | tee surface.txt
+          echo "drifted=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+      - name: open an issue when something moved
+        if: steps.watch.outputs.drifted != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = require('fs').readFileSync('surface.txt', 'utf8');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `SuperDocs surface drift detected (${new Date().toISOString().slice(0,10)})`,
+              body: "```\n" + body + "\n```\n\n" +
+                    "Understand the change before re-pinning. Re-pinning to make a red " +
+                    "build green is how a mock starts lying.",
+              labels: ['drift'],
+            });

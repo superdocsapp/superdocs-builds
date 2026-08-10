@@ -1,0 +1,113 @@
+{
+  "covers": [
+    "B-068",
+    "B-069",
+    "B-077"
+  ],
+  "description": "Upload refusals for a legacy .doc and an .odt, settling the contradiction between the supported-formats list and the documented 415 message.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 9782,
+      "id": "i-001",
+      "note": "format probe: .doc",
+      "request": {
+        "headers": {},
+        "method": "POST",
+        "multipart": [
+          {
+            "field": "file",
+            "filename": "<bytes>"
+          }
+        ],
+        "path": "/v1/documents/upload",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "detail": "We temporarily can't convert legacy .doc files (the document-conversion service is warming up). Please try again shortly, or save 'legacy-format-probe.doc' as .docx and re-upload."
+        },
+        "status": 400
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 1597,
+      "id": "i-002",
+      "note": "format probe: .odt",
+      "request": {
+        "headers": {},
+        "method": "POST",
+        "multipart": [
+          {
+            "field": "file",
+            "filename": "<bytes>"
+          }
+        ],
+        "path": "/v1/documents/upload",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "chunks_count": 4,
+          "document_id": "doc_primary",
+          "documents": [
+            {
+              "chunks_count": 4,
+              "document_id": "doc_primary",
+              "focused": true,
+              "page_setup": {
+                "height_in": 11.6931,
+                "margin_in": {
+                  "bottom": 0.7875,
+                  "left": 0.7875,
+                  "right": 0.7875,
+                  "top": 0.7875
+                },
+                "orientation": "portrait",
+                "source": "docx",
+                "width_in": 8.2681
+              }
+            }
+          ],
+          "filename": "rate-card.odt",
+          "html": "<h1 data-chunk-id=\"4eece88c-1560-4827-888c-f440c56ab162\" style=\"font-size:18pt;font-weight:bold;margin-top:12pt;margin-bottom:6pt\">Haulage Rate Card 2026</h1>\n<p data-chunk-id=\"069212e4-496c-4499-ab1b-685d57b9c061\" style=\"font-size:12pt\">Synthetic sample document — fictional rates.</p>\n<p data-chunk-id=\"d4f3086d-a876-467c-af5b-fba22516fce8\" style=\"font-size:12pt\">Inland haulage, per container, up to 120 km: 184.00</p>\n<p data-chunk-id=\"01a1f558-4e17-485b-ada7-7af871d864ec\" style=\"font-size:12pt\">Container drayage, per lift: 62.00</p>",
+          "page_setup": {
+            "height_in": 11.6931,
+            "margin_in": {
+              "bottom": 0.7875,
+              "left": 0.7875,
+              "right": 0.7875,
+              "top": 0.7875
+            },
+            "orientation": "portrait",
+            "source": "docx",
+            "width_in": 8.2681
+          },
+          "persisted": true,
+          "session_id": "sdmock-probe-odt",
+          "version_id": "423ab59d-8ad9-44c5-b5fd-ae1549845333"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "SuperDocs 3.4.0"
+  },
+  "recorded_at": "2026-08-10T17:37:16+00:00",
+  "scenario": "unsupported-format",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "",
+  "synthesised": false
+}

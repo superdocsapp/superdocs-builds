@@ -1,0 +1,49 @@
+# The contract suite against api.superdocs.app.
+#
+# This is the run that actually proves the mock still tells the truth. It is separated
+# from ci.yml for one reason: it spends somebody's operations. So it is manual or weekly,
+# never on push, and it carries a hard budget that stops the run rather than grinding on.
+name: live
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"        # Mondays, early — a weekly truth check
+  workflow_dispatch:
+    inputs:
+      allow_billing:
+        description: "Run the tests that spend operations"
+        type: boolean
+        default: false
+      budget:
+        description: "Hard cap on operations for this run"
+        default: "10"
+
+permissions:
+  contents: write               # to commit the dated evidence file
+
+jobs:
+  live:
+    name: contract suite vs api.superdocs.app
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        transport: [rest, mcp]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e '.[test]'
+      - name: run against live
+        env:
+          SUPERDOCS_API_KEY: ${{ secrets.SUPERDOCS_API_KEY }}
+        run: |
+          pytest contract/ -q --target live \
+            --transport ${{ matrix.transport }} \
+            --op-budget ${{ inputs.budget || 10 }} \
+            ${{ (inputs.allow_billing && '--allow-billing') || '' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-evidence-${{ matrix.transport }}
+          path: docs/evidence/

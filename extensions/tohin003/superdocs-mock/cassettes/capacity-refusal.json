@@ -1,0 +1,70 @@
+{
+  "covers": [
+    "B-070",
+    "B-073",
+    "B-074"
+  ],
+  "description": "A document past the documented 25,000-sections-per-document scale limit, producing the structured 413 that carries limit_expandable: true, plus the documented recovery path.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 9699,
+      "id": "i-001",
+      "note": "oversize document -> capacity refusal",
+      "request": {
+        "headers": {},
+        "method": "POST",
+        "multipart": [
+          {
+            "field": "file",
+            "filename": "<bytes>"
+          }
+        ],
+        "path": "/v1/documents/upload",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "detail": {
+            "contact_email": "hello@superdocs.app",
+            "error_code": "DOCUMENT_TOO_COMPLEX",
+            "limit_expandable": true,
+            "max_sections": 25000,
+            "message": "This document comes to roughly 6,400 pages, which crosses our standard limit of about 6,250 pages for a single document. This is a stability limit, not a hard cap: the platform supports larger deployments. Use Request higher limit (one click here, or the request_limit_increase call on the API/MCP) and we will expand your account's limits, typically within a day. Omkar is notified automatically; you can also email him at hello@superdocs.app. Meanwhile, you can split the file into smaller documents, or upload it as an attachment to reference and search.",
+            "request_increase": {
+              "agent_hint": "Call the request_limit_increase tool (POST /v1/limits/increase-request) with kind and attempted_pages to request an expansion in one call; the team is notified with your account details and typically expands limits within a day. For additional documents you can also start another session (init_session) or close documents you no longer need (close_session_document).",
+              "endpoint": "POST /v1/limits/increase-request",
+              "mcp_tool": "request_limit_increase"
+            },
+            "section_count": 25602,
+            "supported_formats": [
+              ".docx",
+              ".htm",
+              ".html",
+              ".md",
+              ".pdf",
+              ".rtf",
+              ".tex",
+              ".txt"
+            ]
+          }
+        },
+        "status": 413
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "SuperDocs 3.4.0"
+  },
+  "recorded_at": "2026-08-10T17:37:34+00:00",
+  "scenario": "capacity-refusal",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "",
+  "synthesised": false
+}

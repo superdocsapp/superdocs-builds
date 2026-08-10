@@ -1,0 +1,14 @@
+{
+  "exit_status": 0,
+  "note": "The contract suite, run unchanged against the live service. Assertions identical to the --target mock run; a divergence between the mock and SuperDocs would fail here.",
+  "operation_budget": 8,
+  "operations_counted": 0,
+  "recorded_at": "2026-08-10T17:52:06+00:00",
+  "results": {
+    "passed": 98,
+    "skipped": 49
+  },
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "target": "https://api.superdocs.app",
+  "transport": "mcp"
+}
