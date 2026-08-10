@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paper Scaffolder</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 0; background: #f5f5f3; color: #222; }
+    main { max-width: 980px; margin: 0 auto; padding: 24px; }
+    h1 { margin-bottom: 4px; }
+    .lead { color: #555; margin-top: 0; }
+    form, .panel { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 18px; margin: 18px 0; }
+    label { display: block; font-weight: 650; margin-top: 14px; }
+    textarea, select { box-sizing: border-box; width: 100%; margin-top: 6px; padding: 10px; border: 1px solid #aaa; border-radius: 5px; font: inherit; }
+    textarea { min-height: 82px; resize: vertical; }
+    #journal-template { min-height: 170px; }
+    button { margin-top: 16px; padding: 10px 15px; border: 0; border-radius: 5px; background: #222; color: white; font-weight: 650; cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .45; }
+    button.secondary { background: #666; }
+    button.approve { background: #147d45; margin-right: 8px; }
+    button.reject { background: #a33a32; }
+    .section { border-left: 4px solid #999; padding: 10px 14px; margin: 12px 0; background: #fafafa; }
+    .section.available { border-color: #147d45; }
+    .section.generated { border-color: #2468c7; }
+    .section.insufficient_information { border-color: #b65c1e; }
+    .status { font: 650 .8rem ui-monospace, monospace; text-transform: uppercase; }
+    .reason { color: #555; }
+    .content { white-space: pre-wrap; background: #eef4ff; padding: 10px; }
+    .error { color: #a01919; white-space: pre-wrap; }
+    .success { color: #147d45; }
+    .integration-status { padding: 10px; background: #f3f3f3; border-radius: 5px; }
+    .change { border: 1px solid #ccc; border-radius: 6px; padding: 14px; margin-top: 14px; }
+    .change-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .change pre { white-space: pre-wrap; max-height: 220px; }
+    code { overflow-wrap: anywhere; }
+    pre { overflow: auto; max-height: 340px; padding: 12px; background: #171717; color: #eee; border-radius: 5px; }
+    small { color: #666; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Paper Scaffolder</h1>
+  <p class="lead">Create a journal-derived skeleton without invented findings, statistics, or citations.</p>
+
+  <form id="scaffold-form">
+    <label for="research-question">Research question</label>
+    <textarea id="research-question" required></textarea>
+
+    <label for="methodology">Methodology</label>
+    <textarea id="methodology" placeholder="Leave empty if no verified methodology is available."></textarea>
+
+    <label for="dataset-description">Dataset description</label>
+    <textarea id="dataset-description" placeholder="Leave empty if no verified dataset description is available."></textarea>
+
+    <label for="journal-template">Target journal/template information</label>
+    <textarea id="journal-template" required placeholder="Required sections:&#10;Title&#10;Abstract&#10;Research Question&#10;Methods&#10;Data&#10;Results&#10;Discussion&#10;References"></textarea>
+    <small>Supply explicit headings using "Required sections:", numbering, bullets, or Markdown headings. A journal name alone is insufficient.</small>
+
+    <button type="submit">Generate skeleton</button>
+    <p id="form-error" class="error" role="alert"></p>
+  </form>
+
+  <section id="results" class="panel" hidden>
+    <h2>Manuscript skeleton</h2>
+    <div id="sections"></div>
+
+    <label for="section-select">Generate one section</label>
+    <select id="section-select"></select>
+    <button id="generate-section" type="button">Generate selected section</button>
+    <p id="section-error" class="error" role="alert"></p>
+
+    <details>
+      <summary>Structured output</summary>
+      <pre id="structured-output"></pre>
+    </details>
+  </section>
+
+  <section id="superdocs-panel" class="panel" hidden>
+    <h2>SuperDocs review workflow</h2>
+    <p id="superdocs-config" class="integration-status">Checking server configuration...</p>
+    <button id="upload-superdocs" type="button" disabled>Send manuscript to SuperDocs</button>
+    <p id="superdocs-error" class="error" role="alert"></p>
+    <p id="superdocs-success" class="success" role="status"></p>
+
+    <div id="superdocs-session" hidden>
+      <p>Session: <code id="superdocs-session-id"></code></p>
+
+      <label for="edit-instruction">SuperDocs edit instruction</label>
+      <textarea id="edit-instruction" placeholder="Format the Methods section according to the target journal style."></textarea>
+      <button id="send-edit" type="button">Request reviewed edit</button>
+      <button id="check-job" class="secondary" type="button" disabled>Check job status</button>
+      <p id="job-status" class="integration-status"></p>
+
+      <div id="proposed-changes"></div>
+
+      <label for="export-format">Export format</label>
+      <select id="export-format">
+        <option value="docx">DOCX</option>
+        <option value="pdf">PDF</option>
+        <option value="html">HTML</option>
+        <option value="markdown">Markdown</option>
+        <option value="txt">Plain text</option>
+      </select>
+      <button id="export-document" type="button">Export current SuperDocs document</button>
+    </div>
+  </section>
+</main>
+
+<script>
+  const form = document.querySelector('#scaffold-form');
+  const results = document.querySelector('#results');
+  const sectionsContainer = document.querySelector('#sections');
+  const sectionSelect = document.querySelector('#section-select');
+  const generateButton = document.querySelector('#generate-section');
+  const formError = document.querySelector('#form-error');
+  const sectionError = document.querySelector('#section-error');
+  const structuredOutput = document.querySelector('#structured-output');
+  const superdocsPanel = document.querySelector('#superdocs-panel');
+  const superdocsConfig = document.querySelector('#superdocs-config');
+  const uploadSuperDocs = document.querySelector('#upload-superdocs');
+  const superdocsError = document.querySelector('#superdocs-error');
+  const superdocsSuccess = document.querySelector('#superdocs-success');
+  const superdocsSession = document.querySelector('#superdocs-session');
+  const superdocsSessionId = document.querySelector('#superdocs-session-id');
+  const editInstruction = document.querySelector('#edit-instruction');
+  const sendEdit = document.querySelector('#send-edit');
+  const checkJob = document.querySelector('#check-job');
+  const jobStatus = document.querySelector('#job-status');
+  const proposedChanges = document.querySelector('#proposed-changes');
+  const exportFormat = document.querySelector('#export-format');
+  const exportDocument = document.querySelector('#export-document');
+  let currentInputs = null;
+  let currentScaffold = null;
+  let uploadedDocument = null;
+  let currentJob = null;
+  let superdocsIsConfigured = false;
+  let jobPollTimer = null;
+  let jobPollInFlight = false;
+  const decidedChangeIds = new Set();
+
+  function clearJobPolling() {
+    if (jobPollTimer !== null) {
+      window.clearTimeout(jobPollTimer);
+      jobPollTimer = null;
+    }
+  }
+
+  function scheduleJobPoll(delay) {
+    clearJobPolling();
+    jobPollTimer = window.setTimeout(() => {
+      jobPollTimer = null;
+      pollJob();
+    }, delay);
+  }
+
+  function inputs() {
+    return {
+      research_question: document.querySelector('#research-question').value,
+      methodology: document.querySelector('#methodology').value,
+      dataset_description: document.querySelector('#dataset-description').value,
+      journal_template: document.querySelector('#journal-template').value
+    };
+  }
+
+  function errorMessage(payload) {
+    const detail = payload && payload.detail;
+    if (!detail) return 'The request failed.';
+    if (typeof detail === 'string') return detail;
+    if (detail.fields) return Object.values(detail.fields).join('\n');
+    return detail.message || JSON.stringify(detail);
+  }
+
+  async function postJson(url, body) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(errorMessage(payload));
+    return payload;
+  }
+
+  async function getJson(url) {
+    const response = await fetch(url);
+    const payload = await response.json();
+    if (!response.ok) throw new Error(errorMessage(payload));
+    return payload;
+  }
+
+  function clearSuperDocsMessages() {
+    superdocsError.textContent = '';
+    superdocsSuccess.textContent = '';
+  }
+
+  function resetSuperDocsWorkflow() {
+    clearJobPolling();
+    uploadedDocument = null;
+    currentJob = null;
+    decidedChangeIds.clear();
+    superdocsSession.hidden = true;
+    proposedChanges.replaceChildren();
+    jobStatus.textContent = '';
+    uploadSuperDocs.disabled = !superdocsIsConfigured;
+    clearSuperDocsMessages();
+  }
+
+  async function loadSuperDocsConfig() {
+    try {
+      const config = await getJson('/api/superdocs/config');
+      superdocsIsConfigured = config.configured;
+      superdocsConfig.textContent = config.message;
+      uploadSuperDocs.disabled = !config.configured || !currentScaffold;
+    } catch (error) {
+      superdocsConfig.textContent = `Could not read SuperDocs configuration: ${error.message}`;
+      uploadSuperDocs.disabled = true;
+    }
+  }
+
+  function render() {
+    sectionsContainer.replaceChildren();
+    sectionSelect.replaceChildren();
+    for (const section of currentScaffold.sections) {
+      const card = document.createElement('article');
+      card.className = `section ${section.status}`;
+
+      const title = document.createElement('h3');
+      title.textContent = section.title;
+      const status = document.createElement('div');
+      status.className = 'status';
+      status.textContent = section.status.replaceAll('_', ' ');
+      const reason = document.createElement('p');
+      reason.className = 'reason';
+      reason.textContent = section.reason;
+      card.append(title, status, reason);
+
+      if (section.content) {
+        const content = document.createElement('div');
+        content.className = 'content';
+        content.textContent = section.content;
+        card.append(content);
+      }
+      sectionsContainer.append(card);
+
+      const option = document.createElement('option');
+      option.value = section.section_id;
+      option.textContent = `${section.title} - ${section.status.replaceAll('_', ' ')}`;
+      sectionSelect.append(option);
+    }
+    structuredOutput.textContent = JSON.stringify(currentScaffold, null, 2);
+    results.hidden = false;
+    superdocsPanel.hidden = false;
+    uploadSuperDocs.disabled = !superdocsIsConfigured;
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    formError.textContent = '';
+    sectionError.textContent = '';
+    currentInputs = inputs();
+    try {
+      currentScaffold = await postJson('/api/scaffolds', currentInputs);
+      resetSuperDocsWorkflow();
+      render();
+    } catch (error) {
+      results.hidden = true;
+      formError.textContent = error.message;
+    }
+  });
+
+  generateButton.addEventListener('click', async () => {
+    if (!currentInputs || !currentScaffold) return;
+    sectionError.textContent = '';
+    generateButton.disabled = true;
+    try {
+      const payload = await postJson('/api/sections/generate', {
+        ...currentInputs,
+        section_id: sectionSelect.value
+      });
+      currentScaffold.sections = currentScaffold.sections.map((section) =>
+        section.section_id === payload.section.section_id ? payload.section : section
+      );
+      render();
+      sectionSelect.value = payload.section.section_id;
+    } catch (error) {
+      sectionError.textContent = error.message;
+    } finally {
+      generateButton.disabled = false;
+    }
+  });
+
+  uploadSuperDocs.addEventListener('click', async () => {
+    if (!currentInputs || !currentScaffold) return;
+    clearSuperDocsMessages();
+    uploadSuperDocs.disabled = true;
+    uploadSuperDocs.textContent = 'Uploading...';
+    try {
+      const generatedSectionIds = currentScaffold.sections
+        .filter((section) => section.status === 'generated')
+        .map((section) => section.section_id);
+      uploadedDocument = await postJson('/api/superdocs/upload', {
+        ...currentInputs,
+        generated_section_ids: generatedSectionIds
+      });
+      superdocsSessionId.textContent = uploadedDocument.session_id;
+      superdocsSession.hidden = false;
+      superdocsSuccess.textContent = `Uploaded ${uploadedDocument.filename} with ${uploadedDocument.chunks_count} chunks.`;
+    } catch (error) {
+      superdocsError.textContent = error.message;
+    } finally {
+      uploadSuperDocs.disabled = !superdocsIsConfigured;
+      uploadSuperDocs.textContent = 'Send manuscript to SuperDocs';
+    }
+  });
+
+  sendEdit.addEventListener('click', async () => {
+    if (!uploadedDocument) return;
+    clearJobPolling();
+    clearSuperDocsMessages();
+    sendEdit.disabled = true;
+    sendEdit.textContent = 'Sending...';
+    decidedChangeIds.clear();
+    proposedChanges.replaceChildren();
+    try {
+      currentJob = await postJson('/api/superdocs/edits', {
+        session_id: uploadedDocument.session_id,
+        instruction: editInstruction.value
+      });
+      jobStatus.textContent = `Job ${currentJob.job_id}: ${currentJob.status}`;
+      checkJob.disabled = false;
+      await pollJob();
+    } catch (error) {
+      superdocsError.textContent = error.message;
+    } finally {
+      sendEdit.disabled = false;
+      sendEdit.textContent = 'Request reviewed edit';
+    }
+  });
+
+  function renderProposedChanges(changes) {
+    proposedChanges.replaceChildren();
+    for (const change of changes) {
+      const card = document.createElement('article');
+      card.className = 'change';
+      const heading = document.createElement('h3');
+      heading.textContent = `${change.operation.toUpperCase()} - ${change.change_id}`;
+      const explanation = document.createElement('p');
+      explanation.textContent = change.ai_explanation || 'No explanation supplied.';
+      const grid = document.createElement('div');
+      grid.className = 'change-grid';
+      for (const [label, value] of [['Before', change.old_html], ['After', change.new_html]]) {
+        const pane = document.createElement('div');
+        const paneTitle = document.createElement('strong');
+        paneTitle.textContent = label;
+        const pre = document.createElement('pre');
+        pre.textContent = value || '(empty)';
+        pane.append(paneTitle, pre);
+        grid.append(pane);
+      }
+      const feedback = document.createElement('textarea');
+      feedback.placeholder = 'Optional rejection feedback';
+      const approve = document.createElement('button');
+      approve.type = 'button';
+      approve.className = 'approve';
+      approve.textContent = 'Approve';
+      const reject = document.createElement('button');
+      reject.type = 'button';
+      reject.className = 'reject';
+      reject.textContent = 'Reject';
+      const alreadyDecided = decidedChangeIds.has(change.change_id);
+      approve.disabled = alreadyDecided;
+      reject.disabled = alreadyDecided;
+      feedback.disabled = alreadyDecided;
+      approve.addEventListener('click', () => decideChange(change, true, feedback.value, approve, reject, feedback));
+      reject.addEventListener('click', () => decideChange(change, false, feedback.value, approve, reject, feedback));
+      card.append(heading, explanation, grid, feedback, approve, reject);
+      proposedChanges.append(card);
+    }
+  }
+
+  async function decideChange(change, approved, feedback, approveButton, rejectButton, feedbackInput) {
+    clearSuperDocsMessages();
+    approveButton.disabled = true;
+    rejectButton.disabled = true;
+    feedbackInput.disabled = true;
+    try {
+      const result = await postJson('/api/superdocs/decisions', {
+        session_id: uploadedDocument.session_id,
+        job_id: currentJob.job_id,
+        change_id: change.change_id,
+        approved,
+        feedback
+      });
+      decidedChangeIds.add(change.change_id);
+      superdocsSuccess.textContent = `${approved ? 'Approved' : 'Rejected'} ${change.change_id}${result.idempotent_replay ? ' (already recorded)' : ''}.`;
+      if (currentJob.proposed_changes.every((item) => decidedChangeIds.has(item.change_id))) {
+        scheduleJobPoll(600);
+      }
+    } catch (error) {
+      superdocsError.textContent = error.message;
+      approveButton.disabled = false;
+      rejectButton.disabled = false;
+      feedbackInput.disabled = false;
+    }
+  }
+
+  async function pollJob() {
+    if (!currentJob || jobPollInFlight) return;
+    clearJobPolling();
+    jobPollInFlight = true;
+    try {
+      const snapshot = await getJson(`/api/superdocs/jobs/${encodeURIComponent(currentJob.job_id)}`);
+      currentJob = snapshot;
+      jobStatus.textContent = `Job ${snapshot.job_id}: ${snapshot.status} (${snapshot.progress}%)`;
+      renderProposedChanges(snapshot.proposed_changes || []);
+      if (snapshot.updated_html) uploadedDocument.html = snapshot.updated_html;
+      if (snapshot.status === 'pending' || snapshot.status === 'in_progress') {
+        scheduleJobPoll(2000);
+      } else if (snapshot.status === 'awaiting_approval' && snapshot.awaiting_kind === 'continue_prompt') {
+        superdocsError.textContent = 'SuperDocs paused for a large-edit continuation. This milestone supports change approval only.';
+      } else if (snapshot.status === 'completed') {
+        superdocsSuccess.textContent = snapshot.response || 'SuperDocs edit completed.';
+      } else if (snapshot.status === 'failed' || snapshot.status === 'cancelled') {
+        superdocsError.textContent = snapshot.error || `SuperDocs job ${snapshot.status}.`;
+      }
+    } catch (error) {
+      superdocsError.textContent = error.message;
+    } finally {
+      jobPollInFlight = false;
+    }
+  }
+
+  checkJob.addEventListener('click', () => {
+    clearJobPolling();
+    pollJob();
+  });
+
+  exportDocument.addEventListener('click', async () => {
+    if (!uploadedDocument) return;
+    clearSuperDocsMessages();
+    exportDocument.disabled = true;
+    exportDocument.textContent = 'Exporting...';
+    try {
+      const response = await fetch('/api/superdocs/export', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          session_id: uploadedDocument.session_id,
+          file_format: exportFormat.value,
+          filename: `paper-scaffold-${currentScaffold.manuscript_id}`
+        })
+      });
+      if (!response.ok) {
+        throw new Error(errorMessage(await response.json()));
+      }
+      const blob = await response.blob();
+      const disposition = response.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename="?([^";]+)/i);
+      const filename = match ? match[1] : `paper-scaffold.${exportFormat.value}`;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(url);
+      superdocsSuccess.textContent = `Exported ${filename}.`;
+    } catch (error) {
+      superdocsError.textContent = error.message;
+    } finally {
+      exportDocument.disabled = false;
+      exportDocument.textContent = 'Export current SuperDocs document';
+    }
+  });
+
+  loadSuperDocsConfig();
+</script>
+</body>
+</html>
