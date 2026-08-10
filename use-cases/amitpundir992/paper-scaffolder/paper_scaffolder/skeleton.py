@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 
-from .grounding import decide_support, semantic_role_for
+from .grounding import decide_support, evidence_for, semantic_role_for
 from .models import ManuscriptSection, ManuscriptSkeleton, PaperInputs
 
 
@@ -16,7 +16,7 @@ def _slug(value: str) -> str:
 
 
 class SkeletonGenerator:
-    """Build an ordered skeleton without filling scientific content."""
+    """Build an ordered skeleton with only directly supplied grounded content."""
 
     def create(
         self, inputs: PaperInputs, section_titles: tuple[str, ...]
@@ -41,13 +41,17 @@ class SkeletonGenerator:
             section_id = base_id if occurrence == 1 else f"{base_id}-{occurrence}"
             role = semantic_role_for(title)
             decision = decide_support(role, inputs)
+            evidence = evidence_for(decision.source_keys, inputs)
+            grounded_content = (
+                next(iter(evidence.values())) if len(evidence) == 1 else ""
+            )
             sections.append(
                 ManuscriptSection(
                     section_id=section_id,
                     title=title,
                     semantic_role=role,
                     status=decision.status,
-                    content="",
+                    content=grounded_content,
                     reason=decision.reason,
                     available_sources=decision.source_keys,
                 )
