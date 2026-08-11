@@ -455,12 +455,17 @@ def cmd_sync(args) -> int:
     published = _load(args)
     with _client() as client:
         changes, expected = session.swap_diagrams(client, published, spec)
+        # `swap_diagrams` moves each document into a fresh session, so the
+        # record on disk has to follow or the next command talks to the old one.
+        _save(published, args.language)
         print(f"{len(pj.image_ids(spec))} diagram(s) re-rendered and uploaded")
 
         try:
             session.assert_only_the_image_changed(changes, expected)
         except SuperDocsError as exc:
             print(f"\nREFUSED: {exc}")
+            print("nothing was approved, and the batch is still parked. "
+                  "`approve --discard` frees the session.")
             return 1
 
         for change in changes:
@@ -468,12 +473,14 @@ def cmd_sync(args) -> int:
                   f"{published.name_for(change.document_id or '')}")
         print(f"\n{len(changes)} change(s), each one an image URL and nothing else")
 
+        path = _save_proposal(published, changes)
         if not args.yes:
-            print("nothing approved. Re-run with --yes to apply.")
+            print(f"nothing approved. {path} holds the batch; `approve` applies it.")
             return 0
 
         results = session.approve_all(client, published, changes)
         print(f"approved {len(changes)} swap(s) across {len(results)} turn(s)")
+    path.unlink(missing_ok=True)
     return 0
 
 

@@ -77,6 +77,34 @@ class Publication:
                 f"document and writes it down")
         return session_id
 
+    def reopen(self, client: SuperDocs) -> None:
+        """Put each document in a fresh session, discarding the conversation.
+
+        A session is a conversation and it remembers. An instruction sent into
+        one that has already discussed a torque figure gets read in the light of
+        that torque figure -- which is right for a person and wrong for a
+        mechanical operation, and it showed: a diagram-URL swap kept proposing
+        an edit to the paragraph that an earlier turn in that session had
+        proposed and had had rejected.
+
+        So work that is meant to be mechanical gets a conversation with no
+        history in it. The documents are durable and unaffected; only the chat
+        around them is thrown away.
+        """
+        for document_id in self.document_ids:
+            durable = self.durable.get(document_id)
+            if not durable:
+                raise SuperDocsError(
+                    f"no durable id recorded for {document_id}, so it cannot be "
+                    f"opened in a new session; re-run `publish`")
+            session_id = client.init_session([durable])
+            held = [d.get("document_id") for d in client.documents(session_id)]
+            if held != [document_id]:
+                raise SuperDocsError(
+                    f"a fresh session for {document_id} came back holding "
+                    f"{held}; the swap would be sent to the wrong document")
+            self.sessions[document_id] = session_id
+
     @property
     def document_ids(self) -> list[str]:
         return [self.manual_id, self.card_id]
@@ -361,7 +389,14 @@ def swap_diagrams(client: SuperDocs, publication: Publication,
     compares each proposed chunk against the one it replaces with the image URLs
     masked out: if a single other character moved, the batch is refused whole.
     The model is allowed to propose the swap and is not trusted to have made it.
+
+    It is also asked in a fresh conversation. A session remembers what was
+    discussed in it, and a swap sent into the session that handled last week's
+    torque correction inherits that discussion -- in practice it re-proposed the
+    very change that had been rejected there. Nothing about a URL substitution
+    benefits from context, so it gets none.
     """
+    publication.reopen(client)
     fresh = refresh_diagrams(client, publication, spec)
     captions = pj.captions(spec)
     # Keyed by caption, because that is what survives the round trip: the
