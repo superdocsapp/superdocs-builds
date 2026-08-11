@@ -31,20 +31,56 @@ contains the figure.
 
 ## Try it
 
+One command, from a fresh clone, with nothing installed:
+
+```bash
+./selftest
+```
+
+It builds the virtualenv on first use, then runs everything this project can be
+asked to prove — cheapest first, and no quota spent by any of it.
+
+```
+==> unit tests (no network, no key)
+    PASS
+==> check: the spec, the pair, and every locale's pagination
+    PASS
+==> build: diagrams and documents rendered to out/
+    PASS
+==> status: what is published, and what is blocking an edit
+    PASS
+==> verify: the live documents are what publish recorded
+    PASS
+
+5 passed, 0 failed
+```
+
+Without a key the two live stages are reported as **skipped**, not as passed,
+and the offline three still run. When something fails it is named at the bottom
+under *what is not working*, and the exit code is non-zero, so this is also the
+CI command.
+
+Every command below is `./mb <subcommand>` — the same wrapper, which also builds
+the virtualenv on first use. `.venv/bin/python -m manualbuilder.cli <subcommand>`
+is the same thing if you would rather see the machinery.
+
+<details>
+<summary>Doing the install by hand instead</summary>
+
 ```bash
 uv venv && uv pip install -e ".[dev]"
 ```
 
-Then `.venv/bin/python` is the interpreter for everything below. Plain `pip
-install -e .` into the system interpreter is refused on any distribution that
-implements PEP 668 — Debian, Ubuntu and Fedora all do — so the virtualenv is not
-a nicety here. [uv](https://docs.astral.sh/uv/) is the one used because it
-brings its own Python and does not need `python3-venv` installed; `python -m
-venv .venv && .venv/bin/pip install -e ".[dev]"` is the same thing if you have
-it.
+Plain `pip install -e .` into the system interpreter is refused on any
+distribution that implements PEP 668 — Debian, Ubuntu and Fedora all do — so the
+virtualenv is not a nicety here. [uv](https://docs.astral.sh/uv/) is the one
+used because it brings its own Python and does not need `python3-venv`
+installed; `python -m venv .venv && .venv/bin/pip install -e ".[dev]"` is the
+same thing if you have it.
+</details>
 
 ```bash
-.venv/bin/python -m pytest
+./mb test
 ```
 
 106 tests, no network and no key.
@@ -52,7 +88,7 @@ it.
 Two commands need no API key and no network:
 
 ```bash
-.venv/bin/python -m manualbuilder.cli check
+./mb check
 ```
 
 ```
@@ -65,7 +101,7 @@ ok
 ```
 
 ```bash
-.venv/bin/python -m manualbuilder.cli build
+./mb build
 ```
 
 Writes 24 SVG diagrams and six documents — English, German and French, manual
@@ -76,11 +112,11 @@ looked at rather than taken on trust.
 Then, with a key in `.env`:
 
 ```bash
-.venv/bin/python -m manualbuilder.cli publish
+./mb publish
 ```
 
 ```bash
-.venv/bin/python -m manualbuilder.cli publish --language de
+./mb publish --language de
 ```
 
 One pair per run rather than every locale at once: the pair is the unit that has
@@ -90,14 +126,14 @@ maintained by chat at all — it comes from the spec, and `check` is what proves
 it.
 
 ```bash
-.venv/bin/python -m manualbuilder.cli edit "raise the rail torque to 1.6 N·m"
+./mb edit "raise the rail torque to 1.6 N·m"
 ```
 
 `edit` prints the proposed changes grouped by document, records the batch to
 `out/proposal.json`, and applies nothing.
 
 ```bash
-.venv/bin/python -m manualbuilder.cli approve --reject CHANGE_ID
+./mb approve --reject CHANGE_ID
 ```
 
 Rejecting one change keeps the rest. That is not a nicety: asked to change one
@@ -112,7 +148,7 @@ between commands. `--manual`, `--card` and `--session` still exist on all four,
 and are the override for working on a pair this machine did not publish.
 
 ```bash
-.venv/bin/python -m manualbuilder.cli sync
+./mb sync
 ```
 
 ```
@@ -153,7 +189,7 @@ and unaffected — only the chat around them is thrown away — and the new sess
 ids are written back to `out/published.json`.
 
 ```bash
-.venv/bin/python -m manualbuilder.cli export --format html
+./mb export --format html
 ```
 
 `export` pulls both finished documents back into `out/export/`, which is how a
@@ -169,7 +205,7 @@ verified](#what-is-verified-against-the-live-service).
 Two commands exist to be run rather than trusted, and neither spends quota:
 
 ```bash
-.venv/bin/python -m manualbuilder.cli status
+./mb status
 ```
 
 What is published, which session each document is edited in, and — the reason
@@ -178,7 +214,7 @@ next turn in it comes back `409 session_busy` with nothing naming the batch.
 This names it.
 
 ```bash
-.venv/bin/python -m manualbuilder.cli verify
+./mb verify
 ```
 
 ```
@@ -431,6 +467,8 @@ manualbuilder/
   verify.py              reading the pair back off the service and checking it
   cli.py                 check / build / publish / edit / approve / sync /
                          export / status / verify
+mb                       the command line, virtualenv taken care of
+selftest                 every check this project can run, in one command
 tests/                   106 tests, no network
 ```
 

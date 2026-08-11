@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Everything this project can be asked to prove, in one command.
+#
+# Cheapest first, and nothing here spends quota: the offline checks need no key
+# at all, and the two live ones read the published documents back -- exports are
+# free. A stranger with no key gets the offline half and is told the rest was
+# skipped rather than being told it passed.
+#
+# Exits non-zero if any stage failed, so CI can run it.
+set -uo pipefail
+cd "$(dirname "$0")"
+
+passed=0
+failed=0
+skipped=0
+declare -a broken=()
+
+stage() {
+    local title="$1"; shift
+    printf '\n\033[1m==> %s\033[0m\n' "$title"
+    if "$@"; then
+        printf '    \033[32mPASS\033[0m  %s\n' "$title"
+        passed=$((passed + 1))
+    else
+        printf '    \033[31mFAIL\033[0m  %s\n' "$title"
+        failed=$((failed + 1))
+        broken+=("$title")
+    fi
+}
+
+skip() {
+    printf '\n\033[1m==> %s\033[0m\n    \033[33mSKIP\033[0m  %s\n' "$1" "$2"
+    skipped=$((skipped + 1))
+}
+
+# A key in the environment or in .env. Checked with grep -q so nothing is
+# printed: this script is meant to be run on a shared screen.
+have_key() {
+    [ -n "${SUPERDOCS_API_KEY:-}" ] && return 0
+    [ -f .env ] && grep -q '^SUPERDOCS_API_KEY=.' .env && return 0
+    return 1
+}
+
+echo "Product Manual and Quick-Start Builder -- self test"
+echo "no quota is spent by anything below."
+
+# On a fresh clone there is no virtualenv yet. `mb` builds one on first use, so
+# this both bootstraps and proves the entry point runs -- quietly, because its
+# output here would be the argparse help and nobody asked for that.
+./mb --help >/dev/null
+
+# ------------------------------------------------------------- offline --
+
+stage "unit tests (no network, no key)" \
+    .venv/bin/python -m pytest -q
+stage "check: the spec, the pair, and every locale's pagination" \
+    ./mb check
+stage "build: diagrams and documents rendered to out/" \
+    ./mb build
+
+# ---------------------------------------------------------------- live --
+
+if have_key; then
+    stage "status: what is published, and what is blocking an edit" \
+        ./mb status
+    stage "verify: the live documents are what publish recorded" \
+        ./mb verify
+else
+    skip "status" "no SUPERDOCS_API_KEY in the environment or .env"
+    skip "verify" "no SUPERDOCS_API_KEY in the environment or .env"
+fi
+
+# -------------------------------------------------------------- report --
+
+printf '\n\033[1m%s\033[0m\n' "-----------------------------------------------"
+printf '%d passed, %d failed' "$passed" "$failed"
+[ "$skipped" -gt 0 ] && printf ', %d skipped (needs a key)' "$skipped"
+printf '\n'
+
+if [ "$failed" -gt 0 ]; then
+    printf '\nwhat is not working:\n'
+    for name in "${broken[@]}"; do printf '  - %s\n' "$name"; done
+    exit 1
+fi
+
+if [ "$skipped" -gt 0 ]; then
+    printf '\nEverything checkable without a key passes. Put a key in .env and\n'
+    printf 'run this again to check the published documents themselves.\n'
+else
+    printf '\nEverything passes, including the documents on the service.\n'
+fi
