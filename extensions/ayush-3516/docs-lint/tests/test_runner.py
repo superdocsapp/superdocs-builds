@@ -388,3 +388,50 @@ def test_a_file_that_vanished_between_runs_is_skipped_honestly(workspace):
     # Resume with the file gone: it must be reported skipped, never assumed clean.
     resumed = make_runner(workspace, config).resume(state_before.run_id, [])
     assert resumed.results[0].verdict.kind in {VerdictKind.SKIPPED, VerdictKind.FINDINGS}
+
+
+def test_no_op_proposals_are_dropped_rather_than_shown_to_a_reviewer(workspace, base_url):
+    """A proposal whose "after" equals its "before" wastes the reviewer's attention."""
+    from docs_lint.superdocs.lint_pass import findings_from_job
+    from docs_lint.superdocs.models import Job
+
+    payload = {
+        "job_id": "j1",
+        "status": "awaiting_approval",
+        "metadata": {
+            "awaiting_kind": "approval",
+            "pending_changes": [
+                {
+                    "change_id": "same",
+                    "operation": "edit",
+                    "chunk_id": "c1",
+                    "old_html": "<p>This text is already correct.</p>",
+                    "new_html": "<p>This text is already correct.</p>",
+                },
+                {
+                    "change_id": "whitespace",
+                    "operation": "edit",
+                    "chunk_id": "c1",
+                    "old_html": "<p>Wrapped across\ntwo lines.</p>",
+                    "new_html": "<p>Wrapped across two lines.</p>",
+                },
+                {
+                    "change_id": "real",
+                    "operation": "edit",
+                    "chunk_id": "c1",
+                    "old_html": "<p>We utilise it.</p>",
+                    "new_html": "<p>We use it.</p>",
+                },
+            ],
+        },
+    }
+    job = Job.from_payload(payload)
+    from docs_lint.parser import parse_document
+
+    document = parse_document("a.md", "We utilise it.\n")
+    outcome = findings_from_job(
+        job, document=document, chunk_ids=frozenset({"c1"}), severity=Severity.WARNING
+    )
+
+    assert [f.change_id for f in outcome.findings] == ["real"]
+    assert {c.change_id for c in outcome.no_ops} == {"same", "whitespace"}

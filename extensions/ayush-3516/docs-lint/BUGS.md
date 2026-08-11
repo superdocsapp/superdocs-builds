@@ -242,7 +242,67 @@ changed, and no truncation in the API payload — let the client truncate for di
 
 ---
 
-## 10. `page_setup` is documented as compact upload metadata but returns `null`
+## 10. Markdown export is not byte-preserving: it altered a fenced code block nobody touched
+
+**Severity: high.** This is the one that most directly threatens what the product promises.
+
+**What I did.** Uploaded a Markdown document, approved a change to *one* paragraph, and exported
+the result as Markdown.
+
+**What I expected.** The approved paragraph changed, and every other byte identical. That
+expectation is not mine alone — "anything you do not write stays exactly as it was, because you
+never touched it" is the task document's own description of how this should work.
+
+**What happened.** A fenced code block that no proposal referred to came back with an extra blank
+line inserted before its closing fence:
+
+```
+ ```                        ```
+ pip install widget    ->   pip install widget
+ ```                        (blank line)
+                            ```
+```
+
+**Why it matters.** Applying a single approved fix means re-exporting the whole document, so every
+untouched region is exposed to whatever the export does. A tool that promises "only what you
+approved changed" cannot keep that promise if the export quietly reformats around it. I only found
+it because a later literal string match failed; in a real repository it would have arrived as
+noise in someone's diff, and the natural conclusion would be that the linter did it.
+
+**How I worked around it.** docs-lint now diffs the exported document against the original and
+reports any block that changed without an approval behind it, rather than claiming a precision it
+cannot deliver. That converts silent corruption into a visible warning, but the underlying export
+still needs to be lossless.
+
+**Repro.** Upload any Markdown containing a fenced code block, approve an unrelated change, export
+with `format: "markdown"`, and diff against the input.
+
+---
+
+## 11. The same document and instruction produce wildly different review results between runs
+
+**Severity: medium**, and hard to design around.
+
+Three consecutive runs over the *same* document, with the *same* instruction and the same uploaded
+style guide, produced **seven** proposals, then **zero**, then **one**. The document plainly
+violated several rules in the guide every time.
+
+**Why it matters.** A linter is expected to be repeatable — the same input on Tuesday should give
+the same answer as on Monday, or people stop believing it. It also makes the tool hard to test
+honestly against the live service: I cannot assert "this document yields N findings".
+
+I am not asking for determinism from a model. But the spread between seven and zero is wide enough
+that a CI gate built on it would be flaky, and the zero-proposal run reported a document as having
+passed its style review when it had not.
+
+**Related, and possibly the cause:** adding one sentence to my instruction ("do not propose a
+change unless the text actually breaks a rule") took the same document from seven proposals to
+zero. Recall appears very sensitive to instruction phrasing. A short note in the docs about which
+phrasings suppress output would save integrators a lot of guessing.
+
+---
+
+## 12. `page_setup` is documented as compact upload metadata but returns `null`
 
 **Severity: cosmetic.** `POST /v1/documents/upload-base64` is documented as returning
 *"chunks_count, version_id, page_setup"*. It returns `chunks_count` and `version_id` correctly, and

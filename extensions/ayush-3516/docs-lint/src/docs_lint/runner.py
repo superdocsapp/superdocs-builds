@@ -385,6 +385,30 @@ class Runner:
                 )
             )
 
+        if outcome.no_ops:
+            self.observe(
+                Event(
+                    "superdocs",
+                    "dropped",
+                    f"{len(outcome.no_ops)} proposal(s) would have changed nothing",
+                    target.relative,
+                )
+            )
+
+        if not outcome.findings and not outcome.discarded:
+            # Distinguish "the review found nothing" from "the review was filtered down to
+            # nothing", so a quiet run is never mistaken for a thorough one.
+            self.observe(
+                Event(
+                    "superdocs",
+                    "no-findings",
+                    f"{len(outcome.no_ops)} proposal(s) dropped as no-ops"
+                    if outcome.no_ops
+                    else "the review proposed no changes",
+                    target.relative,
+                )
+            )
+
         if outcome.findings:
             self.observe(
                 Event(

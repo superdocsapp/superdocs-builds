@@ -250,3 +250,37 @@ def test_model_fixes_are_skipped_when_no_session_was_recorded(tmp_path):
     )
     assert any("no SuperDocs session" in s.reason for s in outcome.skipped)
     assert outcome.applied == []
+
+
+# -- guarding against the platform changing what nobody approved --------------------
+
+
+def test_drift_detection_notices_a_block_the_export_altered_without_approval(tmp_path):
+    """BUGS.md #11: the Markdown export is not byte-preserving for untouched regions."""
+    from docs_lint.apply import detect_drift
+
+    before = "# Title\n\nApproved paragraph.\n\n```\npip install widget\n```\n"
+    # The export added a blank line inside the fenced block, which nobody asked for.
+    after = "# Title\n\nCorrected paragraph.\n\n```\npip install widget\n\n```\n"
+
+    drift = detect_drift(before, after, approved_originals={"Approved paragraph."}, path="a.md")
+
+    assert len(drift) == 1
+    assert "pip install widget" in drift[0].before
+
+
+def test_drift_detection_is_silent_when_only_approved_text_changed(tmp_path):
+    from docs_lint.apply import detect_drift
+
+    before = "# Title\n\nWe utilise it.\n\nUntouched.\n"
+    after = "# Title\n\nWe use it.\n\nUntouched.\n"
+
+    assert detect_drift(before, after, approved_originals={"We utilise it."}, path="a.md") == []
+
+
+def test_a_run_with_drift_is_not_reported_as_ok(tmp_path):
+    from docs_lint.apply import ApplyResult, Drift
+
+    outcome = ApplyResult(drift=[Drift(path="a.md", before="x", after=None)])
+    assert not outcome.ok
+    assert "unapproved change" in outcome.summary_line()

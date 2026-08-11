@@ -427,6 +427,19 @@ def apply(
             f"[yellow]not applied[/] {skipped.path} ({skipped.rule_id}): {skipped.reason}"
         )
 
+    if outcome.drift:
+        console.print()
+        console.print(
+            "[bold yellow]Warning: the export changed text nobody approved.[/]\n"
+            "[yellow]This is a SuperDocs export fidelity issue rather than an approved edit "
+            "(see BUGS.md). Check these before committing:[/]"
+        )
+        for drift in outcome.drift:
+            preview = drift.before if len(drift.before) <= 70 else drift.before[:70] + "…"
+            console.print(
+                f"[yellow]  {drift.path}: {preview!r} — {drift.after or 'no longer present'}[/]"
+            )
+
     console.print()
     console.print(outcome.summary_line())
     raise typer.Exit(EXIT_OK if outcome.ok else EXIT_FINDINGS)

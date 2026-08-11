@@ -44,17 +44,27 @@ class SkippedFix:
 
 
 @dataclass
+class Drift:
+    """A region that changed without anyone approving a change to it."""
+
+    path: str
+    before: str
+    after: str | None
+
+
+@dataclass
 class ApplyResult:
     """What actually happened, in enough detail to report without overstating."""
 
     applied: list[AppliedFix] = field(default_factory=list)
     skipped: list[SkippedFix] = field(default_factory=list)
     files_written: list[str] = field(default_factory=list)
+    drift: list[Drift] = field(default_factory=list)
     rejected: int = 0
 
     @property
     def ok(self) -> bool:
-        return not self.skipped
+        return not self.skipped and not self.drift
 
     def summary_line(self) -> str:
         parts = [f"{len(self.applied)} fix(es) applied across {len(self.files_written)} file(s)"]
@@ -62,7 +72,49 @@ class ApplyResult:
             parts.append(f"{self.rejected} rejected")
         if self.skipped:
             parts.append(f"{len(self.skipped)} could not be applied")
+        if self.drift:
+            parts.append(f"{len(self.drift)} unapproved change(s) detected in the export")
         return ", ".join(parts)
+
+
+def detect_drift(
+    before: str, after: str, *, approved_originals: set[str], path: str
+) -> list[Drift]:
+    """Find blocks that changed although nobody approved a change to them.
+
+    This exists because applying a model fix means re-exporting the whole document, and the export
+    is not guaranteed byte-identical for the parts nobody touched - it has been observed inserting
+    a blank line inside a fenced code block (BUGS.md #11).
+
+    The card asks for surgical precision and for being able to *show* nothing else changed. Since
+    this tool cannot make the platform's export lossless, it does the next best thing and refuses
+    to claim a precision it did not achieve: any block that moved without approval is reported.
+    """
+    from .parser import parse_document
+
+    def blocks(text: str) -> list[str]:
+        return [segment.raw.strip() for segment in parse_document(path, text).segments]
+
+    after_blocks = set(blocks(after))
+    normalised_after = {_squash(b) for b in after_blocks}
+
+    drifted: list[Drift] = []
+    for block in blocks(before):
+        if block in after_blocks:
+            continue  # survived exactly
+        if any(_squash(original) in _squash(block) for original in approved_originals if original):
+            continue  # this block is where an approved fix landed
+        if _squash(block) in normalised_after:
+            # Same words, different whitespace. Still not what was approved, and still worth
+            # saying out loud, but reported as the lesser thing it is.
+            drifted.append(Drift(path=path, before=block, after="(whitespace changed)"))
+            continue
+        drifted.append(Drift(path=path, before=block, after=None))
+    return drifted
+
+
+def _squash(text: str) -> str:
+    return " ".join(text.split())
 
 
 def apply_to_results(
@@ -118,6 +170,17 @@ def apply_to_results(
                 current=text,
                 outcome=outcome,
             )
+            # Applying a model fix re-exports the whole document, so check that the export did
+            # not quietly alter anything nobody approved.
+            if text != original_text:
+                outcome.drift.extend(
+                    detect_drift(
+                        original_text,
+                        text,
+                        approved_originals={f.original or "" for f in model_findings},
+                        path=result.path,
+                    )
+                )
 
         if local_findings:
             text = _apply_local(local_findings, text, path=result.path, outcome=outcome)

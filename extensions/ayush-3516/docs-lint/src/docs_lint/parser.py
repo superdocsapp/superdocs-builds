@@ -161,10 +161,18 @@ def parse_document(path: str, text: str) -> Document:
 
         elif token.type == "inline" and pending_kind is not None and pending_token is not None:
             start, end = offsets(pending_token)
-            raw = text[start:end]
+
+            if pending_kind is SegmentKind.HEADING:
+                # Close every section at or below this heading's level *before* recording its own
+                # path, so a second `##` reports its parent rather than its preceding sibling.
+                # Doing this after would make "Configuring the widget" claim to live inside
+                # "Installing the widget", which is simply untrue.
+                while heading_stack and heading_stack[-1][0] >= heading_level:
+                    heading_stack.pop()
+
             segment = Segment(
                 kind=pending_kind,
-                raw=raw,
+                raw=text[start:end],
                 content=token.content,
                 start_line=pending_token.map[0] + 1,
                 end_line=pending_token.map[1],
@@ -176,10 +184,6 @@ def parse_document(path: str, text: str) -> Document:
             segments.append(segment)
 
             if pending_kind is SegmentKind.HEADING:
-                # A heading closes every section at or below its level, then opens its own. This
-                # is what keeps `heading_path` correct when a document goes h1, h2, h3, h2.
-                while heading_stack and heading_stack[-1][0] >= heading_level:
-                    heading_stack.pop()
                 heading_stack.append((heading_level, token.content.strip()))
 
             pending_kind = None

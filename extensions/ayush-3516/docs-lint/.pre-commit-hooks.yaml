@@ -1,0 +1,23 @@
+- id: docs-lint
+  name: docs-lint (house style)
+  description: >-
+    Check changed Markdown documents against your team's style guide. Reports findings; never
+    rewrites anything. Use `docs-lint fix` separately to review and apply corrections.
+  entry: docs-lint check
+  language: python
+  # Only touched documents reach the hook: pre-commit passes staged files as arguments, which is
+  # what keeps it fast on a large repository.
+  types_or: [markdown]
+  files: \.(md|mdx)$
+  require_serial: false
+
+- id: docs-lint-local
+  name: docs-lint (house style, offline)
+  description: >-
+    The deterministic rules only - no network, no API key, no operations spent. Suitable as a
+    commit-time gate when the full style-guide review belongs in CI instead.
+  entry: docs-lint check --no-ai
+  language: python
+  types_or: [markdown]
+  files: \.(md|mdx)$
+  require_serial: false

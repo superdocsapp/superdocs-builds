@@ -310,3 +310,21 @@ def test_rules_run_in_a_stable_order_so_output_is_reproducible(tmp_path):
 def test_the_rule_set_survives_unusual_documents(text, tmp_path):
     """No rule may crash on valid Markdown, however odd."""
     list(run_local_rules(doc(text), Config(root=tmp_path)))
+
+
+def test_a_headings_own_path_excludes_its_preceding_sibling():
+    """ "Configuring" sits under the h1, not inside "Installing"."""
+    document = doc("# Top\n\n## Installing\n\ntext\n\n## Configuring\n\ntext\n")
+    headings = {
+        s.content: s.heading_path for s in document.segments if s.kind is SegmentKind.HEADING
+    }
+
+    assert headings["Top"] == ()
+    assert headings["Installing"] == ("Top",)
+    assert headings["Configuring"] == ("Top",), "a sibling must not appear in its sibling's path"
+
+
+def test_body_text_still_reports_the_section_it_belongs_to():
+    document = doc("# Top\n\n## Installing\n\nbody text here\n")
+    body = [s for s in document.segments if s.kind is SegmentKind.PARAGRAPH][0]
+    assert body.heading_path == ("Top", "Installing")
