@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500">
+    <rect width="900" height="500" fill="#f4f4f4"/>
+    <rect x="40" y="40" width="820" height="420" rx="12" fill="white"/>
+    <text x="80" y="100" font-size="32" font-family="Arial">SuperDocs</text>
+    <text x="80" y="170" font-size="26" font-family="Arial">Crear proyecto</text>
+    <rect x="80" y="220" width="500" height="55" rx="8" fill="#eeeeee"/>
+    <text x="100" y="255" font-size="20" font-family="Arial">Nombre del proyecto</text>
+    <rect x="80" y="320" width="180" height="55" rx="8" fill="#dddddd"/>
+    <text x="125" y="355" font-size="20" font-family="Arial">Crear</text>
+</svg>
