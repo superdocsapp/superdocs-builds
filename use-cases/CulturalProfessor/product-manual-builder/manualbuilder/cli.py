@@ -9,6 +9,7 @@ quota.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -229,12 +230,59 @@ def _client():
     return SuperDocs()
 
 
+STATE = "published.json"
+PROPOSAL = "proposal.json"
+
+
+def _save(published, language: str) -> Path:
+    """Remember what `publish` made, so nothing has to be pasted by hand.
+
+    Three ids are needed to edit a published pair -- the session and both
+    documents -- and a demo that asks somebody to copy three ids between
+    commands is a demo that goes wrong on camera.
+    """
+    OUT.mkdir(exist_ok=True)
+    path = OUT / STATE
+    path.write_text(json.dumps({
+        "session_id": published.session_id,
+        "manual_id": published.manual_id,
+        "card_id": published.card_id,
+        "language": language,
+        "images": published.images,
+    }, indent=2), encoding="utf-8")
+    return path
+
+
+def _load(args):
+    """The published pair: from the flags if given, from `out/` if not."""
+    saved = {}
+    path = OUT / STATE
+    if path.is_file():
+        saved = json.loads(path.read_text(encoding="utf-8"))
+
+    published = session.Publication(
+        manual_id=getattr(args, "manual", "") or saved.get("manual_id", ""),
+        card_id=getattr(args, "card", "") or saved.get("card_id", ""),
+        session_id=getattr(args, "session", "") or saved.get("session_id"),
+        images=saved.get("images", {}),
+    )
+    missing = [name for name, value in (("--session", published.session_id),
+                                        ("--manual", published.manual_id),
+                                        ("--card", published.card_id)) if not value]
+    if missing:
+        raise SpecError(
+            f"no published pair to work on: {', '.join(missing)} not given and "
+            f"{path} does not have it. Run `publish` first."
+        )
+    return published
+
+
 def cmd_publish(args) -> int:
     """Upload one language's pair. One pair per run, deliberately.
 
     Publishing every locale at once would be one flag and several times the
     quota, and the pair is the unit that has to stay consistent -- a German
-    manual and a German card open in one session and are edited in one turn, the
+    manual and a German card live in one session and are edited together, the
     same way the English pair is. Cross-language consistency is not maintained by
     chat at all: it comes from the spec, and `check` is what proves it.
     """
@@ -249,10 +297,12 @@ def cmd_publish(args) -> int:
 
     with _client() as client:
         published = session.publish(client, spec, language=args.language)
+    path = _save(published, args.language)
+    print(f"session {published.session_id}")
     print(f"manual  {published.manual_id}")
     print(f"card    {published.card_id}")
     print(f"images  {len(published.images)} uploaded")
-    print("\nkeep those ids; `edit` needs them.")
+    print(f"\nwritten to {path}; `edit`, `sync` and `export` read it from there.")
     return 0
 
 
@@ -260,7 +310,7 @@ def cmd_edit(args) -> int:
     """One instruction, both documents, nothing applied without a look."""
     from manualbuilder.superdocs import SuperDocsError
 
-    published = session.Publication(manual_id=args.manual, card_id=args.card)
+    published = _load(args)
     with _client() as client:
         changes, _ = session.edit_both(client, published, args.instruction)
 
@@ -272,7 +322,8 @@ def cmd_edit(args) -> int:
         for document_id, items in grouped.items():
             print(f"\n{published.name_for(document_id)} — {len(items)} change(s)")
             for change in items:
-                print(f"  [{change.operation}] chunk {change.chunk_id}")
+                print(f"  [{change.operation}] {change.change_id}")
+                print(f"    chunk {change.chunk_id}")
                 print(f"    - {change.old_html[:100]}")
                 print(f"    + {change.new_html[:100]}")
                 if change.explanation:
@@ -284,12 +335,78 @@ def cmd_edit(args) -> int:
             print(f"\nREFUSED: {exc}")
             return 1
 
+        path = _save_proposal(published, changes)
         if not args.yes:
-            print("\nnothing approved. Re-run with --yes to apply.")
+            print(f"\nnothing approved. {path} holds the batch:")
+            print("  manualbuilder approve            — apply all of it")
+            print("  manualbuilder approve --reject ID — apply the rest")
             return 0
 
-        result = session.approve_all(client, published, changes)
-        print(f"\napproved {len(changes)} change(s): {result.get('status', 'ok')}")
+        results = session.approve_all(client, published, changes)
+        print(f"\napproved {len(changes)} change(s) across {len(results)} turn(s)")
+    return 0
+
+
+def _save_proposal(published, changes) -> Path:
+    """Write the proposed batch down so a person can review it and come back.
+
+    Change ids are minted per turn: re-running `edit` to reject one of them
+    produces a different batch with different ids, so a review that spans two
+    commands has to be reviewing a *recorded* batch rather than a remembered
+    one. This is that record, and it is why `approve` is its own command.
+    """
+    OUT.mkdir(exist_ok=True)
+    path = OUT / PROPOSAL
+    path.write_text(json.dumps({
+        "session_id": published.session_id,
+        "jobs": published.jobs,
+        "changes": [{"change_id": c.change_id, "operation": c.operation,
+                     "chunk_id": c.chunk_id, "document_id": c.document_id,
+                     "old_html": c.old_html, "new_html": c.new_html,
+                     "explanation": c.explanation} for c in changes],
+    }, indent=2), encoding="utf-8")
+    return path
+
+
+def cmd_approve(args) -> int:
+    """Apply a batch `edit` proposed, minus anything rejected by id.
+
+    The gate, as its own step. Rejecting one change does not discard the rest:
+    the two changes that were asked for go in and the one that was not stays
+    out, in a single review.
+    """
+    from manualbuilder.superdocs import ProposedChange, SuperDocsError
+
+    path = OUT / PROPOSAL
+    if not path.is_file():
+        print(f"no proposal at {path}; run `edit` first", file=sys.stderr)
+        return 2
+    saved = json.loads(path.read_text(encoding="utf-8"))
+
+    published = _load(args)
+    published.session_id = saved["session_id"]
+    published.jobs = saved["jobs"]
+    changes = [ProposedChange(
+        change_id=c["change_id"], operation=c["operation"], chunk_id=c["chunk_id"],
+        document_id=c["document_id"], old_html=c["old_html"],
+        new_html=c["new_html"], explanation=c["explanation"])
+        for c in saved["changes"]]
+
+    reject = set(args.reject)
+    with _client() as client:
+        try:
+            results = session.approve_all(client, published, changes, reject=reject)
+        except SuperDocsError as exc:
+            print(f"REFUSED: {exc}", file=sys.stderr)
+            return 1
+
+    for change in changes:
+        verdict = "rejected" if change.change_id in reject else "approved"
+        print(f"  {verdict}  {change.change_id}  "
+              f"{published.name_for(change.document_id or '')}")
+    print(f"\n{len(changes) - len(reject)} approved, {len(reject)} rejected, "
+          f"across {len(results)} turn(s)")
+    path.unlink()          # a batch is applied once; a stale one is a trap
     return 0
 
 
@@ -311,7 +428,7 @@ def cmd_sync(args) -> int:
             return 2
         spec = locales[args.language]
 
-    published = session.Publication(manual_id=args.manual, card_id=args.card)
+    published = _load(args)
     with _client() as client:
         changes, images = session.swap_diagrams(client, published, spec)
         print(f"{len(images)} diagram(s) re-rendered and uploaded")
@@ -331,8 +448,8 @@ def cmd_sync(args) -> int:
             print("nothing approved. Re-run with --yes to apply.")
             return 0
 
-        result = session.approve_all(client, published, changes)
-        print(f"approved: {result.get('status', 'ok')}")
+        results = session.approve_all(client, published, changes)
+        print(f"approved {len(changes)} swap(s) across {len(results)} turn(s)")
     return 0
 
 
@@ -345,15 +462,36 @@ def cmd_export(args) -> int:
     verification path leans on them.
     """
     OUT.mkdir(exist_ok=True)
-    published = session.Publication(manual_id=args.manual, card_id=args.card)
+    published = _load(args)
     with _client() as client:
+        # Export is keyed by session, and a session renders its focused
+        # document -- so each document is focused in turn rather than assuming
+        # one call brings back both.
+        # Into out/export/, never out/ itself: `build` writes `manual.html`
+        # there, and an export landing on top of it would replace the local
+        # render with the service's copy under the same name. Comparing the two
+        # is most of what export is for here.
+        target = OUT / "export"
+        target.mkdir(parents=True, exist_ok=True)
         for document_id in published.document_ids:
             name = published.name_for(document_id).replace(" ", "-")
-            data = client.export_bytes(document_id, args.format)
-            path = OUT / f"{name}.{args.format}"
+            client.focus(published.session_id, document_id)
+            data = client.export_bytes(published.session_id, args.format)
+            path = target / f"{name}.{args.format}"
             path.write_bytes(data)
             print(f"{path}  {len(data):,} bytes")
     return 0
+
+
+def _published_args(parser) -> None:
+    """The three ids that identify a published pair.
+
+    All optional: `publish` writes them to out/published.json and these are the
+    override for working on a pair this machine did not publish.
+    """
+    parser.add_argument("--session", default="", help="chat session id")
+    parser.add_argument("--manual", default="", help="manual document id")
+    parser.add_argument("--card", default="", help="quick-start document id")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -370,26 +508,30 @@ def main(argv: list[str] | None = None) -> int:
 
     edit = sub.add_parser("edit", help="one instruction, both documents")
     edit.add_argument("instruction")
-    edit.add_argument("--manual", required=True, help="manual document id")
-    edit.add_argument("--card", required=True, help="quick-start document id")
+    _published_args(edit)
     edit.add_argument("--yes", action="store_true",
                       help="approve the proposed changes; without it, nothing is applied")
+    approve = sub.add_parser(
+        "approve", help="apply the batch `edit` proposed, minus what you reject")
+    approve.add_argument("--reject", action="append", default=[],
+                         metavar="CHANGE_ID",
+                         help="reject one change by id; the rest still applies. "
+                              "Repeatable.")
+    _published_args(approve)
 
     sync = sub.add_parser("sync", help="re-render the diagrams and swap them in")
-    sync.add_argument("--manual", required=True, help="manual document id")
-    sync.add_argument("--card", required=True, help="quick-start document id")
+    _published_args(sync)
     sync.add_argument("--language", default="", help="a locale from locales/")
     sync.add_argument("--yes", action="store_true",
                       help="approve the swaps; without it, nothing is applied")
 
     export = sub.add_parser("export", help="download both finished documents")
-    export.add_argument("--manual", required=True, help="manual document id")
-    export.add_argument("--card", required=True, help="quick-start document id")
+    _published_args(export)
     export.add_argument("--format", default="pdf", help="pdf (default) or docx")
 
     args = parser.parse_args(argv)
     handler = {"check": cmd_check, "build": cmd_build, "publish": cmd_publish,
-               "edit": cmd_edit, "sync": cmd_sync,
+               "edit": cmd_edit, "approve": cmd_approve, "sync": cmd_sync,
                "export": cmd_export}[args.command]
     try:
         return handler(args)

@@ -36,6 +36,10 @@ class Publication:
     card_id: str
     images: dict[str, str] = field(default_factory=dict)
     session_id: str | None = None
+    #: One job per turn, and a turn is per document. Approving needs the job the
+    #: changes came from, so the pair's two turns carry two job ids and both are
+    #: kept until the batch is approved or thrown away together.
+    jobs: dict[str, str] = field(default_factory=dict)
 
     @property
     def document_ids(self) -> list[str]:
@@ -82,27 +86,78 @@ def publish(client: SuperDocs, spec: Spec, language: str = "") -> Publication:
     """
     images = upload_diagrams(client, spec)
     suffix = f"-{language}" if language else ""
+    session_id = client.init_session()
+
+    # `new_focused` then `background`: the second document joins the session
+    # beside the first instead of replacing it. The default is `replace`, which
+    # returns 200 and "persisted": true while destroying the manual.
     manual_id = client.upload(
-        f"{_slug(spec.name)}-manual{suffix}.html", pj.manual_html(spec, images))
+        f"{_slug(spec.name)}-manual{suffix}.html", pj.manual_html(spec, images),
+        session_id=session_id, open_mode="new_focused")
     card_id = client.upload(
         f"{_slug(spec.name)}-quickstart{suffix}.html",
-        pj.quick_start_html(spec, images))
-    return Publication(manual_id=manual_id, card_id=card_id, images=images)
+        pj.quick_start_html(spec, images),
+        session_id=session_id, open_mode="background")
+
+    holding = {d.get("document_id") for d in client.documents(session_id)}
+    missing = [name for name, doc_id in (("manual", manual_id), ("card", card_id))
+               if doc_id not in holding]
+    if missing:
+        raise SuperDocsError(
+            f"the session holds {len(holding)} document(s) and not the "
+            f"{' and '.join(missing)}; uploading the pair replaced rather than "
+            f"opened, so an edit would only ever reach one of them"
+        )
+    return Publication(manual_id=manual_id, card_id=card_id, images=images,
+                       session_id=session_id)
 
 
 def edit_both(client: SuperDocs, publication: Publication,
-              instruction: str) -> tuple[list[ProposedChange], dict[str, Any]]:
-    """One instruction, both documents open, changes parked for approval.
+              instruction: str) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
+    """One instruction, both documents, nothing applied by either turn.
 
-    Returns the proposed changes and the raw reply. Nothing is applied: the turn
-    parks at `awaiting_approval` so a person -- or the assertion below -- can
-    look at what it wants to do first.
+    Two turns, because the service edits one document per turn. That is not the
+    design this started with -- it started with one turn naming both documents,
+    which the API accepts, which returns proposed changes, and every one of
+    which lands in the focused document. The card was never touched and the
+    reply gave no sign of it.
+
+    So the guarantee moved to where it actually holds. It was never really the
+    single request that kept the pair together; it was that **nothing is applied
+    until both documents have proposed the change**. Both turns park at
+    `awaiting_approval`, `assert_touched_both` looks at the pair, and approval
+    covers both or neither. There is still no window in which the manual has
+    moved and the card has not, because the window opens at approval and
+    approval is one decision.
+
+    Both turns run in one session, so the second one is sent to a service that
+    has already read the first document -- which is why the same sentence works
+    for both without being re-specified per document.
     """
-    reply = client.chat(instruction, publication.document_ids,
-                        session_id=publication.session_id)
-    publication.session_id = (reply.get("session_id")
-                              or reply.get("id") or publication.session_id)
-    return client.pending_changes(reply), reply
+    if not publication.session_id:
+        raise SuperDocsError(
+            "no session to edit in; `publish` opens one and `edit` needs its id")
+
+    changes: list[ProposedChange] = []
+    replies: list[dict[str, Any]] = []
+    for document_id in publication.document_ids:
+        # Async, not `/v1/chat`, and this is the whole reason the human gate
+        # works at all. The synchronous endpoint returns the proposed changes
+        # and its job goes straight to `completed` -- approving against it comes
+        # back "Job is not awaiting approval (status: completed)", so the
+        # changes it showed you can never be applied. `/v1/chat/async` parks its
+        # job at `awaiting_approval` with the same changes in
+        # `metadata.pending_changes`, and that job is the thing approval needs.
+        job_id = client.chat_async(instruction, publication.session_id,
+                                   document_id=document_id)
+        job = client.wait_for_job(job_id)
+        replies.append(job)
+
+        turn = client.pending_changes(job)
+        if turn:
+            publication.jobs[document_id] = job_id
+        changes += turn
+    return changes, replies
 
 
 def changes_by_document(publication: Publication,
@@ -142,11 +197,51 @@ def assert_touched_both(publication: Publication,
 
 
 def approve_all(client: SuperDocs, publication: Publication,
-                changes: list[ProposedChange]) -> dict[str, Any]:
+                changes: list[ProposedChange],
+                reject: set[str] | None = None) -> list[dict[str, Any]]:
+    """Approve the batch, minus anything rejected by change id.
+
+    Rejecting one change does not discard the rest, and that is not a nicety.
+    Asked to change one torque figure, a turn will find the same number in a
+    step that legitimately shares it and offer to change that too -- it happened
+    on the first live run of this code, twice. The right answer is to take the
+    two changes that were asked for and refuse the third, in one review, which
+    is what the per-change `approved` field is for.
+
+    One call per job, because a job is one turn and a turn is one document.
+    """
+    reject = reject or set()
     if not publication.session_id:
         raise SuperDocsError("no session to approve against; run edit_both first")
-    return client.approve(publication.session_id,
-                          {change.change_id: True for change in changes})
+    if not publication.jobs:
+        raise SuperDocsError(
+            "no job to approve against; the turns proposed nothing, or "
+            "`edit_both` was not the thing that ran them")
+
+    unknown = reject - {change.change_id for change in changes}
+    if unknown:
+        raise SuperDocsError(
+            f"asked to reject {', '.join(sorted(unknown))}, which is not in this "
+            f"batch. Approving the rest would apply a change somebody meant to "
+            f"stop, so nothing was sent."
+        )
+
+    by_job: dict[str, dict[str, bool]] = {}
+    for change in changes:
+        job_id = publication.jobs.get(change.document_id or "")
+        if not job_id:
+            raise SuperDocsError(
+                f"change {change.change_id} belongs to document "
+                f"{change.document_id!r}, which no recorded turn produced")
+        by_job.setdefault(job_id, {})[change.change_id] = change.change_id not in reject
+
+    # `approved` at the top level is the default for entries that omit their
+    # own. Every entry here carries its own, so the default only matters if the
+    # service adds a change we did not see -- and False is the safe answer to
+    # that.
+    return [client.approve(publication.session_id, job_id, decisions,
+                           approved_by_default=False)
+            for job_id, decisions in by_job.items()]
 
 
 def refresh_diagrams(client: SuperDocs, publication: Publication,

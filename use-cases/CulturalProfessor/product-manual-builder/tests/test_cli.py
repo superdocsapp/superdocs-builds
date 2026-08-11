@@ -104,4 +104,20 @@ def test_a_command_that_needs_a_key_says_so_before_it_tries(monkeypatch):
     monkeypatch.chdir(PROJECT_ROOT)
 
     with pytest.raises(SuperDocsError, match="SUPERDOCS_API_KEY is not set"):
-        cli.main(["export", "--manual", "doc_1", "--card", "doc_2"])
+        cli.main(["export", "--session", "sess_1",
+                  "--manual", "doc_1", "--card", "doc_2"])
+
+
+def test_a_command_that_needs_a_published_pair_says_which_id_is_missing(
+        monkeypatch, tmp_path, capsys):
+    """Three ids identify a published pair, and `publish` writes them down so
+    nobody has to paste them. Asked to work on a pair that was never published,
+    the answer is which id is missing and where it was looked for -- not a
+    request to the service with an empty document id in it."""
+    monkeypatch.setattr(cli, "OUT", tmp_path / "nothing-here")
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    code = cli.main(["export"])
+    err = capsys.readouterr().err
+    assert code == 2
+    assert "--session" in err and "Run `publish` first" in err
