@@ -104,10 +104,13 @@ class SuperDocs:
             )
         self.base_url = (base_url or os.environ.get("SUPERDOCS_BASE_URL")
                          or DEFAULT_BASE_URL).rstrip("/")
+        # No client-wide Content-Type. httpx sets `application/json` for a
+        # `json=` body and a multipart boundary for a `files=` body, and a
+        # default here would override the boundary and make every upload a
+        # malformed JSON request.
         self._client = httpx.Client(
             base_url=self.base_url, timeout=timeout,
-            headers={"Authorization": f"Bearer {key}",
-                     "Content-Type": "application/json"},
+            headers={"Authorization": f"Bearer {key}"},
         )
 
     def close(self) -> None:
@@ -149,101 +152,170 @@ class SuperDocs:
 
     # ------------------------------------------------------------ documents --
 
-    def upload(self, filename: str, content: str | bytes,
-               content_type: str = "text/html") -> str:
-        """Upload a document and return its id.
+    def init_session(self, document_ids: list[str] | None = None) -> str:
+        """Open a session. Everything else needs one.
 
-        The service parses an upload into HTML chunks, and chunk-level editing is
-        what makes "this edit changed exactly this and nothing else" provable
-        later. Uploading pre-chunked HTML rather than a flat blob is therefore
-        not cosmetic.
+        A session is the unit that holds documents, and `/v1/chat` requires one:
+        there is no document-only call anywhere on the surface.
+        """
+        body = self._post("/v1/sessions/init",
+                          {"document_ids": document_ids} if document_ids else {})
+        session_id = body.get("session_id") or body.get("id")
+        if not session_id:
+            raise SuperDocsError(f"session init returned no id: {body}")
+        return str(session_id)
+
+    def upload(self, filename: str, content: str | bytes, session_id: str,
+               open_mode: str = "background",
+               content_type: str = "text/html") -> str:
+        """Upload a document into a session and return its id.
+
+        Multipart, not JSON, and that is the whole reason this method exists in
+        this shape. The JSON sibling `/v1/documents/upload-base64` has no
+        `open_mode` field, so it always replaces the focused document -- upload
+        two documents through it and the first one is gone, with `200` and
+        `"persisted": true` on both calls. `open_mode="background"` is what puts
+        a second document *beside* the first instead of on top of it.
+
+        The service parses the upload into HTML chunks and hands back
+        `data-chunk-id` on every element, which is what makes a later edit
+        provably confined to one chunk.
         """
         data = content.encode("utf-8") if isinstance(content, str) else content
-        body = self._post("/v1/documents/upload", {
-            "filename": filename,
-            "content_base64": base64.b64encode(data).decode("ascii"),
-            "content_type": content_type,
-        })
+        body = self._read(self._client.post(
+            "/v1/documents/upload",
+            files={"file": (filename, data, content_type)},
+            data={"session_id": session_id, "open_mode": open_mode},
+        ))
         document_id = body.get("document_id") or body.get("id")
         if not document_id:
-            raise SuperDocsError(f"upload returned no document id: {body}")
+            raise SuperDocsError(f"upload returned no document id: {list(body)}")
+        if not body.get("persisted", True):
+            raise SuperDocsError(
+                f"{filename} was converted but not stored: "
+                f"{body.get('how_to_persist', 'no session_id was accepted')}"
+            )
         return str(document_id)
 
+    def documents(self, session_id: str) -> list[dict[str, Any]]:
+        """What the session currently holds, newest view.
+
+        Worth reading after an upload rather than trusting the upload's own
+        reply: these two disagreed with each other during development, and the
+        session's list is the one the chat call goes on.
+        """
+        body = self._get(f"/v1/sessions/{session_id}/documents")
+        listed = body.get("documents")
+        return listed if isinstance(listed, list) else []
+
+    def focus(self, session_id: str, document_id: str) -> dict[str, Any]:
+        """Make a document the session's focused one.
+
+        Export renders what the session is focused on, so getting both documents
+        out means focusing each in turn. Be warned that this endpoint has
+        returned a *different* document's title than the one it was asked to
+        focus; `documents()` is the view to trust.
+        """
+        return self._post(
+            f"/v1/sessions/{session_id}/documents/{document_id}/focus", {})
+
     def upload_image(self, filename: str, svg: str) -> str:
-        """Upload an image and return a stable URL for an `<img src>`."""
-        body = self._post("/v1/images/upload", {
+        """Upload an image and return a stable URL for an `<img src>`.
+
+        `url` is the durable one. The reply also carries a `view_url` with a
+        signature and an expiry on it, which renders today and 404s in a week --
+        putting that one in a document is a manual whose diagrams disappear.
+        """
+        body = self._post("/v1/documents/images/upload-base64", {
+            "image_base64": base64.b64encode(svg.encode("utf-8")).decode("ascii"),
             "filename": filename,
-            "content_base64": base64.b64encode(svg.encode("utf-8")).decode("ascii"),
             "content_type": "image/svg+xml",
         })
-        url = body.get("url") or body.get("image_url")
+        url = body.get("url")
         if not url:
-            raise SuperDocsError(f"image upload returned no url: {body}")
+            raise SuperDocsError(f"image upload returned no durable url: {list(body)}")
         return str(url)
 
-    def export(self, document_id: str, fmt: str = "pdf") -> dict[str, Any]:
-        """Exports are free, which is why the verification path leans on them."""
-        return self._post("/v1/documents/export",
-                          {"document_id": document_id, "format": fmt})
-
-    def export_bytes(self, document_id: str, fmt: str = "pdf") -> bytes:
+    def export_bytes(self, session_id: str, fmt: str = "pdf",
+                     filename: str | None = None) -> bytes:
         """The exported file itself.
 
-        The call is one of the four in the documented spine; what its reply
-        carries the file *as* is the part that varies, so both shapes are
-        handled -- inline base64, or a URL to fetch. A reply carrying neither is
-        an error here rather than an empty file written to disk with a reassuring
-        message next to it.
+        Keyed by session, not by document: export renders what the session is
+        focused on. And it returns the *file*, not JSON describing one -- an
+        `application/json` reply here means something went wrong, or that a
+        future version started handing back a link, so both are handled and
+        anything else is an error rather than an empty file written to disk with
+        a reassuring message next to it.
+
+        Exports are free, which is why the verification path leans on them.
         """
-        body = self.export(document_id, fmt)
+        payload: dict[str, Any] = {"session_id": session_id, "format": fmt}
+        if filename:
+            payload["filename"] = filename
+        response = self._client.post("/v1/documents/export", json=payload)
+        if response.status_code == 429:
+            raise QuotaExceeded(f"quota exceeded on export: {response.text[:200]}")
+        if response.status_code >= 400:
+            raise SuperDocsError(
+                f"POST /v1/documents/export -> {response.status_code}: "
+                f"{response.text[:400]}")
+
+        if not response.headers.get("content-type", "").startswith("application/json"):
+            return response.content
+
+        body = response.json()
         for key in ("content_base64", "file_base64", "data"):
             if body.get(key):
                 return base64.b64decode(body[key])
         for key in ("url", "download_url", "file_url"):
             if body.get(key):
-                response = self._client.get(body[key])
-                if response.status_code >= 400:
+                linked = self._client.get(body[key])
+                if linked.status_code >= 400:
                     raise SuperDocsError(
-                        f"export URL {body[key]} -> {response.status_code}")
-                return response.content
+                        f"export URL {body[key]} -> {linked.status_code}")
+                return linked.content
         raise SuperDocsError(
-            f"export of {document_id} returned neither file content nor a URL: "
-            f"{list(body)}"
+            f"export of session {session_id} returned JSON carrying neither file "
+            f"content nor a URL: {list(body)}"
         )
 
     # ----------------------------------------------------------------- chat --
 
-    def chat(self, message: str, document_ids: list[str],
-             session_id: str | None = None,
-             open_mode: str = "background") -> dict[str, Any]:
+    def chat(self, message: str, session_id: str,
+             document_id: str | None = None) -> dict[str, Any]:
         """One edit turn, parked for approval rather than applied.
 
-        `document_ids` is a list because a turn can touch several open documents
-        at once. That is the whole reason the manual and the card can't drift:
-        one instruction produces both edits, so there is no window in which one
-        document has been updated and the other has not.
+        One turn, one document. A session can hold several documents like tabs,
+        and a turn can *read* across them, but the changes it proposes land in
+        one -- the one named by `document_id`, falling back to whichever is
+        focused. There is no call that edits two documents at once.
+
+        That is worth being blunt about, because an earlier version of this
+        client sent `document_ids` as a list and looked like it worked: the
+        service accepts unknown fields, the reply comes back with proposed
+        changes, and every one of them is in the focused document. Keeping the
+        manual and the card consistent is therefore not something a single
+        request can buy -- see `session.edit_both`, which buys it at the
+        approval gate instead.
         """
         payload: dict[str, Any] = {
             "message": message,
-            "document_ids": document_ids,
+            "session_id": session_id,
             "approval_mode": "ask_every_time",
-            "open_mode": open_mode,
         }
-        if session_id:
-            payload["session_id"] = session_id
+        if document_id:
+            payload["document_id"] = document_id
         return self._post("/v1/chat", payload)
 
-    def chat_async(self, message: str, document_ids: list[str],
-                   session_id: str | None = None,
-                   open_mode: str = "background") -> str:
+    def chat_async(self, message: str, session_id: str,
+                   document_id: str | None = None) -> str:
         payload: dict[str, Any] = {
             "message": message,
-            "document_ids": document_ids,
+            "session_id": session_id,
             "approval_mode": "ask_every_time",
-            "open_mode": open_mode,
         }
-        if session_id:
-            payload["session_id"] = session_id
+        if document_id:
+            payload["document_id"] = document_id
         body = self._post("/v1/chat/async", payload)
         job_id = body.get("job_id") or body.get("id")
         if not job_id:
@@ -252,6 +324,11 @@ class SuperDocs:
 
     def job(self, job_id: str) -> dict[str, Any]:
         return self._get(f"/v1/jobs/{job_id}")
+
+    def jobs(self, session_id: str) -> list[dict[str, Any]]:
+        body = self._get(f"/v1/sessions/{session_id}/jobs")
+        listed = body.get("jobs")
+        return listed if isinstance(listed, list) else []
 
     def wait_for_job(self, job_id: str, timeout: float = DEFAULT_TIMEOUT,
                      poll: float = POLL_INTERVAL) -> dict[str, Any]:
@@ -271,15 +348,17 @@ class SuperDocs:
         raise SuperDocsError(
             f"job {job_id} still {last.get('status')!r} after {timeout:.0f}s")
 
-    def approve(self, session_id: str, decisions: dict[str, bool],
+    def approve(self, session_id: str, job_id: str, decisions: dict[str, bool],
                 approved_by_default: bool = True) -> dict[str, Any]:
         """Approve or reject proposed changes, individually.
 
-        `approved` is sent at the top level as well as per change. It is the
-        default for any entry that omits its own, and omitting it approves
-        nothing -- which looks exactly like a service that ignored the call.
+        `job_id` and `approved` are both required, and `approved` is the default
+        for any entry in `changes` that omits its own -- so leaving it out
+        approves nothing while looking exactly like a service that ignored the
+        call. It is sent at the top level *and* per change for that reason.
         """
         return self._post(f"/v1/chat/{session_id}/approve", {
+            "job_id": job_id,
             "approved": approved_by_default,
             "changes": [{"change_id": change_id, "approved": ok}
                         for change_id, ok in decisions.items()],
@@ -297,10 +376,14 @@ class SuperDocs:
         caller has to know which one it is holding, and so the double-parse is
         written once instead of being rediscovered.
         """
-        metadata = payload.get("metadata") or {}
-        raw = metadata.get("pending_changes")
-        if isinstance(raw, list):
-            return [ProposedChange.from_payload(item) for item in raw]
+        # The synchronous reply nests them under `document_changes`; the job
+        # object puts the same already-parsed list under `metadata`. Both are
+        # lists, and both are checked because a caller holding one of them
+        # should not have to know which call produced it.
+        for container in (payload.get("document_changes"), payload.get("metadata")):
+            raw = (container or {}).get("pending_changes")
+            if isinstance(raw, list):
+                return [ProposedChange.from_payload(item) for item in raw]
 
         out: list[ProposedChange] = []
         for entry in payload.get("intermediate_responses") or []:
@@ -356,7 +439,15 @@ def _batch_items(content: Any) -> list[dict[str, Any]]:
 
 
 def load_dotenv(path: str | Path = ".env") -> None:
-    """Read a .env if one is present. Never overwrites what is already set."""
+    """Read a .env if one is present. Never overwrites what is already set.
+
+    Quotes are stripped, and that is not tidiness. `KEY="sk_live_..."` is how
+    half the world writes a .env, and keeping the quotes sends a bearer token
+    with two extra characters in it -- which comes back as 401 *invalid
+    credentials*, so the hour goes on the key being wrong rather than on the
+    parsing being wrong. An `export ` prefix, from a file someone was sourcing
+    in a shell, goes the same way.
+    """
     file = Path(path)
     if not file.is_file():
         return
@@ -364,8 +455,13 @@ def load_dotenv(path: str | Path = ".env") -> None:
         line = line.strip()
         if not line or line.startswith("#") or "=" not in line:
             continue
+        if line.startswith("export "):
+            line = line[len("export "):]
         key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip())
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        os.environ.setdefault(key.strip(), value)
 
 
 __all__ = ["SuperDocs", "SuperDocsError", "QuotaExceeded", "ProposedChange",

@@ -102,9 +102,13 @@ def test_the_approval_payload_carries_a_top_level_default(monkeypatch):
     client = SuperDocs()
     client._client = Fake()
 
-    client.approve("sess_1", {"c1": True, "c2": False})
+    client.approve("sess_1", "job_7", {"c1": True, "c2": False})
 
     assert sent["path"] == "/v1/chat/sess_1/approve"
+    assert sent["body"]["job_id"] == "job_7", (
+        "approve is keyed by the job the changes came from, and the synchronous "
+        "chat reply does not carry one -- it comes from the session's job list"
+    )
     assert sent["body"]["approved"] is True, (
         "the top-level default is what makes the per-change entries mean anything"
     )
@@ -131,12 +135,19 @@ def test_a_chat_turn_parks_for_approval(monkeypatch):
     client = SuperDocs()
     client._client = Fake()
 
-    client.chat("raise the rail torque to 1.6 N·m", ["doc_manual", "doc_card"])
+    client.chat("raise the rail torque to 1.6 N·m", "sess_1",
+                document_id="doc_manual")
 
     assert sent["body"]["approval_mode"] == "ask_every_time"
-    assert sent["body"]["document_ids"] == ["doc_manual", "doc_card"], (
-        "one turn, both documents -- this is the anti-drift mechanism"
+    assert sent["body"]["session_id"] == "sess_1", "chat requires a session"
+    assert sent["body"]["document_id"] == "doc_manual", (
+        "one turn, one document. An earlier version of this client sent "
+        "`document_ids` as a list and looked like it worked: the service "
+        "accepts the unknown field, returns proposed changes, and every one of "
+        "them lands in the focused document. The pair is kept together at the "
+        "approval gate instead -- see session.edit_both."
     )
+    assert "document_ids" not in sent["body"]
 
 
 def _ok(body: dict):
