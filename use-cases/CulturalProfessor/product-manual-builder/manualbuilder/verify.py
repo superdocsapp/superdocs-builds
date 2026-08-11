@@ -39,8 +39,14 @@ inventing a comparison rather than making one. A passage still verbatim in one
 document and unrecognisable in the other is not a `--` -- it is the pair coming
 apart as completely as it can, and it fails.
 
-No quota is spent here. Exports are free, which is the whole reason the
-verification path leans on them.
+Each document is read back by its **durable id**, not exported out of its
+session. That is not a performance choice. Export renders whatever the session
+is focused on, and focus is not owned by whoever opened the session -- so an
+export can return a perfectly valid document that is not the one asked for, and
+this module would then report on it at length and in detail. Naming the document
+removes the failure mode rather than checking for it afterwards.
+
+Nothing here is billed either way.
 """
 from __future__ import annotations
 
@@ -90,9 +96,11 @@ MATCH = 0.75
 def text_of(html: str) -> str:
     """The words a reader sees, with markup and whitespace differences gone.
 
-    The service wraps an export in a full HTML document with its own
-    stylesheet, so `<style>` has to come out before the tags do or a comparison
-    is searching several hundred bytes of CSS as well.
+    `<script>` and `<style>` come out before the tags do. A document read by id
+    is the stored body and carries neither, but an export of the same document
+    arrives wrapped in a full HTML document with several hundred bytes of the
+    service's own CSS in it -- and a comparison that searched that would be
+    matching stylesheet text against manual text.
     """
     return _WS.sub(" ", unescape(_TAG.sub(" ", _DROP.sub(" ", html)))).strip()
 

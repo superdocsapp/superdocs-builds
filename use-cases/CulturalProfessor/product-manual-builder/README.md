@@ -192,15 +192,19 @@ ids are written back to `out/published.json`.
 ./mb export --format html
 ```
 
-`export` pulls both finished documents back into `out/export/`, which is how a
-claim about them becomes checkable: what lands there is what the service holds,
-not what this program believes it uploaded. It is deliberately a different
-folder from the local render, because comparing the two is the point. Exports
-cost no quota. `--format` is `pdf` by default; `html` is the one to ask for if
-you want to read the markup back.
+`export` renders both finished documents into `out/export/` — the deliverable,
+the thing somebody prints. It is deliberately a different folder from the local
+render, because comparing the two is the point. Exports cost no quota.
+`--format` is `pdf` by default and takes any of `docx`, `pdf`, `html`,
+`markdown`, `txt`; anything else is refused by the service with a `422`.
 
 Give it a moment after `approve`, though — see the caveat under [what is
 verified](#what-is-verified-against-the-live-service).
+
+Export is *not* how this project checks its work. It renders whatever the
+session is focused on, so it can hand back a valid document that is not the one
+asked for; `verify` reads by document id instead, and the paragraph on it below
+says why.
 
 Two commands exist to be run rather than trusted, and neither spends quota:
 
@@ -218,13 +222,13 @@ This names it.
 ```
 
 ```
-exported both documents to out/export/ (no quota spent)
+read both documents by id into out/served/ (no quota spent)
 
-  ok   manual: breakdown                  d8c0d831fc2f40aaae234c83925895b6.svg
+  ok   manual: breakdown                  2874d655669b4bd4a93057dd3259cfc5.svg
   …
-  ok   quick-start card: breakdown        d8c0d831fc2f40aaae234c83925895b6.svg
-  ok   step rails                         edited since publish, both documents carry the
-                                          same new wording (-1.2 +1.6)
+  ok   quick-start card: breakdown        2874d655669b4bd4a93057dd3259cfc5.svg
+  ok   step rails                         edited since publish, and both documents carry
+                                          the same new wording (-1.2 +1.6)
   ok   step gantry                        word for word in both documents
   …
 18 passed, 0 failed
@@ -232,10 +236,22 @@ exported both documents to out/export/ (no quota spent)
 
 `verify` reads both documents back off the service and checks the two claims
 that can fail silently: **every figure points at the drawing that was uploaded
-for it** — compared by URL path, because the served `src` carries a ~750-
-character signature that differs on every read — and **the manual and the card
+for it** — compared by URL path, because the stored `src` carries a ~750-
+character signature the service put there — and **the manual and the card
 still agree word for word**, on the served documents rather than on the local
 render.
+
+It reads them **by durable id**, with `GET /v1/documents/{id}?include_html=true`,
+and that is the difference between this command being worth running and not.
+Export is keyed by session and a session renders whatever it is *focused* on,
+which is not something this integration owns: open the pair in the web interface
+and click the other tab, and the session recorded for the card serves the manual
+— same call, same session id, a different document, no error. That happened, and
+`verify` duly reported the card as having eight figures and disagreeing with the
+manual. Both true of the document it was handed; neither about the card. Naming
+the document deletes the failure mode instead of checking for it afterwards, and
+it is also what the service's own agent guide says to do: *"Verify for free —
+never export just to check."*
 
 The second check cannot be made against the spec alone, and that is the whole
 difficulty. An approved edit moves the live documents away from the spec that
@@ -401,7 +417,8 @@ and the German stops matching, which is a true statement about paper.
 | `approval_mode: ask_every_time` | every turn parks at `awaiting_approval`; nothing applies itself |
 | Batch approve with mixed decisions | per-change, with the top-level `approved` default |
 | Image upload | the rendered SVGs, returning stable URLs for `<img src>` |
-| Export | free, which is why verification leans on it |
+| Export | free; the deliverable, rendered from a session |
+| Reading a document by durable id | free, and what `verify` checks — it names the document instead of inheriting a session's focus |
 
 Three API behaviours are pinned in `tests/test_superdocs.py` rather than left to
 be rediscovered:
@@ -462,21 +479,44 @@ approving a synchronous chat's job comes back *"Job is not awaiting approval
 (status: completed)"* — the sync endpoint shows you proposed changes that can
 never be applied.
 
-`templates` remains unexercised: this build has no use for it and a call nobody
-makes is not a call anyone verified.
+`templates` is exercised but unused: this build has no use for a template, and
+the two calls were left in the client as a guess at the convention the verified
+ones follow. One of the guesses was wrong — `POST /v1/templates/upload` is
+multipart, so the JSON this client sent came back `422`, and the JSON sibling is
+`POST /v1/templates/upload-base64` with `filename` / `file_base64`. Both are now
+run against the live service. A call nobody makes is not a call anyone verified,
+which is exactly how it stayed wrong through nine commits.
 
 ### What broke while building this
 
-[`BUGS.md`](BUGS.md) — thirteen numbered findings against the live API, each
+[`BUGS.md`](BUGS.md) — nineteen numbered findings against the live API, each
 with what was expected, what happened, how to reproduce it and what it cost.
 They sit next to the build that found them rather than in a notes file
 somewhere, because most of them are the reason a particular piece of this code
 is shaped the way it is. The pair guarantee moved because of #5; the diagram
 swap anchors on captions because of #6 and opens a fresh session because of #8;
 `sync` asks each document about its own figures because of #9; and `verify`
-re-binds a session before reading it because of #11.
+reads by document id rather than by session because of #11.
 
-Item 13 is an observation without a reproduction, and says so.
+Item 13 is an observation without a reproduction, and says so. Items 14–19 came
+from a second pass made after reading `docs.superdocs.app` in full rather than
+working from `/openapi.json`, and that pass also **corrected four of the first
+thirteen** — one of them, #1, had asserted something about the documentation
+that the documentation does not say. The corrections are in the file, in place,
+under *Corrections*.
+
+The same pass found this project calling the wrong endpoint. `verify` used to
+export each document out of its session, which meant re-binding a session first
+and hoping nothing re-focused it in between; it now reads each document by its
+durable id with `GET /v1/documents/{id}?include_html=true`, which is free, needs
+no session, and cannot be pointed at the wrong document. Same eighteen checks,
+same result, one fewer way to be confidently wrong. `ensure_sessions` survives
+for `export`, which genuinely is keyed by session.
+
+#14 is the one to read if you read one: the service replaces the durable image
+URL with a signed one that expires **24 hours** after it is written, so a
+published manual's diagrams die on a timer that nothing in the API surfaces.
+That one this project cannot fix from its side.
 
 ## Layout
 

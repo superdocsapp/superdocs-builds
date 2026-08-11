@@ -158,23 +158,20 @@ def test_verify_reports_a_document_that_is_not_what_was_published(
         def __enter__(self): return self
         def __exit__(self, *exc): return False
 
-        def documents(self, session_id):
-            # Both sessions still hold what they were published holding, so
-            # nothing gets re-bound and the export goes ahead.
-            return [{"document_id":
-                     "doc_m" if session_id == "s_manual" else "doc_c"}]
-
-        def export_bytes(self, session_id, fmt, filename=None):
-            # One session per document, so the session is what picks the page.
-            return pages["manual" if session_id == "s_manual"
-                         else "quick-start card"].encode("utf-8")
+        def document_html(self, durable_id):
+            # Keyed by the durable id and nothing else. No session is consulted,
+            # so there is no focus for a read to follow to the wrong document --
+            # which is the point of reading by id rather than exporting.
+            return pages["manual" if durable_id == "uuid-m"
+                         else "quick-start card"]
 
     out = tmp_path / "out"
     out.mkdir()
     (out / "published.json").write_text(json.dumps({
         "manual_id": "doc_m", "card_id": "doc_c",
         "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
-        "durable": {}, "language": "", "images": images}))
+        "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
+        "language": "", "images": images}))
 
     monkeypatch.setattr(cli, "OUT", out)
     monkeypatch.setattr(cli, "_client", lambda: FakeClient())
@@ -186,3 +183,35 @@ def test_verify_reports_a_document_that_is_not_what_was_published(
     assert "FAIL" in printed and "breakdown" in printed
     assert "older drawing" in printed
     assert "not what this program recorded publishing" in printed
+
+
+def test_verify_refuses_a_publication_with_no_durable_ids(monkeypatch, tmp_path):
+    """A `published.json` written before durable ids were recorded cannot be
+    verified, and has to say so rather than falling back to a session read.
+
+    The fallback is the tempting thing to write and it is the wrong thing: a
+    session serves whatever it is focused on, so it would answer -- plausibly,
+    and about some other document. Refusing names what is missing instead."""
+    from manualbuilder.superdocs import SuperDocsError
+
+    class FakeClient:
+        def __enter__(self): return self
+        def __exit__(self, *exc): return False
+
+        def document_html(self, durable_id):      # pragma: no cover
+            raise AssertionError(
+                "a read was attempted with no durable id recorded")
+
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "published.json").write_text(json.dumps({
+        "manual_id": "doc_m", "card_id": "doc_c",
+        "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+        "durable": {}, "language": "", "images": {}}))
+
+    monkeypatch.setattr(cli, "OUT", out)
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    with pytest.raises(SuperDocsError, match="no durable id recorded"):
+        cli.main(["verify"])

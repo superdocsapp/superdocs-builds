@@ -32,20 +32,22 @@ Stated here because the difference matters to whoever runs this next.
 `POST /v1/documents/upload`, `POST /v1/chat`, `POST /v1/chat/{id}/approve`,
 `POST /v1/documents/export` -- and the two reply shapes for proposed changes.
 Also `POST /v1/sessions/init`, `GET /v1/sessions/{id}/documents`,
-`POST /v1/documents/images/upload-base64`, `POST /v1/chat/async` and the job
-endpoints its poll loop reads. The image path in particular is not the one this
-client first guessed: `/v1/images/upload` does not exist.
+`GET /v1/documents/{id}`, `POST /v1/documents/images/upload-base64`,
+`POST /v1/chat/async` and the job endpoints its poll loop reads. The image path
+in particular is not the one this client first guessed: `/v1/images/upload` does
+not exist.
 
-*Inferred, not yet exercised:* the template paths. The documented interface
-names those capabilities as MCP tools (`upload_template_base64`,
-`list_user_templates`) without naming their REST paths, so `/v1/templates/upload`
-and `/v1/templates` are this client's guess at the convention the verified calls
-follow. They are isolated in their own methods for that reason: if the
-convention is different, two short methods change and nothing else does.
+The template paths used to be listed here as guesses, and one of the guesses was
+wrong. `GET /v1/templates` was right. `POST /v1/templates/upload` exists but
+takes *multipart*, so posting JSON to it returned `422`; the JSON sibling is
+`POST /v1/templates/upload-base64` and takes `filename` / `file_base64`. Both are
+now exercised against the live service, and `upload_template` says so where it
+is defined.
 
-Nothing in the offline test suite depends on those paths being right, and
-`check` and `build` never call them -- so a wrong guess here cannot make a
-passing test lie about the parts of this project that are actually proven.
+*Inferred, not yet exercised:* `POST /v1/chat/{id}/continue`. `wait_for_job`
+answers a continue prompt with it, but no document in this project is large
+enough to provoke one, so that branch has offline tests and no live run behind
+it. It is one call in one place for that reason.
 """
 from __future__ import annotations
 
@@ -227,6 +229,37 @@ class SuperDocs:
         return self._post(
             f"/v1/sessions/{session_id}/documents/{document_id}/focus", {})
 
+    def document(self, durable_id: str, include_html: bool = False) -> dict[str, Any]:
+        """A stored document by its durable id, with no session involved.
+
+        This is the read that should have been here from the start. Everything
+        else in this client goes through a session, and a session is not a
+        handle on a document -- it serves whatever it is focused on, and focus
+        is not owned by the integration that opened it. This call names the
+        document, so it cannot come back holding a different one.
+
+        `include_html` adds the stored body. Without it the reply still carries
+        `structure` -- headings, `section_count`, `block_count`, `media` -- which
+        is the cheap way to check an edit landed. Neither is billed.
+        """
+        suffix = "?include_html=true" if include_html else ""
+        return self._get(f"/v1/documents/{durable_id}{suffix}")
+
+    def document_html(self, durable_id: str) -> str:
+        """The stored HTML of one document, by durable id.
+
+        What `verify` reads. Note that the `<img src>` values come back with the
+        service's ~750-character signature on them, minted when the document was
+        written -- so they are compared by path, never as strings. See BUGS #14.
+        """
+        body = self.document(durable_id, include_html=True)
+        html = body.get("html")
+        if not isinstance(html, str) or not html:
+            raise SuperDocsError(
+                f"document {durable_id} came back with no html body: "
+                f"{list(body)}")
+        return html
+
     def upload_image(self, filename: str, svg: str) -> str:
         """Upload an image and return a stable URL for an `<img src>`.
 
@@ -353,20 +386,62 @@ class SuperDocs:
         """Throw a turn away, including one parked at `awaiting_approval`."""
         return self._post(f"/v1/jobs/{job_id}/cancel", {})
 
+    def continue_job(self, session_id: str, job_id: str,
+                     resume: bool = True) -> dict[str, Any]:
+        """Answer a large edit's "shall I carry on?" prompt.
+
+        `resume=False` stops there and keeps the work already applied, which is
+        a half-edited document -- so this client always says yes. See
+        `wait_for_job`.
+        """
+        return self._post(f"/v1/chat/{session_id}/continue",
+                          {"job_id": job_id, "continue": resume})
+
     def wait_for_job(self, job_id: str, timeout: float = DEFAULT_TIMEOUT,
-                     poll: float = POLL_INTERVAL) -> dict[str, Any]:
+                     poll: float = POLL_INTERVAL,
+                     resume_large_edits: bool = True) -> dict[str, Any]:
         """Poll until the job stops moving.
 
         Deep operations run thirty seconds to several minutes with no visible
         progress, so a short timeout here reports a working service as broken.
+
+        **`awaiting_approval` means two different things** and they are not
+        distinguishable the documented way. A turn parked for review carries
+        `metadata.pending_changes`; a turn too large to finish in one go carries
+        `metadata.continue_prompt` and is waiting to be told whether to carry on.
+        The docs say to branch on `metadata.awaiting_kind` -- the service does
+        not send that field, so this branches on which of the two is populated
+        instead. See BUGS #18.
+
+        A continue prompt is answered rather than returned. Stopping keeps
+        whatever was applied, which is a document edited half way through, and
+        no caller of this client wants that: every operation here is one
+        instruction that is either done or not done. So it says yes and keeps
+        polling, within the same deadline. `resume_large_edits=False` returns
+        the parked job instead, for a caller that wants the decision.
+
+        `cancelled` is terminal too. Leaving it out meant a cancelled job was
+        polled until the timeout and then reported as one that never finished.
         """
         deadline = time.monotonic() + timeout
         last: dict[str, Any] = {}
         while time.monotonic() < deadline:
             last = self.job(job_id)
             status = str(last.get("status", ""))
-            if status in ("awaiting_approval", "completed", "failed", "error"):
+            if status in ("completed", "failed", "error", "cancelled"):
                 return last
+            if status == "awaiting_approval":
+                metadata = last.get("metadata") or {}
+                if not (resume_large_edits and metadata.get("continue_prompt")):
+                    return last
+                session_id = last.get("session_id") or metadata.get("session_id")
+                if not session_id:
+                    raise SuperDocsError(
+                        f"job {job_id} is waiting on a continue prompt but names "
+                        f"no session, so it cannot be resumed: {list(last)}")
+                # The job goes back to `in_progress` and may pause again for the
+                # next segment, so this is a loop and not a single answer.
+                self.continue_job(str(session_id), job_id)
             time.sleep(poll)
         raise SuperDocsError(
             f"job {job_id} still {last.get('status')!r} after {timeout:.0f}s")
@@ -427,17 +502,29 @@ class SuperDocs:
 
     # ------------------------------------------------------------ templates --
 
-    def upload_template(self, name: str, html: str) -> str:
-        body = self._post("/v1/templates/upload", {
-            "name": name,
-            "content_base64": base64.b64encode(html.encode("utf-8")).decode("ascii"),
+    def upload_template(self, filename: str, html: str) -> str:
+        """Save a template and return its id.
+
+        `-base64`, and the field names are `filename` / `file_base64` -- the same
+        `Base64UploadRequest` the document upload uses. The sibling
+        `POST /v1/templates/upload` exists but is *multipart*: posting JSON to it
+        answers
+        `422 {"detail":[{"type":"missing","loc":["body","file"],"msg":"Field required"}]}`,
+        which is what this method did until it was checked against the live
+        service. The template is named after the file, so `filename` carries the
+        name a caller wants to see back from `templates()`.
+        """
+        body = self._post("/v1/templates/upload-base64", {
+            "filename": filename,
+            "file_base64": base64.b64encode(html.encode("utf-8")).decode("ascii"),
         })
-        template_id = body.get("template_id") or body.get("id")
+        template_id = body.get("id") or body.get("template_id")
         if not template_id:
             raise SuperDocsError(f"template upload returned no id: {body}")
         return str(template_id)
 
     def templates(self) -> list[dict[str, Any]]:
+        """Every saved template, as `{id, name, file_extension, file_size, …}`."""
         body = self._get("/v1/templates")
         listed = body.get("templates")
         return listed if isinstance(listed, list) else []

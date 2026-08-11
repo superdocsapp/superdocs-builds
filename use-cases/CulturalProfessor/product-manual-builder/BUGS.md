@@ -9,7 +9,9 @@ All of these were found against `https://api.superdocs.app` with a free-tier
 folder. Items 1–7 are from **2026-08-11**; items 8–13 from **2026-08-12** — 8–10
 while getting the diagram-refresh path to complete one clean run, and 11–13
 while building `verify`, the command that reads the published documents back and
-checks them.
+checks them. Items 14–19 are from a deliberate second pass on **2026-08-12**,
+made after reading `https://docs.superdocs.app` end to end rather than working
+from `/openapi.json` alone.
 
 They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
@@ -17,9 +19,15 @@ collects the same list.
 
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
-Items 1–7 are ranked by how much they cost me; 8–13 are appended in the order
+Items 1–7 are ranked by how much they cost me; 8–19 are appended in the order
 they turned up rather than renumbering the list. Item 13 is an observation
 without a reproduction, and says so.
+
+**Read [Corrections](#corrections-after-reading-the-documentation) first.** That
+second pass found the documentation says things this file originally claimed it
+did not, and four items are weakened or retracted there. They are corrected in
+place rather than deleted, because a bug report that quietly edits away its
+mistakes is not one anybody should trust.
 
 ---
 
@@ -537,6 +545,395 @@ on their own.
 
 ---
 
+## 14. A stored document's image URLs expire 24 hours after they are written
+
+**Severity: high — every diagram in a published manual goes dead after a day.**
+
+**What I did.** Uploaded an SVG through `POST /v1/documents/images/upload-base64`,
+took the `url` from the reply — the field that comes back *without* a signature,
+and the one this client has always treated as the durable one — put it in an
+`<img src>`, and uploaded the document.
+
+**What I expected.** The document to hold the URL I put in it.
+
+**What happened.** The service **rewrote the `src`**. What it stored, and what it
+serves back on every read, is the *signed* variant — the same file path with
+`X-Goog-Expires=86400` and a 512-character signature appended. The signature is
+minted once, at write time, and never refreshed: two reads of the same document
+an hour apart return a byte-identical `X-Goog-Signature` and the same
+`X-Goog-Date`. So the images in a document written today stop resolving 24 hours
+from the moment it was written.
+
+The published manual in this folder was written at `20:26:39Z` and its eight
+diagrams expire at `20:26:39Z` the next day. Nothing in any reply says so.
+
+And the signature is not buying anything: the same URL with the whole query
+stripped returns `200` and identical bytes. The bucket object is public.
+
+![Probe output: the durable url goes in, a 24-hour signed url comes back](docs/bugs/14-image-url-expiry.png)
+
+**Reproduce.**
+
+```bash
+UP=$(curl -sX POST https://api.superdocs.app/v1/documents/images/upload-base64 \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" -H 'Content-Type: application/json' \
+  -d "{\"filename\":\"probe.svg\",\"content_type\":\"image/svg+xml\",
+       \"image_base64\":\"$(printf '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"/>' | base64 -w0)\"}")
+PLAIN=$(echo "$UP" | jq -r .url)     # no signature on this one
+
+SID=$(curl -sX POST https://api.superdocs.app/v1/sessions/init \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" \
+  -H 'Content-Type: application/json' -d '{}' | jq -r .session_id)
+
+printf '<h1>probe</h1><figure><img src="%s" alt="probe"></figure>' "$PLAIN" > probe.html
+curl -sX POST https://api.superdocs.app/v1/documents/upload \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" \
+  -F "file=@probe.html;type=text/html" -F "session_id=$SID" -F "open_mode=new_focused" >/dev/null
+
+DUR=$(curl -s "https://api.superdocs.app/v1/sessions/$SID/documents" \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" | jq -r '.documents[0].durable_document_id')
+
+# The src that comes back is not the src that went in:
+curl -s "https://api.superdocs.app/v1/documents/$DUR?include_html=true" \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" | jq -r .html | grep -o 'X-Goog-Expires=[0-9]*'
+# X-Goog-Expires=86400
+
+# And the plain url the service told us was durable is publicly readable anyway:
+curl -so /dev/null -w '%{http_code}\n' "$PLAIN"    # 200
+```
+
+**Cost to me.** None yet, and that is the point — the manual published yesterday
+looks perfect and its diagrams have hours left. This is the failure that arrives
+after the integrator has stopped watching.
+
+**Suggested fix.** Store the `src` the caller supplied. If the rewrite is
+deliberate, either re-sign on read — which is what item 7 assumed was happening
+— or use a lifetime that outlives a document. A 24-hour signature on a URL
+persisted inside a document is a broken image with a delay on it.
+
+---
+
+## 15. `upload-base64` returns `document_id: null`, and leaves a document whose title and body come from different files
+
+**Severity: high — this is item 1, re-run, and it is worse than item 1 said.**
+
+**What I did.** Three base64 uploads into one session — `alpha.html`,
+`bravo.html`, `charlie.html` — repeating item 1's reproduction with one more
+document and reading the body back this time.
+
+**What happened.** All three returned `200` with `"persisted": true`. The session
+holds **one** document. Its `title` is `alpha` — the filename of the *first*
+upload. Its body is `<h1>charlie</h1>` — the content of the *third*. The title
+and the content belong to different files, and a caller listing the session sees
+a document that is lying about what is in it.
+
+Two things beyond item 1:
+
+- **The reply carries `"document_id": null`.** Not a wrong id — no id. A caller
+  cannot address what it just stored, which is why this build uses the multipart
+  endpoint instead.
+- **`open_mode` is accepted and ignored.** Sending `"open_mode": "background"`
+  returns `200`, no `422`, and changes nothing. The field is not in
+  `Base64UploadRequest`, and the service does not say so.
+
+![Three uploads, one document, title from the first and body from the third](docs/bugs/15-17-upload-and-quota.png)
+
+**Reproduce.** The snippet under item 1, with a third upload, then
+`GET /v1/sessions/{id}/documents?include_html=true` and compare `title` against
+`html`.
+
+**Suggested fix.** Return the `document_id` of whatever was stored. Reject
+`open_mode` with a `422` rather than accepting it silently. And when a document
+is replaced, carry the replaced id in the reply — the same fix item 1 asks for.
+
+---
+
+## 16. `usage` is missing from the async chat reply, so an approval workflow cannot see what it is spending
+
+**Severity: medium — the documented way to read quota does not work on the path
+human-in-the-loop forces you onto.**
+
+**What I did.** Followed the documentation. *Plans & Usage* says, plainly:
+
+> the `/v1/users/me/usage` and `/v1/users/me/limits` endpoints … reject `sk_` /
+> `lce_` API keys with a `401`. From an API-key context, read usage straight off
+> the `usage` block returned in **every** `/v1/chat` and `/v1/chat/async`
+> response.
+
+**What happened.** `POST /v1/chat` does carry it. `POST /v1/chat/async` does not:
+
+```
+POST /v1/chat        -> keys: [document_changes, hint, response, session_id, usage]
+POST /v1/chat/async  -> keys: [job_id, message, session_id, status]
+```
+
+Nor does anything downstream of it until the work is already done and paid for:
+
+| call | `usage` |
+|---|---|
+| `POST /v1/chat/async` reply | absent |
+| `GET /v1/jobs/{id}` while `awaiting_approval` | absent, `result` is `null` |
+| `POST /v1/chat/{session_id}/approve` reply | absent |
+| `GET /v1/jobs/{id}` once `completed` | `result.usage`, at last |
+
+`approval_mode: "ask_every_time"` only ever parks a job on the **async** path —
+the synchronous endpoint's job goes straight to `completed` and cannot be
+approved. So every integration that puts a human in front of its edits is on the
+one path where usage is invisible until after the human has approved.
+
+**Reproduce.** Send `POST /v1/chat/async` and read the reply's keys.
+
+**Suggested fix.** Put `usage` on the async reply, or on the job while it is
+parked. Either one lets a caller decide whether to approve a batch knowing what
+it costs.
+
+---
+
+## 17. `whoami` reports the monthly bucket only, and operations come out of a different one
+
+**Severity: medium — the number the docs tell an agent to trust is the wrong number.**
+
+**What I did.** `GET /v1/agents/whoami`, which the *Agent Editing Playbook*
+recommends: *"Check remaining quota anytime: `get_account_status` /
+`GET /v1/agents/whoami`"*.
+
+**What happened.** It answers:
+
+```json
+{"tier":"free","monthly_limit":500,"used":0,"remaining":500,"resets_at":"2026-09-01T00:00:00+00:00"}
+```
+
+`used: 0` — on an account that had run dozens of billable turns that day. It
+stays at 0 through a full chat-plus-approve cycle. The reason is in the job's own
+reply, and it is not a bug:
+
+```json
+{"monthly_used":0,"was_billable":true,"ops_charged":1,
+ "bucket_used":"promo",
+ "promotions":[{"name":"Round 2 Builders - August 2026","ops_remaining":9985,"ops_granted":10000}]}
+```
+
+Credits are drawn down before the monthly allowance — documented, and working
+correctly. The bug is that **`whoami` cannot see the bucket the operations are
+actually coming from.** It reports 500 remaining to an account with 9,985 promo
+operations plus 500 monthly. An agent budgeting against it under-counts by
+twenty times, and an agent watching it for exhaustion watches a counter that
+will not move until the credits are gone.
+
+`GET /v1/users/me/promotions` does accept an `sk_` key and returns the real
+balance, so the data is reachable — just not from the endpoint agents are told
+to use.
+
+**Reproduce.** Redeem a promo code, run one billable turn, and compare
+`GET /v1/agents/whoami` against `result.usage` on the job.
+
+**Suggested fix.** Put the promo bucket in `whoami`'s `quota` object — an
+`effective_remaining` that sums the buckets, or the `promotions` array the chat
+reply already carries.
+
+---
+
+## 18. `metadata.awaiting_kind` is documented, and never sent
+
+**Severity: medium — it is the field that would have prevented item 9.**
+
+**What I did.** *Async Jobs → Job statuses* says of `awaiting_approval`:
+
+> The job is paused for your input — check `metadata.awaiting_kind`. **Change
+> review** (HITL): read `metadata.pending_changes`, call `/approve`. **Continue
+> prompt** (large edit): read `metadata.continue_prompt`, call `/continue`.
+
+So I branched on it.
+
+**What happened.** It is not there. A genuine HITL pause — `status:
+"awaiting_approval"`, one real change in `metadata.pending_changes` — carries
+these metadata keys and no `awaiting_kind` among them:
+
+```
+content_type, cumulative_tokens, document_html_provided, file_size, filename,
+initial_doc_version, intermediate_responses, last_real_progress_ts, message,
+model_tier, pending_changes, request_message, response_mode, session_id,
+thinking_depth, user_id, user_turn_index_pre_inserted
+```
+
+A caller doing what the documentation says gets `None` and has to fall back to
+guessing from which of `pending_changes` / `continue_prompt` happens to be
+populated. Which is exactly the guessing item 9 is about: an `awaiting_approval`
+job with an empty change list is a large edit paused for a continue prompt, or a
+turn that asked a clarifying question, or a turn with nothing to do, and
+`awaiting_kind` is the field that would tell them apart.
+
+**Reproduce.** Any `chat/async` turn with `approval_mode: "ask_every_time"`; read
+`.metadata | keys` off the parked job.
+
+**Suggested fix.** Send the field. The documentation is already right.
+
+---
+
+## 19. `409 session_busy` is not documented anywhere
+
+**Severity: low as a defect, high as a cost — it is the error that decided this
+build's architecture.**
+
+**What I did.** Searched for it after the fact, having spent an hour on item 5.
+
+**What happened.** `session_busy` appears **zero times** in
+`docs.superdocs.app/llms-full.txt` (555 KB, the whole documentation set), zero
+times in `llms.txt`, and zero times in `/openapi.json`. `POST /v1/chat/async`
+documents exactly two responses, `200` and `422`. The 409 that a second turn in a
+busy session reliably returns is in neither.
+
+The *Error Codes* page lists 409 with one cause — *"Revert blocked because a chat
+job is currently running on the same session"* — which is a different call
+failing for a related reason, and reads as though revert is the only thing that
+can hit it.
+
+The response body itself is genuinely good: it names `list_jobs`, `cancel_job`
+and using another session. It is the only place this behaviour is written down,
+and you have to trigger it to read it.
+
+**Reproduce.** `grep -c session_busy llms-full.txt openapi.json` → `0`, `0`.
+
+**Suggested fix.** One row in the Error Codes table, and a `409` in the OpenAPI
+responses for `/v1/chat` and `/v1/chat/async`. That a session takes one turn at a
+time is an architectural fact about the API; an integrator should not have to
+discover it by being refused.
+
+---
+
+## Corrections, after reading the documentation
+
+The first thirteen items were written against `/openapi.json`, which this file
+called *"the best documentation on the site"*. It is not — `docs.superdocs.app`
+carries guides that the schema does not, and `llms-full.txt` serves all of them
+in one request. Reading them properly weakens four items above.
+
+**Item 1 — the asymmetry is documented, and I said it was not.** Item 1 claims
+the `open_mode` asymmetry is *"not in the OpenAPI schema and not in the
+multi-document guide"*. The first half is true. The second half is wrong. The
+Multi-Document Sessions guide has an explicit note on it:
+
+> **`open_mode` is on the multipart upload only.** … The agent-facing upload
+> tools — `upload_document_base64` and the pre-signed
+> `process_uploaded_document` — don't take `open_mode`; they load the file as the
+> focused document (replacing the current one).
+
+So the replacement is intended and written down, and item 1 should not have said
+otherwise. What survives is narrower and still stands: a call that destroys a
+document should not report `"persisted": true` with nothing naming what it
+replaced, and it should not hand back `document_id: null` (item 15).
+
+**Item 3 — documented behaviour, undocumented message.** `GET /v1/poll/{id}` is
+described in the schema as *"Long-poll for real-time job updates on a session
+(B2B organizations only)"*. A free-tier `sk_` key is supposed to be refused. The
+finding is therefore only about the message: `{"detail": "Invalid API key"}` is
+false about a key that works everywhere else, and the same service already has
+the right sentence — `/v1/users/me/limits` answers *"This endpoint requires a
+signed-in user session; API keys (sk_/lce_) are not accepted here."* Both were
+re-run for this pass and both still answer exactly that.
+
+**Item 7 — the mechanism was wrong.** Item 7 assumed the service *re-signs image
+URLs when it serves them*, and recommended comparing paths rather than strings.
+Comparing paths is still right, and it is what `verify` does. But the signing does
+not happen on read — it happens **once, at write**, and item 14 has the
+measurement. Item 7's closing worry, that *"a document stored today references an
+image URL that may stop resolving later"*, turns out to be the actual bug rather
+than an aside. Its other question is now answered: `url` is the durable field and
+`view_url` is the signed one, confirmed against the live reply — the client had
+this right.
+
+**Item 11 — the complaint stands, the conclusion drawn from it was too broad.**
+Export really is keyed by session: `ExportRequest` takes `session_id` or inline
+`html` and has no `document_id`, so a session that has been re-focused elsewhere
+really will export a different document than the one asked for. But item 11 goes
+on to treat that as the only way to read a published document back, and it is
+not. `GET /v1/documents/{document_id}?include_html=true` returns the full stored
+HTML **by durable id**, with no session, no focus, and no billing — and the
+*Agent Editing Playbook* is blunt that this is the intended path: *"Verify for
+free (never export just to check)."* The bug is real; the corner this build
+painted itself into was avoidable, and `verify` should be reading documents by
+id. See [Are we calling the right API?](#are-we-calling-the-right-api) below.
+
+**Item 9 gets sharper, not weaker.** The docs promise the discriminator it asks
+for — `metadata.awaiting_kind` — and the service does not send it. That is item
+18.
+
+---
+
+## Are we calling the right API?
+
+The API has an **agent-facing surface** alongside the web-app one, and the
+difference is not cosmetic: several endpoints exist specifically because an
+`sk_` key cannot use the web-app equivalents. This build was using the web-app
+shape in three places.
+
+| Job | What this build used | What the agent surface offers |
+|---|---|---|
+| Read a published document back | `POST /v1/documents/export` — keyed by **session**, needs the session re-bound first (item 11) | `GET /v1/documents/{id}?include_html=true` — keyed by **durable id**, free, no session |
+| Check an edit landed | export, then parse the file | `GET /v1/documents/{id}` → `structure`: headings, `section_count`, `block_count`, `media.images`; never billed |
+| Read remaining quota | nothing — `/v1/users/me/limits` 401s on `sk_` keys | `GET /v1/agents/whoami` (but see item 17), `GET /v1/users/me/promotions` |
+| Move large files | inline base64 / multipart | `POST /v1/uploads` → pre-signed PUT, `POST /v1/downloads` → pre-signed GET |
+| Hit the quota cap | fail | `POST /v1/agents/handoff`, `POST /v1/agents/request-upgrade` |
+| Get an account at all | a human signs up | `POST /v1/agents/signup` |
+
+Verified live for this pass, on the published manual:
+
+```
+GET /v1/documents/b97ad85a-…?include_html=true   -> 200, 22 659 bytes,
+      8 <img>, all eight paths equal to the URLs out/published.json recorded
+GET /v1/agents/whoami before and after           -> used: 0 → 0  (free)
+```
+
+Against a `POST /v1/documents/export` of the same document: also `200`, also
+free, but routed through a session whose focus this integration does not own.
+**Both are free; only one of them is addressed by document.**
+
+**This one is now fixed.** `verify` reads each document by durable id and no
+longer exports; it makes no session call at all, so there is nothing to re-bind
+and nothing for a re-focus to redirect. Same eighteen checks, same result
+against the live pair. `ensure_sessions()` stays for `export`, which really is
+keyed by session and where a re-focused session is a live risk rather than an
+avoidable one.
+
+Three further mismatches between this client and the documented API were found
+in the same pass. All three are now fixed; they are kept here because each one
+was a wrong guess that a passing test suite had no way to catch.
+
+- **`upload_template()` called a multipart endpoint with a JSON body.**
+  `POST /v1/templates/upload` takes `multipart/form-data`; the client sent
+  `{"name", "content_base64"}` and got
+  `422 {"detail":[{"type":"missing","loc":["body","file"],"msg":"Field required"}]}`.
+  The JSON sibling is `POST /v1/templates/upload-base64` and it takes
+  `{"filename", "file_base64"}`, returning `{"id", "name", "status":"ready"}`.
+  `GET /v1/templates` had been guessed correctly. Both are now exercised against
+  the live service rather than merely unverified.
+- **`wait_for_job` did not treat `cancelled` as terminal.** It returned on
+  `awaiting_approval`, `completed`, `failed` and `error` only, so a cancelled
+  job was polled for the full 600 seconds and then reported as one that never
+  finished.
+- **`wait_for_job` did not handle a continue prompt.** A very large edit pauses
+  at `awaiting_approval` with `metadata.continue_prompt` and an *empty*
+  `pending_changes` — the same status a batch parked for review uses. Read as a
+  review, that says "this turn proposed nothing", which is false: it proposed
+  half a document and is waiting to be told to finish. It now answers
+  `POST /v1/chat/{session_id}/continue` and keeps polling, because stopping
+  keeps the half. Item 18 is why the branch cannot be written the documented
+  way — `metadata.awaiting_kind` would say which kind of pause it is, and the
+  service does not send it, so the code branches on which of the two fields is
+  populated. No document in this project is large enough to provoke one, so that
+  path has offline tests and no live run behind it, and the client says so.
+
+Smaller, and listed for completeness: `format` on export is a strict enum
+(`docx|pdf|html|markdown|txt`) and the CLI's `--format` help names only two of
+them, so `--format md` reaches the service and returns `422`; `export_bytes`
+sends the top-level `filename`, which the schema marks **DEPRECATED** in favour
+of `options.filename`; `QuotaExceeded` reads the `detail` string, which the docs
+say to ignore in favour of the `Retry-After` and `X-Usage-Remaining` headers; and
+jobs are purged one hour after creation, so `status` and `approve` on a batch
+parked longer than that will 404 rather than reporting a stale proposal.
+
+---
+
 ## Not bugs, but things that cost time and are not written down anywhere
 
 - **`POST /v1/chat` requires `session_id`,** and takes a singular `document_id`.
@@ -552,8 +949,14 @@ on their own.
   the synchronous reply, `metadata.pending_changes` on the job object. Both are
   already-parsed lists; the JSON-encoded string only appears on the streaming
   path.
-- **`GET /openapi.json` is the best documentation on the site** and is not linked
-  from it. Every shape above came from there in one request.
+- **`GET /openapi.json` is not the best documentation on the site, and an earlier
+  version of this file said it was.** It has every shape and none of the
+  behaviour: `open_mode`'s asymmetry, the free `structure` read, `awaiting_kind`,
+  the promo bucket and the 30-minute cap are all in the prose and none of them
+  are in the schema. `https://docs.superdocs.app/llms-full.txt` is the whole
+  documentation set in one 555 KB request and is the thing to read first —
+  it is also not linked from the docs' navigation. Between them they still do not
+  mention `session_busy` (item 19).
 - **A document has two ids.** The session-scoped `doc_c8c07c4a91` is what a chat
   turn names; the durable UUID underneath is what opens it in another session.
   Passing the session-scoped one to `/v1/sessions/init` returns *"None of the

@@ -77,6 +77,22 @@ class Publication:
                 f"document and writes it down")
         return session_id
 
+    def durable_for(self, document_id: str) -> str:
+        """The id that identifies this document anywhere, not just in a session.
+
+        `doc_c8c07c4a91` means something only inside the session it came from.
+        The UUID underneath it is what `GET /v1/documents/{id}` takes, and is
+        therefore what any read that must not come back holding a different
+        document has to use.
+        """
+        durable = self.durable.get(document_id)
+        if not durable:
+            raise SuperDocsError(
+                f"no durable id recorded for {document_id}; it cannot be read "
+                f"by id, only through whatever its session happens to be "
+                f"focused on. Re-run `publish`.")
+        return durable
+
     def reopen(self, client: SuperDocs) -> None:
         """Put each document in a fresh session, discarding the conversation.
 

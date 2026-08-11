@@ -583,9 +583,24 @@ def cmd_verify(args) -> int:
     """Read both documents back off the service and check what they say.
 
     The claim every other command makes is about what it sent. This is the one
-    that asks what is actually there -- so it exports, and checks the answer
-    against `out/published.json` and against the spec. Exports cost no quota,
-    which is why this can be run as often as it is worth running.
+    that asks what is actually there -- so it reads each document back by its
+    **durable id** and checks the answer against `out/published.json` and
+    against the spec. Nothing here is billed.
+
+    Reading by id rather than exporting is the whole difference between this
+    command being trustworthy and not. Export is keyed by session, and a session
+    serves whatever it is focused on: open the pair in the web interface, click
+    the other tab, and the session recorded for the card starts serving the
+    manual -- same call, same session id, a different document, no error. That
+    happened, and this command reported the card as having eight figures and
+    disagreeing with the manual, which was true of the document it was handed
+    and nothing to do with the card.
+
+    `GET /v1/documents/{id}?include_html=true` names the document, so there is
+    no focus to drift and no session to re-bind first. It is also the read the
+    service's own agent guide points at: *"Verify for free -- never export just
+    to check."* Export is still what `export` does, because a rendered PDF is a
+    deliverable and this is not.
     """
     spec = _spec(args)
     if args.language:
@@ -596,18 +611,18 @@ def cmd_verify(args) -> int:
         spec = locales[args.language]
 
     published = _load(args)
-    target = OUT / "export"
+    target = OUT / "served"
     target.mkdir(parents=True, exist_ok=True)
 
     served: dict[str, str] = {}
     with _client() as client:
-        _rebind(client, published, args)
         for document_id in published.document_ids:
             name = published.name_for(document_id)
-            data = client.export_bytes(published.session_for(document_id), "html")
-            (target / f"{name.replace(' ', '-')}.html").write_bytes(data)
-            served[name] = data.decode("utf-8")
-    print(f"exported both documents to {target}/ (no quota spent)\n")
+            html = client.document_html(published.durable_for(document_id))
+            (target / f"{name.replace(' ', '-')}.html").write_text(
+                html, encoding="utf-8")
+            served[name] = html
+    print(f"read both documents by id into {target}/ (no quota spent)\n")
 
     findings = vf.verify(served, published.images, spec)
     for finding in findings:

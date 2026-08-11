@@ -162,3 +162,117 @@ def _ok(body: dict):
 def test_proposed_change_tolerates_either_id_field():
     assert ProposedChange.from_payload({"id": "c9"}).change_id == "c9"
     assert ProposedChange.from_payload({"change_id": "c9"}).change_id == "c9"
+
+
+def _client(monkeypatch, fake) -> SuperDocs:
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test")
+    client = SuperDocs()
+    client._client = fake
+    return client
+
+
+def test_a_cancelled_job_is_terminal(monkeypatch):
+    """`cancelled` is a documented job status and was missing from the list this
+    poll loop stops on, so a cancelled job was polled until the 600-second
+    timeout and then reported as one that never finished."""
+    polls = []
+
+    class Fake:
+        def get(self, path):
+            polls.append(path)
+            return _ok({"job_id": "job_7", "status": "cancelled"})
+
+        def close(self):
+            pass
+
+    job = _client(monkeypatch, Fake()).wait_for_job("job_7", timeout=30)
+
+    assert job["status"] == "cancelled"
+    assert len(polls) == 1, "a terminal status is not polled twice"
+
+
+def test_a_continue_prompt_is_answered_rather_than_returned(monkeypatch):
+    """A large edit pauses at `awaiting_approval` with `metadata.continue_prompt`
+    and an empty change list -- the same status a turn parked for review uses.
+    Read as review it says "this turn proposed nothing", which is false: it
+    proposed half a document and is waiting to be told to finish.
+
+    The documented discriminator, `metadata.awaiting_kind`, is not sent by the
+    service (BUGS #18), so the branch is on which of the two is populated."""
+    calls: list = []
+    replies = [
+        {"job_id": "job_7", "session_id": "sess_1", "status": "awaiting_approval",
+         "metadata": {"continue_prompt": {"done": 500, "total": 864,
+                                          "remaining": 364},
+                      "pending_changes": []}},
+        {"job_id": "job_7", "session_id": "sess_1", "status": "in_progress"},
+        {"job_id": "job_7", "session_id": "sess_1", "status": "completed",
+         "metadata": {"pending_changes": [change("c1")]}},
+    ]
+
+    class Fake:
+        def get(self, path):
+            calls.append(("GET", path))
+            return _ok(replies.pop(0))
+
+        def post(self, path, json):  # noqa: A002
+            calls.append(("POST", path, json))
+            return _ok({"status": "resumed"})
+
+        def close(self):
+            pass
+
+    client = _client(monkeypatch, Fake())
+    job = client.wait_for_job("job_7", timeout=30, poll=0)
+
+    assert job["status"] == "completed"
+    assert ("POST", "/v1/chat/sess_1/continue",
+            {"job_id": "job_7", "continue": True}) in calls, (
+        "stopping keeps whatever was applied, which is a document edited half "
+        "way through -- so this client always resumes"
+    )
+    assert SuperDocs.pending_changes(job)[0].change_id == "c1"
+
+
+def test_a_review_pause_is_still_returned(monkeypatch):
+    """The other half of the same branch: an `awaiting_approval` job carrying
+    real pending changes is a human's decision and must not be resumed past."""
+    class Fake:
+        def get(self, path):
+            return _ok({"job_id": "job_7", "session_id": "sess_1",
+                        "status": "awaiting_approval",
+                        "metadata": {"pending_changes": [change("c1")]}})
+
+        def post(self, path, json):  # noqa: A002
+            raise AssertionError("a batch awaiting review was resumed")
+
+        def close(self):
+            pass
+
+    job = _client(monkeypatch, Fake()).wait_for_job("job_7", timeout=30)
+    assert job["status"] == "awaiting_approval"
+
+
+def test_templates_upload_uses_the_json_endpoint_and_its_field_names(monkeypatch):
+    """`/v1/templates/upload` is multipart; posting JSON to it answers 422 with
+    `loc: ["body","file"]`. The JSON sibling is `-base64`, and it takes
+    `filename` / `file_base64` -- not the `name` / `content_base64` this client
+    guessed."""
+    sent: dict = {}
+
+    class Fake:
+        def post(self, path, json):  # noqa: A002
+            sent["path"], sent["body"] = path, json
+            return _ok({"id": "tpl_1", "name": "letterhead.html",
+                        "status": "ready"})
+
+        def close(self):
+            pass
+
+    template_id = _client(monkeypatch, Fake()).upload_template(
+        "letterhead.html", "<h1>x</h1>")
+
+    assert sent["path"] == "/v1/templates/upload-base64"
+    assert sorted(sent["body"]) == ["file_base64", "filename"]
+    assert sent["body"]["filename"] == "letterhead.html"
+    assert template_id == "tpl_1", "the reply names it `id`, not `template_id`"
