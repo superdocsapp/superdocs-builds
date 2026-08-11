@@ -237,16 +237,17 @@ PROPOSAL = "proposal.json"
 def _save(published, language: str) -> Path:
     """Remember what `publish` made, so nothing has to be pasted by hand.
 
-    Three ids are needed to edit a published pair -- the session and both
-    documents -- and a demo that asks somebody to copy three ids between
-    commands is a demo that goes wrong on camera.
+    A published pair is two documents and the session each is edited in, and a
+    demo that asks somebody to copy four ids between commands is a demo that
+    goes wrong on camera.
     """
     OUT.mkdir(exist_ok=True)
     path = OUT / STATE
     path.write_text(json.dumps({
-        "session_id": published.session_id,
         "manual_id": published.manual_id,
         "card_id": published.card_id,
+        "sessions": published.sessions,
+        "durable": published.durable,
         "language": language,
         "images": published.images,
     }, indent=2), encoding="utf-8")
@@ -263,12 +264,22 @@ def _load(args):
     published = session.Publication(
         manual_id=getattr(args, "manual", "") or saved.get("manual_id", ""),
         card_id=getattr(args, "card", "") or saved.get("card_id", ""),
-        session_id=getattr(args, "session", "") or saved.get("session_id"),
+        sessions=dict(saved.get("sessions", {})),
+        durable=dict(saved.get("durable", {})),
         images=saved.get("images", {}),
     )
-    missing = [name for name, value in (("--session", published.session_id),
-                                        ("--manual", published.manual_id),
-                                        ("--card", published.card_id)) if not value]
+    # There is one session per document and no single id that means "the
+    # session", so a --session on the command line applies to both documents
+    # named alongside it.
+    if getattr(args, "session", ""):
+        for document_id in published.document_ids:
+            published.sessions.setdefault(document_id, args.session)
+
+    missing = [name for name, value in (
+        ("--manual", published.manual_id),
+        ("--card", published.card_id),
+        ("--session", published.sessions.get(published.manual_id)),
+    ) if not value]
     if missing:
         raise SpecError(
             f"no published pair to work on: {', '.join(missing)} not given and "
@@ -298,9 +309,9 @@ def cmd_publish(args) -> int:
     with _client() as client:
         published = session.publish(client, spec, language=args.language)
     path = _save(published, args.language)
-    print(f"session {published.session_id}")
-    print(f"manual  {published.manual_id}")
-    print(f"card    {published.card_id}")
+    for document_id in published.document_ids:
+        print(f"{published.name_for(document_id):<16} {document_id}  "
+              f"in {published.sessions[document_id]}")
     print(f"images  {len(published.images)} uploaded")
     print(f"\nwritten to {path}; `edit`, `sync` and `export` read it from there.")
     return 0
@@ -358,7 +369,7 @@ def _save_proposal(published, changes) -> Path:
     OUT.mkdir(exist_ok=True)
     path = OUT / PROPOSAL
     path.write_text(json.dumps({
-        "session_id": published.session_id,
+        "sessions": published.sessions,
         "jobs": published.jobs,
         "changes": [{"change_id": c.change_id, "operation": c.operation,
                      "chunk_id": c.chunk_id, "document_id": c.document_id,
@@ -378,13 +389,25 @@ def cmd_approve(args) -> int:
     from manualbuilder.superdocs import ProposedChange, SuperDocsError
 
     path = OUT / PROPOSAL
+    published = _load(args)
+
+    # `--discard` deliberately does not need a proposal file. The case it exists
+    # for is a batch parked by a run that never wrote one -- a crash between
+    # turns, a different machine, a session someone left open -- and that is
+    # precisely when there is nothing on disk to read.
+    if args.discard:
+        with _client() as client:
+            denied = session.discard_outstanding(client, published)
+        path.unlink(missing_ok=True)
+        print(f"denied {denied} proposed change(s); the session is free for the "
+              f"next edit" if denied else "nothing was parked; the session is free")
+        return 0
+
     if not path.is_file():
         print(f"no proposal at {path}; run `edit` first", file=sys.stderr)
         return 2
     saved = json.loads(path.read_text(encoding="utf-8"))
-
-    published = _load(args)
-    published.session_id = saved["session_id"]
+    published.sessions.update(saved.get("sessions", {}))
     published.jobs = saved["jobs"]
     changes = [ProposedChange(
         change_id=c["change_id"], operation=c["operation"], chunk_id=c["chunk_id"],
@@ -394,6 +417,7 @@ def cmd_approve(args) -> int:
 
     reject = set(args.reject)
     with _client() as client:
+
         try:
             results = session.approve_all(client, published, changes, reject=reject)
         except SuperDocsError as exc:
@@ -430,11 +454,11 @@ def cmd_sync(args) -> int:
 
     published = _load(args)
     with _client() as client:
-        changes, images = session.swap_diagrams(client, published, spec)
-        print(f"{len(images)} diagram(s) re-rendered and uploaded")
+        changes, expected = session.swap_diagrams(client, published, spec)
+        print(f"{len(pj.image_ids(spec))} diagram(s) re-rendered and uploaded")
 
         try:
-            session.assert_only_the_image_changed(changes, images)
+            session.assert_only_the_image_changed(changes, expected)
         except SuperDocsError as exc:
             print(f"\nREFUSED: {exc}")
             return 1
@@ -475,8 +499,10 @@ def cmd_export(args) -> int:
         target.mkdir(parents=True, exist_ok=True)
         for document_id in published.document_ids:
             name = published.name_for(document_id).replace(" ", "-")
-            client.focus(published.session_id, document_id)
-            data = client.export_bytes(published.session_id, args.format)
+            # One document per session, so its own session exports it: no
+            # focus juggling, and no way to export the wrong one.
+            data = client.export_bytes(published.session_for(document_id),
+                                       args.format)
             path = target / f"{name}.{args.format}"
             path.write_bytes(data)
             print(f"{path}  {len(data):,} bytes")
@@ -517,6 +543,8 @@ def main(argv: list[str] | None = None) -> int:
                          metavar="CHANGE_ID",
                          help="reject one change by id; the rest still applies. "
                               "Repeatable.")
+    approve.add_argument("--discard", action="store_true",
+                         help="throw the whole batch away and unblock the session")
     _published_args(approve)
 
     sync = sub.add_parser("sync", help="re-render the diagrams and swap them in")

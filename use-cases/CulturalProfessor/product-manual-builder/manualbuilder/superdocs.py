@@ -58,6 +58,11 @@ import httpx
 
 DEFAULT_BASE_URL = "https://api.superdocs.app"
 POLL_INTERVAL = 3.0
+
+#: A session runs one turn at a time. Anything in these states holds it, and a
+#: second turn sent while one is outstanding comes back 409 `session_busy`.
+ACTIVE_JOB_STATUSES = frozenset(
+    {"pending", "queued", "in_progress", "running", "awaiting_approval"})
 DEFAULT_TIMEOUT = 600.0
 
 
@@ -329,6 +334,21 @@ class SuperDocs:
         body = self._get(f"/v1/sessions/{session_id}/jobs")
         listed = body.get("jobs")
         return listed if isinstance(listed, list) else []
+
+    def active_jobs(self, session_id: str) -> list[dict[str, Any]]:
+        """Jobs holding the session: still running, or waiting to be approved.
+
+        A session takes one turn at a time. Sending another while one is
+        outstanding returns 409 `session_busy`, and the outstanding one is
+        usually a batch somebody proposed and walked away from -- so the useful
+        thing is to name it rather than to retry.
+        """
+        return [job for job in self.jobs(session_id)
+                if str(job.get("status")) in ACTIVE_JOB_STATUSES]
+
+    def cancel_job(self, job_id: str) -> dict[str, Any]:
+        """Throw a turn away, including one parked at `awaiting_approval`."""
+        return self._post(f"/v1/jobs/{job_id}/cancel", {})
 
     def wait_for_job(self, job_id: str, timeout: float = DEFAULT_TIMEOUT,
                      poll: float = POLL_INTERVAL) -> dict[str, Any]:

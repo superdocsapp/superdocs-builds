@@ -21,15 +21,27 @@ import pytest
 from manualbuilder import session
 from manualbuilder.superdocs import ProposedChange, SuperDocsError
 
+#: Keyed by caption, because that is the only anchor that survives an upload:
+#: the service strips `data-*` and hands the figure back as
+#: `<figure><img alt="..."></figure>`.
 IMAGES = {
-    "breakdown": "https://cdn.example/breakdown-v2.svg",
-    "step:laser": "https://cdn.example/step_laser-v2.svg",
+    "Halyard M1 parts breakdown": "https://cdn.example/breakdown-v2.svg",
+    "Step 4: Fit the laser module": "https://cdn.example/step_laser-v2.svg",
 }
+LASER = "Step 4: Fit the laser module"
 
 
-def figure(image_id: str, url: str, caption: str = "Step 4: Fit the laser module",
-           extra: str = "") -> str:
-    return (f'<figure data-block="step:laser:figure" data-diagram="{image_id}">'
+def figure(caption: str, url: str, extra: str = "", chunked: bool = False) -> str:
+    """A figure as this renderer writes it, or as the service hands it back.
+
+    `chunked=True` is the shape that comes back: `data-*` gone, a `data-chunk-id`
+    added, and `alt` before `src` rather than after. A check that only worked on
+    the shape we sent would pass every test and fail on the first real chunk.
+    """
+    if chunked:
+        return (f'<figure data-chunk-id="f248c6f2"><img alt="{caption}" '
+                f'src="{url}"/><figcaption>{caption}</figcaption></figure>{extra}')
+    return (f'<figure data-block="step:laser:figure" data-diagram="step:laser">'
             f'<img src="{url}" alt="{caption}"/>'
             f"<figcaption>{caption}</figcaption></figure>{extra}")
 
@@ -40,13 +52,25 @@ def swap(new_html: str, old_html: str | None = None,
         change_id=change_id, operation="edit", chunk_id="chunk_12",
         document_id="doc_manual",
         old_html=old_html if old_html is not None else figure(
-            "step:laser", "https://cdn.example/step_laser-v1.svg"),
+            LASER, "https://cdn.example/step_laser-v1.svg"),
         new_html=new_html, explanation="updated the diagram",
     )
 
 
 def test_the_swap_that_is_only_a_swap_is_allowed():
-    changes = [swap(figure("step:laser", IMAGES["step:laser"]))]
+    changes = [swap(figure(LASER, IMAGES[LASER]))]
+    session.assert_only_the_image_changed(changes, IMAGES)
+
+
+def test_the_shape_the_service_actually_returns_is_allowed():
+    """The same swap, in the markup a real chunk comes back as: attributes
+    stripped, a chunk id added, alt before src. The first live run refused this
+    because the check was reading the markup we sent rather than the markup that
+    came back."""
+    changes = [swap(
+        new_html=figure(LASER, IMAGES[LASER], chunked=True),
+        old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg",
+                        chunked=True))]
     session.assert_only_the_image_changed(changes, IMAGES)
 
 
@@ -54,14 +78,13 @@ def test_a_reworded_caption_is_refused():
     """The likeliest failure, and the most reasonable-looking one: asked to
     change a URL, the turn tidies the caption while it is in there. A person
     reviewing forty of these approves it."""
-    changes = [swap(figure("step:laser", IMAGES["step:laser"],
-                           caption="Step 4: Fitting the laser module"))]
+    changes = [swap(figure("Step 4: Fitting the laser module", IMAGES[LASER]))]
     with pytest.raises(SuperDocsError, match="altered more than the image URL"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
 
 def test_a_paragraph_added_next_to_the_figure_is_refused():
-    changes = [swap(figure("step:laser", IMAGES["step:laser"],
+    changes = [swap(figure(LASER, IMAGES[LASER],
                            extra="<p>See also the parts table.</p>"))]
     with pytest.raises(SuperDocsError, match="altered more than the image URL"):
         session.assert_only_the_image_changed(changes, IMAGES)
@@ -73,7 +96,7 @@ def test_a_plausible_url_that_was_never_uploaded_is_refused():
     it is the reason this check compares against what was uploaded rather than
     checking that the src merely changed."""
     invented = "https://cdn.example/step_laser-v3.svg"
-    changes = [swap(figure("step:laser", invented))]
+    changes = [swap(figure(LASER, invented))]
     with pytest.raises(SuperDocsError, match="not the URL uploaded for it"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
@@ -83,27 +106,29 @@ def test_the_right_url_on_the_wrong_figure_is_refused():
     the wrong figures, so every page still shows a diagram and two of them are
     the wrong drawing -- which is the failure a person is least likely to catch
     by reading a diff."""
-    changes = [swap(figure("step:laser", IMAGES["breakdown"]))]
+    changes = [swap(figure(LASER, IMAGES["Halyard M1 parts breakdown"]))]
     with pytest.raises(SuperDocsError, match="not the URL uploaded for it"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
 
 def test_a_figure_nobody_asked_about_is_refused():
     changes = [swap(
-        new_html=figure("step:power", "https://cdn.example/step_power-v2.svg"),
-        old_html=figure("step:power", "https://cdn.example/step_power-v1.svg"))]
+        new_html=figure("Step 6: Power up and home",
+                        "https://cdn.example/step_power-v2.svg"),
+        old_html=figure("Step 6: Power up and home",
+                        "https://cdn.example/step_power-v1.svg"))]
     with pytest.raises(SuperDocsError, match="not part of this refresh"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
 
-def test_a_chunk_whose_figures_and_images_do_not_pair_up_is_refused():
-    """Two figures and one image cannot be checked: whichever way they are
-    paired, the pairing is a guess. A check that cannot be made is reported, not
-    skipped."""
-    two = (figure("breakdown", IMAGES["breakdown"])
-           + '<figure data-diagram="step:laser"><figcaption>x</figcaption></figure>')
-    changes = [swap(new_html=two, old_html=two.replace("-v2", "-v1"))]
-    with pytest.raises(SuperDocsError, match="pairing"):
+def test_an_image_with_no_caption_to_identify_it_is_refused():
+    """A figure whose alt text was dropped cannot be checked: there is nothing
+    left saying which drawing it is meant to be. A check that cannot be made is
+    reported, not skipped."""
+    anonymous = '<figure><img src="https://cdn.example/step_laser-v2.svg"/></figure>'
+    changes = [swap(new_html=anonymous,
+                    old_html=anonymous.replace("-v2", "-v1"))]
+    with pytest.raises(SuperDocsError, match="not part of this refresh"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
 
@@ -118,9 +143,9 @@ def test_one_bad_change_refuses_the_whole_batch():
     """Not "approve the good ones and flag the rest". If one chunk came back
     rewritten, what the turn did to the others is not evidence of anything."""
     changes = [
-        swap(figure("breakdown", IMAGES["breakdown"]), change_id="ok"),
-        swap(figure("step:laser", IMAGES["step:laser"], caption="Reworded"),
-             change_id="bad"),
+        swap(figure("Halyard M1 parts breakdown",
+                    IMAGES["Halyard M1 parts breakdown"]), change_id="ok"),
+        swap(figure("Reworded", IMAGES[LASER]), change_id="bad"),
     ]
     with pytest.raises(SuperDocsError, match="whole batch was refused"):
         session.assert_only_the_image_changed(changes, IMAGES)
@@ -151,3 +176,29 @@ def test_an_edit_that_touched_both_is_allowed(publication):
 @pytest.fixture
 def publication():
     return session.Publication(manual_id="doc_manual", card_id="doc_card")
+
+
+def test_the_signature_the_service_appends_is_not_a_different_image():
+    """Every image URL comes back with a 754-character signed query on it,
+    because the service signs image links when it serves them. Comparing the
+    strings refuses a correct swap; comparing nothing accepts a wrong one. The
+    path is the file, the query is the signature."""
+    signed = (IMAGES[LASER] + "?X-Goog-Algorithm=GOOG4-RSA-SHA256"
+              "&X-Goog-Credential=x&X-Goog-Date=20260811T000000Z"
+              "&X-Goog-Expires=604800&X-Goog-Signature=" + "a" * 512)
+    changes = [swap(figure(LASER, signed, chunked=True),
+                    old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg",
+                                    chunked=True))]
+    session.assert_only_the_image_changed(changes, IMAGES)
+
+
+def test_a_different_file_with_a_valid_looking_signature_is_still_refused():
+    """The check must not become "anything from that host". A signature on the
+    wrong file is the wrong drawing, signed."""
+    other = (IMAGES["Halyard M1 parts breakdown"]
+             + "?X-Goog-Signature=" + "a" * 512)
+    changes = [swap(figure(LASER, other, chunked=True),
+                    old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg",
+                                    chunked=True))]
+    with pytest.raises(SuperDocsError, match="not the URL uploaded for it"):
+        session.assert_only_the_image_changed(changes, IMAGES)

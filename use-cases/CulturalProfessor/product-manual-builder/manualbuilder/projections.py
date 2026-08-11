@@ -76,6 +76,30 @@ def render(blocks: list[Block]) -> str:
     return "\n".join(block.html for block in blocks if block.html) + "\n"
 
 
+def captions(spec: Spec) -> dict[str, str]:
+    """Every caption either document uses -> the diagram id it belongs to.
+
+    The only anchor that survives a round trip. `data-diagram` does not: the
+    service strips `data-*` attributes when it stores a document and puts its
+    own `data-chunk-id` on instead, so a figure comes back as `<figure><img
+    alt="..."></figure>` with nothing on it naming which drawing it is. The
+    caption is derived from the spec, is visible to a reader, and is what the
+    alt text carries -- a better anchor than an attribute in any case.
+
+    Keyed by caption rather than by diagram id because the mapping is many to
+    one: the breakdown appears in the manual pointing at a parts table and on
+    the card with nothing to point at, so it is captioned differently in each.
+    Both spellings have to resolve to the same drawing.
+    """
+    out = {
+        f"{spec.name} parts breakdown. Numbers key to the table below.": BREAKDOWN,
+        f"{spec.name} parts breakdown": BREAKDOWN,
+    }
+    for index, step in enumerate(spec.steps, start=1):
+        out[f"Step {index}: {step.title}"] = step_image_id(step)
+    return out
+
+
 # ------------------------------------------------------------- the manual --
 
 def manual_blocks(spec: Spec, images: dict[str, str] | None = None) -> list[Block]:

@@ -7,22 +7,37 @@ assembly, changing which steps the card carries -- these change the diagrams, so
 they are made in `spec/*.yaml`, regenerated, and re-published. A model is never
 asked to redraw anything.
 
-**Wording edits go through one multi-document chat turn.** "Raise the rail
-torque to 1.6 N·m" is the kind of edit that actually happens to a shipped manual,
-and it is exactly where a manual and its quick-start card come apart: someone
-edits one document and forgets the other. Opening both in a single session and
-sending one instruction means one turn produces both edits. There is no window
-in which the manual has been updated and the card has not, because there is no
-second request.
+**Wording edits go through one instruction, run against both documents.** "Raise
+the rail torque to 1.6 N·m" is the edit that actually happens to a shipped
+manual, and it is exactly where a manual and its quick-start card come apart:
+someone edits one and forgets the other.
 
-That is the first grading criterion, and `changes_by_document` is how a caller
-checks it actually happened rather than trusting that it did.
+The shape of that took three attempts against the live service, and the two
+dead ends are worth keeping written down because both of them *looked* like they
+worked.
+
+*One turn naming both documents.* The API takes `document_ids` without
+complaint, comes back with proposed changes, and puts every one of them in the
+focused document. The card is untouched and nothing says so. There is no call
+that edits two documents at once.
+
+*Two turns in one session.* The first parks at `awaiting_approval`, which holds
+the session, and the second is refused with 409 `session_busy`. A pair sharing a
+session cannot have both halves proposed at the same time -- and both halves
+proposed at the same time is the entire point.
+
+So: **a session per document**, both turns sent before either is waited on, and
+nothing applied until both have proposed. The guarantee was never really in the
+single request; it was in the fact that approval is one decision and approval is
+the only thing that mutates. `changes_by_document` and `assert_touched_both` are
+how a caller checks the pair actually moved together rather than trusting it.
 """
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
 from typing import Any
+from urllib.parse import urlparse
 
 from manualbuilder import diagram, projections as pj
 from manualbuilder.spec import Spec
@@ -31,15 +46,36 @@ from manualbuilder.superdocs import ProposedChange, SuperDocs, SuperDocsError
 
 @dataclass
 class Publication:
-    """What was published, and enough to edit it again."""
+    """What was published, and enough to edit it again.
+
+    A document has two ids and they are not interchangeable. `doc_c8c07c4a91` is
+    scoped to a session and is what a chat turn names; the UUID underneath it is
+    the durable one, and is what opens the document somewhere else. Asking for a
+    session-scoped id in another session returns *"None of the requested
+    documents were found"*, which reads like the document is gone.
+    """
     manual_id: str
     card_id: str
     images: dict[str, str] = field(default_factory=dict)
-    session_id: str | None = None
-    #: One job per turn, and a turn is per document. Approving needs the job the
-    #: changes came from, so the pair's two turns carry two job ids and both are
-    #: kept until the batch is approved or thrown away together.
+    #: document id -> the session that document is edited in. One session each,
+    #: because a session runs one turn at a time and a batch parked at
+    #: `awaiting_approval` blocks the next turn in that session -- so a pair
+    #: sharing a session cannot have both halves proposed at once, which is the
+    #: whole point of the pair.
+    sessions: dict[str, str] = field(default_factory=dict)
+    #: document id -> its durable id, for opening it elsewhere later.
+    durable: dict[str, str] = field(default_factory=dict)
+    #: document id -> the job its last turn produced. Approving needs the job
+    #: the changes came from, so both are kept until the batch is decided.
     jobs: dict[str, str] = field(default_factory=dict)
+
+    def session_for(self, document_id: str) -> str:
+        session_id = self.sessions.get(document_id)
+        if not session_id:
+            raise SuperDocsError(
+                f"no session recorded for {document_id}; `publish` opens one per "
+                f"document and writes it down")
+        return session_id
 
     @property
     def document_ids(self) -> list[str]:
@@ -86,30 +122,33 @@ def publish(client: SuperDocs, spec: Spec, language: str = "") -> Publication:
     """
     images = upload_diagrams(client, spec)
     suffix = f"-{language}" if language else ""
-    session_id = client.init_session()
 
-    # `new_focused` then `background`: the second document joins the session
-    # beside the first instead of replacing it. The default is `replace`, which
-    # returns 200 and "persisted": true while destroying the manual.
-    manual_id = client.upload(
-        f"{_slug(spec.name)}-manual{suffix}.html", pj.manual_html(spec, images),
-        session_id=session_id, open_mode="new_focused")
-    card_id = client.upload(
-        f"{_slug(spec.name)}-quickstart{suffix}.html",
-        pj.quick_start_html(spec, images),
-        session_id=session_id, open_mode="background")
+    published = Publication(manual_id="", card_id="", images=images)
+    for role, filename, html in (
+            ("manual", f"{_slug(spec.name)}-manual{suffix}.html",
+             pj.manual_html(spec, images)),
+            ("card", f"{_slug(spec.name)}-quickstart{suffix}.html",
+             pj.quick_start_html(spec, images))):
+        # A session each. Sharing one would be tidier and would mean the pair
+        # could never have both halves proposed at the same time: the first
+        # turn parks at `awaiting_approval` and the session refuses the second
+        # with 409 `session_busy`.
+        session_id = client.init_session()
+        document_id = client.upload(filename, html, session_id=session_id,
+                                    open_mode="new_focused")
 
-    holding = {d.get("document_id") for d in client.documents(session_id)}
-    missing = [name for name, doc_id in (("manual", manual_id), ("card", card_id))
-               if doc_id not in holding]
-    if missing:
-        raise SuperDocsError(
-            f"the session holds {len(holding)} document(s) and not the "
-            f"{' and '.join(missing)}; uploading the pair replaced rather than "
-            f"opened, so an edit would only ever reach one of them"
-        )
-    return Publication(manual_id=manual_id, card_id=card_id, images=images,
-                       session_id=session_id)
+        held = client.documents(session_id)
+        if [d.get("document_id") for d in held] != [document_id]:
+            raise SuperDocsError(
+                f"the {role}'s session holds {[d.get('document_id') for d in held]} "
+                f"rather than {document_id} alone; an edit would reach the wrong "
+                f"document")
+
+        setattr(published, f"{role}_id" if role == "manual" else "card_id",
+                document_id)
+        published.sessions[document_id] = session_id
+        published.durable[document_id] = str(held[0].get("durable_document_id") or "")
+    return published
 
 
 def edit_both(client: SuperDocs, publication: Publication,
@@ -130,34 +169,84 @@ def edit_both(client: SuperDocs, publication: Publication,
     moved and the card has not, because the window opens at approval and
     approval is one decision.
 
-    Both turns run in one session, so the second one is sent to a service that
-    has already read the first document -- which is why the same sentence works
-    for both without being re-specified per document.
+    A session each, and both turns sent before either is waited on: they are
+    different conversations, so they run at the same time and the pair costs one
+    wait rather than two.
     """
-    if not publication.session_id:
+    # A batch nobody decided on holds its session open, and the service answers
+    # the next turn with 409 `session_busy` -- correct, and four frames deep in
+    # a stack trace. Checked here, where the answer can name what is in the way.
+    for document_id in publication.document_ids:
+        outstanding = client.active_jobs(publication.session_for(document_id))
+        if not outstanding:
+            continue
+        waiting = [job for job in outstanding
+                   if job.get("status") == "awaiting_approval"]
         raise SuperDocsError(
-            "no session to edit in; `publish` opens one and `edit` needs its id")
+            f"the {publication.name_for(document_id)} already has "
+            f"{len(outstanding)} turn(s) in flight"
+            + (f", {len(waiting)} waiting to be approved. Run `approve` to apply "
+               f"that batch or `approve --discard` to throw it away; a proposal "
+               f"nobody decided on blocks every later edit."
+               if waiting else
+               ". Wait for it to finish -- deep operations run minutes, and a "
+               "second turn sent now would be refused rather than queued.")
+        )
+
+    # Both turns are sent before either is waited on. They are in different
+    # sessions, so they run at the same time rather than one after the other,
+    # and the pair costs one wait instead of two.
+    started: list[tuple[str, str]] = []
+    for document_id in publication.document_ids:
+        # Async, not `/v1/chat`, and this is the whole reason the human gate
+        # works at all. The synchronous endpoint returns proposed changes and
+        # its job goes straight to `completed` -- approving against it comes
+        # back "Job is not awaiting approval (status: completed)", so the
+        # changes it just showed you can never be applied. `/v1/chat/async`
+        # parks its job at `awaiting_approval` with the same changes in
+        # `metadata.pending_changes`, and that job is what approval needs.
+        job_id = client.chat_async(instruction,
+                                   publication.session_for(document_id),
+                                   document_id=document_id)
+        started.append((document_id, job_id))
 
     changes: list[ProposedChange] = []
     replies: list[dict[str, Any]] = []
-    for document_id in publication.document_ids:
-        # Async, not `/v1/chat`, and this is the whole reason the human gate
-        # works at all. The synchronous endpoint returns the proposed changes
-        # and its job goes straight to `completed` -- approving against it comes
-        # back "Job is not awaiting approval (status: completed)", so the
-        # changes it showed you can never be applied. `/v1/chat/async` parks its
-        # job at `awaiting_approval` with the same changes in
-        # `metadata.pending_changes`, and that job is the thing approval needs.
-        job_id = client.chat_async(instruction, publication.session_id,
-                                   document_id=document_id)
+    for document_id, job_id in started:
         job = client.wait_for_job(job_id)
         replies.append(job)
-
         turn = client.pending_changes(job)
         if turn:
             publication.jobs[document_id] = job_id
         changes += turn
     return changes, replies
+
+
+def discard_outstanding(client: SuperDocs, publication: Publication) -> int:
+    """Deny every batch parked in this session. Returns how many changes went.
+
+    Asks the session what is actually outstanding rather than trusting a
+    recorded batch, because the two come apart: a proposal file written by an
+    earlier run names jobs that have since resolved, while the job really
+    holding the session is one this process never saw. Whatever is in the way is
+    what has to be cleared.
+
+    Denied, not cancelled: `/v1/jobs/{id}/cancel` refuses a job parked at
+    `awaiting_approval` -- there is nothing left to interrupt -- and the way a
+    parked batch resolves is by being decided. Denied changes cost no quota.
+    """
+    denied = 0
+    for session_id in dict.fromkeys(publication.sessions.values()):
+        for job in client.active_jobs(session_id):
+            if job.get("status") != "awaiting_approval":
+                continue
+            job_id = str(job.get("job_id") or job.get("id"))
+            changes = client.pending_changes(job)
+            client.approve(session_id, job_id,
+                           {change.change_id: False for change in changes},
+                           approved_by_default=False)
+            denied += len(changes)
+    return denied
 
 
 def changes_by_document(publication: Publication,
@@ -211,8 +300,6 @@ def approve_all(client: SuperDocs, publication: Publication,
     One call per job, because a job is one turn and a turn is one document.
     """
     reject = reject or set()
-    if not publication.session_id:
-        raise SuperDocsError("no session to approve against; run edit_both first")
     if not publication.jobs:
         raise SuperDocsError(
             "no job to approve against; the turns proposed nothing, or "
@@ -226,22 +313,24 @@ def approve_all(client: SuperDocs, publication: Publication,
             f"stop, so nothing was sent."
         )
 
-    by_job: dict[str, dict[str, bool]] = {}
+    by_job: dict[tuple[str, str], dict[str, bool]] = {}
     for change in changes:
-        job_id = publication.jobs.get(change.document_id or "")
+        document_id = change.document_id or ""
+        job_id = publication.jobs.get(document_id)
         if not job_id:
             raise SuperDocsError(
                 f"change {change.change_id} belongs to document "
-                f"{change.document_id!r}, which no recorded turn produced")
-        by_job.setdefault(job_id, {})[change.change_id] = change.change_id not in reject
+                f"{document_id!r}, which no recorded turn produced")
+        key = (publication.session_for(document_id), job_id)
+        by_job.setdefault(key, {})[change.change_id] = change.change_id not in reject
 
     # `approved` at the top level is the default for entries that omit their
     # own. Every entry here carries its own, so the default only matters if the
     # service adds a change we did not see -- and False is the safe answer to
     # that.
-    return [client.approve(publication.session_id, job_id, decisions,
+    return [client.approve(session_id, job_id, decisions,
                            approved_by_default=False)
-            for job_id, decisions in by_job.items()]
+            for (session_id, job_id), decisions in by_job.items()]
 
 
 def refresh_diagrams(client: SuperDocs, publication: Publication,
@@ -274,30 +363,66 @@ def swap_diagrams(client: SuperDocs, publication: Publication,
     The model is allowed to propose the swap and is not trusted to have made it.
     """
     fresh = refresh_diagrams(client, publication, spec)
+    captions = pj.captions(spec)
+    # Keyed by caption, because that is what survives the round trip: the
+    # service strips `data-*` when it stores a document, so the figure comes
+    # back with nothing on it naming which drawing it is except its alt text.
+    expected = {caption: fresh[image_id]
+                for caption, image_id in captions.items() if image_id in fresh}
     lines = "\n".join(
-        f'- the figure with data-diagram="{image_id}": set its <img src> to '
-        f"{url}" for image_id, url in fresh.items()
+        f'- the figure whose caption is "{caption}": set its <img src> to {url}'
+        for caption, url in expected.items()
     )
     instruction = (
         "Update the diagram image URLs. Make exactly these substitutions and "
-        "nothing else -- do not reword, reformat, or renumber anything, and do "
-        "not touch a figure that is not listed:\n" + lines
+        "nothing else -- do not reword, reformat, or renumber anything, do not "
+        "change any caption or alt text, and do not touch a figure that is not "
+        "listed:\n" + lines
     )
     changes, _ = edit_both(client, publication, instruction)
-    return changes, fresh
+    return changes, expected
 
 
-_IMG_SRC = re.compile(r'(<img\b[^>]*?\bsrc=")([^"]*)(")', re.I)
-_FIGURE_ID = re.compile(r'data-diagram="([^"]+)"')
+_IMG_TAG = re.compile(r"<img\b[^>]*>", re.I)
+_SRC = re.compile(r'\bsrc="([^"]*)"', re.I)
+_ALT = re.compile(r'\balt="([^"]*)"', re.I)
 
 
 def _masked(html: str) -> str:
-    """The chunk with every image URL replaced by a placeholder."""
-    return _IMG_SRC.sub(r"\g<1>\g<3>", html)
+    """The chunk with every image URL blanked, so the rest can be compared.
+
+    Attribute order is not fixed -- this renderer writes `src` before `alt` and
+    what comes back writes `alt` first -- so the blanking works inside each
+    `<img>` tag rather than on a pattern that assumes an order.
+    """
+    return _IMG_TAG.sub(lambda m: _SRC.sub('src=""', m.group(0)), html)
+
+
+def _same_image(one: str, other: str) -> bool:
+    """Whether two URLs point at the same uploaded file.
+
+    Compared by path, not by string. What goes into a document is the durable
+    URL; what comes back on every read is that URL with a 754-character signed
+    query appended, because the service signs image links when it serves them.
+    An exact-match comparison therefore refuses a correct swap -- it did, on the
+    first live run -- while a comparison that ignored the whole URL would accept
+    a wrong one. The path is the identity of the file; the query is the
+    service's signature on it.
+    """
+    return urlparse(one).path == urlparse(other).path
+
+
+def _images_in(html: str) -> list[tuple[str, str]]:
+    """Every image in a chunk as (alt, src), in document order."""
+    out: list[tuple[str, str]] = []
+    for tag in _IMG_TAG.findall(html):
+        alt, src = _ALT.search(tag), _SRC.search(tag)
+        out.append((alt.group(1) if alt else "", src.group(1) if src else ""))
+    return out
 
 
 def assert_only_the_image_changed(changes: list[ProposedChange],
-                                  images: dict[str, str]) -> None:
+                                  expected: dict[str, str]) -> None:
     """Refuse a diagram swap that did anything besides swap the diagram.
 
     Three ways this goes wrong, and all three are refused rather than shown to a
@@ -324,24 +449,16 @@ def assert_only_the_image_changed(changes: list[ProposedChange],
                 f"  after:  {change.new_html[:160]}"
             )
 
-        figures = _FIGURE_ID.findall(change.new_html)
-        sources = [m.group(2) for m in _IMG_SRC.finditer(change.new_html)]
-        if len(figures) != len(sources):
-            raise SuperDocsError(
-                f"change {change.change_id} has {len(figures)} figure(s) and "
-                f"{len(sources)} image(s) in the same chunk; the pairing that "
-                f"proves the right URL went to the right figure is not there"
-            )
-        for image_id, source in zip(figures, sources):
-            if image_id not in images:
+        for caption, source in _images_in(change.new_html):
+            if caption not in expected:
                 raise SuperDocsError(
-                    f"change {change.change_id} touched figure {image_id!r}, "
-                    f"which was not part of this refresh"
+                    f"change {change.change_id} touched a figure captioned "
+                    f"{caption!r}, which was not part of this refresh"
                 )
-            if source != images[image_id]:
+            if not _same_image(source, expected[caption]):
                 raise SuperDocsError(
-                    f"change {change.change_id} set {image_id!r} to {source!r}, "
-                    f"which is not the URL uploaded for it ({images[image_id]!r}). "
+                    f"change {change.change_id} pointed {caption!r} at "
+                    f"{source[:80]!r}, which is not the URL uploaded for it. "
                     f"That renders as a broken image in a shipped manual."
                 )
 
