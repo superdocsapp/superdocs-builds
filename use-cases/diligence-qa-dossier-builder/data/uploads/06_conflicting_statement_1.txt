@@ -1,0 +1,9 @@
+ACME AI — SECONDARY FINANCIAL STATEMENT
+
+This document is included specifically to test conflict detection.
+
+FY2025 ARR: $3.9 million.
+FY2025 revenue: $3.8 million.
+
+This statement conflicts with the primary financial record, which reports FY2025 ARR of $4.2 million.
+Reviewers should identify and resolve the conflicting evidence rather than silently selecting one value.

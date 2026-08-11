@@ -1,0 +1,23 @@
+ACME AI — LEGAL AND SECURITY REVIEW
+
+Corporate Structure:
+Acme AI Private Limited is incorporated in India.
+
+Material Litigation:
+The company is not currently involved in any material litigation.
+
+Intellectual Property:
+The company owns the source code for its primary software platform.
+Employee IP agreements are signed by all full-time engineering employees.
+
+Security:
+The company completed a SOC 2 Type I audit in October 2025.
+SOC 2 Type II certification has not yet been completed.
+The company uses encryption at rest and in transit.
+Customer data is logically isolated between customer accounts.
+
+Known Security Issue:
+A minor authentication vulnerability was identified during an internal security review in November 2025. The issue was patched within seven days and no customer data exposure was identified.
+
+Privacy:
+The company maintains a GDPR data processing policy for applicable customers.

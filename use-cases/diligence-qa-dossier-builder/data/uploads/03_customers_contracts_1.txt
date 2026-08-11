@@ -1,0 +1,25 @@
+ACME AI — CUSTOMERS AND CONTRACTS
+
+The company has 120 paying customers as of December 2025.
+
+Largest customers by annual contract value:
+
+Customer: GlobalTech
+Annual Contract Value: $420,000
+Contract Term: 36 months
+
+Customer: FinServe
+Annual Contract Value: $310,000
+Contract Term: 24 months
+
+Customer: RetailHub
+Annual Contract Value: $185,000
+Contract Term: 24 months
+
+Customer concentration:
+The top five customers represent approximately 18% of total ARR.
+
+The company has a gross annual customer retention rate of 91%.
+Net revenue retention is approximately 116%.
+Approximately 72% of customers are on annual contracts.
+The company has no customer representing more than 10% of total ARR.
