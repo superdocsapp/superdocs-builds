@@ -44,7 +44,15 @@ INDENT = 26
 ROW_GAP = 6
 PAD = 24
 HEADER_H = 34
-BAND_GAP = 30
+# Advance widths, estimated. The renderer emits SVG and never measures a glyph,
+# so these are what stands in for a font metric: the average advance of the
+# title face at 15px and of the note face at 11px, rounded up rather than down.
+TITLE_CHAR_W = 8.2
+NOTE_CHAR_W = 5.6
+
+BAND_GAP = 52   # rule at +26, its label on the baseline at +46, box top at +52:
+                # anything tighter and the label prints underneath the first
+                # loose part, which is legible in English and not in German
 
 # The palette is declared here rather than inherited from a stylesheet because
 # these SVGs are uploaded to a document service and rendered wherever it puts
@@ -128,15 +136,38 @@ def layout(spec: Spec) -> Layout:
     bottom = max((p.y for p in placed), default=PAD) + BOX_H
     return Layout(
         placed=tuple(placed),
-        width=deepest + BOX_W + PAD,
+        width=max(deepest + BOX_W + PAD, _text_width(spec)),
         height=bottom + PAD + 18,
         band_y=band_y,
     )
 
 
+def _text_width(spec: Spec) -> int:
+    """Wide enough for the words the drawing prints on itself.
+
+    Boxes are not the only thing in the frame. The title runs along the top and
+    the highlight note along the bottom, and neither wraps -- so a width derived
+    from the boxes alone is a width that fits English and cuts the last three
+    words off the French. The measurement is a character-count estimate, which
+    is coarse and errs wide, and errs wide in every language.
+
+    Every diagram in a document is laid out to the same width, deliberately: the
+    breakdown and the seven step drawings sit in one column, and a column that
+    changed width from page to page would look like a mistake even though each
+    drawing on its own was right.
+    """
+    titles = [spec.text("breakdown_title", name=spec.name)]
+    titles += [spec.text("step_title", name=spec.name, title=step.title)
+               for step in spec.steps]
+    widest_title = max((len(t) for t in titles), default=0) * TITLE_CHAR_W
+    note = len(spec.text("highlight_note")) * NOTE_CHAR_W
+    return PAD * 2 + int(max(widest_title, note)) + 1
+
+
 def exploded(spec: Spec) -> str:
     """The whole assembly, every part called out and keyed to the parts list."""
-    return _render(spec, layout(spec), title=f"{spec.name} — parts breakdown",
+    return _render(spec, layout(spec),
+                   title=spec.text("breakdown_title", name=spec.name),
                    highlight=frozenset())
 
 
@@ -148,7 +179,7 @@ def for_step(spec: Spec, step: Step) -> str:
     not a convention here; there is no other input to this function.
     """
     return _render(spec, layout(spec),
-                   title=f"{spec.name} — step: {step.title}",
+                   title=spec.text("step_title", name=spec.name, title=step.title),
                    highlight=frozenset(step.parts))
 
 
@@ -173,7 +204,8 @@ def _render(spec: Spec, place: Layout, title: str, highlight: frozenset[str]) ->
             f'stroke-dasharray="4 3"/>')
         add(f'<text x="{PAD}" y="{place.band_y + 20}" '
             f'font-family="Helvetica,Arial,sans-serif" font-size="10" '
-            f'letter-spacing="0.6" fill="{MUTED}">SUPPLIED, NOT MOUNTED</text>')
+            f'letter-spacing="0.6" fill="{MUTED}">'
+            f'{escape(spec.text("loose_parts"))}</text>')
 
     # Connectors first, so boxes sit on top of them.
     for spot in place.placed:
@@ -189,8 +221,7 @@ def _render(spec: Spec, place: Layout, title: str, highlight: frozenset[str]) ->
     if highlight:
         add(f'<text x="{PAD}" y="{place.height - 8}" '
             f'font-family="Helvetica,Arial,sans-serif" font-size="11" '
-            f'fill="{MUTED}">Outlined parts are the ones this step uses; the '
-            f'rest of the assembly is shown for position.</text>')
+            f'fill="{MUTED}">{escape(spec.text("highlight_note"))}</text>')
 
     add("</svg>")
     return "\n".join(out) + "\n"

@@ -109,6 +109,20 @@ def test_the_drawing_fits_a_page(spec):
     assert place.width <= 800, f"{place.width}px will not sit in a manual"
 
 
+def test_the_band_label_does_not_print_underneath_a_part(spec):
+    """It did. The "supplied, not mounted" caption sat on the same lines as the
+    first loose part's box, which is faintly legible in English and unreadable
+    the moment a locale makes either string longer. Geometry, so it is checked
+    the way geometry is checked rather than by looking at it again."""
+    place = diagram.layout(spec)
+    assert place.band_y is not None, "the shipped spec has loose parts"
+
+    baseline = place.band_y + 20                   # where `_render` puts the text
+    for spot in place.placed:
+        assert not (spot.y <= baseline <= spot.y + diagram.BOX_H), \
+            f"the band label lands inside {spot.part.id}'s box"
+
+
 def _geometry(rect_line: str) -> str:
     """The x/y/width/height of a rect, without its fill or stroke.
 
