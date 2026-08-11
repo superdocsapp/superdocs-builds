@@ -1,0 +1,239 @@
+# French strings for the Halyard M1. Human-supplied; nothing here is machine
+# translated at build time.
+#
+# The second launch market, and the reason there are two: one locale proves the
+# mechanism runs, two prove it is not shaped around German. French expands about
+# as much as German does and expands in different places -- longer noun phrases,
+# shorter compounds -- so a layout that only ever saw `de` would be a layout
+# tuned to one language's habits.
+#
+# This file can only supply strings for ids the spec already has. It cannot add
+# a step, drop a warning, or rename an id: `localize.py` refuses that, because a
+# locale that changes structure is a locale that repaginates.
+
+language: fr
+
+product_name: Halyard M1
+tagline: Graveuse laser à diode de paillasse
+
+footer: >
+  Manuel complet, dépannage et réglages matière : halyard.example/m1
+
+# The words the drawings put on themselves. Without these the French manual
+# would carry French instructions around English diagrams -- printed English is
+# harder to spot inside an SVG than in a paragraph.
+diagram:
+  breakdown_title: "{name} — vue des pièces"
+  step_title: "{name} — étape : {title}"
+  loose_parts: FOURNI, NON MONTÉ
+  highlight_note: >
+    Les pièces entourées sont celles de cette étape ; le reste de l'ensemble est
+    montré pour situer.
+
+specifications:
+  Work area: Surface de travail
+  Laser source: Source laser
+  Enclosure class: Classe de l'enceinte
+  Maximum feed rate: Vitesse d'avance maximale
+  Input power: Alimentation
+  Connectivity: Connectique
+  "Mass, assembled": Masse, montée
+  Extraction requirement: Extraction requise
+
+parts:
+  base:
+    label: Châssis de base
+    note: Livré assemblé. Les quatre pieds caoutchouc sont imperdables.
+  rail_y_left:
+    label: Rail Y, gauche
+  rail_y_right:
+    label: Rail Y, droit
+  gantry:
+    label: Portique X
+    note: Enjambe les deux rails Y ; se pose d'abord sur le rail gauche.
+  carriage:
+    label: Chariot laser
+  laser_module:
+    label: Module laser, 10 W
+    note: >
+      Saisir par le dissipateur. La lentille n'est pas remplaçable par
+      l'utilisateur.
+  lens_cap:
+    label: Capuchon de protection de lentille
+  controller:
+    label: Carte contrôleur
+  lid:
+    label: Capot de l'enceinte
+    note: >
+      Porte l'aimant du verrouillage. La machine ne tire pas capot ouvert.
+  duct:
+    label: Gaine d'extraction, 60 mm
+  psu:
+    label: Alimentation, 24 V
+  hex_keys:
+    label: Jeu de clés six pans, 2,5 / 3 / 4 mm
+
+steps:
+  unpack:
+    title: Déballer et vérifier la livraison
+    body: >
+      Sortez la machine par le châssis de base, jamais par le portique. Vérifiez
+      la liste de colisage avant de jeter l'emballage ; les clés six pans sont
+      dans la mousse sous le châssis.
+  rails:
+    title: Poser les rails Y
+    body: >
+      Engagez chaque rail Y dans sa gorge sur le châssis et serrez les quatre vis
+      M4 à la main, puis à 1,2 N·m avec la clé de 2,5 mm. Ne serrez pas un rail à
+      fond avant que l'autre soit en place, sinon le châssis sort d'équerre.
+  gantry:
+    title: Monter le portique X
+    body: >
+      Posez le portique d'abord sur le rail Y gauche, puis rabattez l'extrémité
+      droite jusqu'à ce que les deux blocs d'extrémité affleurent. Serrez les
+      deux vis M4 de chaque côté à 1,2 N·m.
+  laser:
+    title: Monter le module laser
+    body: >
+      Glissez le chariot sur le portique, puis fixez le module laser au chariot
+      avec les deux vis imperdables. Laissez le capuchon de protection en place
+      jusqu'à ce que la machine soit entièrement montée et le capot posé.
+  extraction:
+    title: Raccorder l'extraction
+    body: >
+      Emmanchez la gaine de 60 mm sur la buse arrière jusqu'à ce que le bourrelet
+      soit en place, et menez-la vers une sortie extérieure ou un filtre adapté à
+      la matière découpée. Graver sans extraction dépose de la résine sur la
+      lentille et remplit la pièce de ce que dégage le matériau.
+  power:
+    title: Mettre sous tension et prendre l'origine
+    body: >
+      Posez le capot, branchez l'alimentation 24 V, puis l'USB-C. La machine
+      prend son origine à l'avant gauche à la mise sous tension ; gardez les
+      mains à l'écart du portique. Une LED verte fixe sur le contrôleur indique
+      qu'elle est prête.
+  first_burn:
+    title: Lancer le motif de test
+    body: >
+      Posez la chute de carton fournie sur le plateau, chargez TEST.GC depuis la
+      carte microSD et lancez. Le motif prend environ quatre-vingt-dix secondes.
+      Restez près de la machine pendant l'exécution.
+
+warnings:
+  eye_protection:
+    title: Rayonnement laser
+    body: >
+      N'utilisez jamais le module hors de l'enceinte fermée. Une lumière à 450 nm,
+      directe ou réfléchie, provoque des lésions rétiniennes définitives plus vite
+      que le réflexe palpébral. Les lunettes fournies protègent incidemment
+      pendant le montage ; elles ne remplacent pas l'enceinte.
+  fire_watch:
+    title: Risque d'incendie
+    body: >
+      La découpe et la gravure créent des conditions de flamme nue. Gardez un
+      extincteur de classe ABC à portée de la machine.
+  never_unattended:
+    title: Ne jamais laisser un travail sans surveillance
+    body: >
+      Ne laissez pas la machine sans surveillance pendant un travail, y compris
+      pour les travaux longs et pour ceux que vous avez déjà lancés.
+  ventilation:
+    title: Extraction obligatoire
+    body: >
+      La gravure libère des particules fines et, selon la matière, des gaz
+      irritants ou toxiques. Ne découpez jamais de PVC ni aucun plastique chloré :
+      il produit du chlorure d'hydrogène, qui vous blesse et détruit la machine.
+  interlock:
+    title: Ne pas neutraliser le verrouillage
+    body: >
+      Le verrouillage du capot est ce qui fait de ce produit un appareil de
+      classe 1. Le neutraliser en fait un laser de classe 4 et annule à la fois la
+      garantie et la déclaration CE.
+  no_lens_touch:
+    title: Saisir le module par le dissipateur
+    body: >
+      Le sébum sur la lentille cuit à la première utilisation et diffuse le
+      faisceau de façon permanente. La lentille n'est pas remplaçable par
+      l'utilisateur.
+  square_frame:
+    title: Serrer les rails uniformément
+    body: >
+      Serrer un rail à fond avant que l'autre soit en place sort le châssis
+      d'équerre, et chaque gravure suivante devient un parallélogramme.
+
+troubleshooting:
+  no_fire:
+    symptom: Le portique se déplace et le travail se lance, mais rien n'est gravé.
+    cause: >
+      Le capot est ouvert, ou l'aimant du verrouillage n'est pas en appui contre
+      son capteur. Le contrôleur exécute tout le travail diode coupée au lieu de
+      refuser de démarrer.
+    fix: >
+      Fermez complètement le capot et vérifiez que la LED de verrouillage du
+      contrôleur est allumée. Si elle reste éteinte capot fermé, l'aimant a bougé
+      dans son logement ; remettez-le à fleur et relancez.
+  out_of_square:
+    symptom: >
+      Les carrés sortent en parallélogrammes, et l'écart croît sur la largeur du
+      plateau.
+    cause: Un rail Y a été serré à fond avant que l'autre soit en place.
+    fix: >
+      Desserrez les huit vis de rail, poussez le portique en butée avant pour que
+      le châssis se remette d'équerre, puis reserrez les rails en alternance à
+      1,2 N·m.
+  faint_engraving:
+    symptom: >
+      La gravure est pâle ou irrégulière, et pire sur la droite du plateau.
+    cause: >
+      De la résine sur la lentille, à force de graver sans extraction. Elle
+      diffuse d'autant plus le faisceau que le chariot s'éloigne de l'extraction.
+    fix: >
+      Arrêtez, laissez refroidir le module et inspectez la lentille machine hors
+      tension. La résine impose un remplacement de lentille, pas un nettoyage :
+      la lentille n'est pas remplaçable par l'utilisateur. Réparez l'extraction
+      avant de relancer.
+  no_home:
+    symptom: À la mise sous tension, le portique force en butée et cale.
+    cause: >
+      Un rail Y est engagé dans la mauvaise gorge, si bien que le contact
+      d'origine ne se ferme jamais.
+    fix: >
+      Coupez l'alimentation. Vérifiez que chaque rail est dans sa propre gorge et
+      que les blocs d'extrémité affleurent avant de remettre sous tension.
+  no_power:
+    symptom: Aucune LED sur le contrôleur, et la machine ne répond pas en USB.
+    cause: L'alimentation 24 V n'est pas enfoncée, ou l'USB-C a été branché avant.
+    fix: >
+      Débranchez l'USB-C, enfoncez le connecteur 24 V jusqu'au clic, attendez la
+      LED verte, puis rebranchez l'USB-C. Le contrôleur s'énumère à la mise sous
+      tension, pas à la connexion de données.
+  smoke_smell:
+    symptom: >
+      La pièce sent la fumée pendant un travail alors que l'extraction tourne.
+    cause: La gaine s'est détachée de la buse arrière, ou le conduit est obstrué.
+    fix: >
+      Arrêtez le travail. Vérifiez que la gaine est engagée au-delà du bourrelet
+      aux deux extrémités et que la sortie extérieure est dégagée. Ne poursuivez
+      pas un travail pour voir si cela s'améliore.
+
+statements:
+  warranty:
+    title: Garantie
+    body: >
+      Halyard garantit cette machine contre les défauts de matière et de
+      fabrication pendant 24 mois à compter de l'achat. Le module laser est un
+      consommable, garanti 12 mois ou 500 heures de fonctionnement, au premier des
+      deux termes atteint. La garantie ne couvre pas les dommages dus à
+      l'utilisation avec le verrouillage neutralisé, à la découpe de plastiques
+      chlorés ou à la contamination de la lentille. Le service sous garantie passe
+      par le revendeur ; conservez la preuve d'achat. Cette garantie n'affecte pas
+      vos droits légaux.
+  disposal:
+    title: Mise au rebut et recyclage
+    body: >
+      Ne jetez pas cette machine avec les ordures ménagères. C'est un équipement
+      électrique au sens de la directive DEEE, marqué de la poubelle barrée.
+      Rapportez-la en déchetterie ou au revendeur lors de l'achat d'un équipement
+      équivalent. Déposez le module laser séparément avant la mise au rebut : il
+      contient un ensemble à diode qui est récupéré et non broyé. L'emballage est
+      en carton ondulé et en pulpe moulée, et se recycle avec le papier.

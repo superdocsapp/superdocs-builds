@@ -18,6 +18,18 @@ footer: >
   Vollständiges Handbuch, Fehlerbehebung und Materialeinstellungen:
   halyard.example/m1
 
+# The words the drawings put on themselves. Without these the German manual
+# would carry German instructions around English diagrams -- printed English is
+# harder to spot inside an SVG than in a paragraph, which is exactly why it
+# survives revisions.
+diagram:
+  breakdown_title: "{name} — Teileübersicht"
+  step_title: "{name} — Schritt: {title}"
+  loose_parts: MITGELIEFERT, NICHT MONTIERT
+  highlight_note: >
+    Hervorgehoben sind die Teile dieses Schritts; die übrige Baugruppe dient der
+    Orientierung.
+
 specifications:
   Work area: Arbeitsfläche
   Laser source: Laserquelle
@@ -151,3 +163,87 @@ warnings:
     body: >
       Wird eine Schiene vollständig angezogen, bevor die andere sitzt, verzieht
       sich der Rahmen, und jede folgende Gravur wird zum Parallelogramm.
+
+troubleshooting:
+  no_fire:
+    symptom: Das Portal fährt und der Auftrag läuft, es wird aber nichts graviert.
+    cause: >
+      Der Deckel ist offen oder der Verriegelungsmagnet liegt nicht am Sensor an.
+      Die Steuerung fährt den gesamten Auftrag mit abgeschalteter Diode, statt
+      den Start zu verweigern.
+    fix: >
+      Deckel vollständig schließen und prüfen, ob die Verriegelungs-LED an der
+      Steuerplatine leuchtet. Bleibt sie bei geschlossenem Deckel dunkel, hat
+      sich der Magnet in seiner Aussparung verschoben; bündig andrücken und den
+      Auftrag erneut starten.
+  out_of_square:
+    symptom: >
+      Quadrate werden zu Parallelogrammen, und der Fehler wächst über die
+      Arbeitsfläche.
+    cause: Eine Y-Schiene wurde festgezogen, bevor die andere saß.
+    fix: >
+      Alle acht Schienenschrauben lösen, das Portal bis zum vorderen Anschlag
+      schieben, damit sich der Rahmen selbst ausrichtet, dann die Schienen
+      abwechselnd mit 1,2 N·m anziehen.
+  faint_engraving:
+    symptom: >
+      Die Gravur ist schwach oder ungleichmäßig und rechts auf der
+      Arbeitsfläche schlechter.
+    cause: >
+      Harz auf der Linse, durch Betrieb ohne Absaugung. Je weiter der Schlitten
+      vom Abzug entfernt ist, desto mehr Strahl wird gestreut.
+    fix: >
+      Auftrag beenden, Modul abkühlen lassen und die Linse bei spannungsfreiem
+      Gerät prüfen. Harz erfordert einen Linsentausch, keine Reinigung: die
+      Linse ist nicht vom Benutzer zu warten. Vor dem nächsten Lauf die
+      Absaugung instand setzen.
+  no_home:
+    symptom: Das Portal fährt beim Einschalten in den Endanschlag und blockiert.
+    cause: >
+      Eine Y-Schiene sitzt in der falschen Aufnahme, sodass der Endschalter nie
+      schließt.
+    fix: >
+      Am Netzteil ausschalten. Prüfen, ob jede Schiene in ihrer eigenen Aufnahme
+      sitzt und die Endblöcke bündig sind, bevor Sie wieder einschalten.
+  no_power:
+    symptom: >
+      Keine LED an der Steuerplatine, und das Gerät reagiert nicht über USB.
+    cause: >
+      Das 24-V-Netzteil sitzt nicht, oder USB-C wurde vor der Spannung
+      angeschlossen.
+    fix: >
+      USB-C trennen, den 24-V-Hohlstecker bis zum Einrasten aufstecken, die
+      grüne LED abwarten und dann USB-C wieder anschließen. Die Steuerplatine
+      meldet sich beim Einschalten an, nicht über die Datenverbindung.
+  smoke_smell:
+    symptom: >
+      Es riecht während des Auftrags nach Rauch, obwohl die Absaugung läuft.
+    cause: Der Schlauch hat sich vom hinteren Stutzen gelöst, oder die Abluft ist blockiert.
+    fix: >
+      Auftrag abbrechen. Prüfen, ob der Schlauch an beiden Enden hinter dem
+      Wulst sitzt und der Außenauslass frei ist. Führen Sie einen Auftrag nicht
+      weiter, um zu sehen, ob es besser wird.
+
+statements:
+  warranty:
+    title: Garantie
+    body: >
+      Halyard leistet 24 Monate ab Kaufdatum Gewähr für Material- und
+      Verarbeitungsfehler. Das Lasermodul ist ein Verschleißteil und wird für
+      12 Monate oder 500 Betriebsstunden gewährleistet, je nachdem, was zuerst
+      eintritt. Nicht abgedeckt sind Schäden durch Betrieb mit überbrückter
+      Verriegelung, durch das Schneiden chlorhaltiger Kunststoffe oder durch
+      Verunreinigung der Linse. Die Abwicklung erfolgt über den Händler, bei dem
+      das Gerät gekauft wurde; bewahren Sie den Kaufbeleg auf. Ihre gesetzlichen
+      Rechte bleiben unberührt.
+  disposal:
+    title: Entsorgung und Recycling
+    body: >
+      Dieses Gerät gehört nicht in den Hausmüll. Es ist Elektrogerät im Sinne der
+      WEEE-Richtlinie und mit der durchgestrichenen Mülltonne gekennzeichnet.
+      Geben Sie es bei einer kommunalen Sammelstelle ab oder beim Händler, wenn
+      Sie ein gleichwertiges Gerät kaufen. Nehmen Sie das Lasermodul vor der
+      Entsorgung ab und geben Sie es getrennt ab: es enthält eine
+      Diodenbaugruppe, die zurückgewonnen und nicht geschreddert wird. Die
+      Verpackung besteht aus Wellpappe und Formfaserstoff und gehört ins
+      Altpapier.
