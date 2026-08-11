@@ -79,8 +79,21 @@ and `check` is what proves it.
 python -m manualbuilder.cli edit "raise the rail torque to 1.6 N·m" --manual doc_… --card doc_…
 ```
 
-`edit` prints the proposed changes grouped by document and applies nothing.
-Add `--yes` to approve them.
+`edit` prints the proposed changes grouped by document, records the batch to
+`out/proposal.json`, and applies nothing.
+
+```bash
+python -m manualbuilder.cli approve --reject CHANGE_ID
+```
+
+Rejecting one change keeps the rest. That is not a nicety: asked to change one
+torque figure, the live service also offered to change the gantry step, which
+legitimately shares the number. Approve the two you asked for, refuse the two
+you did not, in one review.
+
+`publish` writes the session and both document ids to `out/published.json`, so
+`edit`, `approve`, `sync` and `export` find them without anything being pasted
+between commands.
 
 ```bash
 python -m manualbuilder.cli sync --manual doc_… --card doc_…
@@ -95,9 +108,11 @@ swap and nothing else.
 python -m manualbuilder.cli export --manual doc_… --card doc_…
 ```
 
-`export` pulls both finished documents back down, which is how a claim about
-them becomes checkable: what lands in `out/` is what the service holds, not what
-this program believes it uploaded. Exports cost no quota.
+`export` pulls both finished documents back into `out/export/`, which is how a
+claim about them becomes checkable: what lands there is what the service holds,
+not what this program believes it uploaded. It is deliberately a different
+folder from the local render, because comparing the two is the point. Exports
+cost no quota.
 
 ## What is in the documents
 
@@ -118,14 +133,18 @@ quietly ship without them.
 
 ### The quick-start stays consistent when the manual changes
 
-Both documents open in **one multi-document session**, and an edit is a single
-turn against both `document_ids`. One instruction produces both edits, so there
-is no window in which the manual has been updated and the card has not.
+Both documents live in **one session**, and one instruction runs as one turn
+per document — because the service edits one document per turn. This build was
+designed around a single turn naming both `document_ids`, and the API accepts
+that field, returns proposed changes, and puts every one of them in the focused
+document. The card was never touched and nothing in the reply said so.
 
-`assert_touched_both` refuses a batch that proposes a change to only one of
-them. An edit to a fact that appears in both documents and comes back touching
-one is drift caught before it ships, and the whole batch is rejected rather than
-half-applied.
+So the guarantee sits where it actually holds: **nothing is applied until both
+documents have proposed the change.** `assert_touched_both` refuses a batch that
+proposes a change to only one of them, and approval covers the batch or none of
+it. There is still no window in which the manual has moved and the card has not,
+because the window opens at approval and approval is one decision — which is
+the honest place for it, since approval is the only thing that mutates.
 
 Underneath that, the structural guarantee: the card is a projection of the same
 spec, carrying six of the seven steps, three of the seven warnings and three of
@@ -236,23 +255,35 @@ be rediscovered:
 - Deep operations run 30 s to several minutes with no visible progress. That is
   still processing.
 
-### What is verified against the live service, and what is not
+### What is verified against the live service
 
-The four-call spine — upload, chat, approve, export — and both proposed-change
-reply shapes are verified. The REST paths for **image upload, templates and job
-polling are inferred**: the documented interface names those capabilities as MCP
-tools without naming their REST paths, so this client guesses the convention the
-verified four follow. They are isolated in their own methods, so a wrong guess
-changes four short methods and nothing else.
+All of it, now: session init, upload, image upload, chat, approve, export. A
+run on 2026-08-11 published the pair, proposed a torque change across both
+documents, approved two changes and rejected two, and exported the result —
+the manual came back reading 1.6 N·m in the rails step and 1.2 N·m in the
+gantry step, which is exactly what the review decided.
 
-What an export reply carries the file *as* is also unverified, so both shapes are
-handled — inline base64, or a URL to fetch — and a reply carrying neither is an
-error rather than an empty file written to disk with a reassuring message next
-to it.
+An earlier version of this README said the same thing and was wrong. The client
+had never been run, and almost every shape in it was a guess that read like a
+fact. What the guesses cost is written up in the commits; the short version:
 
-No offline test depends on those paths, and `check` and `build` never call
-them — a wrong guess there cannot make a passing test lie about the parts that
-are actually proven.
+| Guessed | Actual |
+|---|---|
+| `POST /v1/images/upload` | `POST /v1/documents/images/upload-base64` |
+| upload as JSON base64 | multipart, with **`open_mode`** |
+| `chat {document_ids: [...]}` | `chat {session_id, document_id}` — singular |
+| approve by session | approve by **`job_id`**, and only an **async** job ever reaches `awaiting_approval` |
+| export by document, returns JSON | export by session, returns the file |
+
+Two of those are quiet rather than loud, and they are the ones worth knowing
+about. `open_mode` defaults to `replace`, so uploading a second document into a
+session destroys the first and returns `"persisted": true` for both. And
+approving a synchronous chat's job comes back *"Job is not awaiting approval
+(status: completed)"* — the sync endpoint shows you proposed changes that can
+never be applied.
+
+`templates` remains unexercised: this build has no use for it and a call nobody
+makes is not a call anyone verified.
 
 ## Layout
 
@@ -267,8 +298,8 @@ manualbuilder/
   paginate.py            blocks -> pages; where a translation moved something
   localize.py            locale fill + the structural assertion
   superdocs.py           thin API client, no product decisions
-  session.py             publish, one-turn multi-document edit, diagram swap
-  cli.py                 check / build / publish / edit / sync / export
+  session.py             publish, the paired edit, approval, diagram swap
+  cli.py                 check / build / publish / edit / approve / sync / export
 tests/                   85 tests, no network
 ```
 
