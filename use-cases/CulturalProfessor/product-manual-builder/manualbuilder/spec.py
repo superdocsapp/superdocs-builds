@@ -22,6 +22,28 @@ import yaml
 
 SEVERITIES = ("danger", "warning", "caution")
 
+# A manual that ships without these is not a shorter manual, it is a
+# non-compliant one: a consumer product sold in the EU or the UK carries a
+# warranty statement and a WEEE disposal statement, and the absence of either is
+# a defect in the document rather than a stylistic choice. So the two ids are
+# required by name. This is a deliberate hard-coded rule, not a missing feature:
+# a spec is free to declare further statements, and they render alongside these.
+REQUIRED_STATEMENTS = ("warranty", "disposal")
+
+# The words the drawings put on themselves. They are not product content -- no
+# spec author writes them -- but they are printed English inside a German
+# manual if nobody owns them, which is the sort of thing that survives three
+# revisions because it lives in a renderer rather than in a document. A locale
+# overrides them by id under `diagram:`; anything it does not override falls
+# back to these.
+DIAGRAM_STRINGS = {
+    "breakdown_title": "{name} — parts breakdown",
+    "step_title": "{name} — step: {title}",
+    "loose_parts": "SUPPLIED, NOT MOUNTED",
+    "highlight_note": ("Outlined parts are the ones this step uses; the rest of "
+                       "the assembly is shown for position."),
+}
+
 
 class SpecError(ValueError):
     """The spec is not internally consistent. Reported with what to fix."""
@@ -54,6 +76,32 @@ class Step:
 
 
 @dataclass(frozen=True)
+class Fault:
+    """One row of the troubleshooting table.
+
+    `step` and `parts` are what make it more than three strings: a fault that
+    names the step it belongs to can be checked against a manual that still has
+    that step, and one that names its parts is refused when a part is renamed
+    out of the graph. A troubleshooting table that points at a step the manual
+    no longer contains is the classic way this section rots.
+    """
+    id: str
+    symptom: str
+    cause: str
+    fix: str
+    step: str | None = None
+    parts: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class Statement:
+    """A warranty, disposal or other legal statement, worded once."""
+    id: str
+    title: str
+    body: str
+
+
+@dataclass(frozen=True)
 class Spec:
     name: str
     tagline: str
@@ -64,10 +112,14 @@ class Spec:
     parts: tuple[Part, ...]
     steps: tuple[Step, ...]
     warnings: tuple[Warning_, ...]
+    faults: tuple[Fault, ...]
+    statements: tuple[Statement, ...]
     quick_start_steps: tuple[str, ...]
     quick_start_warnings: tuple[str, ...]
+    quick_start_faults: tuple[str, ...]
     quick_start_footer: str
     source: Path | None = None
+    chrome: dict[str, str] = field(default_factory=dict)
 
     # -- lookups, so no caller re-derives them -----------------------------
 
@@ -75,6 +127,7 @@ class Spec:
     _by_warning: dict[str, Warning_] = field(default_factory=dict, compare=False,
                                              repr=False)
     _by_step: dict[str, Step] = field(default_factory=dict, compare=False, repr=False)
+    _by_fault: dict[str, Fault] = field(default_factory=dict, compare=False, repr=False)
 
     def part(self, part_id: str) -> Part:
         return self._by_part[part_id]
@@ -85,6 +138,15 @@ class Spec:
     def step(self, step_id: str) -> Step:
         return self._by_step[step_id]
 
+    def fault(self, fault_id: str) -> Fault:
+        return self._by_fault[fault_id]
+
+    def statement(self, statement_id: str) -> Statement:
+        for statement in self.statements:
+            if statement.id == statement_id:
+                return statement
+        raise KeyError(statement_id)
+
     def children_of(self, part_id: str | None) -> list[Part]:
         """The parts that mount directly onto this one, in declared order."""
         return [p for p in self.parts if p.mounts_to == part_id]
@@ -94,6 +156,17 @@ class Spec:
 
     def quick_start(self) -> list[Step]:
         return [self.step(s) for s in self.quick_start_steps]
+
+    def text(self, key: str, **fmt: str) -> str:
+        """A drawing's own words, in this spec's language.
+
+        Falls back to English rather than to an empty string: a diagram with no
+        caption is a diagram whose caption nobody notices is missing.
+        """
+        return self.chrome.get(key, DIAGRAM_STRINGS[key]).format(**fmt)
+
+    def quick_start_troubleshooting(self) -> list[Fault]:
+        return [self.fault(f) for f in self.quick_start_faults]
 
 
 def load_spec(path: str | Path) -> Spec:
@@ -107,7 +180,8 @@ def load_spec(path: str | Path) -> Spec:
 # ------------------------------------------------------------------ build --
 
 def _build(raw: dict[str, Any], path: Path) -> Spec:
-    for section in ("product", "parts", "setup_steps", "warnings", "quick_start"):
+    for section in ("product", "parts", "setup_steps", "warnings",
+                    "troubleshooting", "statements", "quick_start"):
         if section not in raw:
             raise SpecError(f"{path.name}: missing required section {section!r}")
 
@@ -136,6 +210,20 @@ def _build(raw: dict[str, Any], path: Path) -> Spec:
         )
         for s in raw["setup_steps"]
     )
+    faults = tuple(
+        Fault(
+            id=str(f["id"]), symptom=_text(f["symptom"]) or "",
+            cause=_text(f["cause"]) or "", fix=_text(f["fix"]) or "",
+            step=f.get("step") or None,
+            parts=tuple(str(x) for x in f.get("parts", [])),
+        )
+        for f in raw["troubleshooting"]
+    )
+    statements = tuple(
+        Statement(id=str(s["id"]), title=str(s["title"]),
+                  body=_text(s["body"]) or "")
+        for s in raw["statements"]
+    )
 
     return Spec(
         name=str(product["name"]),
@@ -147,13 +235,16 @@ def _build(raw: dict[str, Any], path: Path) -> Spec:
             (str(row["label"]), str(row["value"])) for row in raw.get("specifications", [])
         ),
         parts=parts, steps=steps, warnings=warnings,
+        faults=faults, statements=statements,
         quick_start_steps=tuple(str(x) for x in quick.get("steps", [])),
         quick_start_warnings=tuple(str(x) for x in quick.get("warnings", [])),
+        quick_start_faults=tuple(str(x) for x in quick.get("troubleshooting", [])),
         quick_start_footer=_text(quick.get("footer")) or "",
         source=path,
         _by_part={p.id: p for p in parts},
         _by_warning={w.id: w for w in warnings},
         _by_step={s.id: s for s in steps},
+        _by_fault={f.id: f for f in faults},
     )
 
 
@@ -172,6 +263,8 @@ def _validate(spec: Spec) -> None:
     problems += _duplicates("part", [p.id for p in spec.parts])
     problems += _duplicates("warning", [w.id for w in spec.warnings])
     problems += _duplicates("step", [s.id for s in spec.steps])
+    problems += _duplicates("fault", [f.id for f in spec.faults])
+    problems += _duplicates("statement", [s.id for s in spec.statements])
 
     for warning in spec.warnings:
         if warning.severity not in SEVERITIES:
@@ -197,6 +290,31 @@ def _validate(spec: Spec) -> None:
 
     problems += _cycles(spec)
 
+    # A troubleshooting row that points at a step or a part the manual no longer
+    # has is how this section rots: the step is renamed during a revision, the
+    # table keeps the old name, and the reader is sent to a section that is not
+    # there. The reference is checked so the rot is a load error instead.
+    for fault in spec.faults:
+        if fault.step and fault.step not in spec._by_step:
+            problems.append(
+                f"troubleshooting {fault.id!r} refers to step {fault.step!r}, "
+                f"which is not a setup step"
+            )
+        for part_id in fault.parts:
+            if part_id not in spec._by_part:
+                problems.append(
+                    f"troubleshooting {fault.id!r} names unknown part {part_id!r}")
+
+    missing = [s for s in REQUIRED_STATEMENTS
+               if s not in {statement.id for statement in spec.statements}]
+    if missing:
+        problems.append(
+            "statements is missing " + " and ".join(repr(m) for m in missing)
+            + "; a shipped manual carries both, so a spec without them would "
+              "render a document that is missing a section rather than one that "
+              "chose not to have it"
+        )
+
     # The quick-start card is a projection, not a second document. Every step it
     # carries has to be a step of the manual, or the card would contain an
     # instruction the manual does not -- which is the drift this project is
@@ -210,6 +328,13 @@ def _validate(spec: Spec) -> None:
     for warning_id in spec.quick_start_warnings:
         if warning_id not in spec._by_warning:
             problems.append(f"quick_start names unknown warning {warning_id!r}")
+    for fault_id in spec.quick_start_faults:
+        if fault_id not in spec._by_fault:
+            problems.append(
+                f"quick_start names {fault_id!r}, which is not a troubleshooting "
+                f"entry; the card's few fixes are the manual's fixes, never a "
+                f"shorter wording of them"
+            )
 
     # A warning nobody references is a warning nobody reads. It is a spec bug,
     # not a stylistic one: someone wrote a safety notice believing it shipped.
@@ -259,4 +384,5 @@ def _cycles(spec: Spec) -> list[str]:
     return problems
 
 
-__all__ = ["Spec", "Part", "Step", "Warning_", "SpecError", "load_spec", "SEVERITIES"]
+__all__ = ["Spec", "Part", "Step", "Warning_", "Fault", "Statement", "SpecError",
+           "load_spec", "SEVERITIES", "REQUIRED_STATEMENTS"]

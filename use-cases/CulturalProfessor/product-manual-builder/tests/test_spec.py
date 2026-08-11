@@ -93,6 +93,37 @@ def test_an_unknown_severity(tmp_path):
     assert "expected one of" in refuses(tmp_path, mutate)
 
 
+def test_a_troubleshooting_row_pointing_at_a_step_that_was_renamed(tmp_path):
+    """How this section actually rots. The step is renamed during a revision,
+    the table keeps pointing at the old id, and the reader is sent to a section
+    that is not in the document."""
+    def mutate(raw):
+        for fault in raw["troubleshooting"]:
+            if fault["id"] == "no_fire":
+                fault["step"] = "power_up"          # was `power`
+    message = refuses(tmp_path, mutate)
+    assert "troubleshooting 'no_fire'" in message
+    assert "not a setup step" in message
+
+
+def test_a_card_fix_that_is_not_a_manual_fix(tmp_path):
+    """Same rule as the steps. Three fixes on the card, six in the manual, and
+    the three are the same objects -- never a shorter re-wording of them."""
+    def mutate(raw):
+        raw["quick_start"]["troubleshooting"].append("turn_it_off_and_on")
+    assert "never a shorter wording" in refuses(tmp_path, mutate)
+
+
+def test_a_manual_with_no_disposal_statement(tmp_path):
+    """A manual missing its WEEE statement is not a shorter manual, it is a
+    non-compliant one, and it is invisible in the rendered output: every other
+    section is there and reads correctly."""
+    def mutate(raw):
+        raw["statements"] = [s for s in raw["statements"] if s["id"] != "disposal"]
+    message = refuses(tmp_path, mutate)
+    assert "missing 'disposal'" in message
+
+
 def test_every_problem_is_reported_at_once(tmp_path):
     """Fixing a spec one error per run is how someone gives up halfway and
     hand-edits the output instead."""

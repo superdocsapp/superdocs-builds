@@ -234,11 +234,108 @@ warnings:
       Fully tightening one rail before the other is seated pulls the frame out
       of square, and every engraving after that is a parallelogram.
 
+# The troubleshooting table. `step` and `parts` are references, not prose: a row
+# that points at a step is refused if that step is renamed out of the manual,
+# which is how this section normally goes stale.
+troubleshooting:
+  - id: no_fire
+    symptom: The gantry moves and the job runs, but nothing is engraved.
+    cause: >
+      The lid is open, or the interlock magnet is not seated against its sensor.
+      The controller runs the whole job with the diode disabled rather than
+      refusing to start.
+    fix: >
+      Close the lid fully and confirm the interlock LED on the controller is
+      lit. If it stays dark with the lid closed, the magnet has shifted in its
+      recess; press it flush and re-run.
+    step: power
+    parts: [lid, controller]
+
+  - id: out_of_square
+    symptom: Squares come out as parallelograms, and the error grows across the bed.
+    cause: One Y rail was fully tightened before the other was seated.
+    fix: >
+      Loosen all eight rail screws, push the gantry to the front stop so the
+      frame pulls itself square, then re-torque the rails alternately to
+      1.2 N·m.
+    step: rails
+    parts: [rail_y_left, rail_y_right, base]
+
+  - id: faint_engraving
+    symptom: Engraving is faint or uneven, and worse on the right of the bed.
+    cause: >
+      Resin on the lens, from running without extraction. It scatters more of
+      the beam the further the carriage travels from the exhaust.
+    fix: >
+      Stop, let the module cool, and inspect the lens with the machine
+      unpowered. Resin needs a lens replacement, not cleaning: the lens is not
+      user-serviceable. Fix the extraction before running again.
+    step: extraction
+    parts: [laser_module, duct]
+
+  - id: no_home
+    symptom: On power-up the gantry drives into the end stop and stalls.
+    cause: A Y rail is seated in the wrong channel, so the home switch never closes.
+    fix: >
+      Power down at the supply. Check that each rail sits in its own channel and
+      the end blocks are flush before powering up again.
+    step: power
+    parts: [rail_y_left, rail_y_right, psu]
+
+  - id: no_power
+    symptom: No LED on the controller, and the machine does not respond to USB.
+    cause: The 24 V supply is not seated, or USB-C was connected before power.
+    fix: >
+      Disconnect USB-C, seat the 24 V barrel connector until it clicks, wait for
+      the green LED, then reconnect USB-C. The controller enumerates on power,
+      not on the data connection.
+    step: power
+    parts: [psu, controller]
+
+  - id: smoke_smell
+    symptom: The room smells of smoke during a job even with extraction running.
+    cause: The duct has come off the rear spigot, or the vent run is blocked.
+    fix: >
+      Stop the job. Check the duct is seated past the bead at both ends and that
+      the outside vent is clear. Do not continue a job to see whether it
+      improves.
+    step: extraction
+    parts: [duct]
+
+# Statements that ship with the product. Worded once here, rendered into every
+# language from the same ids, and `spec.py` refuses a spec that has no warranty
+# or no disposal statement.
+statements:
+  - id: warranty
+    title: Warranty
+    body: >
+      Halyard warrants this machine against defects in materials and workmanship
+      for 24 months from the date of purchase. The laser module is a consumable
+      and is warranted for 12 months or 500 operating hours, whichever comes
+      first. The warranty does not cover damage from operating the machine with
+      the interlock bypassed, from cutting chlorinated plastics, or from lens
+      contamination. Warranty service is arranged through the reseller who sold
+      the machine; keep the proof of purchase. This statement does not affect
+      your statutory rights.
+
+  - id: disposal
+    title: Disposal and recycling
+    body: >
+      Do not put this machine in household waste. It is electrical equipment
+      under the WEEE Directive and is marked with the crossed-out wheeled bin.
+      Return it to a municipal collection point or to the reseller when you buy
+      an equivalent replacement. Remove the laser module before disposal and
+      hand it in separately: it contains a diode assembly that is recovered
+      rather than shredded. The packaging is corrugated board and moulded pulp,
+      and both go in paper recycling.
+
 # What goes on the quick-start card, and nothing else. The card is not a
 # shortened manual -- it is a different projection with a different job, so the
-# spec says which steps it carries and which warnings ride along.
+# spec says which steps it carries, which warnings ride along, and which of the
+# troubleshooting rows are worth the space on a folded card.
 quick_start:
   steps: [rails, gantry, laser, extraction, power, first_burn]
   warnings: [eye_protection, ventilation, never_unattended]
+  troubleshooting: [no_fire, no_power, out_of_square]
   footer: >
     Full manual, troubleshooting and material settings: halyard.example/m1

@@ -32,7 +32,8 @@ from typing import Any
 
 import yaml
 
-from manualbuilder.spec import Part, Spec, Step, Warning_
+from manualbuilder.spec import (
+    DIAGRAM_STRINGS, Fault, Part, Spec, Statement, Step, Warning_)
 
 # The structural elements a page break cares about. Text runs of different
 # lengths are expected and fine; a different *number* of headings is not.
@@ -70,11 +71,19 @@ def localise(spec: Spec, locale: dict[str, Any]) -> Spec:
     steps = locale.get("steps") or {}
     warnings = locale.get("warnings") or {}
     parts = locale.get("parts") or {}
+    faults = locale.get("troubleshooting") or {}
+    statements = locale.get("statements") or {}
+    chrome = locale.get("diagram") or {}
 
     unknown = (
         [f"step {k!r}" for k in steps if k not in {s.id for s in spec.steps}]
         + [f"warning {k!r}" for k in warnings if k not in {w.id for w in spec.warnings}]
         + [f"part {k!r}" for k in parts if k not in {p.id for p in spec.parts}]
+        + [f"troubleshooting {k!r}" for k in faults
+           if k not in {f.id for f in spec.faults}]
+        + [f"statement {k!r}" for k in statements
+           if k not in {s.id for s in spec.statements}]
+        + [f"diagram string {k!r}" for k in chrome if k not in DIAGRAM_STRINGS]
     )
     if unknown:
         raise LocaleError(
@@ -113,11 +122,27 @@ def localise(spec: Spec, locale: dict[str, Any]) -> Spec:
                      body=warnings.get(w.id, {}).get("body", w.body))
             for w in spec.warnings
         ),
+        faults=tuple(
+            Fault(id=f.id,
+                  symptom=faults.get(f.id, {}).get("symptom", f.symptom),
+                  cause=faults.get(f.id, {}).get("cause", f.cause),
+                  fix=faults.get(f.id, {}).get("fix", f.fix),
+                  step=f.step, parts=f.parts)
+            for f in spec.faults
+        ),
+        statements=tuple(
+            Statement(id=s.id,
+                      title=statements.get(s.id, {}).get("title", s.title),
+                      body=statements.get(s.id, {}).get("body", s.body))
+            for s in spec.statements
+        ),
         quick_start_steps=spec.quick_start_steps,
         quick_start_warnings=spec.quick_start_warnings,
+        quick_start_faults=spec.quick_start_faults,
         quick_start_footer=locale.get("footer", spec.quick_start_footer),
         source=spec.source,
-        _by_part={}, _by_warning={}, _by_step={},
+        chrome=dict(chrome),
+        _by_part={}, _by_warning={}, _by_step={}, _by_fault={},
     )
 
 
@@ -126,6 +151,7 @@ def _rebuilt(spec: Spec) -> Spec:
     object.__setattr__(spec, "_by_part", {p.id: p for p in spec.parts})
     object.__setattr__(spec, "_by_warning", {w.id: w for w in spec.warnings})
     object.__setattr__(spec, "_by_step", {s.id: s for s in spec.steps})
+    object.__setattr__(spec, "_by_fault", {f.id: f for f in spec.faults})
     return spec
 
 
