@@ -92,18 +92,56 @@ class Publication:
         around them is thrown away.
         """
         for document_id in self.document_ids:
-            durable = self.durable.get(document_id)
-            if not durable:
-                raise SuperDocsError(
-                    f"no durable id recorded for {document_id}, so it cannot be "
-                    f"opened in a new session; re-run `publish`")
-            session_id = client.init_session([durable])
-            held = [d.get("document_id") for d in client.documents(session_id)]
-            if held != [document_id]:
-                raise SuperDocsError(
-                    f"a fresh session for {document_id} came back holding "
-                    f"{held}; the swap would be sent to the wrong document")
-            self.sessions[document_id] = session_id
+            self.sessions[document_id] = self._open_fresh(client, document_id)
+
+    def _open_fresh(self, client: SuperDocs, document_id: str) -> str:
+        """A new session holding this document and nothing else."""
+        durable = self.durable.get(document_id)
+        if not durable:
+            raise SuperDocsError(
+                f"no durable id recorded for {document_id}, so it cannot be "
+                f"opened in a new session; re-run `publish`")
+        session_id = client.init_session([durable])
+        held = [d.get("document_id") for d in client.documents(session_id)]
+        if held != [document_id]:
+            raise SuperDocsError(
+                f"a fresh session for {document_id} came back holding "
+                f"{held}; the turn would be sent to the wrong document")
+        return session_id
+
+    def ensure_sessions(self, client: SuperDocs) -> list[str]:
+        """Re-bind any document whose session has stopped holding it.
+
+        Returns the documents that had to be moved.
+
+        A session is not a stable handle on a document, and export is keyed by
+        session: it renders what the session is *focused* on. Open the pair in
+        the web interface and focus the other tab, and the session this program
+        recorded for the card starts serving the manual -- same call, same
+        session id, different document, no error. That happened, and `verify`
+        reported the card as having eight figures and disagreeing with the
+        manual, which was true of the document it was handed and nothing to do
+        with the card.
+
+        So the recorded session is checked against what it actually holds before
+        anything is read out of it, and a document that has drifted is re-opened
+        by its durable id -- the id that does identify a document.
+        """
+        moved: list[str] = []
+        for document_id in self.document_ids:
+            session_id = self.sessions.get(document_id)
+            held: list[str | None] = []
+            if session_id:
+                try:
+                    held = [d.get("document_id")
+                            for d in client.documents(session_id)]
+                except SuperDocsError:
+                    held = []          # gone, or not ours any more; re-open it
+            if held == [document_id]:
+                continue
+            self.sessions[document_id] = self._open_fresh(client, document_id)
+            moved.append(document_id)
+        return moved
 
     @property
     def document_ids(self) -> list[str]:

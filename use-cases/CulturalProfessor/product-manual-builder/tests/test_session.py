@@ -266,3 +266,74 @@ def test_a_different_file_with_a_valid_looking_signature_is_still_refused():
                                     chunked=True))]
     with pytest.raises(SuperDocsError, match="not the URL uploaded for it"):
         session.assert_only_the_image_changed(changes, IMAGES)
+
+
+# ------------------------------- the session that stopped holding it --
+
+class _Sessions:
+    """A service where a session serves whatever it is focused on.
+
+    Which is what the real one does, and why `ensure_sessions` exists: export
+    is keyed by session, so a session that has been re-focused elsewhere hands
+    back a different document under the same call.
+    """
+
+    def __init__(self, holding: dict[str, list[str]]):
+        self.holding = holding
+        self.opened: list[list[str]] = []
+
+    def documents(self, session_id):
+        return [{"document_id": d} for d in self.holding.get(session_id, [])]
+
+    def init_session(self, document_ids=None):
+        self.opened.append(list(document_ids or []))
+        name = f"session_fresh_{len(self.opened)}"
+        # A fresh session opened on a durable id holds exactly that document.
+        durable_to_doc = {"dur_manual": "doc_manual", "dur_card": "doc_card"}
+        self.holding[name] = [durable_to_doc[d] for d in (document_ids or [])]
+        return name
+
+
+def _pair() -> session.Publication:
+    return session.Publication(
+        manual_id="doc_manual", card_id="doc_card",
+        sessions={"doc_manual": "s_manual", "doc_card": "s_card"},
+        durable={"doc_manual": "dur_manual", "doc_card": "dur_card"})
+
+
+def test_a_session_still_holding_its_document_is_left_alone():
+    publication = _pair()
+    client = _Sessions({"s_manual": ["doc_manual"], "s_card": ["doc_card"]})
+
+    assert publication.ensure_sessions(client) == []
+    assert publication.sessions == {"doc_manual": "s_manual", "doc_card": "s_card"}
+    assert client.opened == [], "nothing needed re-opening, so nothing was opened"
+
+
+def test_a_session_serving_a_different_document_is_re_opened():
+    """The live failure. Opening the pair in the web interface and focusing the
+    other tab left the card's recorded session serving the manual -- same call,
+    same session id, different document, no error. `verify` then reported the
+    card as having eight figures and disagreeing with the manual, which was
+    true of the document it was handed and nothing to do with the card."""
+    publication = _pair()
+    client = _Sessions({"s_manual": ["doc_manual"], "s_card": ["doc_manual"]})
+
+    assert publication.ensure_sessions(client) == ["doc_card"]
+    assert publication.sessions["doc_manual"] == "s_manual", "untouched"
+    assert publication.sessions["doc_card"] != "s_card"
+    assert client.opened == [["dur_card"]], "re-opened by durable id, not by doc id"
+    # And the new session really does hold the card.
+    held = client.documents(publication.sessions["doc_card"])
+    assert [d["document_id"] for d in held] == ["doc_card"]
+
+
+def test_a_document_with_no_durable_id_recorded_says_so():
+    """Without a durable id there is no way to re-open it, and guessing with
+    the session-scoped id gets "None of the requested documents were found"."""
+    publication = _pair()
+    publication.durable.pop("doc_card")
+    client = _Sessions({"s_manual": ["doc_manual"], "s_card": ["doc_manual"]})
+
+    with pytest.raises(SuperDocsError, match="no durable id recorded"):
+        publication.ensure_sessions(client)

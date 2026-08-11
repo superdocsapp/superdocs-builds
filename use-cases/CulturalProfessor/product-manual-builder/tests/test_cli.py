@@ -158,6 +158,12 @@ def test_verify_reports_a_document_that_is_not_what_was_published(
         def __enter__(self): return self
         def __exit__(self, *exc): return False
 
+        def documents(self, session_id):
+            # Both sessions still hold what they were published holding, so
+            # nothing gets re-bound and the export goes ahead.
+            return [{"document_id":
+                     "doc_m" if session_id == "s_manual" else "doc_c"}]
+
         def export_bytes(self, session_id, fmt, filename=None):
             # One session per document, so the session is what picks the page.
             return pages["manual" if session_id == "s_manual"

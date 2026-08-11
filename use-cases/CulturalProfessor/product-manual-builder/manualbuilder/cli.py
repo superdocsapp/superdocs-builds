@@ -510,6 +510,7 @@ def cmd_export(args) -> int:
         # is most of what export is for here.
         target = OUT / "export"
         target.mkdir(parents=True, exist_ok=True)
+        _rebind(client, published, args)
         for document_id in published.document_ids:
             name = published.name_for(document_id).replace(" ", "-")
             # One document per session, so its own session exports it: no
@@ -560,6 +561,24 @@ def cmd_status(args) -> int:
     return 0
 
 
+def _rebind(client, published, args) -> None:
+    """Check each session still holds its document, and re-open it if not.
+
+    Reading is keyed by session and a session is not a stable handle: it serves
+    whatever it is focused on. Anything that changes focus -- a person opening
+    the pair in the web interface and clicking the other tab -- silently points
+    a read at the wrong document. Cheap to check, and the alternative is a
+    verification step that confidently reports on a document nobody asked about.
+    """
+    moved = published.ensure_sessions(client)
+    if not moved:
+        return
+    for document_id in moved:
+        print(f"note: {published.name_for(document_id)}'s session no longer held "
+              f"it; re-opened as {published.sessions[document_id]}")
+    _save(published, getattr(args, "language", ""))
+
+
 def cmd_verify(args) -> int:
     """Read both documents back off the service and check what they say.
 
@@ -582,6 +601,7 @@ def cmd_verify(args) -> int:
 
     served: dict[str, str] = {}
     with _client() as client:
+        _rebind(client, published, args)
         for document_id in published.document_ids:
             name = published.name_for(document_id)
             data = client.export_bytes(published.session_for(document_id), "html")
