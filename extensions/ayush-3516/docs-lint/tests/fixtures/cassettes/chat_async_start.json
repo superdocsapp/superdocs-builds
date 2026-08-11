@@ -1,0 +1,16 @@
+{
+  "recorded": "2026-08-11",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat/async"
+  },
+  "status": 200,
+  "elapsed_seconds": 0.39,
+  "note": "THE one billed operation in this recording",
+  "body": {
+    "job_id": "041ad2e8-4861-4f0f-8660-9314333092a3",
+    "session_id": "docslint-rec-session",
+    "status": "pending",
+    "message": "Chat request queued for processing"
+  }
+}

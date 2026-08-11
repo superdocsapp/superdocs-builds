@@ -54,6 +54,39 @@ Consequence for the design: the local review UI is a thin client over that API, 
 *after* the machine-drivable path (`--plan` / `apply` with a `decisions.json`), not before. The gate
 therefore works headlessly and stays testable without a browser.
 
+### 2026-08-11 — One SuperDocs session per document, not one per run
+
+Forced by a live finding, not chosen on taste. A session holds **one active job at a time**, and a
+job parked at `awaiting_approval` keeps holding it for as long as the human takes to review — a
+second request to that session gets `409 session_busy` indefinitely ([BUGS.md](BUGS.md) #8).
+
+Since human review is unbounded in time, one session per run would mean the first document awaiting
+review blocks every other document in the run. One session per document removes the coupling
+entirely, and has a second benefit that pays for behaviour 9: two concurrent runs cannot collide,
+because they never share a session.
+
+Cost: one session per file instead of one per run. Sessions are free; only chat turns are billed,
+and the count of those is unchanged.
+
+### 2026-08-11 — Lint instructions must be phrased as edit commands
+
+The first live lint attempt used "review this document and propose corrections" and got back *"I
+wasn't able to determine an action for that request"* — billed, with nothing to show. Rephrasing to
+"edit this document so it complies with the uploaded style guide, making the smallest change that
+fixes each violation" produced exactly the right proposals on the same document.
+
+So `approval_mode: "ask_every_time"` is what converts an edit into a reviewable proposal; the
+instruction itself must still command an edit. Recorded as [BUGS.md](BUGS.md) #3, and the prompt in
+`docs_lint` carries a comment pointing at it so nobody "improves" it back.
+
+### 2026-08-11 — Run cost is read from `result.usage.ops_charged`, not a whoami delta
+
+The original plan sampled `GET /v1/agents/whoami` either side of a run and reported the difference.
+That measures nothing: whoami reports only the free-tier counter and omits the promo bucket the work
+is actually billed against, so the delta across a real billed operation is zero
+([BUGS.md](BUGS.md) #1). Cost now comes from each job's own `result.usage`, which carries
+`ops_charged` per turn. There is a test pinning both halves of this.
+
 ---
 
 ## Cuts made, and why
@@ -64,16 +97,9 @@ therefore works headlessly and stays testable without a browser.
 
 ## Bugs, rough edges and confusing moments in SuperDocs
 
-*(Collected from day one for the submission form's first question. Reported to hello@superdocs.app
-and via the in-app bug button as they are found.)*
+Collected in **[BUGS.md](BUGS.md)**, in the shape the task document asked for: what I did, what I
+expected, what happened instead, how badly it blocked me, and a reproduction.
 
-### 2026-08-10 — Documentation: upload and export endpoints publish an empty response schema
-
-`POST /v1/documents/upload-base64` and `POST /v1/documents/export` both document their 200 response
-as `{}` in the OpenAPI spec at `docs.superdocs.app/openapi.json`. The prose describes what comes
-back (`chunks_count`, `version_id`, `page_setup` for upload) but the machine-readable schema is
-empty, so a generated client gets no types and an integrator has to guess field names or make a live
-call to find out.
-
-Severity: low, worked around by recording real responses into a cassette and writing the client
-against those. Not blocking.
+Kept in its own file rather than inline here because it is a deliverable in its own right — it
+feeds the submission form's first question and the email to the team — and because it should stay
+readable by someone who does not care about this project's build log.

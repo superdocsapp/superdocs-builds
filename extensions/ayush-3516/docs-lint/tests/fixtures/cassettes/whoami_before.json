@@ -1,0 +1,24 @@
+{
+  "recorded": "2026-08-11",
+  "request": {
+    "method": "GET",
+    "path": "/v1/agents/whoami"
+  },
+  "status": 200,
+  "elapsed_seconds": 1.14,
+  "note": "quota before the run",
+  "body": {
+    "account_id": "00000000-0000-0000-0000-000000000000",
+    "tier": "free",
+    "quota": {
+      "tier": "free",
+      "monthly_limit": 500,
+      "used": 0,
+      "remaining": 500,
+      "resets_at": "2026-09-01T00:00:00+00:00"
+    },
+    "is_agent_account": false,
+    "adopted": null,
+    "hint": null
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "recorded": "2026-08-11",
+  "status": 200,
+  "note": "Export returns a RAW body, not JSON.",
+  "body": {
+    "_raw_text": "# Getting Started\n\nWe use the API to fetch results.\n\nThis paragraph is already fine and must not change.\n\nYou can leverage the client for batch work.\n"
+  }
+}
