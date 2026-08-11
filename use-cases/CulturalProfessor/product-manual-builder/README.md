@@ -83,6 +83,15 @@ python -m manualbuilder.cli edit "raise the rail torque to 1.6 N·m" --manual do
 Add `--yes` to approve them.
 
 ```bash
+python -m manualbuilder.cli sync --manual doc_… --card doc_…
+```
+
+`sync` is the path a spec change takes once the documents are published: every
+diagram re-rendered from the parts graph, uploaded, and swapped into the
+existing chunks. It refuses the whole batch unless each proposed change is that
+swap and nothing else.
+
+```bash
 python -m manualbuilder.cli export --manual doc_… --card doc_…
 ```
 
@@ -145,8 +154,26 @@ ones with a translation around them — including the words the drawing prints o
 *itself*, which are the ones that get missed. Printed English is much harder to
 spot inside an SVG than in a paragraph.
 
-On edit the diagram is replaced, never patched: re-render, upload, swap one
-`<img src>` in one chunk.
+On edit the diagram is replaced, never patched. `sync` re-renders from the spec,
+uploads, and puts the new URL into the documents that are already published —
+and that last step is the one place this design has to hold its nose, so it is
+worth saying plainly.
+
+A document on the service cannot be re-uploaded without becoming a different
+document, so the new URL has to reach the existing chunks, and the only edit
+surface is a chat turn. That means asking a model to perform what is really a
+text substitution. So it is asked for, and then it is checked:
+`assert_only_the_image_changed` compares each proposed chunk against the one it
+replaces with the image URLs masked out, and refuses the whole batch if a single
+other character moved. It also refuses a `src` that is not the exact URL just
+uploaded for that exact figure — a plausible-looking URL is the likeliest thing
+for a model to produce here, and it renders as a broken image in a shipped
+manual. The model is allowed to propose the swap and is not trusted to have made
+it.
+
+`test_session.py` is eight batches that each look reasonable and are each
+refused: a tidied caption, an added sentence, an invented URL, two real URLs on
+the wrong figures.
 
 ### Localised versions keep page structure
 
@@ -240,9 +267,9 @@ manualbuilder/
   paginate.py            blocks -> pages; where a translation moved something
   localize.py            locale fill + the structural assertion
   superdocs.py           thin API client, no product decisions
-  session.py             publish, one-turn multi-document edit, approve
-  cli.py                 check / build / publish / edit / export
-tests/                   74 tests, no network
+  session.py             publish, one-turn multi-document edit, diagram swap
+  cli.py                 check / build / publish / edit / sync / export
+tests/                   85 tests, no network
 ```
 
 ## What it does not do
