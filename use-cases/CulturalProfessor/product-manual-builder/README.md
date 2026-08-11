@@ -465,6 +465,19 @@ never be applied.
 `templates` remains unexercised: this build has no use for it and a call nobody
 makes is not a call anyone verified.
 
+### What broke while building this
+
+[`BUGS.md`](BUGS.md) — thirteen numbered findings against the live API, each
+with what was expected, what happened, how to reproduce it and what it cost.
+They sit next to the build that found them rather than in a notes file
+somewhere, because most of them are the reason a particular piece of this code
+is shaped the way it is. The pair guarantee moved because of #5; the diagram
+swap anchors on captions because of #6 and opens a fresh session because of #8;
+`sync` asks each document about its own figures because of #9; and `verify`
+re-binds a session before reading it because of #11.
+
+Item 13 is an observation without a reproduction, and says so.
+
 ## Layout
 
 ```
@@ -482,6 +495,7 @@ manualbuilder/
   verify.py              reading the pair back off the service and checking it
   cli.py                 check / build / publish / edit / approve / sync /
                          export / status / verify
+BUGS.md                  what broke on the live API while building this
 mb                       the command line, virtualenv taken care of
 selftest                 every check this project can run, in one command
 tests/                   112 tests, no network
