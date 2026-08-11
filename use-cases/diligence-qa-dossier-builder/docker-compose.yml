@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: diligence-postgres
+    environment:
+      POSTGRES_USER: diligence_user
+      POSTGRES_PASSWORD: diligence_password
+      POSTGRES_DB: diligence_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U diligence_user -d diligence_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
