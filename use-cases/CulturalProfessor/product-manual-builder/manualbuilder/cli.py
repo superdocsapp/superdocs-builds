@@ -12,7 +12,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from manualbuilder import localize as lz, projections as pj, session
+from manualbuilder import localize as lz, paginate as pg, projections as pj, session
 from manualbuilder.spec import SpecError, load_spec
 
 DEFAULT_SPEC = Path("spec/halyard_m1.yaml")
@@ -42,7 +42,7 @@ def cmd_check(args) -> int:
     spec = _spec(args)
     print(f"spec        {spec.name} rev {spec.revision} — "
           f"{len(spec.parts)} parts, {len(spec.steps)} steps, "
-          f"{len(spec.warnings)} warnings")
+          f"{len(spec.warnings)} warnings, {len(spec.faults)} faults")
 
     manual = pj.manual_html(spec)
     card = pj.quick_start_html(spec)
@@ -52,23 +52,68 @@ def cmd_check(args) -> int:
         if step.body not in manual or step.body not in card:
             print(f"  FAIL  step {step.id!r} differs between the two documents")
             return 1
-    print(f"card        {len(spec.quick_start_steps)} of {len(spec.steps)} steps, "
-          f"every instruction identical to the manual")
+    for fault in spec.quick_start_troubleshooting():
+        if fault.fix not in manual or fault.fix not in card:
+            print(f"  FAIL  fix {fault.id!r} differs between the two documents")
+            return 1
+    print(f"card        {len(spec.quick_start_steps)} of {len(spec.steps)} steps and "
+          f"{len(spec.quick_start_faults)} of {len(spec.faults)} fixes, "
+          f"every word identical to the manual")
+
+    layouts = {
+        "manual": pg.paginate(pj.manual_blocks(spec), pg.PAGE),
+        "card": pg.paginate(pj.quick_start_blocks(spec), pg.PANEL),
+    }
+    print(f"{'layout':<11} manual {layouts['manual'].pages} pages, fullest "
+          f"{layouts['manual'].tightest()[1]:.0%}; card "
+          f"{layouts['card'].pages} panels, fullest "
+          f"{layouts['card'].tightest()[1]:.0%}")
+    for name, layout in layouts.items():
+        unit = "page" if name == "manual" else "panel"
+        for block_id, excess in layout.overflows():
+            print(f"  FAIL  {block_id} overruns its {unit} by {excess} lines")
+            return 1
 
     failures = 0
-    for language, localised in _locales(spec).items():
-        try:
-            lz.assert_same_structure(manual, pj.manual_html(localised), language)
-            lz.assert_same_structure(card, pj.quick_start_html(localised), language)
-        except lz.LocaleError as exc:
-            print(f"  FAIL  {exc}")
+    for language, localised in sorted(_locales(spec).items()):
+        problem = _check_locale(spec, localised, language, layouts)
+        if problem:
+            print(f"  FAIL  {problem}")
             failures += 1
             continue
         ratio = len(pj.manual_html(localised)) / len(manual)
-        print(f"locale {language}    structure identical, text {ratio:.0%} of source length")
+        tightest = max(
+            pg.paginate(pj.manual_blocks(localised), pg.PAGE).tightest()[1],
+            pg.paginate(pj.quick_start_blocks(localised), pg.PANEL).tightest()[1],
+        )
+        print(f"{'locale ' + language:<11} same page for every block, text "
+              f"{ratio:.0%} of source, {1 - tightest:.0%} headroom")
 
     print("ok" if not failures else f"{failures} locale(s) would repaginate")
     return 1 if failures else 0
+
+
+def _check_locale(spec, localised, language: str, layouts) -> str | None:
+    """Structure first, then pagination. Returns the problem, or None.
+
+    The order is deliberate: a missing heading and a page that moved have the
+    same symptom in print, and reporting the heading is what tells somebody
+    which one it is.
+    """
+    try:
+        lz.assert_same_structure(pj.manual_html(spec),
+                                 pj.manual_html(localised), language)
+        lz.assert_same_structure(pj.quick_start_html(spec),
+                                 pj.quick_start_html(localised), language)
+        pg.assert_same_pagination(
+            layouts["manual"], pg.paginate(pj.manual_blocks(localised), pg.PAGE),
+            language, "manual")
+        pg.assert_same_pagination(
+            layouts["card"], pg.paginate(pj.quick_start_blocks(localised), pg.PANEL),
+            language, "card")
+    except (lz.LocaleError, pg.PaginationError) as exc:
+        return str(exc)
+    return None
 
 
 def cmd_build(args) -> int:
@@ -76,24 +121,103 @@ def cmd_build(args) -> int:
     spec = _spec(args)
     OUT.mkdir(exist_ok=True)
 
-    diagrams = session.render_diagrams(spec)
-    for image_id, svg in diagrams.items():
-        (OUT / f"{image_id.replace(':', '_')}.svg").write_text(svg, encoding="utf-8")
+    # A diagram is drawn from the parts graph, and a localised spec is a parts
+    # graph with German labels in it -- so every language gets its own drawings
+    # from the same renderer rather than the English ones with a translation
+    # around them. Nothing is redrawn by hand and no model is in this path.
+    sources = {"": spec} | dict(sorted(_locales(spec).items()))
+    images: dict[str, dict[str, str]] = {}
+    written = 0
+    for language, source in sources.items():
+        suffix = f".{language}" if language else ""
+        images[language] = {}
+        for image_id, svg in session.render_diagrams(source).items():
+            name = f"{image_id.replace(':', '_')}{suffix}.svg"
+            (OUT / name).write_text(svg, encoding="utf-8")
+            images[language][image_id] = name    # a local path, so out/ opens
+            written += 1
 
-    # Local files rather than uploaded URLs, so `out/` opens in a browser.
-    images = {image_id: f"{image_id.replace(':', '_')}.svg" for image_id in diagrams}
-    written = [("manual.html", pj.manual_html(spec, images)),
-               ("quickstart.html", pj.quick_start_html(spec, images))]
-    for language, localised in _locales(spec).items():
-        written.append((f"manual.{language}.html", pj.manual_html(localised, images)))
-        written.append((f"quickstart.{language}.html",
-                        pj.quick_start_html(localised, images)))
+    documents = [("manual", spec, pj.manual_blocks, pg.PAGE, "")]
+    documents.append(("quickstart", spec, pj.quick_start_blocks, pg.PANEL, ""))
+    for language, localised in sorted(_locales(spec).items()):
+        documents.append((f"manual.{language}", localised, pj.manual_blocks,
+                          pg.PAGE, language))
+        documents.append((f"quickstart.{language}", localised,
+                          pj.quick_start_blocks, pg.PANEL, language))
 
-    for name, html in written:
-        (OUT / name).write_text(html, encoding="utf-8")
+    for name, source, builder, box, language in documents:
+        blocks = builder(source, images[language])
+        (OUT / f"{name}.html").write_text(pj.render(blocks), encoding="utf-8")
+        (OUT / f"{name}.preview.html").write_text(
+            _preview(name, blocks, pg.paginate(blocks, box), language),
+            encoding="utf-8")
 
-    print(f"{len(diagrams)} diagrams and {len(written)} documents in {OUT}/")
+    print(f"{written} diagrams and {len(documents)} documents in {OUT}/")
+    print(f"open {OUT}/manual.preview.html to see where the pages break")
     return 0
+
+
+def _preview(title: str, blocks, layout, language: str) -> str:
+    """The document with the page boundaries drawn on it.
+
+    `*.html` is what gets uploaded: the bare chunks, no wrapper, because that is
+    what makes a chunk-level edit provable. This file is the same body with a
+    stylesheet and a rule drawn wherever `paginate` says a page ends. It exists
+    so the pagination claim can be looked at instead of taken on trust -- open
+    the English and the German side by side and the rules land in the same
+    places.
+    """
+    by_id = {block.id: block for block in blocks}
+    parts: list[str] = []
+    page = 0
+    for placement in layout.placements:
+        if placement.page != page:
+            page = placement.page
+            parts.append(f'<hr class="pagebreak" data-page="{page}">')
+        if placement.rows and placement.rows[0] > 0:
+            continue                       # a table continuing overleaf
+        parts.append(by_id[placement.block_id].html)
+
+    lang = f' lang="{language}"' if language else ""
+    return (f'<!doctype html><meta charset="utf-8"><title>{title}</title>'
+            f"<style>{_PREVIEW_CSS}</style>"
+            f'<body{lang}><main>' + "\n".join(parts) + "</main></body>")
+
+
+_PREVIEW_CSS = """
+:root { color-scheme: light dark; }
+body { margin: 0; background: #f2f0ec; font: 16px/1.55 Charter, Georgia, serif;
+       color: #14110d; }
+main { max-width: 46rem; margin: 0 auto; padding: 3rem 2rem 6rem; }
+h1 { font-size: 2rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+h2 { font-size: 1.35rem; margin: 2.4rem 0 .6rem;
+     border-bottom: 2px solid #14110d; padding-bottom: .25rem; }
+h3 { font-size: 1.1rem; margin: 1.8rem 0 .4rem; }
+p { margin: 0 0 .8rem; }
+strong { letter-spacing: .01em; }
+figure { margin: 1rem 0; }
+figure img { display: block; width: 100%; max-width: 34rem; }
+figcaption { font-size: .82rem; color: #6a6155; margin-top: .35rem; }
+table { border-collapse: collapse; width: 100%; margin: .6rem 0 1.2rem;
+        font-size: .9rem; }
+th, td { border: 1px solid #cfc8bd; padding: .4rem .55rem; text-align: left;
+         vertical-align: top; }
+th { background: #e7e3dc; font-weight: 600; }
+.pagebreak { border: 0; border-top: 1px dashed #b8ab97; margin: 2.5rem 0 1.2rem;
+             position: relative; }
+.pagebreak::after { content: "page " attr(data-page); position: absolute;
+                    top: -.62rem; right: 0; background: #f2f0ec; padding: 0 .5rem;
+                    font: .7rem/1 ui-monospace, monospace; color: #a1907a;
+                    letter-spacing: .08em; text-transform: uppercase; }
+@media (prefers-color-scheme: dark) {
+  body { background: #14120f; color: #ece7df; }
+  h2 { border-bottom-color: #ece7df; }
+  th { background: #241f19; } th, td { border-color: #3a332a; }
+  figcaption { color: #9a9086; }
+  .pagebreak { border-top-color: #4a4034; }
+  .pagebreak::after { background: #14120f; color: #6f6355; }
+}
+"""
 
 
 # ------------------------------------------------------------- online --
@@ -106,9 +230,25 @@ def _client():
 
 
 def cmd_publish(args) -> int:
+    """Upload one language's pair. One pair per run, deliberately.
+
+    Publishing every locale at once would be one flag and several times the
+    quota, and the pair is the unit that has to stay consistent -- a German
+    manual and a German card open in one session and are edited in one turn, the
+    same way the English pair is. Cross-language consistency is not maintained by
+    chat at all: it comes from the spec, and `check` is what proves it.
+    """
     spec = _spec(args)
+    if args.language:
+        locales = _locales(spec)
+        if args.language not in locales:
+            print(f"no locales/{args.language}.yaml; have "
+                  f"{', '.join(sorted(locales)) or 'none'}", file=sys.stderr)
+            return 2
+        spec = locales[args.language]
+
     with _client() as client:
-        published = session.publish(client, spec)
+        published = session.publish(client, spec, language=args.language)
     print(f"manual  {published.manual_id}")
     print(f"card    {published.card_id}")
     print(f"images  {len(published.images)} uploaded")
@@ -153,6 +293,26 @@ def cmd_edit(args) -> int:
     return 0
 
 
+def cmd_export(args) -> int:
+    """Pull both finished documents back down. The fourth call of the spine.
+
+    Export is how a claim about a document becomes checkable: the manual on
+    disk after an approved edit is the manual the service holds, not the one
+    this program believes it uploaded. Exports cost no quota, which is why the
+    verification path leans on them.
+    """
+    OUT.mkdir(exist_ok=True)
+    published = session.Publication(manual_id=args.manual, card_id=args.card)
+    with _client() as client:
+        for document_id in published.document_ids:
+            name = published.name_for(document_id).replace(" ", "-")
+            data = client.export_bytes(document_id, args.format)
+            path = OUT / f"{name}.{args.format}"
+            path.write_bytes(data)
+            print(f"{path}  {len(data):,} bytes")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="manualbuilder", description=__doc__)
     parser.add_argument("--spec", type=Path, default=DEFAULT_SPEC)
@@ -160,7 +320,10 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("check", help="validate the spec and every locale (offline)")
     sub.add_parser("build", help="render documents and diagrams to out/ (offline)")
-    sub.add_parser("publish", help="upload both documents and their diagrams")
+    publish = sub.add_parser("publish",
+                             help="upload both documents and their diagrams")
+    publish.add_argument("--language", default="",
+                         help="a locale from locales/ (default: the spec's own)")
 
     edit = sub.add_parser("edit", help="one instruction, both documents")
     edit.add_argument("instruction")
@@ -169,9 +332,14 @@ def main(argv: list[str] | None = None) -> int:
     edit.add_argument("--yes", action="store_true",
                       help="approve the proposed changes; without it, nothing is applied")
 
+    export = sub.add_parser("export", help="download both finished documents")
+    export.add_argument("--manual", required=True, help="manual document id")
+    export.add_argument("--card", required=True, help="quick-start document id")
+    export.add_argument("--format", default="pdf", help="pdf (default) or docx")
+
     args = parser.parse_args(argv)
-    handler = {"check": cmd_check, "build": cmd_build,
-               "publish": cmd_publish, "edit": cmd_edit}[args.command]
+    handler = {"check": cmd_check, "build": cmd_build, "publish": cmd_publish,
+               "edit": cmd_edit, "export": cmd_export}[args.command]
     try:
         return handler(args)
     except SpecError as exc:

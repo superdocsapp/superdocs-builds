@@ -186,6 +186,31 @@ class SuperDocs:
         return self._post("/v1/documents/export",
                           {"document_id": document_id, "format": fmt})
 
+    def export_bytes(self, document_id: str, fmt: str = "pdf") -> bytes:
+        """The exported file itself.
+
+        The call is one of the four in the documented spine; what its reply
+        carries the file *as* is the part that varies, so both shapes are
+        handled -- inline base64, or a URL to fetch. A reply carrying neither is
+        an error here rather than an empty file written to disk with a reassuring
+        message next to it.
+        """
+        body = self.export(document_id, fmt)
+        for key in ("content_base64", "file_base64", "data"):
+            if body.get(key):
+                return base64.b64decode(body[key])
+        for key in ("url", "download_url", "file_url"):
+            if body.get(key):
+                response = self._client.get(body[key])
+                if response.status_code >= 400:
+                    raise SuperDocsError(
+                        f"export URL {body[key]} -> {response.status_code}")
+                return response.content
+        raise SuperDocsError(
+            f"export of {document_id} returned neither file content nor a URL: "
+            f"{list(body)}"
+        )
+
     # ----------------------------------------------------------------- chat --
 
     def chat(self, message: str, document_ids: list[str],

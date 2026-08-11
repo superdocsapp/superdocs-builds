@@ -71,13 +71,21 @@ def upload_diagrams(client: SuperDocs, spec: Spec) -> dict[str, str]:
     return urls
 
 
-def publish(client: SuperDocs, spec: Spec) -> Publication:
-    """Upload the diagrams, then both documents that reference them."""
+def publish(client: SuperDocs, spec: Spec, language: str = "") -> Publication:
+    """Upload the diagrams, then both documents that reference them.
+
+    `language` only names the files. What makes these the German documents is
+    that `spec` is the German spec -- including its drawings, which are rendered
+    from a parts graph carrying German labels rather than being the English ones
+    with a translation around them.
+    """
     images = upload_diagrams(client, spec)
+    suffix = f"-{language}" if language else ""
     manual_id = client.upload(
-        f"{_slug(spec.name)}-manual.html", pj.manual_html(spec, images))
+        f"{_slug(spec.name)}-manual{suffix}.html", pj.manual_html(spec, images))
     card_id = client.upload(
-        f"{_slug(spec.name)}-quickstart.html", pj.quick_start_html(spec, images))
+        f"{_slug(spec.name)}-quickstart{suffix}.html",
+        pj.quick_start_html(spec, images))
     return Publication(manual_id=manual_id, card_id=card_id, images=images)
 
 
