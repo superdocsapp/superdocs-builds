@@ -87,6 +87,19 @@ def test_custom_excludes_are_honoured(tmp_path):
     assert names(targets) == ["a.md"]
 
 
+def test_the_style_guide_is_never_linted_against_itself(tmp_path):
+    """A guide that bans "utilise" has to write the word down. Flagging it would be absurd."""
+    repo(tmp_path, {"styleguide.md": "# Style\nNever write 'utilise'.\n", "a.md": "# A\n"})
+    config = parse_config({"styleguide": {"path": "styleguide.md"}}, root=tmp_path)
+
+    targets, _ = select_targets(config)
+    assert names(targets) == ["a.md"]
+
+    # Even when named explicitly, e.g. by a pre-commit hook passing every staged file.
+    explicit, _ = select_targets(config, paths=["styleguide.md", "a.md"])
+    assert names(explicit) == ["a.md"]
+
+
 def test_a_missing_file_is_skipped_rather_than_fatal(tmp_path):
     config = repo(tmp_path, {"a.md": "# A\n"})
     targets, _ = select_targets(config, paths=["a.md", "gone.md"])

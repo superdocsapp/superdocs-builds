@@ -99,15 +99,22 @@ def _glob(config: Config) -> list[Path]:
 
 def _filter(candidates: Iterable[Path], config: Config) -> list[Path]:
     """Keep existing Markdown files that no exclude pattern matches, de-duplicated and sorted."""
+    # The style guide is never linted against itself. A guide that says `never write "utilise"`
+    # has to quote the word it bans, and flagging it for doing so is both wrong and the kind of
+    # thing that makes people delete the tool.
+    styleguide = config.styleguide.resolve(config.root)
+
     kept: dict[Path, None] = {}
     for candidate in candidates:
         path = candidate if candidate.is_absolute() else (config.root / candidate)
         if not path.is_file() or path.suffix.lower() not in MARKDOWN_SUFFIXES:
             continue
-        relative = _relative(path, config.root)
-        if _is_excluded(relative, config.exclude):
+        resolved = path.resolve()
+        if styleguide is not None and resolved == styleguide:
             continue
-        kept.setdefault(path.resolve(), None)
+        if _is_excluded(_relative(path, config.root), config.exclude):
+            continue
+        kept.setdefault(resolved, None)
     return sorted(kept)
 
 

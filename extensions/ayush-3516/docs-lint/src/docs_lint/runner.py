@@ -413,11 +413,15 @@ class Runner:
         seconds: float = 0.0,
         from_cache: bool = False,
     ) -> tuple[RunState, FileResult]:
-        updated = file_state.advanced(
+        # Read the live record rather than trusting the caller's copy. The SuperDocs pass advances
+        # and persists its own copy mid-flight (session id, job id), and writing a stale one over
+        # the top would erase exactly the two fields that make a resume free and `apply` possible.
+        current = state.file(file_state.path) or file_state
+        updated = current.advanced(
             Stage.DONE,
             verdict=verdict,
             findings=findings,
-            ops_charged=file_state.ops_charged + ops_charged,
+            ops_charged=current.ops_charged + ops_charged,
             seconds=seconds,
             from_cache=from_cache,
         )
