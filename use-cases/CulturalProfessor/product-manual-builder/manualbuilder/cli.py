@@ -293,6 +293,49 @@ def cmd_edit(args) -> int:
     return 0
 
 
+def cmd_sync(args) -> int:
+    """Re-draw every diagram from the spec and put the new ones in place.
+
+    The path a spec change takes when the documents are already published. The
+    drawing is regenerated, never patched -- and the swap that carries it into
+    the document is checked to have been a swap and nothing else before anyone
+    is asked to approve it.
+    """
+    from manualbuilder.superdocs import SuperDocsError
+
+    spec = _spec(args)
+    if args.language:
+        locales = _locales(spec)
+        if args.language not in locales:
+            print(f"no locales/{args.language}.yaml", file=sys.stderr)
+            return 2
+        spec = locales[args.language]
+
+    published = session.Publication(manual_id=args.manual, card_id=args.card)
+    with _client() as client:
+        changes, images = session.swap_diagrams(client, published, spec)
+        print(f"{len(images)} diagram(s) re-rendered and uploaded")
+
+        try:
+            session.assert_only_the_image_changed(changes, images)
+        except SuperDocsError as exc:
+            print(f"\nREFUSED: {exc}")
+            return 1
+
+        for change in changes:
+            print(f"  [{change.operation}] chunk {change.chunk_id} in "
+                  f"{published.name_for(change.document_id or '')}")
+        print(f"\n{len(changes)} change(s), each one an image URL and nothing else")
+
+        if not args.yes:
+            print("nothing approved. Re-run with --yes to apply.")
+            return 0
+
+        result = session.approve_all(client, published, changes)
+        print(f"approved: {result.get('status', 'ok')}")
+    return 0
+
+
 def cmd_export(args) -> int:
     """Pull both finished documents back down. The fourth call of the spine.
 
@@ -332,6 +375,13 @@ def main(argv: list[str] | None = None) -> int:
     edit.add_argument("--yes", action="store_true",
                       help="approve the proposed changes; without it, nothing is applied")
 
+    sync = sub.add_parser("sync", help="re-render the diagrams and swap them in")
+    sync.add_argument("--manual", required=True, help="manual document id")
+    sync.add_argument("--card", required=True, help="quick-start document id")
+    sync.add_argument("--language", default="", help="a locale from locales/")
+    sync.add_argument("--yes", action="store_true",
+                      help="approve the swaps; without it, nothing is applied")
+
     export = sub.add_parser("export", help="download both finished documents")
     export.add_argument("--manual", required=True, help="manual document id")
     export.add_argument("--card", required=True, help="quick-start document id")
@@ -339,7 +389,8 @@ def main(argv: list[str] | None = None) -> int:
 
     args = parser.parse_args(argv)
     handler = {"check": cmd_check, "build": cmd_build, "publish": cmd_publish,
-               "edit": cmd_edit, "export": cmd_export}[args.command]
+               "edit": cmd_edit, "sync": cmd_sync,
+               "export": cmd_export}[args.command]
     try:
         return handler(args)
     except SpecError as exc:

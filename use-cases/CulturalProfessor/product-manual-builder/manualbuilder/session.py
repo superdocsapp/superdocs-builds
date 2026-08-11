@@ -20,6 +20,7 @@ checks it actually happened rather than trusting that it did.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -153,14 +154,101 @@ def refresh_diagrams(client: SuperDocs, publication: Publication,
     """Re-render every diagram from the graph and re-upload it.
 
     The second grading criterion, and the reason it is a separate function from
-    `edit_both`: a diagram is never edited, it is replaced. The model is not in
-    this path at all. What reaches the document is a new URL in one `<img src>`
-    inside one chunk, which is why "the diagram changed and nothing else did" is
-    checkable rather than asserted.
+    `edit_both`: a diagram is never edited, it is replaced. No model is in the
+    drawing path at all. Getting the new URL into the document is `swap_diagrams`
+    below, and that is where the interesting part is.
     """
     fresh = upload_diagrams(client, spec)
     publication.images = fresh
     return fresh
+
+
+def swap_diagrams(client: SuperDocs, publication: Publication,
+                  spec: Spec) -> tuple[list[ProposedChange], dict[str, str]]:
+    """Re-render, upload, and propose swapping each `<img src>` for the new URL.
+
+    A document already on the service cannot be re-uploaded without becoming a
+    different document, so the new URL has to reach the existing chunks, and the
+    only edit surface is a chat turn. That means asking a model to perform what
+    is really a text substitution -- which is exactly the kind of step this
+    project otherwise avoids.
+
+    So it is asked for, and then it is checked. `assert_only_the_image_changed`
+    compares each proposed chunk against the one it replaces with the image URLs
+    masked out: if a single other character moved, the batch is refused whole.
+    The model is allowed to propose the swap and is not trusted to have made it.
+    """
+    fresh = refresh_diagrams(client, publication, spec)
+    lines = "\n".join(
+        f'- the figure with data-diagram="{image_id}": set its <img src> to '
+        f"{url}" for image_id, url in fresh.items()
+    )
+    instruction = (
+        "Update the diagram image URLs. Make exactly these substitutions and "
+        "nothing else -- do not reword, reformat, or renumber anything, and do "
+        "not touch a figure that is not listed:\n" + lines
+    )
+    changes, _ = edit_both(client, publication, instruction)
+    return changes, fresh
+
+
+_IMG_SRC = re.compile(r'(<img\b[^>]*?\bsrc=")([^"]*)(")', re.I)
+_FIGURE_ID = re.compile(r'data-diagram="([^"]+)"')
+
+
+def _masked(html: str) -> str:
+    """The chunk with every image URL replaced by a placeholder."""
+    return _IMG_SRC.sub(r"\g<1>\g<3>", html)
+
+
+def assert_only_the_image_changed(changes: list[ProposedChange],
+                                  images: dict[str, str]) -> None:
+    """Refuse a diagram swap that did anything besides swap the diagram.
+
+    Three ways this goes wrong, and all three are refused rather than shown to a
+    person to notice: the turn rewrote surrounding prose while it was in there;
+    it changed a figure nobody asked it to; or it put a URL in the `src` that is
+    not the one just uploaded for that figure -- a plausible-looking URL is the
+    single most likely thing for a model to produce here, and it would render as
+    a broken image in a shipped manual.
+    """
+    if not changes:
+        raise SuperDocsError(
+            "the turn proposed no changes, so the documents still point at the "
+            "old diagrams. Nothing was uploaded in vain -- but nothing was "
+            "swapped either."
+        )
+
+    for change in changes:
+        if _masked(change.old_html) != _masked(change.new_html):
+            raise SuperDocsError(
+                f"change {change.change_id} altered more than the image URL in "
+                f"chunk {change.chunk_id}. A diagram refresh is a URL "
+                f"substitution and nothing else, so the whole batch was "
+                f"refused.\n  before: {change.old_html[:160]}\n"
+                f"  after:  {change.new_html[:160]}"
+            )
+
+        figures = _FIGURE_ID.findall(change.new_html)
+        sources = [m.group(2) for m in _IMG_SRC.finditer(change.new_html)]
+        if len(figures) != len(sources):
+            raise SuperDocsError(
+                f"change {change.change_id} has {len(figures)} figure(s) and "
+                f"{len(sources)} image(s) in the same chunk; the pairing that "
+                f"proves the right URL went to the right figure is not there"
+            )
+        for image_id, source in zip(figures, sources):
+            if image_id not in images:
+                raise SuperDocsError(
+                    f"change {change.change_id} touched figure {image_id!r}, "
+                    f"which was not part of this refresh"
+                )
+            if source != images[image_id]:
+                raise SuperDocsError(
+                    f"change {change.change_id} set {image_id!r} to {source!r}, "
+                    f"which is not the URL uploaded for it ({images[image_id]!r}). "
+                    f"That renders as a broken image in a shipped manual."
+                )
 
 
 def _slug(name: str) -> str:
@@ -168,5 +256,5 @@ def _slug(name: str) -> str:
 
 
 __all__ = ["Publication", "publish", "edit_both", "approve_all", "refresh_diagrams",
-           "changes_by_document", "assert_touched_both", "render_diagrams",
-           "upload_diagrams"]
+           "swap_diagrams", "assert_only_the_image_changed", "changes_by_document",
+           "assert_touched_both", "render_diagrams", "upload_diagrams"]
