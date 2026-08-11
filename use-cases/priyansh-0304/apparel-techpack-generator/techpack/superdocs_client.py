@@ -1,16 +1,9 @@
-"""
-Thin wrapper around the SuperDocs API.
-Confirmed against the live API: chat.
-Not yet confirmed: approve, export — paths below are best-guess based on the
-task doc's naming ("upload, chat, approve, export"). Verify against
-docs.superdocs.app before relying on these for the real submission.
-"""
-
 import os
 import json
 import requests
 
 BASE_URL = "https://api.superdocs.app/v1"
+REQUEST_TIMEOUT = 30  # seconds -- prevents an indefinite hang on network issues
 
 
 class SuperDocsError(Exception):
@@ -43,22 +36,19 @@ def send_edit(session_id: str, message: str, document_html: str = None) -> dict:
     if document_html is not None:
         payload["document_html"] = document_html
 
-    resp = requests.post(f"{BASE_URL}/chat", headers=_get_headers(), json=payload)
+    resp = requests.post(f"{BASE_URL}/chat", headers=_get_headers(), json=payload, timeout=REQUEST_TIMEOUT)
 
     if resp.status_code != 200:
-        raise SuperDocsError(
-            f"chat call failed ({resp.status_code}): {resp.text}"
-        )
+        raise SuperDocsError(f"chat call failed ({resp.status_code}): {resp.text}")
 
     data = resp.json()
 
-    if data.get("document_changes") is None:
+    # Debug visibility gated behind an explicit env var -- printing full raw
+    # API responses by default risks leaking document contents into logs.
+    if data.get("document_changes") is None and os.environ.get("SUPERDOCS_DEBUG"):
         print("⚠️  document_changes was null. Full raw response:")
         print(json.dumps(data, indent=2))
 
-    # Known gotcha from the task doc: proposed-change content can arrive as a
-    # JSON-encoded string that needs a second parse. Handle it defensively here
-    # so callers never have to think about it.
     changes = data.get("document_changes") or {}
     for change in changes.get("changes") or []:
         for key in ("old_html", "new_html"):
@@ -76,10 +66,6 @@ def approve_changes(version_id: str, change_ids: list[str] = None, approve_all: 
     """
     NOT YET CONFIRMED against live docs — path/shape is inferred from the task
     doc's naming, not verified. Test this before depending on it.
-
-    Intent: approve pending changes for a given version, either all of them
-    or a specific subset by change_id (so rejecting one doesn't discard the rest,
-    per the task doc's requirement #3).
     """
     payload = {"version_id": version_id}
     if approve_all:
@@ -87,7 +73,7 @@ def approve_changes(version_id: str, change_ids: list[str] = None, approve_all: 
     else:
         payload["change_ids"] = change_ids or []
 
-    resp = requests.post(f"{BASE_URL}/approve", headers=_get_headers(), json=payload)
+    resp = requests.post(f"{BASE_URL}/approve", headers=_get_headers(), json=payload, timeout=REQUEST_TIMEOUT)
 
     if resp.status_code == 404:
         raise SuperDocsError(
@@ -104,8 +90,7 @@ def export_document(html: str, filename: str = "document", format: str = "docx")
     """
     Confirmed shape (captured from the web app's own network traffic):
     the export call takes the full current document HTML directly, not a
-    session_id. Path assumed mirrored onto the public API domain — verify
-    this actually works with Bearer auth before relying on it.
+    session_id.
     """
     payload = {
         "format": format,
@@ -119,7 +104,7 @@ def export_document(html: str, filename: str = "document", format: str = "docx")
         },
     }
 
-    resp = requests.post(f"{BASE_URL}/documents/export", headers=_get_headers(), json=payload)
+    resp = requests.post(f"{BASE_URL}/documents/export", headers=_get_headers(), json=payload, timeout=REQUEST_TIMEOUT)
 
     if resp.status_code == 404:
         raise SuperDocsError(

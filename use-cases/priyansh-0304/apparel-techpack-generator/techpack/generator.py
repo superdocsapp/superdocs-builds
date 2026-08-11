@@ -8,10 +8,11 @@ def generate_tech_pack_html(style: dict) -> str:
     graded = build_graded_spec(style)
     sizes = style["size_range"]
 
-    rows = ""
+    row_parts = []
     for point in style["measurement_points"]:
         cells = "".join(f"<td>{graded[point['point_name']][s]}\"</td>" for s in sizes)
-        rows += f"<tr><td>{point['point_name']}</td>{cells}<td>±{point['tolerance']}\"</td></tr>"
+        row_parts.append(f"<tr><td>{point['point_name']}</td>{cells}<td>±{point['tolerance']}\"</td></tr>")
+    rows = "".join(row_parts)
 
     bom_rows = "".join(
         f"<tr><td>{m['component']}</td><td>{m['spec']}</td><td>{m['placement']}</td></tr>"

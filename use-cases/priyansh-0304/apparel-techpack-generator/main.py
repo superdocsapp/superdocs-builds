@@ -1,5 +1,4 @@
 import json
-import os
 import time
 from pathlib import Path
 
@@ -37,7 +36,6 @@ def main():
     html = generate_tech_pack_html(style)
     print(f"Generated HTML for {style['style_name']} ({len(html)} chars)")
 
-    # Step 1: load the pre-computed document into a SuperDocs session
     result = send_edit(
         session_id=session_id,
         message="Format this document cleanly with a professional letterhead style. Do not change any numbers in the measurement table.",
@@ -49,7 +47,6 @@ def main():
     is_valid, mismatches = verify_measurement_table(latest_html, style)
     print("✅ Table verified after formatting" if is_valid else f"❌ Table mismatch after formatting: {mismatches}")
 
-    # Step 2: ask for flat sketch images
     result = send_edit(
         session_id=session_id,
         message=(
@@ -70,17 +67,18 @@ def main():
     changes = result.get("document_changes") or {}
     version_id = changes.get("version_id")
 
-    # Step 3: approve if needed
     if changes.get("requires_approval") or changes.get("pending_changes"):
-        try:
-            approve_changes(version_id=version_id, approve_all=True)
-            print("Changes approved.")
-        except SuperDocsError as e:
-            print(f"Approve step failed: {e}")
+        if not version_id:
+            print("⚠️  Approval required but no version_id was returned — cannot approve. Skipping approval step.")
+        else:
+            try:
+                approve_changes(version_id=version_id, approve_all=True)
+                print("Changes approved.")
+            except SuperDocsError as e:
+                print(f"Approve step failed: {e}")
     else:
         print("No approval required — changes were auto-approved.")
 
-    # Step 4: export the actual latest state
     OUTPUT_DIR.mkdir(exist_ok=True)
     try:
         file_bytes = export_document(html=latest_html, filename=style["style_id"])
