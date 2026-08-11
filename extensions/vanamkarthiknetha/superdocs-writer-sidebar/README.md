@@ -25,6 +25,18 @@ existing paragraph/character styles are respected.
 > paragraphs, not table-cell content (those changes are reported as skipped,
 > and the approved SuperDocs copy still has them).
 
+**v0.3.3 — the panel is responsive.** It used to be a fixed-coordinate
+layout that claimed a fixed height, so in a small office window the bottom of
+the stack — the status line, the one control that says what just happened —
+was placed outside the panel and clipped. The panel now reports its real
+minimum/preferred/maximum height to the sidebar deck and re-lays itself out on
+every resize: the flexible boxes (instruction, preview, status) share the
+slack in a tall panel and give it back in a short one, the hint and title drop
+out before anything functional does, and **Apply/Reject and the status line
+stay on screen at every size**. An empty preview now takes no room at all, and
+both the status and preview carry their full text as a tooltip. Sizes scale
+with the host's DPI/font scaling rather than a hardcoded factor.
+
 ## Screenshots
 
 **Selection mode (Linux, WSLg):**
@@ -53,6 +65,20 @@ exactly what happened.
 A follow-up whole-document *edit* on that same draft ("Add some styles to it
 like Markdown."): 22 proposed changes come back as a reviewable proposal with
 the actual proposed text quoted — nothing lands until Apply.
+
+**Small office window (Windows):**
+
+![Small window](screenshots/windows-small-window.png)
+
+The same panel in a 900×520 office window. The hint paragraph has dropped out
+and the instruction box has shrunk to fit, but the checkbox, Send, Apply/Reject
+and the status line ("Ready.") are all still on screen — before v0.3.3 the
+status line was positioned below the panel's visible area and simply vanished.
+Squeeze further and the title goes too; the working controls and the status
+line are the last things standing. Below even that floor layout the sidebar
+deck gives you its own scrollbar and the status is still reachable — the old
+fixed height claimed the panel was 360px tall while its content was ~500px, so
+the deck saw no reason to scroll and the overflow was simply lost.
 
 ## Build
 
@@ -118,6 +144,14 @@ profile; they never touch your normal LibreOffice or its profile.
   real API: UNO doc → .docx export → `request_doc_edit` → approve → write-back
   from the actual returned `old_html`/`new_html`. Costs 1 operation. Ends with
   `WHOLE-DOC LIVE TEST: ALL PASS`.
+- `tests/layout_test.py` — **offline, plain `python3`, no LibreOffice, no API
+  key, 0 operations.** Drives `panel_layout.solve` at every panel height from
+  below the floor to well above the preferred layout, at three DPI scales, and
+  asserts the invariants the panel promises: the status line is always fully
+  inside the panel and always below the decision buttons, the working controls
+  never disappear, rows never overlap or overflow the width, spare height is
+  absorbed instead of left dangling. ~38k assertions over ~2.2k panel sizes;
+  ends with `PANEL LAYOUT TEST: ALL PASS`.
 - `tests/draft_live_test.py` — plain HTTP, no LibreOffice needed, ≤1 operation.
   Sends a drafting instruction and verifies the client surfaces the created
   content as `draft_html` on a completed zero-pending job (the approval-gate
@@ -138,7 +172,8 @@ the test discovers style names at runtime instead of assuming them.)
 | `src/config/Sidebar.xcu` | Registers the SuperDocs deck + panel in Writer's sidebar |
 | `src/config/Factories.xcu` | Maps the panel's resource URL to the Python factory |
 | `src/panel.py` | UNO component: panel factory, panel, threading, both modes |
-| `src/panel.xdl` | Panel UI (whole-doc checkbox, instruction box, Send, preview, Apply/Reject, status) |
+| `src/panel.xdl` | Panel UI (whole-doc checkbox, instruction box, Send, preview, Apply/Reject, status) — authoring geometry; runtime positions come from `panel_layout` |
+| `src/pythonpath/panel_layout.py` | Responsive geometry: where every control goes for the panel's current size (pure arithmetic, no UNO) |
 | `src/pythonpath/superdocs_client.py` | Stdlib SuperDocs client (upload → async chat → approve → export) |
 | `src/pythonpath/writeback.py` | Whole-doc write-back: HTML→paragraphs, unique-run matching, range-by-range apply, draft insertion |
 | `src/icons/superdocs_24.png` | Sidebar deck icon |

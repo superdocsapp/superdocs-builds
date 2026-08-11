@@ -15,13 +15,15 @@ import traceback
 
 import unohelper
 
-from com.sun.star.awt import XActionListener, XCallback
+from com.sun.star.awt import XActionListener, XCallback, XWindowListener
+from com.sun.star.awt.PosSize import POSSIZE
 from com.sun.star.beans import PropertyValue
 from com.sun.star.container import NoSuchElementException
 from com.sun.star.lang import XServiceInfo
 from com.sun.star.ui import XSidebarPanel, XToolPanel, XUIElement, XUIElementFactory, LayoutSize
 from com.sun.star.ui.UIElementType import TOOLPANEL
 
+import panel_layout
 import superdocs_client
 import writeback
 
@@ -55,6 +57,30 @@ class _Action(unohelper.Base, XActionListener):
 
     def actionPerformed(self, _event):
         self._handler()
+
+    def disposing(self, _event):
+        self._handler = None
+
+
+class _Resize(unohelper.Base, XWindowListener):
+    """Re-lays the panel out whenever the sidebar hands it a new size."""
+
+    def __init__(self, handler):
+        self._handler = handler
+
+    def windowResized(self, _event):
+        if self._handler:
+            self._handler()
+
+    def windowShown(self, _event):
+        if self._handler:
+            self._handler()
+
+    def windowMoved(self, _event):
+        pass
+
+    def windowHidden(self, _event):
+        pass
 
     def disposing(self, _event):
         self._handler = None
@@ -105,6 +131,8 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
         self._doc = None           # text-document model
         self._draft_paras = None   # drafted paragraphs awaiting the local gate
         self._busy = False
+        self._unit_px = None       # measured pixels per appfont unit
+        self._preview_text = ""    # mirrors lblPreview; drives its layout tier
 
     # ---- XUIElement ----
     def getRealInterface(self):
@@ -116,7 +144,9 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
             self._window.getControl("btnSend").addActionListener(_Action(self.on_send))
             self._window.getControl("btnApprove").addActionListener(_Action(self.on_apply))
             self._window.getControl("btnReject").addActionListener(_Action(self.on_reject))
+            self._window.addWindowListener(_Resize(self._relayout))
             self._window.setVisible(True)
+            self._relayout()
         return self
 
     # ---- XToolPanel ----
@@ -129,23 +159,70 @@ class SuperDocsPanel(unohelper.Base, XUIElement, XToolPanel, XSidebarPanel):
 
     # ---- XSidebarPanel ----
     def getHeightForWidth(self, _width):
-        return LayoutSize(360, -1, 360)
+        """Report the real range, not a fixed height: the deck then grows the
+        panel when there is room and only scrolls once even the floor layout
+        no longer fits."""
+        unit = self._unit()
+        has_preview = bool(self._preview_text)
+        size = LayoutSize()
+        size.Minimum = panel_layout.stack_height(panel_layout.FLOOR, unit, has_preview)
+        size.Preferred = panel_layout.stack_height(panel_layout.PREF, unit, has_preview)
+        size.Maximum = size.Preferred * 10   # take whatever slack the deck has
+        return size
 
     def getMinimalWidth(self):
-        return 160
+        return int(round(80 * self._unit()))
+
+    # ---- layout (geometry lives in panel_layout; this only applies it) ----
+    def _unit(self):
+        """Pixels per appfont unit, measured from btnSend's authored height so
+        the panel tracks the host's DPI and font scaling."""
+        if self._unit_px is None and self._window is not None:
+            try:
+                measured = (self._window.getControl("btnSend").getPosSize().Height
+                            / panel_layout.SEND_UNITS)
+            except Exception:
+                measured = 0
+            if 1.0 <= measured <= 8.0:
+                self._unit_px = measured
+        return self._unit_px or 2.0
+
+    def _relayout(self):
+        if self._window is None:
+            return
+        try:
+            rect = self._window.getPosSize()
+            if rect.Width <= 0 or rect.Height <= 0:
+                return
+            placements = panel_layout.solve(rect.Width, rect.Height, self._unit(),
+                                            bool(self._preview_text))
+            for control_id, box in placements:
+                control = self._window.getControl(control_id)
+                if box:
+                    control.setPosSize(box[0], box[1], box[2], box[3], POSSIZE)
+                control.setVisible(bool(box))
+        except Exception:
+            traceback.print_exc()   # a layout slip must never break the panel
 
     # ---- ui helpers (safe from any thread via _MainThread.post) ----
     def _ui(self, status=None, preview=None, decisions_enabled=None, send_enabled=None):
         def apply_ui():
             if status is not None:
-                self._window.getControl("lblStatus").getModel().Label = status
+                model = self._window.getControl("lblStatus").getModel()
+                model.Label = status
+                model.HelpText = status    # readable on hover in a short panel
             if preview is not None:
-                self._window.getControl("lblPreview").getModel().Label = preview
+                self._preview_text = preview
+                model = self._window.getControl("lblPreview").getModel()
+                model.Label = preview
+                model.HelpText = preview
             if decisions_enabled is not None:
                 self._window.getControl("btnApprove").getModel().Enabled = decisions_enabled
                 self._window.getControl("btnReject").getModel().Enabled = decisions_enabled
             if send_enabled is not None:
                 self._window.getControl("btnSend").getModel().Enabled = send_enabled
+            if preview is not None:
+                self._relayout()   # the preview box appears/disappears with it
         self._main.post(apply_ui)
 
     def _progress(self, message):

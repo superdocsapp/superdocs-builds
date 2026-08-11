@@ -2,7 +2,7 @@
 <description xmlns="http://openoffice.org/extensions/description/2006"
              xmlns:xlink="http://www.w3.org/1999/xlink">
   <identifier value="app.superdocs.writer.sidebar.vanamkarthiknetha"/>
-  <version value="0.3.2"/>
+  <version value="0.3.3"/>
   <platform value="all"/>
   <display-name>
     <name lang="en">SuperDocs Writer Sidebar</name>

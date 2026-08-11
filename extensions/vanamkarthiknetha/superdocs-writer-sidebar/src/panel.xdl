@@ -3,6 +3,11 @@
             xmlns:script="http://openoffice.org/2000/script"
             dlg:id="SuperDocsPanel" dlg:left="0" dlg:top="0"
             dlg:width="130" dlg:height="254" dlg:withtitlebar="false">
+  <!-- Authoring geometry only: these coordinates are the panel's PREFERRED
+       layout. At runtime pythonpath/panel_layout.py re-places every control
+       for the height the sidebar actually gives the panel, so a short office
+       window no longer pushes the status line off the bottom. Keep the control
+       ids and btnSend's 14-unit height in step with that module. -->
   <dlg:bulletinboard>
     <dlg:text dlg:id="lblTitle" dlg:left="4" dlg:top="4" dlg:width="122" dlg:height="10"
               dlg:value="Edit with SuperDocs AI"/>
