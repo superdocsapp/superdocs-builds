@@ -83,7 +83,7 @@ same thing if you have it.
 ./mb test
 ```
 
-106 tests, no network and no key.
+112 tests, no network and no key.
 
 Two commands need no API key and no network:
 
@@ -223,10 +223,11 @@ exported both documents to out/export/ (no quota spent)
   ok   manual: breakdown                  d8c0d831fc2f40aaae234c83925895b6.svg
   …
   ok   quick-start card: breakdown        d8c0d831fc2f40aaae234c83925895b6.svg
-  --   step rails                         in neither document as the spec words it…
+  ok   step rails                         edited since publish, both documents carry the
+                                          same new wording (-1.2 +1.6)
   ok   step gantry                        word for word in both documents
   …
-17 passed, 0 failed, 1 no longer checkable
+18 passed, 0 failed
 ```
 
 `verify` reads both documents back off the service and checks the two claims
@@ -236,14 +237,28 @@ character signature that differs on every read — and **the manual and the card
 still agree word for word**, on the served documents rather than on the local
 render.
 
-The third verdict is the honest one. `--` means an approved edit has moved the
-text since publish, so the spec no longer words it the way the live documents
-do; the check can no longer see what it was looking at, and it does not claim
-the two still agree. In the run above that is the rails step, where the torque
-edit landed — both documents read 1.6 N·m and the spec on disk still reads 1.2.
-Text found in exactly *one* document is drift, and that is a failure.
+The second check cannot be made against the spec alone, and that is the whole
+difficulty. An approved edit moves the live documents away from the spec that
+describes them: after the torque change above, neither document reads the way
+`spec/halyard_m1.yaml` reads. Asking *"is the spec's sentence in both?"* answers
+**no** for a pair in perfect agreement — and answers **no** just as loudly for a
+manual reading 1.6 N·m beside a card reading 1.8.
 
-`test_verify.py` is ten served documents broken in specific ways — an old
+So when the spec's wording is gone, the question becomes the one this build
+actually claims: *do these two documents still say the same thing?* The passage
+each holds in that place is found by how much of the original survives in it,
+and the two are compared against each other — which is why the rails line above
+reads `ok … both documents carry the same new wording (-1.2 +1.6)` rather than a
+shrug. When they differ, the difference is printed: `-1.6 +1.8` is a report
+somebody can act on and "they disagree" is not.
+
+`--` is kept for the one case that deserves it: a passage rewritten past
+recognition in *both* documents, where nothing ties either to the original and
+picking the highest-scoring paragraph would be inventing a comparison. A passage
+still verbatim in one document and unrecognisable in the other is not that — it
+is the pair coming apart as completely as it can, and it fails.
+
+`test_verify.py` is fourteen served documents broken in specific ways — an old
 drawing left in place, a figure that lost its image, an invented URL, a fix
 dropped from the card — and `verify` has to find each one. A verification step
 that can only print green is worse than none.
@@ -469,7 +484,7 @@ manualbuilder/
                          export / status / verify
 mb                       the command line, virtualenv taken care of
 selftest                 every check this project can run, in one command
-tests/                   106 tests, no network
+tests/                   112 tests, no network
 ```
 
 ## What it does not do

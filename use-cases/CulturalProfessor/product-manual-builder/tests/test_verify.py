@@ -110,10 +110,16 @@ def test_the_two_documents_disagreeing_is_caught(spec):
     bad = vf.failed(vf.pair_findings(pair, spec))
     assert len(bad) == 1
     assert bad[0].check == "step rails"
-    assert "come apart" in bad[0].detail
+    # And it says what the difference *is*, because "they disagree" is a true
+    # sentence nobody can act on. Read manual-first: `-` is the manual's
+    # wording, `+` is the card's.
+    assert "word this differently" in bad[0].detail
+    assert "-1.6" in bad[0].detail and "+1.2" in bad[0].detail
 
 
 def test_a_fix_dropped_from_the_card_is_caught(spec):
+    """Not an edit this cannot follow -- the passage gone out of one document
+    altogether, which is the pair coming apart as completely as it can."""
     images = urls(spec)
     pair = both(spec, images)
     fault = spec.quick_start_troubleshooting()[0]
@@ -121,13 +127,15 @@ def test_a_fix_dropped_from_the_card_is_caught(spec):
 
     bad = vf.failed(vf.pair_findings(pair, spec))
     assert len(bad) == 1 and bad[0].check == f"fix {fault.id}"
+    assert "dropped or rewritten" in bad[0].detail
 
 
-def test_an_edit_applied_to_both_is_reported_as_uncheckable_not_as_a_pass(spec):
-    """The honest third answer. An approved edit means the spec on disk no
-    longer words the step the way the live documents word it. That is not a
-    failure and it is not a pass: the check can no longer see what it was
-    looking at, and saying `ok` would be claiming otherwise."""
+def test_an_edit_applied_to_both_is_a_pass(spec):
+    """The case the spec cannot answer on its own. An approved edit moves the
+    live documents away from the spec that describes them, so neither one still
+    reads the way the spec words it -- and asking the spec gets "I cannot see
+    this any more" for a pair that is in perfect agreement. So the two documents
+    are compared to each other instead, and this is a pass with the edit named."""
     images = urls(spec)
     pair = both(spec, images)
     rails = next(step for step in spec.quick_start() if step.id == "rails")
@@ -137,8 +145,57 @@ def test_an_edit_applied_to_both_is_reported_as_uncheckable_not_as_a_pass(spec):
     findings = vf.pair_findings(pair, spec)
     assert not vf.failed(findings)
     rails_finding = next(f for f in findings if f.check == "step rails")
+    assert rails_finding.status == vf.OK
+    assert "both documents carry the same new wording" in rails_finding.detail
+    assert "+1.6" in rails_finding.detail
+
+
+def test_an_edit_applied_to_both_but_differently_is_caught(spec):
+    """The failure the previous version of this check could not see at all. Both
+    documents were edited, so neither matches the spec, so the old answer was
+    "cannot tell" -- for a manual reading 1.6 N·m and a card reading 1.8."""
+    images = urls(spec)
+    pair = both(spec, images)
+    rails = next(step for step in spec.quick_start() if step.id == "rails")
+    pair[vf.MANUAL] = pair[vf.MANUAL].replace(rails.body,
+                                              rails.body.replace("1.2", "1.6"))
+    pair[vf.CARD] = pair[vf.CARD].replace(rails.body,
+                                          rails.body.replace("1.2", "1.8"))
+
+    bad = vf.failed(vf.pair_findings(pair, spec))
+    assert len(bad) == 1 and bad[0].check == "step rails"
+    assert "-1.6" in bad[0].detail and "+1.8" in bad[0].detail
+
+
+def test_a_passage_edited_past_recognition_is_not_guessed_at(spec):
+    """The limit of matching by similarity, and it has to stay a `--`. If both
+    documents rewrote the step from scratch there is nothing left tying either
+    of them to the original, and picking whichever paragraph scores highest
+    would be inventing a comparison."""
+    images = urls(spec)
+    pair = both(spec, images)
+    rails = next(step for step in spec.quick_start() if step.id == "rails")
+    pair = {role: html.replace(rails.body, "Refer to the assembly video.")
+            for role, html in pair.items()}
+
+    findings = vf.pair_findings(pair, spec)
+    assert not vf.failed(findings)
+    rails_finding = next(f for f in findings if f.check == "step rails")
     assert rails_finding.status == vf.MOOT
-    assert "does not prove" in rails_finding.detail
+    assert "cannot be compared" in rails_finding.detail
+
+
+def test_a_different_step_is_never_mistaken_for_an_edited_one(spec):
+    """The threshold has to sit above what unrelated steps score against each
+    other, or a deleted passage gets silently matched to a neighbouring one and
+    reported as drift -- or worse, as agreement."""
+    rails = next(step for step in spec.quick_start() if step.id == "rails")
+    others = [step.body for step in spec.quick_start() if step.id != "rails"]
+    best, score = vf._closest(rails.body, others)
+    assert score < vf.MATCH, f"a different step scored {score:.2f}: {best[:60]!r}"
+
+    edited = rails.body.replace("1.2", "1.6")
+    assert vf._closest(rails.body, [edited])[1] > vf.MATCH
 
 
 def test_the_services_stylesheet_is_not_searched_for_document_text(spec):

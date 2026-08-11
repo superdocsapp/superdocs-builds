@@ -18,20 +18,36 @@ rather than on the local render. A step body that reads one way on the card and
 another way in the manual is the failure this whole build exists to prevent, and
 it is worth asking the service rather than asking ourselves.
 
-That second check has three answers and not two, which is the honest shape.
-Documents get edited after they are published: an approved torque change means
-the spec on disk no longer words the step the way the live documents word it.
-Text found in *neither* document is not a failure -- it is a check that can no
-longer see what it was looking at, and it says so. Text found in exactly *one*
-is drift, and that is a failure.
+The second check cannot be done against the spec alone, and that is the whole
+difficulty. Documents get edited after they are published: an approved torque
+change means the spec on disk no longer words the step the way either live
+document words it. Asking "is the spec's sentence in both?" then answers *no*
+for a pair in perfect agreement -- and would answer *no* just as loudly for a
+manual reading 1.6 N·m beside a card reading 1.8.
+
+So when the spec's wording is missing, the question changes to the one this
+build actually makes a claim about: **do these two documents still say the same
+thing?** The passage each document holds in that place is found by how much of
+the original survives in it, and the two are then compared against each other,
+with the difference printed -- `-1.6 +1.8` is a report somebody can act on and
+"they disagree" is not.
+
+Three answers, and the third one is load-bearing. A passage rewritten past
+recognition in both documents is a `--`: there is nothing left tying either of
+them to the original, and picking whichever paragraph scores highest would be
+inventing a comparison rather than making one. A passage still verbatim in one
+document and unrecognisable in the other is not a `--` -- it is the pair coming
+apart as completely as it can, and it fails.
 
 No quota is spent here. Exports are free, which is the whole reason the
 verification path leans on them.
 """
 from __future__ import annotations
 
+import difflib
 import re
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from html import unescape
 from urllib.parse import urlparse
 
@@ -60,6 +76,15 @@ class Finding:
 _DROP = re.compile(r"<(script|style)\b[^>]*>.*?</\1>", re.I | re.S)
 _TAG = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
+_BLOCK = re.compile(
+    r"<(p|li|td|th|h[1-6]|figcaption|blockquote)\b[^>]*>(.*?)</\1>", re.I | re.S)
+
+#: How close a passage has to be to the spec's wording to be treated as that
+#: passage, edited. Chosen well above what unrelated steps score against each
+#: other and well below what a changed figure costs: swapping 1.2 for 1.6 in a
+#: 40-word instruction is a ratio around 0.99, and the nearest *different* step
+#: in this document set scores under 0.5. `test_verify.py` pins both ends.
+MATCH = 0.75
 
 
 def text_of(html: str) -> str:
@@ -74,6 +99,41 @@ def text_of(html: str) -> str:
 
 def _needle(text: str) -> str:
     return _WS.sub(" ", unescape(text)).strip()
+
+
+def passages(html: str) -> list[str]:
+    """Every block-level element's text, as a list.
+
+    `text_of` flattens a document so a passage can be looked for in it. This
+    keeps the passages apart, so the one that *used* to be a given instruction
+    can be found again after somebody edited it.
+    """
+    body = _DROP.sub(" ", html)
+    found = (_needle(_TAG.sub(" ", m.group(2))) for m in _BLOCK.finditer(body))
+    return [text for text in found if text]
+
+
+def _closest(needle: str, candidates: list[str]) -> tuple[str, float]:
+    """The candidate most like `needle`, and how like it it is."""
+    best, score = "", 0.0
+    for candidate in candidates:
+        ratio = SequenceMatcher(None, needle, candidate).ratio()
+        if ratio > score:
+            best, score = candidate, ratio
+    return best, score
+
+
+def _difference(one: str, other: str, limit: int = 8) -> str:
+    """The words that differ, for a message somebody has to act on.
+
+    "the two have come apart" is a true sentence nobody can do anything with.
+    `-1.2 +1.6` is the whole story.
+    """
+    words = [w for w in difflib.unified_diff(one.split(), other.split(),
+                                             lineterm="", n=0)
+             if w[:1] in "+-" and not w.startswith(("+++", "---"))]
+    shown = " ".join(words[:limit])
+    return shown + (" …" if len(words) > limit else "")
 
 
 def image_findings(served: dict[str, str], images: dict[str, str],
@@ -128,6 +188,7 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
         return [Finding(MOOT, "pair", "both documents are needed to compare them")]
 
     manual, card = text_of(served[MANUAL]), text_of(served[CARD])
+    blocks = {MANUAL: passages(served[MANUAL]), CARD: passages(served[CARD])}
     out: list[Finding] = []
     items = ([("step", step.id, step.body) for step in spec.quick_start()]
              + [("fix", fault.id, fault.fix)
@@ -137,19 +198,50 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
         needle = _needle(body)
         in_manual, in_card = needle in manual, needle in card
         label = f"{kind} {item_id}"
+
         if in_manual and in_card:
             out.append(Finding(OK, label, "word for word in both documents"))
-        elif not in_manual and not in_card:
-            out.append(Finding(
-                MOOT, label,
-                "in neither document as the spec words it -- edited since "
-                "publish; this does not prove the two still agree"))
-        else:
+            continue
+
+        # The spec's wording is not in one or both of them, which on its own
+        # says nothing: an approved edit moves the live documents away from the
+        # spec that describes them, and that is the normal state of a published
+        # pair. So the question stops being "does the spec's sentence appear"
+        # and becomes "do these two documents still say the same thing" -- which
+        # is the claim this build actually makes. The passage each document has
+        # in that place is found by how close it still is to the original, and
+        # the two are compared against each other.
+        best = {role: _closest(needle, blocks[role]) for role in (MANUAL, CARD)}
+        lost = [role for role, (_, score) in best.items() if score < MATCH]
+        if lost and (in_manual or in_card):
+            # One document still has the sentence exactly as published and the
+            # other has nothing resembling it. That is not an edit this cannot
+            # follow, it is the passage being dropped or rewritten out of one of
+            # them -- the pair coming apart in the most complete way available.
             here = MANUAL if in_manual else CARD
-            missing = CARD if in_manual else MANUAL
             out.append(Finding(
                 FAIL, label,
-                f"in the {here} but not the {missing} -- the two have come apart"))
+                f"in the {here} as published, and nothing in the "
+                f"{lost[0]} resembles it any more -- dropped or rewritten"))
+            continue
+        if lost:
+            out.append(Finding(
+                MOOT, label,
+                f"nothing in the {' or the '.join(lost)} is recognisably this "
+                f"any more, so the two cannot be compared on it"))
+            continue
+
+        theirs, ours = best[MANUAL][0], best[CARD][0]
+        if theirs == ours:
+            out.append(Finding(
+                OK, label,
+                "edited since publish, and both documents carry the same new "
+                f"wording ({_difference(needle, ours, limit=4) or 'reformatted'})"))
+        else:
+            out.append(Finding(
+                FAIL, label,
+                f"the two documents word this differently -- manual vs card: "
+                f"{_difference(theirs, ours)}"))
     return out
 
 
@@ -162,5 +254,6 @@ def failed(findings: list[Finding]) -> list[Finding]:
     return [finding for finding in findings if finding.status == FAIL]
 
 
-__all__ = ["Finding", "MANUAL", "CARD", "OK", "FAIL", "MOOT", "text_of",
+__all__ = ["Finding", "MANUAL", "CARD", "OK", "FAIL", "MOOT", "MATCH",
+           "text_of", "passages",
            "image_findings", "pair_findings", "verify", "failed"]
