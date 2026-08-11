@@ -40,7 +40,7 @@ def test_the_card_is_a_subset_and_says_so_in_its_own_numbering(spec):
     position on the card is right, and is why the headings differ while every
     instruction does not."""
     card = pj.quick_start_html(spec)
-    headings = re.findall(r"<h3>(\d+)\. ", card)
+    headings = re.findall(r"<h3[^>]*>(\d+)\. ", card)
     assert headings == [str(n) for n in range(1, len(spec.quick_start_steps) + 1)]
     assert len(spec.quick_start_steps) < len(spec.steps)
 
@@ -82,6 +82,56 @@ def test_the_manual_carries_every_step_and_every_warning(spec):
         assert step.body in manual
     for warning in spec.warnings:
         assert warning.body in manual
+    for fault in spec.faults:
+        assert fault.symptom in manual and fault.fix in manual
+    for statement in spec.statements:
+        assert statement.title in manual and statement.body in manual
+
+
+def test_the_cards_fixes_are_the_manuals_fixes(spec):
+    """The same failure as a diverging torque figure, one section further down:
+    the card says power-cycle and the manual says re-seat the magnet, and the
+    person at the bench believes the card. Three of the six rows ride along, and
+    they are the manual's rows rendered twice rather than a shorter re-wording."""
+    manual = pj.manual_html(spec)
+    card = pj.quick_start_html(spec)
+
+    assert len(spec.quick_start_faults) < len(spec.faults)
+    for fault in spec.quick_start_troubleshooting():
+        assert fault.symptom in card and fault.symptom in manual
+        assert fault.fix in card and fault.fix in manual
+    # And the rows the card left behind stayed behind.
+    for fault in spec.faults:
+        if fault.id not in spec.quick_start_faults:
+            assert fault.fix not in card
+
+
+def test_the_card_does_not_carry_the_legal_statements(spec):
+    """A deliberate asymmetry, stated so it is a decision rather than an
+    oversight: the warranty and the WEEE text belong in the manual, and a folded
+    card that reproduced them would be a card nobody reads. The card points at
+    the manual in its footer instead."""
+    card = pj.quick_start_html(spec)
+    for statement in spec.statements:
+        assert statement.body not in card
+    assert spec.quick_start_footer in card
+
+
+def test_every_block_id_appears_once_in_the_rendered_html(spec):
+    """The page map is keyed by block id, so a block whose id never reached the
+    markup would be measured and not printed -- or printed twice and measured
+    once. Either way the pagination check would be describing a document that
+    does not exist."""
+    for blocks, html in ((pj.manual_blocks(spec), pj.manual_html(spec)),
+                         (pj.quick_start_blocks(spec), pj.quick_start_html(spec))):
+        ids = [block.id for block in blocks]
+        assert len(ids) == len(set(ids)), "block ids must be unique in a document"
+        for block_id in ids:
+            assert html.count(f'data-block="{block_id}"') == 1
+
+        # ...and in the same order, because the layout walks them in order.
+        found = re.findall(r'data-block="([^"]+)"', html)
+        assert found == ids
 
 
 def test_diagrams_render_as_captioned_figures_with_no_urls_yet(spec):

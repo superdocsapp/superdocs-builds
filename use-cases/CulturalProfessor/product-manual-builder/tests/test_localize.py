@@ -7,6 +7,8 @@ printed card no longer folds where the crease is.
 """
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from manualbuilder import localize as lz, projections as pj
@@ -17,6 +19,26 @@ from .conftest import PROJECT_ROOT
 @pytest.fixture(scope="session")
 def german(spec):
     return lz.localised_spec(spec, lz.load_locale(PROJECT_ROOT / "locales" / "de.yaml"))
+
+
+@pytest.fixture(scope="session")
+def french(spec):
+    return lz.localised_spec(spec, lz.load_locale(PROJECT_ROOT / "locales" / "fr.yaml"))
+
+
+def test_both_launch_markets_are_complete(spec, german, french):
+    """A half-translated locale silently falls back to English, which is the
+    right behaviour and a terrible thing to ship without noticing. Every string
+    the two shipped locales are responsible for is checked to have moved."""
+    for code, localised in (("de", german), ("fr", french)):
+        for step in spec.steps:
+            assert localised.step(step.id).body != step.body, f"{code}/{step.id}"
+        for warning in spec.warnings:
+            assert localised.warning(warning.id).body != warning.body
+        for fault in spec.faults:
+            assert localised.fault(fault.id).fix != fault.fix
+        for statement in spec.statements:
+            assert localised.statement(statement.id).body != statement.body
 
 
 def test_the_german_manual_is_longer_and_shaped_the_same(spec, german):
@@ -48,6 +70,34 @@ def test_the_localised_card_still_matches_the_localised_manual(german):
         assert step.body in manual
 
 
+def test_the_drawings_speak_the_locale_too(spec, german, french):
+    """A drawing is generated from the parts graph, and a localised spec is that
+    graph with German labels in it -- so the German manual gets German diagrams
+    from the same renderer rather than English ones with a translation around
+    them. The words the drawing puts on *itself* are the ones that get missed:
+    printed English is much harder to spot inside an SVG than in a paragraph."""
+    from manualbuilder import diagram
+
+    english = diagram.exploded(spec)
+    assert "SUPPLIED, NOT MOUNTED" in english
+
+    for localised in (german, french):
+        drawn = diagram.exploded(localised)
+        assert "SUPPLIED, NOT MOUNTED" not in drawn
+        assert "parts breakdown" not in drawn
+        for part in localised.parts:
+            if part.label != spec.part(part.id).label:
+                assert part.label[:18] in drawn
+
+
+def test_a_locale_cannot_invent_a_diagram_string(spec):
+    """Same rule as everywhere else: a locale fills ids that exist. A key nobody
+    reads is a translation somebody paid for that never appears."""
+    with pytest.raises(lz.LocaleError, match="diagram string 'tagline_footer'"):
+        lz.localised_spec(spec, {"language": "xx",
+                                 "diagram": {"tagline_footer": "..."}})
+
+
 def test_a_locale_cannot_add_structure(spec):
     """A locale supplies strings. A locale that names a step the spec does not
     have is a locale adding a section, and a document with an extra section
@@ -64,9 +114,10 @@ def test_a_dropped_heading_is_caught(spec, german):
     manual is the smallest structural break that would reflow a page, and it is
     exactly what a translator working in a word processor would do."""
     german_html = pj.manual_html(german)
-    broken = german_html.replace("<h2>Spezifikationen</h2>", "", 1)
-    if broken == german_html:                      # heading label is not translated
-        broken = german_html.replace("<h2>Specifications</h2>", "", 1)
+    # By block id rather than by its words: the heading a translator would
+    # delete is the same heading whatever language it is written in.
+    broken = re.sub(r'<h2 data-block="sec:specifications">.*?</h2>\n', "",
+                    german_html, count=1)
     assert broken != german_html, "the test did not actually remove a heading"
 
     problems = lz.compare_structure(pj.manual_html(spec), broken)
