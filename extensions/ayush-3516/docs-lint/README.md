@@ -78,6 +78,40 @@ docs-lint report                            # what a run cost, stage by stage
 docs-lint rules                             # list the built-in rules
 ```
 
+### Reviewing proposed fixes
+
+`docs-lint fix` opens a review page on `127.0.0.1` (ephemeral port, single-use token in the URL)
+showing every proposed correction as a card with its before and after, the rule that raised it, and
+whether it came from a deterministic rule or the style-guide review. Approve and reject
+individually, then apply.
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│ docs-lint review      3 of 6 decided · 2 to apply   [Apply]      │
+├──────────────────────────────────────────────────────────────────┤
+│ docs/getting-started.md                                          │
+│ ┌──────────────────────────────────────────────────────────────┐ │
+│ │ ERROR   RULE   banned-terms · line 3                         │ │
+│ │ Avoid 'utilise'; the style guide prefers 'use'.              │ │
+│ │  - utilise                                                   │ │
+│ │  + use                                                       │ │
+│ │            [ Approve ]  [ Reject ]                           │ │
+│ └──────────────────────────────────────────────────────────────┘ │
+│ ┌──────────────────────────────────────────────────────────────┐ │
+│ │ WARNING  STYLE GUIDE REVIEW   style-guide · line 3           │ │
+│ │ Rewrite to match the style guide.                            │ │
+│ └──────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+The page is a thin client over the same API `docs-lint apply` uses — it posts the identical
+decisions structure. That ordering was deliberate: the machine path was built first, so the gate is
+fully testable without automating a browser, and the browser cannot do anything the API does not
+already permit. Closing the tab changes nothing; the proposals are written to a decisions file
+first either way, so a review can always be finished later with `docs-lint apply`.
+
+Prefer the file? `docs-lint fix --plan decisions.json` skips the browser entirely.
+
 ### As a pre-commit hook
 
 ```yaml
@@ -147,7 +181,7 @@ a rewrite if it is ever worth doing.
 | **A machine can drive it** | `fix --plan` writes a decisions file; `apply` consumes one. JSON and SARIF output, meaningful exit codes. No interface to click through. |
 | **Never bluffs** | Every file ends with exactly one verdict, and a clean verdict must name the checks that ran. A pass that failed is never counted as a check that happened; the run is marked partial and says why. |
 | **A stranger can run it** | `pip install`, then `docs-lint init && docs-lint check`. Sample repo included. |
-| **Proves itself** | 214 tests, green with **no API key set**, driving the real client over real HTTP against a stateful fake service. Response shapes are pinned against cassettes recorded from the live API. |
+| **Proves itself** | 227 tests, green with **no API key set**, driving the real client over real HTTP against a stateful fake service. Response shapes are pinned against cassettes recorded from the live API. |
 | **Takes no orders from documents** | Fixed instruction that never interpolates file content; every proposal must target a chunk from the manifest of the document actually uploaded. Anything else is discarded *and reported*. |
 | **Concurrent runs stay separate** | One SuperDocs session per document, `O_EXCL` locks per file, atomic cache writes. Proven by a test running two real processes at once. |
 | **Knows what it cost** | Per-stage timings and operations charged, on every run and retrievable later with `docs-lint report`. |
@@ -189,7 +223,7 @@ whether the claim is true. That is what the approval gate is for.
 python3 -m venv .venv && . .venv/bin/activate
 pip install -e '.[dev]'
 
-pytest                  # 214 tests, no API key needed, no operations spent
+pytest                  # 227 tests, no API key needed, no operations spent
 pytest -m resume        # kills a real process mid-run and resumes it
 pytest -m concurrency   # two real processes over one repository
 pytest -m injection     # documents that try to give the linter orders

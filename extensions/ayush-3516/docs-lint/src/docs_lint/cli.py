@@ -317,13 +317,37 @@ def fix(
 
     plan_path = plan or (store.run_dir(summary.run_id) / "decisions.json")
     write_atomic(plan_path, _decisions_template(summary))
-    console.print()
-    console.print(f"[bold]{len(fixable)} proposed fix(es).[/] Nothing has been applied.")
-    console.print(
-        f'Review them in [bold]{plan_path}[/], set "approved": true on the ones you want,'
+
+    if plan is not None:
+        console.print()
+        console.print(f"[bold]{len(fixable)} proposed fix(es).[/] Nothing has been applied.")
+        console.print(
+            f'Review them in [bold]{plan_path}[/], set "approved": true on the ones you want,'
+        )
+        console.print(f"then run: [bold]docs-lint apply {plan_path}[/]")
+        raise typer.Exit(EXIT_OK)
+
+    # The interactive path. It posts the same decisions structure the file above holds, so both
+    # doors open the same gate; the file is written first regardless, which means a reviewer who
+    # closes the tab can still finish the job with `docs-lint apply`.
+    from .review.server import run_review
+
+    outcome = run_review(summary)
+    if outcome.cancelled or outcome.decisions is None:
+        console.print(f"[dim]Nothing applied. The proposals are still in {plan_path}.[/dim]")
+        raise typer.Exit(EXIT_OK)
+
+    state = store.load(summary.run_id)
+    applied = apply_to_results(
+        list(summary.results),
+        outcome.decisions,
+        root=config.root,
+        client=_client(config, required=False),
+        sessions={f.path: f.session_id for f in state.files if f.session_id},
+        job_ids={f.path: f.job_id for f in state.files if f.job_id},
     )
-    console.print(f"then run: [bold]docs-lint apply {plan_path}[/]")
-    raise typer.Exit(EXIT_OK)
+    _print_apply(applied)
+    raise typer.Exit(EXIT_OK if applied.ok else EXIT_FINDINGS)
 
 
 def _decisions_template(summary) -> str:
@@ -420,6 +444,12 @@ def apply(
         job_ids={f.path: f.job_id for f in state.files if f.job_id},
     )
 
+    _print_apply(outcome)
+    raise typer.Exit(EXIT_OK if outcome.ok else EXIT_FINDINGS)
+
+
+def _print_apply(outcome) -> None:
+    """Report what landed, what did not, and anything that changed without approval."""
     for fixed in outcome.applied:
         console.print(f"[green]applied[/] {fixed.path}: {fixed.summary}")
     for skipped in outcome.skipped:
@@ -442,7 +472,6 @@ def apply(
 
     console.print()
     console.print(outcome.summary_line())
-    raise typer.Exit(EXIT_OK if outcome.ok else EXIT_FINDINGS)
 
 
 # -- resume and report --------------------------------------------------------------

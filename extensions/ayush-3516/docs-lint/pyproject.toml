@@ -53,3 +53,8 @@ src = ["src", "tests"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# The review page is an embedded HTML/CSS/JS template. Python line limits do not apply to it,
+# and breaking CSS rules across lines to satisfy a Python linter would make it harder to read.
+"src/docs_lint/review/server.py" = ["E501"]
