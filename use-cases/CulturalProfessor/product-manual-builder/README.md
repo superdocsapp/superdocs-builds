@@ -32,13 +32,27 @@ contains the figure.
 ## Try it
 
 ```bash
-pip install -e ".[dev]"
+uv venv && uv pip install -e ".[dev]"
 ```
+
+Then `.venv/bin/python` is the interpreter for everything below. Plain `pip
+install -e .` into the system interpreter is refused on any distribution that
+implements PEP 668 — Debian, Ubuntu and Fedora all do — so the virtualenv is not
+a nicety here. [uv](https://docs.astral.sh/uv/) is the one used because it
+brings its own Python and does not need `python3-venv` installed; `python -m
+venv .venv && .venv/bin/pip install -e ".[dev]"` is the same thing if you have
+it.
+
+```bash
+.venv/bin/python -m pytest
+```
+
+94 tests, no network and no key.
 
 Two commands need no API key and no network:
 
 ```bash
-python -m manualbuilder.cli check
+.venv/bin/python -m manualbuilder.cli check
 ```
 
 ```
@@ -51,7 +65,7 @@ ok
 ```
 
 ```bash
-python -m manualbuilder.cli build
+.venv/bin/python -m manualbuilder.cli build
 ```
 
 Writes 24 SVG diagrams and six documents — English, German and French, manual
@@ -62,28 +76,28 @@ looked at rather than taken on trust.
 Then, with a key in `.env`:
 
 ```bash
-python -m manualbuilder.cli publish
+.venv/bin/python -m manualbuilder.cli publish
 ```
 
 ```bash
-python -m manualbuilder.cli publish --language de
+.venv/bin/python -m manualbuilder.cli publish --language de
 ```
 
 One pair per run rather than every locale at once: the pair is the unit that has
-to stay consistent, and a German manual and a German card are opened in one
-session and edited in one turn exactly as the English pair is. Consistency
-*across* languages is not maintained by chat at all — it comes from the spec,
-and `check` is what proves it.
+to stay consistent, and a German manual and a German card are published and
+edited exactly as the English pair is. Consistency *across* languages is not
+maintained by chat at all — it comes from the spec, and `check` is what proves
+it.
 
 ```bash
-python -m manualbuilder.cli edit "raise the rail torque to 1.6 N·m" --manual doc_… --card doc_…
+.venv/bin/python -m manualbuilder.cli edit "raise the rail torque to 1.6 N·m"
 ```
 
 `edit` prints the proposed changes grouped by document, records the batch to
 `out/proposal.json`, and applies nothing.
 
 ```bash
-python -m manualbuilder.cli approve --reject CHANGE_ID
+.venv/bin/python -m manualbuilder.cli approve --reject CHANGE_ID
 ```
 
 Rejecting one change keeps the rest. That is not a nicety: asked to change one
@@ -91,28 +105,66 @@ torque figure, the live service also offered to change the gantry step, which
 legitimately shares the number. Approve the two you asked for, refuse the two
 you did not, in one review.
 
-`publish` writes the session and both document ids to `out/published.json`, so
+`publish` writes both document ids, the session each is edited in, the durable
+id underneath each, and the uploaded diagram URLs to `out/published.json`, so
 `edit`, `approve`, `sync` and `export` find them without anything being pasted
-between commands.
+between commands. `--manual`, `--card` and `--session` still exist on all four,
+and are the override for working on a pair this machine did not publish.
 
 ```bash
-python -m manualbuilder.cli sync --manual doc_… --card doc_…
+.venv/bin/python -m manualbuilder.cli sync
+```
+
+```
+8 diagram(s) re-rendered and uploaded
+  [edit] chunk f248c6f2-… in manual
+  … 7 more …
+  [edit] chunk f2f400e9-… in quick-start card
+
+9 change(s), each one an image URL and nothing else
+nothing approved. out/proposal.json holds the batch; `approve` applies it.
 ```
 
 `sync` is the path a spec change takes once the documents are published: every
 diagram re-rendered from the parts graph, uploaded, and swapped into the
-existing chunks. It refuses the whole batch unless each proposed change is that
-swap and nothing else.
+existing chunks. Like `edit` it applies nothing — the batch goes to
+`out/proposal.json` and `approve` is a separate decision.
+
+Nine changes and not eight, because the card carries the breakdown too. Each
+document is asked only about the figures it actually holds, and that is not
+cosmetic: the first version sent both documents the union of all eight captions,
+and the card — which holds one of them — replied that it could only see one of
+the figures listed and asked which were meant, and changed nothing. The manual
+moved to the new drawings, the card kept the old one, and the run reported eight
+clean swaps. Both statements were true and together they were the two documents
+disagreeing.
+
+So there are two guards and neither implies the other.
+`assert_only_the_image_changed` asks whether everything that moved was a diagram
+URL; `assert_every_figure_swapped` asks whether every diagram URL that should
+have moved did. A turn that changed nothing satisfies the first on its own.
+
+`sync` also opens a **fresh session per document** before it asks. A session is
+a conversation and it remembers: sent into the session that had earlier handled
+the torque edit above, the swap kept re-proposing the change that had been
+rejected there, and the guard refused the batch every time. Nothing about a URL
+substitution benefits from context, so it gets none. The documents are durable
+and unaffected — only the chat around them is thrown away — and the new session
+ids are written back to `out/published.json`.
 
 ```bash
-python -m manualbuilder.cli export --manual doc_… --card doc_…
+.venv/bin/python -m manualbuilder.cli export --format html
 ```
 
 `export` pulls both finished documents back into `out/export/`, which is how a
 claim about them becomes checkable: what lands there is what the service holds,
 not what this program believes it uploaded. It is deliberately a different
 folder from the local render, because comparing the two is the point. Exports
-cost no quota.
+cost no quota. `--format` is `pdf` by default; `html` is the one to ask for if
+you want to read the markup back.
+
+Give it a moment after `approve`, though — see the caveat under [what is
+verified](#what-is-verified-against-the-live-service).
 
 ## What is in the documents
 
@@ -133,11 +185,20 @@ quietly ship without them.
 
 ### The quick-start stays consistent when the manual changes
 
-Both documents live in **one session**, and one instruction runs as one turn
-per document — because the service edits one document per turn. This build was
-designed around a single turn naming both `document_ids`, and the API accepts
-that field, returns proposed changes, and puts every one of them in the focused
-document. The card was never touched and nothing in the reply said so.
+One instruction runs as **one turn per document, in a session each** — because
+the service edits one document per turn, and because a session runs one turn at
+a time. This build was designed around a single turn naming both
+`document_ids`, and the API accepts that field, returns proposed changes, and
+puts every one of them in the focused document. The card was never touched and
+nothing in the reply said so.
+
+The obvious repair — two turns in one session — does not work either: the first
+parks at `awaiting_approval`, which holds the session, and the second is refused
+with 409 `session_busy`. A pair sharing a session cannot have both halves
+proposed at the same time, and both halves proposed at the same time is the
+entire point. So each document gets its own session, and both turns are sent
+before either is waited on, which also makes the pair cost one wait instead of
+two.
 
 So the guarantee sits where it actually holds: **nothing is applied until both
 documents have proposed the change.** `assert_touched_both` refuses a batch that
@@ -188,11 +249,13 @@ other character moved. It also refuses a `src` that is not the exact URL just
 uploaded for that exact figure — a plausible-looking URL is the likeliest thing
 for a model to produce here, and it renders as a broken image in a shipped
 manual. The model is allowed to propose the swap and is not trusted to have made
-it.
+it. `assert_every_figure_swapped` is the other half, and the one that was
+missing: a figure nobody swapped is a figure still pointing at the old drawing.
 
-`test_session.py` is eight batches that each look reasonable and are each
+`test_session.py` is eleven batches that each look reasonable and are each
 refused: a tidied caption, an added sentence, an invented URL, two real URLs on
-the wrong figures.
+the wrong figures, a signature on the wrong file, and a document that answered
+politely and changed nothing.
 
 ### Localised versions keep page structure
 
@@ -236,7 +299,8 @@ and the German stops matching, which is a true statement about paper.
 | | |
 |---|---|
 | Document upload | both documents, as pre-chunked HTML so chunk-level edits are provable |
-| Multi-document chat session | the anti-drift mechanism — one turn, both `document_ids` |
+| Chat session per document | one turn each, both sent before either is waited on; a session runs one turn at a time |
+| Re-opening a document in a new session | by its durable id, to send a turn no earlier conversation colours |
 | `approval_mode: ask_every_time` | every turn parks at `awaiting_approval`; nothing applies itself |
 | Batch approve with mixed decisions | per-change, with the top-level `approved` default |
 | Image upload | the rendered SVGs, returning stable URLs for `<img src>` |
@@ -257,11 +321,27 @@ be rediscovered:
 
 ### What is verified against the live service
 
-All of it, now: session init, upload, image upload, chat, approve, export. A
-run on 2026-08-11 published the pair, proposed a torque change across both
+All of it, now: session init, upload, image upload, chat, approve, export, and
+re-opening a document in a fresh session by its durable id.
+
+A run on 2026-08-11 published the pair, proposed a torque change across both
 documents, approved two changes and rejected two, and exported the result —
 the manual came back reading 1.6 N·m in the rails step and 1.2 N·m in the
 gantry step, which is exactly what the review decided.
+
+A run on 2026-08-12 exercised `sync`: 8 diagrams re-rendered and uploaded, 9
+swaps proposed across the two documents, both guards passed, all 9 approved, and
+both documents exported pointing at all 9 of the newly uploaded URLs — compared
+by URL *path*, because the service appends a ~750-character signed query when it
+serves an image and that query differs on every read. The check is
+`out/published.json` against `out/export/*.html`, and it is the reason the
+paragraph above this one can be written down.
+
+One caveat found while doing that, and it is a real one: `export` run
+immediately after `approve`, in the same shell command, came back with the
+document as it was *before* the approval, and gave no sign of it. Re-exported a
+few seconds later it was correct. Approval is not instantly visible to export,
+so a script that chains the two without a pause can verify the wrong bytes.
 
 An earlier version of this README said the same thing and was wrong. The client
 had never been run, and almost every shape in it was a guess that read like a
@@ -300,7 +380,7 @@ manualbuilder/
   superdocs.py           thin API client, no product decisions
   session.py             publish, the paired edit, approval, diagram swap
   cli.py                 check / build / publish / edit / approve / sync / export
-tests/                   85 tests, no network
+tests/                   94 tests, no network
 ```
 
 ## What it does not do

@@ -31,14 +31,17 @@ Stated here because the difference matters to whoever runs this next.
 *Verified against the live service:* the four-call spine --
 `POST /v1/documents/upload`, `POST /v1/chat`, `POST /v1/chat/{id}/approve`,
 `POST /v1/documents/export` -- and the two reply shapes for proposed changes.
+Also `POST /v1/sessions/init`, `GET /v1/sessions/{id}/documents`,
+`POST /v1/documents/images/upload-base64`, `POST /v1/chat/async` and the job
+endpoints its poll loop reads. The image path in particular is not the one this
+client first guessed: `/v1/images/upload` does not exist.
 
-*Inferred, not yet exercised:* the paths for image upload, templates and job
-polling. The documented interface names those capabilities as MCP tools
-(`upload_image_base64`, `upload_template_base64`, `list_user_templates`) without
-naming their REST paths, so `/v1/images/upload`, `/v1/templates/upload`,
-`/v1/templates` and `/v1/jobs/{id}` are this client's guess at the convention the
-verified four follow. They are isolated in their own methods for that reason: if
-the convention is different, four short methods change and nothing else does.
+*Inferred, not yet exercised:* the template paths. The documented interface
+names those capabilities as MCP tools (`upload_template_base64`,
+`list_user_templates`) without naming their REST paths, so `/v1/templates/upload`
+and `/v1/templates` are this client's guess at the convention the verified calls
+follow. They are isolated in their own methods for that reason: if the
+convention is different, two short methods change and nothing else does.
 
 Nothing in the offline test suite depends on those paths being right, and
 `check` and `build` never call them -- so a wrong guess here cannot make a
