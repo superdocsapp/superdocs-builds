@@ -57,6 +57,10 @@ class Block:
     rows: tuple[str, ...] = ()
     starts_page: bool = False
     keep_with_next: bool = False
+    #: For a figure, the diagram it shows. Carried on the block rather than read
+    #: back out of the `data-diagram` attribute, because that attribute does not
+    #: survive an upload and this has to keep working on the way back.
+    diagram: str = ""
 
 
 def step_image_id(step: Step) -> str:
@@ -76,8 +80,8 @@ def render(blocks: list[Block]) -> str:
     return "\n".join(block.html for block in blocks if block.html) + "\n"
 
 
-def captions(spec: Spec) -> dict[str, str]:
-    """Every caption either document uses -> the diagram id it belongs to.
+def captions_in(blocks: list[Block]) -> dict[str, str]:
+    """The captions one document carries -> the diagram each of them names.
 
     The only anchor that survives a round trip. `data-diagram` does not: the
     service strips `data-*` attributes when it stores a document and puts its
@@ -86,18 +90,29 @@ def captions(spec: Spec) -> dict[str, str]:
     caption is derived from the spec, is visible to a reader, and is what the
     alt text carries -- a better anchor than an attribute in any case.
 
-    Keyed by caption rather than by diagram id because the mapping is many to
-    one: the breakdown appears in the manual pointing at a parts table and on
-    the card with nothing to point at, so it is captioned differently in each.
-    Both spellings have to resolve to the same drawing.
+    Read off the blocks rather than spelled out a second time here, because the
+    edit path has to be asking about the captions the document actually has. A
+    caption reworded in `manual_blocks` and not here would leave the swap
+    hunting for a figure under a name nothing carries.
+
+    Per document, because the two do not hold the same figures: the card has the
+    breakdown and none of the step diagrams. Asking a document to swap a figure
+    it does not contain is what made the card refuse the whole instruction.
     """
-    out = {
-        f"{spec.name} parts breakdown. Numbers key to the table below.": BREAKDOWN,
-        f"{spec.name} parts breakdown": BREAKDOWN,
-    }
-    for index, step in enumerate(spec.steps, start=1):
-        out[f"Step {index}: {step.title}"] = step_image_id(step)
-    return out
+    return {block.text: block.diagram
+            for block in blocks if block.kind == "figure" and block.diagram}
+
+
+def captions(spec: Spec) -> dict[str, str]:
+    """Every caption either document uses -> the diagram id it belongs to.
+
+    The union, for the check on the way back: a proposed change is looked up by
+    caption without much caring which document it came from. Many to one, and
+    deliberately: the breakdown appears in the manual pointing at a parts table
+    and on the card with nothing to point at, so it is captioned differently in
+    each, and both spellings resolve to the same drawing.
+    """
+    return captions_in(manual_blocks(spec)) | captions_in(quick_start_blocks(spec))
 
 
 # ------------------------------------------------------------- the manual --
@@ -291,7 +306,7 @@ def _figure(images: dict[str, str], block_id: str, image_id: str, caption: str,
         html=f'<figure data-block="{escape(block_id, quote=True)}" '
              f'data-diagram="{escape(image_id, quote=True)}">{picture}'
              f"<figcaption>{escape(caption)}</figcaption></figure>",
-        text=caption, keep_with_next=keep_with_next,
+        text=caption, keep_with_next=keep_with_next, diagram=image_id,
     )
 
 

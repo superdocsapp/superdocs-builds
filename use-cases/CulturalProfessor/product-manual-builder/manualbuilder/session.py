@@ -183,6 +183,10 @@ def edit_both(client: SuperDocs, publication: Publication,
               instruction: str) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
     """One instruction, both documents, nothing applied by either turn.
 
+    The wording case: "raise the rail torque to 1.6 N·m" is one sentence and it
+    is true of both documents, so both get it verbatim. `edit_each` is the same
+    machinery for the case where the two need to be asked different things.
+
     Two turns, because the service edits one document per turn. That is not the
     design this started with -- it started with one turn naming both documents,
     which the API accepts, which returns proposed changes, and every one of
@@ -201,10 +205,31 @@ def edit_both(client: SuperDocs, publication: Publication,
     different conversations, so they run at the same time and the pair costs one
     wait rather than two.
     """
+    return edit_each(client, publication,
+                     {document_id: instruction
+                      for document_id in publication.document_ids})
+
+
+def edit_each(client: SuperDocs, publication: Publication,
+              instructions: dict[str, str]) -> tuple[list[ProposedChange],
+                                                     list[dict[str, Any]]]:
+    """A turn per document, each with its own instruction.
+
+    Same machinery as `edit_both` and a different question per document, which
+    the diagram swap needs: the manual holds eight figures and the card holds
+    one, and the list of substitutions is therefore not the same list. Sending
+    the union to both is what broke the card -- asked to swap seven figures it
+    does not contain, the turn stopped and asked which ones were meant, and
+    changed nothing at all.
+
+    A document named with no instruction is not sent a turn. A document with no
+    figures in it has nothing to say about a diagram refresh, and a turn that
+    costs quota to be told that is a turn not worth sending.
+    """
     # A batch nobody decided on holds its session open, and the service answers
     # the next turn with 409 `session_busy` -- correct, and four frames deep in
     # a stack trace. Checked here, where the answer can name what is in the way.
-    for document_id in publication.document_ids:
+    for document_id in instructions:
         outstanding = client.active_jobs(publication.session_for(document_id))
         if not outstanding:
             continue
@@ -225,7 +250,7 @@ def edit_both(client: SuperDocs, publication: Publication,
     # sessions, so they run at the same time rather than one after the other,
     # and the pair costs one wait instead of two.
     started: list[tuple[str, str]] = []
-    for document_id in publication.document_ids:
+    for document_id, instruction in instructions.items():
         # Async, not `/v1/chat`, and this is the whole reason the human gate
         # works at all. The synchronous endpoint returns proposed changes and
         # its job goes straight to `completed` -- approving against it comes
@@ -376,7 +401,8 @@ def refresh_diagrams(client: SuperDocs, publication: Publication,
 
 
 def swap_diagrams(client: SuperDocs, publication: Publication,
-                  spec: Spec) -> tuple[list[ProposedChange], dict[str, str]]:
+                  spec: Spec) -> tuple[list[ProposedChange], dict[str, str],
+                                       dict[str, dict[str, str]]]:
     """Re-render, upload, and propose swapping each `<img src>` for the new URL.
 
     A document already on the service cannot be re-uploaded without becoming a
@@ -398,24 +424,74 @@ def swap_diagrams(client: SuperDocs, publication: Publication,
     """
     publication.reopen(client)
     fresh = refresh_diagrams(client, publication, spec)
-    captions = pj.captions(spec)
+
     # Keyed by caption, because that is what survives the round trip: the
     # service strips `data-*` when it stores a document, so the figure comes
     # back with nothing on it naming which drawing it is except its alt text.
     expected = {caption: fresh[image_id]
-                for caption, image_id in captions.items() if image_id in fresh}
+                for caption, image_id in pj.captions(spec).items()
+                if image_id in fresh}
+
+    # A document is asked only about the figures it actually holds. The card
+    # holds the breakdown and none of the seven step diagrams, and a card handed
+    # the manual's list answers that it can only see one of them and asks which
+    # were meant -- politely, and having changed nothing.
+    asked = {
+        publication.manual_id: pj.captions_in(pj.manual_blocks(spec)),
+        publication.card_id: pj.captions_in(pj.quick_start_blocks(spec)),
+    }
+    instructions = {
+        document_id: _swap_instruction(captions, expected)
+        for document_id, captions in asked.items()
+        if captions
+    }
+
+    changes, _ = edit_each(client, publication, instructions)
+    return changes, expected, {document_id: asked[document_id]
+                               for document_id in instructions}
+
+
+def _swap_instruction(captions: dict[str, str], expected: dict[str, str]) -> str:
     lines = "\n".join(
-        f'- the figure whose caption is "{caption}": set its <img src> to {url}'
-        for caption, url in expected.items()
+        f'- the figure whose caption is "{caption}": set its <img src> to '
+        f"{expected[caption]}"
+        for caption in captions if caption in expected
     )
-    instruction = (
+    return (
         "Update the diagram image URLs. Make exactly these substitutions and "
         "nothing else -- do not reword, reformat, or renumber anything, do not "
         "change any caption or alt text, and do not touch a figure that is not "
         "listed:\n" + lines
     )
-    changes, _ = edit_both(client, publication, instruction)
-    return changes, expected
+
+
+def assert_every_figure_swapped(changes: list[ProposedChange],
+                                asked: dict[str, dict[str, str]]) -> None:
+    """Refuse a refresh that left one of the figures pointing at the old drawing.
+
+    The complement of `assert_only_the_image_changed`, and the check that was
+    missing. That one asks whether everything that changed was a diagram URL; it
+    is satisfied by a turn that changed nothing, so the two together are what a
+    refresh actually needs. Without this, a live run swapped all eight figures in
+    the manual, none of the one in the card, and reported eight clean swaps --
+    which is exactly the manual and the card disagreeing, arrived at through the
+    path built to keep them together.
+    """
+    seen: dict[str, set[str]] = {}
+    for change in changes:
+        for caption, _ in _images_in(change.new_html):
+            seen.setdefault(change.document_id or "", set()).add(caption)
+
+    for document_id, captions in asked.items():
+        missing = sorted(set(captions) - seen.get(document_id, set()))
+        if missing:
+            raise SuperDocsError(
+                f"{len(missing)} figure(s) in {document_id} were not swapped: "
+                + ", ".join(repr(caption) for caption in missing)
+                + ". They still point at the old drawing, so approving this "
+                  "batch would leave the two documents showing different "
+                  "diagrams. Nothing was approved."
+            )
 
 
 _IMG_TAG = re.compile(r"<img\b[^>]*>", re.I)
@@ -502,6 +578,7 @@ def _slug(name: str) -> str:
     return "".join(c.lower() if c.isalnum() else "-" for c in name).strip("-")
 
 
-__all__ = ["Publication", "publish", "edit_both", "approve_all", "refresh_diagrams",
-           "swap_diagrams", "assert_only_the_image_changed", "changes_by_document",
+__all__ = ["Publication", "publish", "edit_both", "edit_each", "approve_all",
+           "refresh_diagrams", "swap_diagrams", "assert_only_the_image_changed",
+           "assert_every_figure_swapped", "changes_by_document",
            "assert_touched_both", "render_diagrams", "upload_diagrams"]

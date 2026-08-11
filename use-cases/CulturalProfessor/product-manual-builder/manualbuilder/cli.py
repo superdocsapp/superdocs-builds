@@ -454,14 +454,19 @@ def cmd_sync(args) -> int:
 
     published = _load(args)
     with _client() as client:
-        changes, expected = session.swap_diagrams(client, published, spec)
+        changes, expected, asked = session.swap_diagrams(client, published, spec)
         # `swap_diagrams` moves each document into a fresh session, so the
         # record on disk has to follow or the next command talks to the old one.
         _save(published, args.language)
         print(f"{len(pj.image_ids(spec))} diagram(s) re-rendered and uploaded")
 
         try:
+            # Two checks, and neither one implies the other: the first says
+            # nothing but diagram URLs moved, the second says every diagram URL
+            # that should have moved did. A turn that changed nothing passes the
+            # first on its own.
             session.assert_only_the_image_changed(changes, expected)
+            session.assert_every_figure_swapped(changes, asked)
         except SuperDocsError as exc:
             print(f"\nREFUSED: {exc}")
             print("nothing was approved, and the batch is still parked. "

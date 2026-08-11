@@ -151,6 +151,70 @@ def test_one_bad_change_refuses_the_whole_batch():
         session.assert_only_the_image_changed(changes, IMAGES)
 
 
+# ------------------------------------- the figure that was left behind --
+
+#: What each document was asked to swap: the manual holds both figures, the card
+#: holds only the breakdown, and it captions it differently.
+ASKED = {
+    "doc_manual": {"Halyard M1 parts breakdown. Numbers key to the table below.":
+                   "breakdown", LASER: "step:laser"},
+    "doc_card": {"Halyard M1 parts breakdown": "breakdown"},
+}
+
+
+def in_document(document_id: str, caption: str, change_id: str) -> ProposedChange:
+    return ProposedChange(
+        change_id=change_id, operation="edit", chunk_id="chunk_12",
+        document_id=document_id,
+        old_html=figure(caption, "https://cdn.example/old.svg", chunked=True),
+        new_html=figure(caption, "https://cdn.example/new.svg", chunked=True),
+        explanation="updated the diagram")
+
+
+def test_a_document_that_swapped_nothing_is_refused():
+    """The live failure this check exists for. Asked to swap seven figures it
+    does not contain and one it does, the card asked which were meant and
+    changed nothing -- so the manual moved to the new drawings, the card kept
+    the old one, and `assert_only_the_image_changed` saw eight clean swaps and
+    was satisfied. That is the two documents disagreeing, reached through the
+    path built to keep them together."""
+    changes = [
+        in_document("doc_manual",
+                    "Halyard M1 parts breakdown. Numbers key to the table below.",
+                    "c1"),
+        in_document("doc_manual", LASER, "c2"),
+    ]
+    with pytest.raises(SuperDocsError, match="were not swapped"):
+        session.assert_every_figure_swapped(changes, ASKED)
+
+
+def test_a_document_that_swapped_only_some_of_its_figures_is_refused():
+    changes = [in_document("doc_manual", LASER, "c1"),
+               in_document("doc_card", "Halyard M1 parts breakdown", "c2")]
+    with pytest.raises(SuperDocsError, match="parts breakdown. Numbers key"):
+        session.assert_every_figure_swapped(changes, ASKED)
+
+
+def test_every_figure_swapped_is_allowed():
+    changes = [
+        in_document("doc_manual",
+                    "Halyard M1 parts breakdown. Numbers key to the table below.",
+                    "c1"),
+        in_document("doc_manual", LASER, "c2"),
+        in_document("doc_card", "Halyard M1 parts breakdown", "c3"),
+    ]
+    session.assert_every_figure_swapped(changes, ASKED)
+
+
+def test_the_two_checks_do_not_imply_each_other():
+    """Neither check is redundant. An empty batch passes this one for every
+    document nobody asked anything of, and a complete batch of rewritten prose
+    passes the other -- so `sync` runs both."""
+    session.assert_every_figure_swapped([], {})
+    with pytest.raises(SuperDocsError, match="proposed no changes"):
+        session.assert_only_the_image_changed([], IMAGES)
+
+
 # ------------------------------------------------- the other refusal --
 
 def test_an_edit_that_touched_only_one_document_is_refused(publication):

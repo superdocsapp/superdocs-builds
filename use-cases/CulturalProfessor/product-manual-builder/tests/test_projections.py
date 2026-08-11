@@ -169,3 +169,19 @@ def test_markup_is_escaped(spec, tmp_path):
     manual = pj.manual_html(hostile)
     assert "<script>" not in manual
     assert "&lt;script&gt;" in manual
+
+
+def test_the_two_documents_do_not_hold_the_same_figures(spec):
+    """The fact the diagram swap has to know. The manual carries the breakdown
+    and a diagram per step; the card carries the breakdown alone, captioned
+    differently because it has no parts table to point at. Handing the card the
+    manual's list of substitutions is what made it refuse the lot."""
+    manual = pj.captions_in(pj.manual_blocks(spec))
+    card = pj.captions_in(pj.quick_start_blocks(spec))
+
+    assert len(manual) == 1 + len(spec.steps)
+    assert card == {f"{spec.name} parts breakdown": pj.BREAKDOWN}
+    assert not set(card) & set(manual), "the two spellings must stay distinct"
+    # Both spellings resolve to the same drawing, and the union is what the
+    # check on the way back looks a returned caption up in.
+    assert pj.captions(spec) == manual | card
