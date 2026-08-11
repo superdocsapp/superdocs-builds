@@ -479,7 +479,7 @@ def assert_every_figure_swapped(changes: list[ProposedChange],
     """
     seen: dict[str, set[str]] = {}
     for change in changes:
-        for caption, _ in _images_in(change.new_html):
+        for caption, _ in images_in(change.new_html):
             seen.setdefault(change.document_id or "", set()).add(caption)
 
     for document_id, captions in asked.items():
@@ -523,7 +523,7 @@ def _same_image(one: str, other: str) -> bool:
     return urlparse(one).path == urlparse(other).path
 
 
-def _images_in(html: str) -> list[tuple[str, str]]:
+def images_in(html: str) -> list[tuple[str, str]]:
     """Every image in a chunk as (alt, src), in document order."""
     out: list[tuple[str, str]] = []
     for tag in _IMG_TAG.findall(html):
@@ -560,7 +560,7 @@ def assert_only_the_image_changed(changes: list[ProposedChange],
                 f"  after:  {change.new_html[:160]}"
             )
 
-        for caption, source in _images_in(change.new_html):
+        for caption, source in images_in(change.new_html):
             if caption not in expected:
                 raise SuperDocsError(
                     f"change {change.change_id} touched a figure captioned "
@@ -579,6 +579,7 @@ def _slug(name: str) -> str:
 
 
 __all__ = ["Publication", "publish", "edit_both", "edit_each", "approve_all",
+           "images_in",
            "refresh_diagrams", "swap_diagrams", "assert_only_the_image_changed",
            "assert_every_figure_swapped", "changes_by_document",
            "assert_touched_both", "render_diagrams", "upload_diagrams"]

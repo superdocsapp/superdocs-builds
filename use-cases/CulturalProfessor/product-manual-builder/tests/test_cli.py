@@ -10,6 +10,8 @@ Nothing here touches the network or needs a key, which is the same promise
 """
 from __future__ import annotations
 
+import json
+
 import pytest
 import yaml
 
@@ -121,3 +123,60 @@ def test_a_command_that_needs_a_published_pair_says_which_id_is_missing(
     err = capsys.readouterr().err
     assert code == 2
     assert "--session" in err and "Run `publish` first" in err
+
+
+def test_status_and_verify_need_a_published_pair_before_they_touch_anything(
+        monkeypatch, tmp_path, capsys):
+    """Both new commands are free, and both are useless without a published
+    pair. Asked to work on one that does not exist they name the missing id
+    rather than opening a client and failing inside a request."""
+    monkeypatch.setattr(cli, "OUT", tmp_path / "nothing-here")
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    for command in ("status", "verify"):
+        assert cli.main([command]) == 2
+        assert "Run `publish` first" in capsys.readouterr().err
+
+
+def test_verify_reports_a_document_that_is_not_what_was_published(
+        monkeypatch, tmp_path, capsys):
+    """The wiring that matters, with the network stubbed out: a served document
+    pointing at an older drawing has to come back non-zero and name the figure
+    -- not print a green summary because the command reached the end."""
+    from manualbuilder import projections as pj, verify as vf
+    from manualbuilder.spec import load_spec
+
+    from .test_verify import served, urls
+
+    spec = load_spec(PROJECT_ROOT / "spec" / "halyard_m1.yaml")
+    images = urls(spec)
+    stale = dict(images, **{pj.BREAKDOWN: "https://storage.example/img/old.svg"})
+    pages = {"manual": served(spec, vf.MANUAL, images),
+             "quick-start card": served(spec, vf.CARD, stale)}
+
+    class FakeClient:
+        def __enter__(self): return self
+        def __exit__(self, *exc): return False
+
+        def export_bytes(self, session_id, fmt, filename=None):
+            # One session per document, so the session is what picks the page.
+            return pages["manual" if session_id == "s_manual"
+                         else "quick-start card"].encode("utf-8")
+
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "published.json").write_text(json.dumps({
+        "manual_id": "doc_m", "card_id": "doc_c",
+        "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+        "durable": {}, "language": "", "images": images}))
+
+    monkeypatch.setattr(cli, "OUT", out)
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    code = cli.main(["verify"])
+    printed = capsys.readouterr().out
+    assert code == 1
+    assert "FAIL" in printed and "breakdown" in printed
+    assert "older drawing" in printed
+    assert "not what this program recorded publishing" in printed

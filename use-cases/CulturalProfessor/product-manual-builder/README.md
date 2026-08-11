@@ -47,7 +47,7 @@ it.
 .venv/bin/python -m pytest
 ```
 
-94 tests, no network and no key.
+106 tests, no network and no key.
 
 Two commands need no API key and no network:
 
@@ -165,6 +165,52 @@ you want to read the markup back.
 
 Give it a moment after `approve`, though — see the caveat under [what is
 verified](#what-is-verified-against-the-live-service).
+
+Two commands exist to be run rather than trusted, and neither spends quota:
+
+```bash
+.venv/bin/python -m manualbuilder.cli status
+```
+
+What is published, which session each document is edited in, and — the reason
+it exists — whether a batch is parked. A parked batch holds its session and the
+next turn in it comes back `409 session_busy` with nothing naming the batch.
+This names it.
+
+```bash
+.venv/bin/python -m manualbuilder.cli verify
+```
+
+```
+exported both documents to out/export/ (no quota spent)
+
+  ok   manual: breakdown                  d8c0d831fc2f40aaae234c83925895b6.svg
+  …
+  ok   quick-start card: breakdown        d8c0d831fc2f40aaae234c83925895b6.svg
+  --   step rails                         in neither document as the spec words it…
+  ok   step gantry                        word for word in both documents
+  …
+17 passed, 0 failed, 1 no longer checkable
+```
+
+`verify` reads both documents back off the service and checks the two claims
+that can fail silently: **every figure points at the drawing that was uploaded
+for it** — compared by URL path, because the served `src` carries a ~750-
+character signature that differs on every read — and **the manual and the card
+still agree word for word**, on the served documents rather than on the local
+render.
+
+The third verdict is the honest one. `--` means an approved edit has moved the
+text since publish, so the spec no longer words it the way the live documents
+do; the check can no longer see what it was looking at, and it does not claim
+the two still agree. In the run above that is the rails step, where the torque
+edit landed — both documents read 1.6 N·m and the spec on disk still reads 1.2.
+Text found in exactly *one* document is drift, and that is a failure.
+
+`test_verify.py` is ten served documents broken in specific ways — an old
+drawing left in place, a figure that lost its image, an invented URL, a fix
+dropped from the card — and `verify` has to find each one. A verification step
+that can only print green is worse than none.
 
 ## What is in the documents
 
@@ -333,9 +379,12 @@ A run on 2026-08-12 exercised `sync`: 8 diagrams re-rendered and uploaded, 9
 swaps proposed across the two documents, both guards passed, all 9 approved, and
 both documents exported pointing at all 9 of the newly uploaded URLs — compared
 by URL *path*, because the service appends a ~750-character signed query when it
-serves an image and that query differs on every read. The check is
-`out/published.json` against `out/export/*.html`, and it is the reason the
-paragraph above this one can be written down.
+serves an image and that query differs on every read.
+
+That check is the `verify` command, not something run by hand once and written
+up here — which is the point. Anything in this section can be re-checked with
+one free command, and if the documents on the service stop matching what
+`publish` recorded, `verify` exits non-zero and names the figure.
 
 One caveat found while doing that, and it is a real one: `export` run
 immediately after `approve`, in the same shell command, came back with the
@@ -379,8 +428,10 @@ manualbuilder/
   localize.py            locale fill + the structural assertion
   superdocs.py           thin API client, no product decisions
   session.py             publish, the paired edit, approval, diagram swap
-  cli.py                 check / build / publish / edit / approve / sync / export
-tests/                   94 tests, no network
+  verify.py              reading the pair back off the service and checking it
+  cli.py                 check / build / publish / edit / approve / sync /
+                         export / status / verify
+tests/                   106 tests, no network
 ```
 
 ## What it does not do

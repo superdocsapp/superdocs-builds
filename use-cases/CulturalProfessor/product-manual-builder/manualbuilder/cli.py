@@ -13,7 +13,8 @@ import json
 import sys
 from pathlib import Path
 
-from manualbuilder import localize as lz, paginate as pg, projections as pj, session
+from manualbuilder import (localize as lz, paginate as pg, projections as pj,
+                           session, verify as vf)
 from manualbuilder.spec import SpecError, load_spec
 
 DEFAULT_SPEC = Path("spec/halyard_m1.yaml")
@@ -521,6 +522,91 @@ def cmd_export(args) -> int:
     return 0
 
 
+def cmd_status(args) -> int:
+    """What is published, and whether anything is in the way of an edit.
+
+    Free, and the first thing to run when a command has just refused. The state
+    that stops work here is a batch parked at `awaiting_approval`: it holds its
+    session, the next turn in that session comes back 409 `session_busy`, and
+    nothing about the error names the batch. This does.
+    """
+    published = _load(args)
+    print(f"{'document':<16} {'id':<16} session")
+    for document_id in published.document_ids:
+        print(f"{published.name_for(document_id):<16} {document_id:<16} "
+              f"{published.sessions.get(document_id, '—')}")
+    print(f"\nimages   {len(published.images)} diagram URL(s) recorded")
+
+    proposal = OUT / PROPOSAL
+    if proposal.is_file():
+        saved = json.loads(proposal.read_text(encoding="utf-8"))
+        print(f"proposal {len(saved.get('changes', []))} change(s) written to "
+              f"{proposal}, not yet decided")
+
+    blocked = 0
+    with _client() as client:
+        for document_id in published.document_ids:
+            for job in client.active_jobs(published.session_for(document_id)):
+                status = job.get("status")
+                blocked += status == "awaiting_approval"
+                print(f"\n{published.name_for(document_id)}: job "
+                      f"{job.get('job_id') or job.get('id')} is {status}")
+    if blocked:
+        print(f"\n{blocked} batch(es) parked. A parked batch holds its session, so "
+              f"`approve`\nor `approve --discard` has to happen before any other "
+              f"edit in it.")
+    else:
+        print("\nnothing parked; both sessions are free for the next edit.")
+    return 0
+
+
+def cmd_verify(args) -> int:
+    """Read both documents back off the service and check what they say.
+
+    The claim every other command makes is about what it sent. This is the one
+    that asks what is actually there -- so it exports, and checks the answer
+    against `out/published.json` and against the spec. Exports cost no quota,
+    which is why this can be run as often as it is worth running.
+    """
+    spec = _spec(args)
+    if args.language:
+        locales = _locales(spec)
+        if args.language not in locales:
+            print(f"no locales/{args.language}.yaml", file=sys.stderr)
+            return 2
+        spec = locales[args.language]
+
+    published = _load(args)
+    target = OUT / "export"
+    target.mkdir(parents=True, exist_ok=True)
+
+    served: dict[str, str] = {}
+    with _client() as client:
+        for document_id in published.document_ids:
+            name = published.name_for(document_id)
+            data = client.export_bytes(published.session_for(document_id), "html")
+            (target / f"{name.replace(' ', '-')}.html").write_bytes(data)
+            served[name] = data.decode("utf-8")
+    print(f"exported both documents to {target}/ (no quota spent)\n")
+
+    findings = vf.verify(served, published.images, spec)
+    for finding in findings:
+        print(f"  {finding.status:<4} {finding.check:<34} {finding.detail}")
+
+    bad = vf.failed(findings)
+    moot = [f for f in findings if f.status == vf.MOOT]
+    print(f"\n{len(findings) - len(bad) - len(moot)} passed, {len(bad)} failed"
+          + (f", {len(moot)} no longer checkable" if moot else ""))
+    if bad:
+        print("\nthe documents on the service are not what this program "
+              "recorded publishing.")
+        return 1
+    print("every figure points at the drawing uploaded for it, and every "
+          "instruction\nthe card shares with the manual is word for word the same "
+          "in both.")
+    return 0
+
+
 def _published_args(parser) -> None:
     """The three ids that identify a published pair.
 
@@ -569,10 +655,21 @@ def main(argv: list[str] | None = None) -> int:
     _published_args(export)
     export.add_argument("--format", default="pdf", help="pdf (default) or docx")
 
+    status = sub.add_parser(
+        "status", help="what is published, and what is blocking an edit (free)")
+    _published_args(status)
+
+    check_live = sub.add_parser(
+        "verify", help="read both documents back and check them (free)")
+    _published_args(check_live)
+    check_live.add_argument("--language", default="",
+                            help="a locale from locales/")
+
     args = parser.parse_args(argv)
     handler = {"check": cmd_check, "build": cmd_build, "publish": cmd_publish,
                "edit": cmd_edit, "approve": cmd_approve, "sync": cmd_sync,
-               "export": cmd_export}[args.command]
+               "export": cmd_export, "status": cmd_status,
+               "verify": cmd_verify}[args.command]
     try:
         return handler(args)
     except SpecError as exc:
