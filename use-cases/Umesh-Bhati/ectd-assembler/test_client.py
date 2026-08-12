@@ -4,15 +4,22 @@ from unittest.mock import patch
 from client import SuperDocsClient
 from requests.exceptions import ConnectionError
 
+@patch.dict(os.environ, {"SUPERDOCS_API_KEY": "sk_test_123"})
 class TestSuperDocsClient(unittest.TestCase):
     
-    @patch.dict(os.environ, {"SUPERDOCS_API_KEY": "sk_test_123"})
+    def setUp(self):
+        self.env_patcher = patch.dict(os.environ, {"SUPERDOCS_API_KEY": "sk_test_123"})
+        self.env_patcher.start()
+        self.client = SuperDocsClient()
+
+    def tearDown(self):
+        self.env_patcher.stop()
+
     @patch('client.requests.get')
     def test_verify_connection_success(self, mock_get):
         mock_get.return_value.status_code = 200
         
-        client = SuperDocsClient()
-        result = client.verify_connection()
+        result = self.client.verify_connection()
         
         self.assertTrue(result)
         mock_get.assert_called_once_with(
@@ -27,21 +34,37 @@ class TestSuperDocsClient(unittest.TestCase):
             client.verify_connection()
         self.assertTrue("SUPERDOCS_API_KEY" in str(context.exception))
 
-    @patch.dict(os.environ, {"SUPERDOCS_API_KEY": "sk_test_123"})
     @patch('client.requests.get')
     def test_verify_connection_error(self, mock_get):
         mock_get.return_value.status_code = 401
         
-        client = SuperDocsClient()
-        self.assertFalse(client.verify_connection())
+        self.assertFalse(self.client.verify_connection())
 
-    @patch.dict(os.environ, {"SUPERDOCS_API_KEY": "sk_test_123"})
     @patch('client.requests.get')
     def test_verify_connection_exception(self, mock_get):
         mock_get.side_effect = ConnectionError("Network failure")
         
-        client = SuperDocsClient()
-        self.assertFalse(client.verify_connection())
+        self.assertFalse(self.client.verify_connection())
+
+    @patch('client.requests.post')
+    def test_upload_document_success(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"session_id": "sess_123", "document_id": "doc_123"}
+        
+        with patch('builtins.open', unittest.mock.mock_open(read_data=b"dummy")):
+            result = self.client.upload_document("dummy.docx")
+            
+        self.assertEqual(result, {"session_id": "sess_123", "document_id": "doc_123"})
+
+    @patch('client.requests.post')
+    def test_upload_attachment_success(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"attachment_id": "att_123"}
+        
+        with patch('builtins.open', unittest.mock.mock_open(read_data=b"dummy text")):
+            result = self.client.upload_attachment("sess_123", "dummy.txt")
+            
+        self.assertEqual(result, "att_123")
 
 if __name__ == '__main__':
     unittest.main()
