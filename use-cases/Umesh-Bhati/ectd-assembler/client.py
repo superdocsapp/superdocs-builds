@@ -7,14 +7,14 @@ class SuperDocsClient:
         self.api_key = os.environ.get("SUPERDOCS_API_KEY")
         self.base_url = base_url
 
-    def _require_api_key(self):
+    @property
+    def auth_headers(self) -> dict:
         if not self.api_key:
             raise ValueError("SUPERDOCS_API_KEY environment variable is missing")
+        return {"Authorization": f"Bearer {self.api_key}"}
 
     def _post_file(self, endpoint: str, filepath: str) -> dict:
-        self._require_api_key()
-        
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        headers = self.auth_headers
         
         with open(filepath, 'rb') as f:
             files = {'file': (os.path.basename(filepath), f)}
@@ -24,9 +24,7 @@ class SuperDocsClient:
         return response.json()
 
     def verify_connection(self) -> bool:
-        self._require_api_key()
-            
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        headers = self.auth_headers
         
         try:
             response = requests.get(f"{self.base_url}/sessions", headers=headers)
@@ -42,9 +40,8 @@ class SuperDocsClient:
         return res.get("attachment_id")
 
     def chat_async(self, session_id: str, prompt: str) -> str:
-        self._require_api_key()
-            
-        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        headers = self.auth_headers
+        headers["Content-Type"] = "application/json"
         payload = {"prompt": prompt}
         
         response = requests.post(
@@ -57,9 +54,7 @@ class SuperDocsClient:
         return response.json().get("job_id")
 
     def get_job_status(self, job_id: str) -> str:
-        self._require_api_key()
-            
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        headers = self.auth_headers
         response = requests.get(
             f"{self.base_url}/jobs/{job_id}",
             headers=headers
@@ -68,9 +63,7 @@ class SuperDocsClient:
         return response.json().get("status")
 
     def export_document(self, document_id: str, output_path: str) -> str:
-        self._require_api_key()
-            
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        headers = self.auth_headers
         response = requests.get(
             f"{self.base_url}/export",
             headers=headers,
