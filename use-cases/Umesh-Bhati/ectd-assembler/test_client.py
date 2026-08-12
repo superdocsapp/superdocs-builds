@@ -66,5 +66,19 @@ class TestSuperDocsClient(unittest.TestCase):
             
         self.assertEqual(result, "att_123")
 
+    @patch('client.requests.post')
+    def test_chat_async_success(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"job_id": "job_123"}
+        
+        result = self.client.chat_async("sess_123", "Draft section 2.5")
+        
+        self.assertEqual(result, "job_123")
+        mock_post.assert_called_once_with(
+            "https://api.superdocs.app/v1/sessions/sess_123/chat_async",
+            headers={"Authorization": "Bearer sk_test_123", "Content-Type": "application/json"},
+            json={"prompt": "Draft section 2.5"}
+        )
+
 if __name__ == '__main__':
     unittest.main()

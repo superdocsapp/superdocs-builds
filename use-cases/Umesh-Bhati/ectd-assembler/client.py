@@ -38,3 +38,19 @@ class SuperDocsClient:
     def upload_attachment(self, session_id: str, filepath: str) -> str:
         res = self._post_file(f"/sessions/{session_id}/attachments", filepath)
         return res.get("attachment_id")
+
+    def chat_async(self, session_id: str, prompt: str) -> str:
+        if not self.api_key:
+            raise ValueError("SUPERDOCS_API_KEY environment variable is missing")
+            
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        payload = {"prompt": prompt}
+        
+        response = requests.post(
+            f"{self.base_url}/sessions/{session_id}/chat_async", 
+            headers=headers, 
+            json=payload
+        )
+        response.raise_for_status()
+        
+        return response.json().get("job_id")
