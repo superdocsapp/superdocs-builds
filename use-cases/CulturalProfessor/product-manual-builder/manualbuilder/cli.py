@@ -6,6 +6,7 @@ being reproducible, a translation keeping its shape -- is checkable before
 anything is uploaded. `publish` and `edit` are the two commands that spend
 quota.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -13,8 +14,11 @@ import json
 import sys
 from pathlib import Path
 
-from manualbuilder import (localize as lz, paginate as pg, projections as pj,
-                           session, verify as vf)
+from manualbuilder import localize as lz
+from manualbuilder import paginate as pg
+from manualbuilder import projections as pj
+from manualbuilder import session
+from manualbuilder import verify as vf
 from manualbuilder.spec import SpecError, load_spec
 
 DEFAULT_SPEC = Path("spec/halyard_m1.yaml")
@@ -39,12 +43,15 @@ def _locales(spec):
 
 # ------------------------------------------------------------- offline --
 
+
 def cmd_check(args) -> int:
     """Validate the spec and every locale. No network, no key."""
     spec = _spec(args)
-    print(f"spec        {spec.name} rev {spec.revision} — "
-          f"{len(spec.parts)} parts, {len(spec.steps)} steps, "
-          f"{len(spec.warnings)} warnings, {len(spec.faults)} faults")
+    print(
+        f"spec        {spec.name} rev {spec.revision} — "
+        f"{len(spec.parts)} parts, {len(spec.steps)} steps, "
+        f"{len(spec.warnings)} warnings, {len(spec.faults)} faults"
+    )
 
     manual = pj.manual_html(spec)
     card = pj.quick_start_html(spec)
@@ -58,18 +65,22 @@ def cmd_check(args) -> int:
         if fault.fix not in manual or fault.fix not in card:
             print(f"  FAIL  fix {fault.id!r} differs between the two documents")
             return 1
-    print(f"card        {len(spec.quick_start_steps)} of {len(spec.steps)} steps and "
-          f"{len(spec.quick_start_faults)} of {len(spec.faults)} fixes, "
-          f"every word identical to the manual")
+    print(
+        f"card        {len(spec.quick_start_steps)} of {len(spec.steps)} steps and "
+        f"{len(spec.quick_start_faults)} of {len(spec.faults)} fixes, "
+        f"every word identical to the manual"
+    )
 
     layouts = {
         "manual": pg.paginate(pj.manual_blocks(spec), pg.PAGE),
         "card": pg.paginate(pj.quick_start_blocks(spec), pg.PANEL),
     }
-    print(f"{'layout':<11} manual {layouts['manual'].pages} pages, fullest "
-          f"{layouts['manual'].tightest()[1]:.0%}; card "
-          f"{layouts['card'].pages} panels, fullest "
-          f"{layouts['card'].tightest()[1]:.0%}")
+    print(
+        f"{'layout':<11} manual {layouts['manual'].pages} pages, fullest "
+        f"{layouts['manual'].tightest()[1]:.0%}; card "
+        f"{layouts['card'].pages} panels, fullest "
+        f"{layouts['card'].tightest()[1]:.0%}"
+    )
     for name, layout in layouts.items():
         unit = "page" if name == "manual" else "panel"
         for block_id, excess in layout.overflows():
@@ -88,8 +99,10 @@ def cmd_check(args) -> int:
             pg.paginate(pj.manual_blocks(localised), pg.PAGE).tightest()[1],
             pg.paginate(pj.quick_start_blocks(localised), pg.PANEL).tightest()[1],
         )
-        print(f"{'locale ' + language:<11} same page for every block, text "
-              f"{ratio:.0%} of source, {1 - tightest:.0%} headroom")
+        print(
+            f"{'locale ' + language:<11} same page for every block, text "
+            f"{ratio:.0%} of source, {1 - tightest:.0%} headroom"
+        )
 
     print("ok" if not failures else f"{failures} locale(s) would repaginate")
     return 1 if failures else 0
@@ -103,16 +116,22 @@ def _check_locale(spec, localised, language: str, layouts) -> str | None:
     which one it is.
     """
     try:
-        lz.assert_same_structure(pj.manual_html(spec),
-                                 pj.manual_html(localised), language)
-        lz.assert_same_structure(pj.quick_start_html(spec),
-                                 pj.quick_start_html(localised), language)
+        lz.assert_same_structure(pj.manual_html(spec), pj.manual_html(localised), language)
+        lz.assert_same_structure(
+            pj.quick_start_html(spec), pj.quick_start_html(localised), language
+        )
         pg.assert_same_pagination(
-            layouts["manual"], pg.paginate(pj.manual_blocks(localised), pg.PAGE),
-            language, "manual")
+            layouts["manual"],
+            pg.paginate(pj.manual_blocks(localised), pg.PAGE),
+            language,
+            "manual",
+        )
         pg.assert_same_pagination(
-            layouts["card"], pg.paginate(pj.quick_start_blocks(localised), pg.PANEL),
-            language, "card")
+            layouts["card"],
+            pg.paginate(pj.quick_start_blocks(localised), pg.PANEL),
+            language,
+            "card",
+        )
     except (lz.LocaleError, pg.PaginationError) as exc:
         return str(exc)
     return None
@@ -136,23 +155,29 @@ def cmd_build(args) -> int:
         for image_id, svg in session.render_diagrams(source).items():
             name = f"{image_id.replace(':', '_')}{suffix}.svg"
             (OUT / name).write_text(svg, encoding="utf-8")
-            images[language][image_id] = name    # a local path, so out/ opens
+            images[language][image_id] = name  # a local path, so out/ opens
             written += 1
 
     documents = [("manual", spec, pj.manual_blocks, pg.PAGE, "")]
     documents.append(("quickstart", spec, pj.quick_start_blocks, pg.PANEL, ""))
     for language, localised in sorted(_locales(spec).items()):
-        documents.append((f"manual.{language}", localised, pj.manual_blocks,
-                          pg.PAGE, language))
-        documents.append((f"quickstart.{language}", localised,
-                          pj.quick_start_blocks, pg.PANEL, language))
+        documents.append((f"manual.{language}", localised, pj.manual_blocks, pg.PAGE, language))
+        documents.append(
+            (
+                f"quickstart.{language}",
+                localised,
+                pj.quick_start_blocks,
+                pg.PANEL,
+                language,
+            )
+        )
 
     for name, source, builder, box, language in documents:
         blocks = builder(source, images[language])
         (OUT / f"{name}.html").write_text(pj.render(blocks), encoding="utf-8")
         (OUT / f"{name}.preview.html").write_text(
-            _preview(name, blocks, pg.paginate(blocks, box), language),
-            encoding="utf-8")
+            _preview(name, blocks, pg.paginate(blocks, box), language), encoding="utf-8"
+        )
 
     print(f"{written} diagrams and {len(documents)} documents in {OUT}/")
     print(f"open {OUT}/manual.preview.html to see where the pages break")
@@ -177,13 +202,15 @@ def _preview(title: str, blocks, layout, language: str) -> str:
             page = placement.page
             parts.append(f'<hr class="pagebreak" data-page="{page}">')
         if placement.rows and placement.rows[0] > 0:
-            continue                       # a table continuing overleaf
+            continue  # a table continuing overleaf
         parts.append(by_id[placement.block_id].html)
 
     lang = f' lang="{language}"' if language else ""
-    return (f'<!doctype html><meta charset="utf-8"><title>{title}</title>'
-            f"<style>{_PREVIEW_CSS}</style>"
-            f'<body{lang}><main>' + "\n".join(parts) + "</main></body>")
+    return (
+        f'<!doctype html><meta charset="utf-8"><title>{title}</title>'
+        f"<style>{_PREVIEW_CSS}</style>"
+        f"<body{lang}><main>" + "\n".join(parts) + "</main></body>"
+    )
 
 
 _PREVIEW_CSS = """
@@ -224,6 +251,7 @@ th { background: #e7e3dc; font-weight: 600; }
 
 # ------------------------------------------------------------- online --
 
+
 def _client():
     from manualbuilder.superdocs import SuperDocs, load_dotenv
 
@@ -244,14 +272,20 @@ def _save(published, language: str) -> Path:
     """
     OUT.mkdir(exist_ok=True)
     path = OUT / STATE
-    path.write_text(json.dumps({
-        "manual_id": published.manual_id,
-        "card_id": published.card_id,
-        "sessions": published.sessions,
-        "durable": published.durable,
-        "language": language,
-        "images": published.images,
-    }, indent=2), encoding="utf-8")
+    path.write_text(
+        json.dumps(
+            {
+                "manual_id": published.manual_id,
+                "card_id": published.card_id,
+                "sessions": published.sessions,
+                "durable": published.durable,
+                "language": language,
+                "images": published.images,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     return path
 
 
@@ -276,11 +310,15 @@ def _load(args):
         for document_id in published.document_ids:
             published.sessions.setdefault(document_id, args.session)
 
-    missing = [name for name, value in (
-        ("--manual", published.manual_id),
-        ("--card", published.card_id),
-        ("--session", published.sessions.get(published.manual_id)),
-    ) if not value]
+    missing = [
+        name
+        for name, value in (
+            ("--manual", published.manual_id),
+            ("--card", published.card_id),
+            ("--session", published.sessions.get(published.manual_id)),
+        )
+        if not value
+    ]
     if missing:
         raise SpecError(
             f"no published pair to work on: {', '.join(missing)} not given and "
@@ -302,8 +340,10 @@ def cmd_publish(args) -> int:
     if args.language:
         locales = _locales(spec)
         if args.language not in locales:
-            print(f"no locales/{args.language}.yaml; have "
-                  f"{', '.join(sorted(locales)) or 'none'}", file=sys.stderr)
+            print(
+                f"no locales/{args.language}.yaml; have {', '.join(sorted(locales)) or 'none'}",
+                file=sys.stderr,
+            )
             return 2
         spec = locales[args.language]
 
@@ -311,8 +351,10 @@ def cmd_publish(args) -> int:
         published = session.publish(client, spec, language=args.language)
     path = _save(published, args.language)
     for document_id in published.document_ids:
-        print(f"{published.name_for(document_id):<16} {document_id}  "
-              f"in {published.sessions[document_id]}")
+        print(
+            f"{published.name_for(document_id):<16} {document_id}  "
+            f"in {published.sessions[document_id]}"
+        )
     print(f"images  {len(published.images)} uploaded")
     print(f"\nwritten to {path}; `edit`, `sync` and `export` read it from there.")
     return 0
@@ -369,14 +411,28 @@ def _save_proposal(published, changes) -> Path:
     """
     OUT.mkdir(exist_ok=True)
     path = OUT / PROPOSAL
-    path.write_text(json.dumps({
-        "sessions": published.sessions,
-        "jobs": published.jobs,
-        "changes": [{"change_id": c.change_id, "operation": c.operation,
-                     "chunk_id": c.chunk_id, "document_id": c.document_id,
-                     "old_html": c.old_html, "new_html": c.new_html,
-                     "explanation": c.explanation} for c in changes],
-    }, indent=2), encoding="utf-8")
+    path.write_text(
+        json.dumps(
+            {
+                "sessions": published.sessions,
+                "jobs": published.jobs,
+                "changes": [
+                    {
+                        "change_id": c.change_id,
+                        "operation": c.operation,
+                        "chunk_id": c.chunk_id,
+                        "document_id": c.document_id,
+                        "old_html": c.old_html,
+                        "new_html": c.new_html,
+                        "explanation": c.explanation,
+                    }
+                    for c in changes
+                ],
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     return path
 
 
@@ -400,8 +456,11 @@ def cmd_approve(args) -> int:
         with _client() as client:
             denied = session.discard_outstanding(client, published)
         path.unlink(missing_ok=True)
-        print(f"denied {denied} proposed change(s); the session is free for the "
-              f"next edit" if denied else "nothing was parked; the session is free")
+        print(
+            f"denied {denied} proposed change(s); the session is free for the next edit"
+            if denied
+            else "nothing was parked; the session is free"
+        )
         return 0
 
     if not path.is_file():
@@ -410,15 +469,21 @@ def cmd_approve(args) -> int:
     saved = json.loads(path.read_text(encoding="utf-8"))
     published.sessions.update(saved.get("sessions", {}))
     published.jobs = saved["jobs"]
-    changes = [ProposedChange(
-        change_id=c["change_id"], operation=c["operation"], chunk_id=c["chunk_id"],
-        document_id=c["document_id"], old_html=c["old_html"],
-        new_html=c["new_html"], explanation=c["explanation"])
-        for c in saved["changes"]]
+    changes = [
+        ProposedChange(
+            change_id=c["change_id"],
+            operation=c["operation"],
+            chunk_id=c["chunk_id"],
+            document_id=c["document_id"],
+            old_html=c["old_html"],
+            new_html=c["new_html"],
+            explanation=c["explanation"],
+        )
+        for c in saved["changes"]
+    ]
 
     reject = set(args.reject)
     with _client() as client:
-
         try:
             results = session.approve_all(client, published, changes, reject=reject)
         except SuperDocsError as exc:
@@ -427,11 +492,12 @@ def cmd_approve(args) -> int:
 
     for change in changes:
         verdict = "rejected" if change.change_id in reject else "approved"
-        print(f"  {verdict}  {change.change_id}  "
-              f"{published.name_for(change.document_id or '')}")
-    print(f"\n{len(changes) - len(reject)} approved, {len(reject)} rejected, "
-          f"across {len(results)} turn(s)")
-    path.unlink()          # a batch is applied once; a stale one is a trap
+        print(f"  {verdict}  {change.change_id}  {published.name_for(change.document_id or '')}")
+    print(
+        f"\n{len(changes) - len(reject)} approved, {len(reject)} rejected, "
+        f"across {len(results)} turn(s)"
+    )
+    path.unlink()  # a batch is applied once; a stale one is a trap
     return 0
 
 
@@ -470,13 +536,17 @@ def cmd_sync(args) -> int:
             session.assert_every_figure_swapped(changes, asked)
         except SuperDocsError as exc:
             print(f"\nREFUSED: {exc}")
-            print("nothing was approved, and the batch is still parked. "
-                  "`approve --discard` frees the session.")
+            print(
+                "nothing was approved, and the batch is still parked. "
+                "`approve --discard` frees the session."
+            )
             return 1
 
         for change in changes:
-            print(f"  [{change.operation}] chunk {change.chunk_id} in "
-                  f"{published.name_for(change.document_id or '')}")
+            print(
+                f"  [{change.operation}] chunk {change.chunk_id} in "
+                f"{published.name_for(change.document_id or '')}"
+            )
         print(f"\n{len(changes)} change(s), each one an image URL and nothing else")
 
         path = _save_proposal(published, changes)
@@ -515,8 +585,7 @@ def cmd_export(args) -> int:
             name = published.name_for(document_id).replace(" ", "-")
             # One document per session, so its own session exports it: no
             # focus juggling, and no way to export the wrong one.
-            data = client.export_bytes(published.session_for(document_id),
-                                       args.format)
+            data = client.export_bytes(published.session_for(document_id), args.format)
             path = target / f"{name}.{args.format}"
             path.write_bytes(data)
             print(f"{path}  {len(data):,} bytes")
@@ -534,15 +603,19 @@ def cmd_status(args) -> int:
     published = _load(args)
     print(f"{'document':<16} {'id':<16} session")
     for document_id in published.document_ids:
-        print(f"{published.name_for(document_id):<16} {document_id:<16} "
-              f"{published.sessions.get(document_id, '—')}")
+        print(
+            f"{published.name_for(document_id):<16} {document_id:<16} "
+            f"{published.sessions.get(document_id, '—')}"
+        )
     print(f"\nimages   {len(published.images)} diagram URL(s) recorded")
 
     proposal = OUT / PROPOSAL
     if proposal.is_file():
         saved = json.loads(proposal.read_text(encoding="utf-8"))
-        print(f"proposal {len(saved.get('changes', []))} change(s) written to "
-              f"{proposal}, not yet decided")
+        print(
+            f"proposal {len(saved.get('changes', []))} change(s) written to "
+            f"{proposal}, not yet decided"
+        )
 
     blocked = 0
     with _client() as client:
@@ -550,12 +623,16 @@ def cmd_status(args) -> int:
             for job in client.active_jobs(published.session_for(document_id)):
                 status = job.get("status")
                 blocked += status == "awaiting_approval"
-                print(f"\n{published.name_for(document_id)}: job "
-                      f"{job.get('job_id') or job.get('id')} is {status}")
+                print(
+                    f"\n{published.name_for(document_id)}: job "
+                    f"{job.get('job_id') or job.get('id')} is {status}"
+                )
     if blocked:
-        print(f"\n{blocked} batch(es) parked. A parked batch holds its session, so "
-              f"`approve`\nor `approve --discard` has to happen before any other "
-              f"edit in it.")
+        print(
+            f"\n{blocked} batch(es) parked. A parked batch holds its session, so "
+            f"`approve`\nor `approve --discard` has to happen before any other "
+            f"edit in it."
+        )
     else:
         print("\nnothing parked; both sessions are free for the next edit.")
     return 0
@@ -574,8 +651,10 @@ def _rebind(client, published, args) -> None:
     if not moved:
         return
     for document_id in moved:
-        print(f"note: {published.name_for(document_id)}'s session no longer held "
-              f"it; re-opened as {published.sessions[document_id]}")
+        print(
+            f"note: {published.name_for(document_id)}'s session no longer held "
+            f"it; re-opened as {published.sessions[document_id]}"
+        )
     _save(published, getattr(args, "language", ""))
 
 
@@ -619,8 +698,7 @@ def cmd_verify(args) -> int:
         for document_id in published.document_ids:
             name = published.name_for(document_id)
             html = client.document_html(published.durable_for(document_id))
-            (target / f"{name.replace(' ', '-')}.html").write_text(
-                html, encoding="utf-8")
+            (target / f"{name.replace(' ', '-')}.html").write_text(html, encoding="utf-8")
             served[name] = html
     print(f"read both documents by id into {target}/ (no quota spent)\n")
 
@@ -630,15 +708,18 @@ def cmd_verify(args) -> int:
 
     bad = vf.failed(findings)
     moot = [f for f in findings if f.status == vf.MOOT]
-    print(f"\n{len(findings) - len(bad) - len(moot)} passed, {len(bad)} failed"
-          + (f", {len(moot)} no longer checkable" if moot else ""))
+    print(
+        f"\n{len(findings) - len(bad) - len(moot)} passed, {len(bad)} failed"
+        + (f", {len(moot)} no longer checkable" if moot else "")
+    )
     if bad:
-        print("\nthe documents on the service are not what this program "
-              "recorded publishing.")
+        print("\nthe documents on the service are not what this program recorded publishing.")
         return 1
-    print("every figure points at the drawing uploaded for it, and every "
-          "instruction\nthe card shares with the manual is word for word the same "
-          "in both.")
+    print(
+        "every figure points at the drawing uploaded for it, and every "
+        "instruction\nthe card shares with the manual is word for word the same "
+        "in both."
+    )
     return 0
 
 
@@ -660,51 +741,70 @@ def main(argv: list[str] | None = None) -> int:
 
     sub.add_parser("check", help="validate the spec and every locale (offline)")
     sub.add_parser("build", help="render documents and diagrams to out/ (offline)")
-    publish = sub.add_parser("publish",
-                             help="upload both documents and their diagrams")
-    publish.add_argument("--language", default="",
-                         help="a locale from locales/ (default: the spec's own)")
+    publish = sub.add_parser("publish", help="upload both documents and their diagrams")
+    publish.add_argument(
+        "--language",
+        default="",
+        help="a locale from locales/ (default: the spec's own)",
+    )
 
     edit = sub.add_parser("edit", help="one instruction, both documents")
     edit.add_argument("instruction")
     _published_args(edit)
-    edit.add_argument("--yes", action="store_true",
-                      help="approve the proposed changes; without it, nothing is applied")
+    edit.add_argument(
+        "--yes",
+        action="store_true",
+        help="approve the proposed changes; without it, nothing is applied",
+    )
     approve = sub.add_parser(
-        "approve", help="apply the batch `edit` proposed, minus what you reject")
-    approve.add_argument("--reject", action="append", default=[],
-                         metavar="CHANGE_ID",
-                         help="reject one change by id; the rest still applies. "
-                              "Repeatable.")
-    approve.add_argument("--discard", action="store_true",
-                         help="throw the whole batch away and unblock the session")
+        "approve", help="apply the batch `edit` proposed, minus what you reject"
+    )
+    approve.add_argument(
+        "--reject",
+        action="append",
+        default=[],
+        metavar="CHANGE_ID",
+        help="reject one change by id; the rest still applies. Repeatable.",
+    )
+    approve.add_argument(
+        "--discard",
+        action="store_true",
+        help="throw the whole batch away and unblock the session",
+    )
     _published_args(approve)
 
     sync = sub.add_parser("sync", help="re-render the diagrams and swap them in")
     _published_args(sync)
     sync.add_argument("--language", default="", help="a locale from locales/")
-    sync.add_argument("--yes", action="store_true",
-                      help="approve the swaps; without it, nothing is applied")
+    sync.add_argument(
+        "--yes",
+        action="store_true",
+        help="approve the swaps; without it, nothing is applied",
+    )
 
     export = sub.add_parser("export", help="download both finished documents")
     _published_args(export)
     export.add_argument("--format", default="pdf", help="pdf (default) or docx")
 
-    status = sub.add_parser(
-        "status", help="what is published, and what is blocking an edit (free)")
+    status = sub.add_parser("status", help="what is published, and what is blocking an edit (free)")
     _published_args(status)
 
-    check_live = sub.add_parser(
-        "verify", help="read both documents back and check them (free)")
+    check_live = sub.add_parser("verify", help="read both documents back and check them (free)")
     _published_args(check_live)
-    check_live.add_argument("--language", default="",
-                            help="a locale from locales/")
+    check_live.add_argument("--language", default="", help="a locale from locales/")
 
     args = parser.parse_args(argv)
-    handler = {"check": cmd_check, "build": cmd_build, "publish": cmd_publish,
-               "edit": cmd_edit, "approve": cmd_approve, "sync": cmd_sync,
-               "export": cmd_export, "status": cmd_status,
-               "verify": cmd_verify}[args.command]
+    handler = {
+        "check": cmd_check,
+        "build": cmd_build,
+        "publish": cmd_publish,
+        "edit": cmd_edit,
+        "approve": cmd_approve,
+        "sync": cmd_sync,
+        "export": cmd_export,
+        "status": cmd_status,
+        "verify": cmd_verify,
+    }[args.command]
     try:
         return handler(args)
     except SpecError as exc:

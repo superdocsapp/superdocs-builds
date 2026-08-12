@@ -24,6 +24,7 @@ Diagrams arrive as an `images` mapping from diagram id to URL. Rendering with an
 empty mapping is legal and produces a document with the diagrams' captions and
 no `<img>` -- which is what makes the HTML testable without a network.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -50,6 +51,7 @@ class Block:
     they are what makes "the German step 4 is on the same page as the English
     step 4" a property of the design rather than a coincidence of length.
     """
+
     id: str
     kind: str
     html: str
@@ -99,8 +101,9 @@ def captions_in(blocks: list[Block]) -> dict[str, str]:
     breakdown and none of the step diagrams. Asking a document to swap a figure
     it does not contain is what made the card refuse the whole instruction.
     """
-    return {block.text: block.diagram
-            for block in blocks if block.kind == "figure" and block.diagram}
+    return {
+        block.text: block.diagram for block in blocks if block.kind == "figure" and block.diagram
+    }
 
 
 def captions(spec: Spec) -> dict[str, str]:
@@ -117,41 +120,63 @@ def captions(spec: Spec) -> dict[str, str]:
 
 # ------------------------------------------------------------- the manual --
 
+
 def manual_blocks(spec: Spec, images: dict[str, str] | None = None) -> list[Block]:
     images = images or {}
     out: list[Block] = []
 
-    out.append(_heading("doc:title", 1, f"{spec.name} — Product Manual",
-                        keep_with_next=True))
-    out.append(_para("doc:tagline", f"<em>{escape(spec.tagline)}</em>",
-                     spec.tagline, keep_with_next=True))
-    out.append(_para("doc:meta",
-                     f"Model {escape(spec.model_number)} · Revision "
-                     f"{escape(spec.revision)}",
-                     f"Model {spec.model_number} Revision {spec.revision}"))
+    out.append(_heading("doc:title", 1, f"{spec.name} — Product Manual", keep_with_next=True))
+    out.append(
+        _para("doc:tagline", f"<em>{escape(spec.tagline)}</em>", spec.tagline, keep_with_next=True)
+    )
+    out.append(
+        _para(
+            "doc:meta",
+            f"Model {escape(spec.model_number)} · Revision {escape(spec.revision)}",
+            f"Model {spec.model_number} Revision {spec.revision}",
+        )
+    )
 
     out.append(_section("sec:safety", "Before you start"))
-    out.append(_para(
-        "safety:preamble",
-        "Read the safety notices below in full. They are repeated at the step "
-        "they apply to, and the wording is the same in both places because it "
-        "is written once.",
-        "Read the safety notices below in full. They are repeated at the step "
-        "they apply to, and the wording is the same in both places because it "
-        "is written once."))
+    out.append(
+        _para(
+            "safety:preamble",
+            "Read the safety notices below in full. They are repeated at the step "
+            "they apply to, and the wording is the same in both places because it "
+            "is written once.",
+            "Read the safety notices below in full. They are repeated at the step "
+            "they apply to, and the wording is the same in both places because it "
+            "is written once.",
+        )
+    )
     out += _notices("safety", spec.warnings)
 
     out.append(_section("sec:specifications", "Specifications"))
-    out.append(_table("specifications:table", ["Specification", "Value"],
-                      [[label, value] for label, value in spec.specifications]))
+    out.append(
+        _table(
+            "specifications:table",
+            ["Specification", "Value"],
+            [[label, value] for label, value in spec.specifications],
+        )
+    )
 
     out.append(_section("sec:parts", "What is in the box"))
-    out.append(_figure(images, "parts:figure", BREAKDOWN,
-                       f"{spec.name} parts breakdown. Numbers key to the table "
-                       f"below.", keep_with_next=True))
-    out.append(_table("parts:table", ["No.", "Part", "Qty", "Notes"],
-                      [[str(n), label, qty, note] for n, label, qty, note
-                       in parts_list_rows(spec)]))
+    out.append(
+        _figure(
+            images,
+            "parts:figure",
+            BREAKDOWN,
+            f"{spec.name} parts breakdown. Numbers key to the table below.",
+            keep_with_next=True,
+        )
+    )
+    out.append(
+        _table(
+            "parts:table",
+            ["No.", "Part", "Qty", "Notes"],
+            [[str(n), label, qty, note] for n, label, qty, note in parts_list_rows(spec)],
+        )
+    )
 
     out.append(_section("sec:setup", "Setting up"))
     for index, step in enumerate(spec.steps, start=1):
@@ -159,12 +184,24 @@ def manual_blocks(spec: Spec, images: dict[str, str] | None = None) -> list[Bloc
         # instruction, and those three are useless apart -- so rather than hope
         # they stay together as text lengths change per language, the break is
         # declared here and inherited by every translation.
-        out.append(_heading(f"step:{step.id}:head", 3,
-                            f"Step {index} — {step.title}",
-                            starts_page=True, keep_with_next=True))
-        out.append(_figure(images, f"step:{step.id}:figure",
-                           step_image_id(step), f"Step {index}: {step.title}",
-                           keep_with_next=True))
+        out.append(
+            _heading(
+                f"step:{step.id}:head",
+                3,
+                f"Step {index} — {step.title}",
+                starts_page=True,
+                keep_with_next=True,
+            )
+        )
+        out.append(
+            _figure(
+                images,
+                f"step:{step.id}:figure",
+                step_image_id(step),
+                f"Step {index}: {step.title}",
+                keep_with_next=True,
+            )
+        )
         out.append(_para(f"step:{step.id}:body", escape(step.body), step.body))
         out += _notices(f"step:{step.id}", spec.warnings_for(step))
 
@@ -173,12 +210,10 @@ def manual_blocks(spec: Spec, images: dict[str, str] | None = None) -> list[Bloc
 
     for statement in spec.statements:
         out.append(_section(f"statement:{statement.id}:head", statement.title))
-        out.append(_para(f"statement:{statement.id}:body",
-                         escape(statement.body), statement.body))
+        out.append(_para(f"statement:{statement.id}:body", escape(statement.body), statement.body))
 
     out.append(_section("sec:support", "Support"))
-    out.append(_para("support:footer", escape(spec.quick_start_footer),
-                     spec.quick_start_footer))
+    out.append(_para("support:footer", escape(spec.quick_start_footer), spec.quick_start_footer))
     return out
 
 
@@ -188,19 +223,21 @@ def manual_html(spec: Spec, images: dict[str, str] | None = None) -> str:
 
 # --------------------------------------------------------------- the card --
 
-def quick_start_blocks(spec: Spec,
-                       images: dict[str, str] | None = None) -> list[Block]:
+
+def quick_start_blocks(spec: Spec, images: dict[str, str] | None = None) -> list[Block]:
     images = images or {}
     steps = spec.quick_start()
     out: list[Block] = []
 
-    out.append(_heading("doc:title", 1, f"{spec.name} — Quick Start",
-                        keep_with_next=True))
-    out.append(_para("doc:meta",
-                     f"Model {escape(spec.model_number)} · Revision "
-                     f"{escape(spec.revision)} · {len(steps)} steps",
-                     f"Model {spec.model_number} Revision {spec.revision} "
-                     f"{len(steps)} steps"))
+    out.append(_heading("doc:title", 1, f"{spec.name} — Quick Start", keep_with_next=True))
+    out.append(
+        _para(
+            "doc:meta",
+            f"Model {escape(spec.model_number)} · Revision "
+            f"{escape(spec.revision)} · {len(steps)} steps",
+            f"Model {spec.model_number} Revision {spec.revision} {len(steps)} steps",
+        )
+    )
 
     out.append(_section("sec:safety", "Read first"))
     out += _notices("safety", [spec.warning(w) for w in spec.quick_start_warnings])
@@ -216,20 +253,24 @@ def quick_start_blocks(spec: Spec,
         # sentence. Declaring the break makes the panel the unit that has to fit
         # -- which `paginate` then checks, rather than the translation being
         # free to push step six onto the back.
-        out.append(_heading(f"step:{step.id}:head", 3, f"{index}. {step.title}",
-                            starts_page=True, keep_with_next=True))
+        out.append(
+            _heading(
+                f"step:{step.id}:head",
+                3,
+                f"{index}. {step.title}",
+                starts_page=True,
+                keep_with_next=True,
+            )
+        )
         out.append(_para(f"step:{step.id}:body", escape(step.body), step.body))
 
     out.append(_section("sec:troubleshooting", "If something is wrong"))
-    out.append(_trouble_table("troubleshooting:table",
-                              spec.quick_start_troubleshooting()))
+    out.append(_trouble_table("troubleshooting:table", spec.quick_start_troubleshooting()))
 
     out.append(_section("sec:reference", "Assembly reference"))
-    out.append(_figure(images, "parts:figure", BREAKDOWN,
-                       f"{spec.name} parts breakdown"))
+    out.append(_figure(images, "parts:figure", BREAKDOWN, f"{spec.name} parts breakdown"))
 
-    out.append(_para("support:footer", escape(spec.quick_start_footer),
-                     spec.quick_start_footer))
+    out.append(_para("support:footer", escape(spec.quick_start_footer), spec.quick_start_footer))
     return out
 
 
@@ -239,13 +280,17 @@ def quick_start_html(spec: Spec, images: dict[str, str] | None = None) -> str:
 
 # ---------------------------------------------------------------- shared --
 
-def _heading(block_id: str, level: int, text: str, *, starts_page: bool = False,
-             keep_with_next: bool = False) -> Block:
+
+def _heading(
+    block_id: str, level: int, text: str, *, starts_page: bool = False, keep_with_next: bool = False
+) -> Block:
     return Block(
-        id=block_id, kind=f"h{level}",
-        html=f'<h{level} data-block="{escape(block_id, quote=True)}">'
-             f"{escape(text)}</h{level}>",
-        text=text, starts_page=starts_page, keep_with_next=keep_with_next,
+        id=block_id,
+        kind=f"h{level}",
+        html=f'<h{level} data-block="{escape(block_id, quote=True)}">{escape(text)}</h{level}>',
+        text=text,
+        starts_page=starts_page,
+        keep_with_next=keep_with_next,
     )
 
 
@@ -260,12 +305,13 @@ def _section(block_id: str, title: str) -> Block:
     return _heading(block_id, 2, title, starts_page=True, keep_with_next=True)
 
 
-def _para(block_id: str, inner_html: str, text: str, *,
-          keep_with_next: bool = False) -> Block:
+def _para(block_id: str, inner_html: str, text: str, *, keep_with_next: bool = False) -> Block:
     return Block(
-        id=block_id, kind="p",
+        id=block_id,
+        kind="p",
         html=f'<p data-block="{escape(block_id, quote=True)}">{inner_html}</p>',
-        text=text, keep_with_next=keep_with_next,
+        text=text,
+        keep_with_next=keep_with_next,
     )
 
 
@@ -280,18 +326,27 @@ def _notices(prefix: str, warnings: list[Warning_]) -> list[Block]:
     for warning in warnings:
         label = SEVERITY_LABEL.get(warning.severity, warning.severity.title())
         text = f"{label}: {warning.title}. {warning.body}"
-        out.append(Block(
-            id=f"{prefix}:warning:{warning.id}", kind="notice",
-            html=f'<p data-block="{escape(f"{prefix}:warning:{warning.id}", quote=True)}">'
-                 f"<strong>{escape(label)}: {escape(warning.title)}.</strong> "
-                 f"{escape(warning.body)}</p>",
-            text=text,
-        ))
+        out.append(
+            Block(
+                id=f"{prefix}:warning:{warning.id}",
+                kind="notice",
+                html=f'<p data-block="{escape(f"{prefix}:warning:{warning.id}", quote=True)}">'
+                f"<strong>{escape(label)}: {escape(warning.title)}.</strong> "
+                f"{escape(warning.body)}</p>",
+                text=text,
+            )
+        )
     return out
 
 
-def _figure(images: dict[str, str], block_id: str, image_id: str, caption: str,
-            *, keep_with_next: bool = False) -> Block:
+def _figure(
+    images: dict[str, str],
+    block_id: str,
+    image_id: str,
+    caption: str,
+    *,
+    keep_with_next: bool = False,
+) -> Block:
     """A figure, with its caption whether or not the image exists yet.
 
     The caption is not decoration: it is what carries the figure when a document
@@ -299,27 +354,29 @@ def _figure(images: dict[str, str], block_id: str, image_id: str, caption: str,
     holding a given diagram.
     """
     url = images.get(image_id)
-    picture = (f'<img src="{escape(url, quote=True)}" alt="{escape(caption)}"/>'
-               if url else "")
+    picture = f'<img src="{escape(url, quote=True)}" alt="{escape(caption)}"/>' if url else ""
     return Block(
-        id=block_id, kind="figure",
+        id=block_id,
+        kind="figure",
         html=f'<figure data-block="{escape(block_id, quote=True)}" '
-             f'data-diagram="{escape(image_id, quote=True)}">{picture}'
-             f"<figcaption>{escape(caption)}</figcaption></figure>",
-        text=caption, keep_with_next=keep_with_next, diagram=image_id,
+        f'data-diagram="{escape(image_id, quote=True)}">{picture}'
+        f"<figcaption>{escape(caption)}</figcaption></figure>",
+        text=caption,
+        keep_with_next=keep_with_next,
+        diagram=image_id,
     )
 
 
 def _table(block_id: str, headers: list[str], rows: list[list[str]]) -> Block:
     head = "".join(f"<th>{escape(h)}</th>" for h in headers)
     body = "".join(
-        "<tr>" + "".join(f"<td>{escape(cell)}</td>" for cell in row) + "</tr>"
-        for row in rows
+        "<tr>" + "".join(f"<td>{escape(cell)}</td>" for cell in row) + "</tr>" for row in rows
     )
     return Block(
-        id=block_id, kind="table",
+        id=block_id,
+        kind="table",
         html=f'<table data-block="{escape(block_id, quote=True)}">'
-             f"<thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>",
+        f"<thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>",
         text=" ".join(headers),
         rows=tuple(" ".join(row) for row in rows),
     )
@@ -333,10 +390,18 @@ def _trouble_table(block_id: str, faults: list[Fault]) -> Block:
     rendered twice, so "the card's fix disagrees with the manual's fix" has no
     way to happen.
     """
-    return _table(block_id, list(TROUBLE_HEADERS),
-                  [[f.symptom, f.cause, f.fix] for f in faults])
+    return _table(block_id, list(TROUBLE_HEADERS), [[f.symptom, f.cause, f.fix] for f in faults])
 
 
-__all__ = ["Block", "manual_html", "quick_start_html", "manual_blocks",
-           "quick_start_blocks", "render", "image_ids", "step_image_id",
-           "BREAKDOWN", "TROUBLE_HEADERS"]
+__all__ = [
+    "BREAKDOWN",
+    "TROUBLE_HEADERS",
+    "Block",
+    "image_ids",
+    "manual_blocks",
+    "manual_html",
+    "quick_start_blocks",
+    "quick_start_html",
+    "render",
+    "step_image_id",
+]

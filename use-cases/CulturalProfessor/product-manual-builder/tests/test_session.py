@@ -14,6 +14,7 @@ plausible and is refused.
 
 No network: a proposed change is a dataclass, and that is all these need.
 """
+
 from __future__ import annotations
 
 import pytest
@@ -39,21 +40,30 @@ def figure(caption: str, url: str, extra: str = "", chunked: bool = False) -> st
     the shape we sent would pass every test and fail on the first real chunk.
     """
     if chunked:
-        return (f'<figure data-chunk-id="f248c6f2"><img alt="{caption}" '
-                f'src="{url}"/><figcaption>{caption}</figcaption></figure>{extra}')
-    return (f'<figure data-block="step:laser:figure" data-diagram="step:laser">'
-            f'<img src="{url}" alt="{caption}"/>'
-            f"<figcaption>{caption}</figcaption></figure>{extra}")
+        return (
+            f'<figure data-chunk-id="f248c6f2"><img alt="{caption}" '
+            f'src="{url}"/><figcaption>{caption}</figcaption></figure>{extra}'
+        )
+    return (
+        f'<figure data-block="step:laser:figure" data-diagram="step:laser">'
+        f'<img src="{url}" alt="{caption}"/>'
+        f"<figcaption>{caption}</figcaption></figure>{extra}"
+    )
 
 
-def swap(new_html: str, old_html: str | None = None,
-         change_id: str = "c1") -> ProposedChange:
+def swap(new_html: str, old_html: str | None = None, change_id: str = "c1") -> ProposedChange:
     return ProposedChange(
-        change_id=change_id, operation="edit", chunk_id="chunk_12",
+        change_id=change_id,
+        operation="edit",
+        chunk_id="chunk_12",
         document_id="doc_manual",
-        old_html=old_html if old_html is not None else figure(
-            LASER, "https://cdn.example/step_laser-v1.svg"),
-        new_html=new_html, explanation="updated the diagram",
+        old_html=(
+            old_html
+            if old_html is not None
+            else figure(LASER, "https://cdn.example/step_laser-v1.svg")
+        ),
+        new_html=new_html,
+        explanation="updated the diagram",
     )
 
 
@@ -67,10 +77,12 @@ def test_the_shape_the_service_actually_returns_is_allowed():
     stripped, a chunk id added, alt before src. The first live run refused this
     because the check was reading the markup we sent rather than the markup that
     came back."""
-    changes = [swap(
-        new_html=figure(LASER, IMAGES[LASER], chunked=True),
-        old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg",
-                        chunked=True))]
+    changes = [
+        swap(
+            new_html=figure(LASER, IMAGES[LASER], chunked=True),
+            old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg", chunked=True),
+        )
+    ]
     session.assert_only_the_image_changed(changes, IMAGES)
 
 
@@ -84,8 +96,7 @@ def test_a_reworded_caption_is_refused():
 
 
 def test_a_paragraph_added_next_to_the_figure_is_refused():
-    changes = [swap(figure(LASER, IMAGES[LASER],
-                           extra="<p>See also the parts table.</p>"))]
+    changes = [swap(figure(LASER, IMAGES[LASER], extra="<p>See also the parts table.</p>"))]
     with pytest.raises(SuperDocsError, match="altered more than the image URL"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
@@ -112,11 +123,12 @@ def test_the_right_url_on_the_wrong_figure_is_refused():
 
 
 def test_a_figure_nobody_asked_about_is_refused():
-    changes = [swap(
-        new_html=figure("Step 6: Power up and home",
-                        "https://cdn.example/step_power-v2.svg"),
-        old_html=figure("Step 6: Power up and home",
-                        "https://cdn.example/step_power-v1.svg"))]
+    changes = [
+        swap(
+            new_html=figure("Step 6: Power up and home", "https://cdn.example/step_power-v2.svg"),
+            old_html=figure("Step 6: Power up and home", "https://cdn.example/step_power-v1.svg"),
+        )
+    ]
     with pytest.raises(SuperDocsError, match="not part of this refresh"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
@@ -126,8 +138,7 @@ def test_an_image_with_no_caption_to_identify_it_is_refused():
     left saying which drawing it is meant to be. A check that cannot be made is
     reported, not skipped."""
     anonymous = '<figure><img src="https://cdn.example/step_laser-v2.svg"/></figure>'
-    changes = [swap(new_html=anonymous,
-                    old_html=anonymous.replace("-v2", "-v1"))]
+    changes = [swap(new_html=anonymous, old_html=anonymous.replace("-v2", "-v1"))]
     with pytest.raises(SuperDocsError, match="not part of this refresh"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
@@ -143,8 +154,10 @@ def test_one_bad_change_refuses_the_whole_batch():
     """Not "approve the good ones and flag the rest". If one chunk came back
     rewritten, what the turn did to the others is not evidence of anything."""
     changes = [
-        swap(figure("Halyard M1 parts breakdown",
-                    IMAGES["Halyard M1 parts breakdown"]), change_id="ok"),
+        swap(
+            figure("Halyard M1 parts breakdown", IMAGES["Halyard M1 parts breakdown"]),
+            change_id="ok",
+        ),
         swap(figure("Reworded", IMAGES[LASER]), change_id="bad"),
     ]
     with pytest.raises(SuperDocsError, match="whole batch was refused"):
@@ -156,19 +169,24 @@ def test_one_bad_change_refuses_the_whole_batch():
 #: What each document was asked to swap: the manual holds both figures, the card
 #: holds only the breakdown, and it captions it differently.
 ASKED = {
-    "doc_manual": {"Halyard M1 parts breakdown. Numbers key to the table below.":
-                   "breakdown", LASER: "step:laser"},
+    "doc_manual": {
+        "Halyard M1 parts breakdown. Numbers key to the table below.": "breakdown",
+        LASER: "step:laser",
+    },
     "doc_card": {"Halyard M1 parts breakdown": "breakdown"},
 }
 
 
 def in_document(document_id: str, caption: str, change_id: str) -> ProposedChange:
     return ProposedChange(
-        change_id=change_id, operation="edit", chunk_id="chunk_12",
+        change_id=change_id,
+        operation="edit",
+        chunk_id="chunk_12",
         document_id=document_id,
         old_html=figure(caption, "https://cdn.example/old.svg", chunked=True),
         new_html=figure(caption, "https://cdn.example/new.svg", chunked=True),
-        explanation="updated the diagram")
+        explanation="updated the diagram",
+    )
 
 
 def test_a_document_that_swapped_nothing_is_refused():
@@ -179,9 +197,9 @@ def test_a_document_that_swapped_nothing_is_refused():
     was satisfied. That is the two documents disagreeing, reached through the
     path built to keep them together."""
     changes = [
-        in_document("doc_manual",
-                    "Halyard M1 parts breakdown. Numbers key to the table below.",
-                    "c1"),
+        in_document(
+            "doc_manual", "Halyard M1 parts breakdown. Numbers key to the table below.", "c1"
+        ),
         in_document("doc_manual", LASER, "c2"),
     ]
     with pytest.raises(SuperDocsError, match="were not swapped"):
@@ -189,17 +207,19 @@ def test_a_document_that_swapped_nothing_is_refused():
 
 
 def test_a_document_that_swapped_only_some_of_its_figures_is_refused():
-    changes = [in_document("doc_manual", LASER, "c1"),
-               in_document("doc_card", "Halyard M1 parts breakdown", "c2")]
-    with pytest.raises(SuperDocsError, match="parts breakdown. Numbers key"):
+    changes = [
+        in_document("doc_manual", LASER, "c1"),
+        in_document("doc_card", "Halyard M1 parts breakdown", "c2"),
+    ]
+    with pytest.raises(SuperDocsError, match=r"parts breakdown\. Numbers key"):
         session.assert_every_figure_swapped(changes, ASKED)
 
 
 def test_every_figure_swapped_is_allowed():
     changes = [
-        in_document("doc_manual",
-                    "Halyard M1 parts breakdown. Numbers key to the table below.",
-                    "c1"),
+        in_document(
+            "doc_manual", "Halyard M1 parts breakdown. Numbers key to the table below.", "c1"
+        ),
         in_document("doc_manual", LASER, "c2"),
         in_document("doc_card", "Halyard M1 parts breakdown", "c3"),
     ]
@@ -217,22 +237,44 @@ def test_the_two_checks_do_not_imply_each_other():
 
 # ------------------------------------------------- the other refusal --
 
+
 def test_an_edit_that_touched_only_one_document_is_refused(publication):
     """The drift this project exists to prevent, caught before it ships."""
-    changes = [ProposedChange(
-        change_id="c1", operation="edit", chunk_id="chunk_3",
-        document_id=publication.manual_id, old_html="<p>1.2 N·m</p>",
-        new_html="<p>1.6 N·m</p>", explanation="torque")]
+    changes = [
+        ProposedChange(
+            change_id="c1",
+            operation="edit",
+            chunk_id="chunk_3",
+            document_id=publication.manual_id,
+            old_html="<p>1.2 N·m</p>",
+            new_html="<p>1.6 N·m</p>",
+            explanation="torque",
+        )
+    ]
     with pytest.raises(SuperDocsError, match="quick-start card"):
         session.assert_touched_both(publication, changes)
 
 
 def test_an_edit_that_touched_both_is_allowed(publication):
     changes = [
-        ProposedChange("c1", "edit", "chunk_3", publication.manual_id,
-                       "<p>1.2 N·m</p>", "<p>1.6 N·m</p>", "torque"),
-        ProposedChange("c2", "edit", "chunk_1", publication.card_id,
-                       "<p>1.2 N·m</p>", "<p>1.6 N·m</p>", "torque"),
+        ProposedChange(
+            "c1",
+            "edit",
+            "chunk_3",
+            publication.manual_id,
+            "<p>1.2 N·m</p>",
+            "<p>1.6 N·m</p>",
+            "torque",
+        ),
+        ProposedChange(
+            "c2",
+            "edit",
+            "chunk_1",
+            publication.card_id,
+            "<p>1.2 N·m</p>",
+            "<p>1.6 N·m</p>",
+            "torque",
+        ),
     ]
     session.assert_touched_both(publication, changes)
 
@@ -247,28 +289,36 @@ def test_the_signature_the_service_appends_is_not_a_different_image():
     because the service signs image links when it serves them. Comparing the
     strings refuses a correct swap; comparing nothing accepts a wrong one. The
     path is the file, the query is the signature."""
-    signed = (IMAGES[LASER] + "?X-Goog-Algorithm=GOOG4-RSA-SHA256"
-              "&X-Goog-Credential=x&X-Goog-Date=20260811T000000Z"
-              "&X-Goog-Expires=604800&X-Goog-Signature=" + "a" * 512)
-    changes = [swap(figure(LASER, signed, chunked=True),
-                    old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg",
-                                    chunked=True))]
+    signed = (
+        IMAGES[LASER] + "?X-Goog-Algorithm=GOOG4-RSA-SHA256"
+        "&X-Goog-Credential=x&X-Goog-Date=20260811T000000Z"
+        "&X-Goog-Expires=604800&X-Goog-Signature=" + "a" * 512
+    )
+    changes = [
+        swap(
+            figure(LASER, signed, chunked=True),
+            old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg", chunked=True),
+        )
+    ]
     session.assert_only_the_image_changed(changes, IMAGES)
 
 
 def test_a_different_file_with_a_valid_looking_signature_is_still_refused():
     """The check must not become "anything from that host". A signature on the
     wrong file is the wrong drawing, signed."""
-    other = (IMAGES["Halyard M1 parts breakdown"]
-             + "?X-Goog-Signature=" + "a" * 512)
-    changes = [swap(figure(LASER, other, chunked=True),
-                    old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg",
-                                    chunked=True))]
+    other = IMAGES["Halyard M1 parts breakdown"] + "?X-Goog-Signature=" + "a" * 512
+    changes = [
+        swap(
+            figure(LASER, other, chunked=True),
+            old_html=figure(LASER, "https://cdn.example/step_laser-v1.svg", chunked=True),
+        )
+    ]
     with pytest.raises(SuperDocsError, match="not the URL uploaded for it"):
         session.assert_only_the_image_changed(changes, IMAGES)
 
 
 # ------------------------------- the session that stopped holding it --
+
 
 class _Sessions:
     """A service where a session serves whatever it is focused on.
@@ -296,9 +346,11 @@ class _Sessions:
 
 def _pair() -> session.Publication:
     return session.Publication(
-        manual_id="doc_manual", card_id="doc_card",
+        manual_id="doc_manual",
+        card_id="doc_card",
         sessions={"doc_manual": "s_manual", "doc_card": "s_card"},
-        durable={"doc_manual": "dur_manual", "doc_card": "dur_card"})
+        durable={"doc_manual": "dur_manual", "doc_card": "dur_card"},
+    )
 
 
 def test_a_session_still_holding_its_document_is_left_alone():

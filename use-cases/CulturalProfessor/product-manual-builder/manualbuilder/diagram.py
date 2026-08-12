@@ -23,6 +23,7 @@ Determinism is a property this file has to actually hold, not aspire to:
 `test_diagram.py` renders twice and compares bytes, and renders across a
 subprocess boundary to catch anything that would vary with hash seeding.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -50,9 +51,9 @@ HEADER_H = 34
 TITLE_CHAR_W = 8.2
 NOTE_CHAR_W = 5.6
 
-BAND_GAP = 52   # rule at +26, its label on the baseline at +46, box top at +52:
-                # anything tighter and the label prints underneath the first
-                # loose part, which is legible in English and not in German
+BAND_GAP = 52  # rule at +26, its label on the baseline at +46, box top at +52:
+# anything tighter and the label prints underneath the first
+# loose part, which is legible in English and not in German
 
 # The palette is declared here rather than inherited from a stylesheet because
 # these SVGs are uploaded to a document service and rendered wherever it puts
@@ -104,11 +105,15 @@ def layout(spec: Spec) -> Layout:
 
     def walk(part: Part, depth: int) -> None:
         nonlocal callout, row
-        placed.append(Placed(
-            part=part, callout=callout, depth=depth,
-            x=PAD + depth * INDENT,
-            y=PAD + HEADER_H + row * (BOX_H + ROW_GAP),
-        ))
+        placed.append(
+            Placed(
+                part=part,
+                callout=callout,
+                depth=depth,
+                x=PAD + depth * INDENT,
+                y=PAD + HEADER_H + row * (BOX_H + ROW_GAP),
+            )
+        )
         callout += 1
         row += 1
         for child in spec.children_of(part.id):
@@ -125,10 +130,15 @@ def layout(spec: Spec) -> Layout:
     if loose:
         band_y = PAD + HEADER_H + row * (BOX_H + ROW_GAP) + BAND_GAP // 2
         for part in loose:
-            placed.append(Placed(
-                part=part, callout=callout, depth=0, x=PAD,
-                y=PAD + HEADER_H + row * (BOX_H + ROW_GAP) + BAND_GAP,
-            ))
+            placed.append(
+                Placed(
+                    part=part,
+                    callout=callout,
+                    depth=0,
+                    x=PAD,
+                    y=PAD + HEADER_H + row * (BOX_H + ROW_GAP) + BAND_GAP,
+                )
+            )
             callout += 1
             row += 1
 
@@ -157,8 +167,7 @@ def _text_width(spec: Spec) -> int:
     drawing on its own was right.
     """
     titles = [spec.text("breakdown_title", name=spec.name)]
-    titles += [spec.text("step_title", name=spec.name, title=step.title)
-               for step in spec.steps]
+    titles += [spec.text("step_title", name=spec.name, title=step.title) for step in spec.steps]
     widest_title = max((len(t) for t in titles), default=0) * TITLE_CHAR_W
     note = len(spec.text("highlight_note")) * NOTE_CHAR_W
     return PAD * 2 + int(max(widest_title, note)) + 1
@@ -166,9 +175,12 @@ def _text_width(spec: Spec) -> int:
 
 def exploded(spec: Spec) -> str:
     """The whole assembly, every part called out and keyed to the parts list."""
-    return _render(spec, layout(spec),
-                   title=spec.text("breakdown_title", name=spec.name),
-                   highlight=frozenset())
+    return _render(
+        spec,
+        layout(spec),
+        title=spec.text("breakdown_title", name=spec.name),
+        highlight=frozenset(),
+    )
 
 
 def for_step(spec: Spec, step: Step) -> str:
@@ -178,34 +190,46 @@ def for_step(spec: Spec, step: Step) -> str:
     step's illustration cannot show a part the step does not mention. That is
     not a convention here; there is no other input to this function.
     """
-    return _render(spec, layout(spec),
-                   title=spec.text("step_title", name=spec.name, title=step.title),
-                   highlight=frozenset(step.parts))
+    return _render(
+        spec,
+        layout(spec),
+        title=spec.text("step_title", name=spec.name, title=step.title),
+        highlight=frozenset(step.parts),
+    )
 
 
 # ----------------------------------------------------------------- render --
+
 
 def _render(spec: Spec, place: Layout, title: str, highlight: frozenset[str]) -> str:
     index = place.by_id()
     out: list[str] = []
     add = out.append
 
-    add(f'<svg xmlns="http://www.w3.org/2000/svg" width="{place.width}" '
+    add(
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{place.width}" '
         f'height="{place.height}" viewBox="0 0 {place.width} {place.height}" '
-        f'role="img" aria-label="{escape(title)}">')
+        f'role="img" aria-label="{escape(title)}">'
+    )
     add(f"<title>{escape(title)}</title>")
     add(f'<rect width="{place.width}" height="{place.height}" fill="{FILL}"/>')
-    add(f'<text x="{PAD}" y="{PAD}" font-family="Helvetica,Arial,sans-serif" '
-        f'font-size="15" font-weight="600" fill="{INK}">{escape(title)}</text>')
+    add(
+        f'<text x="{PAD}" y="{PAD}" font-family="Helvetica,Arial,sans-serif" '
+        f'font-size="15" font-weight="600" fill="{INK}">{escape(title)}</text>'
+    )
 
     if place.band_y is not None:
-        add(f'<line x1="{PAD}" y1="{place.band_y}" x2="{place.width - PAD}" '
+        add(
+            f'<line x1="{PAD}" y1="{place.band_y}" x2="{place.width - PAD}" '
             f'y2="{place.band_y}" stroke="{RULE}" stroke-width="1" '
-            f'stroke-dasharray="4 3"/>')
-        add(f'<text x="{PAD}" y="{place.band_y + 20}" '
+            f'stroke-dasharray="4 3"/>'
+        )
+        add(
+            f'<text x="{PAD}" y="{place.band_y + 20}" '
             f'font-family="Helvetica,Arial,sans-serif" font-size="10" '
             f'letter-spacing="0.6" fill="{MUTED}">'
-            f'{escape(spec.text("loose_parts"))}</text>')
+            f"{escape(spec.text('loose_parts'))}</text>"
+        )
 
     # Connectors first, so boxes sit on top of them.
     for spot in place.placed:
@@ -219,9 +243,11 @@ def _render(spec: Spec, place: Layout, title: str, highlight: frozenset[str]) ->
         add(_box(spot, lit=spot.part.id in highlight, dim=bool(highlight)))
 
     if highlight:
-        add(f'<text x="{PAD}" y="{place.height - 8}" '
+        add(
+            f'<text x="{PAD}" y="{place.height - 8}" '
             f'font-family="Helvetica,Arial,sans-serif" font-size="11" '
-            f'fill="{MUTED}">{escape(spec.text("highlight_note"))}</text>')
+            f'fill="{MUTED}">{escape(spec.text("highlight_note"))}</text>'
+        )
 
     add("</svg>")
     return "\n".join(out) + "\n"
@@ -238,8 +264,10 @@ def _elbow(parent: Placed, child: Placed, lit: bool) -> str:
     y2 = child.y + BOX_H // 2
     stroke = ACCENT if lit else RULE
     width = 2 if lit else 1
-    return (f'<path d="M {x} {y1} V {y2} H {child.x}" fill="none" '
-            f'stroke="{stroke}" stroke-width="{width}"/>')
+    return (
+        f'<path d="M {x} {y1} V {y2} H {child.x}" fill="none" '
+        f'stroke="{stroke}" stroke-width="{width}"/>'
+    )
 
 
 def _box(spot: Placed, lit: bool, dim: bool) -> str:
@@ -269,7 +297,8 @@ def _box(spot: Placed, lit: bool, dim: bool) -> str:
         out.append(
             f'<text x="{spot.x + BOX_W - 12}" y="{mid + 4}" text-anchor="end" '
             f'font-family="Helvetica,Arial,sans-serif" font-size="11" '
-            f'fill="{MUTED}">{qty}</text>')
+            f'fill="{MUTED}">{qty}</text>'
+        )
     out.append("</g>")
     return "".join(out)
 
@@ -293,4 +322,4 @@ def parts_list_rows(spec: Spec) -> list[tuple[int, str, str, str]]:
     ]
 
 
-__all__ = ["exploded", "for_step", "layout", "parts_list_rows", "Layout", "Placed"]
+__all__ = ["Layout", "Placed", "exploded", "for_step", "layout", "parts_list_rows"]

@@ -41,6 +41,8 @@ It builds the virtualenv on first use, then runs everything this project can be
 asked to prove — cheapest first, and no quota spent by any of it.
 
 ```
+==> lint: ruff check, black --check
+    PASS
 ==> unit tests (no network, no key)
     PASS
 ==> check: the spec, the pair, and every locale's pagination
@@ -52,11 +54,11 @@ asked to prove — cheapest first, and no quota spent by any of it.
 ==> verify: the live documents are what publish recorded
     PASS
 
-5 passed, 0 failed
+6 passed, 0 failed
 ```
 
 Without a key the two live stages are reported as **skipped**, not as passed,
-and the offline three still run. When something fails it is named at the bottom
+and the offline four still run. When something fails it is named at the bottom
 under *what is not working*, and the exit code is non-zero, so this is also the
 CI command.
 
@@ -84,6 +86,14 @@ same thing if you have it.
 ```
 
 112 tests, no network and no key.
+
+```bash
+./mb fix
+```
+
+`selftest`'s lint stage only checks — `ruff check` and `black --check` both leave
+files as they are, so a red stage there never rewrites something you're mid-edit
+on. `./mb fix` is the other half: `ruff check --fix` then `black`, applied.
 
 Two commands need no API key and no network:
 

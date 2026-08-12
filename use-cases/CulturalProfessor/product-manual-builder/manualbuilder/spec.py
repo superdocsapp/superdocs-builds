@@ -12,6 +12,7 @@ that is exactly the failure this project exists to make impossible. So it is
 refused at load time, where one person reads one error, rather than at render
 time in one of six locales.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -40,8 +41,10 @@ DIAGRAM_STRINGS = {
     "breakdown_title": "{name} — parts breakdown",
     "step_title": "{name} — step: {title}",
     "loose_parts": "SUPPLIED, NOT MOUNTED",
-    "highlight_note": ("Outlined parts are the ones this step uses; the rest of "
-                       "the assembly is shown for position."),
+    "highlight_note": (
+        "Outlined parts are the ones this step uses; the rest of "
+        "the assembly is shown for position."
+    ),
 }
 
 
@@ -85,6 +88,7 @@ class Fault:
     out of the graph. A troubleshooting table that points at a step the manual
     no longer contains is the classic way this section rots.
     """
+
     id: str
     symptom: str
     cause: str
@@ -96,6 +100,7 @@ class Fault:
 @dataclass(frozen=True)
 class Statement:
     """A warranty, disposal or other legal statement, worded once."""
+
     id: str
     title: str
     body: str
@@ -124,8 +129,7 @@ class Spec:
     # -- lookups, so no caller re-derives them -----------------------------
 
     _by_part: dict[str, Part] = field(default_factory=dict, compare=False, repr=False)
-    _by_warning: dict[str, Warning_] = field(default_factory=dict, compare=False,
-                                             repr=False)
+    _by_warning: dict[str, Warning_] = field(default_factory=dict, compare=False, repr=False)
     _by_step: dict[str, Step] = field(default_factory=dict, compare=False, repr=False)
     _by_fault: dict[str, Fault] = field(default_factory=dict, compare=False, repr=False)
 
@@ -179,9 +183,17 @@ def load_spec(path: str | Path) -> Spec:
 
 # ------------------------------------------------------------------ build --
 
+
 def _build(raw: dict[str, Any], path: Path) -> Spec:
-    for section in ("product", "parts", "setup_steps", "warnings",
-                    "troubleshooting", "statements", "quick_start"):
+    for section in (
+        "product",
+        "parts",
+        "setup_steps",
+        "warnings",
+        "troubleshooting",
+        "statements",
+        "quick_start",
+    ):
         if section not in raw:
             raise SpecError(f"{path.name}: missing required section {section!r}")
 
@@ -190,7 +202,8 @@ def _build(raw: dict[str, Any], path: Path) -> Spec:
 
     parts = tuple(
         Part(
-            id=str(p["id"]), label=str(p["label"]),
+            id=str(p["id"]),
+            label=str(p["label"]),
             quantity=int(p.get("quantity", 1)),
             mounts_to=p.get("mounts_to") or None,
             note=_text(p.get("note")),
@@ -198,13 +211,19 @@ def _build(raw: dict[str, Any], path: Path) -> Spec:
         for p in raw["parts"]
     )
     warnings = tuple(
-        Warning_(id=str(w["id"]), severity=str(w["severity"]),
-                 title=str(w["title"]), body=_text(w["body"]) or "")
+        Warning_(
+            id=str(w["id"]),
+            severity=str(w["severity"]),
+            title=str(w["title"]),
+            body=_text(w["body"]) or "",
+        )
         for w in raw["warnings"]
     )
     steps = tuple(
         Step(
-            id=str(s["id"]), title=str(s["title"]), body=_text(s["body"]) or "",
+            id=str(s["id"]),
+            title=str(s["title"]),
+            body=_text(s["body"]) or "",
             parts=tuple(str(x) for x in s.get("parts", [])),
             warnings=tuple(str(x) for x in s.get("warnings", [])),
         )
@@ -212,16 +231,17 @@ def _build(raw: dict[str, Any], path: Path) -> Spec:
     )
     faults = tuple(
         Fault(
-            id=str(f["id"]), symptom=_text(f["symptom"]) or "",
-            cause=_text(f["cause"]) or "", fix=_text(f["fix"]) or "",
+            id=str(f["id"]),
+            symptom=_text(f["symptom"]) or "",
+            cause=_text(f["cause"]) or "",
+            fix=_text(f["fix"]) or "",
             step=f.get("step") or None,
             parts=tuple(str(x) for x in f.get("parts", [])),
         )
         for f in raw["troubleshooting"]
     )
     statements = tuple(
-        Statement(id=str(s["id"]), title=str(s["title"]),
-                  body=_text(s["body"]) or "")
+        Statement(id=str(s["id"]), title=str(s["title"]), body=_text(s["body"]) or "")
         for s in raw["statements"]
     )
 
@@ -234,8 +254,11 @@ def _build(raw: dict[str, Any], path: Path) -> Spec:
         specifications=tuple(
             (str(row["label"]), str(row["value"])) for row in raw.get("specifications", [])
         ),
-        parts=parts, steps=steps, warnings=warnings,
-        faults=faults, statements=statements,
+        parts=parts,
+        steps=steps,
+        warnings=warnings,
+        faults=faults,
+        statements=statements,
         quick_start_steps=tuple(str(x) for x in quick.get("steps", [])),
         quick_start_warnings=tuple(str(x) for x in quick.get("warnings", [])),
         quick_start_faults=tuple(str(x) for x in quick.get("troubleshooting", [])),
@@ -256,6 +279,7 @@ def _text(value: Any) -> str | None:
 
 
 # --------------------------------------------------------------- validate --
+
 
 def _validate(spec: Spec) -> None:
     problems: list[str] = []
@@ -285,8 +309,7 @@ def _validate(spec: Spec) -> None:
 
     for part in spec.parts:
         if part.mounts_to and part.mounts_to not in spec._by_part:
-            problems.append(
-                f"part {part.id!r} mounts to unknown part {part.mounts_to!r}")
+            problems.append(f"part {part.id!r} mounts to unknown part {part.mounts_to!r}")
 
     problems += _cycles(spec)
 
@@ -302,17 +325,18 @@ def _validate(spec: Spec) -> None:
             )
         for part_id in fault.parts:
             if part_id not in spec._by_part:
-                problems.append(
-                    f"troubleshooting {fault.id!r} names unknown part {part_id!r}")
+                problems.append(f"troubleshooting {fault.id!r} names unknown part {part_id!r}")
 
-    missing = [s for s in REQUIRED_STATEMENTS
-               if s not in {statement.id for statement in spec.statements}]
+    missing = [
+        s for s in REQUIRED_STATEMENTS if s not in {statement.id for statement in spec.statements}
+    ]
     if missing:
         problems.append(
-            "statements is missing " + " and ".join(repr(m) for m in missing)
+            "statements is missing "
+            + " and ".join(repr(m) for m in missing)
             + "; a shipped manual carries both, so a spec without them would "
-              "render a document that is missing a section rather than one that "
-              "chose not to have it"
+            "render a document that is missing a section rather than one that "
+            "chose not to have it"
         )
 
     # The quick-start card is a projection, not a second document. Every step it
@@ -384,5 +408,15 @@ def _cycles(spec: Spec) -> list[str]:
     return problems
 
 
-__all__ = ["Spec", "Part", "Step", "Warning_", "Fault", "Statement", "SpecError",
-           "load_spec", "SEVERITIES", "REQUIRED_STATEMENTS"]
+__all__ = [
+    "REQUIRED_STATEMENTS",
+    "SEVERITIES",
+    "Fault",
+    "Part",
+    "Spec",
+    "SpecError",
+    "Statement",
+    "Step",
+    "Warning_",
+    "load_spec",
+]

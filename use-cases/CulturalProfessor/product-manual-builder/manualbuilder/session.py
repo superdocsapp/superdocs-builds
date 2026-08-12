@@ -32,6 +32,7 @@ single request; it was in the fact that approval is one decision and approval is
 the only thing that mutates. `changes_by_document` and `assert_touched_both` are
 how a caller checks the pair actually moved together rather than trusting it.
 """
+
 from __future__ import annotations
 
 import re
@@ -39,7 +40,8 @@ from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlparse
 
-from manualbuilder import diagram, projections as pj
+from manualbuilder import diagram
+from manualbuilder import projections as pj
 from manualbuilder.spec import Spec
 from manualbuilder.superdocs import ProposedChange, SuperDocs, SuperDocsError
 
@@ -54,6 +56,7 @@ class Publication:
     session-scoped id in another session returns *"None of the requested
     documents were found"*, which reads like the document is gone.
     """
+
     manual_id: str
     card_id: str
     images: dict[str, str] = field(default_factory=dict)
@@ -74,7 +77,8 @@ class Publication:
         if not session_id:
             raise SuperDocsError(
                 f"no session recorded for {document_id}; `publish` opens one per "
-                f"document and writes it down")
+                f"document and writes it down"
+            )
         return session_id
 
     def durable_for(self, document_id: str) -> str:
@@ -90,7 +94,8 @@ class Publication:
             raise SuperDocsError(
                 f"no durable id recorded for {document_id}; it cannot be read "
                 f"by id, only through whatever its session happens to be "
-                f"focused on. Re-run `publish`.")
+                f"focused on. Re-run `publish`."
+            )
         return durable
 
     def reopen(self, client: SuperDocs) -> None:
@@ -116,13 +121,15 @@ class Publication:
         if not durable:
             raise SuperDocsError(
                 f"no durable id recorded for {document_id}, so it cannot be "
-                f"opened in a new session; re-run `publish`")
+                f"opened in a new session; re-run `publish`"
+            )
         session_id = client.init_session([durable])
         held = [d.get("document_id") for d in client.documents(session_id)]
         if held != [document_id]:
             raise SuperDocsError(
                 f"a fresh session for {document_id} came back holding "
-                f"{held}; the turn would be sent to the wrong document")
+                f"{held}; the turn would be sent to the wrong document"
+            )
         return session_id
 
     def ensure_sessions(self, client: SuperDocs) -> list[str]:
@@ -149,10 +156,9 @@ class Publication:
             held: list[str | None] = []
             if session_id:
                 try:
-                    held = [d.get("document_id")
-                            for d in client.documents(session_id)]
+                    held = [d.get("document_id") for d in client.documents(session_id)]
                 except SuperDocsError:
-                    held = []          # gone, or not ours any more; re-open it
+                    held = []  # gone, or not ours any more; re-open it
             if held == [document_id]:
                 continue
             self.sessions[document_id] = self._open_fresh(client, document_id)
@@ -207,34 +213,33 @@ def publish(client: SuperDocs, spec: Spec, language: str = "") -> Publication:
 
     published = Publication(manual_id="", card_id="", images=images)
     for role, filename, html in (
-            ("manual", f"{_slug(spec.name)}-manual{suffix}.html",
-             pj.manual_html(spec, images)),
-            ("card", f"{_slug(spec.name)}-quickstart{suffix}.html",
-             pj.quick_start_html(spec, images))):
+        ("manual", f"{_slug(spec.name)}-manual{suffix}.html", pj.manual_html(spec, images)),
+        ("card", f"{_slug(spec.name)}-quickstart{suffix}.html", pj.quick_start_html(spec, images)),
+    ):
         # A session each. Sharing one would be tidier and would mean the pair
         # could never have both halves proposed at the same time: the first
         # turn parks at `awaiting_approval` and the session refuses the second
         # with 409 `session_busy`.
         session_id = client.init_session()
-        document_id = client.upload(filename, html, session_id=session_id,
-                                    open_mode="new_focused")
+        document_id = client.upload(filename, html, session_id=session_id, open_mode="new_focused")
 
         held = client.documents(session_id)
         if [d.get("document_id") for d in held] != [document_id]:
             raise SuperDocsError(
                 f"the {role}'s session holds {[d.get('document_id') for d in held]} "
                 f"rather than {document_id} alone; an edit would reach the wrong "
-                f"document")
+                f"document"
+            )
 
-        setattr(published, f"{role}_id" if role == "manual" else "card_id",
-                document_id)
+        setattr(published, f"{role}_id" if role == "manual" else "card_id", document_id)
         published.sessions[document_id] = session_id
         published.durable[document_id] = str(held[0].get("durable_document_id") or "")
     return published
 
 
-def edit_both(client: SuperDocs, publication: Publication,
-              instruction: str) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
+def edit_both(
+    client: SuperDocs, publication: Publication, instruction: str
+) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
     """One instruction, both documents, nothing applied by either turn.
 
     The wording case: "raise the rail torque to 1.6 N·m" is one sentence and it
@@ -259,14 +264,12 @@ def edit_both(client: SuperDocs, publication: Publication,
     different conversations, so they run at the same time and the pair costs one
     wait rather than two.
     """
-    return edit_each(client, publication,
-                     {document_id: instruction
-                      for document_id in publication.document_ids})
+    return edit_each(client, publication, dict.fromkeys(publication.document_ids, instruction))
 
 
-def edit_each(client: SuperDocs, publication: Publication,
-              instructions: dict[str, str]) -> tuple[list[ProposedChange],
-                                                     list[dict[str, Any]]]:
+def edit_each(
+    client: SuperDocs, publication: Publication, instructions: dict[str, str]
+) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
     """A turn per document, each with its own instruction.
 
     Same machinery as `edit_both` and a different question per document, which
@@ -287,17 +290,18 @@ def edit_each(client: SuperDocs, publication: Publication,
         outstanding = client.active_jobs(publication.session_for(document_id))
         if not outstanding:
             continue
-        waiting = [job for job in outstanding
-                   if job.get("status") == "awaiting_approval"]
+        waiting = [job for job in outstanding if job.get("status") == "awaiting_approval"]
         raise SuperDocsError(
             f"the {publication.name_for(document_id)} already has "
             f"{len(outstanding)} turn(s) in flight"
-            + (f", {len(waiting)} waiting to be approved. Run `approve` to apply "
-               f"that batch or `approve --discard` to throw it away; a proposal "
-               f"nobody decided on blocks every later edit."
-               if waiting else
-               ". Wait for it to finish -- deep operations run minutes, and a "
-               "second turn sent now would be refused rather than queued.")
+            + (
+                f", {len(waiting)} waiting to be approved. Run `approve` to apply "
+                f"that batch or `approve --discard` to throw it away; a proposal "
+                f"nobody decided on blocks every later edit."
+                if waiting
+                else ". Wait for it to finish -- deep operations run minutes, and a "
+                "second turn sent now would be refused rather than queued."
+            )
         )
 
     # Both turns are sent before either is waited on. They are in different
@@ -312,9 +316,9 @@ def edit_each(client: SuperDocs, publication: Publication,
         # changes it just showed you can never be applied. `/v1/chat/async`
         # parks its job at `awaiting_approval` with the same changes in
         # `metadata.pending_changes`, and that job is what approval needs.
-        job_id = client.chat_async(instruction,
-                                   publication.session_for(document_id),
-                                   document_id=document_id)
+        job_id = client.chat_async(
+            instruction, publication.session_for(document_id), document_id=document_id
+        )
         started.append((document_id, job_id))
 
     changes: list[ProposedChange] = []
@@ -349,30 +353,32 @@ def discard_outstanding(client: SuperDocs, publication: Publication) -> int:
                 continue
             job_id = str(job.get("job_id") or job.get("id"))
             changes = client.pending_changes(job)
-            client.approve(session_id, job_id,
-                           {change.change_id: False for change in changes},
-                           approved_by_default=False)
+            client.approve(
+                session_id,
+                job_id,
+                {change.change_id: False for change in changes},
+                approved_by_default=False,
+            )
             denied += len(changes)
     return denied
 
 
-def changes_by_document(publication: Publication,
-                        changes: list[ProposedChange]) -> dict[str, list[ProposedChange]]:
+def changes_by_document(
+    publication: Publication, changes: list[ProposedChange]
+) -> dict[str, list[ProposedChange]]:
     """Group a turn's changes by the document they touch.
 
     This is the check behind the consistency claim. One instruction that comes
     back having touched only the manual is drift caught before it ships, and the
     caller can refuse the whole batch.
     """
-    grouped: dict[str, list[ProposedChange]] = {
-        publication.manual_id: [], publication.card_id: []}
+    grouped: dict[str, list[ProposedChange]] = {publication.manual_id: [], publication.card_id: []}
     for change in changes:
         grouped.setdefault(change.document_id or "unknown", []).append(change)
     return grouped
 
 
-def assert_touched_both(publication: Publication,
-                        changes: list[ProposedChange]) -> None:
+def assert_touched_both(publication: Publication, changes: list[ProposedChange]) -> None:
     """Refuse a batch that would leave the pair disagreeing.
 
     An edit to a fact that appears in both documents must propose changes to
@@ -380,21 +386,25 @@ def assert_touched_both(publication: Publication,
     exists to prevent -- so the batch is rejected rather than half-applied.
     """
     grouped = changes_by_document(publication, changes)
-    empty = [publication.name_for(doc_id)
-             for doc_id in publication.document_ids if not grouped[doc_id]]
+    empty = [
+        publication.name_for(doc_id) for doc_id in publication.document_ids if not grouped[doc_id]
+    ]
     if empty:
         raise SuperDocsError(
             "this edit proposed no change to the "
             + " or the ".join(empty)
             + ". Applying it would leave the manual and the card disagreeing, "
-              "so nothing was approved. Either the fact does not appear in that "
-              "document, or the instruction was too narrow."
+            "so nothing was approved. Either the fact does not appear in that "
+            "document, or the instruction was too narrow."
         )
 
 
-def approve_all(client: SuperDocs, publication: Publication,
-                changes: list[ProposedChange],
-                reject: set[str] | None = None) -> list[dict[str, Any]]:
+def approve_all(
+    client: SuperDocs,
+    publication: Publication,
+    changes: list[ProposedChange],
+    reject: set[str] | None = None,
+) -> list[dict[str, Any]]:
     """Approve the batch, minus anything rejected by change id.
 
     Rejecting one change does not discard the rest, and that is not a nicety.
@@ -410,7 +420,8 @@ def approve_all(client: SuperDocs, publication: Publication,
     if not publication.jobs:
         raise SuperDocsError(
             "no job to approve against; the turns proposed nothing, or "
-            "`edit_both` was not the thing that ran them")
+            "`edit_both` was not the thing that ran them"
+        )
 
     unknown = reject - {change.change_id for change in changes}
     if unknown:
@@ -427,7 +438,8 @@ def approve_all(client: SuperDocs, publication: Publication,
         if not job_id:
             raise SuperDocsError(
                 f"change {change.change_id} belongs to document "
-                f"{document_id!r}, which no recorded turn produced")
+                f"{document_id!r}, which no recorded turn produced"
+            )
         key = (publication.session_for(document_id), job_id)
         by_job.setdefault(key, {})[change.change_id] = change.change_id not in reject
 
@@ -435,13 +447,13 @@ def approve_all(client: SuperDocs, publication: Publication,
     # own. Every entry here carries its own, so the default only matters if the
     # service adds a change we did not see -- and False is the safe answer to
     # that.
-    return [client.approve(session_id, job_id, decisions,
-                           approved_by_default=False)
-            for (session_id, job_id), decisions in by_job.items()]
+    return [
+        client.approve(session_id, job_id, decisions, approved_by_default=False)
+        for (session_id, job_id), decisions in by_job.items()
+    ]
 
 
-def refresh_diagrams(client: SuperDocs, publication: Publication,
-                     spec: Spec) -> dict[str, str]:
+def refresh_diagrams(client: SuperDocs, publication: Publication, spec: Spec) -> dict[str, str]:
     """Re-render every diagram from the graph and re-upload it.
 
     The second grading criterion, and the reason it is a separate function from
@@ -454,9 +466,9 @@ def refresh_diagrams(client: SuperDocs, publication: Publication,
     return fresh
 
 
-def swap_diagrams(client: SuperDocs, publication: Publication,
-                  spec: Spec) -> tuple[list[ProposedChange], dict[str, str],
-                                       dict[str, dict[str, str]]]:
+def swap_diagrams(
+    client: SuperDocs, publication: Publication, spec: Spec
+) -> tuple[list[ProposedChange], dict[str, str], dict[str, dict[str, str]]]:
     """Re-render, upload, and propose swapping each `<img src>` for the new URL.
 
     A document already on the service cannot be re-uploaded without becoming a
@@ -482,9 +494,11 @@ def swap_diagrams(client: SuperDocs, publication: Publication,
     # Keyed by caption, because that is what survives the round trip: the
     # service strips `data-*` when it stores a document, so the figure comes
     # back with nothing on it naming which drawing it is except its alt text.
-    expected = {caption: fresh[image_id]
-                for caption, image_id in pj.captions(spec).items()
-                if image_id in fresh}
+    expected = {
+        caption: fresh[image_id]
+        for caption, image_id in pj.captions(spec).items()
+        if image_id in fresh
+    }
 
     # A document is asked only about the figures it actually holds. The card
     # holds the breakdown and none of the seven step diagrams, and a card handed
@@ -501,15 +515,14 @@ def swap_diagrams(client: SuperDocs, publication: Publication,
     }
 
     changes, _ = edit_each(client, publication, instructions)
-    return changes, expected, {document_id: asked[document_id]
-                               for document_id in instructions}
+    return changes, expected, {document_id: asked[document_id] for document_id in instructions}
 
 
 def _swap_instruction(captions: dict[str, str], expected: dict[str, str]) -> str:
     lines = "\n".join(
-        f'- the figure whose caption is "{caption}": set its <img src> to '
-        f"{expected[caption]}"
-        for caption in captions if caption in expected
+        f'- the figure whose caption is "{caption}": set its <img src> to {expected[caption]}'
+        for caption in captions
+        if caption in expected
     )
     return (
         "Update the diagram image URLs. Make exactly these substitutions and "
@@ -519,8 +532,9 @@ def _swap_instruction(captions: dict[str, str], expected: dict[str, str]) -> str
     )
 
 
-def assert_every_figure_swapped(changes: list[ProposedChange],
-                                asked: dict[str, dict[str, str]]) -> None:
+def assert_every_figure_swapped(
+    changes: list[ProposedChange], asked: dict[str, dict[str, str]]
+) -> None:
     """Refuse a refresh that left one of the figures pointing at the old drawing.
 
     The complement of `assert_only_the_image_changed`, and the check that was
@@ -543,8 +557,8 @@ def assert_every_figure_swapped(changes: list[ProposedChange],
                 f"{len(missing)} figure(s) in {document_id} were not swapped: "
                 + ", ".join(repr(caption) for caption in missing)
                 + ". They still point at the old drawing, so approving this "
-                  "batch would leave the two documents showing different "
-                  "diagrams. Nothing was approved."
+                "batch would leave the two documents showing different "
+                "diagrams. Nothing was approved."
             )
 
 
@@ -586,8 +600,7 @@ def images_in(html: str) -> list[tuple[str, str]]:
     return out
 
 
-def assert_only_the_image_changed(changes: list[ProposedChange],
-                                  expected: dict[str, str]) -> None:
+def assert_only_the_image_changed(changes: list[ProposedChange], expected: dict[str, str]) -> None:
     """Refuse a diagram swap that did anything besides swap the diagram.
 
     Three ways this goes wrong, and all three are refused rather than shown to a
@@ -632,8 +645,19 @@ def _slug(name: str) -> str:
     return "".join(c.lower() if c.isalnum() else "-" for c in name).strip("-")
 
 
-__all__ = ["Publication", "publish", "edit_both", "edit_each", "approve_all",
-           "images_in",
-           "refresh_diagrams", "swap_diagrams", "assert_only_the_image_changed",
-           "assert_every_figure_swapped", "changes_by_document",
-           "assert_touched_both", "render_diagrams", "upload_diagrams"]
+__all__ = [
+    "Publication",
+    "approve_all",
+    "assert_every_figure_swapped",
+    "assert_only_the_image_changed",
+    "assert_touched_both",
+    "changes_by_document",
+    "edit_both",
+    "edit_each",
+    "images_in",
+    "publish",
+    "refresh_diagrams",
+    "render_diagrams",
+    "swap_diagrams",
+    "upload_diagrams",
+]

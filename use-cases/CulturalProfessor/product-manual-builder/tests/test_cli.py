@@ -8,6 +8,7 @@ somebody trusts.
 Nothing here touches the network or needs a key, which is the same promise
 `check` and `build` make.
 """
+
 from __future__ import annotations
 
 import json
@@ -37,8 +38,7 @@ def test_check_passes_on_what_ships(monkeypatch, capsys):
         assert f"locale {language}" in out
 
 
-def test_check_fails_and_says_where_when_a_locale_runs_long(
-        monkeypatch, tmp_path, capsys):
+def test_check_fails_and_says_where_when_a_locale_runs_long(monkeypatch, tmp_path, capsys):
     """The wiring that matters. A locale is lengthened until it repaginates, and
     `check` has to come back non-zero with the block named -- not with a
     traceback, and not with `ok`."""
@@ -47,8 +47,7 @@ def test_check_fails_and_says_where_when_a_locale_runs_long(
     raw = yaml.safe_load((PROJECT_ROOT / "locales" / "de.yaml").read_text())
     for warning in raw["warnings"].values():
         warning["body"] = " ".join([warning["body"]] * 3)
-    (locales / "de.yaml").write_text(
-        yaml.safe_dump(raw, allow_unicode=True, sort_keys=False))
+    (locales / "de.yaml").write_text(yaml.safe_dump(raw, allow_unicode=True, sort_keys=False))
 
     monkeypatch.setattr(cli, "LOCALES", locales)
     code, out = _run(monkeypatch, ["check"], capsys)
@@ -59,15 +58,19 @@ def test_check_fails_and_says_where_when_a_locale_runs_long(
     assert "safety:warning:" in out, "the report must name the block that moved"
 
 
-def test_build_writes_a_document_per_language_and_its_diagrams(
-        monkeypatch, tmp_path, capsys):
+def test_build_writes_a_document_per_language_and_its_diagrams(monkeypatch, tmp_path, capsys):
     monkeypatch.setattr(cli, "OUT", tmp_path / "out")
-    code, out = _run(monkeypatch, ["build"], capsys)
+    code, _out = _run(monkeypatch, ["build"], capsys)
     assert code == 0
 
     written = {path.name for path in (tmp_path / "out").iterdir()}
-    for name in ("manual.html", "quickstart.html", "manual.de.html",
-                 "manual.fr.html", "manual.preview.html"):
+    for name in (
+        "manual.html",
+        "quickstart.html",
+        "manual.de.html",
+        "manual.fr.html",
+        "manual.preview.html",
+    ):
         assert name in written
 
     # The drawings are per language too, not the English ones reused.
@@ -78,12 +81,12 @@ def test_build_writes_a_document_per_language_and_its_diagrams(
     assert "Grundrahmen" in german
 
 
-def test_the_preview_marks_every_page_the_layout_found(monkeypatch, tmp_path,
-                                                       capsys):
+def test_the_preview_marks_every_page_the_layout_found(monkeypatch, tmp_path, capsys):
     """The preview is what makes the pagination claim something you can look at.
     If it drew fewer rules than there are pages it would be a picture of a
     different document."""
-    from manualbuilder import paginate as pg, projections as pj
+    from manualbuilder import paginate as pg
+    from manualbuilder import projections as pj
     from manualbuilder.spec import load_spec
 
     monkeypatch.setattr(cli, "OUT", tmp_path / "out")
@@ -106,12 +109,12 @@ def test_a_command_that_needs_a_key_says_so_before_it_tries(monkeypatch):
     monkeypatch.chdir(PROJECT_ROOT)
 
     with pytest.raises(SuperDocsError, match="SUPERDOCS_API_KEY is not set"):
-        cli.main(["export", "--session", "sess_1",
-                  "--manual", "doc_1", "--card", "doc_2"])
+        cli.main(["export", "--session", "sess_1", "--manual", "doc_1", "--card", "doc_2"])
 
 
 def test_a_command_that_needs_a_published_pair_says_which_id_is_missing(
-        monkeypatch, tmp_path, capsys):
+    monkeypatch, tmp_path, capsys
+):
     """Three ids identify a published pair, and `publish` writes them down so
     nobody has to paste them. Asked to work on a pair that was never published,
     the answer is which id is missing and where it was looked for -- not a
@@ -126,7 +129,8 @@ def test_a_command_that_needs_a_published_pair_says_which_id_is_missing(
 
 
 def test_status_and_verify_need_a_published_pair_before_they_touch_anything(
-        monkeypatch, tmp_path, capsys):
+    monkeypatch, tmp_path, capsys
+):
     """Both new commands are free, and both are useless without a published
     pair. Asked to work on one that does not exist they name the missing id
     rather than opening a client and failing inside a request."""
@@ -138,12 +142,12 @@ def test_status_and_verify_need_a_published_pair_before_they_touch_anything(
         assert "Run `publish` first" in capsys.readouterr().err
 
 
-def test_verify_reports_a_document_that_is_not_what_was_published(
-        monkeypatch, tmp_path, capsys):
+def test_verify_reports_a_document_that_is_not_what_was_published(monkeypatch, tmp_path, capsys):
     """The wiring that matters, with the network stubbed out: a served document
     pointing at an older drawing has to come back non-zero and name the figure
     -- not print a green summary because the command reached the end."""
-    from manualbuilder import projections as pj, verify as vf
+    from manualbuilder import projections as pj
+    from manualbuilder import verify as vf
     from manualbuilder.spec import load_spec
 
     from .test_verify import served, urls
@@ -151,27 +155,38 @@ def test_verify_reports_a_document_that_is_not_what_was_published(
     spec = load_spec(PROJECT_ROOT / "spec" / "halyard_m1.yaml")
     images = urls(spec)
     stale = dict(images, **{pj.BREAKDOWN: "https://storage.example/img/old.svg"})
-    pages = {"manual": served(spec, vf.MANUAL, images),
-             "quick-start card": served(spec, vf.CARD, stale)}
+    pages = {
+        "manual": served(spec, vf.MANUAL, images),
+        "quick-start card": served(spec, vf.CARD, stale),
+    }
 
     class FakeClient:
-        def __enter__(self): return self
-        def __exit__(self, *exc): return False
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
 
         def document_html(self, durable_id):
             # Keyed by the durable id and nothing else. No session is consulted,
             # so there is no focus for a read to follow to the wrong document --
             # which is the point of reading by id rather than exporting.
-            return pages["manual" if durable_id == "uuid-m"
-                         else "quick-start card"]
+            return pages["manual" if durable_id == "uuid-m" else "quick-start card"]
 
     out = tmp_path / "out"
     out.mkdir()
-    (out / "published.json").write_text(json.dumps({
-        "manual_id": "doc_m", "card_id": "doc_c",
-        "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
-        "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
-        "language": "", "images": images}))
+    (out / "published.json").write_text(
+        json.dumps(
+            {
+                "manual_id": "doc_m",
+                "card_id": "doc_c",
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
+                "language": "",
+                "images": images,
+            }
+        )
+    )
 
     monkeypatch.setattr(cli, "OUT", out)
     monkeypatch.setattr(cli, "_client", lambda: FakeClient())
@@ -195,19 +210,29 @@ def test_verify_refuses_a_publication_with_no_durable_ids(monkeypatch, tmp_path)
     from manualbuilder.superdocs import SuperDocsError
 
     class FakeClient:
-        def __enter__(self): return self
-        def __exit__(self, *exc): return False
+        def __enter__(self):
+            return self
 
-        def document_html(self, durable_id):      # pragma: no cover
-            raise AssertionError(
-                "a read was attempted with no durable id recorded")
+        def __exit__(self, *exc):
+            return False
+
+        def document_html(self, durable_id):  # pragma: no cover
+            raise AssertionError("a read was attempted with no durable id recorded")
 
     out = tmp_path / "out"
     out.mkdir()
-    (out / "published.json").write_text(json.dumps({
-        "manual_id": "doc_m", "card_id": "doc_c",
-        "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
-        "durable": {}, "language": "", "images": {}}))
+    (out / "published.json").write_text(
+        json.dumps(
+            {
+                "manual_id": "doc_m",
+                "card_id": "doc_c",
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "durable": {},
+                "language": "",
+                "images": {},
+            }
+        )
+    )
 
     monkeypatch.setattr(cli, "OUT", out)
     monkeypatch.setattr(cli, "_client", lambda: FakeClient())

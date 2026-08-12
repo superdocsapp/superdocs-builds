@@ -30,6 +30,7 @@ claimed, is relative: the same model applied to both languages puts every block
 on the same page. A model wrong in the same direction for both is still a valid
 comparison, and the one place to change if the house style changes is `Box`.
 """
+
 from __future__ import annotations
 
 import math
@@ -45,11 +46,11 @@ class PaginationError(ValueError):
 @dataclass(frozen=True)
 class Box:
     """The page, in lines. One place to change if the house style changes."""
+
     lines_per_page: int = 46
     chars_per_line: int = 88
-    figure_lines: int = 16       # a diagram at a third of the text column
-    heading_lines: dict[str, int] = field(
-        default_factory=lambda: {"h1": 5, "h2": 4, "h3": 3})
+    figure_lines: int = 16  # a diagram at a third of the text column
+    heading_lines: dict[str, int] = field(default_factory=lambda: {"h1": 5, "h2": 4, "h3": 3})
     table_header_lines: int = 2
     space_after_paragraph: int = 1
 
@@ -69,17 +70,19 @@ PAGE = Box()
 #: exactly 26, which passes and is not a card anyone should print. The number
 #: that matters is the headroom the tightest panel leaves the next translation,
 #: and `check` prints it for every locale so it is a fact rather than a hope.
-PANEL = Box(lines_per_page=28, chars_per_line=58, figure_lines=9,
-            heading_lines={"h1": 3, "h2": 2, "h3": 2})
+PANEL = Box(
+    lines_per_page=28, chars_per_line=58, figure_lines=9, heading_lines={"h1": 3, "h2": 2, "h3": 2}
+)
 
 
 @dataclass(frozen=True)
 class Placement:
     """One block, or part of one, on one page."""
+
     block_id: str
     page: int
     lines: int
-    rows: tuple[int, int] | None = None   # for a table split across pages
+    rows: tuple[int, int] | None = None  # for a table split across pages
 
     @property
     def is_partial(self) -> bool:
@@ -89,7 +92,7 @@ class Placement:
 @dataclass(frozen=True)
 class Layout:
     placements: tuple[Placement, ...]
-    used: tuple[int, ...]          # lines used, per page
+    used: tuple[int, ...]  # lines used, per page
     box: Box
 
     @property
@@ -107,8 +110,7 @@ class Layout:
         out: dict[str, tuple[int, int]] = {}
         for placement in self.placements:
             first, last = out.get(placement.block_id, (placement.page, placement.page))
-            out[placement.block_id] = (min(first, placement.page),
-                                       max(last, placement.page))
+            out[placement.block_id] = (min(first, placement.page), max(last, placement.page))
         return out
 
     def fill(self) -> list[float]:
@@ -130,12 +132,14 @@ class Layout:
         for index, used in enumerate(self.used):
             if used > self.box.lines_per_page:
                 on_page = [p.block_id for p in self.placements if p.page == index + 1]
-                out.append((on_page[0] if on_page else f"page {index + 1}",
-                            used - self.box.lines_per_page))
+                out.append(
+                    (on_page[0] if on_page else f"page {index + 1}", used - self.box.lines_per_page)
+                )
         return out
 
 
 # ------------------------------------------------------------- measuring --
+
 
 def height(block: Block, box: Box) -> int:
     if block.kind in box.heading_lines:
@@ -171,6 +175,7 @@ def _groups(blocks: list[Block]) -> list[list[Block]]:
 
 
 # --------------------------------------------------------------- laying out --
+
 
 def paginate(blocks: list[Block], box: Box | None = None) -> Layout:
     box = box or Box()
@@ -256,6 +261,7 @@ def _split(group: list[Block], box: Box, used: list[int], page) -> list[Placemen
 
 # ------------------------------------------------------------- comparing --
 
+
 @dataclass(frozen=True)
 class Shift:
     block_id: str
@@ -263,8 +269,7 @@ class Shift:
     found: tuple[int, int]
 
     def __str__(self) -> str:
-        return (f"{self.block_id} was on {_pages(self.expected)}, "
-                f"is on {_pages(self.found)}")
+        return f"{self.block_id} was on {_pages(self.expected)}, is on {_pages(self.found)}"
 
 
 def _pages(span: tuple[int, int]) -> str:
@@ -287,8 +292,9 @@ def compare(source: Layout, localised: Layout) -> list[Shift]:
     return shifts
 
 
-def assert_same_pagination(source: Layout, localised: Layout,
-                           language: str, document: str = "manual") -> None:
+def assert_same_pagination(
+    source: Layout, localised: Layout, language: str, document: str = "manual"
+) -> None:
     """Refuse a translation that would print differently from its source.
 
     The message names the blocks, not a page count, because "4 pages became 5"
@@ -306,23 +312,33 @@ def assert_same_pagination(source: Layout, localised: Layout,
             f"the {language} {document} paginates on the same pages as the "
             f"source and does not fit on them:\n  - "
             + "\n  - ".join(
-                f"{block_id} overruns its page by {excess} line"
-                f"{'' if excess == 1 else 's'}" for block_id, excess in overflows[:5])
+                f"{block_id} overruns its page by {excess} line{'' if excess == 1 else 's'}"
+                for block_id, excess in overflows[:5]
+            )
         )
 
     shifts = compare(source, localised)
     if not shifts:
         return
     shown = shifts[:5]
-    more = ("" if len(shifts) <= len(shown)
-            else f"\n  ... and {len(shifts) - len(shown)} more")
+    more = "" if len(shifts) <= len(shown) else f"\n  ... and {len(shifts) - len(shown)} more"
     raise PaginationError(
         f"the {language} {document} does not paginate like the source "
         f"({source.pages} pages became {localised.pages}); the translation is "
         f"longer than the layout has room for:\n  - "
-        + "\n  - ".join(str(shift) for shift in shown) + more
+        + "\n  - ".join(str(shift) for shift in shown)
+        + more
     )
 
 
-__all__ = ["Box", "Layout", "Placement", "Shift", "PaginationError", "paginate",
-           "compare", "assert_same_pagination", "height"]
+__all__ = [
+    "Box",
+    "Layout",
+    "PaginationError",
+    "Placement",
+    "Shift",
+    "assert_same_pagination",
+    "compare",
+    "height",
+    "paginate",
+]

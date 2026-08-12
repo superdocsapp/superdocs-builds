@@ -5,13 +5,15 @@ mistranslation -- it is that German runs longer than English, so a translated
 manual reflows, a step lands on a different page from its diagram, and the
 printed card no longer folds where the crease is.
 """
+
 from __future__ import annotations
 
 import re
 
 import pytest
 
-from manualbuilder import localize as lz, projections as pj
+from manualbuilder import localize as lz
+from manualbuilder import projections as pj
 
 from .conftest import PROJECT_ROOT
 
@@ -94,8 +96,7 @@ def test_a_locale_cannot_invent_a_diagram_string(spec):
     """Same rule as everywhere else: a locale fills ids that exist. A key nobody
     reads is a translation somebody paid for that never appears."""
     with pytest.raises(lz.LocaleError, match="diagram string 'tagline_footer'"):
-        lz.localised_spec(spec, {"language": "xx",
-                                 "diagram": {"tagline_footer": "..."}})
+        lz.localised_spec(spec, {"language": "xx", "diagram": {"tagline_footer": "..."}})
 
 
 def test_a_locale_cannot_add_structure(spec):
@@ -103,10 +104,13 @@ def test_a_locale_cannot_add_structure(spec):
     have is a locale adding a section, and a document with an extra section
     paginates differently by definition."""
     with pytest.raises(lz.LocaleError, match="cannot add or rename structure"):
-        lz.localised_spec(spec, {
-            "language": "fr",
-            "steps": {"calibrer_le_flux": {"title": "Calibrer", "body": "..."}},
-        })
+        lz.localised_spec(
+            spec,
+            {
+                "language": "fr",
+                "steps": {"calibrer_le_flux": {"title": "Calibrer", "body": "..."}},
+            },
+        )
 
 
 def test_a_dropped_heading_is_caught(spec, german):
@@ -116,8 +120,7 @@ def test_a_dropped_heading_is_caught(spec, german):
     german_html = pj.manual_html(german)
     # By block id rather than by its words: the heading a translator would
     # delete is the same heading whatever language it is written in.
-    broken = re.sub(r'<h2 data-block="sec:specifications">.*?</h2>\n', "",
-                    german_html, count=1)
+    broken = re.sub(r'<h2 data-block="sec:specifications">.*?</h2>\n', "", german_html, count=1)
     assert broken != german_html, "the test did not actually remove a heading"
 
     problems = lz.compare_structure(pj.manual_html(spec), broken)
@@ -138,16 +141,16 @@ def test_the_outline_ignores_words_entirely(spec, german):
     """The property being defended is shape, not length. If `outline` were
     sensitive to text it would fail every honest translation."""
     assert lz.outline(pj.manual_html(spec)) == lz.outline(pj.manual_html(german))
-    assert all(tag.lstrip("/") in lz.STRUCTURE_TAGS
-               for tag in lz.outline(pj.manual_html(spec)))
+    assert all(tag.lstrip("/") in lz.STRUCTURE_TAGS for tag in lz.outline(pj.manual_html(spec)))
 
 
 def test_untranslated_strings_fall_back_rather_than_vanishing(spec):
     """A partial locale is normal during translation. A missing string must show
     the source language, never an empty heading -- an empty heading is a
     structural element with nothing in it, which is worse than English."""
-    partial = lz.localised_spec(spec, {"language": "fr",
-                                       "steps": {"rails": {"title": "Monter les rails"}}})
+    partial = lz.localised_spec(
+        spec, {"language": "fr", "steps": {"rails": {"title": "Monter les rails"}}}
+    )
     assert partial.step("rails").title == "Monter les rails"
     assert partial.step("rails").body == spec.step("rails").body
     assert partial.step("gantry").title == spec.step("gantry").title

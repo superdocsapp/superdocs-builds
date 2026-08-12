@@ -51,6 +51,8 @@ echo "no quota is spent by anything below."
 
 # ------------------------------------------------------------- offline --
 
+stage "lint: ruff check, black --check" \
+    bash -c ".venv/bin/ruff check . && .venv/bin/black --check ."
 stage "unit tests (no network, no key)" \
     .venv/bin/python -m pytest -q
 stage "check: the spec, the pair, and every locale's pagination" \

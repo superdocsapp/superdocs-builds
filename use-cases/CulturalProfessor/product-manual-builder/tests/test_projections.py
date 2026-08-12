@@ -5,6 +5,7 @@ manual changes. The mechanism is that neither document contains anything: both
 are rendered from the spec. These tests check the property that mechanism is
 supposed to buy, rather than checking that the mechanism exists.
 """
+
 from __future__ import annotations
 
 import re
@@ -122,8 +123,10 @@ def test_every_block_id_appears_once_in_the_rendered_html(spec):
     markup would be measured and not printed -- or printed twice and measured
     once. Either way the pagination check would be describing a document that
     does not exist."""
-    for blocks, html in ((pj.manual_blocks(spec), pj.manual_html(spec)),
-                         (pj.quick_start_blocks(spec), pj.quick_start_html(spec))):
+    for blocks, html in (
+        (pj.manual_blocks(spec), pj.manual_html(spec)),
+        (pj.quick_start_blocks(spec), pj.quick_start_html(spec)),
+    ):
         ids = [block.id for block in blocks]
         assert len(ids) == len(set(ids)), "block ids must be unique in a document"
         for block_id in ids:
@@ -145,8 +148,7 @@ def test_diagrams_render_as_captioned_figures_with_no_urls_yet(spec):
 
 
 def test_diagram_urls_are_substituted_when_supplied(spec):
-    images = {image_id: f"https://cdn.example/{image_id}.svg"
-              for image_id in pj.image_ids(spec)}
+    images = {image_id: f"https://cdn.example/{image_id}.svg" for image_id in pj.image_ids(spec)}
     manual = pj.manual_html(spec, images)
     assert manual.count("<img ") == len(images)
     assert "https://cdn.example/step:laser.svg" in manual

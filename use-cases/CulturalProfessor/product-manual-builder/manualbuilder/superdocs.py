@@ -49,6 +49,7 @@ answers a continue prompt with it, but no document in this project is large
 enough to provoke one, so that branch has offline tests and no live run behind
 it. It is one call in one place for that reason.
 """
+
 from __future__ import annotations
 
 import base64
@@ -67,7 +68,8 @@ POLL_INTERVAL = 3.0
 #: A session runs one turn at a time. Anything in these states holds it, and a
 #: second turn sent while one is outstanding comes back 409 `session_busy`.
 ACTIVE_JOB_STATUSES = frozenset(
-    {"pending", "queued", "in_progress", "running", "awaiting_approval"})
+    {"pending", "queued", "in_progress", "running", "awaiting_approval"}
+)
 DEFAULT_TIMEOUT = 600.0
 
 
@@ -82,8 +84,9 @@ class QuotaExceeded(SuperDocsError):
 @dataclass(frozen=True)
 class ProposedChange:
     """One edit the model wants to make to one chunk of one document."""
+
     change_id: str
-    operation: str          # edit | create | delete
+    operation: str  # edit | create | delete
     chunk_id: str | None
     document_id: str | None
     old_html: str
@@ -104,22 +107,28 @@ class ProposedChange:
 
 
 class SuperDocs:
-    def __init__(self, api_key: str | None = None, base_url: str | None = None,
-                 timeout: float = DEFAULT_TIMEOUT) -> None:
+    def __init__(
+        self,
+        api_key: str | None = None,
+        base_url: str | None = None,
+        timeout: float = DEFAULT_TIMEOUT,
+    ) -> None:
         key = api_key or os.environ.get("SUPERDOCS_API_KEY", "")
         if not key:
             raise SuperDocsError(
                 "SUPERDOCS_API_KEY is not set. Copy .env.example to .env and put "
                 "your key in it; the key is never read from anywhere else."
             )
-        self.base_url = (base_url or os.environ.get("SUPERDOCS_BASE_URL")
-                         or DEFAULT_BASE_URL).rstrip("/")
+        self.base_url = (
+            base_url or os.environ.get("SUPERDOCS_BASE_URL") or DEFAULT_BASE_URL
+        ).rstrip("/")
         # No client-wide Content-Type. httpx sets `application/json` for a
         # `json=` body and a multipart boundary for a `files=` body, and a
         # default here would override the boundary and make every upload a
         # malformed JSON request.
         self._client = httpx.Client(
-            base_url=self.base_url, timeout=timeout,
+            base_url=self.base_url,
+            timeout=timeout,
             headers={"Authorization": f"Bearer {key}"},
         )
 
@@ -156,8 +165,7 @@ class SuperDocs:
             return response.json()
         except ValueError as exc:
             raise SuperDocsError(
-                f"expected JSON from {response.request.url.path}, got "
-                f"{response.text[:200]!r}"
+                f"expected JSON from {response.request.url.path}, got {response.text[:200]!r}"
             ) from exc
 
     # ------------------------------------------------------------ documents --
@@ -168,16 +176,22 @@ class SuperDocs:
         A session is the unit that holds documents, and `/v1/chat` requires one:
         there is no document-only call anywhere on the surface.
         """
-        body = self._post("/v1/sessions/init",
-                          {"document_ids": document_ids} if document_ids else {})
+        body = self._post(
+            "/v1/sessions/init", {"document_ids": document_ids} if document_ids else {}
+        )
         session_id = body.get("session_id") or body.get("id")
         if not session_id:
             raise SuperDocsError(f"session init returned no id: {body}")
         return str(session_id)
 
-    def upload(self, filename: str, content: str | bytes, session_id: str,
-               open_mode: str = "background",
-               content_type: str = "text/html") -> str:
+    def upload(
+        self,
+        filename: str,
+        content: str | bytes,
+        session_id: str,
+        open_mode: str = "background",
+        content_type: str = "text/html",
+    ) -> str:
         """Upload a document into a session and return its id.
 
         Multipart, not JSON, and that is the whole reason this method exists in
@@ -192,11 +206,13 @@ class SuperDocs:
         provably confined to one chunk.
         """
         data = content.encode("utf-8") if isinstance(content, str) else content
-        body = self._read(self._client.post(
-            "/v1/documents/upload",
-            files={"file": (filename, data, content_type)},
-            data={"session_id": session_id, "open_mode": open_mode},
-        ))
+        body = self._read(
+            self._client.post(
+                "/v1/documents/upload",
+                files={"file": (filename, data, content_type)},
+                data={"session_id": session_id, "open_mode": open_mode},
+            )
+        )
         document_id = body.get("document_id") or body.get("id")
         if not document_id:
             raise SuperDocsError(f"upload returned no document id: {list(body)}")
@@ -226,8 +242,7 @@ class SuperDocs:
         returned a *different* document's title than the one it was asked to
         focus; `documents()` is the view to trust.
         """
-        return self._post(
-            f"/v1/sessions/{session_id}/documents/{document_id}/focus", {})
+        return self._post(f"/v1/sessions/{session_id}/documents/{document_id}/focus", {})
 
     def document(self, durable_id: str, include_html: bool = False) -> dict[str, Any]:
         """A stored document by its durable id, with no session involved.
@@ -255,9 +270,7 @@ class SuperDocs:
         body = self.document(durable_id, include_html=True)
         html = body.get("html")
         if not isinstance(html, str) or not html:
-            raise SuperDocsError(
-                f"document {durable_id} came back with no html body: "
-                f"{list(body)}")
+            raise SuperDocsError(f"document {durable_id} came back with no html body: {list(body)}")
         return html
 
     def upload_image(self, filename: str, svg: str) -> str:
@@ -267,18 +280,20 @@ class SuperDocs:
         signature and an expiry on it, which renders today and 404s in a week --
         putting that one in a document is a manual whose diagrams disappear.
         """
-        body = self._post("/v1/documents/images/upload-base64", {
-            "image_base64": base64.b64encode(svg.encode("utf-8")).decode("ascii"),
-            "filename": filename,
-            "content_type": "image/svg+xml",
-        })
+        body = self._post(
+            "/v1/documents/images/upload-base64",
+            {
+                "image_base64": base64.b64encode(svg.encode("utf-8")).decode("ascii"),
+                "filename": filename,
+                "content_type": "image/svg+xml",
+            },
+        )
         url = body.get("url")
         if not url:
             raise SuperDocsError(f"image upload returned no durable url: {list(body)}")
         return str(url)
 
-    def export_bytes(self, session_id: str, fmt: str = "pdf",
-                     filename: str | None = None) -> bytes:
+    def export_bytes(self, session_id: str, fmt: str = "pdf", filename: str | None = None) -> bytes:
         """The exported file itself.
 
         Keyed by session, not by document: export renders what the session is
@@ -298,8 +313,8 @@ class SuperDocs:
             raise QuotaExceeded(f"quota exceeded on export: {response.text[:200]}")
         if response.status_code >= 400:
             raise SuperDocsError(
-                f"POST /v1/documents/export -> {response.status_code}: "
-                f"{response.text[:400]}")
+                f"POST /v1/documents/export -> {response.status_code}: {response.text[:400]}"
+            )
 
         if not response.headers.get("content-type", "").startswith("application/json"):
             return response.content
@@ -312,8 +327,7 @@ class SuperDocs:
             if body.get(key):
                 linked = self._client.get(body[key])
                 if linked.status_code >= 400:
-                    raise SuperDocsError(
-                        f"export URL {body[key]} -> {linked.status_code}")
+                    raise SuperDocsError(f"export URL {body[key]} -> {linked.status_code}")
                 return linked.content
         raise SuperDocsError(
             f"export of session {session_id} returned JSON carrying neither file "
@@ -322,8 +336,7 @@ class SuperDocs:
 
     # ----------------------------------------------------------------- chat --
 
-    def chat(self, message: str, session_id: str,
-             document_id: str | None = None) -> dict[str, Any]:
+    def chat(self, message: str, session_id: str, document_id: str | None = None) -> dict[str, Any]:
         """One edit turn, parked for approval rather than applied.
 
         One turn, one document. A session can hold several documents like tabs,
@@ -348,8 +361,7 @@ class SuperDocs:
             payload["document_id"] = document_id
         return self._post("/v1/chat", payload)
 
-    def chat_async(self, message: str, session_id: str,
-                   document_id: str | None = None) -> str:
+    def chat_async(self, message: str, session_id: str, document_id: str | None = None) -> str:
         payload: dict[str, Any] = {
             "message": message,
             "session_id": session_id,
@@ -379,27 +391,30 @@ class SuperDocs:
         usually a batch somebody proposed and walked away from -- so the useful
         thing is to name it rather than to retry.
         """
-        return [job for job in self.jobs(session_id)
-                if str(job.get("status")) in ACTIVE_JOB_STATUSES]
+        return [
+            job for job in self.jobs(session_id) if str(job.get("status")) in ACTIVE_JOB_STATUSES
+        ]
 
     def cancel_job(self, job_id: str) -> dict[str, Any]:
         """Throw a turn away, including one parked at `awaiting_approval`."""
         return self._post(f"/v1/jobs/{job_id}/cancel", {})
 
-    def continue_job(self, session_id: str, job_id: str,
-                     resume: bool = True) -> dict[str, Any]:
+    def continue_job(self, session_id: str, job_id: str, resume: bool = True) -> dict[str, Any]:
         """Answer a large edit's "shall I carry on?" prompt.
 
         `resume=False` stops there and keeps the work already applied, which is
         a half-edited document -- so this client always says yes. See
         `wait_for_job`.
         """
-        return self._post(f"/v1/chat/{session_id}/continue",
-                          {"job_id": job_id, "continue": resume})
+        return self._post(f"/v1/chat/{session_id}/continue", {"job_id": job_id, "continue": resume})
 
-    def wait_for_job(self, job_id: str, timeout: float = DEFAULT_TIMEOUT,
-                     poll: float = POLL_INTERVAL,
-                     resume_large_edits: bool = True) -> dict[str, Any]:
+    def wait_for_job(
+        self,
+        job_id: str,
+        timeout: float = DEFAULT_TIMEOUT,
+        poll: float = POLL_INTERVAL,
+        resume_large_edits: bool = True,
+    ) -> dict[str, Any]:
         """Poll until the job stops moving.
 
         Deep operations run thirty seconds to several minutes with no visible
@@ -438,16 +453,21 @@ class SuperDocs:
                 if not session_id:
                     raise SuperDocsError(
                         f"job {job_id} is waiting on a continue prompt but names "
-                        f"no session, so it cannot be resumed: {list(last)}")
+                        f"no session, so it cannot be resumed: {list(last)}"
+                    )
                 # The job goes back to `in_progress` and may pause again for the
                 # next segment, so this is a loop and not a single answer.
                 self.continue_job(str(session_id), job_id)
             time.sleep(poll)
-        raise SuperDocsError(
-            f"job {job_id} still {last.get('status')!r} after {timeout:.0f}s")
+        raise SuperDocsError(f"job {job_id} still {last.get('status')!r} after {timeout:.0f}s")
 
-    def approve(self, session_id: str, job_id: str, decisions: dict[str, bool],
-                approved_by_default: bool = True) -> dict[str, Any]:
+    def approve(
+        self,
+        session_id: str,
+        job_id: str,
+        decisions: dict[str, bool],
+        approved_by_default: bool = True,
+    ) -> dict[str, Any]:
         """Approve or reject proposed changes, individually.
 
         `job_id` and `approved` are both required, and `approved` is the default
@@ -455,12 +475,16 @@ class SuperDocs:
         approves nothing while looking exactly like a service that ignored the
         call. It is sent at the top level *and* per change for that reason.
         """
-        return self._post(f"/v1/chat/{session_id}/approve", {
-            "job_id": job_id,
-            "approved": approved_by_default,
-            "changes": [{"change_id": change_id, "approved": ok}
-                        for change_id, ok in decisions.items()],
-        })
+        return self._post(
+            f"/v1/chat/{session_id}/approve",
+            {
+                "job_id": job_id,
+                "approved": approved_by_default,
+                "changes": [
+                    {"change_id": change_id, "approved": ok} for change_id, ok in decisions.items()
+                ],
+            },
+        )
 
     # -------------------------------------------------------------- reading --
 
@@ -493,8 +517,7 @@ class SuperDocs:
                     content = json.loads(content)
                 except ValueError as exc:
                     raise SuperDocsError(
-                        f"proposed_change_batch content was not JSON: "
-                        f"{content[:200]!r}"
+                        f"proposed_change_batch content was not JSON: {content[:200]!r}"
                     ) from exc
             for item in _batch_items(content):
                 out.append(ProposedChange.from_payload(item))
@@ -514,10 +537,13 @@ class SuperDocs:
         service. The template is named after the file, so `filename` carries the
         name a caller wants to see back from `templates()`.
         """
-        body = self._post("/v1/templates/upload-base64", {
-            "filename": filename,
-            "file_base64": base64.b64encode(html.encode("utf-8")).decode("ascii"),
-        })
+        body = self._post(
+            "/v1/templates/upload-base64",
+            {
+                "filename": filename,
+                "file_base64": base64.b64encode(html.encode("utf-8")).decode("ascii"),
+            },
+        )
         template_id = body.get("id") or body.get("template_id")
         if not template_id:
             raise SuperDocsError(f"template upload returned no id: {body}")
@@ -566,7 +592,7 @@ def load_dotenv(path: str | Path = ".env") -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         if line.startswith("export "):
-            line = line[len("export "):]
+            line = line[len("export ") :]
         key, _, value = line.partition("=")
         value = value.strip()
         if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
@@ -574,5 +600,10 @@ def load_dotenv(path: str | Path = ".env") -> None:
         os.environ.setdefault(key.strip(), value)
 
 
-__all__ = ["SuperDocs", "SuperDocsError", "QuotaExceeded", "ProposedChange",
-           "load_dotenv"]
+__all__ = [
+    "ProposedChange",
+    "QuotaExceeded",
+    "SuperDocs",
+    "SuperDocsError",
+    "load_dotenv",
+]

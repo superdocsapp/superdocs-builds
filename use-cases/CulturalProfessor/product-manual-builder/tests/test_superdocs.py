@@ -4,6 +4,7 @@ No network. These pin the three API behaviours that cost real time to discover,
 so the next person reads a test instead of rediscovering them against a live
 service.
 """
+
 from __future__ import annotations
 
 import json
@@ -15,9 +16,13 @@ from manualbuilder.superdocs import ProposedChange, SuperDocs, SuperDocsError
 
 def change(change_id: str, document_id: str = "doc_manual") -> dict:
     return {
-        "change_id": change_id, "operation": "edit", "chunk_id": "chunk_7",
-        "document_id": document_id, "old_html": "<p>1.2 N·m</p>",
-        "new_html": "<p>1.6 N·m</p>", "ai_explanation": "torque updated",
+        "change_id": change_id,
+        "operation": "edit",
+        "chunk_id": "chunk_7",
+        "document_id": document_id,
+        "old_html": "<p>1.2 N·m</p>",
+        "new_html": "<p>1.6 N·m</p>",
+        "ai_explanation": "torque updated",
     }
 
 
@@ -36,8 +41,7 @@ def test_the_streaming_path_is_a_json_encoded_string():
     payload = {
         "intermediate_responses": [
             {"type": "text", "content": "Working on it"},
-            {"type": "proposed_change_batch",
-             "content": json.dumps({"changes": [change("c3")]})},
+            {"type": "proposed_change_batch", "content": json.dumps({"changes": [change("c3")]})},
         ]
     }
     found = SuperDocs.pending_changes(payload)
@@ -51,11 +55,15 @@ def test_a_batch_grouped_by_document_is_flattened():
     to -- that is what makes the two-document edit checkable."""
     payload = {
         "intermediate_responses": [
-            {"type": "proposed_change_batch",
-             "content": json.dumps({
-                 "doc_manual": [change("c4", "doc_manual")],
-                 "doc_card": [change("c5", "doc_card")],
-             })},
+            {
+                "type": "proposed_change_batch",
+                "content": json.dumps(
+                    {
+                        "doc_manual": [change("c4", "doc_manual")],
+                        "doc_card": [change("c5", "doc_card")],
+                    }
+                ),
+            },
         ]
     }
     found = SuperDocs.pending_changes(payload)
@@ -64,9 +72,11 @@ def test_a_batch_grouped_by_document_is_flattened():
 
 
 def test_a_batch_that_is_not_json_says_so():
-    payload = {"intermediate_responses": [
-        {"type": "proposed_change_batch", "content": "not json at all"},
-    ]}
+    payload = {
+        "intermediate_responses": [
+            {"type": "proposed_change_batch", "content": "not json at all"},
+        ]
+    }
     with pytest.raises(SuperDocsError, match="not JSON"):
         SuperDocs.pending_changes(payload)
 
@@ -91,7 +101,7 @@ def test_the_approval_payload_carries_a_top_level_default(monkeypatch):
     sent: dict = {}
 
     class Fake:
-        def post(self, path, json):  # noqa: A002 -- matching httpx's signature
+        def post(self, path, json):
             sent["path"], sent["body"] = path, json
             return _ok({"status": "applied"})
 
@@ -109,9 +119,9 @@ def test_the_approval_payload_carries_a_top_level_default(monkeypatch):
         "approve is keyed by the job the changes came from, and the synchronous "
         "chat reply does not carry one -- it comes from the session's job list"
     )
-    assert sent["body"]["approved"] is True, (
-        "the top-level default is what makes the per-change entries mean anything"
-    )
+    assert (
+        sent["body"]["approved"] is True
+    ), "the top-level default is what makes the per-change entries mean anything"
     assert sent["body"]["changes"] == [
         {"change_id": "c1", "approved": True},
         {"change_id": "c2", "approved": False},
@@ -124,7 +134,7 @@ def test_a_chat_turn_parks_for_approval(monkeypatch):
     sent: dict = {}
 
     class Fake:
-        def post(self, path, json):  # noqa: A002
+        def post(self, path, json):
             sent["body"] = json
             return _ok({"session_id": "sess_1"})
 
@@ -135,8 +145,7 @@ def test_a_chat_turn_parks_for_approval(monkeypatch):
     client = SuperDocs()
     client._client = Fake()
 
-    client.chat("raise the rail torque to 1.6 N·m", "sess_1",
-                document_id="doc_manual")
+    client.chat("raise the rail torque to 1.6 N·m", "sess_1", document_id="doc_manual")
 
     assert sent["body"]["approval_mode"] == "ask_every_time"
     assert sent["body"]["session_id"] == "sess_1", "chat requires a session"
@@ -154,7 +163,8 @@ def _ok(body: dict):
     import httpx
 
     return httpx.Response(
-        200, json=body,
+        200,
+        json=body,
         request=httpx.Request("POST", "https://api.superdocs.app/x"),
     )
 
@@ -201,13 +211,22 @@ def test_a_continue_prompt_is_answered_rather_than_returned(monkeypatch):
     service (BUGS #18), so the branch is on which of the two is populated."""
     calls: list = []
     replies = [
-        {"job_id": "job_7", "session_id": "sess_1", "status": "awaiting_approval",
-         "metadata": {"continue_prompt": {"done": 500, "total": 864,
-                                          "remaining": 364},
-                      "pending_changes": []}},
+        {
+            "job_id": "job_7",
+            "session_id": "sess_1",
+            "status": "awaiting_approval",
+            "metadata": {
+                "continue_prompt": {"done": 500, "total": 864, "remaining": 364},
+                "pending_changes": [],
+            },
+        },
         {"job_id": "job_7", "session_id": "sess_1", "status": "in_progress"},
-        {"job_id": "job_7", "session_id": "sess_1", "status": "completed",
-         "metadata": {"pending_changes": [change("c1")]}},
+        {
+            "job_id": "job_7",
+            "session_id": "sess_1",
+            "status": "completed",
+            "metadata": {"pending_changes": [change("c1")]},
+        },
     ]
 
     class Fake:
@@ -215,7 +234,7 @@ def test_a_continue_prompt_is_answered_rather_than_returned(monkeypatch):
             calls.append(("GET", path))
             return _ok(replies.pop(0))
 
-        def post(self, path, json):  # noqa: A002
+        def post(self, path, json):
             calls.append(("POST", path, json))
             return _ok({"status": "resumed"})
 
@@ -226,8 +245,7 @@ def test_a_continue_prompt_is_answered_rather_than_returned(monkeypatch):
     job = client.wait_for_job("job_7", timeout=30, poll=0)
 
     assert job["status"] == "completed"
-    assert ("POST", "/v1/chat/sess_1/continue",
-            {"job_id": "job_7", "continue": True}) in calls, (
+    assert ("POST", "/v1/chat/sess_1/continue", {"job_id": "job_7", "continue": True}) in calls, (
         "stopping keeps whatever was applied, which is a document edited half "
         "way through -- so this client always resumes"
     )
@@ -237,13 +255,19 @@ def test_a_continue_prompt_is_answered_rather_than_returned(monkeypatch):
 def test_a_review_pause_is_still_returned(monkeypatch):
     """The other half of the same branch: an `awaiting_approval` job carrying
     real pending changes is a human's decision and must not be resumed past."""
+
     class Fake:
         def get(self, path):
-            return _ok({"job_id": "job_7", "session_id": "sess_1",
-                        "status": "awaiting_approval",
-                        "metadata": {"pending_changes": [change("c1")]}})
+            return _ok(
+                {
+                    "job_id": "job_7",
+                    "session_id": "sess_1",
+                    "status": "awaiting_approval",
+                    "metadata": {"pending_changes": [change("c1")]},
+                }
+            )
 
-        def post(self, path, json):  # noqa: A002
+        def post(self, path, json):
             raise AssertionError("a batch awaiting review was resumed")
 
         def close(self):
@@ -261,16 +285,14 @@ def test_templates_upload_uses_the_json_endpoint_and_its_field_names(monkeypatch
     sent: dict = {}
 
     class Fake:
-        def post(self, path, json):  # noqa: A002
+        def post(self, path, json):
             sent["path"], sent["body"] = path, json
-            return _ok({"id": "tpl_1", "name": "letterhead.html",
-                        "status": "ready"})
+            return _ok({"id": "tpl_1", "name": "letterhead.html", "status": "ready"})
 
         def close(self):
             pass
 
-    template_id = _client(monkeypatch, Fake()).upload_template(
-        "letterhead.html", "<h1>x</h1>")
+    template_id = _client(monkeypatch, Fake()).upload_template("letterhead.html", "<h1>x</h1>")
 
     assert sent["path"] == "/v1/templates/upload-base64"
     assert sorted(sent["body"]) == ["file_base64", "filename"]

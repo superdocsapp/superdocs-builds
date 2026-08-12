@@ -5,6 +5,7 @@ only worth saying if regenerating an unchanged graph produces unchanged bytes.
 Otherwise every edit shows a diff in every diagram and nobody can tell which
 changes were meant.
 """
+
 from __future__ import annotations
 
 import subprocess
@@ -36,10 +37,12 @@ def test_rendering_is_stable_across_processes():
     runs = []
     for seed in ("0", "1", "12345"):
         result = subprocess.run(
-            [sys.executable, "-c", script], cwd=PROJECT_ROOT, capture_output=True,
-            text=True, timeout=120,
-            env={"PYTHONHASHSEED": seed, "PYTHONPATH": str(PROJECT_ROOT),
-                 "PATH": "/usr/bin:/bin"},
+            [sys.executable, "-c", script],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            timeout=120,
+            env={"PYTHONHASHSEED": seed, "PYTHONPATH": str(PROJECT_ROOT), "PATH": "/usr/bin:/bin"},
         )
         assert result.returncode == 0, result.stderr
         runs.append(result.stdout)
@@ -52,8 +55,9 @@ def test_a_change_to_the_graph_changes_the_drawing(spec, tmp_path):
     import yaml
 
     raw = yaml.safe_load(SPEC_PATH.read_text())
-    raw["parts"].append({"id": "spare_lens", "label": "Spare lens",
-                         "quantity": 2, "mounts_to": "laser_module"})
+    raw["parts"].append(
+        {"id": "spare_lens", "label": "Spare lens", "quantity": 2, "mounts_to": "laser_module"}
+    )
     path = tmp_path / "extra.yaml"
     path.write_text(yaml.safe_dump(raw, sort_keys=False))
 
@@ -82,10 +86,11 @@ def test_every_step_gets_the_same_layout(spec):
     coordinates, different emphasis."""
     boxes = [line for line in diagram.exploded(spec).splitlines() if "<rect x=" in line]
     for step in spec.steps:
-        step_boxes = [line for line in diagram.for_step(spec, step).splitlines()
-                      if "<rect x=" in line]
+        step_boxes = [
+            line for line in diagram.for_step(spec, step).splitlines() if "<rect x=" in line
+        ]
         assert len(step_boxes) == len(boxes)
-        for a, b in zip(boxes, step_boxes):
+        for a, b in zip(boxes, step_boxes, strict=True):
             assert _geometry(a) == _geometry(b)
 
 
@@ -117,10 +122,11 @@ def test_the_band_label_does_not_print_underneath_a_part(spec):
     place = diagram.layout(spec)
     assert place.band_y is not None, "the shipped spec has loose parts"
 
-    baseline = place.band_y + 20                   # where `_render` puts the text
+    baseline = place.band_y + 20  # where `_render` puts the text
     for spot in place.placed:
-        assert not (spot.y <= baseline <= spot.y + diagram.BOX_H), \
-            f"the band label lands inside {spot.part.id}'s box"
+        assert not (
+            spot.y <= baseline <= spot.y + diagram.BOX_H
+        ), f"the band label lands inside {spot.part.id}'s box"
 
 
 def _geometry(rect_line: str) -> str:
@@ -133,5 +139,6 @@ def _geometry(rect_line: str) -> str:
     """
     import re
 
-    return " ".join(m.group(2) for m in
-                    re.finditer(r'(?:^|\s)(x|y|width|height)="(\d+)"', rect_line))
+    return " ".join(
+        m.group(2) for m in re.finditer(r'(?:^|\s)(x|y|width|height)="(\d+)"', rect_line)
+    )

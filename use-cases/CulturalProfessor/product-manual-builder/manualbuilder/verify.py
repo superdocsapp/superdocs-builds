@@ -48,6 +48,7 @@ removes the failure mode rather than checking for it afterwards.
 
 Nothing here is billed either way.
 """
+
 from __future__ import annotations
 
 import difflib
@@ -57,7 +58,8 @@ from difflib import SequenceMatcher
 from html import unescape
 from urllib.parse import urlparse
 
-from manualbuilder import projections as pj, session
+from manualbuilder import projections as pj
+from manualbuilder import session
 from manualbuilder.spec import Spec
 
 #: The two role names, matching `Publication.name_for`, because that is what the
@@ -82,8 +84,7 @@ class Finding:
 _DROP = re.compile(r"<(script|style)\b[^>]*>.*?</\1>", re.I | re.S)
 _TAG = re.compile(r"<[^>]+>")
 _WS = re.compile(r"\s+")
-_BLOCK = re.compile(
-    r"<(p|li|td|th|h[1-6]|figcaption|blockquote)\b[^>]*>(.*?)</\1>", re.I | re.S)
+_BLOCK = re.compile(r"<(p|li|td|th|h[1-6]|figcaption|blockquote)\b[^>]*>(.*?)</\1>", re.I | re.S)
 
 #: How close a passage has to be to the spec's wording to be treated as that
 #: passage, edited. Chosen well above what unrelated steps score against each
@@ -137,15 +138,16 @@ def _difference(one: str, other: str, limit: int = 8) -> str:
     "the two have come apart" is a true sentence nobody can do anything with.
     `-1.2 +1.6` is the whole story.
     """
-    words = [w for w in difflib.unified_diff(one.split(), other.split(),
-                                             lineterm="", n=0)
-             if w[:1] in "+-" and not w.startswith(("+++", "---"))]
+    words = [
+        w
+        for w in difflib.unified_diff(one.split(), other.split(), lineterm="", n=0)
+        if w[:1] in "+-" and not w.startswith(("+++", "---"))
+    ]
     shown = " ".join(words[:limit])
     return shown + (" …" if len(words) > limit else "")
 
 
-def image_findings(served: dict[str, str], images: dict[str, str],
-                   spec: Spec) -> list[Finding]:
+def image_findings(served: dict[str, str], images: dict[str, str], spec: Spec) -> list[Finding]:
     """Every figure in every served document, against the URL recorded for it."""
     captions = pj.captions(spec)
     expected = {
@@ -158,35 +160,51 @@ def image_findings(served: dict[str, str], images: dict[str, str],
         found = session.images_in(html)
         wanted = expected.get(role, {})
         if len(found) != len(wanted):
-            out.append(Finding(
-                FAIL, f"{role}: figure count",
-                f"{len(found)} figure(s) served, {len(wanted)} expected -- a "
-                f"figure has been added or lost"))
+            out.append(
+                Finding(
+                    FAIL,
+                    f"{role}: figure count",
+                    f"{len(found)} figure(s) served, {len(wanted)} expected -- a "
+                    f"figure has been added or lost",
+                )
+            )
 
         for alt, src in found:
             image_id = captions.get(alt)
             if image_id is None:
-                out.append(Finding(
-                    FAIL, f"{role}: unknown figure",
-                    f"alt text {alt!r} matches no caption in the spec, so there "
-                    f"is nothing to check it against"))
+                out.append(
+                    Finding(
+                        FAIL,
+                        f"{role}: unknown figure",
+                        f"alt text {alt!r} matches no caption in the spec, so there "
+                        f"is nothing to check it against",
+                    )
+                )
                 continue
             recorded = images.get(image_id)
             if not recorded:
-                out.append(Finding(
-                    MOOT, f"{role}: {image_id}",
-                    "no URL recorded for this diagram in published.json"))
+                out.append(
+                    Finding(
+                        MOOT,
+                        f"{role}: {image_id}",
+                        "no URL recorded for this diagram in published.json",
+                    )
+                )
                 continue
             if urlparse(src).path == urlparse(recorded).path:
-                out.append(Finding(
-                    OK, f"{role}: {image_id}",
-                    urlparse(recorded).path.rsplit("/", 1)[-1]))
+                out.append(
+                    Finding(OK, f"{role}: {image_id}", urlparse(recorded).path.rsplit("/", 1)[-1])
+                )
             else:
-                out.append(Finding(
-                    FAIL, f"{role}: {image_id}",
-                    f"served {urlparse(src).path.rsplit('/', 1)[-1]}, "
-                    f"published {urlparse(recorded).path.rsplit('/', 1)[-1]} -- "
-                    f"this document is showing an older drawing"))
+                out.append(
+                    Finding(
+                        FAIL,
+                        f"{role}: {image_id}",
+                        f"served {urlparse(src).path.rsplit('/', 1)[-1]}, "
+                        f"published {urlparse(recorded).path.rsplit('/', 1)[-1]} -- "
+                        f"this document is showing an older drawing",
+                    )
+                )
     return out
 
 
@@ -198,9 +216,9 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
     manual, card = text_of(served[MANUAL]), text_of(served[CARD])
     blocks = {MANUAL: passages(served[MANUAL]), CARD: passages(served[CARD])}
     out: list[Finding] = []
-    items = ([("step", step.id, step.body) for step in spec.quick_start()]
-             + [("fix", fault.id, fault.fix)
-                for fault in spec.quick_start_troubleshooting()])
+    items = [("step", step.id, step.body) for step in spec.quick_start()] + [
+        ("fix", fault.id, fault.fix) for fault in spec.quick_start_troubleshooting()
+    ]
 
     for kind, item_id, body in items:
         needle = _needle(body)
@@ -227,34 +245,49 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
             # follow, it is the passage being dropped or rewritten out of one of
             # them -- the pair coming apart in the most complete way available.
             here = MANUAL if in_manual else CARD
-            out.append(Finding(
-                FAIL, label,
-                f"in the {here} as published, and nothing in the "
-                f"{lost[0]} resembles it any more -- dropped or rewritten"))
+            out.append(
+                Finding(
+                    FAIL,
+                    label,
+                    f"in the {here} as published, and nothing in the "
+                    f"{lost[0]} resembles it any more -- dropped or rewritten",
+                )
+            )
             continue
         if lost:
-            out.append(Finding(
-                MOOT, label,
-                f"nothing in the {' or the '.join(lost)} is recognisably this "
-                f"any more, so the two cannot be compared on it"))
+            out.append(
+                Finding(
+                    MOOT,
+                    label,
+                    f"nothing in the {' or the '.join(lost)} is recognisably this "
+                    f"any more, so the two cannot be compared on it",
+                )
+            )
             continue
 
         theirs, ours = best[MANUAL][0], best[CARD][0]
         if theirs == ours:
-            out.append(Finding(
-                OK, label,
-                "edited since publish, and both documents carry the same new "
-                f"wording ({_difference(needle, ours, limit=4) or 'reformatted'})"))
+            out.append(
+                Finding(
+                    OK,
+                    label,
+                    "edited since publish, and both documents carry the same new "
+                    f"wording ({_difference(needle, ours, limit=4) or 'reformatted'})",
+                )
+            )
         else:
-            out.append(Finding(
-                FAIL, label,
-                f"the two documents word this differently -- manual vs card: "
-                f"{_difference(theirs, ours)}"))
+            out.append(
+                Finding(
+                    FAIL,
+                    label,
+                    f"the two documents word this differently -- manual vs card: "
+                    f"{_difference(theirs, ours)}",
+                )
+            )
     return out
 
 
-def verify(served: dict[str, str], images: dict[str, str],
-           spec: Spec) -> list[Finding]:
+def verify(served: dict[str, str], images: dict[str, str], spec: Spec) -> list[Finding]:
     return image_findings(served, images, spec) + pair_findings(served, spec)
 
 
@@ -262,6 +295,18 @@ def failed(findings: list[Finding]) -> list[Finding]:
     return [finding for finding in findings if finding.status == FAIL]
 
 
-__all__ = ["Finding", "MANUAL", "CARD", "OK", "FAIL", "MOOT", "MATCH",
-           "text_of", "passages",
-           "image_findings", "pair_findings", "verify", "failed"]
+__all__ = [
+    "CARD",
+    "FAIL",
+    "MANUAL",
+    "MATCH",
+    "MOOT",
+    "OK",
+    "Finding",
+    "failed",
+    "image_findings",
+    "pair_findings",
+    "passages",
+    "text_of",
+    "verify",
+]

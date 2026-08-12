@@ -8,9 +8,11 @@ document that is broken in a specific way, and the check has to find it.
 The served HTML is built here rather than fetched: the point is what `verify`
 concludes from a document, and a document is a string.
 """
+
 from __future__ import annotations
 
-from manualbuilder import projections as pj, verify as vf
+from manualbuilder import projections as pj
+from manualbuilder import verify as vf
 
 BASE = "https://storage.example/img"
 
@@ -22,32 +24,32 @@ def served(spec, role: str, images: dict[str, str]) -> str:
     its stylesheet, and the ~750-character signed query the service appends to
     every image URL when it serves one.
     """
-    blocks = (pj.manual_blocks if role == vf.MANUAL else pj.quick_start_blocks)
+    blocks = pj.manual_blocks if role == vf.MANUAL else pj.quick_start_blocks
     body = pj.render(blocks(spec, images))
-    signed = body.replace(".svg\"", ".svg?X-Goog-Expires=86400&X-Goog-Signature="
-                          + "a" * 512 + "\"")
-    return ("<!DOCTYPE html><html><head><style>body { font-size: 11pt; }"
-            "h1 { font-family: sans-serif; }</style></head><body>"
-            + signed + "</body></html>")
+    signed = body.replace('.svg"', ".svg?X-Goog-Expires=86400&X-Goog-Signature=" + "a" * 512 + '"')
+    return (
+        "<!DOCTYPE html><html><head><style>body { font-size: 11pt; }"
+        "h1 { font-family: sans-serif; }</style></head><body>" + signed + "</body></html>"
+    )
 
 
 def urls(spec) -> dict[str, str]:
-    return {image_id: f"{BASE}/{image_id.replace(':', '_')}.svg"
-            for image_id in pj.image_ids(spec)}
+    return {image_id: f"{BASE}/{image_id.replace(':', '_')}.svg" for image_id in pj.image_ids(spec)}
 
 
 def both(spec, images) -> dict[str, str]:
-    return {vf.MANUAL: served(spec, vf.MANUAL, images),
-            vf.CARD: served(spec, vf.CARD, images)}
+    return {vf.MANUAL: served(spec, vf.MANUAL, images), vf.CARD: served(spec, vf.CARD, images)}
 
 
 # ------------------------------------------------------------- the images --
 
+
 def test_a_correctly_published_pair_passes(spec):
     findings = vf.verify(both(spec, urls(spec)), urls(spec), spec)
     assert not vf.failed(findings)
-    assert all(finding.status == vf.OK for finding in findings), \
-        [f for f in findings if f.status != vf.OK]
+    assert all(finding.status == vf.OK for finding in findings), [
+        f for f in findings if f.status != vf.OK
+    ]
 
 
 def test_the_signature_the_service_appends_is_not_a_different_image(spec):
@@ -65,8 +67,7 @@ def test_a_document_still_showing_the_old_drawing_is_caught(spec):
     and left the card's, and every other signal said the run was clean."""
     images = urls(spec)
     stale = dict(images, **{pj.BREAKDOWN: f"{BASE}/breakdown-v1.svg"})
-    pair = {vf.MANUAL: served(spec, vf.MANUAL, images),
-            vf.CARD: served(spec, vf.CARD, stale)}
+    pair = {vf.MANUAL: served(spec, vf.MANUAL, images), vf.CARD: served(spec, vf.CARD, stale)}
 
     bad = vf.failed(vf.image_findings(pair, images, spec))
     assert len(bad) == 1
@@ -89,12 +90,12 @@ def test_a_url_that_was_never_published_is_caught(spec):
     plausible-looking URL is the likeliest wrong answer here."""
     images = urls(spec)
     invented = dict(images, **{"step:laser": f"{BASE}/step_laser-v9.svg"})
-    bad = vf.failed(vf.image_findings(
-        {vf.MANUAL: served(spec, vf.MANUAL, invented)}, images, spec))
+    bad = vf.failed(vf.image_findings({vf.MANUAL: served(spec, vf.MANUAL, invented)}, images, spec))
     assert len(bad) == 1 and "step:laser" in bad[0].check
 
 
 # --------------------------------------------------------------- the pair --
+
 
 def test_the_two_documents_disagreeing_is_caught(spec):
     """The drift this build exists to prevent, found on the served documents
@@ -104,8 +105,7 @@ def test_the_two_documents_disagreeing_is_caught(spec):
     rails = next(step for step in spec.quick_start() if step.id == "rails")
     # The manual corrected, the card left behind: exactly what happens when
     # somebody edits one document and forgets the other.
-    pair[vf.MANUAL] = pair[vf.MANUAL].replace(rails.body,
-                                              rails.body.replace("1.2", "1.6"))
+    pair[vf.MANUAL] = pair[vf.MANUAL].replace(rails.body, rails.body.replace("1.2", "1.6"))
 
     bad = vf.failed(vf.pair_findings(pair, spec))
     assert len(bad) == 1
@@ -157,10 +157,8 @@ def test_an_edit_applied_to_both_but_differently_is_caught(spec):
     images = urls(spec)
     pair = both(spec, images)
     rails = next(step for step in spec.quick_start() if step.id == "rails")
-    pair[vf.MANUAL] = pair[vf.MANUAL].replace(rails.body,
-                                              rails.body.replace("1.2", "1.6"))
-    pair[vf.CARD] = pair[vf.CARD].replace(rails.body,
-                                          rails.body.replace("1.2", "1.8"))
+    pair[vf.MANUAL] = pair[vf.MANUAL].replace(rails.body, rails.body.replace("1.2", "1.6"))
+    pair[vf.CARD] = pair[vf.CARD].replace(rails.body, rails.body.replace("1.2", "1.8"))
 
     bad = vf.failed(vf.pair_findings(pair, spec))
     assert len(bad) == 1 and bad[0].check == "step rails"
@@ -175,8 +173,10 @@ def test_a_passage_edited_past_recognition_is_not_guessed_at(spec):
     images = urls(spec)
     pair = both(spec, images)
     rails = next(step for step in spec.quick_start() if step.id == "rails")
-    pair = {role: html.replace(rails.body, "Refer to the assembly video.")
-            for role, html in pair.items()}
+    pair = {
+        role: html.replace(rails.body, "Refer to the assembly video.")
+        for role, html in pair.items()
+    }
 
     findings = vf.pair_findings(pair, spec)
     assert not vf.failed(findings)

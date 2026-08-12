@@ -33,4 +33,14 @@ if [ "${1:-}" = "test" ]; then
     exec .venv/bin/python -m pytest "$@"
 fi
 
+# `fix`, like `test`, is not a subcommand of the CLI. `selftest`'s lint stage is
+# check-only on purpose -- a proof script that rewrites the thing it is proving
+# is not proving anything -- so this is the other half: the command that
+# actually applies what `selftest` only reports.
+if [ "${1:-}" = "fix" ]; then
+    shift
+    .venv/bin/ruff check --fix .
+    exec .venv/bin/black .
+fi
+
 exec .venv/bin/python -m manualbuilder.cli "$@"
