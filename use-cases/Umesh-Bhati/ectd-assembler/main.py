@@ -65,8 +65,14 @@ def main():
 
     try:
         # 3. Upload main document and attachments for the changed session
-        print("Uploading module2_shell.docx...")
-        doc_res = client.upload_document("module2_shell.docx")
+        if os.path.exists("final_module2.docx"):
+            upload_target = "final_module2.docx"
+            print("Incremental run detected. Uploading final_module2.docx as shell...")
+        else:
+            upload_target = "module2_shell.docx"
+            print("First run detected. Uploading module2_shell.docx as shell...")
+            
+        doc_res = client.upload_document(upload_target)
         session_id = doc_res.get("session_id")
         document_id = doc_res.get("document_id")
         print(f"Session ID: {session_id}, Document ID: {document_id}")
@@ -84,10 +90,18 @@ def main():
         job_ids = {}
         for section_num, title, section_sources in affected_sections:
             print(f"Drafting section {section_num} - {title}...")
+            
+            source_refs = []
+            for src in section_sources:
+                att_id = attachment_ids.get(src)
+                if not att_id:
+                    raise ValueError(f"Missing attachment ID for {src}")
+                source_refs.append(str(att_id))
+                
             prompt = (
                 f"Please draft section '{section_num} {title}' using the attached source documents. "
                 f"You MUST explicitly cite the source document and section for every drafted paragraph. "
-                f"Use the sources: {', '.join(section_sources)}."
+                f"Use the sources: {', '.join(source_refs)}."
             )
             job_id = client.chat_async(session_id, prompt)
             job_ids[section_num] = job_id
