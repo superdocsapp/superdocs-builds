@@ -1,0 +1,769 @@
+:root {
+  /* type */
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* grayscale */
+  --gray-50: #fafafa;
+  --gray-100: #f4f4f6;
+  --gray-200: #e7e7eb;
+  --gray-300: #d3d3da;
+  --gray-500: #8c8c98;
+  --gray-700: #56565f;
+  --gray-900: #17171b;
+
+  --bg: var(--gray-100);
+  --panel: #ffffff;
+  --border: var(--gray-200);
+  --border-strong: var(--gray-300);
+  --text: var(--gray-900);
+  --text-secondary: var(--gray-700);
+  --text-tertiary: var(--gray-500);
+
+  /* accent: primary interactive color (tabs, selected run, total cost) */
+  --accent: #e85d3d;
+  --accent-tint: #fdece5;
+
+  /* semantic: review item types */
+  --conflict: #d1435c;
+  --conflict-tint: #fdeef1;
+  --finding: #6a4fd1;
+  --finding-tint: #f1edfb;
+  --update-c: #a5680b;
+  --update-tint: #fbf1de;
+
+  /* semantic: decisions + gate state */
+  --approved: #1f8a4d;
+  --approved-tint: #e6f6ec;
+  --rejected: #c9433a;
+  --rejected-tint: #fbeceb;
+  --pending: #a5680b;
+  --pending-tint: #fbf1de;
+
+  /* generic error/failure (distinct concept from a "rejected" decision) */
+  --danger: #c9433a;
+  --danger-tint: #fbeceb;
+
+  /* card elevation — warm-tinted (brown, not pure black) to match the coral accent */
+  --shadow-sm: 0 1px 3px rgba(60, 30, 20, 0.06);
+  --shadow-md: 0 2px 4px rgba(60, 30, 20, 0.05), 0 8px 20px rgba(60, 30, 20, 0.09);
+  --shadow-lift: 0 6px 14px rgba(60, 30, 20, 0.1), 0 18px 36px rgba(60, 30, 20, 0.13);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+.app-header h1 {
+  margin: 0;
+  font-size: 2.125rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+.app-header .subtitle {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 400;
+}
+
+.layout {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.run-list {
+  width: 300px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--panel);
+  overflow-y: auto;
+  padding: 16px;
+}
+.run-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.run-list-header h2 {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+.run-list-header button {
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 7px;
+  padding: 5px 11px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.run-list-header button:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--gray-50);
+}
+.run-list-header button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.run-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.run-row {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  padding: 16px 18px;
+  cursor: pointer;
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s ease, transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.run-row:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+  background: var(--gray-50);
+}
+.run-row.selected {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  box-shadow: var(--shadow-md);
+}
+.run-row.selected:hover {
+  transform: none;
+}
+.run-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.run-trigger {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.run-status-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.run-id {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  word-break: break-all;
+}
+.run-created {
+  font-size: 0.6875rem;
+  color: var(--text-tertiary);
+  margin-top: 3px;
+}
+
+.run-detail {
+  flex: 1;
+  padding: 24px 32px;
+  overflow-y: auto;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.tabs button {
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease;
+}
+.tabs button:hover {
+  color: var(--text);
+}
+.tabs button.active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+}
+.muted.loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.muted.loading::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.35;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.empty-state {
+  color: var(--text-tertiary);
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.error-banner {
+  background: var(--danger-tint);
+  color: var(--danger);
+  border: 1px solid rgba(201, 67, 58, 0.22);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+
+@keyframes item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.review-item {
+  border: 1px solid transparent;
+  border-left: 4px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 22px 24px;
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  animation: item-enter 0.28s ease;
+}
+.review-item.decided {
+  opacity: 0.8;
+}
+.review-item.decided.approved {
+  border-left-color: var(--approved);
+}
+.review-item.decided.rejected {
+  border-left-color: var(--rejected);
+}
+.review-item.pending {
+  border-left-color: var(--pending);
+}
+
+.review-item-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.item-type-badge {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--gray-100);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.item-type-badge.conflict {
+  background: var(--conflict-tint);
+  color: var(--conflict);
+}
+.item-type-badge.finding {
+  background: var(--finding-tint);
+  color: var(--finding);
+}
+.item-type-badge.update {
+  background: var(--update-tint);
+  color: var(--update-c);
+}
+
+.outcome-badge {
+  font-size: 0.6875rem;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.outcome-badge.approved {
+  background: var(--approved-tint);
+  color: var(--approved);
+}
+.outcome-badge.rejected {
+  background: var(--rejected-tint);
+  color: var(--rejected);
+}
+
+.review-item-summary {
+  margin: 0 0 10px;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.conflict-diff {
+  margin-bottom: 10px;
+}
+.conflict-diff-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+.conflict-diff-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.diff-chip {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.diff-chip.diff-old {
+  background: var(--rejected-tint);
+  color: var(--rejected);
+  font-weight: 500;
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+.diff-chip.diff-new {
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-weight: 600;
+}
+.diff-arrow {
+  color: var(--text-tertiary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+.review-item-source {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+}
+.review-item-source code {
+  font-family: var(--font-mono);
+}
+
+.review-item-actions {
+  display: flex;
+  gap: 8px;
+}
+.review-item-actions button {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  padding: 6px 15px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.review-item-actions button.approve {
+  border-color: var(--approved);
+  color: var(--approved);
+}
+.review-item-actions button.approve:hover:not(:disabled) {
+  background: var(--approved-tint);
+}
+.review-item-actions button.reject {
+  border-color: var(--rejected);
+  color: var(--rejected);
+}
+.review-item-actions button.reject:hover:not(:disabled) {
+  background: var(--rejected-tint);
+}
+.review-item-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.review-queue section + section {
+  margin-top: 30px;
+}
+.review-queue h3 {
+  font-size: 1.625rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0 0 16px;
+  color: var(--text);
+}
+.count-badge {
+  background: var(--gray-200);
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 3px 11px;
+  border-radius: 999px;
+}
+
+.deliverable-section {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  padding: 24px 26px;
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+.deliverable-section h3 {
+  margin: 0 0 12px;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  color: var(--text);
+}
+.claim-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.claim-line {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 0.9375rem;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border);
+}
+.claim-line:last-child {
+  border-bottom: none;
+}
+.claim-type {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  min-width: 130px;
+}
+.claim-value {
+  flex: 1;
+  color: var(--text);
+}
+.claim-confidence {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cost-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  background: var(--panel);
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.cost-total-label {
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cost-total-value {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.cost-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  font-size: 0.8125rem;
+}
+.cost-table th,
+.cost-table td {
+  padding: 9px 14px;
+  text-align: left;
+}
+.cost-table thead th {
+  background: var(--gray-50);
+  color: var(--text-tertiary);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1px solid var(--border);
+}
+.cost-table tbody td {
+  color: var(--text-secondary);
+}
+.cost-table tbody tr + tr {
+  border-top: 1px solid var(--border);
+}
+.cost-table td:not(:first-child) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cost-table th:not(:first-child) {
+  text-align: right;
+}
+
+/* --- Task 2 additions below: new elements Task 1 never needed. Same
+   tokens (colors/radii/shadows/type scale) throughout, nothing redesigned. --- */
+
+.negotiation-form {
+  border: 1px solid transparent;
+  border-radius: 16px;
+  padding: 22px 24px;
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.negotiation-form h3 {
+  margin: 0 0 4px;
+  font-size: 1.0625rem;
+  font-weight: 650;
+  color: var(--text);
+}
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.form-row label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+.form-row input[type="text"] {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--panel);
+}
+.form-row input[type="text"]:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-row input[type="file"] {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+.form-submit {
+  align-self: flex-start;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+.form-submit:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.form-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.form-submit.secondary {
+  background: var(--panel);
+  color: var(--accent);
+}
+
+/* decision toggle buttons need a visible "selected" state — Task 1's
+   review actions were one-shot (click = submit immediately); here a
+   decision is staged client-side, then the whole round's decisions
+   submit together in one batch call (the real API decides a job's
+   pending changes as one unit, confirmed live in Phase 3) */
+.review-item-actions button.approve.active {
+  background: var(--approved);
+  border-color: var(--approved);
+  color: #fff;
+}
+.review-item-actions button.reject.active {
+  background: var(--rejected);
+  border-color: var(--rejected);
+  color: #fff;
+}
+
+.tracker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.tracker-header h3 {
+  font-size: 1.625rem;
+  font-weight: 750;
+  letter-spacing: -0.015em;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin: 0;
+  color: var(--text);
+}
+
+.tracker-item {
+  border: 1px solid transparent;
+  border-left: 4px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 18px 22px;
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  animation: item-enter 0.28s ease;
+}
+.tracker-item.status-open {
+  border-left-color: var(--pending);
+}
+.tracker-item.status-approved {
+  border-left-color: var(--approved);
+  opacity: 0.85;
+}
+.tracker-item.status-rejected {
+  border-left-color: var(--rejected);
+  opacity: 0.85;
+}
+/* REOPENED is the property this whole card is graded on — it gets a
+   tinted card + stronger shadow, not just a different badge color, so
+   it visibly pops out of the list instead of blending in. */
+.tracker-item.status-reopened {
+  border-left-color: var(--finding);
+  background: var(--finding-tint);
+  box-shadow: var(--shadow-md);
+}
+
+.status-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.status-badge.open {
+  background: var(--pending-tint);
+  color: var(--pending);
+}
+.status-badge.approved {
+  background: var(--approved-tint);
+  color: var(--approved);
+}
+.status-badge.rejected {
+  background: var(--rejected-tint);
+  color: var(--rejected);
+}
+.status-badge.reopened {
+  background: var(--finding);
+  color: #fff;
+  font-weight: 700;
+}
+.reopened-flag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--finding);
+}
+
+.chunk-code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+}
+
+.round-status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
