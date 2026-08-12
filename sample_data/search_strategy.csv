@@ -1,0 +1,4 @@
+database,query,filters,date_run,hits
+PubMed,"(diabetes[MeSH] AND remission[tiab])",English; 2015-2025,2026-01-15,842
+Embase,"'diabetes'/exp AND remission:ti,ab",English; 2015-2025,2026-01-15,611
+Cochrane Library,"diabetes AND remission",2015-2025,2026-01-16,203

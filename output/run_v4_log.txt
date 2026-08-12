@@ -1,0 +1,16 @@
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [job_id: 6fed6dcb-a57c-496d-83f8-977d287207d9]
+✓ Flow diagram inserted and approved.
+    [job_id: 93560074-d66b-44a8-9490-008991d818b1]
+✓ Search strategy appendix inserted and approved.
+    [job_id: 7ea1d1f3-0449-4efa-ad56-838ad58b22ad]
+✓ Evidence table inserted and approved.
+    [job_id: 0f2654fa-72b8-46ed-98a0-32201b147138]
+✓ Risk-of-bias summary inserted and approved.
+Export verified on attempt 1 (1 image(s), 25 paragraphs).
+  DATA FIDELITY CHECK FAILED — expected values not found in any table: ['Alvarez 2021', 'Bianchi 2022', 'Chen 2020']
+
+⚠️  ABORTING: exported evidence table does not contain our real source data.
+This must be fixed before the package can be considered complete — do not submit this file.

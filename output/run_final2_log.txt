@@ -1,0 +1,18 @@
+Session: review-package-8e48f741
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [attempt 1, job_id: aa98c627-107e-40ad-86c6-610046aed792]
+✓ Flow diagram inserted and approved.
+  ✓ Checkpoint passed after diagram.
+    [attempt 1, job_id: ec6914af-034c-45ff-8345-35d02eed6c81]
+✓ Evidence table inserted and approved.
+  ✓ Checkpoint passed after evidence table.
+    [attempt 1, job_id: 122caa02-2056-459a-9286-6df02a1dae26]
+✓ Search strategy appendix inserted and approved.
+  ✓ Checkpoint passed after search appendix.
+    [attempt 1, job_id: 5b418fc2-abba-4f77-a474-0c379ec96731]
+✓ Risk-of-bias summary inserted and approved.
+  ✓ Checkpoint passed after risk-of-bias (final).
+
+✓ Full package assembled, exported, AND verified at every step: ../output/final_review_package.docx

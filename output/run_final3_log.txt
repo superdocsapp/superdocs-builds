@@ -1,0 +1,20 @@
+Session: review-package-58b99a35
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [attempt 1, job_id: 8b4954ff-af07-4e44-97a8-c1f23f7b4d3f]
+✓ Flow diagram inserted and approved.
+  ✓ Checkpoint passed after diagram.
+    [attempt 1, job_id: 135bb495-ceb8-4154-a97c-7567b7151aeb]
+✓ Evidence table inserted and approved.
+  ✓ Checkpoint passed after evidence table.
+    [attempt 1, job_id: 954bf4b4-558f-458e-8e1d-ffd9f3959c76]
+✓ Search strategy appendix inserted and approved.
+  ✓ Checkpoint passed after search appendix.
+    [attempt 1, job_id: b1290d44-17a8-4231-9bcc-70fa78fc0a34]
+    Attempt 1: fabricated placeholder content detected in proposed change BEFORE approval — rejecting and retrying...
+    [attempt 2, job_id: eafab061-db50-414c-82e6-3c37513947d0]
+✓ Risk-of-bias summary inserted and approved.
+  ✓ Checkpoint passed after risk-of-bias (final).
+
+✓ Full package assembled, exported, AND verified at every step: ../output/final_review_package.docx

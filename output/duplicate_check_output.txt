@@ -1,0 +1,119 @@
+Total pages: 4
+Total extracted text length: 1552 chars
+
+'Search Strategy Appendix': appears 1 time(s)
+'Risk of Bias Summary': appears 1 time(s)
+'Table 1. Characteristics': appears 1 time(s)
+'Discussion': appears 1 time(s)
+
+--- Full text, unretruncated ---
+Effectiveness of Lifestyle Interventions for
+Type 2 Diabetes Remission: A Systematic
+Review
+Abstract
+Background: Type 2 diabetes remission through lifestyle intervention has gained clinical interest.
+This review synthesizes evidence on intervention effectiveness.
+Methods
+We searched multiple databases for relevant studies published between 2015 and 2025.
+Figure: Study flow diagram
+Results
+We identified relevant studies meeting inclusion criteria.
+Table 1. Characteristics and results of included studies.
+Study
+ID
+Author
+(Year)
+Design
+N
+Intervention
+Comparator
+Primary
+Outcome
+Result
+S01
+Alvarez
+2021
+RCT
+214
+Low-calorie diet
+Standard
+care
+HbA1c
+reduction
+-1.2% (95%
+CI -1.6 to
+-0.8)
+S02
+Bianchi
+2022
+RCT
+156
+Bariatric surgery
+Standard
+care
+Diabetes
+remission at
+12mo
+58% vs 12%,
+p<0.001
+S03
+Chen
+2020
+Cohort
+489
+Intensive lifestyle
+program
+Usual care
+Diabetes
+remission at
+24mo
+34% vs 9%
+Risk of Bias Summary
+Study
+ID
+Randomization
+Deviations
+Missing
+Data
+Outcome
+Measurement
+Selective
+Reporting
+Overall
+S01
+Low
+Low
+Low
+Some concerns
+Low
+Some
+concerns
+S02
+Low
+Low
+Low
+Low
+Low
+Low
+S03
+High
+Some
+concerns
+Low
+Some concerns
+Low
+High
+Discussion
+The findings suggest lifestyle interventions may support diabetes remission in select
+populations.
+Search Strategy Appendix
+PubMed (run 2026-01-15, 842 hits)
+(diabetes[MeSH] AND remission[tiab])
+Filters: English; 2015-2025
+Embase (run 2026-01-15, 611 hits)
+'diabetes'/exp AND remission:ti,ab
+Filters: English; 2015-2025
+Cochrane Library (run 2026-01-16, 203 hits)
+diabetes AND remission
+Filters: 2015-2025
+

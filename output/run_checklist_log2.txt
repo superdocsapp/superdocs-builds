@@ -1,0 +1,57 @@
+Session: review-package-2c8475b4
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [attempt 1, job_id: 503a5d4d-0f11-4935-b71a-59dcbd3d4fae]
+✓ Flow diagram inserted and approved.
+  ✓ Checkpoint passed after diagram.
+    [attempt 1, job_id: 9f44158c-77b7-4930-bf10-b432dc4ee24d]
+✓ Evidence table inserted and approved.
+⚠️  Export completed with warnings: [
+  {
+    "code": "image_download_failed",
+    "message": "Image could not be downloaded; rendered as alt text.",
+    "detail": {
+      "src": "flow-diagram.png"
+    }
+  }
+]
+  ✓ Checkpoint passed after evidence table.
+    [attempt 1, job_id: 6018b783-8c6e-4c26-af97-09a888c60068]
+✓ Search strategy appendix inserted and approved.
+⚠️  Export completed with warnings: [
+  {
+    "code": "image_download_failed",
+    "message": "Image could not be downloaded; rendered as alt text.",
+    "detail": {
+      "src": "flow-diagram.png"
+    }
+  }
+]
+  ✓ Checkpoint passed after search appendix.
+    [attempt 1, job_id: 027ac976-64d6-400e-a495-e37436df7cef]
+✓ Risk-of-bias summary inserted and approved.
+⚠️  Export completed with warnings: [
+  {
+    "code": "image_download_failed",
+    "message": "Image could not be downloaded; rendered as alt text.",
+    "detail": {
+      "src": "flow-diagram.png"
+    }
+  }
+]
+  ✓ Checkpoint passed after risk-of-bias.
+    [attempt 1, job_id: ca1ccf28-19e7-4b8e-88c9-a8a95ba33ca1]
+✓ Reporting checklist inserted and approved.
+⚠️  Export completed with warnings: [
+  {
+    "code": "image_download_failed",
+    "message": "Image could not be downloaded; rendered as alt text.",
+    "detail": {
+      "src": "flow-diagram.png"
+    }
+  }
+]
+  ✓ Checkpoint passed after reporting checklist.
+
+✓ Full package assembled, exported, verified, AND checklist page-referenced: ../output/final_review_package.docx

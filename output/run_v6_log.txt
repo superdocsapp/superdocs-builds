@@ -1,0 +1,25 @@
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [attempt 1, job_id: 2abc1e37-5f39-49e7-9aa9-172ca4351bf8]
+✓ Flow diagram inserted and approved.
+    [attempt 1, job_id: 97f161b4-fee5-4962-9d1b-a7e6a1ebb75f]
+✓ Evidence table inserted and approved.
+    [attempt 1, job_id: ce83a98b-335c-4d95-842b-10f2adfbedfa]
+✓ Search strategy appendix inserted and approved.
+    [attempt 1, job_id: bbf58a34-ebca-46f2-9428-64dc77b45dfd]
+    Attempt 1: fabricated placeholder content detected in proposed change BEFORE approval — rejecting and retrying...
+    [attempt 2, job_id: 54054e79-8900-4dbf-9073-b19aae3d1b5e]
+✓ Risk-of-bias summary inserted and approved.
+⚠️  Export completed with warnings: [
+  {
+    "code": "image_download_failed",
+    "message": "Image could not be downloaded; rendered as alt text.",
+    "detail": {
+      "src": "flow-diagram.png"
+    }
+  }
+]
+Export verified on attempt 1 (1 image(s), 15 paragraphs).
+
+✓ Full package assembled, exported, AND data-fidelity verified: ../output/final_review_package.docx

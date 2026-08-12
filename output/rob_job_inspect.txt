@@ -1,0 +1,110 @@
+Length: 8404
+
+<h1 data-chunk-id="60b4df61-09f7-4b73-b49d-cfc85850bddd">Effectiveness of Lifestyle Interventions for Type 2 Diabetes Remission: A Systematic Review</h1>
+<h2 data-chunk-id="46f22439-3882-402a-b3a8-3ae902a8bc50">Abstract</h2>
+<p data-chunk-id="56a60a5a-5773-43a2-91eb-d4fe596eb6f9">Background: Type 2 diabetes remission through lifestyle intervention has gained clinical interest. This review synthesizes evidence on intervention effectiveness.</p>
+<h2 data-chunk-id="cf6ae231-951f-4f4a-8ca0-740c5f6a6886">Methods</h2>
+<p data-chunk-id="77723058-cc58-40f8-8209-bf35c8f29861">We searched multiple databases for relevant studies published between 2015 and 2025.</p>
+<div data-chunk-id="d8b85265-c44e-4d94-a8fc-098d9148a190"><figure style="text-align: center;"><img alt="Study flow diagram" src="https://storage.googleapis.com/superdocs-document-images/img/c7bce3e4c1e042d095cd23db625d3293.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260810%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260810T223051Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=5ca81ae37fe5eb88ba36e297f13aa1682255cffdbfe2bfd1014061eb02534453b87191212d22a1f7929f20c4df34500640de76546dc8419ebc096077518fab91d3f85b98086669d2d90ab7edfbf22fdff4b9e49048805f6715576c3329244eb0ca9b761920d408a99cfc334bf2291814fa955e3ec1dae8c6f6aab0a44add9d250850b0b8255211b3eb0b702b8cf86b9667fa24bddac13e8bc99f16d3b84d193542f40f1aecc81a2da53b476acd65b3d5cc76c8c87cd5f55bd88737fff07be2b6546ae8593669e412211dca22f5fb3bdb02d0f13e11ab0a763f1ccf2e2d96b4ba9762ff46e131ece8b2f7b53dd5d587c6fd5463e167646627c50c30dc4db34084" style="max-width: 100%; height: auto;"/><figcaption>Study flow diagram</figcaption></figure></div>
+<h2 data-chunk-id="179194b3-a2c6-4c75-b5b2-962f4eb8c933">Results</h2>
+<p data-chunk-id="47936abd-4b7f-4aeb-a51e-439f2b6678bd">We identified relevant studies meeting inclusion criteria.</p>
+<div data-chunk-id="31e6627e-8273-480b-86e8-734f2909f994"><h3>Table 1. Characteristics and results of included studies.</h3>
+<table style="border-collapse:collapse;width:100%;font-size:0.9em;margin-bottom:24px">
+<thead>
+<tr>
+<th style="border:1px solid #333;padding:6px;text-align:left">Study ID</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">Author (Year)</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">Design</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">N</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">Intervention</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">Comparator</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">Primary Outcome</th>
+<th style="border:1px solid #333;padding:6px;text-align:left">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border:1px solid #333;padding:6px">S01</td>
+<td style="border:1px solid #333;padding:6px">Alvarez 2021</td>
+<td style="border:1px solid #333;padding:6px">RCT</td>
+<td style="border:1px solid #333;padding:6px">214</td>
+<td style="border:1px solid #333;padding:6px">Low-calorie diet</td>
+<td style="border:1px solid #333;padding:6px">Standard care</td>
+<td style="border:1px solid #333;padding:6px">HbA1c reduction</td>
+<td style="border:1px solid #333;padding:6px">-1.2% (95% CI -1.6 to -0.8)</td>
+</tr>
+<tr style="background-color:#f9f9f9">
+<td style="border:1px solid #333;padding:6px">S02</td>
+<td style="border:1px solid #333;padding:6px">Bianchi 2022</td>
+<td style="border:1px solid #333;padding:6px">RCT</td>
+<td style="border:1px solid #333;padding:6px">156</td>
+<td style="border:1px solid #333;padding:6px">Bariatric surgery</td>
+<td style="border:1px solid #333;padding:6px">Standard care</td>
+<td style="border:1px solid #333;padding:6px">Diabetes remission at 12mo</td>
+<td style="border:1px solid #333;padding:6px">58% vs 12%, p&lt;0.001</td>
+</tr>
+<tr>
+<td style="border:1px solid #333;padding:6px">S03</td>
+<td style="border:1px solid #333;padding:6px">Chen 2020</td>
+<td style="border:1px solid #333;padding:6px">Cohort</td>
+<td style="border:1px solid #333;padding:6px">489</td>
+<td style="border:1px solid #333;padding:6px">Intensive lifestyle program</td>
+<td style="border:1px solid #333;padding:6px">Usual care</td>
+<td style="border:1px solid #333;padding:6px">Diabetes remission at 24mo</td>
+<td style="border:1px solid #333;padding:6px">34% vs 9%</td>
+</tr>
+</tbody>
+</table>
+<h3>Search Strategy Appendix</h3>
+<p><mark>Please fill: search strategy content</mark></p></div>
+<div data-chunk-id="c4004f0c-2076-4ec9-8ead-d6953beaf9e2"><h3>Table 1. Characteristics and results of included studies.</h3>
+<table style="border-collapse: collapse; width: 100%; font-size: 0.9em; margin-bottom: 24px;">
+<thead>
+<tr style="background-color: #f0f0f0;">
+<th style="border: 1px solid #333; padding: 8px; text-align: left;">Study ID</th>
+<th style="border: 1px solid #333; padding: 8px; text-align: left;">Author (Year)</th>
+<th style="border: 1px solid #333; padding: 8px; text-align: left;">Sample Size (N)</th>
+<th style="border: 1px solid #333; padding: 8px; text-align: left;">Intervention</th>
+<th style="border: 1px solid #333; padding: 8px; text-align: left;">Primary Outcome</th>
+<th style="border: 1px solid #333; padding: 8px; text-align: left;">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border: 1px solid #333; padding: 8px;"><mark>Please fill: Study ID</mark></td>
+<td style="border: 1px solid #333; padding: 8px;"><mark>Please fill: Author (Year)</mark></td>
+<td style="border: 1px solid #333; padding: 8px;"><mark>Please fill: N</mark></td>
+<td style="border: 1px solid #333; padding: 8px;"><mark>Please fill: Intervention</mark></td>
+<td style="border: 1px solid #333; padding: 8px;"><mark>Please fill: Outcome</mark></td>
+<td style="border: 1px solid #333; padding: 8px;"><mark>Please fill: Result</mark></td>
+</tr>
+</tbody>
+</table>
+<h3>Risk of Bias Summary</h3>
+<table style="border-collapse: collapse; width: 100%; font-size: 0.9em;">
+<thead>
+<tr>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Study ID</th>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Randomization</th>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Deviations</th>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Missing Data</th>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Outcome Measurement</th>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Selective Reporting</th>
+<th style="border: 1px solid #333; padding: 6px; background: #f0f0f0;">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Study ID</mark></td>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Randomization rating</mark></td>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Deviations rating</mark></td>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Missing Data rating</mark></td>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Outcome Measurement rating</mark></td>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Selective Reporting rating</mark></td>
+<td style="border: 1px solid #333; padding: 6px; background: #ffffff;"><mark>Please fill: Overall rating</mark></td>
+</tr>
+</tbody>
+</table></div>
+<h2 data-chunk-id="18045b47-235e-435a-a9b9-37c9f5829877">Discussion</h2>
+<p data-chunk-id="33400ca3-7ffb-4b08-b107-b87789f5c214">The findings suggest lifestyle interventions may support diabetes remission in select populations.</p>
+<div data-chunk-id="2f3013b7-ed3f-4e1d-9aa5-19fda1c3ca95"><h3>Search Strategy Appendix</h3><p><strong>PubMed</strong> (run 2026-01-15, 842 hits)</p><p style="font-family:monospace;padding:8px">(diabetes[MeSH] AND remission[tiab])</p><p><em>Filters: English; 2015-2025</em></p><p><strong>Embase</strong> (run 2026-01-15, 611 hits)</p><p style="font-family:monospace;padding:8px">'diabetes'/exp AND remission:ti,ab</p><p><em>Filters: English; 2015-2025</em></p><p><strong>Cochrane Library</strong> (run 2026-01-16, 203 hits)</p><p style="font-family:monospace;padding:8px">diabetes AND remission</p><p><em>Filters: 2015-2025</em></p></div>
