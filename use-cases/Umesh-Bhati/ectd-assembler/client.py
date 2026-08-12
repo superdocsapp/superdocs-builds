@@ -1,0 +1,20 @@
+import os
+import requests
+from requests.exceptions import RequestException
+
+class SuperDocsClient:
+    def __init__(self, base_url="https://api.superdocs.app/v1"):
+        self.api_key = os.environ.get("SUPERDOCS_API_KEY")
+        self.base_url = base_url
+
+    def verify_connection(self) -> bool:
+        if not self.api_key:
+            raise ValueError("SUPERDOCS_API_KEY environment variable is missing")
+            
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        
+        try:
+            response = requests.get(f"{self.base_url}/sessions", headers=headers)
+            return response.status_code == 200
+        except RequestException:
+            return False
