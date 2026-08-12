@@ -80,5 +80,34 @@ class TestSuperDocsClient(unittest.TestCase):
             json={"prompt": "Draft section 2.5"}
         )
 
+    @patch('client.requests.get')
+    def test_get_job_status_success(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {"status": "completed"}
+        
+        result = self.client.get_job_status("job_123")
+        
+        self.assertEqual(result, "completed")
+        mock_get.assert_called_once_with(
+            "https://api.superdocs.app/v1/jobs/job_123",
+            headers={"Authorization": "Bearer sk_test_123"}
+        )
+
+    @patch('client.requests.get')
+    def test_export_document_success(self, mock_get):
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.content = b"exported_content"
+        
+        with patch('builtins.open', unittest.mock.mock_open()) as m:
+            result = self.client.export_document("doc_123", "out.docx")
+            
+        self.assertEqual(result, "out.docx")
+        mock_get.assert_called_once_with(
+            "https://api.superdocs.app/v1/export",
+            headers={"Authorization": "Bearer sk_test_123"},
+            params={"document_id": "doc_123"}
+        )
+        m().write.assert_called_once_with(b"exported_content")
+
 if __name__ == '__main__':
     unittest.main()

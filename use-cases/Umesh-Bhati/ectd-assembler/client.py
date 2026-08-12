@@ -7,9 +7,12 @@ class SuperDocsClient:
         self.api_key = os.environ.get("SUPERDOCS_API_KEY")
         self.base_url = base_url
 
-    def _post_file(self, endpoint: str, filepath: str) -> dict:
+    def _require_api_key(self):
         if not self.api_key:
             raise ValueError("SUPERDOCS_API_KEY environment variable is missing")
+
+    def _post_file(self, endpoint: str, filepath: str) -> dict:
+        self._require_api_key()
         
         headers = {"Authorization": f"Bearer {self.api_key}"}
         
@@ -21,8 +24,7 @@ class SuperDocsClient:
         return response.json()
 
     def verify_connection(self) -> bool:
-        if not self.api_key:
-            raise ValueError("SUPERDOCS_API_KEY environment variable is missing")
+        self._require_api_key()
             
         headers = {"Authorization": f"Bearer {self.api_key}"}
         
@@ -40,8 +42,7 @@ class SuperDocsClient:
         return res.get("attachment_id")
 
     def chat_async(self, session_id: str, prompt: str) -> str:
-        if not self.api_key:
-            raise ValueError("SUPERDOCS_API_KEY environment variable is missing")
+        self._require_api_key()
             
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         payload = {"prompt": prompt}
@@ -54,3 +55,30 @@ class SuperDocsClient:
         response.raise_for_status()
         
         return response.json().get("job_id")
+
+    def get_job_status(self, job_id: str) -> str:
+        self._require_api_key()
+            
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        response = requests.get(
+            f"{self.base_url}/jobs/{job_id}",
+            headers=headers
+        )
+        response.raise_for_status()
+        return response.json().get("status")
+
+    def export_document(self, document_id: str, output_path: str) -> str:
+        self._require_api_key()
+            
+        headers = {"Authorization": f"Bearer {self.api_key}"}
+        response = requests.get(
+            f"{self.base_url}/export",
+            headers=headers,
+            params={"document_id": document_id}
+        )
+        response.raise_for_status()
+        
+        with open(output_path, 'wb') as f:
+            f.write(response.content)
+            
+        return output_path

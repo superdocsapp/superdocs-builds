@@ -1,5 +1,7 @@
 import json
 import os
+import time
+from requests.exceptions import RequestException
 from client import SuperDocsClient
 from hasher import get_file_hashes
 
@@ -60,6 +62,7 @@ def main():
         if any(src in changed_sources for src in section_sources):
             affected_sections.append((section, data["title"], section_sources))
             
+    job_ids = {}
     for section_num, title, section_sources in affected_sections:
         print(f"Drafting section {section_num} - {title}...")
         prompt = (
@@ -68,9 +71,34 @@ def main():
             f"Use the sources: {', '.join(section_sources)}."
         )
         job_id = client.chat_async(session_id, prompt)
+        job_ids[section_num] = job_id
         print(f"Started drafting job for {section_num}: {job_id}")
 
-    # 5. Save state
+    # 6. Review and Export
+    print("\nWaiting for SuperDocs AI to finish drafting...")
+    for section_num, job_id in job_ids.items():
+        while True:
+            # We mock the sleep out in tests, but this would poll normally
+            try:
+                status = client.get_job_status(job_id)
+                if status in ["completed", "approved", "hitl_approval_required"]:
+                    break
+            except RequestException:
+                # Keep polling if there's a transient network issue
+                pass
+            time.sleep(1)
+            
+    print(f"\nDrafting complete. Please review and approve the changes in the SuperDocs Web UI:")
+    print(f"https://app.superdocs.app/sessions/{session_id}")
+    
+    # HITL Step
+    input("Press Enter once you have reviewed and approved the document natively in the browser...")
+    
+    print("Exporting final document...")
+    client.export_document(document_id, "final_module2.docx")
+    print("Successfully exported to final_module2.docx.")
+
+    # 7. Save state
     state = {
         "session_id": session_id,
         "document_id": document_id,

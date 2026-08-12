@@ -12,4 +12,5 @@ An orchestration script that automates the drafting of clinical summaries (eCTD 
 2. Activate it: `source venv/bin/activate`
 3. Install dependencies: `pip install -r requirements.txt`
 4. Generate test data: `python generate_test_data.py`
-5. *(Coming soon: run the orchestrator script)*
+5. Set your API key: `export SUPERDOCS_API_KEY="your-key-here"`
+6. *(Coming soon: run the orchestrator script)*
