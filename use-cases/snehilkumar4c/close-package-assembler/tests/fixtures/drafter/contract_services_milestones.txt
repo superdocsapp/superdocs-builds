@@ -1,0 +1,81 @@
+PROFESSIONAL SERVICES AGREEMENT
+
+This Professional Services Agreement ("Agreement") is made effective as
+of March 1, 2026, between Ridgeline Consulting LLC ("Consultant") and
+Harbor Manufacturing Co. ("Client").
+
+1. SCOPE OF SERVICES
+
+Consultant shall perform an enterprise resource planning (ERP) system
+implementation for Client, structured in three (3) sequential phases as
+described below. Each phase constitutes a distinct deliverable accepted
+independently by Client.
+
+1.1 Phase 1 - Discovery and Requirements. Consultant shall conduct a
+comprehensive assessment of Client's current systems and document
+functional requirements in a Requirements Specification Document. Phase 1
+is complete upon Client's written acceptance of the Requirements
+Specification Document, expected within forty-five (45) days of the
+Effective Date.
+
+1.2 Phase 2 - System Configuration and Data Migration. Consultant shall
+configure the ERP system per the accepted Requirements Specification
+Document and migrate Client's historical data. Phase 2 is complete upon
+successful completion of user acceptance testing (UAT), expected within
+one hundred twenty (120) days of the Effective Date.
+
+1.3 Phase 3 - Go-Live and Stabilization. Consultant shall support Client
+through production go-live and provide thirty (30) days of post-go-live
+stabilization support. Phase 3 is complete upon the conclusion of the
+30-day stabilization period following go-live.
+
+2. FEES AND MILESTONE BILLING
+
+2.1 Phase 1 Fee. Client shall pay Consultant a fixed fee of $85,000 for
+Phase 1, invoiced and due upon Client's written acceptance of the
+Requirements Specification Document.
+
+2.2 Phase 2 Fee. Client shall pay Consultant a fixed fee of $310,000 for
+Phase 2, invoiced and due upon successful completion of user acceptance
+testing.
+
+2.3 Phase 3 Fee. Client shall pay Consultant a fixed fee of $105,000 for
+Phase 3, invoiced and due upon conclusion of the 30-day stabilization
+period.
+
+2.4 Total Contract Value. The total value of this Agreement across all
+three phases is $500,000.
+
+3. ACCEPTANCE CRITERIA
+
+3.1 Each phase requires Client's written acceptance before the applicable
+milestone fee becomes due. Client shall have ten (10) business days to
+review deliverables and either accept or provide written objections.
+
+3.2 The parties agree that each phase represents a distinct performance
+obligation, as each phase is separately identifiable and Client can
+benefit from each phase's deliverables independently of the others, given
+that the Requirements Specification Document (Phase 1) and the
+implemented system (Phase 2) each have standalone value to Client's
+operations.
+
+4. TERM
+
+4.1 This Agreement commences on the Effective Date and continues until
+all three phases are complete, currently estimated at approximately two
+hundred (200) days from the Effective Date.
+
+5. GENERAL PROVISIONS
+
+5.1 Independent Contractor. Consultant is an independent contractor, not
+an employee or agent of Client.
+
+5.2 Governing Law. This Agreement is governed by the laws of the State of
+Illinois.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement.
+
+Ridgeline Consulting LLC                     Harbor Manufacturing Co.
+By: _________________________                By: _________________________
+Name: Devon Ashworth                          Name: Linda Okonkwo-Price
+Title: Managing Partner                       Title: VP of Operations
