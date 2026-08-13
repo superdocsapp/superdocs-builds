@@ -1,0 +1,67 @@
+MASTER SUBSCRIPTION AGREEMENT
+
+This Master Subscription Agreement ("Agreement") is entered into as of
+January 1, 2026 (the "Effective Date") between Northstar Analytics Inc.
+("Vendor") and Brightline Retail Group ("Customer").
+
+1. SERVICES PROVIDED
+
+1.1 Platform Access. Vendor shall provide Customer with access to the
+Northstar Analytics Platform (the "Platform"), a cloud-based data
+analytics and reporting software-as-a-service product, for a term of
+twelve (12) months beginning on the Effective Date.
+
+1.2 Onboarding Services. Vendor shall provide a one-time onboarding
+package consisting of initial data migration, account configuration, and
+two (2) training sessions for Customer's staff. Onboarding Services shall
+be completed within thirty (30) days of the Effective Date and represent
+a distinct deliverable separate from ongoing Platform Access.
+
+1.3 Premium Support. Vendor shall provide Premium Support for the
+duration of the Term, consisting of 24/7 phone and email support with a
+four (4) hour response time guarantee. Premium Support is available
+throughout the Term and is billed as part of the annual subscription fee.
+
+2. FEES
+
+2.1 Total Annual Fee. Customer shall pay Vendor a total annual fee of
+$96,000 for the Term, payable in equal quarterly installments of $24,000.
+
+2.2 Fee Allocation. Of the total annual fee, $12,000 is specifically
+allocated to Onboarding Services (a one-time fee, itemized separately on
+Vendor's invoice), and the remaining $84,000 is allocated to Platform
+Access inclusive of Premium Support, billed ratably over the Term.
+
+3. TERM AND RENEWAL
+
+3.1 Initial Term. This Agreement shall remain in effect for twelve (12)
+months from the Effective Date (the "Term"), after which it shall
+automatically renew for successive twelve (12) month periods unless
+either party provides sixty (60) days written notice of non-renewal.
+
+4. ACCEPTANCE AND DELIVERY
+
+4.1 Onboarding Completion. Onboarding Services shall be deemed complete
+upon written confirmation from Customer that data migration and training
+sessions have concluded, which the parties agree shall occur no later
+than the 30-day onboarding period specified in Section 1.2.
+
+4.2 Platform Access Delivery. Customer shall have continuous access to
+the Platform throughout the Term, with Vendor providing an uptime service
+level of 99.5% measured monthly.
+
+5. GENERAL PROVISIONS
+
+5.1 Governing Law. This Agreement shall be governed by the laws of the
+State of Delaware.
+
+5.2 Entire Agreement. This Agreement constitutes the entire agreement
+between the parties regarding the subject matter herein.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the
+Effective Date.
+
+Northstar Analytics Inc.                    Brightline Retail Group
+By: _________________________               By: _________________________
+Name: Priya Chandrasekaran                   Name: Marcus Webb
+Title: VP of Sales                           Title: Chief Operating Officer
