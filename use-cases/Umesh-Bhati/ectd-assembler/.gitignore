@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+venv/
+session_state.json
+final_module2.docx
+final_module2.previous.docx

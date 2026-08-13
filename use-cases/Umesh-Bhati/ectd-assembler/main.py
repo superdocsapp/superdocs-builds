@@ -1,151 +1,153 @@
+import argparse
 import json
 import os
+import shutil
 import sys
-import time
+
 from requests.exceptions import RequestException
-from client import SuperDocsClient
+
+from client import SuperDocsClient, session_url
+from diff_report import compare_section_exports
 from hasher import get_file_hashes
+from manifest import Manifest, detect_changed_sources, select_upload_target
 
-class Manifest:
-    def __init__(self, filepath: str):
-        with open(filepath, "r") as f:
-            self.data = json.load(f)
-            
-    def get_all_sources(self) -> set:
-        sources = set()
-        for data in self.data.get("sections", {}).values():
-            for source in data.get("sources", []):
-                sources.add(source)
-        return sources
-        
-    def get_affected_sections(self, changed_sources: set) -> list:
-        affected = []
-        for section, data in self.data.get("sections", {}).items():
-            section_sources = data.get("sources", [])
-            if any(src in changed_sources for src in section_sources):
-                affected.append((section, data["title"], section_sources))
-        return affected
+STATE_FILE = "session_state.json"
+FINAL_DOCX = "final_module2.docx"
+PREVIOUS_DOCX = "final_module2.previous.docx"
+SHELL_DOCX = "module2_shell.docx"
+MANIFEST_PATH = "manifest.json"
 
-def main():
+
+def build_section_prompt(section_num: str, title: str, source_filenames: list[str]) -> str:
+    sources = ", ".join(source_filenames)
+    return (
+        f"Draft section '{section_num} {title}' in the Module 2 Clinical Summary document. "
+        f"Use the attached Module 5 study report(s): {sources}. "
+        f"Pull facts only from those sources. "
+        f"For every drafted paragraph, add a citation pointing to the exact source report and section. "
+        f"Preserve existing section numbering and cross-references elsewhere in the document."
+    )
+
+
+def load_state() -> dict:
+    if not os.path.exists(STATE_FILE):
+        return {}
+    with open(STATE_FILE, "r") as f:
+        return json.load(f)
+
+
+def save_state(state: dict) -> None:
+    with open(STATE_FILE, "w") as f:
+        json.dump(state, f, indent=2)
+
+
+def print_diff_report(report) -> None:
+    print("\nIncremental diff report:")
+    print(f"  Expected to change: {', '.join(report.expected_changed) or '(none)'}")
+    print(f"  Actually changed:   {', '.join(report.changed_sections) or '(none)'}")
+    print(f"  Unchanged:          {', '.join(report.unchanged_sections) or '(none)'}")
+    if report.proof_passed:
+        print("  Proof: PASSED — only dependent sections changed.")
+    else:
+        print("  Proof: REVIEW NEEDED — changed sections do not match manifest dependencies.")
+
+
+def run_pipeline(*, browser_review: bool) -> None:
     print("Starting eCTD Module 2 Assembler Pipeline...")
     client = SuperDocsClient()
-    
+
     try:
         if not client.verify_connection():
             print("Error: Could not verify connection to SuperDocs API.")
+            print("Tip: confirm SUPERDOCS_API_KEY is set and valid (GET /v1/sessions should return 200).")
             sys.exit(1)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
     except RequestException as e:
         print(f"Error: Could not connect to SuperDocs API. ({e})")
         sys.exit(1)
-    
-    # 1. Read manifest to find files
-    manifest = Manifest("manifest.json")
+
+    manifest = Manifest(MANIFEST_PATH)
     sources = manifest.get_all_sources()
-            
-    # 2. Hashing and Dependency Tracking BEFORE uploading
-    state_file = "session_state.json"
-    old_state = {}
-    if os.path.exists(state_file):
-        with open(state_file, "r") as f:
-            old_state = json.load(f)
-            
+
+    old_state = load_state()
     old_hashes = old_state.get("hashes", {})
     new_hashes = get_file_hashes(sources)
-    
-    changed_sources = set()
-    for source in sources:
-        if new_hashes.get(source) != old_hashes.get(source):
-            changed_sources.add(source)
-            
-    print(f"Changed sources detected: {changed_sources}")
-    
+    changed_sources = detect_changed_sources(sources, old_hashes, new_hashes)
+
+    print(f"Changed sources detected: {sorted(changed_sources) or '(none)'}")
+
     if not changed_sources:
         print("No changes detected in source documents. Exiting early.")
         return
 
+    affected_sections = manifest.get_affected_sections(changed_sources)
+    expected_changed_section_ids = [section_num for section_num, _, _ in affected_sections]
+
+    if os.path.exists(FINAL_DOCX):
+        shutil.copy(FINAL_DOCX, PREVIOUS_DOCX)
+        print(f"Saved previous export to {PREVIOUS_DOCX} for diff proof.")
+
+    upload_target = select_upload_target(FINAL_DOCX, SHELL_DOCX)
+    if upload_target == FINAL_DOCX:
+        print("Incremental run detected. Uploading previous export as the working document...")
+    else:
+        print("First run detected. Uploading module2_shell.docx as the working document...")
+
     try:
-        # 3. Upload main document and attachments for the changed session
-        if os.path.exists("final_module2.docx"):
-            upload_target = "final_module2.docx"
-            print("Incremental run detected. Uploading final_module2.docx as shell...")
-        else:
-            upload_target = "module2_shell.docx"
-            print("First run detected. Uploading module2_shell.docx as shell...")
-            
-        doc_res = client.upload_document(upload_target)
-        session_id = doc_res.get("session_id")
-        document_id = doc_res.get("document_id")
-        print(f"Session ID: {session_id}, Document ID: {document_id}")
-        
-        attachment_ids = {}
-        for source in sources:
-            print(f"Uploading attachment: {source}...")
-            att_id = client.upload_attachment(session_id, source)
-            attachment_ids[source] = att_id
-            print(f"Attachment ID for {source}: {att_id}")
-        
-        # 4. Draft Sections affected by changed sources
-        affected_sections = manifest.get_affected_sections(changed_sources)
-            
-        job_ids = {}
+        bootstrap = client.bootstrap_session(upload_target, sorted(sources))
+        session_id = bootstrap["session_id"]
+        print(f"Session ready: {bootstrap['session_url']}")
+
         for section_num, title, section_sources in affected_sections:
-            print(f"Drafting section {section_num} - {title}...")
-            
-            source_refs = []
-            for src in section_sources:
-                att_id = attachment_ids.get(src)
-                if not att_id:
-                    raise ValueError(f"Missing attachment ID for {src}")
-                source_refs.append(str(att_id))
-                
-            prompt = (
-                f"Please draft section '{section_num} {title}' using the attached source documents. "
-                f"You MUST explicitly cite the source document and section for every drafted paragraph. "
-                f"Use the sources: {', '.join(source_refs)}."
-            )
+            source_filenames = [os.path.basename(src) for src in section_sources]
+            prompt = build_section_prompt(section_num, title, source_filenames)
+            print(f"\nDrafting section {section_num} - {title}...")
             job_id = client.chat_async(session_id, prompt)
-            job_ids[section_num] = job_id
-            print(f"Started drafting job for {section_num}: {job_id}")
+            print(f"  Job started: {job_id}")
+            client.resolve_job(session_id, job_id, browser_review=browser_review)
+            print(f"  Section {section_num} complete.")
 
-        # 6. Review and Export
-        print("\nWaiting for SuperDocs AI to finish drafting...")
-        for section_num, job_id in job_ids.items():
-            while True:
-                # We mock the sleep out in tests, but this would poll normally
-                try:
-                    status = client.get_job_status(job_id)
-                    if status in ["completed", "approved", "hitl_approval_required"]:
-                        break
-                except RequestException:
-                    # Keep polling if there's a transient network issue
-                    pass
-                time.sleep(1)
-                
-        print(f"\nDrafting complete. Please review and approve the changes in the SuperDocs Web UI:")
-        print(f"https://app.superdocs.app/sessions/{session_id}")
-        
-        # HITL Step
-        input("Press Enter once you have reviewed and approved the document natively in the browser...")
-        
-        print("Exporting final document...")
-        client.export_document(document_id, "final_module2.docx")
-        print("Successfully exported to final_module2.docx.")
+        print("\nExporting final document...")
+        client.export_document(session_id, FINAL_DOCX)
+        print(f"Successfully exported to {FINAL_DOCX}.")
 
-        # 7. Save state
-        state = {
-            "session_id": session_id,
-            "document_id": document_id,
-            "attachments": attachment_ids,
-            "hashes": new_hashes
-        }
-        with open(state_file, "w") as f:
-            json.dump(state, f, indent=2)
-        print("Pipeline complete. State saved to session_state.json.")
-        
+        if os.path.exists(PREVIOUS_DOCX):
+            report = compare_section_exports(
+                PREVIOUS_DOCX,
+                FINAL_DOCX,
+                manifest.get_all_section_ids(),
+                expected_changed_section_ids,
+            )
+            print_diff_report(report)
+
+        save_state(
+            {
+                "session_id": session_id,
+                "document_id": bootstrap.get("document_id"),
+                "attachments": bootstrap.get("attachments", {}),
+                "hashes": new_hashes,
+            }
+        )
+        print(f"Pipeline complete. State saved to {STATE_FILE}.")
+        print(f"Open session: {session_url(session_id)}")
+
     except RequestException as e:
-        print(f"\nPipeline failed due to API Error: {e}")
+        print(f"\nPipeline failed due to API error: {e}")
         sys.exit(1)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Assemble eCTD Module 2 summaries from Module 5 study reports.")
+    parser.add_argument(
+        "--browser-review",
+        action="store_true",
+        help="Wait for a human to approve changes in the SuperDocs web UI instead of auto-approving via API.",
+    )
+    args = parser.parse_args()
+    run_pipeline(browser_review=args.browser_review)
+
 
 if __name__ == "__main__":
     main()
-
