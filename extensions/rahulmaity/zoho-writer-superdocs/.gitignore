@@ -1,0 +1,9 @@
+node_modules/
+dist/
+release/
+config/connector.workspace.json
+coverage/
+.DS_Store
+.env
+.env.*
+!.env.example

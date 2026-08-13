@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 72">
+  <rect width="72" height="72" rx="20" fill="#1e673d"/>
+  <path d="M20 19h33v8H30v8h19v8H30v8h23v8H20z" fill="#fff"/>
+  <text x="88" y="45" fill="#162019" font-family="Arial, sans-serif" font-size="26" font-weight="700">SuperDocs Review</text>
+</svg>

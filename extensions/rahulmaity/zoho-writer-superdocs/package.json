@@ -1,0 +1,27 @@
+{
+  "name": "zoho-writer-superdocs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0 <21 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "package:sigma": "npm run build && node scripts/package.mjs",
+    "package:sigma:workspace": "npm run build && node scripts/package.mjs --workspace",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:live": "vitest run tests/live.test.ts"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^26.2.0",
+    "adm-zip": "^0.6.0",
+    "jsdom": "^30.0.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  }
+}

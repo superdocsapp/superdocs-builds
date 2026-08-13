@@ -1,0 +1,18 @@
+{
+  "service": "WRITER",
+  "storage": false,
+  "whiteListedDomains": [
+    "https://api.superdocs.app"
+  ],
+  "modules": {
+    "widgets": [
+      {
+        "name": "superdocs_review",
+        "location": "writer.extensions",
+        "url": "index.html",
+        "logo": "img/logo.svg",
+        "icon": "img/icon.svg"
+      }
+    ]
+  }
+}
