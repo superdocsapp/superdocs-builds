@@ -117,7 +117,7 @@ class TestSuperDocsClient(unittest.TestCase):
 
 class TestSessionUrl(unittest.TestCase):
     def test_session_url(self):
-        self.assertEqual(session_url("abc"), "https://app.superdocs.app/sessions/abc")
+        self.assertEqual(session_url("abc"), "https://use.superdocs.app/sessions/abc")
 
 
 if __name__ == "__main__":

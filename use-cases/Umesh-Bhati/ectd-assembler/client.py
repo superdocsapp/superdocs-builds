@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import RequestException
 
 API_BASE_URL = "https://api.superdocs.app/v1"
-WEB_APP_BASE_URL = "https://app.superdocs.app"
+WEB_APP_BASE_URL = "https://use.superdocs.app"
 
 TERMINAL_JOB_STATUSES = frozenset({"completed", "failed", "cancelled"})
 
@@ -225,6 +225,8 @@ class SuperDocsClient:
             print(f"    - {explanation}")
 
         print(f"\n  Review session: {session_url(session_id)}")
+        if browser_review:
+            print("  Tip: if the document looks stale, refresh the browser tab to sync API changes.")
 
         if browser_review:
             input("  Press Enter after approving changes in the SuperDocs web UI...")

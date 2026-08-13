@@ -87,6 +87,7 @@ python -m unittest discover -v
 
 ## Known limitations
 
+- **Browser sync:** When using `--browser-review`, the web editor may not auto-refresh after API edits — reload the session tab if content looks stale
 - Synthetic Module 5 sources are plain `.txt` files, not full study-report PDFs/DOCX
 - Citation quality depends on SuperDocs AI following prompt instructions; citations are not independently validated
 - Section diff proof compares extracted paragraph text, not byte-identical DOCX structure

@@ -3,8 +3,6 @@ import os
 
 from docx import Document
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
 
 SECTIONS = {
     "2.5.1": {"title": "Clinical Pharmacology", "sources": ["module5/study_report_1.txt"]},
@@ -27,28 +25,6 @@ STUDY_REPORTS = {
 }
 
 
-def _add_toc_field(paragraph) -> None:
-    run = paragraph.add_run()
-    fld_begin = OxmlElement("w:fldChar")
-    fld_begin.set(qn("w:fldCharType"), "begin")
-    run._r.append(fld_begin)
-
-    instr = OxmlElement("w:instrText")
-    instr.set(qn("xml:space"), "preserve")
-    instr.text = ' TOC \\o "1-3" \\h \\z \\u '
-    run._r.append(instr)
-
-    fld_separate = OxmlElement("w:fldChar")
-    fld_separate.set(qn("w:fldCharType"), "separate")
-    run._r.append(fld_separate)
-
-    run.add_text("[Update table of contents in Word: References → Update Table]")
-
-    fld_end = OxmlElement("w:fldChar")
-    fld_end.set(qn("w:fldCharType"), "end")
-    run._r.append(fld_end)
-
-
 def create_module2_shell(filepath: str) -> None:
     doc = Document()
     section = doc.sections[0]
@@ -68,8 +44,9 @@ def create_module2_shell(filepath: str) -> None:
     )
 
     toc_heading = doc.add_heading("Table of Contents", level=1)
-    toc_heading.style = doc.styles["Heading 1"]
-    _add_toc_field(doc.add_paragraph())
+    doc.add_paragraph(
+        "[Table of contents will be generated after all sections are drafted.]"
+    )
 
     for section_num, metadata in SECTIONS.items():
         doc.add_heading(f"{section_num} {metadata['title']}", level=1)

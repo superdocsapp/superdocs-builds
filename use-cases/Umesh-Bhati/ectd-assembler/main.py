@@ -19,13 +19,27 @@ MANIFEST_PATH = "manifest.json"
 
 
 def build_section_prompt(section_num: str, title: str, source_filenames: list[str]) -> str:
+    heading = f"{section_num} {title}"
     sources = ", ".join(source_filenames)
     return (
-        f"Draft section '{section_num} {title}' in the Module 2 Clinical Summary document. "
+        f"The document already contains a Heading 1 titled '{heading}'. "
+        f"Replace ONLY the placeholder paragraph(s) directly under that existing heading with drafted body text. "
+        f"Do NOT add a new heading, subheading, or duplicate of '{heading}' anywhere. "
+        f"Do not modify any other section. "
         f"Use the attached Module 5 study report(s): {sources}. "
         f"Pull facts only from those sources. "
-        f"For every drafted paragraph, add a citation pointing to the exact source report and section. "
-        f"Preserve existing section numbering and cross-references elsewhere in the document."
+        f"For every drafted paragraph, add a citation pointing to the exact source report and section."
+    )
+
+
+def build_toc_prompt(section_headings: list[str]) -> str:
+    headings = ", ".join(section_headings)
+    return (
+        "Update the 'Table of Contents' section near the top of the document. "
+        "Replace the TOC placeholder with a readable list of all major section headings and their titles. "
+        f"Include these sections: {headings}. "
+        "Use plain text or a simple list — do not insert Word field codes. "
+        "Do not change any section body text."
     )
 
 
@@ -100,6 +114,10 @@ def run_pipeline(*, browser_review: bool) -> None:
         session_id = bootstrap["session_id"]
         print(f"Session ready: {bootstrap['session_url']}")
 
+        all_section_headings = [
+            f"{num} {data['title']}" for num, data in manifest.sections.items()
+        ]
+
         for section_num, title, section_sources in affected_sections:
             source_filenames = [os.path.basename(src) for src in section_sources]
             prompt = build_section_prompt(section_num, title, source_filenames)
@@ -108,6 +126,12 @@ def run_pipeline(*, browser_review: bool) -> None:
             print(f"  Job started: {job_id}")
             client.resolve_job(session_id, job_id, browser_review=browser_review)
             print(f"  Section {section_num} complete.")
+
+        if affected_sections:
+            print("\nUpdating table of contents...")
+            toc_job_id = client.chat_async(session_id, build_toc_prompt(all_section_headings))
+            client.resolve_job(session_id, toc_job_id, browser_review=browser_review)
+            print("  Table of contents updated.")
 
         print("\nExporting final document...")
         client.export_document(session_id, FINAL_DOCX)
