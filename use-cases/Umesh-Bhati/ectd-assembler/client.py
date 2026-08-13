@@ -23,8 +23,10 @@ def session_url(session_id: str) -> str:
 
 
 class SuperDocsClient:
-    def __init__(self, base_url: str = API_BASE_URL):
-        self.api_key = os.environ.get("SUPERDOCS_API_KEY")
+    def __init__(self, base_url: str = API_BASE_URL, api_key: str | None = None):
+        self.api_key = (
+            api_key if api_key is not None else os.environ.get("SUPERDOCS_API_KEY")
+        )
         self.base_url = base_url
 
     @property
