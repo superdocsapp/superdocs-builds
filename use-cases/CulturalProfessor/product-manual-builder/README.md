@@ -53,14 +53,22 @@ asked to prove — cheapest first, and no quota spent by any of it.
     PASS
 ==> verify: the live documents are what publish recorded
     PASS
+==> live re-entry test
+    SKIP  spends a real operation, so it is opt-in: SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest
 
-6 passed, 0 failed
+6 passed, 0 failed, 1 skipped
 ```
 
 Without a key the two live stages are reported as **skipped**, not as passed,
 and the offline four still run. When something fails it is named at the bottom
 under *what is not working*, and the exit code is non-zero, so this is also the
 CI command.
+
+One stage stays skipped even with a key: the live re-entry test spends a real
+operation to park a batch on `api.superdocs.app` and prove a second turn is
+really refused with `409 session_busy` — see [crash recovery, proven rather
+than assumed](#crash-recovery-proven-rather-than-assumed). A key alone does
+not turn it on; `SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest` does.
 
 Every command below is `./mb <subcommand>` — the same wrapper, which also builds
 the virtualenv on first use. `.venv/bin/python -m manualbuilder.cli <subcommand>`
@@ -85,7 +93,11 @@ same thing if you have it.
 ./mb test
 ```
 
-112 tests, no network and no key.
+119 tests, no network and no key — one of them (`test_process_reentry.py`)
+runs `mb` as a real subprocess against a local stub and kills it mid-request,
+which is still no network and no key: the stub is local. A 120th test exists
+only to be run on purpose; see [crash recovery, proven rather than
+assumed](#crash-recovery-proven-rather-than-assumed).
 
 ```bash
 ./mb fix
@@ -288,6 +300,47 @@ is the pair coming apart as completely as it can, and it fails.
 drawing left in place, a figure that lost its image, an invented URL, a fix
 dropped from the card — and `verify` has to find each one. A verification step
 that can only print green is worse than none.
+
+## Crash recovery, proven rather than assumed
+
+`approve --discard` exists for a specific sentence in its own docstring: *"a
+batch parked by a run that never wrote one — a crash between turns, a
+different machine, a session someone left open."* Every other test in this
+suite proves a claim by calling a function and reading what comes back, which
+proves the code does what it says and nothing about whether the process it
+runs inside can actually be killed and still leave something recoverable. That
+claim had never been run under an actual `kill -9` until it was checked here.
+
+`tests/test_process_reentry.py` runs `mb publish` for real, then launches `mb
+edit` as a real subprocess against a local HTTP stub standing in for
+`api.superdocs.app` (`tests/stub_superdocs.py`). The stub's job-poll endpoint
+signals a `threading.Event` the instant it is hit and then sleeps, so the test
+waits on that event rather than guessing at a sleep long enough to "probably"
+land inside the request — and kills the subprocess while it is genuinely
+blocked inside the HTTP call, before `edit_both` has returned and before
+anything has been written to `out/proposal.json`. A second, unrelated `mb
+approve --discard` process is then pointed at the same stub and has to find
+and deny both stranded batches — the manual's and the card's, since both turns
+are sent before either is waited on — with nothing shared between the two
+processes but the disk and the stub. It does. This is free and needs no key:
+the stub is local, so it runs in the normal offline suite every time.
+
+What it cannot prove is that the real service's `409 session_busy` behaves
+the way the stub is built to assume it does — the stub is a model of BUGS #5,
+not BUGS #5 itself. `tests/test_live_reentry.py` is the other half: it parks a
+real batch on `api.superdocs.app`, sends a second turn into the same session,
+and checks that the *real* refusal is a `409` and that the *real* parked batch
+is what `active_jobs` names and what denying it clears. It is skipped unless
+`SUPERDOCS_LIVE_REENTRY_TESTS=1` is set, on top of a real key — that is a
+second, separate switch from having a key at all, because unlike every other
+live check in this project (`status`, `verify`, both free), this one spends a
+real operation to park the batch it then has to collide with. Nothing else in
+this codebase turns it on automatically; not `./mb test`, not `./selftest`
+with a key in `.env`, only that variable, explicitly:
+
+```bash
+SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest
+```
 
 ## What is in the documents
 
@@ -548,7 +601,8 @@ manualbuilder/
 BUGS.md                  what broke on the live API while building this
 mb                       the command line, virtualenv taken care of
 selftest                 every check this project can run, in one command
-tests/                   112 tests, no network
+tests/                   119 tests, no network, plus one live test that is
+                         skipped unless asked for twice (a key, and a flag)
 ```
 
 ## What it does not do

@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # Everything this project can be asked to prove, in one command.
 #
-# Cheapest first, and nothing here spends quota: the offline checks need no key
-# at all, and the two live ones read the published documents back -- exports are
-# free. A stranger with no key gets the offline half and is told the rest was
-# skipped rather than being told it passed.
+# Cheapest first, and nothing here spends quota by default: the offline checks
+# need no key at all, and the two live ones read the published documents back --
+# exports are free. A stranger with no key gets the offline half and is told the
+# rest was skipped rather than being told it passed.
+#
+# One stage is the exception, and it stays off unless asked for twice: with a
+# key present AND SUPERDOCS_LIVE_REENTRY_TESTS=1 set, this also runs a test that
+# spends one real operation to park a batch on api.superdocs.app and prove a
+# second turn is really refused with 409 session_busy, not just refused by a
+# mock of one. A key alone does not turn it on.
 #
 # Exits non-zero if any stage failed, so CI can run it.
 set -uo pipefail
@@ -72,11 +78,26 @@ else
     skip "verify" "no SUPERDOCS_API_KEY in the environment or .env"
 fi
 
+# `SUPERDOCS_LIVE_REENTRY_TESTS=1` is a second, separate switch from having a
+# key -- this is the one stage in this script that spends a real operation
+# (tests/test_live_reentry.py parks a real batch on api.superdocs.app to prove
+# a second turn really is refused with 409 session_busy, then denies it for
+# free). Everything above this line, key or no key, spends nothing.
+if have_key && [ "${SUPERDOCS_LIVE_REENTRY_TESTS:-}" = "1" ]; then
+    stage "live re-entry: a real 409 is caught and really cleared (spends ~1 operation)" \
+        .venv/bin/python -m pytest -q tests/test_live_reentry.py
+elif have_key; then
+    skip "live re-entry test" \
+        "spends a real operation, so it is opt-in: SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest"
+else
+    skip "live re-entry test" "needs SUPERDOCS_API_KEY and SUPERDOCS_LIVE_REENTRY_TESTS=1"
+fi
+
 # -------------------------------------------------------------- report --
 
 printf '\n\033[1m%s\033[0m\n' "-----------------------------------------------"
 printf '%d passed, %d failed' "$passed" "$failed"
-[ "$skipped" -gt 0 ] && printf ', %d skipped (needs a key)' "$skipped"
+[ "$skipped" -gt 0 ] && printf ', %d skipped' "$skipped"
 printf '\n'
 
 if [ "$failed" -gt 0 ]; then
@@ -85,9 +106,14 @@ if [ "$failed" -gt 0 ]; then
     exit 1
 fi
 
-if [ "$skipped" -gt 0 ]; then
+if ! have_key; then
     printf '\nEverything checkable without a key passes. Put a key in .env and\n'
     printf 'run this again to check the published documents themselves.\n'
+elif [ "${SUPERDOCS_LIVE_REENTRY_TESTS:-}" != "1" ]; then
+    printf '\nEverything passes, including the documents on the service. Not run: the\n'
+    printf 'live re-entry test, which spends a real operation --\n'
+    printf 'SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest also runs that.\n'
 else
-    printf '\nEverything passes, including the documents on the service.\n'
+    printf '\nEverything passes, including the documents on the service and a real\n'
+    printf '409 session_busy caught and cleared on it.\n'
 fi

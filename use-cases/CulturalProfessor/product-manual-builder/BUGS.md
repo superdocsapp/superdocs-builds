@@ -11,7 +11,9 @@ while getting the diagram-refresh path to complete one clean run, and 11–13
 while building `verify`, the command that reads the published documents back and
 checks them. Items 14–19 are from a deliberate second pass on **2026-08-12**,
 made after reading `https://docs.superdocs.app` end to end rather than working
-from `/openapi.json` alone.
+from `/openapi.json` alone. Item 20 is from **2026-08-13**, found while adding
+a test that parks and denies a real batch to prove the busy-session guard
+against the live service rather than a mock of it.
 
 They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
@@ -19,7 +21,7 @@ collects the same list.
 
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
-Items 1–7 are ranked by how much they cost me; 8–19 are appended in the order
+Items 1–7 are ranked by how much they cost me; 8–20 are appended in the order
 they turned up rather than renumbering the list. Item 13 is an observation
 without a reproduction, and says so.
 
@@ -28,6 +30,17 @@ second pass found the documentation says things this file originally claimed it
 did not, and four items are weakened or retracted there. They are corrected in
 place rather than deleted, because a bug report that quietly edits away its
 mistakes is not one anybody should trust.
+
+**Items 2, 10 and 20 are not the latency work.** The known-issues note in the
+task document says latency is being worked on next, and these three are easy
+to misread as the same thing because they are also about timing. They are not:
+a slow call is one that takes a while and then answers correctly; these are
+calls that answer immediately and *incorrectly* for a short window — a write
+returns `200` and a different read endpoint (session focus, document export,
+a session's job list) disagrees with it until it catches up. Three different
+endpoint pairs, the same shape each time. Making every call faster would not
+obviously close that window; only making the read agree with the write it
+follows would.
 
 ---
 
@@ -798,6 +811,77 @@ and you have to trigger it to read it.
 responses for `/v1/chat` and `/v1/chat/async`. That a session takes one turn at a
 time is an architectural fact about the API; an integrator should not have to
 discover it by being refused.
+
+---
+
+## 20. `GET /v1/sessions/{id}/jobs` can still list a job as active seconds after `approve` resolved it
+
+**Severity: low — a caller polling the wrong endpoint sees the session as busy
+after it has actually freed up.**
+
+**What I did.** Parked a batch (`chat_async`, one document, one edit, real
+`awaiting_approval`), denied every change in it
+(`POST /v1/chat/{session_id}/approve` with every `approved: false`), and
+immediately called `GET /v1/sessions/{session_id}/jobs` to confirm the session
+was free — the same read `active_jobs()` in this client uses, and the same
+one the busy-session guard in `session.edit_each` relies on before sending a
+new turn.
+
+**What I expected.** The job gone from the active set, since `approve` had
+already returned `200`.
+
+**What happened.** The job was still listed with a status inside
+`ACTIVE_JOB_STATUSES`, timed at effectively the same instant `approve`
+returned. `GET /v1/jobs/{job_id}` — the single-job endpoint, not the session's
+list — already read `"status": "completed"` with the change correctly marked
+`"status": "denied"` inside it at that same moment, so the two views of the
+same job disagreed with each other exactly the way items 2 and 10 describe for
+a document's focus and an export. This is the same shape on a third pair of
+endpoints: `POST /v1/chat/{id}/approve` is a write that returns before
+`GET /v1/sessions/{id}/jobs` — though not `GET /v1/jobs/{id}` — agrees with it.
+
+Three clean back-to-back reproductions closed the gap in 0.82s, 1.72s and
+1.74s; the run that first surfaced it (inside the actual test, not an isolated
+timing script) took longer than that — it was still listed active when I
+queried it again from a separate process moments later. So the delay is real
+and short on average, and I have not pinned an upper bound, in the same honest
+shape item 10 already admits to for export.
+
+**Reproduce.**
+
+```bash
+SID=$(curl -sX POST https://api.superdocs.app/v1/sessions/init \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" -H 'Content-Type: application/json' \
+  -d '{}' | jq -r .session_id)
+
+# upload a one-line document into $SID, open_mode=new_focused, note $DOC
+
+JOB=$(curl -sX POST https://api.superdocs.app/v1/chat/async \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" -H 'Content-Type: application/json' \
+  -d "{\"message\":\"change something\",\"session_id\":\"$SID\",\"document_id\":\"$DOC\",\"approval_mode\":\"ask_every_time\"}" \
+  | jq -r .job_id)
+
+# poll GET /v1/jobs/$JOB until status is awaiting_approval, then:
+
+curl -sX POST "https://api.superdocs.app/v1/chat/$SID/approve" \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" -H 'Content-Type: application/json' \
+  -d "{\"job_id\":\"$JOB\",\"approved\":false,\"changes\":[]}" >/dev/null
+
+curl -s "https://api.superdocs.app/v1/sessions/$SID/jobs" \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" | jq '.jobs[] | {job_id, status}'
+# may still show an active status here, immediately after approve returned 200
+```
+
+**Cost to me.** About twenty minutes — one failed test, and the time to tell a
+real propagation delay apart from a real bug in the crash-recovery test this
+was found while writing. The fix on my side was one bounded retry loop instead
+of one assertion; see `tests/test_live_reentry.py`.
+
+**Suggested fix.** Either make `GET /v1/sessions/{id}/jobs` consistent with
+`GET /v1/jobs/{id}` before `approve` returns, or document the delay the way
+`/v1/documents/export` deserves it in item 10 — a caller checking "is this
+session free yet" against the session's job list currently gets a
+plausible-looking wrong answer instead of an error.
 
 ---
 

@@ -255,6 +255,25 @@ def test_an_edit_that_touched_only_one_document_is_refused(publication):
         session.assert_touched_both(publication, changes)
 
 
+def test_a_document_with_a_turn_already_in_flight_refuses_the_next_edit(publication):
+    """The guard at the top of `edit_each`. A batch nobody decided on holds its
+    session open, and the service answers the next turn with 409 `session_busy`
+    -- correct, and four frames deep in a stack trace. Checked here instead, so
+    the failure names what is in the way and how to clear it, and so a second
+    `chat_async` is never sent into a session that is already holding one."""
+    publication.sessions = {"doc_manual": "s_manual", "doc_card": "s_card"}
+
+    class Fake:
+        def active_jobs(self, session_id):
+            return [{"job_id": "job_old", "status": "awaiting_approval"}]
+
+        def chat_async(self, *a, **k):  # pragma: no cover
+            raise AssertionError("a turn was sent while one was still parked")
+
+    with pytest.raises(SuperDocsError, match=r"already has 1 turn.*waiting to be approved"):
+        session.edit_both(Fake(), publication, "raise the rail torque to 1.6 N·m")
+
+
 def test_an_edit_that_touched_both_is_allowed(publication):
     changes = [
         ProposedChange(
