@@ -122,8 +122,14 @@ def passages(html: str) -> list[str]:
     return [text for text in found if text]
 
 
-def _closest(needle: str, candidates: list[str]) -> tuple[str, float]:
-    """The candidate most like `needle`, and how like it it is."""
+def closest(needle: str, candidates: list[str]) -> tuple[str, float]:
+    """The candidate most like `needle`, and how like it it is.
+
+    Public rather than the private helper it started as: `session.py`'s
+    `excusably_empty` reuses it too, to judge whether a document that
+    proposed nothing ever held the fact that changed elsewhere, at the same
+    threshold this module is calibrated against.
+    """
     best, score = "", 0.0
     for candidate in candidates:
         ratio = SequenceMatcher(None, needle, candidate).ratio()
@@ -237,7 +243,7 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
         # is the claim this build actually makes. The passage each document has
         # in that place is found by how close it still is to the original, and
         # the two are compared against each other.
-        best = {role: _closest(needle, blocks[role]) for role in (MANUAL, CARD)}
+        best = {role: closest(needle, blocks[role]) for role in (MANUAL, CARD)}
         lost = [role for role, (_, score) in best.items() if score < MATCH]
         if lost and (in_manual or in_card):
             # One document still has the sentence exactly as published and the
@@ -303,6 +309,7 @@ __all__ = [
     "MOOT",
     "OK",
     "Finding",
+    "closest",
     "failed",
     "image_findings",
     "pair_findings",

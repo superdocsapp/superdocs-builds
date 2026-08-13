@@ -159,6 +159,57 @@ def test_a_chat_turn_parks_for_approval(monkeypatch):
     assert "document_ids" not in sent["body"]
 
 
+def test_model_tier_and_thinking_depth_are_left_out_unless_asked_for(monkeypatch):
+    """The server picks `core` + `balanced` on its own when neither is sent.
+    Sending an empty string or `None` must not put the key in the payload at
+    all -- an empty `model_tier` is not the same request as an absent one to
+    a service that might treat `""` as an explicit, invalid tier rather than
+    "no preference"."""
+    sent: dict = {}
+
+    class Fake:
+        def post(self, path, json):
+            sent["body"] = json
+            return _ok({"session_id": "sess_1"})
+
+        def close(self):
+            pass
+
+    client = _client(monkeypatch, Fake())
+    client.chat("what is the max laser power?", "sess_1", document_id="doc_manual")
+
+    assert "model_tier" not in sent["body"]
+    assert "thinking_depth" not in sent["body"]
+
+
+def test_model_tier_and_thinking_depth_are_sent_when_given(monkeypatch):
+    """docs.superdocs.app/guides/model-selection: `model_tier` is one of core
+    (default) / turbo / pro / max, `thinking_depth` one of fast / balanced
+    (default) / deep. Passed through verbatim -- this client does not
+    second-guess the caller's choice of tier."""
+    sent: dict = {}
+
+    class Fake:
+        def post(self, path, json):
+            sent["body"] = json
+            return _ok({"session_id": "sess_1"})
+
+        def close(self):
+            pass
+
+    client = _client(monkeypatch, Fake())
+    client.chat(
+        "what is the max laser power?",
+        "sess_1",
+        document_id="doc_manual",
+        model_tier="pro",
+        thinking_depth="fast",
+    )
+
+    assert sent["body"]["model_tier"] == "pro"
+    assert sent["body"]["thinking_depth"] == "fast"
+
+
 def _ok(body: dict):
     import httpx
 

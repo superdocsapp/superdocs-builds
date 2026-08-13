@@ -12,6 +12,7 @@ Nothing here touches the network or needs a key, which is the same promise
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 import yaml
@@ -140,6 +141,168 @@ def test_status_and_verify_need_a_published_pair_before_they_touch_anything(
     for command in ("status", "verify"):
         assert cli.main([command]) == 2
         assert "Run `publish` first" in capsys.readouterr().err
+
+
+def _published(out: Path) -> None:
+    out.mkdir()
+    (out / "published.json").write_text(
+        json.dumps(
+            {
+                "manual_id": "doc_m",
+                "card_id": "doc_c",
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
+                "language": "",
+                "images": {},
+            }
+        )
+    )
+
+
+def test_edit_lets_a_manual_only_fact_through_and_says_so(monkeypatch, tmp_path, capsys):
+    """The wiring for `assert_touched_both_or_absent`: a Specifications-table
+    edit that only the manual can hold is not refused, and `edit` says why
+    the card was skipped instead of silently treating it as fine."""
+    from manualbuilder.superdocs import SuperDocs
+
+    old_table = (
+        "<table><thead><tr><th>Specification</th><th>Value</th></tr></thead>"
+        "<tbody><tr><td>Laser source</td><td>450 nm diode laser</td></tr></tbody></table>"
+    )
+    new_table = old_table.replace("450 nm", "460 nm")
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def active_jobs(self, session_id):
+            return []
+
+        def chat_async(self, message, session_id, document_id=None):
+            return "job_manual" if document_id == "doc_m" else "job_card"
+
+        def wait_for_job(self, job_id):
+            if job_id == "job_manual":
+                return {
+                    "status": "completed",
+                    "metadata": {
+                        "pending_changes": [
+                            {
+                                "change_id": "c1",
+                                "chunk_id": "chunk_specs",
+                                "document_id": "doc_m",
+                                "old_html": old_table,
+                                "new_html": new_table,
+                                "ai_explanation": "updated the specifications",
+                            }
+                        ]
+                    },
+                }
+            return {"status": "completed", "metadata": {"pending_changes": []}}
+
+        pending_changes = staticmethod(SuperDocs.pending_changes)
+
+        def document_html(self, durable_id):
+            assert durable_id == "uuid-c"
+            return "<h2>Setup</h2><p>Fit the rails to the base frame.</p>"
+
+    _published(tmp_path / "out")
+    monkeypatch.setattr(cli, "OUT", tmp_path / "out")
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+
+    code, printed = _run(monkeypatch, ["edit", "change the laser source to 460 nm"], capsys)
+    assert code == 0
+    assert "REFUSED" not in printed
+    assert "quick-start card was not required to change" in printed
+    assert (tmp_path / "out" / "proposal.json").is_file(), "the manual's change is still recorded"
+
+
+def test_ask_targets_the_right_document_and_prints_the_answer(monkeypatch, tmp_path, capsys):
+    """The manual by default, the card with --document card -- `edit`'s
+    always-both shape is exactly what `ask` exists to avoid."""
+    calls: list = []
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def init_session(self, document_ids=None):
+            durable_to_doc = {"uuid-m": "doc_m", "uuid-c": "doc_c"}
+            return f"fresh_{durable_to_doc[document_ids[0]]}"
+
+        def documents(self, session_id):
+            return [{"document_id": session_id.removeprefix("fresh_")}]
+
+        def chat(self, message, session_id, document_id=None, thinking_depth=None, **kw):
+            calls.append({"session_id": session_id, "document_id": document_id})
+            return {"response": f"answer for {document_id}", "session_id": session_id}
+
+    _published(tmp_path / "out")
+    monkeypatch.setattr(cli, "OUT", tmp_path / "out")
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+
+    code, printed = _run(monkeypatch, ["ask", "what is the max laser power?"], capsys)
+    assert code == 0
+    assert "answer for doc_m" in printed
+    assert calls[-1] == {"session_id": "fresh_doc_m", "document_id": "doc_m"}
+
+    code, printed = _run(monkeypatch, ["ask", "--document", "card", "same question"], capsys)
+    assert code == 0
+    assert "answer for doc_c" in printed
+    assert calls[-1] == {"session_id": "fresh_doc_c", "document_id": "doc_c"}
+
+
+def test_ask_warns_when_the_turn_also_proposed_changes(monkeypatch, tmp_path, capsys):
+    """The synchronous endpoint can propose changes even to a question, and
+    those can never be approved -- 'Job is not awaiting approval' is what the
+    live service says if you try. `ask` has to say so rather than quietly
+    dropping them the way a plain response-only reader would."""
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def init_session(self, document_ids=None):
+            return "fresh_doc_m"
+
+        def documents(self, session_id):
+            return [{"document_id": "doc_m"}]
+
+        def chat(self, message, session_id, document_id=None, thinking_depth=None, **kw):
+            return {
+                "response": "Sure -- also fixed a typo while I was in there.",
+                "session_id": session_id,
+                "document_changes": {
+                    "pending_changes": [
+                        {
+                            "change_id": "c1",
+                            "chunk_id": "chunk_1",
+                            "document_id": document_id,
+                            "old_html": "<p>teh</p>",
+                            "new_html": "<p>the</p>",
+                        }
+                    ]
+                },
+            }
+
+    _published(tmp_path / "out")
+    monkeypatch.setattr(cli, "OUT", tmp_path / "out")
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+
+    code, printed = _run(monkeypatch, ["ask", "any typos in here?"], capsys)
+    assert code == 0
+    assert "also fixed a typo" in printed
+    assert "also proposed 1 change" in printed
+    assert "can never be approved" in printed
 
 
 def test_verify_reports_a_document_that_is_not_what_was_published(monkeypatch, tmp_path, capsys):

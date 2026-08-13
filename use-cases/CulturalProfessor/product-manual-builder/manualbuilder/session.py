@@ -267,6 +267,79 @@ def edit_both(
     return edit_each(client, publication, dict.fromkeys(publication.document_ids, instruction))
 
 
+def _refuse_if_busy(client: SuperDocs, publication: Publication, document_id: str) -> None:
+    """Refuse to send a turn into a session that already holds one.
+
+    Shared by `edit_each` and `ask`: a batch nobody decided on holds its
+    session open, and the service answers the next turn with 409
+    `session_busy` -- correct, and four frames deep in a stack trace. Checked
+    here instead, where the answer can name what is in the way.
+    """
+    outstanding = client.active_jobs(publication.session_for(document_id))
+    if not outstanding:
+        return
+    waiting = [job for job in outstanding if job.get("status") == "awaiting_approval"]
+    raise SuperDocsError(
+        f"the {publication.name_for(document_id)} already has "
+        f"{len(outstanding)} turn(s) in flight"
+        + (
+            f", {len(waiting)} waiting to be approved. Run `approve` to apply "
+            f"that batch or `approve --discard` to throw it away; a proposal "
+            f"nobody decided on blocks every later edit."
+            if waiting
+            else ". Wait for it to finish -- deep operations run minutes, and a "
+            "second turn sent now would be refused rather than queued."
+        )
+    )
+
+
+def ask(
+    client: SuperDocs,
+    publication: Publication,
+    document_id: str,
+    question: str,
+    thinking_depth: str = "fast",
+) -> dict[str, Any]:
+    """A read-only turn against one document: the answer, not a proposal.
+
+    `edit_both` is the wrong shape for a question. It always targets the pair,
+    so asking about the manual would needlessly cost a second turn against the
+    card, and its callers only ever look at `pending_changes` -- a plain answer
+    in `response` is fetched off the API and then thrown away. This asks one
+    document, through the synchronous endpoint (a question does not need a
+    poll loop, since there is no batch to wait on), and hands back the reply
+    whole so the caller can read `response` and still notice if the turn
+    proposed something anyway.
+
+    `thinking_depth="fast"` by default: a question is not an edit, and a live
+    check against all three depths answered this build's own probe question
+    identically at `fast`, `balanced` and `deep` -- the depth was never what
+    was at risk here. `fast` runs roughly a sixth of the reasoning tokens
+    `balanced` (the server's default) would spend, per
+    docs.superdocs.app/guides/model-selection. A caller who wants deeper
+    reasoning on a harder question can still pass `thinking_depth="deep"`.
+
+    Asked in a session of its own, opened fresh and never recorded on the
+    publication -- the same shape `swap_diagrams` uses for the same reason.
+    `edit`'s session is deliberately conversational, because a later edit can
+    reasonably benefit from remembering an earlier one; a question does not
+    need that, and the risk runs the other way besides. In the one live run
+    that found this, a question about the rail step's torque -- which the
+    step's own sentence plainly states -- came back "the document does not
+    specify a torque value," and the very next `edit` sent into that same
+    session, asked to raise that torque, took its own wrong answer at its
+    word: it left the step's sentence untouched and added a second, newly
+    invented torque figure to the specifications table instead -- a manual
+    that would have shipped disagreeing with itself, past every guard this
+    project has, because both documents had proposed *something* and neither
+    guard asks whether a document still agrees with its own other page. A
+    disposable session does not stop a model being wrong; it stops a wrong
+    answer here from being remembered by a session `edit` will use next.
+    """
+    session_id = publication._open_fresh(client, document_id)
+    return client.chat(question, session_id, document_id=document_id, thinking_depth=thinking_depth)
+
+
 def edit_each(
     client: SuperDocs, publication: Publication, instructions: dict[str, str]
 ) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
@@ -287,22 +360,7 @@ def edit_each(
     # the next turn with 409 `session_busy` -- correct, and four frames deep in
     # a stack trace. Checked here, where the answer can name what is in the way.
     for document_id in instructions:
-        outstanding = client.active_jobs(publication.session_for(document_id))
-        if not outstanding:
-            continue
-        waiting = [job for job in outstanding if job.get("status") == "awaiting_approval"]
-        raise SuperDocsError(
-            f"the {publication.name_for(document_id)} already has "
-            f"{len(outstanding)} turn(s) in flight"
-            + (
-                f", {len(waiting)} waiting to be approved. Run `approve` to apply "
-                f"that batch or `approve --discard` to throw it away; a proposal "
-                f"nobody decided on blocks every later edit."
-                if waiting
-                else ". Wait for it to finish -- deep operations run minutes, and a "
-                "second turn sent now would be refused rather than queued."
-            )
-        )
+        _refuse_if_busy(client, publication, document_id)
 
     # Both turns are sent before either is waited on. They are in different
     # sessions, so they run at the same time rather than one after the other,
@@ -378,17 +436,25 @@ def changes_by_document(
     return grouped
 
 
-def assert_touched_both(publication: Publication, changes: list[ProposedChange]) -> None:
+def assert_touched_both(
+    publication: Publication,
+    changes: list[ProposedChange],
+    required: list[str] | None = None,
+) -> None:
     """Refuse a batch that would leave the pair disagreeing.
 
     An edit to a fact that appears in both documents must propose changes to
     both. If it did not, applying it produces exactly the divergence this build
     exists to prevent -- so the batch is rejected rather than half-applied.
+
+    `required` narrows which documents this demands a change from; it
+    defaults to both. `assert_touched_both_or_absent` is the caller that
+    passes something narrower, having already established that the documents
+    left out never held the fact to begin with.
     """
     grouped = changes_by_document(publication, changes)
-    empty = [
-        publication.name_for(doc_id) for doc_id in publication.document_ids if not grouped[doc_id]
-    ]
+    required = publication.document_ids if required is None else required
+    empty = [publication.name_for(doc_id) for doc_id in required if not grouped[doc_id]]
     if empty:
         raise SuperDocsError(
             "this edit proposed no change to the "
@@ -397,6 +463,67 @@ def assert_touched_both(publication: Publication, changes: list[ProposedChange])
             "so nothing was approved. Either the fact does not appear in that "
             "document, or the instruction was too narrow."
         )
+
+
+def excusably_empty(changes: list[ProposedChange], current_html: str) -> bool:
+    """Whether nothing in `current_html` resembles what any of `changes` used
+    to read there -- i.e. this document never held the fact that changed
+    elsewhere, so it proposing nothing is not the pair coming apart.
+
+    Pure: `current_html` is supplied by the caller (a live read, or a local
+    render) rather than fetched here -- the same split `verify.pair_findings`
+    already uses to stay testable without a client. Reuses `verify`'s own
+    passage matching, at the threshold `verify` is calibrated against real
+    edited wording, so "structurally absent" here means the same thing "no
+    longer recognisable" means in a `verify` report.
+
+    Imported here rather than at module level: `verify` imports `session`, so
+    importing `verify` back at the top of this module would be a cycle.
+    """
+    from manualbuilder import verify as vf
+
+    candidates = vf.passages(current_html)
+    for change in changes:
+        needle = vf.text_of(change.old_html)
+        if needle and vf.closest(needle, candidates)[1] >= vf.MATCH:
+            return False
+    return True
+
+
+def assert_touched_both_or_absent(
+    client: SuperDocs, publication: Publication, changes: list[ProposedChange]
+) -> list[str]:
+    """`assert_touched_both`, except a document that never held the fact to
+    begin with is not required to propose anything.
+
+    The strict check alone cannot tell "the card should have changed and
+    didn't" (real drift -- refuse) apart from "the card never had this fact"
+    (nothing to keep in sync -- refusing buys nothing). A manual-only edit to
+    the Specifications table, which `quick_start_blocks` never renders onto
+    the card at all, was refused by the strict check with no way through it,
+    for a reason that had nothing to do with the pair coming apart.
+
+    So each document that proposed nothing is read back by its durable id
+    (free) and asked, via `excusably_empty`, whether anything in it resembles
+    what changed elsewhere. One that plausibly held the fact is still
+    required to have proposed something, and the strict check still refuses
+    the batch if it did not -- this changes nothing about the case it exists
+    for. One that structurally could not have held it is excused instead, and
+    named in the return value so the caller can say so rather than passing it
+    through silently.
+    """
+    grouped = changes_by_document(publication, changes)
+    empty = [doc_id for doc_id in publication.document_ids if not grouped[doc_id]]
+
+    excused = []
+    for document_id in empty:
+        current = client.document_html(publication.durable_for(document_id))
+        if excusably_empty(changes, current):
+            excused.append(document_id)
+
+    required = [doc_id for doc_id in publication.document_ids if doc_id not in excused]
+    assert_touched_both(publication, changes, required=required)
+    return excused
 
 
 def approve_all(
@@ -648,12 +775,15 @@ def _slug(name: str) -> str:
 __all__ = [
     "Publication",
     "approve_all",
+    "ask",
     "assert_every_figure_swapped",
     "assert_only_the_image_changed",
     "assert_touched_both",
+    "assert_touched_both_or_absent",
     "changes_by_document",
     "edit_both",
     "edit_each",
+    "excusably_empty",
     "images_in",
     "publish",
     "refresh_diagrams",

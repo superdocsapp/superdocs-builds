@@ -298,9 +298,182 @@ def test_an_edit_that_touched_both_is_allowed(publication):
     session.assert_touched_both(publication, changes)
 
 
+def _spec_table_change(document_id: str) -> ProposedChange:
+    """The change that started this: a manual-only Specifications table edit,
+    with a whole `<table>` chunk as `old_html` -- the actual shape `edit`
+    prints, not a simplified stand-in for it."""
+    return ProposedChange(
+        change_id="c1",
+        operation="edit",
+        chunk_id="chunk_specs",
+        document_id=document_id,
+        old_html=(
+            "<table><thead><tr><th>Specification</th><th>Value</th></tr></thead>"
+            "<tbody><tr><td>Work area</td><td>400 × 500 mm</td></tr>"
+            "<tr><td>Laser source</td><td>450 nm diode laser</td></tr></tbody></table>"
+        ),
+        new_html=(
+            "<table><thead><tr><th>Specification</th><th>Value</th></tr></thead>"
+            "<tbody><tr><td>Work area</td><td>400 × 600 mm</td></tr>"
+            "<tr><td>Laser source</td><td>460 nm diode laser</td></tr></tbody></table>"
+        ),
+        explanation="updated the specifications",
+    )
+
+
+def test_excusably_empty_is_true_when_nothing_resembles_the_change():
+    """The card never renders a Specifications section at all -- none of its
+    real content is anywhere close to a table of work-area and wavelength
+    values, so an empty reply from it is not the pair coming apart."""
+    change = _spec_table_change("doc_manual")
+    card_html = (
+        "<h2>Setup</h2><p>Unpack the crate and check the parts against the "
+        "table below.</p><p>Fit the rails to the base frame.</p>"
+    )
+    assert session.excusably_empty([change], card_html) is True
+
+
+def test_excusably_empty_is_false_when_the_old_wording_is_still_there():
+    """The ordinary case `assert_touched_both` exists for: the card holds the
+    torque figure too, in its own words, and an empty reply from it means the
+    turn missed a document it should have touched -- not that the fact was
+    never there."""
+    change = ProposedChange(
+        "c1",
+        "edit",
+        "chunk_3",
+        "doc_manual",
+        "<p>Torque the rail screws to 1.2 N·m.</p>",
+        "<p>Torque the rail screws to 1.6 N·m.</p>",
+        "torque",
+    )
+    card_html = "<h2>Rails</h2><p>Torque the rail screws to 1.2 N·m.</p>"
+    assert session.excusably_empty([change], card_html) is False
+
+
+def test_assert_touched_both_or_absent_excuses_a_manual_only_fact():
+    """The wiring, not just the pure check: a Specifications edit that only
+    touches the manual is let through, and the card is named as excused
+    rather than passed over silently."""
+    publication = session.Publication(
+        manual_id="doc_manual",
+        card_id="doc_card",
+        durable={"doc_manual": "uuid-m", "doc_card": "uuid-c"},
+    )
+    changes = [_spec_table_change("doc_manual")]
+
+    class Fake:
+        def document_html(self, durable_id):
+            assert durable_id == "uuid-c", "only the empty document needs reading"
+            return "<h2>Setup</h2><p>Fit the rails to the base frame.</p>"
+
+    excused = session.assert_touched_both_or_absent(Fake(), publication, changes)
+    assert excused == ["doc_card"]
+
+
+def test_assert_touched_both_or_absent_still_refuses_real_drift():
+    """The case this whole guard exists for is untouched: a fact the card
+    genuinely holds, proposed only in the manual, is still refused -- being
+    able to excuse an absent document must not make a present one optional."""
+    publication = session.Publication(
+        manual_id="doc_manual",
+        card_id="doc_card",
+        durable={"doc_manual": "uuid-m", "doc_card": "uuid-c"},
+    )
+    changes = [
+        ProposedChange(
+            "c1",
+            "edit",
+            "chunk_3",
+            "doc_manual",
+            "<p>Torque the rail screws to 1.2 N·m.</p>",
+            "<p>Torque the rail screws to 1.6 N·m.</p>",
+            "torque",
+        )
+    ]
+
+    class Fake:
+        def document_html(self, durable_id):
+            return "<h2>Rails</h2><p>Torque the rail screws to 1.2 N·m.</p>"
+
+    with pytest.raises(SuperDocsError, match="quick-start card"):
+        session.assert_touched_both_or_absent(Fake(), publication, changes)
+
+
 @pytest.fixture
 def publication():
     return session.Publication(manual_id="doc_manual", card_id="doc_card")
+
+
+def test_ask_opens_a_fresh_session_and_leaves_edits_session_alone():
+    """`ask` and `edit` must never share a session. A live run found why: a
+    question about the rail step's torque -- which the step's own sentence
+    states plainly -- came back "the document does not specify" one, and the
+    very next `edit` sent into that same session took its own wrong answer at
+    its word, adding a second, invented torque figure instead of finding the
+    real one. `ask` opens a session of its own per call and never records it,
+    so whatever `edit` remembers is exactly as it was before the question."""
+    sent: dict = {}
+    publication = session.Publication(
+        manual_id="doc_manual",
+        card_id="doc_card",
+        sessions={"doc_manual": "s_manual", "doc_card": "s_card"},
+        durable={"doc_manual": "dur_manual", "doc_card": "dur_card"},
+    )
+
+    class Fake:
+        def init_session(self, document_ids=None):
+            return "s_manual_fresh"
+
+        def documents(self, session_id):
+            return [{"document_id": "doc_manual"}]
+
+        def chat(self, message, session_id, document_id=None, thinking_depth=None, **kw):
+            sent["message"] = message
+            sent["session_id"] = session_id
+            sent["document_id"] = document_id
+            sent["thinking_depth"] = thinking_depth
+            return {"response": "The laser runs at 5 W.", "session_id": session_id}
+
+    reply = session.ask(Fake(), publication, publication.manual_id, "what is the max laser power?")
+
+    assert sent["session_id"] == "s_manual_fresh", "must not reuse the session edit uses"
+    assert sent["document_id"] == "doc_manual"
+    assert sent["thinking_depth"] == "fast"
+    assert reply["response"] == "The laser runs at 5 W."
+    assert publication.sessions == {
+        "doc_manual": "s_manual",
+        "doc_card": "s_card",
+    }, "the fresh session must not be written back -- edit's session is untouched"
+
+
+def test_ask_is_unaffected_by_a_parked_batch_on_edits_session():
+    """The busy-session guard `edit_each` uses does not apply here, and
+    should not: a parked batch lives on the session `edit` uses, `ask` never
+    touches that session at all, so a question can be answered regardless of
+    what review is sitting unresolved on it."""
+    publication = session.Publication(
+        manual_id="doc_manual",
+        card_id="doc_card",
+        sessions={"doc_manual": "s_manual", "doc_card": "s_card"},
+        durable={"doc_manual": "dur_manual", "doc_card": "dur_card"},
+    )
+
+    class Fake:
+        def init_session(self, document_ids=None):
+            return "s_manual_fresh"
+
+        def documents(self, session_id):
+            return [{"document_id": "doc_manual"}]
+
+        def active_jobs(self, session_id):  # pragma: no cover
+            raise AssertionError("ask must not inspect edit's session at all")
+
+        def chat(self, message, session_id, document_id=None, thinking_depth=None, **kw):
+            return {"response": "answered anyway", "session_id": session_id}
+
+    reply = session.ask(Fake(), publication, publication.manual_id, "any question")
+    assert reply["response"] == "answered anyway"
 
 
 def test_the_signature_the_service_appends_is_not_a_different_image():

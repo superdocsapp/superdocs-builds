@@ -336,7 +336,14 @@ class SuperDocs:
 
     # ----------------------------------------------------------------- chat --
 
-    def chat(self, message: str, session_id: str, document_id: str | None = None) -> dict[str, Any]:
+    def chat(
+        self,
+        message: str,
+        session_id: str,
+        document_id: str | None = None,
+        model_tier: str | None = None,
+        thinking_depth: str | None = None,
+    ) -> dict[str, Any]:
         """One edit turn, parked for approval rather than applied.
 
         One turn, one document. A session can hold several documents like tabs,
@@ -351,6 +358,13 @@ class SuperDocs:
         manual and the card consistent is therefore not something a single
         request can buy -- see `session.edit_both`, which buys it at the
         approval gate instead.
+
+        `model_tier` (`core` default, `turbo`/`pro`/`max`) and `thinking_depth`
+        (`balanced` default, `fast`/`deep`) are left unset here and default to
+        the server's own choice -- left to the caller, because the right tier
+        depends on what the turn is for. `session.ask` sets `thinking_depth`
+        itself, for a reason specific to what it sends. See
+        docs.superdocs.app/guides/model-selection.
         """
         payload: dict[str, Any] = {
             "message": message,
@@ -359,6 +373,10 @@ class SuperDocs:
         }
         if document_id:
             payload["document_id"] = document_id
+        if model_tier:
+            payload["model_tier"] = model_tier
+        if thinking_depth:
+            payload["thinking_depth"] = thinking_depth
         return self._post("/v1/chat", payload)
 
     def chat_async(self, message: str, session_id: str, document_id: str | None = None) -> str:

@@ -70,6 +70,46 @@ really refused with `409 session_busy` — see [crash recovery, proven rather
 than assumed](#crash-recovery-proven-rather-than-assumed). A key alone does
 not turn it on; `SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest` does.
 
+```bash
+./demo
+```
+
+`selftest` is unattended and cheapest-first, and its job is a pass/fail proof
+nobody has to watch. `demo` is the opposite: every subcommand this project
+has, run for real, one stage at a time, with real operations spent along the
+way -- `publish`, `ask`, `edit` and `sync` all touch the live service. Each
+stage says up front what it costs before it runs:
+
+```
+==> sync: every diagram re-rendered from the parts graph and swapped in
+    free to re-render and re-upload; proposing the swap costs roughly one
+    operation per figure the pair holds (9, here)
+
+8 diagram(s) re-rendered and uploaded
+  …
+
+-- press Enter to continue, or Esc to stop --
+```
+
+One key, no typing and no second Enter: `read -n1` acts the moment it has a
+character, so Esc stops immediately and anything that is neither Enter nor
+Esc is ignored rather than guessed at as one or the other. Enter moves to the
+next stage; Esc stops exactly there, with `out/published.json` still naming
+whatever got published so `./mb status` or `./mb verify` still work on it by
+hand. Needs a key for almost everything past the first two stages, and fails
+before touching anything if it does not find
+one. Publishing makes a fresh pair each run rather than reusing whatever was
+already there, so the walkthrough is the same story every time it is run.
+
+A stage that fails is not swallowed. `edit` and `sync` can each find the same
+figure in more than one real place — see BUGS #4 — and a live run doing that
+across both documents leaves the pair genuinely disagreeing, which the later
+`verify` stage is there to catch and does: it exits non-zero, and the
+walkthrough keeps going rather than stopping (a person watching decides that,
+not the script). The closing line says so honestly either way — *"every stage
+passed"* or the stages that did not, named — instead of a blanket "complete"
+regardless of what the run actually did.
+
 Every command below is `./mb <subcommand>` — the same wrapper, which also builds
 the virtualenv on first use. `.venv/bin/python -m manualbuilder.cli <subcommand>`
 is the same thing if you would rather see the machinery.
@@ -93,9 +133,9 @@ same thing if you have it.
 ./mb test
 ```
 
-119 tests, no network and no key — one of them (`test_process_reentry.py`)
+130 tests, no network and no key — one of them (`test_process_reentry.py`)
 runs `mb` as a real subprocess against a local stub and kills it mid-request,
-which is still no network and no key: the stub is local. A 120th test exists
+which is still no network and no key: the stub is local. A 131st test exists
 only to be run on purpose; see [crash recovery, proven rather than
 assumed](#crash-recovery-proven-rather-than-assumed).
 
@@ -163,11 +203,56 @@ torque figure, the live service also offered to change the gantry step, which
 legitimately shares the number. Approve the two you asked for, refuse the two
 you did not, in one review.
 
+```bash
+./mb ask "what is the rated laser wavelength?"
+```
+
+```
+The Halyard M1 uses a 450 nm diode laser source. Regarding the rail assembly,
+the M4 screws should be driven to a torque of 1.6 N·m.
+```
+
+`edit` is the wrong shape for a question. It always targets the pair, so
+asking about the manual would needlessly cost a second turn against the card
+too, and its callers only ever look at `pending_changes` — a plain answer
+sits in the reply's `response` field and gets fetched off the API and thrown
+away. `ask` targets one document (`--document card` for the other) through the
+synchronous endpoint — a question is not worth a poll loop — and prints
+`response` instead of discarding it. If the turn proposes a change anyway
+(the model is free to; a question is still a chat turn), `ask` says so rather
+than silently dropping it: the synchronous endpoint's proposals can never be
+approved, so `edit` is what to run if that was actually the intent.
+
+`ask` also sets `thinking_depth="fast"` by default — a question is not an
+edit, and per
+[docs.superdocs.app/guides/model-selection](https://docs.superdocs.app/guides/model-selection#thinking-depth)
+that's roughly a sixth of the reasoning tokens the server's own default
+(`balanced`) would spend. Nothing else in this project sets `model_tier` or
+`thinking_depth` at all — every other call runs at the server's own default,
+left alone on purpose, because the right tier depends on what the turn is for
+and a wording edit is exactly the "paragraph rewrite" case the docs already
+recommend `core` + `balanced` for.
+
+`ask` is also asked in a session of its own, opened fresh and never recorded
+— not for cost or speed, but because sharing `edit`'s session turned out to
+be actively dangerous. A live run asked this session whether the rail step's
+torque was specified; the answer was wrong — *"the document does not specify
+a torque value"*, when the step's own sentence plainly gives one — and the
+very next `edit`, sent into that same session, took its own wrong answer at
+its word: it left the real sentence alone and invented a second, contradicting
+torque figure in the specifications table instead. Approved, that manual would
+have shipped disagreeing with itself, past both this build's guards, because
+neither one checks whether a document still agrees with its own other page.
+[BUGS #21](BUGS.md#21-a-wrong-answer-in-a-sessions-memory-steers-a-later-unrelated-edit-into-fabricating-content)
+is the full account; `test_ask_opens_a_fresh_session_and_leaves_edits_session_alone`
+is what pins the fix in place.
+
 `publish` writes both document ids, the session each is edited in, the durable
 id underneath each, and the uploaded diagram URLs to `out/published.json`, so
-`edit`, `approve`, `sync` and `export` find them without anything being pasted
-between commands. `--manual`, `--card` and `--session` still exist on all four,
-and are the override for working on a pair this machine did not publish.
+`edit`, `ask`, `approve`, `sync` and `export` find them without anything being
+pasted between commands. `--manual`, `--card` and `--session` still exist on
+all of them, and are the override for working on a pair this machine did not
+publish.
 
 ```bash
 ./mb sync
@@ -180,7 +265,8 @@ and are the override for working on a pair this machine did not publish.
   [edit] chunk f2f400e9-… in quick-start card
 
 9 change(s), each one an image URL and nothing else
-nothing approved. out/proposal.json holds the batch; `approve` applies it.
+nothing approved. out/proposal.json holds the batch.
+  next  manualbuilder approve to apply it
 ```
 
 `sync` is the path a spec change takes once the documents are published: every
@@ -383,6 +469,25 @@ it. There is still no window in which the manual has moved and the card has not,
 because the window opens at approval and approval is one decision — which is
 the honest place for it, since approval is the only thing that mutates.
 
+That strict check has one honest hole: it cannot tell "the card should have
+changed and didn't" apart from "the card never held this fact." Both look
+identical from where it sits — an empty reply — but only the first is drift.
+`./mb edit "change the laser source to 460 nm and work area 400X600mm"` hit
+this directly: the Specifications table `quick_start_blocks` never renders
+onto the card at all, so the card correctly proposed nothing, and the strict
+check refused the whole batch anyway, for a reason that had nothing to do
+with the pair coming apart — there was no way to make this edit at all.
+
+`assert_touched_both_or_absent` is the fix, and it does not weaken the check
+for the case it exists for. Before refusing, it reads each empty document's
+current live content (free, by durable id) and asks whether anything in it
+still resembles what changed elsewhere — reusing `verify`'s own passage
+matching, at the same threshold `verify` is calibrated against. Nothing
+resembling it: excused, and `edit` says so rather than passing it through
+silently. Something resembling it: still refused, exactly as before —
+`test_assert_touched_both_or_absent_still_refuses_real_drift` pins that the
+torque case is untouched by this.
+
 Underneath that, the structural guarantee: the card is a projection of the same
 spec, carrying six of the seven steps, three of the seven warnings and three of
 the six troubleshooting rows, with its own numbering — and every instruction and
@@ -482,6 +587,8 @@ and the German stops matching, which is a true statement about paper.
 | Image upload | the rendered SVGs, returning stable URLs for `<img src>` |
 | Export | free; the deliverable, rendered from a session |
 | Reading a document by durable id | free, and what `verify` checks — it names the document instead of inheriting a session's focus |
+| Synchronous chat (`POST /v1/chat`) | `ask` — a question doesn't need a poll loop, since there's no batch to wait on |
+| `model_tier` / `thinking_depth` | `ask` sets `thinking_depth="fast"`; every other call leaves both at the server's default |
 
 Three API behaviours are pinned in `tests/test_superdocs.py` rather than left to
 be rediscovered:
@@ -511,6 +618,15 @@ swaps proposed across the two documents, both guards passed, all 9 approved, and
 both documents exported pointing at all 9 of the newly uploaded URLs — compared
 by URL *path*, because the service appends a ~750-character signed query when it
 serves an image and that query differs on every read.
+
+A run on 2026-08-13 exercised `ask` against the already-published pair:
+`./mb ask "what is the rated laser wavelength, and what torque does the rail
+step call for?"` answered "450 nm diode laser source … torque of 1.6 N·m" —
+correct against the spec, and the 1.6 reflects the torque change approved on
+2026-08-11 rather than the spec's original 1.2. `./mb ask --document card
+"does this document list every troubleshooting fix, or only some of them?"`
+correctly answered "only some" without being told the card carries 3 of the
+manual's 6 rows. Neither call proposed a change.
 
 That check is the `verify` command, not something run by hand once and written
 up here — which is the point. Anything in this section can be re-checked with
@@ -552,14 +668,17 @@ which is exactly how it stayed wrong through nine commits.
 
 ### What broke while building this
 
-[`BUGS.md`](BUGS.md) — nineteen numbered findings against the live API, each
+[`BUGS.md`](BUGS.md) — twenty-one numbered findings against the live API, each
 with what was expected, what happened, how to reproduce it and what it cost.
 They sit next to the build that found them rather than in a notes file
 somewhere, because most of them are the reason a particular piece of this code
 is shaped the way it is. The pair guarantee moved because of #5; the diagram
 swap anchors on captions because of #6 and opens a fresh session because of #8;
-`sync` asks each document about its own figures because of #9; and `verify`
-reads by document id rather than by session because of #11.
+`sync` asks each document about its own figures because of #9; `verify` reads
+by document id rather than by session because of #11; and `ask` opens a fresh
+session of its own, never shared with `edit`, because of #21 — the same root
+cause as #8, found again with a worse consequence once there were two
+different commands able to land in the same session.
 
 Item 13 is an observation without a reproduction, and says so. Items 14–19 came
 from a second pass made after reading `docs.superdocs.app` in full rather than
@@ -596,12 +715,13 @@ manualbuilder/
   superdocs.py           thin API client, no product decisions
   session.py             publish, the paired edit, approval, diagram swap
   verify.py              reading the pair back off the service and checking it
-  cli.py                 check / build / publish / edit / approve / sync /
-                         export / status / verify
+  cli.py                 check / build / publish / edit / ask / approve / sync
+                         / export / status / verify
 BUGS.md                  what broke on the live API while building this
 mb                       the command line, virtualenv taken care of
 selftest                 every check this project can run, in one command
-tests/                   119 tests, no network, plus one live test that is
+demo                     every subcommand, paced, for watching rather than proving
+tests/                   130 tests, no network, plus one live test that is
                          skipped unless asked for twice (a key, and a flag)
 ```
 

@@ -191,11 +191,11 @@ def test_a_different_step_is_never_mistaken_for_an_edited_one(spec):
     reported as drift -- or worse, as agreement."""
     rails = next(step for step in spec.quick_start() if step.id == "rails")
     others = [step.body for step in spec.quick_start() if step.id != "rails"]
-    best, score = vf._closest(rails.body, others)
+    best, score = vf.closest(rails.body, others)
     assert score < vf.MATCH, f"a different step scored {score:.2f}: {best[:60]!r}"
 
     edited = rails.body.replace("1.2", "1.6")
-    assert vf._closest(rails.body, [edited])[1] > vf.MATCH
+    assert vf.closest(rails.body, [edited])[1] > vf.MATCH
 
 
 def test_the_services_stylesheet_is_not_searched_for_document_text(spec):

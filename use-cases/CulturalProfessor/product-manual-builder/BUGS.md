@@ -13,7 +13,9 @@ checks them. Items 14–19 are from a deliberate second pass on **2026-08-12**,
 made after reading `https://docs.superdocs.app` end to end rather than working
 from `/openapi.json` alone. Item 20 is from **2026-08-13**, found while adding
 a test that parks and denies a real batch to prove the busy-session guard
-against the live service rather than a mock of it.
+against the live service rather than a mock of it. Item 21 is from
+**2026-08-14**, found by watching a real, narrated run of this build's own
+commands rather than by testing any one of them in isolation.
 
 They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
@@ -21,7 +23,7 @@ collects the same list.
 
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
-Items 1–7 are ranked by how much they cost me; 8–20 are appended in the order
+Items 1–7 are ranked by how much they cost me; 8–21 are appended in the order
 they turned up rather than renumbering the list. Item 13 is an observation
 without a reproduction, and says so.
 
@@ -882,6 +884,76 @@ of one assertion; see `tests/test_live_reentry.py`.
 `/v1/documents/export` deserves it in item 10 — a caller checking "is this
 session free yet" against the session's job list currently gets a
 plausible-looking wrong answer instead of an error.
+
+---
+
+## 21. A wrong answer in a session's memory steers a later, unrelated edit into fabricating content
+
+**Severity: high — a document can end up internally self-contradicting, and
+every guard in this build passes it anyway.**
+
+**What I did.** Built `ask`, a read-only command for asking one document a
+question, and had it reuse the same per-document session `edit` later uses —
+reasonable-looking at the time: one conversation per document, and a later
+`edit` might even benefit from remembering an earlier question. In the same
+session, in order: asked *"what is the rated laser wavelength, and what
+torque does the rail step call for?"*, then sent *"raise the rail torque to
+1.6 N·m."*
+
+**What I expected.** The question answered, then the rails step's own
+sentence — *"…then to 1.2 N·m with the 2.5 mm key"* — found and edited, the
+way the card's turn (a fresh session, sharing nothing) correctly did in the
+same run.
+
+**What happened.** The answer was wrong: *"the document does not specify a
+torque value for the rail steps"* — false, the sentence is right there in the
+step body. The very next turn, in that same session, took its own wrong
+answer at its word: it left that sentence untouched and instead **added a new
+row to the Specifications table**, `Rail step torque | 1.6 N·m`, that never
+existed in the source. Approved, the manual would have shipped reading 1.2
+N·m in the assembly instructions and 1.6 N·m in its own specifications table —
+disagreeing with itself, not just with the card — and every guard this build
+has would have passed it: `assert_touched_both_or_absent` only asks whether
+both documents proposed *something*, and `verify`'s pair check only compares
+the manual against the card, never a document against its own other page.
+Both are entirely correct at the job they check; neither was built to catch a
+document contradicting itself, because nothing before this suggested it
+needed to.
+
+I do not think the reasoning tier caused the wrong answer: the same question,
+asked fresh (see below), was answered correctly at `thinking_depth` `fast`,
+`balanced` and `deep` alike, all three times. The likelier explanation is
+ordinary sampling variance — an LLM can simply be wrong sometimes, on any
+tier — and that is precisely why this matters more, not less: the failure
+mode is not "use a smarter tier," it is "do not let one turn's mistake become
+the next turn's premise."
+
+**Reproduce.** In one session: ask a question whose true answer is a specific
+figure the document does state; get a wrong "not specified" answer to it;
+send an unrelated instruction that references the same figure into the same
+session; read what chunk the reply actually touched.
+
+**Cost to me.** About forty minutes — the wrong answer alone read as a
+plausible model slip; realizing the *next* turn had acted on it, in a
+document that would have quietly shipped self-contradicting, was the part
+worth the time.
+
+**Workaround.** `ask` now opens a session of its own for every call —
+`client.init_session([durable_id])`, never recorded on the publication — the
+same shape item 8 already forced onto `sync`'s diagram swap, for the same
+underlying reason. Re-run with the fix: the question was answered correctly,
+and the edit that followed found and updated a real sentence — this time the
+troubleshooting table's own *"re-torque the rails alternately to 1.2 N·m,"*
+which also legitimately shares the figure. Which real sentence a vague
+instruction lands on is the ambiguity item 4 already documents and review
+mode exists for; a *fabricated* sentence is not that, and is what this item is
+actually about.
+
+**Suggested fix.** This is the same request item 8 makes, sharper for having
+a second, worse consequence behind it: a per-turn way to scope a turn to the
+message and the document, ignoring session history, so an integrator does not
+have to discover — by shipping it — that a stray wrong answer earlier in a
+session can become a fabricated fact two turns later.
 
 ---
 

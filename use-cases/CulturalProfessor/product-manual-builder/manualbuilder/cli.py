@@ -26,6 +26,46 @@ LOCALES = Path("locales")
 OUT = Path("out")
 
 
+# ---------------------------------------------------------------- style --
+# Four codes, the same ones `selftest` and `demo` already use, so a color
+# means the same thing everywhere in this project: bold for a heading, dim
+# for something advisory, green for done, red for blocked or wrong. Gated on
+# `isatty()` so a redirected or piped run -- including every test, since
+# pytest's captured stdout is never a tty -- gets plain text, not escape
+# codes sitting in a log file.
+
+
+def _style(code: str, text: str) -> str:
+    return f"\033[{code}m{text}\033[0m" if sys.stdout.isatty() else text
+
+
+def _bold(text: str) -> str:
+    return _style("1", text)
+
+
+def _dim(text: str) -> str:
+    return _style("2", text)
+
+
+def _green(text: str) -> str:
+    return _style("32", text)
+
+
+def _red(text: str) -> str:
+    return _style("31", text)
+
+
+def _next(*lines: str) -> None:
+    """A suggestion for what to run next, styled the same way everywhere.
+
+    Not printed after every command -- only where a batch was just parked or
+    just applied, the two moments where "what do I do with this" is a real
+    question and not noise on top of an answer that already said everything.
+    """
+    for line in lines:
+        print(_dim(f"  next  {line}"))
+
+
 def _spec(args):
     return load_spec(args.spec)
 
@@ -59,11 +99,11 @@ def cmd_check(args) -> int:
     # The consistency claim, checked rather than trusted.
     for step in spec.quick_start():
         if step.body not in manual or step.body not in card:
-            print(f"  FAIL  step {step.id!r} differs between the two documents")
+            print(f"  {_red('FAIL')}  step {step.id!r} differs between the two documents")
             return 1
     for fault in spec.quick_start_troubleshooting():
         if fault.fix not in manual or fault.fix not in card:
-            print(f"  FAIL  fix {fault.id!r} differs between the two documents")
+            print(f"  {_red('FAIL')}  fix {fault.id!r} differs between the two documents")
             return 1
     print(
         f"card        {len(spec.quick_start_steps)} of {len(spec.steps)} steps and "
@@ -84,14 +124,14 @@ def cmd_check(args) -> int:
     for name, layout in layouts.items():
         unit = "page" if name == "manual" else "panel"
         for block_id, excess in layout.overflows():
-            print(f"  FAIL  {block_id} overruns its {unit} by {excess} lines")
+            print(f"  {_red('FAIL')}  {block_id} overruns its {unit} by {excess} lines")
             return 1
 
     failures = 0
     for language, localised in sorted(_locales(spec).items()):
         problem = _check_locale(spec, localised, language, layouts)
         if problem:
-            print(f"  FAIL  {problem}")
+            print(f"  {_red('FAIL')}  {problem}")
             failures += 1
             continue
         ratio = len(pj.manual_html(localised)) / len(manual)
@@ -104,7 +144,7 @@ def cmd_check(args) -> int:
             f"{ratio:.0%} of source, {1 - tightest:.0%} headroom"
         )
 
-    print("ok" if not failures else f"{failures} locale(s) would repaginate")
+    print(_green("ok") if not failures else _red(f"{failures} locale(s) would repaginate"))
     return 1 if failures else 0
 
 
@@ -180,7 +220,10 @@ def cmd_build(args) -> int:
         )
 
     print(f"{written} diagrams and {len(documents)} documents in {OUT}/")
-    print(f"open {OUT}/manual.preview.html to see where the pages break")
+    _next(
+        f"open {OUT}/manual.preview.html to see where the pages break",
+        "manualbuilder publish (needs a key) to put these on the service",
+    )
     return 0
 
 
@@ -351,12 +394,18 @@ def cmd_publish(args) -> int:
         published = session.publish(client, spec, language=args.language)
     path = _save(published, args.language)
     for document_id in published.document_ids:
-        print(
-            f"{published.name_for(document_id):<16} {document_id}  "
-            f"in {published.sessions[document_id]}"
-        )
+        # Padded before it is coloured: an escape code has visible width to
+        # `str.format`, which does not know it is not a printed character, so
+        # colouring a value first and padding it second misaligns every
+        # column after it in a real terminal.
+        name = f"{published.name_for(document_id):<16}"
+        print(f"{_bold(name)} {document_id}  in {published.sessions[document_id]}")
     print(f"images  {len(published.images)} uploaded")
-    print(f"\nwritten to {path}; `edit`, `sync` and `export` read it from there.")
+    print(f"\nwritten to {path}")
+    _next(
+        'manualbuilder ask "…" to explore a document before changing it',
+        'manualbuilder edit "…" to propose a wording change to both',
+    )
     return 0
 
 
@@ -370,11 +419,15 @@ def cmd_edit(args) -> int:
 
         if not changes:
             print("the turn proposed no changes.")
+            _next(
+                'manualbuilder ask "…" to see what the document currently says',
+                "a more specific instruction, if the fact is there and was missed",
+            )
             return 0
 
         grouped = session.changes_by_document(published, changes)
         for document_id, items in grouped.items():
-            print(f"\n{published.name_for(document_id)} — {len(items)} change(s)")
+            print(f"\n{_bold(f'{published.name_for(document_id)} — {len(items)} change(s)')}")
             for change in items:
                 print(f"  [{change.operation}] {change.change_id}")
                 print(f"    chunk {change.chunk_id}")
@@ -384,20 +437,66 @@ def cmd_edit(args) -> int:
                     print(f"    why: {change.explanation[:150]}")
 
         try:
-            session.assert_touched_both(published, changes)
+            excused = session.assert_touched_both_or_absent(client, published, changes)
         except SuperDocsError as exc:
-            print(f"\nREFUSED: {exc}")
+            print(f"\n{_red('REFUSED')}: {exc}")
             return 1
+        for document_id in excused:
+            print(
+                "\n"
+                + _dim(
+                    f"{published.name_for(document_id)} was not required to change -- "
+                    f"nothing in it currently resembles what changed elsewhere."
+                )
+            )
 
         path = _save_proposal(published, changes)
         if not args.yes:
             print(f"\nnothing approved. {path} holds the batch:")
-            print("  manualbuilder approve            — apply all of it")
-            print("  manualbuilder approve --reject ID — apply the rest")
+            _next(
+                "manualbuilder approve             to apply all of it",
+                "manualbuilder approve --reject ID to apply the rest",
+            )
             return 0
 
         results = session.approve_all(client, published, changes)
-        print(f"\napproved {len(changes)} change(s) across {len(results)} turn(s)")
+        print(f"\n{_green(f'approved {len(changes)} change(s) across {len(results)} turn(s)')}")
+        _next(
+            "manualbuilder verify to confirm it landed the same way in both documents",
+            "manualbuilder export --format html for the finished pair",
+        )
+    return 0
+
+
+def cmd_ask(args) -> int:
+    """Ask one document a question. Nothing is proposed, nothing applied.
+
+    `edit` is the wrong shape for this: it always targets the pair, so a
+    question about just the manual would needlessly cost a second turn
+    against the card, and it only ever looks at proposed changes -- a plain
+    answer is fetched off the API and thrown away there. This asks one
+    document and prints what it said.
+    """
+    from manualbuilder.superdocs import SuperDocs
+
+    published = _load(args)
+    document_id = published.card_id if args.document == "card" else published.manual_id
+    with _client() as client:
+        reply = session.ask(client, published, document_id, args.question)
+
+    print(reply.get("response") or "(the service returned no response text)")
+
+    changes = SuperDocs.pending_changes(reply)
+    if changes:
+        print(
+            "\n"
+            + _dim(
+                f"note: this also proposed {len(changes)} change(s). `ask` does not "
+                f"apply them -- the synchronous endpoint's proposals can never be "
+                f"approved. Run `edit` with the same wording if you meant to change "
+                f"something."
+            )
+        )
     return 0
 
 
@@ -457,9 +556,9 @@ def cmd_approve(args) -> int:
             denied = session.discard_outstanding(client, published)
         path.unlink(missing_ok=True)
         print(
-            f"denied {denied} proposed change(s); the session is free for the next edit"
+            _green(f"denied {denied} proposed change(s); the session is free for the next edit")
             if denied
-            else "nothing was parked; the session is free"
+            else _green("nothing was parked; the session is free")
         )
         return 0
 
@@ -487,15 +586,20 @@ def cmd_approve(args) -> int:
         try:
             results = session.approve_all(client, published, changes, reject=reject)
         except SuperDocsError as exc:
-            print(f"REFUSED: {exc}", file=sys.stderr)
+            print(f"{_red('REFUSED')}: {exc}", file=sys.stderr)
             return 1
 
     for change in changes:
-        verdict = "rejected" if change.change_id in reject else "approved"
+        rejected = change.change_id in reject
+        verdict = _red("rejected") if rejected else _green("approved")
         print(f"  {verdict}  {change.change_id}  {published.name_for(change.document_id or '')}")
     print(
         f"\n{len(changes) - len(reject)} approved, {len(reject)} rejected, "
         f"across {len(results)} turn(s)"
+    )
+    _next(
+        "manualbuilder verify to confirm it landed the same way in both documents",
+        "manualbuilder export --format html for the finished pair",
     )
     path.unlink()  # a batch is applied once; a stale one is a trap
     return 0
@@ -535,11 +639,8 @@ def cmd_sync(args) -> int:
             session.assert_only_the_image_changed(changes, expected)
             session.assert_every_figure_swapped(changes, asked)
         except SuperDocsError as exc:
-            print(f"\nREFUSED: {exc}")
-            print(
-                "nothing was approved, and the batch is still parked. "
-                "`approve --discard` frees the session."
-            )
+            print(f"\n{_red('REFUSED')}: {exc}")
+            _next("manualbuilder approve --discard to free the session; nothing was applied")
             return 1
 
         for change in changes:
@@ -551,11 +652,13 @@ def cmd_sync(args) -> int:
 
         path = _save_proposal(published, changes)
         if not args.yes:
-            print(f"nothing approved. {path} holds the batch; `approve` applies it.")
+            print(f"nothing approved. {path} holds the batch.")
+            _next("manualbuilder approve to apply it")
             return 0
 
         results = session.approve_all(client, published, changes)
-        print(f"approved {len(changes)} swap(s) across {len(results)} turn(s)")
+        print(_green(f"approved {len(changes)} swap(s) across {len(results)} turn(s)"))
+        _next("manualbuilder verify to confirm the pair still agrees, pointing at the new diagrams")
     path.unlink(missing_ok=True)
     return 0
 
@@ -601,7 +704,7 @@ def cmd_status(args) -> int:
     nothing about the error names the batch. This does.
     """
     published = _load(args)
-    print(f"{'document':<16} {'id':<16} session")
+    print(_bold(f"{'document':<16} {'id':<16} session"))
     for document_id in published.document_ids:
         print(
             f"{published.name_for(document_id):<16} {document_id:<16} "
@@ -629,12 +732,15 @@ def cmd_status(args) -> int:
                 )
     if blocked:
         print(
-            f"\n{blocked} batch(es) parked. A parked batch holds its session, so "
-            f"`approve`\nor `approve --discard` has to happen before any other "
-            f"edit in it."
+            "\n"
+            + _red(
+                f"{blocked} batch(es) parked. A parked batch holds its session, so "
+                f"`approve`\nor `approve --discard` has to happen before any other "
+                f"edit in it."
+            )
         )
     else:
-        print("\nnothing parked; both sessions are free for the next edit.")
+        print("\n" + _green("nothing parked; both sessions are free for the next edit."))
     return 0
 
 
@@ -704,22 +810,31 @@ def cmd_verify(args) -> int:
 
     findings = vf.verify(served, published.images, spec)
     for finding in findings:
-        print(f"  {finding.status:<4} {finding.check:<34} {finding.detail}")
+        # Padded before it is coloured, same reason as `publish`'s document
+        # column: an escape code has visible width to `str.format`.
+        colored = {vf.FAIL: _red, vf.OK: _green}.get(finding.status, _dim)
+        status = colored(f"{finding.status:<4}")
+        print(f"  {status} {finding.check:<34} {finding.detail}")
 
     bad = vf.failed(findings)
     moot = [f for f in findings if f.status == vf.MOOT]
-    print(
-        f"\n{len(findings) - len(bad) - len(moot)} passed, {len(bad)} failed"
-        + (f", {len(moot)} no longer checkable" if moot else "")
+    summary = f"{len(findings) - len(bad) - len(moot)} passed, {len(bad)} failed" + (
+        f", {len(moot)} no longer checkable" if moot else ""
     )
+    print(f"\n{summary}" if bad else f"\n{_green(summary)}")
     if bad:
-        print("\nthe documents on the service are not what this program recorded publishing.")
+        print(
+            "\n"
+            + _red("the documents on the service are not what this program recorded publishing.")
+        )
+        _next("manualbuilder status to see what, if anything, is parked and blocking a fix")
         return 1
     print(
         "every figure points at the drawing uploaded for it, and every "
         "instruction\nthe card shares with the manual is word for word the same "
         "in both."
     )
+    _next("manualbuilder export --format html for the finished pair")
     return 0
 
 
@@ -756,6 +871,16 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="approve the proposed changes; without it, nothing is applied",
     )
+    ask = sub.add_parser("ask", help="ask one document a question; nothing is proposed or applied")
+    ask.add_argument("question")
+    _published_args(ask)
+    ask.add_argument(
+        "--document",
+        choices=("manual", "card"),
+        default="manual",
+        help="which document to ask (default: manual)",
+    )
+
     approve = sub.add_parser(
         "approve", help="apply the batch `edit` proposed, minus what you reject"
     )
@@ -799,6 +924,7 @@ def main(argv: list[str] | None = None) -> int:
         "build": cmd_build,
         "publish": cmd_publish,
         "edit": cmd_edit,
+        "ask": cmd_ask,
         "approve": cmd_approve,
         "sync": cmd_sync,
         "export": cmd_export,
