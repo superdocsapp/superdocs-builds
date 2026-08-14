@@ -1,0 +1,149 @@
+[
+  {
+    "timestamp": "2026-08-14T08:18:12.249512Z",
+    "mode": "sample",
+    "article_count": 3,
+    "article_ids": [
+      "art-001",
+      "art-002",
+      "art-003"
+    ],
+    "change_count": 6,
+    "steps": [
+      {
+        "step": "find_affected",
+        "seconds": 0.0022,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "propose_edits",
+        "seconds": 0.0017,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "flag_screenshots",
+        "seconds": 0.0015,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "score_freshness",
+        "seconds": 0.0024,
+        "cost_usd": 0.0
+      }
+    ],
+    "total_seconds": 0.0079,
+    "total_cost_usd": 0.0,
+    "spend_cap_usd": 0.0,
+    "portfolio_freshness_score": 17.6,
+    "affected_pairs": 3,
+    "could_not_assess_pairs": 0
+  },
+  {
+    "timestamp": "2026-08-14T08:19:01.631486+00:00",
+    "mode": "full",
+    "article_count": 18,
+    "article_ids": [
+      "art-001",
+      "art-002",
+      "art-003",
+      "art-004",
+      "art-005",
+      "art-006",
+      "art-007",
+      "art-008",
+      "art-009",
+      "art-010",
+      "art-011",
+      "art-012",
+      "art-013",
+      "art-014",
+      "art-015",
+      "art-016",
+      "art-017",
+      "art-018"
+    ],
+    "change_count": 6,
+    "steps": [
+      {
+        "step": "find_affected",
+        "seconds": 0.0024,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "propose_edits",
+        "seconds": 0.0017,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "flag_screenshots",
+        "seconds": 0.002,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "score_freshness",
+        "seconds": 0.0024,
+        "cost_usd": 0.0
+      }
+    ],
+    "total_seconds": 0.0086,
+    "total_cost_usd": 0.0,
+    "spend_cap_usd": 0.0,
+    "portfolio_freshness_score": 36.6,
+    "affected_pairs": 15,
+    "could_not_assess_pairs": 2
+  },
+  {
+    "timestamp": "2026-08-14T08:40:08.371419+00:00",
+    "mode": "full",
+    "article_count": 18,
+    "article_ids": [
+      "art-001",
+      "art-002",
+      "art-003",
+      "art-004",
+      "art-005",
+      "art-006",
+      "art-007",
+      "art-008",
+      "art-009",
+      "art-010",
+      "art-011",
+      "art-012",
+      "art-013",
+      "art-014",
+      "art-015",
+      "art-016",
+      "art-017",
+      "art-018"
+    ],
+    "change_count": 6,
+    "steps": [
+      {
+        "step": "find_affected",
+        "seconds": 0.0021,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "propose_edits",
+        "seconds": 0.0015,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "flag_screenshots",
+        "seconds": 0.0023,
+        "cost_usd": 0.0
+      },
+      {
+        "step": "score_freshness",
+        "seconds": 0.0035,
+        "cost_usd": 0.0
+      }
+    ],
+    "total_seconds": 0.0095,
+    "total_cost_usd": 0.0,
+    "spend_cap_usd": 0.0,
+    "portfolio_freshness_score": 36.6,
+    "affected_pairs": 15,
+    "could_not_assess_pairs": 2
+  }
+]

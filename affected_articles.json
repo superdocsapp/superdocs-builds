@@ -1,0 +1,310 @@
+{
+  "generated_at": "2026-08-14T08:40:08.361981+00:00",
+  "method": "Semantic review performed by Claude (Claude Code) while authoring the corpus, encoded here as static rules with quoted evidence -- no external LLM API calls happen at run time. Matching includes paraphrased/implied mentions that share no keyword with the change (see mention_type=indirect).",
+  "changes_evaluated": 6,
+  "articles_in_scope": [
+    "art-001",
+    "art-002",
+    "art-003",
+    "art-004",
+    "art-005",
+    "art-006",
+    "art-007",
+    "art-008",
+    "art-009",
+    "art-010",
+    "art-011",
+    "art-012",
+    "art-013",
+    "art-014",
+    "art-015",
+    "art-016",
+    "art-017",
+    "art-018"
+  ],
+  "results": [
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "affected_articles": [
+        {
+          "article_id": "art-003",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "evidence": "each key can make up to 100 requests per minute across all endpoints",
+          "rationale": "States the exact old limit that the change replaces.",
+          "article_title": "Understanding API Rate Limits"
+        },
+        {
+          "article_id": "art-004",
+          "mention_type": "indirect",
+          "confidence": 0.78,
+          "evidence": "if you're building a high-volume integration and start seeing frequent 429 responses, consider spreading requests across a longer window or batching calls",
+          "rationale": "Assumes 429s are common enough to require batching advice; that assumption is calibrated to the old 100/min ceiling and reads as overly cautious once the limit is 500/min. No number or the phrase 'rate limit' appears.",
+          "article_title": "Generating and Managing API Keys"
+        },
+        {
+          "article_id": "art-005",
+          "mention_type": "indirect",
+          "confidence": 0.68,
+          "evidence": "if you're checking for updates more than once every second or two, you're a good candidate for webhooks instead of polling",
+          "rationale": "The polling threshold implicitly reflects the old per-minute budget. Still technically safe advice, but understates how much headroom exists under the new limit.",
+          "article_title": "Troubleshooting Common API Errors"
+        }
+      ],
+      "could_not_assess": [
+        {
+          "change_id": "chg-01",
+          "article_id": "art-006",
+          "confidence": 0.4,
+          "evidence": "Enterprise includes custom contracts, dedicated support, SSO, and elevated API throughput beyond the standard per-key limit",
+          "reason": "Enterprise throughput is described as custom/negotiated and only 'beyond the standard limit' -- unclear whether raising the standard 100->500 limit changes what 'elevated' means here, or whether Enterprise numbers are independent. Needs a human (or a source-of-truth on Enterprise contracts) to resolve.",
+          "article_title": "Billing and Subscription Plans Overview"
+        }
+      ],
+      "unaffected_articles": [
+        "art-001",
+        "art-002",
+        "art-007",
+        "art-008",
+        "art-009",
+        "art-010",
+        "art-011",
+        "art-012",
+        "art-013",
+        "art-014",
+        "art-015",
+        "art-016",
+        "art-017",
+        "art-018"
+      ]
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "affected_articles": [
+        {
+          "article_id": "art-011",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "evidence": "click the 'Export' button in the top toolbar",
+          "rationale": "Names the exact button label being renamed.",
+          "article_title": "Exporting Your Data"
+        },
+        {
+          "article_id": "art-012",
+          "mention_type": "direct",
+          "confidence": 0.9,
+          "evidence": "uses the same generation process as clicking the export icon in the toolbar yourself",
+          "rationale": "Refers back to the same toolbar control by its current (soon-to-be-old) name.",
+          "article_title": "Scheduling Automated Exports"
+        },
+        {
+          "article_id": "art-017",
+          "mention_type": "direct",
+          "confidence": 0.85,
+          "evidence": "click the export icon at the top of the log to save the filtered results as a CSV file",
+          "rationale": "A second, easy-to-miss instance of the same UI element in a different article -- the rename is app-wide, not just on the Exporting Your Data page.",
+          "article_title": "Understanding Audit Logs"
+        }
+      ],
+      "could_not_assess": [],
+      "unaffected_articles": [
+        "art-001",
+        "art-002",
+        "art-003",
+        "art-004",
+        "art-005",
+        "art-006",
+        "art-007",
+        "art-008",
+        "art-009",
+        "art-010",
+        "art-013",
+        "art-014",
+        "art-015",
+        "art-016",
+        "art-018"
+      ]
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "affected_articles": [
+        {
+          "article_id": "art-006",
+          "mention_type": "direct",
+          "confidence": 0.97,
+          "evidence": "it includes core features, community support, and 5GB of cloud storage per team",
+          "rationale": "States the exact old Starter storage figure.",
+          "article_title": "Billing and Subscription Plans Overview"
+        },
+        {
+          "article_id": "art-007",
+          "mention_type": "indirect",
+          "confidence": 0.75,
+          "evidence": "dropping down to the smaller allowance on the entry-level plan could put you over the cap",
+          "rationale": "Warns that downgrading is risky because Starter storage is small; that risk is much lower once Starter is 20GB. No number is stated.",
+          "article_title": "Upgrading or Downgrading Your Plan"
+        },
+        {
+          "article_id": "art-013",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "evidence": "On the Starter plan, this allowance is 5GB per team",
+          "rationale": "States the exact old Starter storage figure.",
+          "article_title": "Managing Storage and File Limits"
+        }
+      ],
+      "could_not_assess": [],
+      "unaffected_articles": [
+        "art-001",
+        "art-002",
+        "art-003",
+        "art-004",
+        "art-005",
+        "art-008",
+        "art-009",
+        "art-010",
+        "art-011",
+        "art-012",
+        "art-014",
+        "art-015",
+        "art-016",
+        "art-017",
+        "art-018"
+      ]
+    },
+    {
+      "change_id": "chg-04",
+      "change_title": "Legacy Webhook v1 Retirement",
+      "affected_articles": [
+        {
+          "article_id": "art-009",
+          "mention_type": "direct",
+          "confidence": 0.97,
+          "evidence": "Endpoints created under our legacy v1 system receive unsigned XML payloads ... Both formats are currently supported side by side",
+          "rationale": "Explicitly names v1 and states it is still supported, which becomes false once v1 is retired.",
+          "article_title": "Webhook Event Payload Reference"
+        },
+        {
+          "article_id": "art-010",
+          "mention_type": "indirect",
+          "confidence": 0.8,
+          "evidence": "you may still be pointed at our original webhook endpoint format from early in Cascade's history -- these older connections continue to function for now",
+          "rationale": "Describes v1 without ever naming it, and asserts it 'continues to function' -- exactly the claim the retirement invalidates.",
+          "article_title": "Integrating with Third-Party Apps"
+        }
+      ],
+      "could_not_assess": [],
+      "unaffected_articles": [
+        "art-001",
+        "art-002",
+        "art-003",
+        "art-004",
+        "art-005",
+        "art-006",
+        "art-007",
+        "art-008",
+        "art-011",
+        "art-012",
+        "art-013",
+        "art-014",
+        "art-015",
+        "art-016",
+        "art-017",
+        "art-018"
+      ]
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "affected_articles": [
+        {
+          "article_id": "art-001",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "evidence": "the link is single-use and expires 24 hours after it's sent",
+          "rationale": "States the exact old expiration window.",
+          "article_title": "Resetting Your Password"
+        },
+        {
+          "article_id": "art-002",
+          "mention_type": "indirect",
+          "confidence": 0.82,
+          "evidence": "the reset link sent to your inbox will stay active for a while after it's issued, so there's no need to rush back to your email the moment you request it",
+          "rationale": "Directly contradicts the new 1-hour window ('no need to rush') without ever stating a duration -- an unusually sharp example of an implied mention going stale.",
+          "article_title": "Setting Up Two-Factor Authentication"
+        }
+      ],
+      "could_not_assess": [
+        {
+          "change_id": "chg-05",
+          "article_id": "art-016",
+          "confidence": 0.35,
+          "evidence": "Once SSO is enabled, you can require it for all members, which disables password-based sign-in for your workspace",
+          "reason": "SSO-enforced workspaces disable password sign-in entirely, so the reset-link expiration change may be moot for this article's audience -- but it's a judgment call on scope, not a clear factual error, so it's not asserted as affected.",
+          "article_title": "Setting Up Single Sign-On (SSO)"
+        }
+      ],
+      "unaffected_articles": [
+        "art-003",
+        "art-004",
+        "art-005",
+        "art-006",
+        "art-007",
+        "art-008",
+        "art-009",
+        "art-010",
+        "art-011",
+        "art-012",
+        "art-013",
+        "art-014",
+        "art-015",
+        "art-017",
+        "art-018"
+      ]
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "affected_articles": [
+        {
+          "article_id": "art-014",
+          "mention_type": "indirect",
+          "confidence": 0.8,
+          "evidence": "Anyone you invite as an Editor today can create, modify, and delete any content in the workspace ... Editors currently have broad, unrestricted content permissions",
+          "rationale": "Describes the pre-split, all-or-nothing Editor role and never uses the word 'Contributor' or states a role count -- purely behavioral description that goes stale once the role splits.",
+          "article_title": "Managing Team Members and Roles"
+        },
+        {
+          "article_id": "art-015",
+          "mention_type": "direct",
+          "confidence": 0.98,
+          "evidence": "Cascade currently has four permission levels: Owner, Admin, Editor, and Viewer ... there currently isn't a role that draws that distinction",
+          "rationale": "States the exact old role count/list and explicitly claims the gap that the new Contributor role fills no longer exists.",
+          "article_title": "Understanding Permission Levels"
+        }
+      ],
+      "could_not_assess": [],
+      "unaffected_articles": [
+        "art-001",
+        "art-002",
+        "art-003",
+        "art-004",
+        "art-005",
+        "art-006",
+        "art-007",
+        "art-008",
+        "art-009",
+        "art-010",
+        "art-011",
+        "art-012",
+        "art-013",
+        "art-016",
+        "art-017",
+        "art-018"
+      ]
+    }
+  ]
+}

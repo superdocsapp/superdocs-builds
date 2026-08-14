@@ -1,0 +1,283 @@
+{
+  "generated_at": "2026-08-14T08:40:08.365537+00:00",
+  "flag_threshold": 0.55,
+  "screenshot_assessments": [
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-003",
+      "article_title": "Understanding API Rate Limits",
+      "screenshot_filename": "api-rate-limit-dashboard.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.9,
+      "rationale": "Dashboard screenshot almost certainly renders the numeric per-key rate limit somewhere in the UI."
+    },
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-004",
+      "article_title": "Generating and Managing API Keys",
+      "screenshot_filename": "api-keys-management-page.png",
+      "mention_type": "indirect",
+      "flagged": true,
+      "confidence": 0.55,
+      "rationale": "Key management page may show a per-key quota figure next to each key; moderate confidence only, no explicit description of the number being visible."
+    },
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-005",
+      "article_title": "Troubleshooting Common API Errors",
+      "screenshot_filename": "api-error-response-console.png",
+      "mention_type": "indirect",
+      "flagged": false,
+      "confidence": 0.2,
+      "rationale": "Console/error screenshot shows a 429 response, not the numeric rate limit itself."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-011",
+      "article_title": "Exporting Your Data",
+      "screenshot_filename": "export-button-toolbar.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.97,
+      "rationale": "Screenshot filename and caption are literally of the toolbar button being relabeled."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-012",
+      "article_title": "Scheduling Automated Exports",
+      "screenshot_filename": "scheduled-exports-list.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.6,
+      "rationale": "List view of scheduled exports likely shows the export/download icon in a column or row action menu."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-017",
+      "article_title": "Understanding Audit Logs",
+      "screenshot_filename": "audit-log-table-view.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.55,
+      "rationale": "Audit log table view may include the export/download icon in its header toolbar."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-006",
+      "article_title": "Billing and Subscription Plans Overview",
+      "screenshot_filename": "billing-plans-comparison-table.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.85,
+      "rationale": "Plan comparison table almost certainly renders the storage figure as a table cell."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-007",
+      "article_title": "Upgrading or Downgrading Your Plan",
+      "screenshot_filename": "plan-change-confirmation-modal.png",
+      "mention_type": "indirect",
+      "flagged": false,
+      "confidence": 0.25,
+      "rationale": "Confirmation modal most likely just names the plan being switched to, not its storage allowance."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-013",
+      "article_title": "Managing Storage and File Limits",
+      "screenshot_filename": "storage-usage-meter.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.9,
+      "rationale": "Usage meter screenshots typically render the cap value in the label or tooltip (e.g. 'X of 5GB used')."
+    },
+    {
+      "change_id": "chg-04",
+      "change_title": "Legacy Webhook v1 Retirement",
+      "article_id": "art-009",
+      "article_title": "Webhook Event Payload Reference",
+      "screenshot_filename": "webhook-payload-json-example.png",
+      "mention_type": "direct",
+      "flagged": false,
+      "confidence": 0.15,
+      "rationale": "The example shown is the v2 JSON payload, which stays accurate after v1 is retired -- the stale claim is in the surrounding text, not the image."
+    },
+    {
+      "change_id": "chg-04",
+      "change_title": "Legacy Webhook v1 Retirement",
+      "article_id": "art-010",
+      "article_title": "Integrating with Third-Party Apps",
+      "screenshot_filename": "integrations-marketplace-grid.png",
+      "mention_type": "indirect",
+      "flagged": false,
+      "confidence": 0.1,
+      "rationale": "Marketplace grid of integration logos is not tied to any specific webhook payload format."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-001",
+      "article_title": "Resetting Your Password",
+      "screenshot_filename": "password-reset-email-link.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.75,
+      "rationale": "Email screenshot plausibly shows the stated validity window ('this link expires in...') in the email body."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-002",
+      "article_title": "Setting Up Two-Factor Authentication",
+      "screenshot_filename": "2fa-setup-qr-code.png",
+      "mention_type": "indirect",
+      "flagged": false,
+      "confidence": 0.1,
+      "rationale": "QR code screenshot for 2FA setup is unrelated to password reset link timing."
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "article_id": "art-014",
+      "article_title": "Managing Team Members and Roles",
+      "screenshot_filename": "team-members-role-list.png",
+      "mention_type": "indirect",
+      "flagged": true,
+      "confidence": 0.65,
+      "rationale": "Role list/dropdown screenshot likely enumerates role names, which gains a new 'Contributor' entry."
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "article_id": "art-015",
+      "article_title": "Understanding Permission Levels",
+      "screenshot_filename": "permission-levels-diagram.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.9,
+      "rationale": "The screenshot is a diagram of the permission hierarchy itself, so it directly depicts the role being added."
+    }
+  ],
+  "flagged_for_update": [
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-003",
+      "article_title": "Understanding API Rate Limits",
+      "screenshot_filename": "api-rate-limit-dashboard.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.9,
+      "rationale": "Dashboard screenshot almost certainly renders the numeric per-key rate limit somewhere in the UI."
+    },
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-004",
+      "article_title": "Generating and Managing API Keys",
+      "screenshot_filename": "api-keys-management-page.png",
+      "mention_type": "indirect",
+      "flagged": true,
+      "confidence": 0.55,
+      "rationale": "Key management page may show a per-key quota figure next to each key; moderate confidence only, no explicit description of the number being visible."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-011",
+      "article_title": "Exporting Your Data",
+      "screenshot_filename": "export-button-toolbar.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.97,
+      "rationale": "Screenshot filename and caption are literally of the toolbar button being relabeled."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-012",
+      "article_title": "Scheduling Automated Exports",
+      "screenshot_filename": "scheduled-exports-list.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.6,
+      "rationale": "List view of scheduled exports likely shows the export/download icon in a column or row action menu."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-017",
+      "article_title": "Understanding Audit Logs",
+      "screenshot_filename": "audit-log-table-view.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.55,
+      "rationale": "Audit log table view may include the export/download icon in its header toolbar."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-006",
+      "article_title": "Billing and Subscription Plans Overview",
+      "screenshot_filename": "billing-plans-comparison-table.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.85,
+      "rationale": "Plan comparison table almost certainly renders the storage figure as a table cell."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-013",
+      "article_title": "Managing Storage and File Limits",
+      "screenshot_filename": "storage-usage-meter.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.9,
+      "rationale": "Usage meter screenshots typically render the cap value in the label or tooltip (e.g. 'X of 5GB used')."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-001",
+      "article_title": "Resetting Your Password",
+      "screenshot_filename": "password-reset-email-link.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.75,
+      "rationale": "Email screenshot plausibly shows the stated validity window ('this link expires in...') in the email body."
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "article_id": "art-014",
+      "article_title": "Managing Team Members and Roles",
+      "screenshot_filename": "team-members-role-list.png",
+      "mention_type": "indirect",
+      "flagged": true,
+      "confidence": 0.65,
+      "rationale": "Role list/dropdown screenshot likely enumerates role names, which gains a new 'Contributor' entry."
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "article_id": "art-015",
+      "article_title": "Understanding Permission Levels",
+      "screenshot_filename": "permission-levels-diagram.png",
+      "mention_type": "direct",
+      "flagged": true,
+      "confidence": 0.9,
+      "rationale": "The screenshot is a diagram of the permission hierarchy itself, so it directly depicts the role being added."
+    }
+  ]
+}
