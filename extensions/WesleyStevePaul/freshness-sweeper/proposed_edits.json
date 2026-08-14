@@ -1,0 +1,187 @@
+{
+  "generated_at": "2026-08-14T09:15:46.598560+00:00",
+  "edit_count": 15,
+  "edits": [
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-003",
+      "article_title": "Understanding API Rate Limits",
+      "mention_type": "direct",
+      "confidence": 0.99,
+      "current_sentence": "Currently, each key can make up to 100 requests per minute across all endpoints.",
+      "suggested_sentence": "Currently, each key can make up to 500 requests per minute across all endpoints.",
+      "instruction": "Replace '100 requests per minute' with '500 requests per minute'."
+    },
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-004",
+      "article_title": "Generating and Managing API Keys",
+      "mention_type": "indirect",
+      "confidence": 0.78,
+      "current_sentence": "consider spreading requests across a longer window or batching calls rather than firing them all at once",
+      "suggested_sentence": "consider spreading requests across a longer window or batching calls rather than firing them all at once — though most integrations have plenty of headroom under the current 500-request-per-minute default",
+      "instruction": "Append a clause noting the higher default limit so the batching advice doesn't read as overly cautious."
+    },
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-005",
+      "article_title": "Troubleshooting Common API Errors",
+      "mention_type": "indirect",
+      "confidence": 0.68,
+      "current_sentence": "if you're checking for updates more than once every second or two, you're a good candidate for webhooks instead of polling",
+      "suggested_sentence": "if you're checking for updates more than a few times per second, you're a good candidate for webhooks instead of polling",
+      "instruction": "Loosen the polling threshold to reflect the new, higher per-key throughput ceiling."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-011",
+      "article_title": "Exporting Your Data",
+      "mention_type": "direct",
+      "confidence": 0.99,
+      "current_sentence": "click the 'Export' button in the top toolbar",
+      "suggested_sentence": "click the 'Download' button in the top toolbar",
+      "instruction": "Replace 'Export' with 'Download' (button label) throughout this article."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-012",
+      "article_title": "Scheduling Automated Exports",
+      "mention_type": "direct",
+      "confidence": 0.9,
+      "current_sentence": "uses the same generation process as clicking the export icon in the toolbar yourself",
+      "suggested_sentence": "uses the same generation process as clicking the Download icon in the toolbar yourself",
+      "instruction": "Replace 'export icon' with 'Download icon' to match the renamed toolbar action."
+    },
+    {
+      "change_id": "chg-02",
+      "change_title": "\"Export\" Renamed to \"Download\"",
+      "article_id": "art-017",
+      "article_title": "Understanding Audit Logs",
+      "mention_type": "direct",
+      "confidence": 0.85,
+      "current_sentence": "click the export icon at the top of the log to save the filtered results as a CSV file",
+      "suggested_sentence": "click the Download icon at the top of the log to save the filtered results as a CSV file",
+      "instruction": "Replace 'export icon' with 'Download icon' to match the renamed toolbar action."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-006",
+      "article_title": "Billing and Subscription Plans Overview",
+      "mention_type": "direct",
+      "confidence": 0.97,
+      "current_sentence": "it includes core features, community support, and 5GB of cloud storage per team",
+      "suggested_sentence": "it includes core features, community support, and 20GB of cloud storage per team",
+      "instruction": "Replace '5GB' with '20GB' in the Starter plan description."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-007",
+      "article_title": "Upgrading or Downgrading Your Plan",
+      "mention_type": "indirect",
+      "confidence": 0.75,
+      "current_sentence": "dropping down to the smaller allowance on the entry-level plan could put you over the cap, and you'll need to free up space or archive old exports first",
+      "suggested_sentence": "the entry-level plan's allowance is now large enough that this is rarely an issue, but it's still worth checking your usage before downgrading",
+      "instruction": "Soften the downgrade warning now that the Starter allowance is 20GB instead of 5GB."
+    },
+    {
+      "change_id": "chg-03",
+      "change_title": "Starter Plan Storage Limit Increase",
+      "article_id": "art-013",
+      "article_title": "Managing Storage and File Limits",
+      "mention_type": "direct",
+      "confidence": 0.99,
+      "current_sentence": "On the Starter plan, this allowance is 5GB per team",
+      "suggested_sentence": "On the Starter plan, this allowance is 20GB per team",
+      "instruction": "Replace '5GB' with '20GB'."
+    },
+    {
+      "change_id": "chg-04",
+      "change_title": "Legacy Webhook v1 Retirement",
+      "article_id": "art-009",
+      "article_title": "Webhook Event Payload Reference",
+      "mention_type": "direct",
+      "confidence": 0.97,
+      "current_sentence": "Both formats are currently supported side by side, so if you set up your integration a while ago, check which delivery format your endpoint is using before assuming your parsing logic matches what we now recommend for new integrations.",
+      "suggested_sentence": "v1 has been retired and no longer delivers events -- any integration still receiving XML payloads must migrate to v2 before the cutover date or it will stop receiving webhooks.",
+      "instruction": "Replace the 'both formats are currently supported side by side' sentence with a statement that v1 is retired."
+    },
+    {
+      "change_id": "chg-04",
+      "change_title": "Legacy Webhook v1 Retirement",
+      "article_id": "art-010",
+      "article_title": "Integrating with Third-Party Apps",
+      "mention_type": "indirect",
+      "confidence": 0.8,
+      "current_sentence": "these older connections continue to function for now, but we recommend checking your integration's documentation to confirm it's using our currently recommended delivery method, since older formats are being phased out over time",
+      "suggested_sentence": "these older connections have been retired and no longer deliver events — confirm your integration has migrated to our current (v2) webhook format",
+      "instruction": "Change 'continue to function for now' to state plainly that the legacy format has been retired."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-001",
+      "article_title": "Resetting Your Password",
+      "mention_type": "direct",
+      "confidence": 0.99,
+      "current_sentence": "the link is single-use and expires 24 hours after it's sent",
+      "suggested_sentence": "the link is single-use and expires 1 hour after it's sent",
+      "instruction": "Replace '24 hours' with '1 hour'."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-002",
+      "article_title": "Setting Up Two-Factor Authentication",
+      "mention_type": "indirect",
+      "confidence": 0.82,
+      "current_sentence": "the reset link sent to your inbox will stay active for a while after it's issued, so there's no need to rush back to your email the moment you request it",
+      "suggested_sentence": "the reset link sent to your inbox expires within an hour, so check your email and use it promptly after requesting it",
+      "instruction": "Reverse the guidance: state that the reset link expires quickly rather than implying there's no rush."
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "article_id": "art-014",
+      "article_title": "Managing Team Members and Roles",
+      "mention_type": "indirect",
+      "confidence": 0.8,
+      "current_sentence": "Anyone you invite as an Editor today can create, modify, and delete any content in the workspace — essentially everything short of billing and member management.",
+      "suggested_sentence": "Anyone you invite as an Editor can create, modify, and delete any content in the workspace; if they only need to create and edit without delete or publish rights, invite them as a Contributor instead.",
+      "instruction": "Add a mention of the new Contributor role as a lighter-weight alternative to Editor."
+    },
+    {
+      "change_id": "chg-06",
+      "change_title": "Editor Role Split into Editor and Contributor",
+      "article_id": "art-015",
+      "article_title": "Understanding Permission Levels",
+      "mention_type": "direct",
+      "confidence": 0.98,
+      "current_sentence": "Cascade currently has four permission levels: Owner, Admin, Editor, and Viewer.",
+      "suggested_sentence": "Cascade currently has five permission levels: Owner, Admin, Editor, Contributor, and Viewer.",
+      "instruction": "Update the role count and list to include the new Contributor level between Editor and Viewer."
+    }
+  ],
+  "needs_human_review": [
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-006",
+      "article_title": "Billing and Subscription Plans Overview",
+      "note": "Confidence too low to draft a surgical edit automatically -- Enterprise throughput is described as custom/negotiated and only 'beyond the standard limit' -- unclear whether raising the standard 100->500 limit changes what 'elevated' means here, or whether Enterprise numbers are independent. Needs a human (or a source-of-truth on Enterprise contracts) to resolve."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-016",
+      "article_title": "Setting Up Single Sign-On (SSO)",
+      "note": "Confidence too low to draft a surgical edit automatically -- SSO-enforced workspaces disable password sign-in entirely, so the reset-link expiration change may be moot for this article's audience -- but it's a judgment call on scope, not a clear factual error, so it's not asserted as affected."
+    }
+  ]
+}

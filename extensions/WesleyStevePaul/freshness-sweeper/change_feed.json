@@ -1,0 +1,62 @@
+[
+  {
+    "id": "chg-01",
+    "title": "API Rate Limit Increase",
+    "category": "API",
+    "old_behavior": "Each API key is limited to 100 requests per minute across all endpoints, on all plans.",
+    "new_behavior": "Each API key is limited to 500 requests per minute across all endpoints, on all plans.",
+    "description": "Raising the default per-key throughput ceiling to support higher-volume integrations without requiring an Enterprise exception request.",
+    "effective_date": "2026-09-01",
+    "status": "upcoming"
+  },
+  {
+    "id": "chg-02",
+    "title": "\"Export\" Renamed to \"Download\"",
+    "category": "UI/Terminology",
+    "old_behavior": "The action to save data locally is labeled 'Export' throughout the app, including the toolbar button, menu items, and the icon used for one-off and scheduled report generation.",
+    "new_behavior": "The action is relabeled 'Download' throughout the app (button text, menu items, icon tooltip). Underlying functionality, file formats, and API field names are unchanged.",
+    "description": "Renaming based on user research showing 'Export' was confused with data migration; this is a label change only.",
+    "effective_date": "2026-08-25",
+    "status": "upcoming"
+  },
+  {
+    "id": "chg-03",
+    "title": "Starter Plan Storage Limit Increase",
+    "category": "Billing/Storage",
+    "old_behavior": "The Starter plan includes 5GB of cloud storage per team, covering uploads, exports, and attachments.",
+    "new_behavior": "The Starter plan includes 20GB of cloud storage per team.",
+    "description": "Quadrupling the Starter storage allowance to reduce upgrade pressure on small teams; Pro and Enterprise allowances are unchanged.",
+    "effective_date": "2026-09-15",
+    "status": "upcoming"
+  },
+  {
+    "id": "chg-04",
+    "title": "Legacy Webhook v1 Retirement",
+    "category": "API/Webhooks",
+    "old_behavior": "Webhook v1 endpoints (unsigned XML payloads, no retry metadata) remain active and continue delivering events alongside v2.",
+    "new_behavior": "Webhook v1 endpoints are fully retired and stop delivering events. All integrations must use v2 (signed JSON payloads with X-Cascade-Signature header).",
+    "description": "Sunsetting the original webhook delivery system; integrations still pointed at v1 endpoints must migrate before the cutover date or they will stop receiving events.",
+    "effective_date": "2026-10-01",
+    "status": "upcoming"
+  },
+  {
+    "id": "chg-05",
+    "title": "Password Reset Link Expiration Shortened",
+    "category": "Security",
+    "old_behavior": "Password reset links remain valid for 24 hours after being sent.",
+    "new_behavior": "Password reset links expire 1 hour after being sent.",
+    "description": "Shortening the reset link lifetime to reduce the window in which an intercepted or stale link could be exploited.",
+    "effective_date": "2026-08-20",
+    "status": "upcoming"
+  },
+  {
+    "id": "chg-06",
+    "title": "Editor Role Split into Editor and Contributor",
+    "category": "Team/Permissions",
+    "old_behavior": "The 'Editor' role is a single, all-or-nothing grant: it allows creating, editing, and deleting any content in the workspace.",
+    "new_behavior": "The 'Editor' role retains full create/edit/delete/publish rights. A new 'Contributor' role is introduced with create/edit rights only (no delete, no publish). Existing members with the Editor role keep it; new invites default to Contributor unless Editor is explicitly chosen.",
+    "description": "Splitting the role so admins can grant content-creation access without also granting delete/publish rights, addressing repeated Enterprise customer requests.",
+    "effective_date": "2026-09-10",
+    "status": "upcoming"
+  }
+]

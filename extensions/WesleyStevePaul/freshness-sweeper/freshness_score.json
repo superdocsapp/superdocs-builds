@@ -1,0 +1,298 @@
+{
+  "generated_at": "2026-08-14T09:15:46.603033+00:00",
+  "scoring_method": "portfolio_freshness_score = round(100 * (1 - mean(staleness_impact)), 1); staleness_impact(article) = max(mention_weight * confidence) across affecting changes, mention_weight = {direct: 1.0, indirect: 0.6}; articles with no affecting change score 0 impact; could-not-assess pairs are excluded from impact (treated as unknown, not fresh) and reported separately.",
+  "article_count": 18,
+  "portfolio_freshness_score": 36.6,
+  "coverage_pct": 88.2,
+  "summary": {
+    "fresh": 2,
+    "stale_direct": 9,
+    "stale_indirect": 6,
+    "unknown": 1,
+    "unresolved_pairs": 2
+  },
+  "articles": [
+    {
+      "article_id": "art-001",
+      "title": "Resetting Your Password",
+      "status": "stale-direct",
+      "staleness_impact": 0.99,
+      "affecting_changes": [
+        {
+          "change_id": "chg-05",
+          "change_title": "Password Reset Link Expiration Shortened",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "impact": 0.99
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-002",
+      "title": "Setting Up Two-Factor Authentication",
+      "status": "stale-indirect",
+      "staleness_impact": 0.492,
+      "affecting_changes": [
+        {
+          "change_id": "chg-05",
+          "change_title": "Password Reset Link Expiration Shortened",
+          "mention_type": "indirect",
+          "confidence": 0.82,
+          "impact": 0.492
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-003",
+      "title": "Understanding API Rate Limits",
+      "status": "stale-direct",
+      "staleness_impact": 0.99,
+      "affecting_changes": [
+        {
+          "change_id": "chg-01",
+          "change_title": "API Rate Limit Increase",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "impact": 0.99
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-004",
+      "title": "Generating and Managing API Keys",
+      "status": "stale-indirect",
+      "staleness_impact": 0.468,
+      "affecting_changes": [
+        {
+          "change_id": "chg-01",
+          "change_title": "API Rate Limit Increase",
+          "mention_type": "indirect",
+          "confidence": 0.78,
+          "impact": 0.468
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-005",
+      "title": "Troubleshooting Common API Errors",
+      "status": "stale-indirect",
+      "staleness_impact": 0.408,
+      "affecting_changes": [
+        {
+          "change_id": "chg-01",
+          "change_title": "API Rate Limit Increase",
+          "mention_type": "indirect",
+          "confidence": 0.68,
+          "impact": 0.408
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-006",
+      "title": "Billing and Subscription Plans Overview",
+      "status": "stale-direct",
+      "staleness_impact": 0.97,
+      "affecting_changes": [
+        {
+          "change_id": "chg-03",
+          "change_title": "Starter Plan Storage Limit Increase",
+          "mention_type": "direct",
+          "confidence": 0.97,
+          "impact": 0.97
+        }
+      ],
+      "has_unresolved_question": true
+    },
+    {
+      "article_id": "art-007",
+      "title": "Upgrading or Downgrading Your Plan",
+      "status": "stale-indirect",
+      "staleness_impact": 0.45,
+      "affecting_changes": [
+        {
+          "change_id": "chg-03",
+          "change_title": "Starter Plan Storage Limit Increase",
+          "mention_type": "indirect",
+          "confidence": 0.75,
+          "impact": 0.45
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-008",
+      "title": "Configuring Webhooks",
+      "status": "fresh",
+      "staleness_impact": 0.0,
+      "affecting_changes": [],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-009",
+      "title": "Webhook Event Payload Reference",
+      "status": "stale-direct",
+      "staleness_impact": 0.97,
+      "affecting_changes": [
+        {
+          "change_id": "chg-04",
+          "change_title": "Legacy Webhook v1 Retirement",
+          "mention_type": "direct",
+          "confidence": 0.97,
+          "impact": 0.97
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-010",
+      "title": "Integrating with Third-Party Apps",
+      "status": "stale-indirect",
+      "staleness_impact": 0.48,
+      "affecting_changes": [
+        {
+          "change_id": "chg-04",
+          "change_title": "Legacy Webhook v1 Retirement",
+          "mention_type": "indirect",
+          "confidence": 0.8,
+          "impact": 0.48
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-011",
+      "title": "Exporting Your Data",
+      "status": "stale-direct",
+      "staleness_impact": 0.99,
+      "affecting_changes": [
+        {
+          "change_id": "chg-02",
+          "change_title": "\"Export\" Renamed to \"Download\"",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "impact": 0.99
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-012",
+      "title": "Scheduling Automated Exports",
+      "status": "stale-direct",
+      "staleness_impact": 0.9,
+      "affecting_changes": [
+        {
+          "change_id": "chg-02",
+          "change_title": "\"Export\" Renamed to \"Download\"",
+          "mention_type": "direct",
+          "confidence": 0.9,
+          "impact": 0.9
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-013",
+      "title": "Managing Storage and File Limits",
+      "status": "stale-direct",
+      "staleness_impact": 0.99,
+      "affecting_changes": [
+        {
+          "change_id": "chg-03",
+          "change_title": "Starter Plan Storage Limit Increase",
+          "mention_type": "direct",
+          "confidence": 0.99,
+          "impact": 0.99
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-014",
+      "title": "Managing Team Members and Roles",
+      "status": "stale-indirect",
+      "staleness_impact": 0.48,
+      "affecting_changes": [
+        {
+          "change_id": "chg-06",
+          "change_title": "Editor Role Split into Editor and Contributor",
+          "mention_type": "indirect",
+          "confidence": 0.8,
+          "impact": 0.48
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-015",
+      "title": "Understanding Permission Levels",
+      "status": "stale-direct",
+      "staleness_impact": 0.98,
+      "affecting_changes": [
+        {
+          "change_id": "chg-06",
+          "change_title": "Editor Role Split into Editor and Contributor",
+          "mention_type": "direct",
+          "confidence": 0.98,
+          "impact": 0.98
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-016",
+      "title": "Setting Up Single Sign-On (SSO)",
+      "status": "unknown",
+      "staleness_impact": 0.0,
+      "affecting_changes": [],
+      "has_unresolved_question": true
+    },
+    {
+      "article_id": "art-017",
+      "title": "Understanding Audit Logs",
+      "status": "stale-direct",
+      "staleness_impact": 0.85,
+      "affecting_changes": [
+        {
+          "change_id": "chg-02",
+          "change_title": "\"Export\" Renamed to \"Download\"",
+          "mention_type": "direct",
+          "confidence": 0.85,
+          "impact": 0.85
+        }
+      ],
+      "has_unresolved_question": false
+    },
+    {
+      "article_id": "art-018",
+      "title": "Canceling Your Account and Data Retention",
+      "status": "fresh",
+      "staleness_impact": 0.0,
+      "affecting_changes": [],
+      "has_unresolved_question": false
+    }
+  ],
+  "could_not_assess": [
+    {
+      "change_id": "chg-01",
+      "change_title": "API Rate Limit Increase",
+      "article_id": "art-006",
+      "article_title": "Billing and Subscription Plans Overview",
+      "confidence": 0.4,
+      "reason": "Enterprise throughput is described as custom/negotiated and only 'beyond the standard limit' -- unclear whether raising the standard 100->500 limit changes what 'elevated' means here, or whether Enterprise numbers are independent. Needs a human (or a source-of-truth on Enterprise contracts) to resolve."
+    },
+    {
+      "change_id": "chg-05",
+      "change_title": "Password Reset Link Expiration Shortened",
+      "article_id": "art-016",
+      "article_title": "Setting Up Single Sign-On (SSO)",
+      "confidence": 0.35,
+      "reason": "SSO-enforced workspaces disable password sign-in entirely, so the reset-link expiration change may be moot for this article's audience -- but it's a judgment call on scope, not a clear factual error, so it's not asserted as affected."
+    }
+  ]
+}
