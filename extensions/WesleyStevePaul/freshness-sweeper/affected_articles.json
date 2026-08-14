@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T08:40:08.361981+00:00",
+  "generated_at": "2026-08-14T08:59:44.037520+00:00",
   "method": "Semantic review performed by Claude (Claude Code) while authoring the corpus, encoded here as static rules with quoted evidence -- no external LLM API calls happen at run time. Matching includes paraphrased/implied mentions that share no keyword with the change (see mention_type=indirect).",
   "changes_evaluated": 6,
   "articles_in_scope": [

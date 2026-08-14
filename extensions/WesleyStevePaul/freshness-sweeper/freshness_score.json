@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T08:40:08.368093+00:00",
+  "generated_at": "2026-08-14T08:59:44.045418+00:00",
   "scoring_method": "portfolio_freshness_score = round(100 * (1 - mean(staleness_impact)), 1); staleness_impact(article) = max(mention_weight * confidence) across affecting changes, mention_weight = {direct: 1.0, indirect: 0.6}; articles with no affecting change score 0 impact; could-not-assess pairs are excluded from impact (treated as unknown, not fresh) and reported separately.",
   "article_count": 18,
   "portfolio_freshness_score": 36.6,
