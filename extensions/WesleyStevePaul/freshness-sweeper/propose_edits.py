@@ -35,7 +35,7 @@ EDITS = {
     },
     ("chg-01", "art-004"): {
         "current_sentence": "consider spreading requests across a longer window or batching calls rather than firing them all at once",
-        "suggested_sentence": "consider spreading requests across a longer window or batching calls rather than firing them all at once -- though most integrations have plenty of headroom under the current 500-request-per-minute default",
+        "suggested_sentence": "consider spreading requests across a longer window or batching calls rather than firing them all at once — though most integrations have plenty of headroom under the current 500-request-per-minute default",
         "instruction": "Append a clause noting the higher default limit so the batching advice doesn't read as overly cautious.",
     },
     ("chg-01", "art-005"): {
@@ -80,7 +80,7 @@ EDITS = {
     },
     ("chg-04", "art-010"): {
         "current_sentence": "these older connections continue to function for now, but we recommend checking your integration's documentation to confirm it's using our currently recommended delivery method, since older formats are being phased out over time",
-        "suggested_sentence": "these older connections have been retired and no longer deliver events -- confirm your integration has migrated to our current (v2) webhook format",
+        "suggested_sentence": "these older connections have been retired and no longer deliver events — confirm your integration has migrated to our current (v2) webhook format",
         "instruction": "Change 'continue to function for now' to state plainly that the legacy format has been retired.",
     },
     ("chg-05", "art-001"): {
@@ -94,7 +94,7 @@ EDITS = {
         "instruction": "Reverse the guidance: state that the reset link expires quickly rather than implying there's no rush.",
     },
     ("chg-06", "art-014"): {
-        "current_sentence": "Anyone you invite as an Editor today can create, modify, and delete any content in the workspace -- essentially everything short of billing and member management.",
+        "current_sentence": "Anyone you invite as an Editor today can create, modify, and delete any content in the workspace — essentially everything short of billing and member management.",
         "suggested_sentence": "Anyone you invite as an Editor can create, modify, and delete any content in the workspace; if they only need to create and edit without delete or publish rights, invite them as a Contributor instead.",
         "instruction": "Add a mention of the new Contributor role as a lighter-weight alternative to Editor.",
     },

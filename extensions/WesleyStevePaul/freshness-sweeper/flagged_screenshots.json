@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-14T08:59:44.043001+00:00",
+  "generated_at": "2026-08-14T09:15:46.600601+00:00",
   "flag_threshold": 0.55,
   "screenshot_assessments": [
     {
@@ -279,5 +279,6 @@
       "confidence": 0.9,
       "rationale": "The screenshot is a diagram of the permission hierarchy itself, so it directly depicts the role being added."
     }
-  ]
+  ],
+  "needs_human_review": []
 }

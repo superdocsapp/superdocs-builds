@@ -69,7 +69,9 @@ def run_pipeline(mode, article_ids=None):
     all_articles = load_json(ARTICLES_FILE)
     changes = load_json(CHANGES_FILE)
     articles = (
-        [a for a in all_articles if a["id"] in article_ids] if article_ids else all_articles
+        [a for a in all_articles if a["id"] in article_ids]
+        if article_ids is not None
+        else all_articles
     )
 
     steps = []
@@ -124,13 +126,25 @@ def append_log(entry):
     save_json(LOG_FILE, log)
 
 
+def sample_size_type(value):
+    ivalue = int(value)
+    if not (0 < ivalue <= len(DEFAULT_SAMPLE_IDS)):
+        raise argparse.ArgumentTypeError(
+            f"--sample-size must be between 1 and {len(DEFAULT_SAMPLE_IDS)} (got {ivalue})"
+        )
+    return ivalue
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run the knowledge-base freshness sweep.")
     parser.add_argument(
         "--full", action="store_true", help="Run on the full article set instead of the 3-article sample."
     )
     parser.add_argument(
-        "--sample-size", type=int, default=3, help="Number of articles to use in sample mode (default 3)."
+        "--sample-size",
+        type=sample_size_type,
+        default=3,
+        help=f"Number of articles to use in sample mode (1-{len(DEFAULT_SAMPLE_IDS)}, default 3).",
     )
     parser.add_argument(
         "--skip-verification-check",

@@ -127,6 +127,7 @@ def analyze(articles, affected_result):
     article_lookup = {a["id"]: a for a in articles}
 
     assessments = []
+    needs_review = []
     for change_block in affected_result["results"]:
         cid = change_block["change_id"]
         for entry in change_block["affected_articles"]:
@@ -135,6 +136,16 @@ def analyze(articles, affected_result):
                 continue
             flag = SCREENSHOT_FLAGS.get((cid, aid))
             if flag is None:
+                needs_review.append(
+                    {
+                        "change_id": cid,
+                        "change_title": change_block["change_title"],
+                        "article_id": aid,
+                        "article_title": article_lookup[aid]["title"],
+                        "screenshot_filename": article_lookup[aid]["screenshot_filename"],
+                        "note": "Marked affected but no screenshot assessment is on file -- needs a human to look.",
+                    }
+                )
                 continue
             assessments.append(
                 {
@@ -155,6 +166,7 @@ def analyze(articles, affected_result):
         "flag_threshold": FLAG_THRESHOLD,
         "screenshot_assessments": assessments,
         "flagged_for_update": flagged_only,
+        "needs_human_review": needs_review,
     }
 
 
@@ -165,7 +177,8 @@ def main():
     save_json(OUTPUT_FILE, result)
     print(
         f"flag_screenshots: assessed {len(result['screenshot_assessments'])} screenshots, "
-        f"{len(result['flagged_for_update'])} flagged for update. Wrote {OUTPUT_FILE.name}"
+        f"{len(result['flagged_for_update'])} flagged for update, "
+        f"{len(result['needs_human_review'])} with no assessment on file. Wrote {OUTPUT_FILE.name}"
     )
 
 
