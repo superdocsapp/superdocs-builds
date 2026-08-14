@@ -1,0 +1,14 @@
+{
+  "name": "superdocs-gmail-attachment-normaliser",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gmail add-on: inbound attachment normaliser, built on SuperDocs. Built for the SuperDocs Round 2 task.",
+  "scripts": {
+    "test": "node --test",
+    "push": "clasp push",
+    "open": "clasp open"
+  },
+  "devDependencies": {
+    "@google/clasp": "^2.4.2"
+  }
+}
