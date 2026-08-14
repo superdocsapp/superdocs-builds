@@ -1,0 +1,45 @@
+{
+  "timeZone": "Asia/Kolkata",
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.addons.execute",
+    "https://www.googleapis.com/auth/gmail.addons.current.message.readonly",
+    "https://www.googleapis.com/auth/gmail.readonly",
+    "https://www.googleapis.com/auth/gmail.compose",
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/script.scriptapp"
+  ],
+  "addOns": {
+    "common": {
+      "name": "SuperDocs Attachment Normaliser",
+      "logoUrl": "https://www.gstatic.com/images/icons/material/system/2x/description_black_48dp.png",
+      "layoutProperties": {
+        "primaryColor": "#0B57D0",
+        "secondaryColor": "#0B57D0"
+      },
+      "openLinkUrlPrefixes": [
+        "https://superdocs.app/",
+        "https://use.superdocs.app/",
+        "https://docs.superdocs.app/"
+      ]
+    },
+    "gmail": {
+      "contextualTriggers": [
+        {
+          "unconditional": {},
+          "onTriggerFunction": "buildAddOn"
+        }
+      ],
+      "version": "TRUSTED_TESTER_V2"
+    },
+    "drive": {
+      "homepageTrigger": {
+        "runFunction": "buildDriveHomepage"
+      }
+    }
+  }
+}
