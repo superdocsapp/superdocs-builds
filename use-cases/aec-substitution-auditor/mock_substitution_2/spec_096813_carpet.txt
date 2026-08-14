@@ -1,0 +1,10 @@
+SECTION 09 68 13 - CARPET TILING
+
+PART 2 - PRODUCTS
+
+2.1 CARPET TILE SPECIFICATIONS
+A. Carpet Tile:
+   1. Pile Thickness: Greater than or equal to 0.12 inches when tested in accordance with ASTM D6859. (Clause 2.1.A.1)
+   2. Tufted Weight: Greater than or equal to 18 oz/sq yd. (Clause 2.1.A.2)
+   3. Flammability: Class I (CRF greater than or equal to 0.45 W/sq cm) when tested in accordance with ASTM E648. (Clause 2.1.A.3)
+   4. Manufacturer/Product: Subject to compliance with requirements, provide "SoftWalk" by CarpetCo Inc. or approved equivalent. (Clause 2.1.A.4)
