@@ -36,7 +36,7 @@ records decisions made while building, so they can be confirmed or corrected.
 8. **Cost model is an estimate** (`app/services/cost.py`): edit = 1 op, export =
    0 ops, upload = 0 ops; reconciled with any upstream-reported figure. Exact
    billing is authoritative upstream.
-- **SuperDocs endpoint paths are centralized constants** in the client, verified
+9. **SuperDocs endpoint paths are centralized constants** in the client, verified
   against https://api.superdocs.app/openapi.json (2026-08-13). Key corrections:
   approve is `POST /v1/chat/{session_id}/approve` (not `/v1/jobs/.../approvals`);
   async chat and export are session-scoped (no `document_id` on those bodies).
