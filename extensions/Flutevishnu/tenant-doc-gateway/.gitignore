@@ -1,0 +1,26 @@
+# Secrets — never commit a real environment file.
+.env
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local data (uploaded files, sqlite test dbs)
+.openapi.live.json
+/data/
+*.sqlite
+*.sqlite3
+test_*.db
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

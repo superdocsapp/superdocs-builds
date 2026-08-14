@@ -1,0 +1,45 @@
+[project]
+name = "tenant-doc-gateway"
+version = "0.1.0"
+description = "Production-shaped multi-tenant FastAPI gateway wrapping the SuperDocs upload/chat/approve/export contract."
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+
+# Runtime dependencies are pinned in requirements.txt (source of truth for Docker).
+# This block mirrors them for tooling that reads PEP 621 metadata.
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+    "SQLAlchemy>=2.0",
+    "asyncpg>=0.30",
+    "alembic>=1.14",
+    "arq>=0.26",
+    "redis>=5.2",
+    "httpx>=0.28",
+    "structlog>=24.4",
+    "python-multipart>=0.0.20",
+    "aiofiles>=24.1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra -q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["B008"]  # FastAPI Depends() in defaults is idiomatic.
+
+[tool.ruff.lint.per-file-ignores]
+# Tests favor readable, self-contained lines over strict wrapping.
+"tests/**" = ["E501"]
