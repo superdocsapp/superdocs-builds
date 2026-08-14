@@ -1,0 +1,99 @@
+{
+  "name": "Newsroom House Style Pack",
+  "version": "1.0",
+  "source_guide": "The Guardian Style Guide",
+  "source_guide_url": "https://www.theguardian.com/info/series/the-guardian-style-guide",
+  "purpose": "Configuration for checking newsroom articles for selected, testable Guardian-style rules.",
+  "rules": [
+    {
+      "id": "G01",
+      "category": "numbers",
+      "rule": "Spell out numbers one to nine in ordinary prose; use numerals from 10 onward, subject to the guide's exceptions.",
+      "violation_example": "The report found 7 errors.",
+      "preferred_example": "The report found seven errors.",
+      "source": "Guardian Style Guide: N — numbers",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-n"
+    },
+    {
+      "id": "G02",
+      "category": "abbreviations",
+      "rule": "Do not use full points in abbreviations.",
+      "violation_example": "The US and U.S. teams met.",
+      "preferred_example": "The US teams met.",
+      "source": "Guardian Style Guide: A — abbreviations and acronyms",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-a"
+    },
+    {
+      "id": "G03",
+      "category": "initials",
+      "rule": "Do not put spaces between initials.",
+      "violation_example": "W H Smith issued a statement.",
+      "preferred_example": "WH Smith issued a statement.",
+      "source": "Guardian Style Guide: A — abbreviations and acronyms",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-a"
+    },
+    {
+      "id": "G04",
+      "category": "quotation_marks",
+      "rule": "Use single quotation marks for direct quotations in ordinary copy; double quotation marks may be used for words that are not actually quotations.",
+      "violation_example": "\"The deal is done,\" the minister said.",
+      "preferred_example": "'The deal is done,' the minister said.",
+      "source": "Guardian Style Guide: Q — quotes",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-q"
+    },
+    {
+      "id": "G05",
+      "category": "quotation_marks",
+      "rule": "Use double quotation marks for a quotation nested inside single quotation marks.",
+      "violation_example": "'She said \"yes\" to the proposal,' he said.",
+      "preferred_example": "'She said \"yes\" to the proposal,' he said.",
+      "source": "Guardian Style Guide: Q — quotes",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-q"
+    },
+    {
+      "id": "G06",
+      "category": "jargon",
+      "rule": "Avoid 'going forward' when it is used as jargon meaning 'in the future'.",
+      "violation_example": "Going forward, the company will review its policy.",
+      "preferred_example": "In the future, the company will review its policy.",
+      "source": "Guardian Style Guide: G — going forward",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-g"
+    },
+    {
+      "id": "G07",
+      "category": "usage",
+      "rule": "Use 'obliged' rather than 'obligated' where the meaning is required or compelled.",
+      "violation_example": "The firm was obligated to disclose the data.",
+      "preferred_example": "The firm was obliged to disclose the data.",
+      "source": "Guardian Style Guide: O — obliged/obligated",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-o"
+    },
+    {
+      "id": "G08",
+      "category": "clarity",
+      "rule": "Avoid vague or ambiguous wording where a clearer construction is available.",
+      "violation_example": "The company told the regulator it had problems.",
+      "preferred_example": "The company told the regulator that the company had problems.",
+      "source": "Guardian Style Guide — clarity and usage guidance",
+      "source_url": "https://www.theguardian.com/info/series/the-guardian-style-guide"
+    },
+    {
+      "id": "G09",
+      "category": "word_choice",
+      "rule": "Avoid 'and/or'; choose either 'and' or 'or' according to the intended meaning.",
+      "violation_example": "Staff can email and/or call the office.",
+      "preferred_example": "Staff can email or call the office.",
+      "source": "Guardian Style Guide: A — and/or",
+      "source_url": "https://www.theguardian.com/guardian-style-guide-a"
+    },
+    {
+      "id": "G10",
+      "category": "word_choice",
+      "rule": "Prefer precise, ordinary language over unnecessary jargon or cliché where the meaning is unchanged.",
+      "violation_example": "The project will leverage synergies going forward.",
+      "preferred_example": "The project will use the combined resources in the future.",
+      "source": "Guardian Style Guide — usage and jargon guidance",
+      "source_url": "https://www.theguardian.com/info/series/the-guardian-style-guide"
+    }
+  ]
+}
