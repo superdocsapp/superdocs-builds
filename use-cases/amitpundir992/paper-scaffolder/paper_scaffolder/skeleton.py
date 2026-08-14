@@ -32,19 +32,31 @@ class SkeletonGenerator:
         ).encode("utf-8")
         manuscript_id = hashlib.sha256(fingerprint).hexdigest()[:16]
 
+        roles = tuple(semantic_role_for(title) for title in section_titles)
+        has_dataset_section = "dataset" in roles
         used_ids: dict[str, int] = {}
         sections: list[ManuscriptSection] = []
-        for title in section_titles:
+        for title, role in zip(section_titles, roles, strict=True):
             base_id = _slug(title)
             occurrence = used_ids.get(base_id, 0) + 1
             used_ids[base_id] = occurrence
             section_id = base_id if occurrence == 1 else f"{base_id}-{occurrence}"
-            role = semantic_role_for(title)
             decision = decide_support(role, inputs)
-            evidence = evidence_for(decision.source_keys, inputs)
-            grounded_content = (
-                next(iter(evidence.values())) if len(evidence) == 1 else ""
-            )
+            source_keys = decision.source_keys
+            reason = decision.reason
+            if (
+                role == "methodology"
+                and not has_dataset_section
+                and inputs.dataset_description
+                and "methodology" in source_keys
+            ):
+                source_keys = (*source_keys, "dataset_description")
+                reason = (
+                    "Can be generated extractively from the supplied methodology "
+                    "and dataset description."
+                )
+            evidence = evidence_for(source_keys, inputs)
+            grounded_content = "\n\n".join(evidence.values())
             sections.append(
                 ManuscriptSection(
                     section_id=section_id,
@@ -52,8 +64,8 @@ class SkeletonGenerator:
                     semantic_role=role,
                     status=decision.status,
                     content=grounded_content,
-                    reason=decision.reason,
-                    available_sources=decision.source_keys,
+                    reason=reason,
+                    available_sources=source_keys,
                 )
             )
 

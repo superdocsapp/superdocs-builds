@@ -17,4 +17,4 @@ class ExtractiveSectionWriter:
 
     def generate(self, section_title: str, evidence: Mapping[str, str]) -> str:
         del section_title
-        return next(iter(evidence.values()), "")
+        return "\n\n".join(evidence.values())

@@ -4,6 +4,39 @@
 
 Paper Scaffolder helps researchers turn a research question, supplied methodology, dataset description, and journal template or author instructions into a grounded manuscript skeleton. It runs on top of SuperDocs for document editing, human review, and export rather than recreating the SuperDocs editor.
 
+## Demonstrated workflow
+
+The example uses the published PLOS ONE research-article structure with a
+research question, methodology, and dataset description supplied by the user.
+
+![Completed PLOS ONE input](docs/plos-one-input.png)
+
+The resulting scaffold preserves the target order, carries the supplied
+methodology and dataset description into Materials and Methods, and leaves
+Results explicitly empty because no verified findings were supplied.
+
+![Grounded manuscript scaffold](docs/grounded-scaffold.png)
+
+An eligible section can also be generated independently from its listed source
+material.
+
+![Independent section generation](docs/section-generation.png)
+
+SuperDocs returns proposed changes for item-level human review. The proposal
+below introduced completed-study language that the input did not support, so it
+was rejected rather than committed.
+
+![SuperDocs proposed change with approve and reject controls](docs/superdocs-proposed-change.png)
+
+![Rejected unsupported proposal](docs/superdocs-rejected-change.png)
+
+A second, formatting-only proposal preserved the supplied wording and was
+approved. The reviewed document was then exported successfully.
+
+![Approved formatting-only change](docs/superdocs-approved-change.png)
+
+![Successful SuperDocs export](docs/superdocs-export-success.png)
+
 ## Honesty contract
 
 The application never fabricates research results, statistics, experimental findings, citations, dataset facts, methodology details, or conclusions. A section is generated only from evidence supplied for that section. Unsupported sections remain empty and carry an explicit reason, for example:
@@ -83,7 +116,9 @@ The SuperDocs endpoints are unavailable with a safe `503` response when server c
 
 ## Configuration
 
-Copy the placeholder values from `.env.example` into environment variables managed outside source control. The application does not load `.env` files automatically and no dotenv dependency is required.
+Copy `.env.example` to the ignored local `.env` file and replace only its
+placeholder values. The documented Uvicorn command loads that file server-side;
+the values are never sent to the browser.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
@@ -92,14 +127,16 @@ Copy the placeholder values from `.env.example` into environment variables manag
 | `SUPERDOCS_TIMEOUT_SECONDS` | No | Request timeout, default `30` |
 | `RUN_SUPERDOCS_LIVE_TESTS` | Only for opt-in live test | Must equal `1` as a second explicit live-test guard |
 
-PowerShell example for the current terminal:
+PowerShell setup:
 
 ```powershell
-$env:SUPERDOCS_API_KEY = "sk_your_api_key_here"
-python -m uvicorn app:app --reload
+Copy-Item .env.example .env
+# Edit .env locally and replace the placeholder API key.
+python -m uvicorn app:app --reload --env-file .env
 ```
 
-Set the environment before starting the server. Restart the application after changing integration configuration. Do not put a real key in `.env.example`, browser code, screenshots, or commits.
+Restart the application after changing integration configuration. Do not put a
+real key in `.env.example`, browser code, screenshots, or commits.
 
 ## Run locally
 
@@ -109,26 +146,39 @@ Requirements: Python 3.11 or newer.
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-python -m uvicorn app:app --reload
+python -m uvicorn app:app --reload --env-file .env
 ```
 
-Open `http://127.0.0.1:8000`. Without a live key, skeleton and section generation work normally and the SuperDocs panel reports that integration is not configured.
+Open `http://127.0.0.1:8000`. To run the local scaffold without a `.env` file,
+omit `--env-file .env`; skeleton and section generation still work normally and
+the SuperDocs panel reports that integration is not configured.
 
 ## Input/output example
 
-Example template headings:
+The example below uses the required ordering for a PLOS ONE research article
+from the official [PLOS ONE submission guidelines](https://journals.plos.org/plosone/s/submission-guidelines).
+Optional conclusions and supporting-information captions are omitted from this
+minimal example. This demonstrates structural mapping; it does not claim to
+validate every PLOS ONE submission or formatting requirement.
 
 ```text
-Title
+Required sections:
+Title Page
 Abstract
 Introduction
-Methods
+Materials and Methods
 Results
 Discussion
+Acknowledgments
 References
 ```
 
-The skeleton API returns ordered sections with stable IDs, a semantic role, status, empty content by default, a grounding reason, and available evidence sources:
+Because this structure has no separate Data section, the supplied dataset
+description is included extractively in Materials and Methods after the supplied
+methodology. Templates that explicitly contain a Data section keep the two inputs
+in their separate corresponding sections.
+
+The skeleton API returns ordered sections with stable IDs, a semantic role, status, directly supplied grounded content where safely mapped, a grounding reason, and available evidence sources. Unsupported sections keep empty content:
 
 ```json
 {

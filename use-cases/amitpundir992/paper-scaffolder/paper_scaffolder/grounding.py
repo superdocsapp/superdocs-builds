@@ -138,7 +138,11 @@ class ExactEvidenceGroundingGuard:
     @staticmethod
     def accepts(content: str, evidence: Mapping[str, str]) -> bool:
         normalized_content = re.sub(r"\s+", " ", content).strip()
-        return bool(normalized_content) and any(
-            normalized_content == re.sub(r"\s+", " ", value).strip()
-            for value in evidence.values()
+        normalized_evidence = [
+            re.sub(r"\s+", " ", value).strip() for value in evidence.values()
+        ]
+        combined_evidence = " ".join(normalized_evidence)
+        return bool(normalized_content) and (
+            normalized_content in normalized_evidence
+            or normalized_content == combined_evidence
         )

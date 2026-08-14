@@ -4,6 +4,7 @@ import json
 import unittest
 from unittest.mock import Mock
 
+from paper_scaffolder.documents import render_manuscript_html
 from paper_scaffolder.models import PaperInputs, SectionStatus
 from paper_scaffolder.service import ManuscriptService
 from paper_scaffolder.superdocs import parse_proposed_change_content
@@ -20,6 +21,18 @@ Data
 Results
 Discussion
 Conclusion
+References
+"""
+
+PLOS_ONE_RESEARCH_ARTICLE_TEMPLATE = """Target journal: PLOS ONE
+Required sections:
+Title Page
+Abstract
+Introduction
+Materials and Methods
+Results
+Discussion
+Acknowledgments
 References
 """
 
@@ -71,10 +84,32 @@ class ManuscriptServiceTests(unittest.TestCase):
         paper_inputs = inputs()
         result = self.service.generate_section(paper_inputs, "methods")
         scaffold = self.service.create_scaffold(paper_inputs)
+        scaffold_methods = next(
+            section for section in scaffold.sections if section.section_id == "methods"
+        )
 
         self.assertEqual(result.section.status, SectionStatus.GENERATED)
         self.assertEqual(result.section.content, paper_inputs.methodology)
-        self.assertTrue(all(section.content == "" for section in scaffold.sections))
+        self.assertEqual(scaffold_methods.content, paper_inputs.methodology)
+
+    def test_supplied_methods_and_data_appear_in_scaffold_document(self) -> None:
+        paper_inputs = inputs()
+        scaffold = self.service.create_scaffold(paper_inputs)
+        sections = {section.section_id: section for section in scaffold.sections}
+
+        self.assertEqual(sections["methods"].content, paper_inputs.methodology)
+        self.assertEqual(sections["methods"].available_sources, ("methodology",))
+        self.assertEqual(sections["data"].content, paper_inputs.dataset_description)
+        self.assertEqual(
+            sections["results"].status,
+            SectionStatus.INSUFFICIENT_INFORMATION,
+        )
+        self.assertEqual(sections["results"].content, "")
+
+        document_html = render_manuscript_html(scaffold)
+        self.assertIn(paper_inputs.methodology, document_html)
+        self.assertIn(paper_inputs.dataset_description, document_html)
+        self.assertIn("No verified research results were provided", document_html)
 
     def test_unsupported_section_is_explicitly_insufficient(self) -> None:
         custom = inputs(
@@ -95,6 +130,47 @@ class ManuscriptServiceTests(unittest.TestCase):
         self.assertEqual(
             [section.title for section in scaffold.sections],
             ["Methods", "Research Question", "Data", "Results"],
+        )
+
+    def test_plos_one_research_article_structure_is_respected(self) -> None:
+        paper_inputs = inputs(template=PLOS_ONE_RESEARCH_ARTICLE_TEMPLATE)
+        scaffold = self.service.create_scaffold(paper_inputs)
+        sections = {section.title: section for section in scaffold.sections}
+
+        self.assertEqual(
+            [section.title for section in scaffold.sections],
+            [
+                "Title Page",
+                "Abstract",
+                "Introduction",
+                "Materials and Methods",
+                "Results",
+                "Discussion",
+                "Acknowledgments",
+                "References",
+            ],
+        )
+        self.assertEqual(
+            sections["Materials and Methods"].content,
+            f"{paper_inputs.methodology}\n\n{paper_inputs.dataset_description}",
+        )
+        self.assertEqual(
+            sections["Materials and Methods"].available_sources,
+            ("methodology", "dataset_description"),
+        )
+        self.assertEqual(
+            sections["Results"].status,
+            SectionStatus.INSUFFICIENT_INFORMATION,
+        )
+        self.assertEqual(sections["Results"].content, "")
+
+        generated = self.service.generate_section(
+            paper_inputs, "materials-and-methods"
+        )
+        self.assertEqual(generated.section.status, SectionStatus.GENERATED)
+        self.assertEqual(
+            generated.section.content,
+            f"{paper_inputs.methodology}\n\n{paper_inputs.dataset_description}",
         )
 
     def test_external_writer_can_be_mocked(self) -> None:
