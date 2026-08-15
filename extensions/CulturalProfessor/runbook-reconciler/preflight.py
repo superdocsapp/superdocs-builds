@@ -98,19 +98,47 @@ def discover(site, email, token):
     return None, None, None, cloud_id, last
 
 
+# Keys that have a working default, so their absence is a note rather than a
+# fault. Everything else in .env.example is genuinely required.
+#
+# Without this distinction the diagnostic failed on SUPERDOCS_BASE_URL -- and
+# then printed, four lines later, that SUPERDOCS_BASE_URL being empty is fine
+# because the client defaults to api.superdocs.app. A preflight that contradicts
+# itself inside one run teaches people to ignore it, which costs far more than
+# the variable ever could.
+OPTIONAL = {
+    "SUPERDOCS_BASE_URL": "the client defaults to api.superdocs.app",
+    "CONFLUENCE_SPACE_KEY": "every space the token can see is crawled",
+    "CONFLUENCE_RUNBOOK_LABEL": "defaults to 'runbook'",
+    "INFRA_REPO_PATHS": "defaults to the bundled corpus",
+    "SERVICE_CATALOG_PATH": "discovered by walking the infra paths",
+    "ALERT_RULES_GLOB": "discovered by walking the infra paths",
+}
+
+
 def check_keys(env, example):
     print("\nconfiguration")
     missing = 0
     for k, placeholder in example.items():
         if k not in env:
-            print(f"  {BAD}  {k}: missing")
-            missing += 1
+            if k in OPTIONAL:
+                print(f"  {OK}  {k}: not set - {OPTIONAL[k]}")
+            else:
+                print(f"  {BAD}  {k}: missing")
+                missing += 1
         elif env[k] == "":
             print(f"  {WARN}  {k}: empty")
         elif env[k] == placeholder:
             print(f"  {WARN}  {k}: still the placeholder")
         else:
             print(f"  {OK}  {k}: set ({len(env[k])} chars)")
+
+    # A key in .env that .env.example does not know about is usually a rename
+    # somebody half-applied -- SUPERDOCS_API_BASE was this file's own old name
+    # for SUPERDOCS_BASE_URL, and a stale one sits there being silently ignored.
+    unknown = sorted(set(env) - set(example))
+    for k in unknown:
+        print(f"  {WARN}  {k}: in .env but not in .env.example - ignored, probably stale")
     return missing
 
 
