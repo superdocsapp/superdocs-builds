@@ -50,6 +50,7 @@ from __future__ import annotations
 import html
 import re
 from dataclasses import dataclass, field
+from typing import Any
 
 from reconciler.claims import Claim, Finding
 from reconciler.confluence.splice import diff_range
@@ -201,6 +202,48 @@ def propose_for_page(
     changes = client.pending_changes(reply)
     proposal.proposals = _map_changes(changes, editable)
     return proposal
+
+
+def propose_all(register: Any, client: SuperDocs, model_tier: str | None = None) -> dict[str, int]:
+    """A proposal for every page holding undecided, editable contradictions.
+
+    The only place in this project that spends anything, and it is entered only
+    with findings the deterministic layers produced. A page whose findings are
+    all comment-only never opens a session; an estate with no drift never
+    reaches this function at all.
+
+    Findings that already carry a proposal are skipped, which is what makes this
+    safe to re-run after a crash: the register is the record of what has been
+    paid for.
+    """
+    queue = [f for f in register.review_queue() if not f.proposed and f.page_id]
+    by_page: dict[str, list[tuple[Finding, Claim]]] = {}
+    for finding in queue:
+        claim = register.claim(finding.claim_id or "")
+        if claim is None:
+            continue
+        by_page.setdefault(finding.page_id, []).append((finding, claim))
+
+    spent = 0
+    pages = 0
+    for page_id, items in sorted(by_page.items()):
+        proposal = propose_for_page(client, page_id, items, model_tier=model_tier)
+        spent += proposal.operations
+        if proposal.operations:
+            pages += 1
+        for item in proposal.proposals:
+            register.record_proposal(
+                finding_id=item.finding_id,
+                page_id=page_id,
+                session_id=proposal.session_id,
+                job_id=proposal.job_id,
+                document_id=proposal.document_id,
+                durable_id=proposal.durable_id,
+                change_id=item.change_id,
+                proposed=item.proposed,
+                explanation=item.explanation,
+            )
+    return {"operations": spent, "pages": pages, "proposals": len(queue)}
 
 
 def _map_changes(
@@ -427,6 +470,7 @@ __all__ = [
     "build_instruction",
     "build_passage_document",
     "deny",
+    "propose_all",
     "propose_for_page",
     "read_back_passages",
 ]
