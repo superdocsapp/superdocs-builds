@@ -41,7 +41,7 @@ Open `http://127.0.0.1:8000`. On macOS/Linux, use `./.venv/bin/python`.
 Offline demo mode is the default, requires no credentials, and labels itself `OFFLINE TEST MODE`. For live use, set the key only in the server environment and restart:
 
 ```powershell
-$env:SUPERDOCS_API_KEY = "your-key-here"
+$env:SUPERDOCS_API_KEY = Read-Host "Enter the SuperDocs API key"
 .\.venv\Scripts\python.exe app.py
 ```
 
