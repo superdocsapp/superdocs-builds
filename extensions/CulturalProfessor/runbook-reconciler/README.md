@@ -16,6 +16,16 @@ about a wrong Terraform value produces a ticket suggestion, never a write.
 Everything in this README that is a number was produced by a command in this repository,
 and the command is named next to it.
 
+**Which card this is.** The open list's **Documentation drift detector** (S3, extensions
+folder). Its mechanism is this one: report the document, the section, the sentence and the
+evidence; separate what could not be verified from what is correct; propose targeted fixes
+for review; measure precision and recall against a seeded drift corpus. Two things here are
+not on that card, or on any other card in the list. The card's ground truth is another
+document — a changelog, a spec snapshot, a style guide — where this reads a **running
+system's declared state**: Prometheus rules, Terraform, Kubernetes, the Backstage catalog.
+And half two runs the other way round, turning verification *output* into a document rather
+than consuming one.
+
 ---
 
 ## Two minutes to the first output
@@ -344,9 +354,8 @@ fixtures/          synthetic estate, runbooks, and expected.yaml (the measuremen
 docs/              measurement raw data
 ```
 
-Further reading, in the order it is worth reading: [PLAN.md](PLAN.md) (the design brief),
-[BUGS.md](BUGS.md) (what the APIs actually did), [PROGRESS.md](PROGRESS.md) (every
-judgement call and its reasoning).
+Further reading, in the order it is worth reading: [BUGS.md](BUGS.md) (what the APIs
+actually did), [PROGRESS.md](PROGRESS.md) (every judgement call and its reasoning).
 
 ---
 

@@ -17,3 +17,6 @@ register.db
 register.db-journal
 register.db-wal
 register.db-shm
+
+# The build plan is a working document, not part of the deliverable.
+PLAN.md
