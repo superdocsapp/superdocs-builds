@@ -493,3 +493,55 @@ be found later, from a process list, by somebody wondering why their laptop is
 hot. Daemon threads are tolerated deliberately: untidy but harmless, since they
 die with the interpreter. Non-daemon threads hold it open, and that is the one
 that becomes an incident.
+
+## 2026-08-16 — the concurrency flake was a real bug, and the demo wrote wrong prose
+
+**Question.** Two things surfaced from running `./demo` end to end with a human
+watching, neither of which the test suite or any single command had shown.
+
+**Call and reasoning, separately.**
+
+### The register could not be opened twice at once
+
+`test_two_sweeps_at_once_do_not_corrupt_the_register` had been failing about one
+run in five all week, and I had twice treated it as machine load and made the
+test more tolerant. It was not load. A hang traceback showed one thread parked
+at the barrier while the other had failed — so the contention was in
+`Register.__init__`, not in the write loop the test was ostensibly about.
+
+`PRAGMA busy_timeout` was being set *after* `PRAGMA journal_mode=WAL`. Converting
+a database to WAL is the one statement in that constructor needing an exclusive
+lock, and it was running before the connection had been told to wait for
+anything — so two processes opening the same register at the same moment gave
+one of them `database is locked`, after exactly the 30 seconds of the *other*
+timeout. Setting busy_timeout first took it from 2-in-5 to 1-in-20; putting the
+whole of setup under a process-level lock took it to 0-in-30, because the WAL
+pragma itself was still the collision point.
+
+The lesson is the uncomfortable one. Behaviour nine of the brief — "concurrency
+does not corrupt state" — had a test, the test was failing, and I twice adjusted
+the test's tolerance instead of reading what it was telling me. A flaky test
+about concurrency is a concurrency bug until proven otherwise, and "the machine
+was busy" is the most comfortable available explanation rather than the most
+likely one.
+
+### `_sane` needed to check shape, not just size
+
+The walkthrough put two wrong replacements into a live page, both through the
+review gate, both accepted by the guard that was supposed to stop exactly this:
+
+    '750ms'             -> '1.2'
+    'Payments Platform' -> 'Fulfilment, Payments Core, Tracking'
+
+The first drops the unit, because the estate stores the threshold as a bare
+`1.2` and the model copied it — leaving "latency stays above 1.2 for 10
+minutes". The second pastes the whole list of declared rotas, because that is
+what `observed` says when a name resolves to nothing. Neither is longer than the
+cap; neither contains the value it replaced. The existing guard had nothing to
+say about either.
+
+So the rule is now about *shape*: a replacement keeps the unit if the original
+had one, and does not become a list if the original was not one. Both are
+checked rather than instructed, though the instruction says so too — an
+instruction is a request and a guard is a control, and the difference is the
+whole reason the deterministic layer exists.

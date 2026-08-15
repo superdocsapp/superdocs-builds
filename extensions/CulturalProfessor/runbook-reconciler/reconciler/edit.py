@@ -145,6 +145,17 @@ def build_instruction(items: list[tuple[Finding, Claim]]) -> str:
         "Do not restructure the passage, do not add commentary, and do not change anything "
         "not listed.",
         "",
+        # Both of these rules exist because the live service broke them and the
+        # wrong text reached a real page. See `_sane`, which refuses the results
+        # rather than trusting the instruction to be followed.
+        "Two rules about the replacement itself:",
+        "1. Keep the unit and format the document already uses. If the text says '750ms' "
+        "and the infrastructure value is given as '1.2' seconds, the replacement is '1.2s' "
+        "-- never a bare number that leaves the sentence saying 'above 1.2 for 10 minutes'.",
+        "2. Where the infrastructure text lists several valid names, choose exactly the one "
+        "that belongs here and write only that. Never paste the list: 'Page the "
+        "Fulfilment, Payments Core, Tracking rota' is not a sentence.",
+        "",
     ]
     for index, (finding, claim) in enumerate(items, start=1):
         lines.append(
@@ -421,32 +432,64 @@ def _replacement(old_text: str, new_text: str, asserted: str) -> str:
     return ""
 
 
+#: `750ms`, `1.2s`, `5%`, `7 days` -- a number carrying a unit.
+_NUMBER_WITH_UNIT = re.compile(r"^\d[\d.,]*\s*[A-Za-z%]+$")
+#: `1.2`, `14`, `0.05` -- a number with no unit at all.
+_BARE_NUMBER = re.compile(r"^\d[\d.,]*$")
+
+
 def _sane(replacement: str, asserted: str) -> str:
-    """A value, or nothing. Never a sentence about a value.
+    """A value of the same shape as the one it replaces, or nothing.
 
-    The instruction says not to add commentary and the service mostly obeys it.
-    Mostly is not a guarantee, and these came back from the live API:
+    The instruction tells the service not to add commentary, to keep the
+    document's unit, and to pick one name rather than pasting a list. It mostly
+    complies. Mostly is not a control, and every rule below is here because a
+    live run broke it — the first two after the wrong text had already reached a
+    real page:
 
-        'Payments Platform'   -> 'Payments Platform is not a valid rota; valid
-                                  rotas are Fulfilment, Payments Core, and Tracking.'
-        'rollback-production' -> "rollback-production (Note: 'rollback-production'
-                                  is not a valid CI job; please use one of ...)"
+        '750ms'             -> '1.2'
+            The estate stores the threshold as a bare `1.2` and the model copied
+            it, leaving the page reading "latency stays above 1.2 for 10
+            minutes". Shorter than the original, no commentary, and meaningless.
 
-    Both are *helpful* and both would be spliced into the middle of a sentence
-    in somebody's runbook, which is the specific disaster this module's
-    docstring promises not to cause. The tell is reliable: a replacement that
-    still contains the value it was meant to replace has appended commentary
-    rather than replaced anything. The length cap catches the rest.
+        'Payments Platform' -> 'Fulfilment, Payments Core, Tracking'
+            The observed value is a sentence naming every declared rota, so the
+            model pasted all three: "Page the Fulfilment, Payments Core,
+            Tracking rota". One value became a list.
 
-    Refusing costs a human one look at an escalated finding. Accepting costs a
-    paragraph of model prose in the middle of an operational instruction.
+        'Payments Platform' -> 'Payments Platform is not a valid rota; valid
+                                rotas are Fulfilment, Payments Core and Tracking.'
+        'rollback-production' -> "rollback-production (Note: ... not a valid CI
+                                job; please use one of the declared jobs: ...)"
+            Commentary appended rather than a replacement made.
+
+    The through-line: a replacement has to have the same *shape* as what it
+    replaces. Same units, same number of items, roughly the same size, and not
+    containing the thing it was supposed to replace. None of these can tell a
+    right value from a wrong one — only that this is not a value at all.
+
+    Refusing costs a human one look at an escalated finding. Accepting costs
+    wrong prose in an operational instruction that somebody follows at 3am.
     """
     if not replacement:
         return ""
+
+    # Commentary appended rather than a replacement made.
     if asserted in replacement and len(replacement) > len(asserted):
         return ""
     if len(replacement) > 3 * len(asserted) + 20:
         return ""
+
+    # The unit the document was using has been dropped.
+    if _NUMBER_WITH_UNIT.match(asserted.strip()) and _BARE_NUMBER.match(replacement.strip()):
+        return ""
+
+    # One value became a list. Counting separators rather than looking for
+    # specific words keeps this working for jobs, rotas, regions and anything
+    # else whose "observed" value happens to enumerate the valid options.
+    if replacement.count(",") > asserted.count(","):
+        return ""
+
     return replacement
 
 

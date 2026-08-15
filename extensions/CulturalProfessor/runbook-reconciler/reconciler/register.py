@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 import uuid
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
@@ -181,6 +182,12 @@ CREATE TABLE IF NOT EXISTS run_stages (
 """
 
 
+#: Serialises register *opening* between threads of one process. See
+#: `Register.__init__`. Nothing else in this module is locked: once a
+#: connection is set up, SQLite's own locking is what keeps sweeps apart.
+_OPEN_LOCK = threading.Lock()
+
+
 def utcnow() -> str:
     return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
@@ -197,14 +204,34 @@ class Register:
         self.path = Path(path)
         self._conn = sqlite3.connect(str(self.path), isolation_level=None, timeout=30.0)
         self._conn.row_factory = sqlite3.Row
-        # WAL lets a reader (the review queue, a readiness pack export) run
-        # while a sweep is writing. busy_timeout is what turns the *other*
-        # sweep's write from `database is locked` into a wait -- without it,
-        # "two runs at once" is a crash rather than a queue.
-        self._conn.execute("PRAGMA journal_mode=WAL")
-        self._conn.execute("PRAGMA busy_timeout=30000")
-        self._conn.execute("PRAGMA foreign_keys=ON")
-        self._conn.executescript(SCHEMA)
+        # busy_timeout FIRST, and the order is the whole fix.
+        #
+        # It used to be set after `journal_mode=WAL`, which is exactly backwards:
+        # converting a database to WAL is the one statement here that needs an
+        # *exclusive* lock, so it is the statement most likely to collide with
+        # another process opening the same register at the same moment -- and it
+        # was running before this connection had been told to wait for anything.
+        # Two `Register()` constructions racing on a fresh file gave one of them
+        # `database is locked`, which surfaced as a concurrency test failing
+        # roughly one run in five, always after exactly 30 seconds.
+        #
+        # busy_timeout is what turns a second writer's `database is locked` into
+        # a wait. It has to be in force before the first statement that can be
+        # refused, not after it.
+        #
+        # The whole of setup is under `_OPEN_LOCK` for the same reason. Guarding
+        # only the schema left a 1-in-20 failure, because `journal_mode=WAL` is
+        # itself the exclusive-lock statement and two connections were still
+        # reaching it together. Opening a register is rare and fast; serialising
+        # it within a process costs nothing and removes every intra-process race
+        # here. Cross-process contention is what busy_timeout is for.
+        with _OPEN_LOCK:
+            self._conn.execute("PRAGMA busy_timeout=30000")
+            # WAL lets a reader (the review queue, a readiness pack export) run
+            # while a sweep is writing.
+            self._conn.execute("PRAGMA journal_mode=WAL")
+            self._conn.execute("PRAGMA foreign_keys=ON")
+            self._conn.executescript(SCHEMA)
         self._conn.execute(
             "INSERT INTO meta(key, value) VALUES('schema_version', ?) "
             "ON CONFLICT(key) DO NOTHING",

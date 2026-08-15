@@ -231,6 +231,55 @@ def test_helpful_commentary_is_refused_rather_than_spliced() -> None:
         assert _replacement(old, new, asserted) == "", f"commentary accepted for {asserted!r}"
 
 
+def test_a_dropped_unit_is_refused() -> None:
+    """This one reached a live page before it was caught.
+
+    The estate stores the latency threshold as a bare `1.2`; the model copied it
+    verbatim, and the runbook ended up reading "p99 request latency stays above
+    1.2 for 10 minutes". Shorter than the original, no commentary, entirely
+    meaningless — none of the earlier guards had anything to say about it.
+    """
+    from reconciler.edit import _replacement
+
+    assert _replacement("stays above 750ms for ten", "stays above 1.2 for ten", "750ms") == ""
+    assert _replacement("retention: 7 days", "retention: 14", "7 days") == ""
+    # The unit kept, which is the whole point, must still pass.
+    assert _replacement("stays above 750ms for ten", "stays above 1.2s for ten", "750ms") == "1.2s"
+    # Two bare numbers are not a dropped unit.
+    assert _replacement("ratio above 0.02 now", "ratio above 0.05 now", "0.02") == "0.05"
+    assert _replacement("runs 4 replicas", "runs 6 replicas", "4") == "6"
+
+
+def test_a_list_where_there_was_one_value_is_refused() -> None:
+    """The other one that reached a live page.
+
+    `observed` for an escalation finding is a sentence naming every declared
+    rota, so the model pasted all three and the page read "Page the Fulfilment,
+    Payments Core, Tracking rota". A single value became a list, and the
+    replacement was neither longer than the cap nor a superstring of the
+    original.
+    """
+    from reconciler.edit import _replacement
+
+    assert (
+        _replacement(
+            "Page the Payments Platform rota",
+            "Page the Fulfilment, Payments Core, Tracking rota",
+            "Payments Platform",
+        )
+        == ""
+    )
+    # Choosing one of them is the correct answer and must still pass.
+    assert (
+        _replacement(
+            "Page the Payments Platform rota",
+            "Page the Payments Core rota",
+            "Payments Platform",
+        )
+        == "Payments Core"
+    )
+
+
 def test_the_passage_document_does_not_hand_the_model_the_subject() -> None:
     """The heading is a marker, not content.
 
