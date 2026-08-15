@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body{font-family:Arial,sans-serif;margin:16px;color:#202124}.muted{color:#5f6368;font-size:12px}.row{margin:12px 0}.button{padding:9px 14px;border:0;border-radius:6px;background:#1a73e8;color:white;cursor:pointer}.button.secondary{background:#f1f3f4;color:#202124}.button:disabled{opacity:.55;cursor:default}.status{white-space:pre-wrap;background:#f8f9fa;border-radius:8px;padding:10px;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.pill{display:inline-block;padding:3px 8px;border-radius:10px;background:#e8f0fe;font-size:11px}.progress{height:10px;background:#e8eaed;border-radius:8px;overflow:hidden}.progress-bar{height:100%;width:0;background:#1a73e8;transition:width .25s}.progress-bar.active{background:linear-gradient(90deg,#1a73e8 25%,#8ab4f8 50%,#1a73e8 75%);background-size:200% 100%;animation:loading 1.2s linear infinite}.toggle{display:flex;align-items:center;gap:8px;font-size:13px}@keyframes loading{to{background-position:-200% 0}}
+  </style>
+</head>
+<body>
+  <h2>Roster → Documents</h2>
+  <div id="state" class="muted">Loading…</div>
+  <div class="row"><span class="pill">1 template</span> <span class="pill">3-row preview</span> <span class="pill">500-row limit</span></div>
+  <div class="row toggle"><input id="emailToggle" type="checkbox"><label for="emailToggle">Send document emails</label></div>
+  <div class="row"><div class="progress"><div id="progressBar" class="progress-bar"></div></div></div>
+  <div class="row grid">
+    <button id="previewButton" class="button secondary" onclick="preview()">Preview 3</button>
+    <button id="generateButton" class="button" onclick="generate()">Generate All</button>
+  </div>
+  <div class="row"><button id="cancelButton" class="button secondary" onclick="cancelJob()" style="display:none">Cancel active job</button></div>
+  <div class="row"><button id="resumeButton" class="button secondary" onclick="resume()" style="display:none">Refresh / continue saved job</button></div>
+  <div class="row"><div id="status" class="status">Ready.</div></div>
+  <script>
+    let previewJobId = null;
+    let activeJobId = null;
+    let pollTimer = null;
+    const statusEl = document.getElementById('status');
+    function show(value){statusEl.textContent=value;}
+    function setBusy(value){document.getElementById('previewButton').disabled=value;document.getElementById('generateButton').disabled=value;}
+    function showCancel(value){document.getElementById('cancelButton').style.display=value?'inline-block':'none';}
+    function describe(job){
+      if(!job){return 'No saved job for this sheet.';}
+      const percent=job.totalRows ? Math.round(job.completedRows*100/job.totalRows) : 0;
+      const progressBar=document.getElementById('progressBar');
+      progressBar.style.width=Math.min(100,percent)+'%';
+      progressBar.className='progress-bar'+(job.status==='running'?' active':'');
+      const failed=(job.results||[]).filter(function(r){return r.status==='failed';}).length;
+      const emailed=(job.results||[]).filter(function(r){return r.emailed;}).length;
+      return 'Job '+job.jobId+'\nStatus: '+job.status+'\n'+(job.currentAction||'')+'\nRows completed: '+job.completedRows+'/'+job.totalRows+' ('+percent+'%)\nEmails sent: '+emailed+(job.emailEnabled?'':' (emailing disabled)')+'\nFailed rows: '+failed+'\nNext row: '+(job.nextRow<=job.endRow?job.nextRow:'done');
+    }
+    function poll(){
+      if(!activeJobId)return;
+      if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
+      google.script.run.withSuccessHandler(function(job){
+        activeJobId=job.jobId;
+        show(describe(job));
+        document.getElementById('resumeButton').style.display=job.status==='completed'?'none':'inline-block';
+        showCancel(job.status==='running'||job.status==='preview');
+        if(job.status==='completed'||job.status==='failed'||job.status==='cancelled'){setBusy(false);showCancel(false);return;}
+        pollTimer=setTimeout(poll,1500);
+      }).withFailureHandler(function(error){
+        show('Processing is still in progress. Retrying… ' + (error && error.message ? error.message : ''));
+        pollTimer=setTimeout(poll,5000);
+      }).advanceGeneration(activeJobId);
+    }
+    function startPolling(){if(pollTimer)clearTimeout(pollTimer);pollTimer=null;poll();}
+    google.script.run.withSuccessHandler(function(s){
+      document.getElementById('state').textContent = s.sheetName+' · '+s.totalRows+' roster rows · SuperDocs '+(s.superDocsConfigured?'configured':'not configured');
+      document.getElementById('emailToggle').checked=!!s.defaultEmailEnabled;
+      if(!s.superDocsConfigured)show('Open Extensions → Roster to Documents → Settings to add your SuperDocs API key.');
+      if(s.activeJob){
+        activeJobId=s.activeJob.jobId;
+        previewJobId=s.activeJob.status==='preview'?s.activeJob.jobId:null;
+        show(describe(s.activeJob));
+        document.getElementById('resumeButton').style.display=s.activeJob.status==='completed'?'none':'inline-block';
+        showCancel(s.activeJob.status==='running'||s.activeJob.status==='preview');
+        if(s.activeJob.status==='running')startPolling();
+      }
+    }).withFailureHandler(function(e){show('Initialization error: '+e.message);}).getInitialState();
+    function preview(){
+      setBusy(true);show('Running preview on the first 3 rows…');
+      google.script.run.withSuccessHandler(function(p){
+        setBusy(false);previewJobId=p.jobId;activeJobId=p.jobId;showCancel(true);
+        show(p.results.map(function(r){return 'Row '+r.rowNumber+' → '+r.templateId+'\n'+(r.error||'OK');}).join('\n\n')+'\n\nPreview only. Review it, then generate.');
+      }).withFailureHandler(function(e){setBusy(false);show('Preview failed: '+e.message);}).runPreview();
+    }
+    function generate(){
+      if(!previewJobId){preview();return;}
+      setBusy(true);show('Starting saved job…');
+      google.script.run.withSuccessHandler(function(job){activeJobId=job.jobId;showCancel(true);show(describe(job));startPolling();}).withFailureHandler(function(e){setBusy(false);show('Generation failed to start: '+e.message);}).startGeneration(previewJobId,document.getElementById('emailToggle').checked);
+    }
+    function resume(){
+      if(!activeJobId){show('There is no saved job to continue.');return;}
+      setBusy(true);show('Resuming from the saved row…');
+      google.script.run.withSuccessHandler(function(job){activeJobId=job.jobId;show(describe(job));startPolling();}).withFailureHandler(function(e){setBusy(false);show('Resume failed: '+e.message);}).resumeGeneration(activeJobId);
+    }
+    function cancelJob(){
+      if(!activeJobId)return;
+      if(!window.confirm('Cancel this job? Completed rows will remain, and unprocessed rows will not be generated.'))return;
+      setBusy(true);show('Cancelling the active job and removing its continuation triggerâ€¦');
+      google.script.run.withSuccessHandler(function(job){
+        if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
+        activeJobId=null;previewJobId=null;showCancel(false);document.getElementById('resumeButton').style.display='none';setBusy(false);show(describe(job));
+      }).withFailureHandler(function(e){setBusy(false);show('Cancellation failed: '+e.message);}).cancelGeneration(activeJobId);
+    }
+  </script>
+</body>
+</html>

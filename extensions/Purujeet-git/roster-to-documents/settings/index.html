@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body{font-family:Arial,sans-serif;margin:20px;color:#202124}
+    label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px}
+    input{box-sizing:border-box;width:100%;padding:9px;border:1px solid #dadce0;border-radius:4px;font-size:13px}
+    .muted{color:#5f6368;font-size:12px;line-height:1.4}
+    .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+    button{padding:9px 14px;border:0;border-radius:5px;background:#1a73e8;color:white;cursor:pointer}
+    button.secondary{background:#f1f3f4;color:#202124}
+    button:disabled{opacity:.55;cursor:default}
+    #message{margin-top:12px;font-size:12px}
+  </style>
+</head>
+<body>
+  <h3>SuperDocs settings</h3>
+  <div class="muted">The API key is stored securely in Apps Script Script Properties and is never shown after saving.</div>
+  <label for="apiKey">SuperDocs API key</label>
+  <input id="apiKey" type="password" autocomplete="off" placeholder="Paste your API key">
+  <div id="message" class="muted">Loading…</div>
+  <div class="actions">
+    <button class="secondary" onclick="google.script.host.close()">Cancel</button>
+    <button id="save" onclick="save()">Save key</button>
+  </div>
+  <script>
+    const message = document.getElementById('message');
+    const saveButton = document.getElementById('save');
+    google.script.run.withSuccessHandler(function(state){
+      message.textContent = state.superDocsConfigured ? 'A key is currently configured.' : 'No key is configured yet.';
+    }).withFailureHandler(function(error){
+      message.textContent = 'Could not load settings: ' + error.message;
+    }).getSettingsState();
+    function save(){
+      const key = document.getElementById('apiKey').value.trim();
+      if(!key){message.textContent='Enter a SuperDocs API key.';return;}
+      saveButton.disabled=true;
+      message.textContent='Saving…';
+      google.script.run.withSuccessHandler(function(){
+        message.textContent='Saved. You can close this window and generate documents.';
+        document.getElementById('apiKey').value='';
+        saveButton.disabled=false;
+      }).withFailureHandler(function(error){
+        message.textContent='Save failed: ' + error.message;
+        saveButton.disabled=false;
+      }).saveSuperDocsApiKey(key);
+    }
+  </script>
+</body>
+</html>

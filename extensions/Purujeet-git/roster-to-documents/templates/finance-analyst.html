@@ -1,0 +1,21 @@
+<!doctype html>
+<html><body>
+<h1 data-chunk-id="title">Finance Analyst</h1>
+<p data-chunk-id="intro">Dear {Name},</p>
+<p data-chunk-id="role">We are pleased to confirm your appointment as <strong>{JobProfile}</strong> in {Department}.</p>
+<h2 data-chunk-id="overview">Role Overview</h2>
+<p data-chunk-id="description">{JobDescription}</p>
+<h2 data-chunk-id="responsibilities">Financial analysis, reporting, and controls responsibilities</h2>
+<p data-chunk-id="expectations">{JobDescription}</p>
+{#if Remote}
+<h2 data-chunk-id="remote">Remote Work</h2>
+<p data-chunk-id="remote-text">This role is approved for remote work based on the roster configuration.</p>
+{/if}
+{#if Salary}
+<h2 data-chunk-id="compensation">Compensation</h2>
+<p data-chunk-id="salary">Compensation: {Salary}</p>
+{/if}
+<h2 data-chunk-id="terms">Terms</h2>
+<p data-chunk-id="terms-text">Your employment will be subject to the organization's policies and applicable terms.</p>
+<p data-chunk-id="closing">Sincerely,<br/>HR / Administration</p>
+</body></html>

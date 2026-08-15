@@ -1,0 +1,18 @@
+{
+  "name": "roster-to-documents",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Google Sheets to role-specific documents extension for SuperDocs",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "vitest run",
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "open": "clasp open-script"
+  },
+  "devDependencies": {
+    "@types/google-apps-script": "^2.0.8",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
