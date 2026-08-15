@@ -10,7 +10,7 @@ kubectl -n payments describe deploy/payments-api]]></ac:plain-text-body></ac:str
 <p>On a shared cluster you may need to name the namespace yourself:</p>
 <ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="rr-demo-2"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n <your-namespace> top pods]]></ac:plain-text-body></ac:structured-macro>
 <h2>Mitigation</h2>
-<p>Restart the deployment first — it clears a wedged connection pool without needing a release:</p>
+<p>Restart the deployment first, since it clears a wedged connection pool without needing a release:</p>
 <ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="rr-demo-3"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n payments rollout restart deploy/payments-api]]></ac:plain-text-body></ac:structured-macro>
 <p>If a bad release is the cause, re-run the <code>rollback-production</code> job in the deploy workflow. It needs a production environment approval, so find a second reviewer before you start.</p>
 <h2>Escalation</h2>

@@ -66,7 +66,7 @@ work against the site host, still works.
 ## 2. CQL search is unreachable with a scoped token, and there is no v2 replacement
 
 > **Corrected 2026-08-15.** This item originally claimed the v1 REST API was *entirely*
-> unreachable. That is wrong, and I found out by accident when `demo/seed.py` successfully
+> unreachable. That is wrong, and I found out by accident when `seed.py` successfully
 > added a label through a v1 endpoint. Reachability follows the token's granted scopes
 > endpoint by endpoint:
 >
@@ -120,7 +120,7 @@ per page. Documented in that method rather than only here, because the person
 who will care is reading that method wondering why it is N+1.
 
 **Also fixed in the correction above:** adding a label is only possible through v1,
-which the original over-broad claim would have ruled out. `demo/seed.py` labels the
+which the original over-broad claim would have ruled out. `seed.py` labels the
 page it creates, and without that the page is invisible to `rr` — it crawls by label.
 
 ---
@@ -430,6 +430,45 @@ Both are *correct and helpful*, and both would have been spliced into the middle
 
 ---
 
+## 13. A scoped token can create a page but not delete one
+
+**What I did.** `DELETE /wiki/api/v2/pages/{id}`, to clean up the page `seed.py` had just created.
+
+**What I expected.** `204`. Creating had worked, and a token that can create and overwrite a page can already destroy its content.
+
+**What happened.** `401 Unauthorized; scope does not match`. `delete:page:confluence` is not among the scopes an API token can be granted, so the demo can plant a page and cannot remove it.
+
+**How badly it blocked.** Barely, but it caused a worse bug than itself. `seed.py delete` printed `delete 557058 -> 401` and returned normally, so `./demo` announced *"walkthrough complete, and every stage passed"* with the page still sitting in the space. Reporting success for something that did not happen is the exact failure this project exists to catch, and it was in the cleanup path of its own demo. It now exits non-zero and prints what to click.
+
+**Worth noting for the threat model.** A token that can rewrite a page's entire body but cannot delete it is a slightly odd security boundary — the damage a compromised token could do is bounded by version history either way, and version history is what actually protects you.
+
+---
+
+## 14. An open editor tab silently reverts API writes, and version numbers do not stop it
+
+**Verified by losing a page to it.**
+
+**What I did.** Ran the live write round-trip against page 98311, which appends a marker, reads it back, restores the original body and asserts byte-identity. It passed. The page was correct, at version 5, 5,653 bytes.
+
+**What happened.** Nineteen minutes later the page was 29 bytes — a single empty paragraph. Version history:
+
+```
+v6  18:06  message: "Autosaved"                                    <- the browser
+v5  17:47  message: "runbook-reconciler: approved fix to one passage"
+v4  17:47  message: "runbook-reconciler: approved fix to one passage"
+v1  22:01  (original)
+```
+
+The page had been **open in the Confluence web editor** in another tab the whole time. The editor holds its own copy of the document from when it was opened, does not notice writes that arrive through the API, and autosaves its stale copy over the top whenever it feels like it.
+
+**Why the version check did not save it.** Optimistic concurrency protects *this tool* from overwriting somebody else — our `PUT` carries the version we read and fails if it moved. It does nothing in the other direction: the editor's autosave is a perfectly valid write of a new version, and Confluence does not merge or warn.
+
+**How badly it blocked.** It cost a page, recovered from version history, and it is the most important limitation in this file. Nothing in the API surfaces "a human has this page open", so the tool cannot detect it, refuse, or warn. The honest mitigations are operational: sweep when people are not editing, keep the review gate so writes are deliberate and few, and rely on version history — every change this tool makes is one labelled version that can be reverted in two clicks.
+
+**How to reproduce.** Open a page in the Confluence editor, leave the tab open, write to the same page through the API, then wait for or trigger an autosave. The API write is gone.
+
+---
+
 ## Things this file does not claim
 
 Both live paths **have** now been run, on 2026-08-15, and items 7, 8 and 9 above
@@ -441,7 +480,7 @@ RR_LIVE_CONFLUENCE_TESTS=1 RR_LIVE_PAGE_ID=<a page you own> ./rr test -k live
 ```
 
 The **full loop has now run against live Confluence**, on 2026-08-15: a seeded
-runbook page (`demo/seed.py`) with seven planted contradictions, swept live,
+runbook page (`seed.py`) with seven planted contradictions, swept live,
 worded through SuperDocs, approved, and written back — leaving exactly four
 minimal changed ranges on the page and every other byte identical:
 

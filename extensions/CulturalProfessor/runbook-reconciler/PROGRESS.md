@@ -381,3 +381,77 @@ retries only the failures at one operation per page. Two retries converged.
 It does mean any measurement of *that* layer needs several runs, and the README
 says so — a single run would have supported either "this works" or "this barely
 works" depending on which one you did.
+
+## 2026-08-16 — the walkthrough is a third script, not a mode of the other two
+
+**Question.** The sibling build has three entry points: `mb` (the product),
+`selftest` (unattended proof), `demo` (a paced walkthrough). This build had the
+first two and a `demo/` *directory* holding the live-page seeder. Is a
+walkthrough script worth its own file, or is it `selftest` with pauses?
+
+**Call.** Its own file, and the directory was renamed out of the way — the
+seeder is now `seed.py` at the root next to `preflight.py`, and its page lives
+in `fixtures/live/`.
+
+**Reasoning.** They are opposite artefacts. `selftest` exists so nobody has to
+watch it: cheapest-first, pass/fail, live stages skipped loudly. `demo` exists
+to be watched: one stage at a time, real output left on screen, every stage
+printing its cost before it runs, nothing advancing without a keypress. Merging
+them would make one of the two worse — a proof script that pauses cannot run in
+CI, and a walkthrough that races cannot be narrated.
+
+Two things the first end-to-end run of it taught, neither of which was visible
+from running the commands by hand:
+
+**The register spans sweeps, so a walkthrough needs two of them.** Stages 1-3
+sweep the corpus and stages 4-12 sweep a live Confluence space. Sharing one
+register left the corpus's findings — for pages 1001-1007, which exist only in
+`fixtures/` — sitting in the queue when the live half ran, so `rr propose`
+priced eight pages instead of one and `rr review` tried to write to Confluence
+pages that do not exist. That is the register behaving correctly: it holds
+findings until somebody decides on them, and two estates are two sets of
+findings. The script now uses a register per half.
+
+**A demo that hides the wording layer's variance is lying about the product.**
+Stage 7 runs `rr propose --yes` twice, and says why in the stage label. One pass
+worded three of seven findings; two passes worded six. Hiding that behind a
+single lucky run would misrepresent the thing most likely to disappoint somebody
+in week one — and showing it demonstrates the property that makes it survivable,
+which is that a second pass costs one operation and retries only the failures.
+
+## 2026-08-16 — two failures found by running the demo rather than the commands
+
+**Question.** The individual commands had all been run live and were correct.
+Was the walkthrough script just packaging?
+
+**Call.** No — running them *as a sequence* found two things running them
+individually could not, and one of them was a defect in my own code of exactly
+the kind this project exists to catch.
+
+**Reasoning.**
+
+**`seed.py delete` reported success for a delete that never happened.**
+`DELETE /wiki/api/v2/pages/{id}` answers `401 scope does not match` — a scoped
+API token can create and overwrite a page but not delete one. The function
+printed `delete 557058 -> 401` and returned normally, so `./demo` finished with
+"walkthrough complete, and every stage passed" while the page sat in the space.
+A tool whose entire argument is "a claim nobody verified is reported as
+unverified" had a cleanup path that reported success for a refused request. It
+now exits non-zero and prints what to click. This is the argument for demo
+scripts: nobody reads the return code of a command they ran by hand and watched
+succeed, and a script does nothing else.
+
+**An open editor tab silently reverts API writes.** Page 98311 was left correct
+at version 5 by a passing test and was 29 bytes twenty minutes later. Version 6
+is labelled `Autosaved` — the Confluence web editor, open in a browser tab the
+whole time, holding its copy from before any of the API writes and saving it
+over the top. The version check does not help: it protects this tool from
+overwriting somebody else, not the other way round, and the autosave is a
+perfectly valid new version.
+
+That is now the most important limitation in the README, because nothing in the
+API exposes "a human has this page open" — the tool cannot detect it, refuse, or
+warn. What it can do is what it already does: make every change one labelled
+version that reverts in two clicks, and keep the number of writes small and
+deliberate. Worth being blunt about rather than discovering in somebody's
+production space.

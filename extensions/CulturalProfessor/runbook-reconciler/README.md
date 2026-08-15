@@ -95,34 +95,34 @@ same person who wrote the checker.
 ./rr mcp                   # the four tools, over stdio, for an agent
 ```
 
-`./rr test` runs the suite; `./selftest` runs the staged proof, cheapest first, with the
-stages that spend opt-in and loudly skipped rather than silently passed.
+There are three scripts, and they are for three different things:
 
-### The loop, run against a live Confluence page
+| | |
+| --- | --- |
+| `./rr test` | the suite — 270 tests, no key, no network |
+| `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
+| `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 
-`demo/seed.py` puts a runbook with seven planted contradictions into a real space, so the
-whole thing can be exercised end to end rather than described:
+### `./demo` — the whole thing, end to end, against a live space
 
-```bash
-.venv/bin/python demo/seed.py create   # creates and labels the page
-./rr check                             # reads Confluence, finds the drift
-./rr propose --yes                     # 1 operation for the page
-./rr review                            # approve item by item
-.venv/bin/python demo/seed.py delete   # put the space back
+Twelve stages, each printing what it costs before it runs, each waiting for Enter.
+`./demo --offline` stops after stage 3 and needs no credentials at all.
+
+It seeds a runbook with seven planted contradictions into your own Confluence space
+(`seed.py`), sweeps it, prices the wording, buys it, puts every finding through the
+human gate, shows the byte-level diff, sweeps again to show the drift gone, shows that
+a clean estate spends nothing — then deletes the page.
+
+A real run on 2026-08-16: all seven found, **six written, one escalated**, and
+
+```
+page 557058 · 8 changed range(s) out of 2708 bytes
+2678 of 2708 bytes untouched.
 ```
 
-Run on 2026-08-15, that found all seven contradictions and left exactly four minimal
-changed ranges on the page, with every other byte identical:
-
-```
-replace: '2'    -> '5'      error budget 0.02 -> 0.05
-replace: '750m' -> '1.2'    latency 750ms -> 1.2s
-replace: '4'    -> '6'      replicas
-replace: '7'    -> '14'     backup retention days
-```
-
-The three not written are the honest part: a dead dashboard link has no correct
-replacement, so it escalates to a human instead of being guessed at.
+The escalated one is the honest part: a dead dashboard link has no correct replacement,
+so it goes to a human instead of being guessed at. Stage 11 then reports *nothing to
+propose* — zero operations on an estate with nothing left wrong.
 
 ### The claim register is the spine
 
@@ -288,6 +288,13 @@ path puts page text into one.
   deterministic.
 - **Confluence Cloud only.** Not Data Center. The auth discovery and the v2 API are Cloud
   specific.
+- **An editor tab open on a page will silently revert what this tool writes.** The
+  Confluence web editor keeps its own copy from when it was opened, ignores writes that
+  arrive through the API, and autosaves over them. Version numbers do not help: the
+  autosave is a valid new version, and nothing in the API exposes "a human has this open",
+  so the tool cannot detect or refuse it. Every change it makes is one labelled version,
+  revertible in two clicks — that, plus sweeping when people are not editing, is the whole
+  mitigation. Found the hard way; [BUGS.md](BUGS.md) item 14.
 - **Mature SRE teams keep runbooks as markdown in the repo** and need this least. The
   buyer is the large middle where runbooks live in Confluence.
 - **Value decays after the first sweep.** The first run finds years of accumulated drift;
