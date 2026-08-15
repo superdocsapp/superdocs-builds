@@ -1,0 +1,9 @@
+{
+  "id": "1006",
+  "status": "current",
+  "title": "Disaster recovery: payments datastore",
+  "spaceKey": "RUN",
+  "version": { "number": 9, "createdAt": "2026-02-11T15:30:00.000Z", "authorId": "557058:9f1c" },
+  "labels": ["runbook", "dr", "payments"],
+  "_links": { "webui": "/spaces/RUN/pages/1006" }
+}

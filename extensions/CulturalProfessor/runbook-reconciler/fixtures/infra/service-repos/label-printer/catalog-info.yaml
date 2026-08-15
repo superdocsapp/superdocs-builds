@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: label-printer
+  description: Renders and queues carrier shipping labels for depot printers
+  annotations:
+    meridian.io/kubernetes-deployment: label-printer
+    meridian.io/kubernetes-namespace: fulfilment
+    pagerduty.com/escalation-policy: fulfilment-oncall
+spec:
+  type: service
+  lifecycle: production
+  owner: team-fulfilment
+  tier: 2

@@ -1,0 +1,43 @@
+# Escalation policies as declared in the PagerDuty terraform module's inputs.
+# The Payments rota was renamed from "Payments Platform" to "Payments Core" when
+# the platform and product halves merged; page 1002 still names the old one.
+policies:
+  - name: payments-core-oncall
+    display_name: Payments Core
+    services:
+      - payments-api
+    escalation:
+      - level: 1
+        target: payments-core-primary
+        after_minutes: 0
+      - level: 2
+        target: payments-core-secondary
+        after_minutes: 15
+      - level: 3
+        target: head-of-platform
+        after_minutes: 30
+
+  - name: tracking-oncall
+    display_name: Tracking
+    services:
+      - tracking-ingest
+    escalation:
+      - level: 1
+        target: tracking-primary
+        after_minutes: 0
+      - level: 2
+        target: head-of-platform
+        after_minutes: 20
+
+  - name: fulfilment-oncall
+    display_name: Fulfilment
+    services:
+      - label-printer
+      - manifest-worker
+    escalation:
+      - level: 1
+        target: fulfilment-primary
+        after_minutes: 0
+      - level: 2
+        target: head-of-operations
+        after_minutes: 20

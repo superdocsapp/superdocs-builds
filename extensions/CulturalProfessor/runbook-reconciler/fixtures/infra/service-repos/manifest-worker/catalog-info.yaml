@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: manifest-worker
+  description: Batches consignment manifests and files them with customs brokers
+  annotations:
+    meridian.io/kubernetes-deployment: manifest-worker
+    meridian.io/kubernetes-namespace: fulfilment
+    pagerduty.com/escalation-policy: fulfilment-oncall
+spec:
+  type: service
+  lifecycle: production
+  owner: team-fulfilment
+  tier: 2

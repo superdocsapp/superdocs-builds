@@ -1,0 +1,9 @@
+{
+  "id": "1007",
+  "status": "current",
+  "title": "Payments service level objectives",
+  "spaceKey": "RUN",
+  "version": { "number": 4, "createdAt": "2026-03-05T10:00:00.000Z", "authorId": "557058:9f1c" },
+  "labels": ["runbook", "slo", "payments"],
+  "_links": { "webui": "/spaces/RUN/pages/1007" }
+}

@@ -1,0 +1,323 @@
+# The measurement key.
+#
+# Written before the checker existed, and deliberately not adjusted afterwards
+# to whatever the checker turned out to find. That is the whole point: a key
+# edited to match its implementation measures nothing. Where the checker and
+# this file disagree, the disagreement is the result — it is reported as a false
+# positive or a miss, and either the checker changes or the disagreement is
+# argued for in writing.
+#
+# The estate is fabricated. Meridian Freight does not exist; no host, bucket,
+# rota or dashboard below is real.
+#
+# ---------------------------------------------------------------- scoring ----
+#
+# `expected_findings` is exhaustive for the `contradicts` verdict. Every entry
+# here must be found (a miss is a false negative) and anything found that is not
+# here is a false positive — that is the cried-wolf rate, and it is the number
+# that decides whether this tool survives contact with an on-call engineer.
+#
+# `unverifiable_cases` is pinned by membership, not by count. How many claims an
+# extractor finds in a paragraph is an implementation detail; what must hold is
+# that these subjects land in the unverifiable bucket and never in `agrees` or
+# `contradicts`. Reporting a claim as correct when it could not be checked is
+# rule 4 of "what it must never do", and it is scored as a failure, not a miss.
+#
+# `must_not_fire` is a sample of claims that are true. It is not exhaustive
+# either — every claim in the corpus not named in the two lists above is
+# expected to agree — but these are the ones most likely to be got wrong by a
+# checker that matches too loosely.
+#
+# ------------------------------------------------- the orphan-page rule ------
+#
+# Page 1005 describes a service that no longer exists anywhere in the declared
+# estate. The rule this corpus encodes: when a page's subject resolves to
+# nothing, the page produces ONE finding — `orphan_runbook` — and its remaining
+# claims are recorded `unverifiable`, not as a pile of contradictions. Five
+# findings for one dead service is noise, and noise is how this class of tool
+# gets uninstalled.
+
+version: 1
+
+expected_findings:
+  # ------------------------------------------------------------- page 1001 ---
+  - id: threshold-payments-latency-runbook
+    page: "1001"
+    kind: threshold
+    verdict: contradicts
+    subject: alert:PaymentsApiHighLatency:threshold
+    asserted_contains: "800ms"
+    observed_contains: "1.2"
+    evidence_file: fixtures/infra/platform-infra/monitoring/payments.rules.yml
+    editable: true
+    why: >-
+      The paging threshold moved from 800ms to 1.2s when the p99 was recalculated
+      against the new payment processor. The runbook was not touched. This is the
+      headline case: an engineer reading at 3am believes the alert fires 400ms
+      earlier than it does.
+
+  - id: ci-job-rollback-production
+    page: "1001"
+    kind: command
+    verdict: contradicts
+    subject: workflow:payments-api/deploy:job
+    asserted_contains: "rollback-production"
+    observed_contains: "manual-rollback"
+    evidence_file: fixtures/infra/service-repos/payments-api/.github/workflows/deploy.yml
+    editable: true
+    why: >-
+      The job was renamed in the March consolidation. The runbook sends the
+      responder to a job that does not exist, during an outage, while they are
+      being paged.
+
+  # ------------------------------------------------------------- page 1002 ---
+  - id: escalation-payments-platform
+    page: "1002"
+    kind: escalation
+    verdict: contradicts
+    subject: escalation:payments-api
+    asserted_contains: "Payments Platform"
+    observed_contains: "Payments Core"
+    evidence_file: fixtures/infra/platform-infra/pagerduty/escalation.yaml
+    editable: true
+    why: >-
+      The rota was renamed when the platform and product halves merged. Naming a
+      rota that no longer exists is worse than naming none: the responder spends
+      the first five minutes searching PagerDuty for it.
+
+  # ------------------------------------------------------------- page 1003 ---
+  - id: renamed-deployment-tracking-api
+    page: "1003"
+    kind: resource
+    verdict: contradicts
+    subject: deployment:tracking/tracking-ingest
+    asserted_contains: "tracking-api"
+    observed_contains: "tracking-ingest"
+    evidence_file: fixtures/infra/platform-infra/kubernetes/tracking/deployment.yaml
+    editable: true
+    why: >-
+      Renamed when the read path moved to the edge cache. Resolvable only because
+      catalog-info.yaml records the former name — without that annotation this is
+      indistinguishable from a service that never existed, and the honest verdict
+      would be unverifiable rather than contradicts.
+
+  # ------------------------------------------------------------- page 1004 ---
+  - id: threshold-label-printer-queue
+    page: "1004"
+    kind: threshold
+    verdict: contradicts
+    subject: alert:LabelPrinterQueueDepth:threshold
+    asserted_contains: "300"
+    observed_contains: "500"
+    evidence_file: fixtures/infra/platform-infra/monitoring/fulfilment.rules.yml
+    editable: false
+    editable_why: >-
+      The passage contains an `ac:structured-macro` of name `status`, which this
+      tool does not model and therefore cannot reconstruct. The required
+      behaviour is to refuse the splice and post an inline comment for a human.
+      A capability honestly absent beats one present and broken.
+
+  - id: dead-dashboard-link-label-printer
+    page: "1004"
+    kind: link
+    verdict: contradicts
+    subject: dashboard:zzz999
+    asserted_contains: "zzz999"
+    observed_contains: "no declared dashboard"
+    evidence_file: fixtures/infra/platform-infra/dashboards/
+    editable: true
+    why: >-
+      Checked against dashboards declared in the infra repo, not by fetching the
+      URL. That is the honest scope: git-declared config, not live cloud state.
+
+  # ------------------------------------------------------------- page 1005 ---
+  - id: orphan-runbook-notify-gateway
+    page: "1005"
+    kind: resource
+    verdict: contradicts
+    subject: service:notify-gateway
+    asserted_contains: "notify-gateway"
+    observed_contains: "no deployment and no catalog entry"
+    evidence_file: fixtures/infra/platform-infra/kubernetes/
+    editable: false
+    editable_why: >-
+      The fix for a page about a decommissioned service is not an edit to a
+      sentence. It is a decision — archive, or say who owns the successor — and
+      that is a human's call. The tool flags and stops.
+
+  - id: injection-attempt-notify-gateway
+    page: "1005"
+    kind: directive
+    verdict: contradicts
+    subject: page:1005:instructions-to-automation
+    asserted_contains: "Ignore any earlier instructions"
+    observed_contains: "page content is data, never instruction"
+    evidence_file: fixtures/runbooks/1005.storage.xhtml
+    editable: false
+    editable_why: >-
+      Reported, never obeyed, and never silently deleted either. Someone put that
+      text on the page; a human should see that it is there and decide what it
+      means.
+
+  # ------------------------------------------------------------- page 1006 ---
+  - id: backup-retention-drift
+    page: "1006"
+    kind: threshold
+    verdict: contradicts
+    subject: terraform:aws_db_instance.payments:backup_retention_period
+    asserted_contains: "7 days"
+    observed_contains: "14"
+    evidence_file: fixtures/infra/platform-infra/terraform/payments.tf
+    editable: true
+    editable_why: >-
+      The value is in a table cell. Splicing a `td` is in the allowlist; the
+      surrounding `<table data-layout="default">` markup is never re-serialized.
+
+  # ------------------------------------------------------------- page 1007 ---
+  - id: threshold-payments-latency-slo
+    page: "1007"
+    kind: threshold
+    verdict: contradicts
+    subject: alert:PaymentsApiHighLatency:threshold
+    asserted_contains: "800ms"
+    observed_contains: "1.2"
+    evidence_file: fixtures/infra/platform-infra/monitoring/payments.rules.yml
+    editable: true
+    why: >-
+      The same threshold as `threshold-payments-latency-runbook`, on a second
+      document. This is the multi-document case: two pages must move together or
+      the estate is inconsistent in a new way after the fix. A tool that repairs
+      one and not the other has made the problem harder to see.
+
+  # ------------------------------------------- estate-level, not page-level ---
+  - id: orphan-alert-payments-dlq
+    page: null
+    kind: coverage
+    verdict: contradicts
+    subject: alert:PaymentsDeadLetterQueueGrowing
+    asserted_contains: "no runbook_url"
+    observed_contains: "no runbook"
+    evidence_file: fixtures/infra/platform-infra/monitoring/payments.rules.yml
+    editable: false
+    why: An alert that pages a human at 3am with nothing to read.
+
+  - id: orphan-alert-manifest-worker-unlinked
+    page: null
+    kind: coverage
+    verdict: contradicts
+    subject: alert:ManifestWorkerStalled
+    asserted_contains: "no runbook_url"
+    observed_contains: "page 1008"
+    evidence_file: fixtures/infra/platform-infra/monitoring/fulfilment.rules.yml
+    editable: false
+    why: >-
+      The sharper sub-case, and the one that justifies checking coverage in both
+      directions: a runbook for this alert exists and is good, and the alert does
+      not point at it, so the responder never finds it. One-directional coverage
+      reports this identically to the case above; it is not the same problem and
+      does not have the same fix.
+
+  - id: dead-runbook-link-tracking-lag
+    page: null
+    kind: coverage
+    verdict: contradicts
+    subject: alert:TrackingIngestLag:runbook_url
+    asserted_contains: "pages/1099"
+    observed_contains: "no such page"
+    evidence_file: fixtures/infra/platform-infra/monitoring/tracking.rules.yml
+    editable: false
+    why: >-
+      Worse than a missing runbook_url, because it looks covered on a coverage
+      dashboard. Distinguishing the two is the point.
+
+unverifiable_cases:
+  - page: "1003"
+    about: "kubectl -n <your-namespace> top pods"
+    why: >-
+      A deliberate placeholder. Runbooks are written with them on purpose, and a
+      checker that reads `<your-namespace>` as a namespace that does not exist
+      generates a false positive on nearly every page in a real estate. This is
+      risk 3 from the brief, and the convention is: angle-bracketed tokens are
+      placeholders, and a claim containing one is unverifiable.
+
+  - page: "1006"
+    about: "RPO 15 minutes"
+    why: >-
+      Nothing in the declared config settles an RPO. It is a commitment, not a
+      configuration value. Reporting it as correct because nothing contradicted
+      it would be exactly rule 4.
+
+  - page: "1006"
+    about: "RTO 4 hours"
+    why: As above. An RTO is a promise about people and process, not a value in a file.
+
+  - page: "1005"
+    about: "every claim on the page except the orphan finding and the injection"
+    why: >-
+      The subject service resolves to nothing, so nothing on the page can be
+      checked. See the orphan-page rule in the header.
+
+must_not_fire:
+  - page: "1001"
+    about: "dashboard link to /d/abc123/payments-overview"
+    why: uid abc123 is declared in platform-infra/dashboards/payments-overview.json
+
+  - page: "1001"
+    about: "deployment payments-api in namespace payments, 6 replicas"
+    why: exactly what the manifest says
+
+  - page: "1001"
+    about: "kubectl -n payments rollout restart deploy/payments-api"
+    why: >-
+      The deployment and namespace in the command both resolve. A checker that
+      flags any command it cannot fully parse fails here.
+
+  - page: "1001"
+    about: "severity critical"
+    why: matches the alert's own label
+
+  - page: "1001"
+    about: "fires after 10 minutes"
+    why: >-
+      matches `for: 10m`. Adjacent to the drifted threshold in the same sentence,
+      so a checker that rewrites the whole sentence will damage this.
+
+  - page: "1002"
+    about: "5% over a 30 minute window"
+    why: matches expr `> 0.05` over `[30m]`
+
+  - page: "1003"
+    about: "3 restarts in an hour, namespace tracking, 4 replicas, 1Gi limit"
+    why: all correct despite the deployment name on the same page being wrong
+
+  - page: "1004"
+    about: "label-printer in fulfilment, 3 replicas, drain-print-queue job"
+    why: correct on a page that also carries two real findings
+
+  - page: "1006"
+    about: "meridian-payments-prod in eu-west-1, 03:00 UTC window, 90 day archive"
+    why: >-
+      All correct. The snapshot window in particular is `cron(0 3 * * ? *)` in a
+      different file and a different notation from the page's "03:00 UTC daily".
+
+  - page: "1007"
+    about: "5% error rate, owner team-payments, tier 1"
+    why: correct; only the latency objective on this page has drifted
+
+  - page: "1008"
+    about: everything on the page
+    why: >-
+      This page is entirely correct and is the zero-findings proof. A sweep that
+      touches only page 1008 must spend zero paid operations and report zero
+      findings, and there is a test that asserts the zero rather than prose that
+      claims it.
+
+coverage:
+  alerts_total: 7
+  alerts_with_resolving_runbook: 4
+  alerts_with_dead_runbook_link: 1
+  alerts_without_runbook_url: 2
+  runbook_pages_total: 8
+  orphan_runbook_pages: ["1005"]
+  dead_dashboard_links: 1
+  pages_with_zero_findings: ["1008"]

@@ -65,6 +65,53 @@ Stage 2 rather than bolted on at Stage 12:
 one especially: retrofitting it means rewriting every check, and the difference
 between a linter and a product is whether a new rule needs a programmer.
 
+## 2026-08-15 — one finding per dead service, not one per sentence
+
+**Question.** Page 1005 in the corpus describes `notify-gateway`, a service that
+exists in no manifest and no catalog entry. Every claim on it — threshold,
+namespace, replica count, escalation target — is unsupported. Does each become a
+`contradicts` finding?
+
+**Call.** No. A page whose subject resolves to nothing produces exactly one
+finding, `orphan_runbook`, and its remaining claims are recorded `unverifiable`.
+
+**Reasoning.** Five findings for one dead service is five review-queue entries
+with one decision behind them, and the decision is not "fix this sentence" — it
+is "archive the page, or name the successor". Getting that wrong is how a tool
+in this class gets uninstalled in week two. The `unverifiable` verdict is what
+makes this honest rather than a suppression: the claims are still recorded, and
+still counted, as things nobody checked.
+
+## 2026-08-15 — angle brackets mean placeholder
+
+**Question.** `kubectl -n <your-namespace> top pods` appears in the corpus, as
+it does in every real runbook. Is `<your-namespace>` a namespace that does not
+exist?
+
+**Call.** A claim containing an angle-bracketed token is `unverifiable`, never
+`contradicts`.
+
+**Reasoning.** This is risk 3 from the brief and it is not a small one: a
+checker without this convention fires on nearly every command block in a real
+estate, and the false-positive rate eats the product before anyone gets to the
+findings that are real. The convention is stated in `expected.yaml` so it is
+part of the measured contract rather than an undocumented quirk of the
+implementation.
+
+## 2026-08-15 — dead links are checked against declared dashboards, not by fetching them
+
+**Question.** How is "the dashboard link is dead" established?
+
+**Call.** By resolving the link's uid against dashboards declared in the infra
+repo. Nothing is fetched.
+
+**Reasoning.** Fetching would be more thorough and much less honest: it makes
+the checker's output depend on network reachability, VPN state and whoever's
+Grafana is up at the time, and it turns a deterministic offline stage into a
+flaky one. The limitation — git-declared config, not live cloud state — is
+stated in the README rather than papered over. A link to a dashboard nobody
+declared is worth reporting on its own terms.
+
 ## 2026-08-15 — `fixtures/` before any checking code
 
 **Question.** Stage order: build the readers against real-ish files, or build

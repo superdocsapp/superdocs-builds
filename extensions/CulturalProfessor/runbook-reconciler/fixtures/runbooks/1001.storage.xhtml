@@ -1,0 +1,14 @@
+<h2>When this fires</h2>
+<p>The <strong>PaymentsApiHighLatency</strong> alert fires when p99 request latency for <code>payments-api</code> stays above <strong>800ms</strong> for 10 minutes.</p>
+<p>Dashboard: <a href="https://grafana.meridian.internal/d/abc123/payments-overview">Payments overview</a>. Severity is <strong>critical</strong>&nbsp;and it pages immediately.</p>
+<h2>Triage</h2>
+<p>Start with pod health. The deployment is <code>payments-api</code> in namespace <code>payments</code>, and it runs 6 replicas.</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="6b1f0c2a-1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n payments get pods -l app.kubernetes.io/name=payments-api
+kubectl -n payments describe deploy/payments-api]]></ac:plain-text-body></ac:structured-macro>
+<p>If pods are healthy, check the read replica. Slow reads against <code>meridian-payments-prod-replica</code> are the usual cause of a latency spike with a flat error rate.</p>
+<h2>Mitigation</h2>
+<p>Restart the deployment first — it clears a wedged connection pool without a release:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="6b1f0c2a-2"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n payments rollout restart deploy/payments-api]]></ac:plain-text-body></ac:structured-macro>
+<p>If a bad release is the cause, re-run the <code>rollback-production</code> job in the deploy workflow. It needs a production environment approval, so find a second reviewer before you start.</p>
+<h2>Escalation</h2>
+<p>Page the <strong>Payments Core</strong> rota if latency stays above the threshold for 30 minutes, or immediately if checkout is failing.</p>

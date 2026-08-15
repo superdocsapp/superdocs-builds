@@ -1,0 +1,9 @@
+{
+  "id": "1001",
+  "status": "current",
+  "title": "Runbook: payments-api high latency",
+  "spaceKey": "RUN",
+  "version": { "number": 7, "createdAt": "2026-04-18T09:14:00.000Z", "authorId": "557058:9f1c" },
+  "labels": ["runbook", "payments", "tier-1"],
+  "_links": { "webui": "/spaces/RUN/pages/1001" }
+}

@@ -1,0 +1,24 @@
+groups:
+  - name: tracking
+    rules:
+      - alert: TrackingIngestPodRestarts
+        expr: increase(kube_pod_container_status_restarts_total{namespace="tracking"}[1h]) > 3
+        for: 5m
+        labels:
+          severity: warning
+          team: team-tracking
+        annotations:
+          summary: tracking-ingest pods restarting more than 3 times an hour
+          runbook_url: https://meridian.atlassian.net/wiki/spaces/RUN/pages/1003
+
+      # Points at a page that does not exist. Distinct from having no runbook at
+      # all: this one looks covered on a dashboard and is not.
+      - alert: TrackingIngestLag
+        expr: max(tracking_ingest_lag_seconds) > 300
+        for: 10m
+        labels:
+          severity: critical
+          team: team-tracking
+        annotations:
+          summary: tracking ingest lag above 5 minutes
+          runbook_url: https://meridian.atlassian.net/wiki/spaces/RUN/pages/1099

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: label-printer
+  namespace: fulfilment
+  labels:
+    app.kubernetes.io/name: label-printer
+    meridian.io/tier: "2"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: label-printer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: label-printer
+    spec:
+      containers:
+        - name: printer
+          image: ghcr.io/meridian/label-printer:4.2.1
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "500m"

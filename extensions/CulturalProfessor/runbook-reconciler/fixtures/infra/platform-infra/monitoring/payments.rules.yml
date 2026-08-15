@@ -1,0 +1,35 @@
+# Meridian Freight -- payments alerting rules.
+# Fabricated. There is no such company; every host, bucket and rota below is invented.
+groups:
+  - name: payments
+    rules:
+      - alert: PaymentsApiHighLatency
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{service="payments-api"}[5m])) by (le)) > 1.2
+        for: 10m
+        labels:
+          severity: critical
+          team: team-payments
+        annotations:
+          summary: payments-api p99 latency above 1.2s
+          runbook_url: https://meridian.atlassian.net/wiki/spaces/RUN/pages/1001
+
+      - alert: PaymentsApiErrorBudgetBurn
+        expr: sum(rate(http_requests_total{service="payments-api",code=~"5.."}[30m])) / sum(rate(http_requests_total{service="payments-api"}[30m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          team: team-payments
+        annotations:
+          summary: payments-api burning error budget faster than 5%
+          runbook_url: https://meridian.atlassian.net/wiki/spaces/RUN/pages/1002
+
+      # No runbook_url. This is the orphan-alert case: it pages someone at 3am
+      # with nothing to read.
+      - alert: PaymentsDeadLetterQueueGrowing
+        expr: sum(payments_dlq_depth) > 100
+        for: 15m
+        labels:
+          severity: warning
+          team: team-payments
+        annotations:
+          summary: payments dead-letter queue above 100 messages
