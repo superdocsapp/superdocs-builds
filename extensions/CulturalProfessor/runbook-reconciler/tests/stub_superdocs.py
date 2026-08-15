@@ -85,10 +85,19 @@ class Stub:
     a session or job counter by accident.
     """
 
-    def __init__(self, poll_delay: float = 3.0) -> None:
+    def __init__(self, poll_delay: float = 3.0, edit_fn: Any = None) -> None:
         self.sessions: dict[str, dict[str, Any]] = {}
         self.jobs: dict[str, dict[str, Any]] = {}
         self.approve_calls: list[dict[str, Any]] = []
+        # Added for runbook-reconciler.
+        self.documents: dict[str, str] = {}
+        self.durable: dict[str, str] = {}
+        self.pending_html: dict[str, tuple[str, list[dict[str, Any]]]] = {}
+        #: How the stub "edits" a document. Injected so a test can make the
+        #: service return changes out of order, skip a passage, or propose
+        #: something wrong -- the cases that decide whether the mapping back to
+        #: findings is real or is position-guessing that happens to work.
+        self.edit_fn = edit_fn or default_edit
         self.poll_delay = poll_delay
         self.polled = threading.Event()
         self._n_sessions = self._n_docs = self._n_images = self._n_jobs = 0
@@ -135,7 +144,45 @@ class Stub:
             self.sessions[session_id]["documents"] = [
                 {"document_id": document_id, "durable_document_id": durable_id}
             ]
-            h._json(200, {"document_id": document_id, "persisted": True})
+            # Added for runbook-reconciler: the uploaded body is kept so a later
+            # read-back can return the edited document rather than a fiction.
+            self.documents[document_id] = fields.get("file", b"").decode("utf-8", "replace")
+            self.durable[durable_id] = document_id
+            h._json(
+                200,
+                {"document_id": document_id, "durable_document_id": durable_id, "persisted": True},
+            )
+            return
+
+        # Added for runbook-reconciler: the synchronous chat turn. The reply
+        # nests proposed changes under `document_changes`, which is one of the
+        # two shapes `pending_changes()` handles.
+        if path == "/v1/chat":
+            payload = json.loads(body or b"{}")
+            session_id = str(payload["session_id"])
+            document_id = payload.get("document_id", "")
+            self._n_jobs += 1
+            job_id = f"job_{self._n_jobs}"
+            source = self.documents.get(document_id, "")
+            changes = self.edit_fn(source, str(payload.get("message", "")))
+            job = {
+                "job_id": job_id,
+                "session_id": session_id,
+                "status": "awaiting_approval",
+                "metadata": {"pending_changes": changes},
+            }
+            self.sessions.setdefault(session_id, {"documents": [], "jobs": {}})
+            self.sessions[session_id]["jobs"][job_id] = job
+            self.jobs[job_id] = job
+            self.pending_html[job_id] = (document_id, changes)
+            h._json(
+                200,
+                {
+                    "job_id": job_id,
+                    "status": "awaiting_approval",
+                    "document_changes": {"pending_changes": changes},
+                },
+            )
             return
 
         if path == "/v1/documents/images/upload-base64":
@@ -180,6 +227,10 @@ class Stub:
             job_id = payload.get("job_id")
             if job_id in self.jobs:
                 self.jobs[job_id]["status"] = "denied"
+            # Added for runbook-reconciler: approved changes are really applied
+            # to the stored document, so a read-back can disagree with the reply
+            # the way the live service sometimes does.
+            self._apply_decisions(job_id, payload)
             h._json(200, {"status": "ok"})
             return
 
@@ -210,4 +261,74 @@ class Stub:
             h._json(200, self.jobs.get(match.group(1), {}))
             return
 
+        # Added for runbook-reconciler: the free read-back of a stored document.
+        match = re.match(r"^/v1/documents/([^/?]+)", path)
+        if match:
+            key = match.group(1)
+            document_id = self.durable.get(key, key)
+            html = self.documents.get(document_id, "")
+            h._json(200, {"id": key, "html": html, "structure": {"block_count": html.count("<h2")}})
+            return
+
         h._json(404, {"detail": f"stub has no route for GET {path}"})
+
+    # -------------------------------------------------------------- editing --
+
+    def _apply_decisions(self, job_id: str, payload: dict[str, Any]) -> None:
+        entry = self.pending_html.get(job_id)
+        if not entry:
+            return
+        document_id, changes = entry
+        default = bool(payload.get("approved", False))
+        decisions = {
+            str(c.get("change_id")): bool(c.get("approved", default))
+            for c in payload.get("changes") or []
+        }
+        html = self.documents.get(document_id, "")
+        for change in changes:
+            if decisions.get(str(change["change_id"]), default):
+                html = html.replace(change["old_html"], change["new_html"])
+        self.documents[document_id] = html
+
+
+_PASSAGE = re.compile(r"<h2>(Passage \d+)[^<]*</h2>\s*<p>(.*?)</p>", re.DOTALL)
+_INSTRUCTION = re.compile(
+    r"Passage (?P<n>\d+): the text says '(?P<old>[^']*)'\. "
+    r"The infrastructure says '(?P<new>[^']*)'"
+)
+
+
+def default_edit(document: str, instruction: str) -> list[dict[str, Any]]:
+    """A believable stand-in for the model's edit.
+
+    It reads the instruction the same way a model would be asked to — which
+    passage, which value out, which value in — and rewrites the passage's text.
+    Deliberately not a no-op and deliberately not perfect: it substitutes the
+    value and leaves the sentence alone, which is exactly the boundary between
+    what the deterministic layer could already do and what the model is for.
+    """
+    passages = dict(_PASSAGE.findall(document))
+    out: list[dict[str, Any]] = []
+    for n, (index, old, new) in enumerate(
+        (
+            (m.group("n"), m.group("old"), m.group("new"))
+            for m in _INSTRUCTION.finditer(instruction)
+        ),
+        start=1,
+    ):
+        key = f"Passage {index}"
+        text = passages.get(key)
+        if text is None or old not in text:
+            continue
+        replacement = new if not old.endswith(("s", "%")) else f"{new}{old[-1]}"
+        out.append(
+            {
+                "change_id": f"change_{n}",
+                "operation": "edit",
+                "chunk_id": f"chunk_{index}",
+                "old_html": f"<p>{text}</p>",
+                "new_html": f"<p>{text.replace(old, replacement)}</p>",
+                "ai_explanation": f"{key}: {old} is now {replacement}",
+            }
+        )
+    return out

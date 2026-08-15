@@ -106,6 +106,27 @@ CREATE INDEX IF NOT EXISTS findings_by_page ON findings(page_id);
 CREATE UNIQUE INDEX IF NOT EXISTS findings_one_per_claim
     ON findings(claim_id, rule_id) WHERE claim_id IS NOT NULL;
 
+-- A SuperDocs batch parked awaiting approval, and which finding each change
+-- answers. This is state that has to survive a restart: a turn left at
+-- `awaiting_approval` holds its session, so a run that forgets about one leaves
+-- a session that answers `409 session_busy` for ever. `rr status` reads this
+-- table to find them.
+CREATE TABLE IF NOT EXISTS proposals (
+    finding_id  TEXT PRIMARY KEY REFERENCES findings(finding_id),
+    page_id     TEXT NOT NULL,
+    session_id  TEXT NOT NULL,
+    job_id      TEXT,
+    document_id TEXT,
+    durable_id  TEXT,
+    change_id   TEXT,
+    proposed    TEXT NOT NULL DEFAULT '',
+    explanation TEXT NOT NULL DEFAULT '',
+    created_at  TEXT NOT NULL,
+    settled_at  TEXT
+);
+
+CREATE INDEX IF NOT EXISTS proposals_by_job ON proposals(job_id);
+
 -- Cost and timing accounting. Behaviour ten of the brief: a run can report
 -- what it spent and where the time went, stage by stage. Kept in the register
 -- rather than printed and forgotten so `rr report` can answer it afterwards,
@@ -417,6 +438,77 @@ class Register:
             "awaiting_review": len(self.review_queue()),
             "approved_unapplied": len(self.approved_unapplied()),
         }
+
+    # ------------------------------------------------------------ proposals --
+
+    def record_proposal(
+        self,
+        finding_id: str,
+        page_id: str,
+        session_id: str,
+        job_id: str | None,
+        document_id: str | None,
+        durable_id: str | None,
+        change_id: str | None,
+        proposed: str,
+        explanation: str = "",
+    ) -> None:
+        self._conn.execute(
+            """
+            INSERT INTO proposals (finding_id, page_id, session_id, job_id, document_id,
+                                   durable_id, change_id, proposed, explanation, created_at)
+            VALUES (?,?,?,?,?,?,?,?,?,?)
+            ON CONFLICT(finding_id) DO UPDATE SET
+                session_id  = excluded.session_id,
+                job_id      = excluded.job_id,
+                document_id = excluded.document_id,
+                durable_id  = excluded.durable_id,
+                change_id   = excluded.change_id,
+                proposed    = excluded.proposed,
+                explanation = excluded.explanation
+            """,
+            (
+                finding_id,
+                page_id,
+                session_id,
+                job_id,
+                document_id,
+                durable_id,
+                change_id,
+                proposed,
+                explanation,
+                utcnow(),
+            ),
+        )
+        # The proposal is the answer to the finding, so the finding carries it
+        # too. One read for the review queue rather than a join every time.
+        self.set_proposed(finding_id, proposed)
+
+    def proposal(self, finding_id: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            "SELECT * FROM proposals WHERE finding_id = ?", (finding_id,)
+        ).fetchone()
+        return dict(row) if row else None
+
+    def open_batches(self) -> list[dict[str, Any]]:
+        """SuperDocs turns still parked awaiting a decision.
+
+        A parked turn holds its session, and a session that nobody ever answers
+        refuses every later turn with `409 session_busy`. This is how `rr status`
+        finds them after a crash instead of somebody discovering it a week later.
+        """
+        rows = self._conn.execute(
+            "SELECT page_id, session_id, job_id, COUNT(*) AS changes, MIN(created_at) AS opened "
+            "FROM proposals WHERE settled_at IS NULL AND job_id IS NOT NULL "
+            "GROUP BY session_id, job_id ORDER BY opened"
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+    def settle_batch(self, job_id: str) -> None:
+        self._conn.execute(
+            "UPDATE proposals SET settled_at = ? WHERE job_id = ? AND settled_at IS NULL",
+            (utcnow(), job_id),
+        )
 
     # ----------------------------------------------------------- accounting --
 
