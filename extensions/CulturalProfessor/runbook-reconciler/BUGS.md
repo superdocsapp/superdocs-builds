@@ -8,13 +8,21 @@ it blocked, and how to reproduce it.
 SuperDocs API surface this build uses — upload, chat, approve, export — was
 already mapped by the sibling build in
 `use-cases/CulturalProfessor/product-manual-builder`, whose `BUGS.md` carries
-twenty-one items against it. The client here is that file, copied. So the
-findings below are about the *other* half of this project: Atlassian's Confluence
-Cloud API, which nothing in the sibling build touched.
+twenty-one items against it. The client here is that file, copied. So most of
+what is left is the *other* half of this project: Atlassian's Confluence Cloud
+API, which nothing in the sibling build touched.
 
-Everything below was verified against a live Confluence Cloud site on
-**2026-08-15** with a **scoped** API token. No key appears in this file; every
-snippet uses `$CONFLUENCE_API_TOKEN`.
+**Every item says whose it is**, because this project has two vendors and a
+model in it and lumping them together would be the same mistake the tool exists
+to catch. Nine are Confluence Cloud, two are the SuperDocs API, and three are
+the model's behaviour reached through it — that last group is not a defect in
+anyone's service, it is what a non-deterministic layer does, and it is why the
+wording layer sits behind a human gate and the checker does not.
+
+The Confluence items were verified against a live Cloud site on **2026-08-15**
+with a **scoped** API token; the SuperDocs and model items against
+`api.superdocs.app` the same day. No key appears in this file; every snippet
+uses `$CONFLUENCE_API_TOKEN` or `$SUPERDOCS_API_KEY`.
 
 **Item 4 is the one that changed a design.** The others cost time; that one made
 a mechanism in the build plan impossible and forced a different, better one.
@@ -22,6 +30,8 @@ a mechanism in the build plan impossible and forced a different, better one.
 ---
 
 ## 1. A scoped API token is rejected by the site host and works only through the gateway
+
+**Whose:** Confluence Cloud
 
 **What I did.** Authenticated against `https://<site>.atlassian.net/wiki/api/v2/pages`
 with basic auth — email plus a scoped API token created at
@@ -64,6 +74,8 @@ work against the site host, still works.
 ---
 
 ## 2. CQL search is unreachable with a scoped token, and there is no v2 replacement
+
+**Whose:** Confluence Cloud
 
 > **Corrected 2026-08-15.** This item originally claimed the v1 REST API was *entirely*
 > unreachable. That is wrong, and I found out by accident when `seed.py` successfully
@@ -127,6 +139,8 @@ page it creates, and without that the page is invisible to `rr` — it crawls by
 
 ## 3. `401 Unauthorized; scope does not match` is returned for scopes the token has
 
+**Whose:** Confluence Cloud
+
 **What I did.** Granted `read:user:confluence` on the token specifically so the
 tool could learn its own `accountId`, then called
 `GET /wiki/api/v2/users/current`.
@@ -156,6 +170,8 @@ curl -su "$CONFLUENCE_EMAIL:$CONFLUENCE_API_TOKEN" \
 ---
 
 ## 4. There is no way for an API token to learn its own account id — which broke the plan's mechanism for "ignore your own writes"
+
+**Whose:** Confluence Cloud
 
 **What I did.** This build must never re-trigger on its own writes: a sweep can
 end in a page being edited, that edit bumps the page's version, and the watcher
@@ -211,6 +227,8 @@ curl -su "$CONFLUENCE_EMAIL:$CONFLUENCE_API_TOKEN" "$BASE/wiki/api/v2/pages?limi
 
 ## 5. Confluence has no per-block update, so "nothing else changed" cannot be delegated to the API
 
+**Whose:** Confluence Cloud
+
 **What I did.** Looked for a way to update one paragraph of a page.
 
 **What I expected.** Some form of PATCH against a block or a fragment. The
@@ -244,6 +262,8 @@ page one rather than after writing a tree serializer.
 
 ## 6. Pages created in the new editor are returned by the pages API — an expectation that turned out to be wrong
 
+**Whose:** Confluence Cloud
+
 **What I did.** Assumed pages authored in Confluence's newer editor might not
 appear in `/wiki/api/v2/pages`, or might return an empty `storage` body, and
 planned a fallback around it.
@@ -267,6 +287,8 @@ curl -su "$CONFLUENCE_EMAIL:$CONFLUENCE_API_TOKEN" \
 ---
 
 ## 7. A synchronous `/v1/chat` turn proposes changes that can never be approved
+
+**Whose:** SuperDocs API
 
 **This is the most serious item in this file.** Verified live 2026-08-15.
 
@@ -327,6 +349,8 @@ operation to discover.
 
 ## 8. `approve` reports success about three seconds before the stored document agrees
 
+**Whose:** SuperDocs API
+
 **What I did.** Approved a parked batch, then immediately read the document back with
 `GET /v1/documents/{durable_id}?include_html=true` to confirm the change landed.
 
@@ -359,6 +383,8 @@ same behaviour.
 
 ## 9. Confluence normalises entities in new content, but leaves untouched bytes alone
 
+**Whose:** Confluence Cloud
+
 **What I did.** Appended `<p>runbook-reconciler live test — removed immediately</p>` to a
 page and read it back.
 
@@ -387,6 +413,8 @@ the whole design rests on against a real site rather than assuming it.
 
 ## 10. The model edits whatever in the document looks most like the instruction, including headings
 
+**Whose:** the model, through SuperDocs
+
 **What I did.** Sent a document of the shape `<h2>Passage 1 — alert:PaymentsApiErrorBudgetBurn:threshold</h2><p>…the passage…</p>`, with an instruction naming passage 1 and the value to correct.
 
 **What I expected.** The paragraph to be edited.
@@ -400,6 +428,8 @@ the whole design rests on against a real site rather than assuming it.
 ---
 
 ## 11. "Do not add commentary" is followed most of the time, and the exceptions are plausible prose
+
+**Whose:** the model, through SuperDocs
 
 **What I did.** Instruction says, verbatim: *make the smallest edit that corrects the fact… do not add commentary*.
 
@@ -420,6 +450,8 @@ Both are *correct and helpful*, and both would have been spliced into the middle
 
 ## 12. Run-to-run variance on an identical request is large enough to plan for
 
+**Whose:** the model, through SuperDocs
+
 **What I did.** Sent the same batch of five passages three times.
 
 **What happened.** Usable replacements came back for 1/5, then 4/5, then 4/5 — same document, same instruction, same model tier.
@@ -431,6 +463,8 @@ Both are *correct and helpful*, and both would have been spliced into the middle
 ---
 
 ## 13. A scoped token can create a page but not delete one
+
+**Whose:** Confluence Cloud
 
 **What I did.** `DELETE /wiki/api/v2/pages/{id}`, to clean up the page `seed.py` had just created.
 
@@ -445,6 +479,8 @@ Both are *correct and helpful*, and both would have been spliced into the middle
 ---
 
 ## 14. An open editor tab silently reverts API writes, and version numbers do not stop it
+
+**Whose:** Confluence Cloud
 
 **Verified by losing a page to it.**
 

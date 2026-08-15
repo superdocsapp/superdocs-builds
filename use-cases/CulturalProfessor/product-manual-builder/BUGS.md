@@ -21,6 +21,13 @@ They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
 collects the same list.
 
+**Every item says whose it is.** All twenty-one are SuperDocs, because this build
+talks to nothing else — but three of them are the *model's* behaviour reached
+through the API rather than a defect in the API itself, and calling those bugs
+would be unfair to the service. They are marked as such. The sibling build in
+`extensions/CulturalProfessor/runbook-reconciler` carries the Confluence Cloud
+findings, and labels its items the same way.
+
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
 Items 1–7 are ranked by how much they cost me; 8–21 are appended in the order
@@ -47,6 +54,8 @@ follows would.
 ---
 
 ## 1. `upload-base64` silently replaces the focused document
+
+**Whose:** SuperDocs API
 
 **Severity: high — destroys a document, reports success.**
 
@@ -100,6 +109,8 @@ values and the same default as multipart; failing that, return
 
 ## 2. Two endpoints disagree about which document is in a slot
 
+**Whose:** SuperDocs API
+
 **Severity: medium — the API's own views contradict each other.**
 
 **What I did.** Opened a second document into an existing session with
@@ -135,6 +146,8 @@ document the delay and give the read a way to say "not settled yet".
 
 ## 3. `/v1/poll/{session_id}` rejects API keys the rest of the surface accepts
 
+**Whose:** SuperDocs API
+
 **Severity: low — clear once you hit it, but the message points the wrong way.**
 
 **What I did.** Called `GET /v1/poll/{session_id}` with the same `sk_` key that
@@ -164,6 +177,8 @@ curl -si "https://api.superdocs.app/v1/poll/$SID" \
 ---
 
 ## 4. "Change nothing else" changed something else
+
+**Whose:** the model, through SuperDocs
 
 **Severity: medium — a correctness surprise in the edit path, mitigated by review mode.**
 
@@ -195,6 +210,8 @@ reach the reviewer.
 ---
 
 ## 5. A parked approval blocks its session, and the block is invisible until the next turn
+
+**Whose:** SuperDocs API
 
 **Severity: medium — a stalled review locks the conversation it is in.**
 
@@ -237,6 +254,8 @@ in the 409 that denying it is how it is cleared.
 
 ## 6. Uploads lose `data-*` attributes, silently
 
+**Whose:** SuperDocs API
+
 **Severity: medium — an integrator's anchors disappear with no error.**
 
 **What I did.** Uploaded HTML whose figures carried `data-diagram="step:laser"`,
@@ -263,6 +282,8 @@ saying so in the upload docs saves everyone this.
 
 ## 7. Stored image URLs come back signed, with a 754-character query
 
+**Whose:** SuperDocs API
+
 **Severity: low, once you know — but it looks exactly like a wrong URL.**
 
 **What I did.** Uploaded an SVG via `POST /v1/documents/images/upload-base64`,
@@ -286,6 +307,8 @@ strings.
 ---
 
 ## 8. A session's memory re-proposes a change that was rejected in it
+
+**Whose:** the model, through SuperDocs
 
 **Severity: medium–high — a mechanical instruction inherits an unrelated
 conversation, and there is no way to opt out except to open a new session.**
@@ -336,6 +359,8 @@ automated callers should open a fresh session per operation.
 
 ## 9. A turn that asks a clarifying question is indistinguishable from a turn with nothing to do
 
+**Whose:** SuperDocs API
+
 **Severity: high — the caller cannot tell "done, no change needed" from "I did
 nothing and would like to talk about it".**
 
@@ -380,6 +405,8 @@ knowing which happened matters more than which one is chosen.
 
 ## 10. `export` immediately after `approve` returns the pre-approval document
 
+**Whose:** SuperDocs API
+
 **Severity: medium — verification reads stale bytes and reports them as current.**
 
 **What I did.** Approved a batch of 9 changes across two documents
@@ -421,6 +448,8 @@ which is that right now the only way to be sure is to sleep and hope.
 ---
 
 ## 11. A session is not a handle on a document, and export is keyed by session
+
+**Whose:** SuperDocs API
 
 **Severity: high — a read silently returns a different document than the one
 asked for.**
@@ -469,6 +498,8 @@ alongside the file so a caller can tell it got what it asked for.
 
 ## 12. Every entry in Chat History is timestamped "just now"
 
+**Whose:** SuperDocs API
+
 **Severity: low — cosmetic, but it makes the history unusable for finding anything.**
 
 **What I did.** Opened the Chat History panel in the web interface on an account
@@ -502,6 +533,8 @@ screen already formats the same kind of value correctly.
 ---
 
 ## 13. Two documents exist that nothing I ran created
+
+**Whose:** SuperDocs API
 
 **Severity: unknown — recorded because the evidence is solid even though the cause is not.**
 
@@ -561,6 +594,8 @@ on their own.
 ---
 
 ## 14. A stored document's image URLs expire 24 hours after they are written
+
+**Whose:** SuperDocs API
 
 **Severity: high — every diagram in a published manual goes dead after a day.**
 
@@ -630,6 +665,8 @@ persisted inside a document is a broken image with a delay on it.
 
 ## 15. `upload-base64` returns `document_id: null`, and leaves a document whose title and body come from different files
 
+**Whose:** SuperDocs API
+
 **Severity: high — this is item 1, re-run, and it is worse than item 1 said.**
 
 **What I did.** Three base64 uploads into one session — `alpha.html`,
@@ -664,6 +701,8 @@ is replaced, carry the replaced id in the reply — the same fix item 1 asks for
 ---
 
 ## 16. `usage` is missing from the async chat reply, so an approval workflow cannot see what it is spending
+
+**Whose:** SuperDocs API
 
 **Severity: medium — the documented way to read quota does not work on the path
 human-in-the-loop forces you onto.**
@@ -705,6 +744,8 @@ it costs.
 ---
 
 ## 17. `whoami` reports the monthly bucket only, and operations come out of a different one
+
+**Whose:** SuperDocs API
 
 **Severity: medium — the number the docs tell an agent to trust is the wrong number.**
 
@@ -750,6 +791,8 @@ reply already carries.
 
 ## 18. `metadata.awaiting_kind` is documented, and never sent
 
+**Whose:** SuperDocs API
+
 **Severity: medium — it is the field that would have prevented item 9.**
 
 **What I did.** *Async Jobs → Job statuses* says of `awaiting_approval`:
@@ -787,6 +830,8 @@ turn that asked a clarifying question, or a turn with nothing to do, and
 
 ## 19. `409 session_busy` is not documented anywhere
 
+**Whose:** SuperDocs API
+
 **Severity: low as a defect, high as a cost — it is the error that decided this
 build's architecture.**
 
@@ -817,6 +862,8 @@ discover it by being refused.
 ---
 
 ## 20. `GET /v1/sessions/{id}/jobs` can still list a job as active seconds after `approve` resolved it
+
+**Whose:** SuperDocs API
 
 **Severity: low — a caller polling the wrong endpoint sees the session as busy
 after it has actually freed up.**
@@ -888,6 +935,8 @@ plausible-looking wrong answer instead of an error.
 ---
 
 ## 21. A wrong answer in a session's memory steers a later, unrelated edit into fabricating content
+
+**Whose:** the model, through SuperDocs
 
 **Severity: high — a document can end up internally self-contradicting, and
 every guard in this build passes it anyway.**
