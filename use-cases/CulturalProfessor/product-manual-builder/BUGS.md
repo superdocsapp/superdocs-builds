@@ -96,10 +96,9 @@ curl -s "https://api.superdocs.app/v1/sessions/$SID/documents" \
   -H "Authorization: Bearer $SUPERDOCS_API_KEY" | jq '.documents | length'   # 1, not 2
 ```
 
-**Cost to me.** About an hour, and it was only caught because the surviving
-document's title and chunk count disagreed with each other. An integrator
-uploading a second document into a session loses the first one and gets a
-success reply.
+**Cost to me.** It was only caught because the surviving document's title and
+chunk count disagreed with each other. An integrator uploading a second document
+into a session loses the first one and gets a success reply.
 
 **Suggested fix.** Add `open_mode` to `Base64UploadRequest` with the same three
 values and the same default as multipart; failing that, return
@@ -136,8 +135,7 @@ focus.
 `POST /v1/sessions/{id}/documents/open` with document B's durable id, and read
 `GET /v1/sessions/{id}/documents` immediately and again after two seconds.
 
-**Cost to me.** Perhaps forty minutes, most of it spent believing my own code
-had a race in it.
+**Cost to me.** It read as a race in my own code, and that is where I looked.
 
 **Suggested fix.** Either make the read consistent after the write returns, or
 document the delay and give the read a way to say "not settled yet".
@@ -171,7 +169,7 @@ curl -si "https://api.superdocs.app/v1/poll/$SID" \
   -H "Authorization: Bearer $SUPERDOCS_API_KEY" | head -1
 ```
 
-**Cost to me.** Ten minutes, and it would have been zero with the message
+**Cost to me.** Small, and it would have been nothing with the message
 `/v1/users/me/limits` already uses.
 
 ---
@@ -244,8 +242,8 @@ are not:
 `approval_mode: "ask_every_time"`, wait for `awaiting_approval`, then send a
 second chat in the same session.
 
-**Cost to me.** An hour, and an architecture change: one session per document
-instead of one session per pair.
+**Cost to me.** An architecture change: one session per document instead of one
+session per pair.
 
 **Suggested fix.** Let `cancel_job` resolve an `awaiting_approval` job, or say
 in the 409 that denying it is how it is cleared.
@@ -271,8 +269,7 @@ naming which drawing it is. Attribute order changes too — `alt` before `src`,
 where the upload had `src` before `alt` — which breaks a regex written against
 the sent markup.
 
-**Cost to me.** Half an hour, and a redesign of how the diagram-swap step
-identifies a figure: it anchors on the caption now, which survives.
+**Cost to me.** A redesign of how the diagram-swap step identifies a figure: it anchors on the caption now, which survives.
 
 **Suggested fix.** Either preserve `data-*` on elements the service does not own,
 or document the strip. If the strip is deliberate — and it is defensible —
@@ -346,8 +343,8 @@ you have to already believe the history is the problem.
 at approval, then send an unrelated mechanical instruction in the same session
 and read `metadata.pending_changes`.
 
-**Cost to me.** Several hours, most of it spent suspecting my own instruction
-wording, because a re-proposed change looks like a model being sloppy rather
+**Cost to me.** The worst on this list, mostly spent suspecting my own
+instruction wording, because a re-proposed change looks like a model being sloppy rather
 than a model being well-informed.
 
 **Suggested fix.** A per-turn flag on `/v1/chat` and `/v1/chat/async` that scopes
@@ -390,7 +387,7 @@ true.
 contains only some of them, and read `status` and `metadata.pending_changes` on
 the resulting job.
 
-**Cost to me.** An hour to find, and it is the one on this list I would most
+**Cost to me.** Hard to find, and it is the one on this list I would most
 want fixed — it is silent, it looks like success, and a caller doing exactly
 what the docs suggest hits it.
 
@@ -437,8 +434,8 @@ with it — on a different pair of endpoints.
 with no delay between the two calls; compare against an export taken a few
 seconds later.
 
-**Cost to me.** Twenty minutes, and it briefly looked as though a fix I had just
-made had not worked.
+**Cost to me.** Brief, but it looked as though a fix I had just made had not
+worked.
 
 **Suggested fix.** Make export consistent with an approval that has already
 returned, or have the approve reply carry the resulting document version so a
@@ -482,8 +479,8 @@ stable handle on a document.
 that document in the web interface alongside another one, focus the other, then
 export by the original session id.
 
-**Cost to me.** An hour, and a verification step that confidently reported on
-the wrong document. That is the part worth flagging: the failure mode is not an
+**Cost to me.** A verification step that confidently reported on the wrong
+document. That is the part worth flagging: the failure mode is not an
 error, it is a *plausible answer about something else*.
 
 **Workaround.** Before reading, check `GET /v1/sessions/{id}/documents` actually
@@ -921,8 +918,8 @@ curl -s "https://api.superdocs.app/v1/sessions/$SID/jobs" \
 # may still show an active status here, immediately after approve returned 200
 ```
 
-**Cost to me.** About twenty minutes — one failed test, and the time to tell a
-real propagation delay apart from a real bug in the crash-recovery test this
+**Cost to me.** One failed test, and the work of telling a real propagation
+delay apart from a real bug in the crash-recovery test this
 was found while writing. The fix on my side was one bounded retry loop instead
 of one assertion; see `tests/test_live_reentry.py`.
 
@@ -982,10 +979,9 @@ figure the document does state; get a wrong "not specified" answer to it;
 send an unrelated instruction that references the same figure into the same
 session; read what chunk the reply actually touched.
 
-**Cost to me.** About forty minutes — the wrong answer alone read as a
-plausible model slip; realizing the *next* turn had acted on it, in a
-document that would have quietly shipped self-contradicting, was the part
-worth the time.
+**Cost to me.** The wrong answer alone read as a plausible model slip; realizing the *next* turn had acted on it, in a
+document that would have quietly shipped self-contradicting, was the part that
+mattered.
 
 **Workaround.** `ask` now opens a session of its own for every call —
 `client.init_session([durable_id])`, never recorded on the publication — the

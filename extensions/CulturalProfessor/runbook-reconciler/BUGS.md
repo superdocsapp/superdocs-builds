@@ -47,7 +47,7 @@ mistyped credential. The same token against the gateway host works:
 | `https://<site>.atlassian.net` | 401 | 403 |
 | `https://api.atlassian.com/ex/confluence/{cloudId}` | **200** | **200** |
 
-**How badly it blocked.** An hour, and it would have been much longer without
+**How badly it blocked.** Badly, and it would have gone on much longer without
 the guess that the host was the variable. Every piece of advice you find while
 searching says to check the token, which is the one thing that was fine. A
 `401` that means "right credential, wrong host" is the single most expensive
@@ -110,8 +110,7 @@ that serves v2 successfully in the same session with the same header. The v2 pat
 this build needs — `pages`, `pages/{id}/labels`, `labels`, `spaces` — all work, and
 there is no v2 equivalent of CQL search to move to.
 
-**How badly it blocked.** Half an hour, and it left a permanent performance
-scar. Label filtering is now client-side: list the pages, then fetch each page's
+**How badly it blocked.** It left a permanent performance scar. Label filtering is now client-side: list the pages, then fetch each page's
 labels, which is **one extra HTTP call per page in the space**. On a large space
 that is the dominant cost of a sweep. It is also why `rr watch` compares a page
 list rather than re-crawling.
@@ -154,7 +153,7 @@ to. So the message does not distinguish "you did not grant this scope" from
 "this scope cannot be granted to this kind of token", and there is no way from
 the response to tell which situation you are in.
 
-**How badly it blocked.** An hour of re-issuing tokens with different scope
+**How badly it blocked.** It sent me re-issuing tokens with different scope
 combinations, on the assumption that the message meant what it says.
 
 **How to reproduce.** Grant `read:user:confluence`. Then:
@@ -366,7 +365,7 @@ approve -> {"status": "ok", "message": "Approval processed", "batch_complete": t
   t+ 3s  1.2s=True   800ms=False
 ```
 
-**How badly it blocked.** An hour, and it nearly produced a much worse bug than itself.
+**How badly it blocked.** It nearly produced a much worse bug than itself.
 This project reads the document back specifically so it can say "the service said it
 applied the change and the stored document does not contain it". With a single immediate
 read that sentence is true on every successful run, so the honest check becomes a
@@ -405,7 +404,7 @@ practical residue is small: a proposed replacement containing an em dash, smart 
 non-breaking space will be stored in entity form, so it will not match the literal string
 on a later read.
 
-**How badly it blocked.** Twenty minutes, and it turned into the test I most wanted and
+**How badly it blocked.** Barely, and it turned into the test I most wanted and
 had not written: `test_live_an_untouched_body_survives_a_write`, which checks the property
 the whole design rests on against a real site rather than assuming it.
 
