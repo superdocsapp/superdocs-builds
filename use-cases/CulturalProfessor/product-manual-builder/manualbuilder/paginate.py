@@ -3,8 +3,9 @@
 `localize.py` proves a translation has the same *shape*: the same headings, the
 same figures, in the same order. That is necessary and it is not sufficient. Two
 documents with an identical outline still paginate differently the moment one of
-them is twelve per cent longer, which is what German is, and the failure that
-produces is the one that actually costs money: step six is on page seven with
+them runs ten per cent longer, which is what German and French both do here
+(`mb check` reports each locale's ratio), and the failure that produces is the
+one that actually costs money: step six is on page seven with
 its diagram in English and on page eight without it in German, and nobody sees
 it until the print run is boxed.
 

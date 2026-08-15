@@ -382,9 +382,10 @@ picking the highest-scoring paragraph would be inventing a comparison. A passage
 still verbatim in one document and unrecognisable in the other is not that — it
 is the pair coming apart as completely as it can, and it fails.
 
-`test_verify.py` is fourteen served documents broken in specific ways — an old
-drawing left in place, a figure that lost its image, an invented URL, a fix
-dropped from the card — and `verify` has to find each one. A verification step
+`test_verify.py` is thirteen cases: eleven served documents broken in specific
+ways — an old drawing left in place, a figure that lost its image, an invented
+URL, a fix dropped from the card — plus two correctly published pairs that have
+to come back clean. `verify` has to get all thirteen right. A verification step
 that can only print green is worse than none.
 
 ## Crash recovery, proven rather than assumed
