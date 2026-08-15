@@ -28,9 +28,15 @@ import os
 import pytest
 
 from reconciler.claims import Anchor, Claim, Finding
-from reconciler.config import Config
+from reconciler.config import PROJECT_ROOT, Config
 from reconciler.edit import apply_proposal, deny, propose_for_page
-from reconciler.superdocs import SuperDocs
+from reconciler.superdocs import SuperDocs, load_dotenv
+
+# The skip decision is made at import time, and the key normally lives in `.env`
+# rather than the environment -- so without this the test skips on exactly the
+# machine that is configured to run it, and reports "2 skipped" as though the
+# opt-in had not been given. It cost a confused minute the first time.
+load_dotenv(PROJECT_ROOT / ".env")
 
 pytestmark = pytest.mark.skipif(
     os.environ.get("RR_LIVE_SUPERDOCS") != "1" or not os.environ.get("SUPERDOCS_API_KEY"),

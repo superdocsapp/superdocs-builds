@@ -291,3 +291,51 @@ Two things an agent cannot do, as code rather than as tool descriptions: there
 is no approve-all (`finding_ids` is required and empty is an error), and
 `propose` returns a price and spends nothing without `confirm=true`. An agent
 loops; a description it did not read is not a control.
+
+## 2026-08-15 — what the first live run found, and why the stub had hidden it
+
+**Question.** The edit path was green against `tests/stub_superdocs.py` through
+stage 12. What does running it against the real service change?
+
+**Call.** Three things, and one of them means the path as shipped could never
+have worked.
+
+**Reasoning.**
+
+**The synchronous chat turn is a dead end.** `POST /v1/chat` with
+`approval_mode: ask_every_time` returns `requires_approval: true` and a list of
+`change_id`s and **no job id at all**, while `/v1/chat/{s}/approve` requires
+one — `422` without the field, `404 Job not found` when empty, and
+`400 Job is not awaiting approval (status: completed)` for the `sync_chat` job
+the turn actually created. So the operation is spent, the wording comes back,
+and nothing in the API can ever accept it. `edit.propose_for_page` now uses
+`/v1/chat/async`, whose job parks at `awaiting_approval`.
+
+The lesson is about the stub, not the service. The stub had modelled the sync
+reply as carrying a `job_id` — one invented field — and that single fiction kept
+an unusable code path green through five stages. A stub is a hypothesis about a
+service, and this one was wrong in the specific way that is hardest to notice:
+it made the code look correct. The stub has been corrected to omit the field, so
+the offline suite now exercises the path that works.
+
+**Our own mapping was silently dropping correct changes.** The service returned
+"Automated backup retention: 7 days" → "… 14 days", exactly right, and
+`_replacement` returned empty: the diff covers the token `7`, the anchored value
+is `7 days`, and the `asserted not in old_token` guard rejected it. The finding
+then escalated as "no replacement text was produced", which reads like the model
+declining rather than like a bug in this repository. Every corpus fixture
+happens to anchor a single token, so no offline test could have caught it —
+`test_a_multi_word_value_survives_the_mapping` is now a table rather than one
+case, for that reason.
+
+**Confluence normalises new content but not untouched bytes.** A sent `—` is
+stored as `&mdash;`. That is only a curiosity until you notice what it would
+mean if it applied to the whole body: every write would alter bytes outside the
+approved passage, and the central promise of this project would be false through
+no fault of the splice. It does not — a body PUT back unchanged returns
+byte-identical — and that is now `test_live_an_untouched_body_survives_a_write`,
+checked against a real page rather than assumed.
+
+The through-line in all three: the offline suite was testing the code against my
+model of the services, and two of the three failures were in the model. The
+fixes worth keeping are the ones that moved a belief into a test.

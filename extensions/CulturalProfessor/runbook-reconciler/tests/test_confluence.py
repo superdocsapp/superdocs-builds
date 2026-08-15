@@ -286,6 +286,13 @@ def test_live_read_write_round_trip() -> None:
     asserts the body comes back byte-identical afterwards. It is opt-in and
     needs a page id because a test that writes to somebody's wiki by default is
     a test that should not exist.
+
+    **The marker is deliberately pure ASCII.** The first version used an em dash
+    and failed against page 98311 on 2026-08-15: Confluence stored `&mdash;`
+    for the `—` that was sent. That is Confluence normalising *new* content, not
+    a fault in the round trip, and a test that trips over it is testing the
+    wrong thing — see `test_live_an_untouched_body_survives_a_write`, which
+    tests the property this project actually depends on.
     """
     from reconciler.config import Config
 
@@ -293,7 +300,7 @@ def test_live_read_write_round_trip() -> None:
     page_id = os.environ["RR_LIVE_PAGE_ID"]
     with ConfluenceSource.from_config(config) as client:
         before = client.read(page_id)
-        marker = "<p>runbook-reconciler live test — removed immediately</p>"
+        marker = "<p>runbook-reconciler live test - removed immediately</p>"
         version = client.write(page_id, before.body + marker, before.version, before.title)
         try:
             middle = client.read(page_id)
@@ -301,3 +308,36 @@ def test_live_read_write_round_trip() -> None:
         finally:
             client.write(page_id, before.body, version, before.title)
         assert client.read(page_id).body == before.body
+
+
+@pytest.mark.skipif(
+    os.environ.get("RR_LIVE_CONFLUENCE_TESTS") != "1",
+    reason="writes to a real wiki; opt in with RR_LIVE_CONFLUENCE_TESTS=1",
+)
+def test_live_an_untouched_body_survives_a_write() -> None:
+    """Rule 2's live half, and it was not obvious it would hold.
+
+    The splice guarantees that *what this tool sends* differs from the original
+    in exactly one contiguous range. It cannot, by itself, guarantee what
+    Confluence chooses to *store* — and Confluence demonstrably rewrites some
+    content on the way in, turning a sent `—` into a stored `&mdash;`.
+
+    If that normalisation applied to the whole body, every write would silently
+    change bytes outside the approved passage and the central promise of this
+    project would be false through no fault of the splice. It does not: a body
+    PUT back unchanged is returned byte-for-byte identical. Verified against
+    page 98311 on 2026-08-15, and worth re-running against any site before
+    trusting the promise on it.
+    """
+    from reconciler.config import Config
+
+    config = Config.load()
+    page_id = os.environ["RR_LIVE_PAGE_ID"]
+    with ConfluenceSource.from_config(config) as client:
+        before = client.read(page_id)
+        client.write(page_id, before.body, before.version, before.title)
+
+        assert client.read(page_id).body == before.body, (
+            "Confluence rewrote a body that was sent back unchanged; the "
+            "byte-identity promise cannot be kept on this site"
+        )

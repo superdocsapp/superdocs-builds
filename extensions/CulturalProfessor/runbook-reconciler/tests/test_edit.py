@@ -161,6 +161,47 @@ def test_the_replacement_is_the_value_and_not_the_sentence(client: SuperDocs) ->
     assert [p.proposed for p in proposal.proposals] == ["1.2s"]
 
 
+def test_a_multi_word_value_survives_the_mapping() -> None:
+    """A correct change this function used to throw away.
+
+    Found against the live service on 2026-08-15, not offline. The service
+    returned "Automated backup retention: 7 days" -> "... 14 days", which is
+    exactly right, and `_replacement` returned empty: the diff covers the token
+    `7`, the anchored value is `7 days`, and the `asserted not in old_token`
+    guard rejected it. The finding then escalated as "no replacement text was
+    produced", which reads like the model declining rather than like a bug here.
+
+    Every corpus fixture happened to anchor a single token, so nothing offline
+    could have caught it. Hence a table rather than one case.
+    """
+    from reconciler.edit import _replacement
+
+    cases = [
+        # old text,                    new text,                       anchored,   expected
+        (
+            "Automated backup retention: 7 days",
+            "Automated backup retention: 14 days",
+            "7 days",
+            "14 days",
+        ),
+        ("RPO is 15 minutes today", "RPO is 30 minutes today", "15 minutes", "30 minutes"),
+        (
+            "Snapshots run 03:00 UTC daily",
+            "Snapshots run 04:00 UTC daily",
+            "03:00 UTC daily",
+            "04:00 UTC daily",
+        ),
+        # single token, the case that always worked
+        ("latency above 800ms for five", "latency above 1.2s for five", "800ms", "1.2s"),
+        # the value carries punctuation the model kept
+        ("the 800ms, threshold", "the 1.2s, threshold", "800ms", "1.2s"),
+        # the model edited something else entirely: still refused
+        ("unrelated edit here", "unrelated tweak here", "800ms", ""),
+    ]
+    for old, new, asserted, expected in cases:
+        assert _replacement(old, new, asserted) == expected, f"{asserted!r} in {old!r}"
+
+
 def test_changes_are_matched_by_content_not_by_order(stub: Stub) -> None:
     """A service returning changes in a different order is behaving reasonably.
 

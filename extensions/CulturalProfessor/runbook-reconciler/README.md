@@ -272,11 +272,14 @@ path puts page text into one.
   they say so in config.
 - **Label filtering costs one extra call per page** because CQL search is unreachable with
   a scoped token ([BUGS.md](BUGS.md) item 2). On a very large space that dominates a sweep.
-- **The SuperDocs edit path has not been run against the live API by this build.** It is
-  verified against an in-process stub written from the sibling build's live experience.
-  `tests/test_edit_live.py` is the opt-in test that would establish it, and costs one
-  operation. Stated plainly because "tested against a stub" and "tested against the
-  service" are different sentences.
+- **The two halves have been run live separately, not as one continuous sweep.** The
+  SuperDocs edit path spent 11 real operations against the corpus on 2026-08-15, and the
+  Confluence read/write round trip is verified against a real page. What has not been done
+  is a single live sweep that reads a real Confluence space, proposes, and writes back to
+  it.
+- **`rr watch` has not run long enough against a live space to provoke the self-trigger
+  case.** The version ledger that prevents it is unit-tested; the loop has not been
+  observed in production.
 
 ---
 

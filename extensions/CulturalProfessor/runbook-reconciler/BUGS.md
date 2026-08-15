@@ -241,25 +241,150 @@ curl -su "$CONFLUENCE_EMAIL:$CONFLUENCE_API_TOKEN" \
 
 ---
 
-## Things this file does not claim
+## 7. A synchronous `/v1/chat` turn proposes changes that can never be approved
 
-**The SuperDocs edit path has not been run against the live API by this build.**
-Everything in `reconciler/edit.py` is verified against `tests/stub_superdocs.py`
-— an in-process stand-in, written from the sibling build's live experience. That
-proves the batching, the change-to-finding mapping and the approval handling;
-it is not evidence that `api.superdocs.app` behaves that way today.
-`tests/test_edit_live.py` is the opt-in test that would establish it and costs
-one paid operation:
+**This is the most serious item in this file.** Verified live 2026-08-15.
 
-```bash
-RR_LIVE_SUPERDOCS=1 ./rr test tests/test_edit_live.py
+**What I did.** `POST /v1/chat` with `approval_mode: "ask_every_time"`, then tried to
+approve the changes it proposed.
+
+**What I expected.** The reply carries whatever identifier the approval endpoint needs.
+
+**What happened.** It does not. The synchronous reply is:
+
+```json
+{ "session_id": "...", "response": "I've prepared changes for your review...",
+  "document_changes": { "pending_changes": [ { "change_id": "...", ... } ],
+                        "requires_approval": true, "updated_html": null, "version_id": null },
+  "usage": null, "hint": null }
 ```
 
-**No live Confluence *write* has been performed by this build either.** Reads
-are exercised freely; the write round-trip is gated behind
-`RR_LIVE_CONFLUENCE_TESTS=1` and `RR_LIVE_PAGE_ID`, and has not been run against
-a page anybody cares about.
+`requires_approval: true`, a `change_id` per change — and **no `job_id` anywhere**. But
+`POST /v1/chat/{session_id}/approve` requires one:
 
-Both are stated because a capability honestly absent beats one claimed and
-broken, and because "tested against a stub" and "tested against the service" are
-different sentences.
+| Attempt | Result |
+| --- | --- |
+| omit `job_id` | `422 {"type":"missing","loc":["body","job_id"]}` |
+| `job_id: ""` | `404 Job not found` |
+| `job_id` from `GET /v1/sessions/{id}/jobs` | `400 Job is not awaiting approval (status: completed)` |
+
+That last row is the closing of the trap. The sync turn *does* create a job — `job_type:
+"sync_chat"`, `status: "completed"` — and approve rejects it precisely because it is not
+parked. So there is no reachable identifier: the operation is spent, the wording comes
+back, `requires_approval` is true, and nothing in the API can ever accept it. The stored
+document keeps the old text for ever.
+
+**How badly it blocked.** It was shipped. Every offline test passed because the stub had
+modelled the sync reply as carrying a `job_id` — one invented field, and an entire code
+path that cannot work in production was green all the way through stage 12.
+
+**How to reproduce.**
+
+```bash
+# upload a document, then:
+curl -s -X POST https://api.superdocs.app/v1/chat \
+  -H "Authorization: Bearer $SUPERDOCS_API_KEY" -H 'Content-Type: application/json' \
+  -d '{"message":"replace 800ms with 1.2s","session_id":"'"$S"'","document_id":"'"$D"'","approval_mode":"ask_every_time"}' \
+  | python3 -c 'import json,sys; r=json.load(sys.stdin); print("job_id" in r, sorted(r))'
+# False ['document_changes', 'hint', 'response', 'session_id', 'usage']
+```
+
+**Worked around.** `edit.propose_for_page` uses `POST /v1/chat/async`, whose job parks at
+`awaiting_approval` and approves cleanly. The stub was corrected to drop the invented
+field, so the offline suite now exercises the path that works.
+
+**What would fix it.** Either return `job_id` on the sync reply, or let
+`/v1/chat/{session}/approve` accept `change_id`s without one. As it stands,
+`approval_mode: "ask_every_time"` on the sync endpoint is a dead end that costs an
+operation to discover.
+
+---
+
+## 8. `approve` reports success about three seconds before the stored document agrees
+
+**What I did.** Approved a parked batch, then immediately read the document back with
+`GET /v1/documents/{durable_id}?include_html=true` to confirm the change landed.
+
+**What I expected.** `{"status":"ok","batch_complete":true}` to mean the document holds
+the change.
+
+**What happened.** The immediate read returns the **old** text. The same read about three
+seconds later returns the new one.
+
+```
+approve -> {"status": "ok", "message": "Approval processed", "batch_complete": true}
+  t+ 0s  1.2s=False  800ms=True
+  t+ 3s  1.2s=True   800ms=False
+```
+
+**How badly it blocked.** An hour, and it nearly produced a much worse bug than itself.
+This project reads the document back specifically so it can say "the service said it
+applied the change and the stored document does not contain it". With a single immediate
+read that sentence is true on every successful run, so the honest check becomes a
+permanent false alarm — and the obvious fix, deleting the check, throws away the one thing
+that would catch a real failure.
+
+**Worked around.** `edit._stored_after_approval` polls until the stored passages stop
+matching the pre-edit text, bounded, then falls back to the reply. Same shape as items 2,
+10 and 20 in the sibling build's `BUGS.md`: a write returns `200` and a different read
+endpoint disagrees with it for a short window. This is a fourth endpoint pair with the
+same behaviour.
+
+---
+
+## 9. Confluence normalises entities in new content, but leaves untouched bytes alone
+
+**What I did.** Appended `<p>runbook-reconciler live test — removed immediately</p>` to a
+page and read it back.
+
+**What I expected.** The bytes I sent.
+
+**What happened.** The em dash came back as `&mdash;`. Confluence rewrites content on the
+way in.
+
+**Why this mattered more than it looks.** The central promise of this project is that
+every byte outside the approved passage is unchanged. The splice guarantees that about
+what the tool *sends*; it can guarantee nothing about what Confluence chooses to *store*.
+If this normalisation applied to the whole body, every write would silently alter content
+outside the target passage and the promise would be false through no fault of the splice.
+
+**It does not.** A body PUT back unchanged returns byte-for-byte identical — verified
+against page 98311. The normalisation applies only to content newly introduced. The
+practical residue is small: a proposed replacement containing an em dash, smart quote or
+non-breaking space will be stored in entity form, so it will not match the literal string
+on a later read.
+
+**How badly it blocked.** Twenty minutes, and it turned into the test I most wanted and
+had not written: `test_live_an_untouched_body_survives_a_write`, which checks the property
+the whole design rests on against a real site rather than assuming it.
+
+---
+
+## Things this file does not claim
+
+Both live paths **have** now been run, on 2026-08-15, and items 7, 8 and 9 above
+are what they found. Reproduce them with:
+
+```bash
+RR_LIVE_SUPERDOCS=1 ./rr test tests/test_edit_live.py                    # 1 operation
+RR_LIVE_CONFLUENCE_TESTS=1 RR_LIVE_PAGE_ID=<a page you own> ./rr test -k live
+```
+
+What is still **not** claimed:
+
+- **The end-to-end flow has been exercised against the corpus, not against a
+  live Confluence space.** `rr propose --yes` spent 11 real operations across
+  the corpus and `rr review` applied the results to the corpus files, with the
+  byte-level diff checked by hand. The same `apply` code drives Confluence and
+  its round trip is proven separately (item 9), but the two halves have not been
+  run as one continuous live sweep.
+- **The measured precision and recall are against a synthetic corpus** of 8
+  runbooks, and were produced by the deterministic layer only — no live call is
+  involved in that number, by design.
+- **`rr watch` has not been run against a live Confluence space for long
+  enough to observe the self-trigger case.** The version ledger that prevents it
+  is unit-tested; the loop it prevents has not been provoked in production.
+
+Stated because a capability honestly absent beats one claimed and broken, and
+because "tested against a stub" and "tested against the service" are different
+sentences — item 7 is exactly what the difference costs.

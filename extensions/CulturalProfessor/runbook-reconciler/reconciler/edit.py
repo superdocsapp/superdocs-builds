@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import html
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -189,19 +190,52 @@ def propose_for_page(
         session_id=proposal.session_id,
         open_mode="new_focused",
     )
+    # The durable id, not the session-scoped one, is what reopens the document
+    # for the read-back. `upload` returns only `doc_…`.
+    proposal.durable_id = _durable_id(client, proposal.session_id, proposal.document_id)
 
-    reply = client.chat(
+    # ASYNC, and this is not a performance choice -- it is the only path whose
+    # changes can be approved.
+    #
+    # Verified against the live service on 2026-08-15. A synchronous `/v1/chat`
+    # turn returns `document_changes.requires_approval: true` and a list of
+    # `change_id`s, and carries **no job id at all**. `/v1/chat/{s}/approve`
+    # requires one (`422` without the field, `404 Job not found` when empty),
+    # and the job the sync turn did create is `job_type: sync_chat`, status
+    # `completed`, which approve rejects with `400 Job is not awaiting
+    # approval`. So a sync turn proposes changes that nothing can ever accept:
+    # the operation is spent, the wording comes back, and the document is never
+    # updated. The stub had modelled the sync reply as carrying a job id, which
+    # is why every offline test passed against a path that cannot work.
+    proposal.job_id = client.chat_async(
         message=build_instruction(editable),
         session_id=proposal.session_id,
         document_id=proposal.document_id,
         model_tier=model_tier,
     )
     proposal.operations = 1
-    proposal.job_id = str(reply.get("job_id") or reply.get("id") or "")
+    job = client.wait_for_job(proposal.job_id)
 
-    changes = client.pending_changes(reply)
+    changes = client.pending_changes(job)
     proposal.proposals = _map_changes(changes, editable)
     return proposal
+
+
+def _durable_id(client: SuperDocs, session_id: str, document_id: str | None) -> str | None:
+    """The uuid under the `doc_…`, or None if it cannot be resolved.
+
+    Never fatal: the read-back is a belt-and-braces check, and losing it is a
+    reason to trust the reply instead, not to fail a page that was worded fine.
+    """
+    try:
+        for entry in client.documents(session_id):
+            if not document_id or entry.get("document_id") == document_id:
+                durable = entry.get("durable_document_id")
+                if durable:
+                    return str(durable)
+    except SuperDocsError:
+        return None
+    return None
 
 
 def propose_all(register: Any, client: SuperDocs, model_tier: str | None = None) -> dict[str, int]:
@@ -339,6 +373,23 @@ def _replacement(old_text: str, new_text: str, asserted: str) -> str:
     if change is None:
         return ""
 
+    # The anchored value may be several words -- `7 days`, `4 hours`, `03:00 UTC
+    # daily` -- while the edit inside it touches one. When the whole changed
+    # range sits inside the occurrence of `asserted`, the replacement is simply
+    # whatever now occupies that span, and no token arithmetic is needed.
+    #
+    # Found live on 2026-08-15: the service correctly returned "Automated backup
+    # retention: 7 days" -> "... 14 days" and this function threw it away. The
+    # token logic below widened the diff to `7`, `asserted` was `7 days`, so the
+    # `asserted not in old_token` guard rejected a perfectly good change. The
+    # finding then escalated as "no replacement text was produced" -- a silent
+    # quality loss that looks like the model declining rather than like a bug
+    # here, which is exactly why it survived the offline tests.
+    at = old_text.find(asserted)
+    if at != -1 and at <= change.start and change.end_old <= at + len(asserted):
+        tail = len(old_text) - (at + len(asserted))
+        return new_text[at : len(new_text) - tail if tail else None].strip()
+
     left = _token_start(old_text, change.start)
     old_token = old_text[left : _token_end(old_text, change.end_old)]
     new_token = new_text[left : _token_end(new_text, change.end_new)]
@@ -408,7 +459,7 @@ def apply_proposal(
             if decisions.get(item.finding_id)
         }
 
-    stored = client.document_html(proposal.durable_id)
+    stored = _stored_after_approval(client, proposal)
     passages = read_back_passages(stored)
     out: dict[str, str] = {}
     for index, item in enumerate(proposal.proposals, start=1):
@@ -425,6 +476,41 @@ def apply_proposal(
         )
         out[item.finding_id] = from_stored or item.proposed
     return out
+
+
+def _stored_after_approval(
+    client: SuperDocs,
+    proposal: PageProposal,
+    attempts: int = 6,
+    pause: float = 2.0,
+) -> str:
+    """The stored document, once it has caught up with the approval.
+
+    `approve` answers `{"status": "ok", "batch_complete": true}` roughly three
+    seconds before `GET /v1/documents/{id}?include_html=true` reflects it —
+    measured live on 2026-08-15: the read immediately after the approval
+    returned the *old* text, and the same read three seconds later returned the
+    new one. A single read-back therefore reports "the service said it applied
+    the change but the stored document does not contain it", which is the exact
+    sentence this read-back exists to be able to say truthfully. It has to mean
+    a real disagreement, not a race the caller lost.
+
+    So: poll until the stored text stops matching what was there before, or
+    give up and let the caller fall back to the reply. Bounded, because waiting
+    for ever on a document that genuinely did not change is worse than
+    proceeding on the wording the service already returned.
+    """
+    stale = {item.original_passage.strip() for item in proposal.proposals if item.original_passage}
+    stored = ""
+    for attempt in range(attempts):
+        stored = client.document_html(proposal.durable_id or "")
+        passages = read_back_passages(stored)
+        text = " ".join(passages.values())
+        if text and not any(old and old in text for old in stale):
+            return stored
+        if attempt < attempts - 1:
+            time.sleep(pause)
+    return stored
 
 
 def read_back_passages(stored_html: str) -> dict[int, str]:

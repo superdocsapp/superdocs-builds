@@ -391,7 +391,23 @@ class SuperDocs:
             payload["thinking_depth"] = thinking_depth
         return self._post("/v1/chat", payload)
 
-    def chat_async(self, message: str, session_id: str, document_id: str | None = None) -> str:
+    def chat_async(
+        self,
+        message: str,
+        session_id: str,
+        document_id: str | None = None,
+        model_tier: str | None = None,
+    ) -> str:
+        """The turn that can actually be approved. Prefer this over `chat`.
+
+        **Divergence from the copied original:** `model_tier` is new here. It
+        was on `chat` only, and this build had to move off `chat` entirely --
+        see `edit.propose_for_page`. Verified live 2026-08-15: a synchronous
+        `/v1/chat` turn produces a job of type `sync_chat` that is already
+        `completed`, and `/v1/chat/{session}/approve` rejects it with
+        `400 Job is not awaiting approval`. Only the async turn parks at
+        `awaiting_approval`, which is the state approval requires.
+        """
         payload: dict[str, Any] = {
             "message": message,
             "session_id": session_id,
@@ -399,6 +415,8 @@ class SuperDocs:
         }
         if document_id:
             payload["document_id"] = document_id
+        if model_tier:
+            payload["model_tier"] = model_tier
         body = self._post("/v1/chat/async", payload)
         job_id = body.get("job_id") or body.get("id")
         if not job_id:

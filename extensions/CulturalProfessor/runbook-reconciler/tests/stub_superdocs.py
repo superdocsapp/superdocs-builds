@@ -181,12 +181,22 @@ class Stub:
             self.sessions[session_id]["jobs"][job_id] = job
             self.jobs[job_id] = job
             self.pending_html[job_id] = (document_id, changes)
+            # No `job_id`, matching the live service. It used to be here, and
+            # that single invented field is why every offline test passed
+            # against an edit path that could not work: `apply_proposal` reads
+            # `job_id`, found the stub's, and approved happily. Against the real
+            # API it found nothing and returned without approving anything.
             h._json(
                 200,
                 {
-                    "job_id": job_id,
-                    "status": "awaiting_approval",
-                    "document_changes": {"pending_changes": changes},
+                    "session_id": session_id,
+                    "response": "I've prepared changes for your review.",
+                    "document_changes": {
+                        "pending_changes": changes,
+                        "requires_approval": True,
+                        "updated_html": None,
+                        "version_id": None,
+                    },
                 },
             )
             return
@@ -217,32 +227,31 @@ class Stub:
             h._json(200, {"url": f"http://stub.local/img/{self._n_images}.svg"})
             return
 
+        # Corrected against the live service on 2026-08-15. This route used to
+        # return one hard-coded change about torque, which was fine while the
+        # edit path went through `/v1/chat` -- and `/v1/chat` turns out to
+        # produce changes that can never be approved, so the edit path moved
+        # here and this route now has to behave like the real one: run `edit_fn`
+        # over the uploaded document and park the result.
         if path == "/v1/chat/async":
             payload = json.loads(body or b"{}")
+            self.chat_calls.append(payload)
             session_id = str(payload["session_id"])
             document_id = payload.get("document_id", "")
             self._n_jobs += 1
             job_id = f"job_{self._n_jobs}"
+            source = self.documents.get(document_id, "")
+            changes = self.edit_fn(source, str(payload.get("message", "")))
             job = {
                 "job_id": job_id,
                 "session_id": session_id,
                 "status": "awaiting_approval",
-                "metadata": {
-                    "pending_changes": [
-                        {
-                            "change_id": f"change_{self._n_jobs}",
-                            "operation": "edit",
-                            "chunk_id": "chunk_1",
-                            "document_id": document_id,
-                            "old_html": "<p>1.2 N·m</p>",
-                            "new_html": "<p>1.6 N·m</p>",
-                            "ai_explanation": "raised the torque",
-                        }
-                    ]
-                },
+                "job_type": "chat",
+                "metadata": {"pending_changes": changes},
             }
             self.sessions.setdefault(session_id, {"documents": [], "jobs": {}})
             self.sessions[session_id]["jobs"][job_id] = job
+            self.pending_html[job_id] = (document_id, changes)
             self.jobs[job_id] = job
             h._json(200, {"job_id": job_id})
             return
