@@ -5,7 +5,9 @@ Prints key names and status only - never a value. Run it before anything else:
 
     python3 preflight.py
 """
+
 import base64
+import contextlib
 import json
 import pathlib
 import sys
@@ -52,7 +54,9 @@ def http(url, auth_header=None, method="GET"):
             return r.status, r.read()
     except urllib.error.HTTPError as e:
         return e.code, e.read()
-    except Exception as e:  # noqa: BLE001 - diagnostic wants the reason, whatever it is
+    except Exception as e:
+        # Deliberately bare. A diagnostic that dies on an unexpected exception
+        # tells you nothing; this one reports the exception as the finding.
         return None, f"{type(e).__name__}: {e}".encode()
 
 
@@ -77,10 +81,8 @@ def discover(site, email, token):
     code, raw = http(f"{site}/_edge/tenant_info")
     cloud_id = None
     if code == 200:
-        try:
+        with contextlib.suppress(ValueError, KeyError):
             cloud_id = json.loads(raw)["cloudId"]
-        except (ValueError, KeyError):
-            pass
     if cloud_id:
         gw = f"https://api.atlassian.com/ex/confluence/{cloud_id}"
         candidates.append((gw, basic(email, token), "gateway + basic (scoped token)"))
@@ -143,7 +145,9 @@ def check_confluence(env):
     if space and space != "RUNBOOKS":
         code, raw = http(f"{api}/wiki/api/v2/spaces?keys={space}&limit=1", auth)
         found = code == 200 and json.loads(raw).get("results")
-        print(f"  {OK if found else BAD}  space {space}: {'found' if found else 'not found or not visible'}")
+        print(
+            f"  {OK if found else BAD}  space {space}: {'found' if found else 'not found or not visible'}"
+        )
     else:
         code, raw = http(f"{api}/wiki/api/v2/spaces?limit=25", auth)
         if code == 200:
@@ -180,8 +184,8 @@ def main():
     ok = check_confluence(env)
 
     print("\nsuperdocs")
-    if not env.get("SUPERDOCS_API_BASE"):
-        print(f"  {WARN}  SUPERDOCS_API_BASE empty - take the base URL from docs.superdocs.app")
+    if not env.get("SUPERDOCS_BASE_URL"):
+        print(f"  {OK}  SUPERDOCS_BASE_URL empty - the client defaults to api.superdocs.app")
     if not env.get("SUPERDOCS_API_KEY") or env["SUPERDOCS_API_KEY"] == example["SUPERDOCS_API_KEY"]:
         print(f"  {WARN}  SUPERDOCS_API_KEY not set")
     else:

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# The command line, with the virtualenv taken care of.
+#
+# `./rr sweep` rather than `.venv/bin/python -m reconciler.cli sweep`, and on a
+# fresh clone it builds the virtualenv on first use -- so the documented way in
+# is one command that works before anything has been installed.
+#
+# Runs from anywhere: it cd's to its own directory, because every path this
+# project uses (fixtures/, docs/, register.db) is relative to the project root.
+set -euo pipefail
+cd "$(dirname "$0")"
+
+if [ ! -x .venv/bin/python ]; then
+    echo "no .venv here yet -- creating one and installing (once)" >&2
+    if command -v uv >/dev/null 2>&1; then
+        uv venv
+        uv pip install -e ".[dev]"
+    else
+        # Falls back to the stdlib. On Debian and Ubuntu this needs
+        # python3-venv installed; uv is the recommendation because it does not.
+        python3 -m venv .venv
+        .venv/bin/pip install --quiet -e ".[dev]"
+    fi
+    echo >&2
+fi
+
+# `test` is not a subcommand of the CLI and should not be -- the command line is
+# the product, and the test suite is not part of it. It is here because `./rr
+# test` is the obvious thing to type, and being sent to read the README to learn
+# it is `.venv/bin/python -m pytest` is a bad first five minutes.
+if [ "${1:-}" = "test" ]; then
+    shift
+    exec .venv/bin/python -m pytest "$@"
+fi
+
+# `fix`, like `test`, is not a subcommand of the CLI. `selftest`'s lint stage is
+# check-only on purpose -- a proof script that rewrites the thing it is proving
+# is not proving anything -- so this is the other half: the command that
+# actually applies what `selftest` only reports.
+if [ "${1:-}" = "fix" ]; then
+    shift
+    .venv/bin/ruff check --fix .
+    exec .venv/bin/black .
+fi
+
+# `preflight` is a standalone stdlib script on purpose -- it has to run before
+# anything is installed, when the thing being diagnosed may be the install. It
+# is routed here so there is one way in rather than two.
+if [ "${1:-}" = "preflight" ]; then
+    shift
+    exec python3 preflight.py "$@"
+fi
+
+exec .venv/bin/python -m reconciler.cli "$@"
