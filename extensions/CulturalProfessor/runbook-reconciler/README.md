@@ -98,6 +98,32 @@ same person who wrote the checker.
 `./rr test` runs the suite; `./selftest` runs the staged proof, cheapest first, with the
 stages that spend opt-in and loudly skipped rather than silently passed.
 
+### The loop, run against a live Confluence page
+
+`demo/seed.py` puts a runbook with seven planted contradictions into a real space, so the
+whole thing can be exercised end to end rather than described:
+
+```bash
+.venv/bin/python demo/seed.py create   # creates and labels the page
+./rr check                             # reads Confluence, finds the drift
+./rr propose --yes                     # 1 operation for the page
+./rr review                            # approve item by item
+.venv/bin/python demo/seed.py delete   # put the space back
+```
+
+Run on 2026-08-15, that found all seven contradictions and left exactly four minimal
+changed ranges on the page, with every other byte identical:
+
+```
+replace: '2'    -> '5'      error budget 0.02 -> 0.05
+replace: '750m' -> '1.2'    latency 750ms -> 1.2s
+replace: '4'    -> '6'      replicas
+replace: '7'    -> '14'     backup retention days
+```
+
+The three not written are the honest part: a dead dashboard link has no correct
+replacement, so it escalates to a human instead of being guessed at.
+
 ### The claim register is the spine
 
 Both halves read one SQLite file. The reconciler writes claims and findings into it; the
@@ -272,11 +298,11 @@ path puts page text into one.
   they say so in config.
 - **Label filtering costs one extra call per page** because CQL search is unreachable with
   a scoped token ([BUGS.md](BUGS.md) item 2). On a very large space that dominates a sweep.
-- **The two halves have been run live separately, not as one continuous sweep.** The
-  SuperDocs edit path spent 11 real operations against the corpus on 2026-08-15, and the
-  Confluence read/write round trip is verified against a real page. What has not been done
-  is a single live sweep that reads a real Confluence space, proposes, and writes back to
-  it.
+- **The wording layer is not deterministic, and the checker is.** The same batch of five
+  passages returned usable replacements for 1/5, then 4/5, then 4/5. `rr propose` retries
+  only what still lacks wording, so re-running converges, but any measurement of *that*
+  layer needs several runs. The finding, the evidence and the decision are deterministic;
+  only the sentence is not.
 - **`rr watch` has not run long enough against a live space to provoke the self-trigger
   case.** The version ledger that prevents it is unit-tested; the loop has not been
   observed in production.

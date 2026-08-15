@@ -27,18 +27,33 @@ on 2026-08-15 against a real Cloud site with a scoped token:
 - `GET /wiki/api/v2/labels`
 - `GET /wiki/api/v2/spaces`
 
-**Not available, and this shapes the design:** the v1 REST API answers `401`
-through the gateway with a scoped token —
-`GET /wiki/rest/api/content/search?cql=…` was the natural way to crawl by label
-and it is simply not reachable. So labels are filtered client-side, one extra
-call per page. On a 400-page space that is 400 calls, which is fine for a
-nightly sweep and would not be for an interactive one; it is a real cost and it
-is in BUGS.md rather than hidden here.
+**Not available, and this shapes the design:** `GET
+/wiki/rest/api/content/search?cql=…` answers `401 Unauthorized; scope does not
+match` through the gateway with a scoped token, and it was the natural way to
+crawl by label. So labels are filtered client-side, one extra call per page. On
+a 400-page space that is 400 calls, which is fine for a nightly sweep and would
+not be for an interactive one; it is a real cost and it is in BUGS.md rather
+than hidden here.
 
-*Inferred, not exercised:* `PUT /wiki/api/v2/pages/{id}` and
-`POST /wiki/api/v2/inline-comments`. Both are documented and neither has been
-run against a live site by this build, because doing so would write to somebody
-else's wiki to prove a point. `selftest` has an opt-in stage that exercises
+The v1 API as a whole is *not* off limits, which is worth stating because the
+first version of this note claimed it was. Reachability follows the token's
+granted scopes literally, endpoint by endpoint. Verified 2026-08-15:
+
+    GET  /wiki/rest/api/content/search   401     GET  /wiki/rest/api/content/{id}/label   200
+    GET  /wiki/rest/api/content/{id}     401     POST /wiki/rest/api/content/{id}/label   200
+    GET  /wiki/rest/api/user/current     401     DELETE .../label/{name}                  204
+    GET  /wiki/rest/api/space            401
+
+The label endpoints work because `read:label` and `write:label` are on the
+token; the rest are refused because their scopes are not grantable to an API
+token. So "v1 is dead" is the wrong lesson and "check the scope for the exact
+endpoint" is the right one — v1 labels are the only way to *add* a label, and
+`demo/seed.py` depends on them.
+
+*Inferred, not exercised:* `POST /wiki/api/v2/inline-comments` is documented and
+has not been run against a live site by this build, because doing so would write
+to somebody else's wiki to prove a point. `selftest` has an opt-in stage that
+exercises
 them against a page you nominate, and it says so loudly rather than skipping
 quietly.
 """

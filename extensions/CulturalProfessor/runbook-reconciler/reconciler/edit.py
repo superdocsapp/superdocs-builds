@@ -109,14 +109,25 @@ def build_passage_document(page_id: str, items: list[tuple[Finding, Claim]]) -> 
     Headings are the mapping back. The reply's chunk ids are the service's, and
     matching on them would couple this to an id scheme nobody has promised is
     stable; `Passage 3` is ours and survives a read-back in any format.
+
+    **The heading carries the number and nothing else.** It used to read
+    `Passage 1 — alert:PaymentsApiErrorBudgetBurn:threshold`, and against the
+    live service that was actively harmful: the model edited the *heading*
+    rather than the passage, turning it into `Passage 1 —
+    alert:PaymentsApiErrorBudgetBurn:0.05`. Five of seven findings on the first
+    live page came back with nothing usable for exactly this reason. A subject
+    like `alert:X:threshold` is a machine identifier that reads as prose
+    containing the very word the instruction is about, so putting it in the
+    document gives the model a plausible wrong thing to correct. It belongs in
+    the instruction, which is keyed by passage number anyway.
     """
     parts = [
         f"<h1>Runbook passages to correct (Confluence page {html.escape(page_id)})</h1>",
         "<p>Each passage below is quoted verbatim from an operational runbook. "
-        "Correct only what the instruction asks for.</p>",
+        "Correct only what the instruction asks for. Do not edit the headings.</p>",
     ]
-    for index, (finding, claim) in enumerate(items, start=1):
-        parts.append(f"<h2>Passage {index} — {html.escape(finding.subject)}</h2>")
+    for index, (_finding, claim) in enumerate(items, start=1):
+        parts.append(f"<h2>Passage {index}</h2>")
         parts.append(f"<p>{html.escape(claim.excerpt)}</p>")
     return "\n".join(parts)
 
@@ -388,7 +399,7 @@ def _replacement(old_text: str, new_text: str, asserted: str) -> str:
     at = old_text.find(asserted)
     if at != -1 and at <= change.start and change.end_old <= at + len(asserted):
         tail = len(old_text) - (at + len(asserted))
-        return new_text[at : len(new_text) - tail if tail else None].strip()
+        return _sane(new_text[at : len(new_text) - tail if tail else None].strip(), asserted)
 
     left = _token_start(old_text, change.start)
     old_token = old_text[left : _token_end(old_text, change.end_old)]
@@ -399,15 +410,44 @@ def _replacement(old_text: str, new_text: str, asserted: str) -> str:
         # necessarily wrong -- but not something to apply under this anchor.
         return ""
     if old_token == asserted:
-        return new_token
+        return _sane(new_token, asserted)
 
     # The changed token is larger than the value: `800ms,` becoming `1.2s,`.
     # Strip the shared surroundings so what comes back fits the anchor exactly.
     prefix, _, suffix = old_token.partition(asserted)
     if new_token.startswith(prefix) and new_token.endswith(suffix):
         inner = new_token[len(prefix) : len(new_token) - len(suffix) or None]
-        return inner
+        return _sane(inner, asserted)
     return ""
+
+
+def _sane(replacement: str, asserted: str) -> str:
+    """A value, or nothing. Never a sentence about a value.
+
+    The instruction says not to add commentary and the service mostly obeys it.
+    Mostly is not a guarantee, and these came back from the live API:
+
+        'Payments Platform'   -> 'Payments Platform is not a valid rota; valid
+                                  rotas are Fulfilment, Payments Core, and Tracking.'
+        'rollback-production' -> "rollback-production (Note: 'rollback-production'
+                                  is not a valid CI job; please use one of ...)"
+
+    Both are *helpful* and both would be spliced into the middle of a sentence
+    in somebody's runbook, which is the specific disaster this module's
+    docstring promises not to cause. The tell is reliable: a replacement that
+    still contains the value it was meant to replace has appended commentary
+    rather than replaced anything. The length cap catches the rest.
+
+    Refusing costs a human one look at an escalated finding. Accepting costs a
+    paragraph of model prose in the middle of an operational instruction.
+    """
+    if not replacement:
+        return ""
+    if asserted in replacement and len(replacement) > len(asserted):
+        return ""
+    if len(replacement) > 3 * len(asserted) + 20:
+        return ""
+    return replacement
 
 
 def _token_start(text: str, index: int) -> int:

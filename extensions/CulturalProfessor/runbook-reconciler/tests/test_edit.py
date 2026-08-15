@@ -202,6 +202,51 @@ def test_a_multi_word_value_survives_the_mapping() -> None:
         assert _replacement(old, new, asserted) == expected, f"{asserted!r} in {old!r}"
 
 
+def test_helpful_commentary_is_refused_rather_than_spliced() -> None:
+    """Both of these came back from the live API on 2026-08-15.
+
+    The instruction says not to add commentary and the service mostly obeys.
+    Mostly is not a guarantee, and a replacement is spliced into the middle of a
+    sentence in an operational runbook — so a helpful paragraph is worse here
+    than no answer at all. Refusing escalates the finding to a human, which is
+    the outcome the module was designed to prefer.
+    """
+    from reconciler.edit import _replacement
+
+    commentary = [
+        (
+            "Page the Payments Platform rota",
+            "Page the Payments Platform is not a valid rota; valid rotas are "
+            "Fulfilment, Payments Core, and Tracking. rota",
+            "Payments Platform",
+        ),
+        (
+            "re-run the rollback-production job",
+            "re-run the rollback-production (Note: 'rollback-production' is not a valid "
+            "CI job; please use one of the declared jobs) job",
+            "rollback-production",
+        ),
+    ]
+    for old, new, asserted in commentary:
+        assert _replacement(old, new, asserted) == "", f"commentary accepted for {asserted!r}"
+
+
+def test_the_passage_document_does_not_hand_the_model_the_subject() -> None:
+    """The heading is a marker, not content.
+
+    It read `Passage 1 — alert:X:threshold` until the first live run, where the
+    model dutifully edited the *heading* — `alert:X:threshold` became
+    `alert:X:0.05` — and five of seven findings on the page came back with
+    nothing usable. A machine identifier placed in a document reads as prose
+    containing the exact word the instruction is about.
+    """
+    document = build_passage_document("1001", [LATENCY, QUEUE])
+
+    assert "<h2>Passage 1</h2>" in document
+    assert "alert:PaymentsApiHighLatency:threshold" not in document
+    assert "stays above 800ms" in document, "the passage itself must still be there"
+
+
 def test_changes_are_matched_by_content_not_by_order(stub: Stub) -> None:
     """A service returning changes in a different order is behaving reasonably.
 

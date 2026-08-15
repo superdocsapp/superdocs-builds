@@ -63,7 +63,28 @@ work against the site host, still works.
 
 ---
 
-## 2. The v1 REST API is entirely unreachable with a scoped token, which takes CQL search with it
+## 2. CQL search is unreachable with a scoped token, and there is no v2 replacement
+
+> **Corrected 2026-08-15.** This item originally claimed the v1 REST API was *entirely*
+> unreachable. That is wrong, and I found out by accident when `demo/seed.py` successfully
+> added a label through a v1 endpoint. Reachability follows the token's granted scopes
+> endpoint by endpoint:
+>
+> | v1 endpoint | Result |
+> | --- | --- |
+> | `GET /wiki/rest/api/content/search` | 401 |
+> | `GET /wiki/rest/api/content/{id}` | 401 |
+> | `GET /wiki/rest/api/user/current` | 401 |
+> | `GET /wiki/rest/api/space` | 401 |
+> | `GET /wiki/rest/api/content/{id}/label` | **200** |
+> | `POST /wiki/rest/api/content/{id}/label` | **200** |
+> | `DELETE /wiki/rest/api/content/{id}/label/{name}` | **204** |
+>
+> The label endpoints work because `read:label` and `write:label` are on the token. So the
+> lesson is not "v1 is dead" but "check the scope for the exact endpoint" — and it matters
+> practically, because v1 labels are the *only* way to add a label to a page. The finding
+> below stands for CQL search specifically; the generalisation did not.
+
 
 **What I did.** Called `GET /wiki/rest/api/content/search?cql=label="runbook"`
 through the working gateway host, to find every page carrying a label in one
@@ -73,9 +94,9 @@ request.
 documentation tells you to do this, and there is no v2 equivalent.
 
 **What happened.** `401 Unauthorized; scope does not match`, through the gateway
-that serves v2 successfully in the same session with the same header. Every v1
-path behaves this way. The v2 paths this build needs — `pages`,
-`pages/{id}/labels`, `labels`, `spaces` — all work.
+that serves v2 successfully in the same session with the same header. The v2 paths
+this build needs — `pages`, `pages/{id}/labels`, `labels`, `spaces` — all work, and
+there is no v2 equivalent of CQL search to move to.
 
 **How badly it blocked.** Half an hour, and it left a permanent performance
 scar. Label filtering is now client-side: list the pages, then fetch each page's
@@ -97,6 +118,10 @@ curl -su "$CONFLUENCE_EMAIL:$CONFLUENCE_API_TOKEN" \
 **Worked around.** `ConfluenceSource.pages()` lists via v2 and filters labels
 per page. Documented in that method rather than only here, because the person
 who will care is reading that method wondering why it is N+1.
+
+**Also fixed in the correction above:** adding a label is only possible through v1,
+which the original over-broad claim would have ruled out. `demo/seed.py` labels the
+page it creates, and without that the page is invisible to `rr` — it crawls by label.
 
 ---
 
@@ -360,6 +385,51 @@ the whole design rests on against a real site rather than assuming it.
 
 ---
 
+## 10. The model edits whatever in the document looks most like the instruction, including headings
+
+**What I did.** Sent a document of the shape `<h2>Passage 1 — alert:PaymentsApiErrorBudgetBurn:threshold</h2><p>…the passage…</p>`, with an instruction naming passage 1 and the value to correct.
+
+**What I expected.** The paragraph to be edited.
+
+**What happened.** The **heading** was edited. `alert:PaymentsApiErrorBudgetBurn:threshold` became `alert:PaymentsApiErrorBudgetBurn:0.05`. Five of seven findings on the first live page came back with nothing usable, all for this reason.
+
+**Whose bug this is.** Mine, mostly — but it is worth writing down because the mistake is easy and the symptom is misleading. A subject like `alert:X:threshold` is a machine identifier that reads as prose containing the exact word the instruction is about, so putting it in the document offers a plausible wrong thing to correct. The symptom looks like the model declining to help.
+
+**Worked around.** The heading is now `Passage 1` and nothing else; the subject travels in the instruction, which is keyed by passage number anyway. Fixed rate went from 2/7 to 4/5 on the same page, with the fifth correctly declined (a dead dashboard link has no correct replacement).
+
+---
+
+## 11. "Do not add commentary" is followed most of the time, and the exceptions are plausible prose
+
+**What I did.** Instruction says, verbatim: *make the smallest edit that corrects the fact… do not add commentary*.
+
+**What happened.** Usually obeyed. Sometimes not:
+
+```
+'Payments Platform'   -> 'Payments Platform is not a valid rota; valid rotas are
+                          Fulfilment, Payments Core, and Tracking.'
+'rollback-production' -> "rollback-production (Note: 'rollback-production' is not a
+                          valid CI job; please use one of the declared jobs: …)"
+```
+
+Both are *correct and helpful*, and both would have been spliced into the middle of a sentence in an operational runbook.
+
+**How badly it blocked.** It did not block, it nearly shipped. The guard is `edit._sane`: a replacement that still contains the value it was meant to replace has appended commentary rather than replaced anything, and one much longer than what it replaces is prose. Refusing escalates the finding to a human, which costs one look; accepting costs a paragraph of model prose inside an incident instruction.
+
+---
+
+## 12. Run-to-run variance on an identical request is large enough to plan for
+
+**What I did.** Sent the same batch of five passages three times.
+
+**What happened.** Usable replacements came back for 1/5, then 4/5, then 4/5 — same document, same instruction, same model tier.
+
+**How badly it blocked.** Not at all, once noticed, but it would have been badly misleading as a one-shot measurement: a single run would have supported either "this works" or "this barely works" depending on which one you did.
+
+**Worked around, and it falls out of the design.** `propose_all` skips findings that already carry wording, so re-running retries only what failed and costs one operation per page that still needs one. Two retries converged. Worth stating plainly in any measurement of this layer: **the deterministic half of this project is deterministic and the wording half is not**, and the register is what makes the difference survivable — a finding with no usable wording escalates to a human rather than being written wrongly.
+
+---
+
 ## Things this file does not claim
 
 Both live paths **have** now been run, on 2026-08-15, and items 7, 8 and 9 above
@@ -370,14 +440,17 @@ RR_LIVE_SUPERDOCS=1 ./rr test tests/test_edit_live.py                    # 1 ope
 RR_LIVE_CONFLUENCE_TESTS=1 RR_LIVE_PAGE_ID=<a page you own> ./rr test -k live
 ```
 
-What is still **not** claimed:
+The **full loop has now run against live Confluence**, on 2026-08-15: a seeded
+runbook page (`demo/seed.py`) with seven planted contradictions, swept live,
+worded through SuperDocs, approved, and written back — leaving exactly four
+minimal changed ranges on the page and every other byte identical:
 
-- **The end-to-end flow has been exercised against the corpus, not against a
-  live Confluence space.** `rr propose --yes` spent 11 real operations across
-  the corpus and `rr review` applied the results to the corpus files, with the
-  byte-level diff checked by hand. The same `apply` code drives Confluence and
-  its round trip is proven separately (item 9), but the two halves have not been
-  run as one continuous live sweep.
+    replace: '2' -> '5'        (error budget 0.02 -> 0.05)
+    replace: '750m' -> '1.2'   (latency 750ms -> 1.2s)
+    replace: '4' -> '6'        (replicas)
+    replace: '7' -> '14'       (backup retention days)
+
+What is still **not** claimed:
 - **The measured precision and recall are against a synthetic corpus** of 8
   runbooks, and were produced by the deterministic layer only — no live call is
   involved in that number, by design.

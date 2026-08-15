@@ -339,3 +339,45 @@ checked against a real page rather than assumed.
 The through-line in all three: the offline suite was testing the code against my
 model of the services, and two of the three failures were in the model. The
 fixes worth keeping are the ones that moved a belief into a test.
+
+## 2026-08-15 — the first live end-to-end run, and what a document's shape does to a model
+
+**Question.** The edit path worked against one synthetic passage live. What
+happens with seven real ones on a real Confluence page?
+
+**Call.** Two changes to how a request is built, both forced by what came back.
+
+**Reasoning.**
+
+**Do not put machine identifiers in the document.** `build_passage_document`
+wrote `<h2>Passage 1 — alert:PaymentsApiErrorBudgetBurn:threshold</h2>` above
+each passage. The model edited the *heading* — `alert:X:threshold` became
+`alert:X:0.05` — and five of seven findings came back with nothing usable. The
+subject is a machine identifier that reads as prose containing the exact word
+the instruction is about, so it was the most plausible thing in the document to
+correct. The heading is now `Passage 1` and nothing else. Fix rate went from
+2/7 to 4/5 on the same page.
+
+The general lesson is worth more than the fix: everything in the document is a
+candidate for editing, so the document should contain only what is allowed to
+change. That is the same principle as rule 3 pointing the other way — there,
+page text must not become an instruction; here, our metadata must not become
+editable content.
+
+**"Do not add commentary" holds most of the time.** The exceptions were
+`'Payments Platform'` → `'Payments Platform is not a valid rota; valid rotas
+are …'` and `'rollback-production'` → `"rollback-production (Note: … not a
+valid CI job …)"`. Both correct, both helpful, and both would have been spliced
+into the middle of a sentence in an operational runbook. `_sane` refuses a
+replacement that still contains the value it was meant to replace, or that is
+much longer than it. Refusing costs a human one look at an escalated finding;
+accepting costs a paragraph of model prose inside an incident instruction.
+
+**The wording layer is not deterministic and the checker is.** The same batch
+of five passages returned 1/5, then 4/5, then 4/5 usable replacements. This is
+not a defect to fix, it is a property to design around, and the design already
+did: `propose_all` skips findings that already carry wording, so a re-run
+retries only the failures at one operation per page. Two retries converged.
+It does mean any measurement of *that* layer needs several runs, and the README
+says so — a single run would have supported either "this works" or "this barely
+works" depending on which one you did.

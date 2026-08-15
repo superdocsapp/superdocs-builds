@@ -1,0 +1,25 @@
+<h2>When this fires</h2>
+<p>The <strong>PaymentsApiErrorBudgetBurn</strong> alert fires when the fast-burn error ratio for <code>payments-api</code> stays above <strong>0.02</strong> for 5 minutes, measured over a 5-minute window.</p>
+<p>The related <strong>PaymentsApiHighLatency</strong> alert fires when p99 request latency stays above <strong>750ms</strong> for 10 minutes.</p>
+<p>Dashboards: <a href="https://grafana.meridian.internal/d/abc123/payments-overview">Payments overview</a> and <a href="https://grafana.meridian.internal/d/pay404/payments-latency-detail">Latency detail</a>.</p>
+<h2>Triage</h2>
+<p>Start with pod health. The deployment is <code>payments-api</code> in namespace <code>payments</code>, and it runs 4 replicas.</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="rr-demo-1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n payments get pods -l app.kubernetes.io/name=payments-api
+kubectl -n payments describe deploy/payments-api]]></ac:plain-text-body></ac:structured-macro>
+<p>If pods are healthy, check the database. The primary is <code>meridian-payments-prod</code> in region <code>eu-west-1</code>.</p>
+<p>On a shared cluster you may need to name the namespace yourself:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="rr-demo-2"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n <your-namespace> top pods]]></ac:plain-text-body></ac:structured-macro>
+<h2>Mitigation</h2>
+<p>Restart the deployment first — it clears a wedged connection pool without needing a release:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="rr-demo-3"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n payments rollout restart deploy/payments-api]]></ac:plain-text-body></ac:structured-macro>
+<p>If a bad release is the cause, re-run the <code>rollback-production</code> job in the deploy workflow. It needs a production environment approval, so find a second reviewer before you start.</p>
+<h2>Escalation</h2>
+<p>Page the <strong>Payments Platform</strong> rota if latency stays above the threshold for 30 minutes, or immediately if checkout is failing.</p>
+<p>For anything touching card data, also notify the <strong>Fulfilment</strong> rota so despatch can pause.</p>
+<h2>Recovery objectives</h2>
+<table data-layout="default"><tbody>
+<tr><th><p>Measure</p></th><th><p>Target</p></th></tr>
+<tr><td><p>RPO</p></td><td><p>15 minutes</p></td></tr>
+<tr><td><p>RTO</p></td><td><p>4 hours</p></td></tr>
+<tr><td><p>Automated backup retention</p></td><td><p>7 days</p></td></tr>
+</tbody></table>
