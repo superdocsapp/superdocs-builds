@@ -25,6 +25,7 @@ from reconciler.check.coverage import Coverage, check_coverage
 from reconciler.check.vertical import Check, check_page, load_checks
 from reconciler.claims import Claim, Finding
 from reconciler.config import Config
+from reconciler.confluence import PageSource
 from reconciler.confluence.local import LocalSource, PageRef
 from reconciler.estate import Estate
 from reconciler.extract.patterns import extract_claims
@@ -78,7 +79,7 @@ class Sweep:
         self,
         config: Config,
         register: Register,
-        source: LocalSource | None = None,
+        source: PageSource | None = None,
         checks: list[Check] | None = None,
     ) -> None:
         self.config = config
@@ -167,7 +168,7 @@ def doc_text(document: Document) -> str:
     return "\n".join(block.text for block in document.blocks)
 
 
-def pages_of(source: LocalSource) -> list[PageRef]:
+def pages_of(source: PageSource) -> list[PageRef]:
     return source.pages()
 
 

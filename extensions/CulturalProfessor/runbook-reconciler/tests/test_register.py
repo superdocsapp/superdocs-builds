@@ -172,6 +172,12 @@ def test_two_sweeps_at_once_do_not_corrupt_the_register(tmp_path: Path) -> None:
     Two connections, two threads, overlapping writes of overlapping ids. WAL
     plus busy_timeout is what turns the second writer's `database is locked`
     into a wait; without either pragma this test is where that shows up.
+
+    The barrier only lines the two threads up; it is not the thing under test,
+    so a machine too loaded to reach it inside the timeout is a broken *test*,
+    not a broken register. It gets its own error so the two cannot be confused
+    -- they were, once, and `concurrent sweeps failed: [BrokenBarrierError()]`
+    reads exactly like the corruption this test exists to catch.
     """
     path = tmp_path / "register.db"
     errors: list[Exception] = []
@@ -180,7 +186,13 @@ def test_two_sweeps_at_once_do_not_corrupt_the_register(tmp_path: Path) -> None:
     def sweep(tag: str) -> None:
         try:
             with Register(path) as reg:
-                barrier.wait(timeout=10)
+                try:
+                    barrier.wait(timeout=60)
+                except threading.BrokenBarrierError:
+                    raise AssertionError(
+                        "the two threads never lined up -- this machine was too busy "
+                        "to start both within 60s, and nothing was proved either way"
+                    ) from None
                 for n in range(40):
                     claim_id = reg.upsert_claim(claim(text_hash=f"{tag}-{n}"))
                     reg.upsert_finding(finding(claim_id))
@@ -191,8 +203,12 @@ def test_two_sweeps_at_once_do_not_corrupt_the_register(tmp_path: Path) -> None:
     for thread in threads:
         thread.start()
     for thread in threads:
-        thread.join(timeout=30)
+        thread.join(timeout=90)
 
+    # A thread still running here would otherwise be counted as a thread that
+    # wrote nothing, and the row count below would fail as though the register
+    # had lost writes.
+    assert not [t for t in threads if t.is_alive()], "a sweep thread never finished"
     assert not errors, f"concurrent sweeps failed: {errors}"
     with Register(path) as reg:
         assert len(reg.claims_for_page("1001")) == 80

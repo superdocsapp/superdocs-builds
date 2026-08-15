@@ -4,19 +4,22 @@ Subcommands are registered in `COMMANDS` and land stage by stage; a command
 appears here when it works, so `./rr --help` never advertises something that
 answers "not implemented yet".
 
-Every command that can spend a paid operation says so in its own help text.
-The default is that nothing spends: `check` and `report` are local and free,
-and only `sweep --apply` reaches the SuperDocs API at all.
+Every command that can spend a paid operation says so in its own help text, and
+the one that can — `propose` — refuses to spend anything until it is asked
+twice: run it and it prices the work, run it with `--yes` and it does it. The
+default everywhere is that nothing spends.
 """
 
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import sys
 from collections.abc import Callable
 
 from reconciler import __version__
 from reconciler.config import Config
+from reconciler.confluence import PageSource, describe_source, page_source
 from reconciler.register import Register
 from reconciler.sweep import Sweep, SweepResult
 
@@ -29,11 +32,20 @@ def _cmd_version(_: argparse.Namespace) -> int:
 
 
 def _cmd_check(args: argparse.Namespace) -> int:
-    """The free layer, end to end. No model, no network, no spend."""
-    config = Config.load()
+    """The free layer, end to end. No model, no spend.
+
+    Not necessarily no network: with Confluence configured this reads the live
+    site, which is why it says which one it read before it says what it found.
+    An output that does not name its own inputs is how somebody spends an
+    afternoon debugging a finding about a page they were not looking at.
+    """
+    config = _configure(args)
+    source = page_source(config)
+    print(f"reading {describe_source(source)}\n")
     with Register(config.register_path) as register:
-        result = Sweep(config, register).run(mode="check")
+        result = Sweep(config, register, source=source).run(mode="check")
         _report(result, verbose=args.verbose)
+    _close(source)
     # Non-zero when there is drift, so CI can gate on it. `--exit-zero` is for
     # the pre-commit nudge, which must never block a commit.
     return 0 if args.exit_zero or not result.contradictions else 1
@@ -77,7 +89,13 @@ def _short(text: str, limit: int = 110) -> str:
 
 
 def _cmd_measure(args: argparse.Namespace) -> int:
-    """Score the checker against the key that was written before it."""
+    """Score the checker against the key that was written before it.
+
+    Deliberately the one command that does not call `page_source`: the key is
+    the corpus's planted drift, so scoring against whatever Confluence site
+    happens to be configured would produce a precision number about somebody
+    else's wiki and report it as this project's.
+    """
     from reconciler.measure import score, write_raw
 
     config = Config.load()
@@ -92,24 +110,247 @@ def _cmd_measure(args: argparse.Namespace) -> int:
     return 0 if not (scored.misses or scored.false_positives) else 1
 
 
+def _cmd_propose(args: argparse.Namespace) -> int:
+    """The only command that can spend, and it asks twice before it does.
+
+    Priced first, spent second. The estimate is exact rather than indicative —
+    one operation per page holding editable, undecided contradictions — because
+    a tool that says "this may incur charges" has told the operator nothing they
+    can act on.
+    """
+    from reconciler.edit import propose_all
+    from reconciler.superdocs import SuperDocs
+
+    config = Config.load()
+    with Register(config.register_path) as register:
+        pages = _pages_awaiting_proposal(register)
+        if not pages:
+            print("nothing to propose: no undecided contradictions are waiting for wording.")
+            print("run `rr check` first, or `rr review` if they already have proposals.")
+            return 0
+
+        print(f"{sum(pages.values())} finding(s) across {len(pages)} page(s):")
+        for page_id, count in sorted(pages.items()):
+            print(f"  page {page_id}: {count} finding(s) → 1 operation")
+        print(f"\nthis will spend {len(pages)} operation(s).")
+
+        if not args.yes:
+            print("nothing spent. re-run with --yes to go ahead.")
+            return 0
+        if not config.has_superdocs:
+            print(
+                "SUPERDOCS_API_KEY is not set — nothing spent. See .env.example.", file=sys.stderr
+            )
+            return 2
+
+        with SuperDocs(api_key=config.superdocs_key) as client:
+            spent = propose_all(register, client, model_tier=args.tier)
+        print(
+            f"\n{spent['operations']} operation(s) spent across {spent['pages']} page(s). "
+            f"`rr review` is the next step; nothing has been written to any document yet."
+        )
+    return 0
+
+
+def _pages_awaiting_proposal(register: Register) -> dict[str, int]:
+    """Pages whose findings still need wording, counted the way they are billed.
+
+    A finding whose passage this tool refuses to edit is deliberately absent: it
+    resolves to a comment for a human, and paying a model to word a comment
+    nobody asked for is exactly the spend rule 5 is about.
+    """
+    pages: dict[str, int] = {}
+    for finding in register.review_queue():
+        if finding.proposed or not finding.page_id:
+            continue
+        claim = register.claim(finding.claim_id or "")
+        if claim is None or not claim.anchor.editable:
+            continue
+        pages[finding.page_id] = pages.get(finding.page_id, 0) + 1
+    return pages
+
+
+def _cmd_review(args: argparse.Namespace) -> int:
+    """The gate. Reads decisions, writes only what was approved."""
+    from reconciler.review import ReviewQueue, run_terminal_review
+
+    config = _configure(args)
+    source = page_source(config)
+    print(f"reviewing against {describe_source(source)}\n")
+    with Register(config.register_path) as register:
+        result = run_terminal_review(ReviewQueue(register), source, auto=args.auto)
+    _close(source)
+    return 0 if result.ok else 1
+
+
+def _cmd_sweep(args: argparse.Namespace) -> int:
+    """Check, then review what it found. The whole loop, in the honest order.
+
+    Proposing is not folded in here even with `--yes`, and that is deliberate:
+    the one command that spends money should be the one command somebody typed
+    on purpose. `rr sweep` tells you what it would cost and stops.
+    """
+    from reconciler.review import ReviewQueue, run_terminal_review
+
+    config = _configure(args)
+    source = page_source(config)
+    print(f"sweeping {describe_source(source)}\n")
+    try:
+        with Register(config.register_path) as register:
+            result = Sweep(config, register, source=source).run(
+                mode="sweep", page_ids=args.pages or None
+            )
+            _report(result, verbose=args.verbose)
+
+            if not args.review:
+                pages = _pages_awaiting_proposal(register)
+                if pages:
+                    print(
+                        f"\n{len(pages)} page(s) need wording before they can be reviewed: "
+                        f"`rr propose` prices it."
+                    )
+                return 0 if not result.contradictions else 1
+
+            print()
+            outcome = run_terminal_review(ReviewQueue(register), source, auto=args.auto)
+    finally:
+        # The early return above is why this is a `finally` and not a call at
+        # the end: the live adapter holds an httpx connection pool.
+        _close(source)
+    return 0 if outcome.ok else 1
+
+
+def _cmd_status(_: argparse.Namespace) -> int:
+    """What the register holds, including the things that go wrong quietly."""
+    config = Config.load()
+    with Register(config.register_path) as register:
+        summary = register.summary()
+        print(f"register: {config.register_path}")
+        print(
+            f"  {summary['claims']} claims · {summary['agrees']} agree · "
+            f"{summary['contradicts']} contradict · {summary['unverifiable']} unverifiable"
+        )
+        print(
+            f"  {summary['awaiting_review']} awaiting review · "
+            f"{summary['approved_unapplied']} approved and not yet written"
+        )
+
+        batches = register.open_batches()
+        if batches:
+            # A parked turn holds its session, and every later turn against it
+            # comes back 409. Silence here is how that gets found a week later.
+            print(f"\n{len(batches)} SuperDocs turn(s) still parked awaiting a decision:")
+            for batch in batches:
+                print(
+                    f"  page {batch['page_id']} · job {batch['job_id']} · "
+                    f"{batch['changes']} change(s) · opened {batch['opened']}"
+                )
+
+        runs = register.last_runs(limit=5)
+        if runs:
+            print("\nrecent runs:")
+            for run in runs:
+                cost = register.run_cost(run["run_id"])
+                print(
+                    f"  {run['started_at']} · {run['mode']:8} · {run['status'] or 'running':9} · "
+                    f"{cost['seconds']:.2f}s · {cost['operations']} operation(s)"
+                )
+    return 0
+
+
+def _close(source: PageSource) -> None:
+    """The live adapter holds an httpx client; the corpus holds nothing."""
+    closer = getattr(source, "close", None)
+    if callable(closer):
+        closer()
+
+
+def _configure(args: argparse.Namespace) -> Config:
+    """Config, plus the one thing a flag is allowed to override.
+
+    `--corpus` is worth a flag rather than only an environment variable because
+    it is what the demo types: it guarantees the offline half of the recording
+    stays offline with real credentials sitting in `.env`.
+    """
+    config = Config.load()
+    if getattr(args, "corpus", False):
+        return dataclasses.replace(config, source_mode="corpus")
+    return config
+
+
 COMMANDS: dict[str, tuple[str, Handler]] = {
     "check": (
         "check every runbook against the estate (free: no model, no network, no spend)",
         _cmd_check,
     ),
+    "sweep": (
+        "check, and then optionally review what it found (free unless you review)",
+        _cmd_sweep,
+    ),
+    "propose": (
+        "ask SuperDocs to word the fixes — THE ONLY COMMAND THAT SPENDS, and not without --yes",
+        _cmd_propose,
+    ),
+    "review": ("decide finding by finding, then write only what was approved", _cmd_review),
+    "status": ("what the register holds, and what is parked (free)", _cmd_status),
     "measure": ("score the checker against fixtures/expected.yaml", _cmd_measure),
     "version": ("print the version and exit", _cmd_version),
 }
 
+_VERBOSE = (
+    ("--verbose", "-v"),
+    {"action": "store_true", "help": "also list what could not be checked"},
+)
+_AUTO = (
+    ("--auto",),
+    {
+        "choices": ["approve", "reject"],
+        "help": "decide every finding the same way, without a terminal (for CI)",
+    },
+)
+_CORPUS = (
+    ("--corpus",),
+    {
+        "action": "store_true",
+        "help": "read the bundled corpus even if Confluence is configured",
+    },
+)
+
 _OPTIONS: dict[str, list[tuple[tuple[str, ...], dict]]] = {
     "check": [
-        (
-            ("--verbose", "-v"),
-            {"action": "store_true", "help": "also list what could not be checked"},
-        ),
+        _VERBOSE,
+        _CORPUS,
         (
             ("--exit-zero",),
             {"action": "store_true", "help": "always exit 0, for a non-blocking pre-commit hook"},
+        ),
+    ],
+    "sweep": [
+        _VERBOSE,
+        _CORPUS,
+        _AUTO,
+        (
+            ("--pages",),
+            {
+                "nargs": "+",
+                "metavar": "ID",
+                "help": "narrow to these page ids (coverage is then not computed)",
+            },
+        ),
+        (
+            ("--review",),
+            {"action": "store_true", "help": "go straight into the review queue afterwards"},
+        ),
+    ],
+    "review": [_AUTO, _CORPUS],
+    "propose": [
+        (
+            ("--yes",),
+            {"action": "store_true", "help": "actually spend the operations priced above"},
+        ),
+        (
+            ("--tier",),
+            {"help": "SuperDocs model tier, if you want something other than the default"},
         ),
     ],
 }

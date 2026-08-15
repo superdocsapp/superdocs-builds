@@ -124,3 +124,45 @@ written without knowing what the checker would find. Writing the corpus after
 the checker means writing fixtures the checker already passes, which measures
 nothing. This is the one place where doing it in the awkward order buys
 something real.
+
+## 2026-08-15 — what `rr check` reads when a `.env` is sitting there
+
+**Question.** Stage 8 gave the commands a `page_source(config)` helper that
+prefers Confluence when it is configured. That is obviously right for an
+operator. It is not obviously right for `rr check` on a machine that has
+credentials for an unrelated site, and it is definitely wrong for the test
+suite: `Config.load()` reads the real `.env`, so the moment the helper landed,
+`rr check` under pytest started making live HTTP calls and the suite went from
+ten seconds to thirty-four.
+
+**Call.** Three modes, in `RR_SOURCE`: `auto` (the default — Confluence when
+all three of site, email and token are set, the corpus otherwise), `corpus`,
+and `confluence`. `conftest.py` pins `corpus` for the whole suite in an autouse
+session fixture, and `--corpus` is a flag on `check`, `sweep` and `review`.
+Asking for `confluence` without the credentials is an error rather than a
+silent fallback. Every command that reads pages now prints which source it read
+before it prints what it found.
+
+**Reasoning.** The failure this prevents is not a crash, it is a *plausible
+wrong answer*: the live read returned seven contradictions and zero claims,
+which looks like a working run and is actually a report about somebody else's
+wiki. Anything that can silently change what a number is about has to say what
+it is about, and a test suite whose behaviour depends on an untracked file is
+not evidence of anything. `measure` deliberately does not consult the helper at
+all — it is scored against the corpus's planted drift, so reading anything else
+would produce a precision figure about the wrong estate.
+
+## 2026-08-15 — `rr propose` prices the work before it does it
+
+**Question.** `propose` is the only command that can be charged for. Should it
+just run, the way `check` does?
+
+**Call.** No. Run it and it prints the exact cost — one operation per page, the
+pages named — and stops. `--yes` is what actually spends.
+
+**Reasoning.** The estimate is exact rather than indicative, which is the whole
+point: "this may incur charges" tells an operator nothing they can act on,
+while "7 operations, one for each of these pages" is a number they can decide
+about. It also makes the zero-spend property visible at the command line rather
+than only in a test — a clean estate prints "nothing to propose" and there is
+no path from there to a request.

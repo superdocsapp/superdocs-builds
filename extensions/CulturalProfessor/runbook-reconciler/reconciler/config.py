@@ -97,10 +97,37 @@ class Config:
     register_path: Path
     checks_path: Path
     mappings: Mappings
+    #: `auto` reads Confluence when it is configured and the corpus when it is
+    #: not; `corpus` and `confluence` say so outright. See `wants_confluence`.
+    source_mode: str = "auto"
 
     @property
     def has_confluence(self) -> bool:
         return bool(self.confluence_site and self.confluence_email and self.confluence_token)
+
+    @property
+    def wants_confluence(self) -> bool:
+        """Whether to read the live site, asked as one question in one place.
+
+        `auto` exists because a stranger with no `.env` has to get output from
+        their first command, and an operator who filled one in expects it to be
+        used. The other two modes exist because `auto` is not good enough for
+        two cases where guessing wrong is expensive:
+
+        - **The test suite.** Left on `auto`, every test that calls
+          `Config.load()` reads whatever `.env` the developer happens to have,
+          so the suite passes on one machine and makes live HTTP calls on
+          another. `conftest.py` pins `RR_SOURCE=corpus` for exactly this
+          reason -- it was not hypothetical, it turned `rr check` into a network
+          round-trip and a green suite into a slow one.
+        - **The demo.** `RR_SOURCE=corpus` guarantees the offline half of the
+          recording is offline even with credentials sitting in the environment.
+        """
+        if self.source_mode == "corpus":
+            return False
+        if self.source_mode == "confluence":
+            return True
+        return self.has_confluence
 
     @property
     def has_superdocs(self) -> bool:
@@ -132,6 +159,7 @@ class Config:
             register_path=Path(os.environ.get("RR_REGISTER", PROJECT_ROOT / "register.db")),
             checks_path=Path(os.environ.get("RR_CHECKS", CONFIG_DIR / "checks.yaml")),
             mappings=Mappings.load(),
+            source_mode=os.environ.get("RR_SOURCE", "auto").strip().lower() or "auto",
         )
 
 
