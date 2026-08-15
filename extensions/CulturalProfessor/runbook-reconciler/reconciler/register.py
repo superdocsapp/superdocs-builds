@@ -307,6 +307,57 @@ class Register:
         ).fetchall()
         return [_claim_from_row(row) for row in rows]
 
+    def claims_like(self, fragment: str) -> list[Claim]:
+        """Every claim whose subject mentions an entity, by any of its names.
+
+        The readiness pack's join. `LIKE` with the fragment bracketed by
+        separators rather than a bare substring: `api` must not match
+        `payments-api`, or one service's row absorbs another's evidence.
+        """
+        rows = self._conn.execute(
+            "SELECT * FROM claims WHERE subject = ? OR subject LIKE ? OR subject LIKE ? "
+            "OR subject LIKE ? ORDER BY page_id, subject",
+            (fragment, f"{fragment}:%", f"%:{fragment}", f"%:{fragment}:%"),
+        ).fetchall()
+        return [_claim_from_row(row) for row in rows]
+
+    def multi_page_subjects(self) -> dict[str, int]:
+        """Subjects documented on more than one page, and how many spellings.
+
+        A count of 1 is the good case and worth reporting as loudly as the bad
+        one: ten facts repeated across two pages each and agreeing is what
+        multi-document consistency looks like when it is working, and a report
+        that only ever mentions disagreement cannot show that.
+        """
+        rows = self._conn.execute(
+            "SELECT subject, COUNT(DISTINCT asserted) AS spellings FROM claims "
+            "GROUP BY subject HAVING COUNT(DISTINCT page_id) > 1 ORDER BY subject"
+        ).fetchall()
+        return {row["subject"]: int(row["spellings"]) for row in rows}
+
+    def subjects_with_conflicting_assertions(self) -> dict[str, list[tuple[str, str]]]:
+        """Subjects that more than one page asserts, and disagrees about.
+
+        Multi-document consistency, as one query rather than as a pass over
+        every claim in Python. Deliberately independent of the estate: two
+        documents contradicting each other is worth surfacing even where neither
+        can be checked against anything, and it is the one class of problem the
+        vertical checker structurally cannot see.
+        """
+        rows = self._conn.execute("""
+            SELECT subject, page_id, asserted FROM claims
+            WHERE subject IN (
+                SELECT subject FROM claims
+                GROUP BY subject
+                HAVING COUNT(DISTINCT asserted) > 1 AND COUNT(DISTINCT page_id) > 1
+            )
+            ORDER BY subject, page_id
+            """).fetchall()
+        out: dict[str, list[tuple[str, str]]] = {}
+        for row in rows:
+            out.setdefault(row["subject"], []).append((row["page_id"], row["asserted"]))
+        return out
+
     def forget_page(self, page_id: str) -> int:
         """Drop a page's claims and their findings.
 
@@ -391,6 +442,7 @@ class Register:
         page_id: str | None = None,
         undecided_only: bool = False,
         unapplied_only: bool = False,
+        subject: str | None = None,
     ) -> list[Finding]:
         sql = "SELECT * FROM findings WHERE 1=1"
         params: list[Any] = []
@@ -400,6 +452,11 @@ class Register:
         if page_id:
             sql += " AND page_id = ?"
             params.append(page_id)
+        if subject:
+            # Bracketed by separators, like `claims_like`: an entity called
+            # `api` must not collect `payments-api`'s findings.
+            sql += " AND (subject = ? OR subject LIKE ? OR subject LIKE ? OR subject LIKE ?)"
+            params += [subject, f"{subject}:%", f"%:{subject}", f"%:{subject}:%"]
         if undecided_only:
             sql += " AND decision IS NULL"
         if unapplied_only:

@@ -16,6 +16,7 @@ import argparse
 import dataclasses
 import sys
 from collections.abc import Callable
+from pathlib import Path
 
 from reconciler import __version__
 from reconciler.config import Config
@@ -246,6 +247,56 @@ def _cmd_watch(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_pack(args: argparse.Namespace) -> int:
+    """Half two: the readiness report and the DR evidence document.
+
+    Free. Both documents are built from the register offline, and `--export`
+    sends them through SuperDocs' renderer and house template — upload and
+    export are both free operations, which is why the pack leans on them
+    instead of carrying a PDF library.
+    """
+    from reconciler.estate import Estate
+    from reconciler.pack import build_dr_evidence, build_readiness, export_pack
+
+    config = _configure(args)
+    source = page_source(config)
+    out = Path(args.out)
+    try:
+        with Register(config.register_path) as register:
+            if not register.summary()["claims"]:
+                print("the register is empty — run `rr check` first.", file=sys.stderr)
+                return 2
+
+            estate = Estate.load(config)
+            coverage = Sweep(config, register, source=source).run(mode="pack").coverage
+            packs = {
+                "on-call-readiness": build_readiness(register, estate, coverage),
+                "dr-evidence": build_dr_evidence(register, estate),
+            }
+    finally:
+        _close(source)
+
+    for name, pack in packs.items():
+        path = pack.write(out, name)
+        print(f"{pack.title}: {path}")
+        if pack.divergences:
+            print(f"  {len(pack.divergences)} subject(s) documented inconsistently across pages")
+
+    if args.export:
+        if not config.has_superdocs:
+            print("SUPERDOCS_API_KEY is not set — the HTML above is still complete.")
+            return 2
+        from reconciler.superdocs import SuperDocs
+
+        with SuperDocs(api_key=config.superdocs_key) as client:
+            for name, pack in packs.items():
+                blob = export_pack(client, pack, fmt=args.export)
+                path = out / f"{name}.{args.export}"
+                path.write_bytes(blob)
+                print(f"exported {path} ({len(blob)} bytes, 0 paid operations)")
+    return 0
+
+
 def _cmd_status(_: argparse.Namespace) -> int:
     """What the register holds, including the things that go wrong quietly."""
     config = Config.load()
@@ -319,6 +370,7 @@ COMMANDS: dict[str, tuple[str, Handler]] = {
     ),
     "review": ("decide finding by finding, then write only what was approved", _cmd_review),
     "watch": ("sweep whenever the estate changes, debounced and coalesced (free)", _cmd_watch),
+    "pack": ("build the on-call readiness and DR evidence documents (free)", _cmd_pack),
     "status": ("what the register holds, and what is parked (free)", _cmd_status),
     "measure": ("score the checker against fixtures/expected.yaml", _cmd_measure),
     "version": ("print the version and exit", _cmd_version),
@@ -370,6 +422,17 @@ _OPTIONS: dict[str, list[tuple[tuple[str, ...], dict]]] = {
         ),
     ],
     "review": [_AUTO, _CORPUS],
+    "pack": [
+        _CORPUS,
+        (("--out",), {"default": "out", "help": "where to write the documents (default: out/)"}),
+        (
+            ("--export",),
+            {
+                "choices": ["pdf", "docx"],
+                "help": "also render through SuperDocs' template (free, needs a key)",
+            },
+        ),
+    ],
     "watch": [
         _CORPUS,
         (

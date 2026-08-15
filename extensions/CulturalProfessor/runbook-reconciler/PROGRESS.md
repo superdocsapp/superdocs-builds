@@ -219,3 +219,47 @@ The hook always exits zero, and that is the whole design rather than a caveat.
 A blocking hook that costs thirty seconds gets `--no-verify` the first time and
 uninstalled the second, and then the tool is absent from the one moment it had
 the engineer's attention. It also prints nothing at all unless there is drift.
+
+## 2026-08-15 — the readiness table reported a service as verified while it was drifting
+
+**Question.** How does a finding get attributed to a service in the readiness
+table? The obvious answer is by subject: the register knows each claim's
+subject, so join on the service's name.
+
+**Call.** By subject *and* by page. A finding also belongs to a service when it
+sits on a page that service's claims are on.
+
+**Reasoning.** The subject-only join was written, looked right, and was wrong in
+the worst available direction. `payments-api`'s runbook carries a threshold
+contradiction filed under `alert:PaymentsApiHighLatency:threshold` — a subject
+that contains the service's name nowhere — so the first version of the table
+printed `payments-api · 8 verified · 0 drift · verified` while page 1001 held a
+live contradiction the checker had already found and reported two sections
+above. A readiness report is read by somebody deciding whether a team is ready
+to take the pager, and the only failure that really matters in a document like
+that is a confident "fine". The page relation is already established,
+deterministic, and the same one the coverage join uses.
+
+The same reasoning drove `_alerts_for`: an `AlertRule` has no service field, and
+attributing alerts by matching the alert's name against the service's name would
+file `PaymentsApiHighLatency` under a service called `api`. Two exact routes
+only — the alert's `runbook_url` resolves to one of the service's pages, or its
+`team` label equals the catalog owner. Alerts reachable by neither appear in the
+estate-wide coverage numbers and in no service's row.
+
+## 2026-08-15 — reporting the agreements, not only the disagreements
+
+**Question.** Multi-document consistency finds subjects two pages disagree
+about. On the shipped corpus it finds none. Is there anything to report?
+
+**Call.** Yes: the corpus has ten subjects documented on two pages each, all
+agreeing, and the readiness report says so.
+
+**Reasoning.** A consistency check that only speaks up on disagreement cannot
+demonstrate it is working, and "no output" is indistinguishable from "not
+implemented". Ten facts stated in two places and matching everywhere *is* the
+result, and it is the check no single-document review performs — a page can be
+internally consistent, correct against the estate, and still contradict the page
+next to it. The divergence case is covered by a unit test with a register built
+to contain one, rather than by planting drift in a corpus whose measurement key
+was fixed at stage 1.

@@ -90,6 +90,11 @@ class Stub:
         self.jobs: dict[str, dict[str, Any]] = {}
         self.approve_calls: list[dict[str, Any]] = []
         # Added for runbook-reconciler.
+        #: Every chat turn the stub was asked for. The pack's tests assert this
+        #: stays empty: chat is the call that costs, and a readiness document
+        #: that quietly opened one would be a paid operation nobody priced.
+        self.chat_calls: list[dict[str, Any]] = []
+        self.exports: list[dict[str, Any]] = []
         self.documents: dict[str, str] = {}
         self.durable: dict[str, str] = {}
         self.pending_html: dict[str, tuple[str, list[dict[str, Any]]]] = {}
@@ -159,6 +164,7 @@ class Stub:
         # two shapes `pending_changes()` handles.
         if path == "/v1/chat":
             payload = json.loads(body or b"{}")
+            self.chat_calls.append(payload)
             session_id = str(payload["session_id"])
             document_id = payload.get("document_id", "")
             self._n_jobs += 1
@@ -183,6 +189,27 @@ class Stub:
                     "document_changes": {"pending_changes": changes},
                 },
             )
+            return
+
+        # Added for runbook-reconciler: export, for the readiness pack. Returns
+        # bytes with a non-JSON content type, which is the branch of
+        # `export_bytes` that matters -- the client also handles a JSON reply
+        # carrying a URL, and treating "some bytes came back" as success is how
+        # an error page gets written to disk as a PDF.
+        if path == "/v1/documents/export":
+            payload = json.loads(body or b"{}")
+            session = self.sessions.get(str(payload.get("session_id")), {})
+            documents = session.get("documents", [])
+            source = self.documents.get(documents[0]["document_id"] if documents else "", "")
+            self.exports.append(
+                {"session_id": payload.get("session_id"), "format": payload.get("format")}
+            )
+            blob = f"%PDF-1.4 stub export of {len(source)} bytes".encode()
+            h.send_response(200)
+            h.send_header("Content-Type", "application/pdf")
+            h.send_header("Content-Length", str(len(blob)))
+            h.end_headers()
+            h.wfile.write(blob)
             return
 
         if path == "/v1/documents/images/upload-base64":
