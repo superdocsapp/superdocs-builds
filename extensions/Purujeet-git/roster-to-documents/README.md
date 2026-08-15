@@ -2,6 +2,14 @@
 
 Built by Purujeet for the SuperDocs task.
 
+## Screenshots
+
+The add-on running in Google Sheets with the roster data and generated document results:
+
+![Roster to Documents input sheet](./screenshot2.png)
+
+![Generated document links and job status](./screenshot.png)
+
 A Google Sheets add-on that turns a roster into role-specific documents. It reads one record per row, routes each record to one of ten document templates, renders placeholders and conditional sections deterministically, sends the resulting HTML through SuperDocs for AI document refinement, exports the final document, writes the file link back to the originating row, and can email the recipient.
 
 ## What it does
