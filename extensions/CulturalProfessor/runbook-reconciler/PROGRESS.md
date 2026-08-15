@@ -263,3 +263,31 @@ internally consistent, correct against the estate, and still contradict the page
 next to it. The divergence case is covered by a unit test with a register built
 to contain one, rather than by planting drift in a corpus whose measurement key
 was fixed at stage 1.
+
+## 2026-08-15 — MCP without an MCP library
+
+**Question.** Stage 11 wants `analyze`, `propose`, `approve` and `apply` as MCP
+tools. Take the dependency, or write the protocol?
+
+**Call.** Write it. Three methods — `initialize`, `tools/list`, `tools/call` —
+over line-delimited JSON-RPC on stdio, in about eighty lines.
+
+**Reasoning.** Runtime dependencies here are httpx and pyyaml, and a framework
+to expose four functions is a poor trade in a build whose argument is that its
+moving parts are legible. The risk of hand-rolling a protocol is getting it
+subtly wrong, so the two places that actually bite are tested rather than
+assumed: a notification gets no reply at all, and one malformed line does not
+kill the server.
+
+The shape mattered more than the transport. The tempting design is one tool
+called `fix_my_runbooks`, and it is wrong for the reason the whole project
+exists — it moves the human decision inside the tool where nobody can see it.
+Four tools in the same order a person works in, calling the same `ReviewQueue`
+the terminal loop calls. There is a test asserting the server never calls
+`register.decide` directly, because a second copy of the gate is exactly how the
+machine path quietly acquires different rules from the human one.
+
+Two things an agent cannot do, as code rather than as tool descriptions: there
+is no approve-all (`finding_ids` is required and empty is an error), and
+`propose` returns a price and spends nothing without `confirm=true`. An agent
+loops; a description it did not read is not a control.

@@ -297,6 +297,13 @@ def _cmd_pack(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_mcp(_: argparse.Namespace) -> int:
+    """Serve the four tools over stdio. Nothing but JSON-RPC on stdout."""
+    from reconciler.mcp_server import serve
+
+    return serve()
+
+
 def _cmd_status(_: argparse.Namespace) -> int:
     """What the register holds, including the things that go wrong quietly."""
     config = Config.load()
@@ -371,6 +378,7 @@ COMMANDS: dict[str, tuple[str, Handler]] = {
     "review": ("decide finding by finding, then write only what was approved", _cmd_review),
     "watch": ("sweep whenever the estate changes, debounced and coalesced (free)", _cmd_watch),
     "pack": ("build the on-call readiness and DR evidence documents (free)", _cmd_pack),
+    "mcp": ("serve analyze/propose/approve/apply to an agent over stdio", _cmd_mcp),
     "status": ("what the register holds, and what is parked (free)", _cmd_status),
     "measure": ("score the checker against fixtures/expected.yaml", _cmd_measure),
     "version": ("print the version and exit", _cmd_version),
