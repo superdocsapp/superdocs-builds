@@ -20,6 +20,7 @@ site opts in through `RR_LIVE_CONFLUENCE_TESTS`.
 from __future__ import annotations
 
 import os
+import threading
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -48,6 +49,35 @@ def hermetic(tmp_path_factory: pytest.TempPathFactory) -> Iterator[None]:
             os.environ.pop(key, None)
         else:
             os.environ[key] = value
+
+
+@pytest.fixture(autouse=True)
+def no_leaked_threads(request: pytest.FixtureRequest) -> Iterator[None]:
+    """A test that starts something must stop it, and this proves it per test.
+
+    The suite runs an in-process HTTP stub, and the stub owns a server thread.
+    Those threads are daemons, so they die with pytest and cannot pin a CPU
+    after the run — but "cannot" should be a property somebody checks rather
+    than a claim in a docstring, and the failure mode when it stops being true
+    is a machine at 100% across every core with nothing obviously running.
+
+    Only non-daemon threads are failed on. A daemon left behind is untidy; a
+    non-daemon left behind will hold the interpreter open at exit, which is the
+    one that turns into an incident. The test that leaked it is named, because
+    finding that afterwards from a process list is miserable.
+    """
+    before = {t.ident for t in threading.enumerate()}
+    yield
+    leaked = [
+        t for t in threading.enumerate() if t.ident not in before and t.is_alive() and not t.daemon
+    ]
+    if leaked:
+        names = ", ".join(f"{t.name}" for t in leaked)
+        pytest.fail(
+            f"{request.node.name} leaked {len(leaked)} non-daemon thread(s): {names}. "
+            f"Whatever started them has to stop them -- a thread that outlives the "
+            f"test outlives the run."
+        )
 
 
 @pytest.fixture(scope="session")

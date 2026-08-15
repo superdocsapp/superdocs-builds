@@ -455,3 +455,41 @@ warn. What it can do is what it already does: make every change one labelled
 version that reverts in two clicks, and keep the number of writes small and
 deliberate. Worth being blunt about rather than discovering in somebody's
 production space.
+
+## 2026-08-16 — a per-test thread-leak guard, after an incident caused by the same bug class
+
+**Question.** The suite runs an in-process HTTP stub with a server thread. The
+threads are daemons, so they cannot outlive the run. Is that worth a test?
+
+**Call.** Yes — an autouse fixture that fails any test leaving a live
+non-daemon thread behind, naming the test.
+
+**Reasoning.** The prompt for this was an incident during the build: a machine
+with all eight cores pinned at 100% by processes nothing obviously accounted
+for. The cause was not in this repository — it was a shell command run by hand
+while debugging the concurrency test:
+
+    for i in $(seq 1 $(nproc)); do (while :; do :; done) & done
+    LOADPIDS=$(jobs -p)
+    kill $LOADPIDS 2>/dev/null; echo "load stopped"
+
+`jobs -p` inside `$(...)` runs in a subshell that does not inherit the job
+table, so it returned nothing, `kill` was called with no arguments, `2>/dev/null`
+hid the error, and the line printed "load stopped" regardless. Eight infinite
+busy loops survived for hours.
+
+That is the *same failure* as `seed.py delete` reporting success for a `401`,
+found the same day, and it is the failure this whole project is about: a
+cleanup step whose failure is hidden, followed by a message asserting it
+worked. Two instances in one build, both in throwaway cleanup code, neither in
+the parts anybody was reviewing carefully — which is the point. Cleanup paths
+are where unverified success claims live, because nobody is watching the thing
+that is supposed to make nothing happen.
+
+The guard does not prevent that class in shell scripts, and nothing can. What
+it does is convert one specific "this cannot happen" into something checked on
+every test, in the place where an accidental non-daemon thread would otherwise
+be found later, from a process list, by somebody wondering why their laptop is
+hot. Daemon threads are tolerated deliberately: untidy but harmless, since they
+die with the interpreter. Non-daemon threads hold it open, and that is the one
+that becomes an incident.
