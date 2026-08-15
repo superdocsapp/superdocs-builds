@@ -1,0 +1,150 @@
+# Which claims get checked against what, and how the two are compared.
+#
+# The division of labour, stated once so it is not rediscovered as a surprise:
+#
+#   a new RULE is a change to this file
+#   a new SOURCE OF TRUTH is a change to reconciler/check/lookups.py
+#
+# Adding "also check the escalation policy's second level" is an entry here.
+# Teaching the tool that Datadog monitors exist is a reader and a lookup,
+# because no amount of YAML can invent knowledge of a file format. Pretending
+# otherwise would mean a rules file with Python in it, which is a programming
+# language with worse error messages.
+#
+# ------------------------------------------------------------------ shape ---
+#
+#   id        appears on every finding as the rule that produced it
+#   subject   regex over the claim's subject; named groups reach the lookup
+#   lookup    a name from reconciler/check/lookups.py
+#   compare   text | numeric | duration | window | clock | exists
+#   args      passed to the lookup; estate-specific facts live here
+#   detail    the sentence a reviewer reads next to the finding
+#
+# The first rule whose subject matches wins. A claim no rule matches is
+# `unverifiable` -- reported and counted, never assumed correct.
+
+version: 1
+
+checks:
+  - id: alert-threshold
+    subject: '^alert:(?P<alert>[^:]+):threshold$'
+    lookup: alert_threshold
+    compare: numeric
+    detail: the threshold in the alerting rule that actually pages someone
+
+  - id: alert-for
+    subject: '^alert:(?P<alert>[^:]+):for$'
+    lookup: alert_for
+    compare: duration
+    detail: how long the condition must hold before the alert fires
+
+  - id: alert-window
+    subject: '^alert:(?P<alert>[^:]+):window$'
+    lookup: alert_window
+    compare: window
+    detail: the query range the rate is measured over, which is not the `for` duration
+
+  - id: workload-name
+    subject: '^workload:(?P<name>[^:]+):name$'
+    lookup: workload_name
+    compare: text
+    detail: the deployment name as declared in the manifest
+
+  - id: workload-namespace
+    subject: '^workload:(?P<name>[^:]+):namespace$'
+    lookup: workload_namespace
+    compare: text
+    detail: the namespace the workload is actually declared in
+
+  - id: workload-replicas
+    subject: '^workload:(?P<name>[^:]+):replicas$'
+    lookup: workload_replicas
+    compare: numeric
+    detail: the replica count in the manifest
+
+  - id: namespace-exists
+    subject: '^namespace:(?P<namespace>[^:]+)$'
+    lookup: namespace_exists
+    compare: exists
+    detail: a namespace a command in this runbook would be run against
+
+  # Every job in every declared workflow is enumerable, so absence is proof
+  # rather than ignorance: a runbook naming a job that is not there is wrong.
+  - id: ci-job
+    subject: '^job:(?P<job>[^:]+)$'
+    lookup: ci_job
+    compare: exists
+    on_missing: contradicts
+    detail: a CI job this runbook tells a responder to run during an incident
+
+  # The declared rotas are the complete set, so a name that answers to none of
+  # them is a rota that does not exist.
+  - id: escalation-policy
+    subject: '^escalation:(?P<rota>.+)$'
+    lookup: escalation_policy
+    compare: exists
+    on_missing: contradicts
+    detail: the on-call rota named on this page
+
+  # Closed over what the repository declares, which is the stated scope. A
+  # dashboard living only in the Grafana database reads the same way, and the
+  # finding's own text says so rather than the README having to.
+  - id: dashboard-link
+    subject: '^dashboard:(?P<uid>[^:]+)$'
+    lookup: dashboard
+    compare: exists
+    on_missing: contradicts
+    detail: a dashboard link, resolved against dashboards declared in the repository
+
+  - id: cloud-region
+    subject: '^region:(?P<region>[^:]+)$'
+    lookup: cloud_region
+    compare: text
+    detail: the region the provider is configured for
+
+  - id: resource-identifier
+    subject: '^entity:(?P<name>[^:]+)$'
+    lookup: entity_exists
+    compare: exists
+    confidence: 0.7
+    detail: >-
+      an identifier in a code span. Confirmed where it can be found anywhere in the
+      declared estate; a miss is unverifiable rather than a contradiction, because a
+      hyphenated token might be a resource name, a placeholder or an example
+
+  # ------------------------------------------------------- estate-specific ---
+  #
+  # Which terraform resource backs the payments DR plan is a fact about this
+  # estate, not about runbooks in general, so it lives in configuration where a
+  # platform team can change it without opening an editor on Python.
+
+  - id: backup-retention
+    subject: '^measure:automated-backup-retention$'
+    lookup: terraform_attribute
+    compare: duration
+    args:
+      type: aws_db_instance
+      name: payments
+      attribute: backup_retention_period
+      # The attribute is a bare `14` in the file. Terraform means days; the
+      # value does not say so, and this tool does not guess. Without this line
+      # the claim stays unverifiable rather than being compared to a number
+      # whose unit nobody established.
+      observed_unit: days
+    detail: the automated backup retention Terraform actually configures
+
+  - id: snapshot-window
+    subject: '^measure:snapshot-window$'
+    lookup: terraform_attribute
+    compare: clock
+    args:
+      type: aws_backup_plan
+      name: payments
+      attribute: schedule
+    detail: the backup plan's cron schedule, compared as a time of day
+
+  # RPO and RTO are deliberately absent. Nothing in a declared configuration
+  # settles them -- they are commitments about people and process, not values
+  # in a file -- so they fall through to `unverifiable` and are reported as
+  # claims nobody checked. Adding a rule that compared them to something
+  # convenient would be exactly the bluff this tool exists to prevent.

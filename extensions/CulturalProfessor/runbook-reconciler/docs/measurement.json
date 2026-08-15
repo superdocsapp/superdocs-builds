@@ -1,0 +1,758 @@
+{
+  "method": "expected.yaml was written before the checker existed. A produced finding matches an expected one when the page, the kind and the asserted string all agree; subjects are not scored, being an internal naming choice made after the key was written.",
+  "score": {
+    "expected": 13,
+    "reported": 13,
+    "matched": 13,
+    "misses": [],
+    "false_positives": [],
+    "rule_four_violations": [],
+    "unverifiable": 8,
+    "agrees": 49,
+    "precision": 1.0,
+    "recall": 1.0,
+    "cried_wolf": 0.0
+  },
+  "findings": [
+    {
+      "rule_id": "alert-for",
+      "page_id": "1001",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiHighLatency:for",
+      "verdict": "agrees",
+      "observed": "10m",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:6",
+      "tags": []
+    },
+    {
+      "rule_id": "dashboard-link",
+      "page_id": "1001",
+      "kind": "link",
+      "subject": "dashboard:abc123",
+      "verdict": "agrees",
+      "observed": "abc123",
+      "evidence": "fixtures/infra/platform-infra/dashboards/payments-overview.json:1",
+      "tags": []
+    },
+    {
+      "rule_id": "resource-identifier",
+      "page_id": "1001",
+      "kind": "resource",
+      "subject": "entity:meridian-payments-prod-replica",
+      "verdict": "agrees",
+      "observed": "meridian-payments-prod-replica",
+      "evidence": "fixtures/infra/platform-infra/terraform/payments.tf:16",
+      "tags": []
+    },
+    {
+      "rule_id": "escalation-policy",
+      "page_id": "1001",
+      "kind": "escalation",
+      "subject": "escalation:Payments Core",
+      "verdict": "agrees",
+      "observed": "Payments Core",
+      "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:5",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1001",
+      "kind": "command",
+      "subject": "namespace:payments",
+      "verdict": "agrees",
+      "observed": "payments",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1001",
+      "kind": "command",
+      "subject": "namespace:payments",
+      "verdict": "agrees",
+      "observed": "payments",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1001",
+      "kind": "resource",
+      "subject": "workload:payments-api:name",
+      "verdict": "agrees",
+      "observed": "payments-api",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1001",
+      "kind": "command",
+      "subject": "workload:payments-api:name",
+      "verdict": "agrees",
+      "observed": "payments-api",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1001",
+      "kind": "command",
+      "subject": "workload:payments-api:name",
+      "verdict": "agrees",
+      "observed": "payments-api",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-namespace",
+      "page_id": "1001",
+      "kind": "resource",
+      "subject": "workload:payments-api:namespace",
+      "verdict": "agrees",
+      "observed": "payments",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-replicas",
+      "page_id": "1001",
+      "kind": "resource",
+      "subject": "workload:payments-api:replicas",
+      "verdict": "agrees",
+      "observed": "6",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1002",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiErrorBudgetBurn:threshold",
+      "verdict": "agrees",
+      "observed": "0.05",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:16",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-window",
+      "page_id": "1002",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiErrorBudgetBurn:window",
+      "verdict": "agrees",
+      "observed": "30m",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:16",
+      "tags": []
+    },
+    {
+      "rule_id": "dashboard-link",
+      "page_id": "1002",
+      "kind": "link",
+      "subject": "dashboard:abc123",
+      "verdict": "agrees",
+      "observed": "abc123",
+      "evidence": "fixtures/infra/platform-infra/dashboards/payments-overview.json:1",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1002",
+      "kind": "command",
+      "subject": "namespace:payments",
+      "verdict": "agrees",
+      "observed": "payments",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1002",
+      "kind": "resource",
+      "subject": "workload:payments-api:name",
+      "verdict": "agrees",
+      "observed": "payments-api",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1002",
+      "kind": "command",
+      "subject": "workload:payments-api:name",
+      "verdict": "agrees",
+      "observed": "payments-api",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-namespace",
+      "page_id": "1002",
+      "kind": "resource",
+      "subject": "workload:payments-api:namespace",
+      "verdict": "agrees",
+      "observed": "payments",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1003",
+      "kind": "threshold",
+      "subject": "alert:TrackingIngestPodRestarts:threshold",
+      "verdict": "agrees",
+      "observed": "3",
+      "evidence": "fixtures/infra/platform-infra/monitoring/tracking.rules.yml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "escalation-policy",
+      "page_id": "1003",
+      "kind": "escalation",
+      "subject": "escalation:Tracking",
+      "verdict": "agrees",
+      "observed": "Tracking",
+      "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:20",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1003",
+      "kind": "command",
+      "subject": "namespace:tracking",
+      "verdict": "agrees",
+      "observed": "tracking",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/tracking/deployment.yaml:7",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-namespace",
+      "page_id": "1003",
+      "kind": "resource",
+      "subject": "workload:tracking-api:namespace",
+      "verdict": "agrees",
+      "observed": "tracking",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/tracking/deployment.yaml:7",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-replicas",
+      "page_id": "1003",
+      "kind": "resource",
+      "subject": "workload:tracking-api:replicas",
+      "verdict": "agrees",
+      "observed": "4",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/tracking/deployment.yaml:7",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-for",
+      "page_id": "1004",
+      "kind": "threshold",
+      "subject": "alert:LabelPrinterQueueDepth:for",
+      "verdict": "agrees",
+      "observed": "10m",
+      "evidence": "fixtures/infra/platform-infra/monitoring/fulfilment.rules.yml:4",
+      "tags": [
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "resource-identifier",
+      "page_id": "1004",
+      "kind": "resource",
+      "subject": "entity:drain-print-queue",
+      "verdict": "agrees",
+      "observed": "drain-print-queue",
+      "evidence": "fixtures/infra/service-repos/label-printer/.github/workflows/deploy.yml:20",
+      "tags": []
+    },
+    {
+      "rule_id": "escalation-policy",
+      "page_id": "1004",
+      "kind": "escalation",
+      "subject": "escalation:Fulfilment",
+      "verdict": "agrees",
+      "observed": "Fulfilment",
+      "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:32",
+      "tags": []
+    },
+    {
+      "rule_id": "ci-job",
+      "page_id": "1004",
+      "kind": "command",
+      "subject": "job:drain-print-queue",
+      "verdict": "agrees",
+      "observed": "drain-print-queue",
+      "evidence": "fixtures/infra/service-repos/label-printer/.github/workflows/deploy.yml:20",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1004",
+      "kind": "command",
+      "subject": "namespace:fulfilment",
+      "verdict": "agrees",
+      "observed": "fulfilment",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/label-printer.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1004",
+      "kind": "resource",
+      "subject": "workload:label-printer:name",
+      "verdict": "agrees",
+      "observed": "label-printer",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/label-printer.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1004",
+      "kind": "command",
+      "subject": "workload:label-printer:name",
+      "verdict": "agrees",
+      "observed": "label-printer",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/label-printer.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-namespace",
+      "page_id": "1004",
+      "kind": "resource",
+      "subject": "workload:label-printer:namespace",
+      "verdict": "agrees",
+      "observed": "fulfilment",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/label-printer.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-replicas",
+      "page_id": "1004",
+      "kind": "resource",
+      "subject": "workload:label-printer:replicas",
+      "verdict": "agrees",
+      "observed": "3",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/label-printer.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "resource-identifier",
+      "page_id": "1006",
+      "kind": "resource",
+      "subject": "entity:eu-west-1",
+      "verdict": "agrees",
+      "observed": "eu-west-1",
+      "evidence": "fixtures/infra/platform-infra/terraform/payments.tf:1",
+      "tags": []
+    },
+    {
+      "rule_id": "resource-identifier",
+      "page_id": "1006",
+      "kind": "resource",
+      "subject": "entity:meridian-manifest-archive",
+      "verdict": "agrees",
+      "observed": "meridian-manifest-archive",
+      "evidence": "fixtures/infra/platform-infra/terraform/payments.tf:22",
+      "tags": []
+    },
+    {
+      "rule_id": "resource-identifier",
+      "page_id": "1006",
+      "kind": "resource",
+      "subject": "entity:meridian-payments-prod",
+      "verdict": "agrees",
+      "observed": "meridian-payments-prod",
+      "evidence": "fixtures/infra/platform-infra/terraform/payments.tf:5",
+      "tags": []
+    },
+    {
+      "rule_id": "escalation-policy",
+      "page_id": "1006",
+      "kind": "escalation",
+      "subject": "escalation:Payments Core",
+      "verdict": "agrees",
+      "observed": "Payments Core",
+      "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:5",
+      "tags": []
+    },
+    {
+      "rule_id": "snapshot-window",
+      "page_id": "1006",
+      "kind": "threshold",
+      "subject": "measure:snapshot-window",
+      "verdict": "agrees",
+      "observed": "cron(0 3 * * ? *)",
+      "evidence": "fixtures/infra/platform-infra/terraform/backups.tf:5",
+      "tags": []
+    },
+    {
+      "rule_id": "cloud-region",
+      "page_id": "1006",
+      "kind": "resource",
+      "subject": "region:eu-west-1",
+      "verdict": "agrees",
+      "observed": "eu-west-1",
+      "evidence": "fixtures/infra/platform-infra/terraform/payments.tf:1",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1007",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiErrorBudgetBurn:threshold",
+      "verdict": "agrees",
+      "observed": "0.05",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:16",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-window",
+      "page_id": "1007",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiErrorBudgetBurn:window",
+      "verdict": "agrees",
+      "observed": "30m",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:16",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1008",
+      "kind": "threshold",
+      "subject": "alert:ManifestWorkerStalled:threshold",
+      "verdict": "agrees",
+      "observed": "1800",
+      "evidence": "fixtures/infra/platform-infra/monitoring/fulfilment.rules.yml:17",
+      "tags": []
+    },
+    {
+      "rule_id": "resource-identifier",
+      "page_id": "1008",
+      "kind": "resource",
+      "subject": "entity:replay-failed-batch",
+      "verdict": "agrees",
+      "observed": "replay-failed-batch",
+      "evidence": "fixtures/infra/service-repos/manifest-worker/.github/workflows/deploy.yml:21",
+      "tags": []
+    },
+    {
+      "rule_id": "escalation-policy",
+      "page_id": "1008",
+      "kind": "escalation",
+      "subject": "escalation:Fulfilment",
+      "verdict": "agrees",
+      "observed": "Fulfilment",
+      "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:32",
+      "tags": []
+    },
+    {
+      "rule_id": "ci-job",
+      "page_id": "1008",
+      "kind": "command",
+      "subject": "job:replay-failed-batch",
+      "verdict": "agrees",
+      "observed": "replay-failed-batch",
+      "evidence": "fixtures/infra/service-repos/manifest-worker/.github/workflows/deploy.yml:21",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1008",
+      "kind": "command",
+      "subject": "namespace:fulfilment",
+      "verdict": "agrees",
+      "observed": "fulfilment",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/label-printer.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1008",
+      "kind": "resource",
+      "subject": "workload:manifest-worker:name",
+      "verdict": "agrees",
+      "observed": "manifest-worker",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/manifest-worker.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1008",
+      "kind": "command",
+      "subject": "workload:manifest-worker:name",
+      "verdict": "agrees",
+      "observed": "manifest-worker",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/manifest-worker.yaml:4",
+      "tags": [
+        "via:workload"
+      ]
+    },
+    {
+      "rule_id": "workload-namespace",
+      "page_id": "1008",
+      "kind": "resource",
+      "subject": "workload:manifest-worker:namespace",
+      "verdict": "agrees",
+      "observed": "fulfilment",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/manifest-worker.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-replicas",
+      "page_id": "1008",
+      "kind": "resource",
+      "subject": "workload:manifest-worker:replicas",
+      "verdict": "agrees",
+      "observed": "2",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/fulfilment/manifest-worker.yaml:4",
+      "tags": []
+    },
+    {
+      "rule_id": "unlinked-runbook",
+      "page_id": null,
+      "kind": "coverage",
+      "subject": "alert:ManifestWorkerStalled:runbook_url",
+      "verdict": "contradicts",
+      "observed": "no runbook_url, although page 1008 documents this alert",
+      "evidence": "fixtures/infra/platform-infra/monitoring/fulfilment.rules.yml:17",
+      "tags": [
+        "coverage",
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "orphan-alert",
+      "page_id": null,
+      "kind": "coverage",
+      "subject": "alert:PaymentsDeadLetterQueueGrowing",
+      "verdict": "contradicts",
+      "observed": "no runbook_url and no page in the space mentions it",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:28",
+      "tags": [
+        "coverage",
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "dead-runbook-link",
+      "page_id": null,
+      "kind": "coverage",
+      "subject": "alert:TrackingIngestLag:runbook_url",
+      "verdict": "contradicts",
+      "observed": "runbook_url points at https://meridian.atlassian.net/wiki/spaces/RUN/pages/1099, and page 1099 is not in the reconciled space",
+      "evidence": "fixtures/infra/platform-infra/monitoring/tracking.rules.yml:16",
+      "tags": [
+        "coverage",
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1001",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiHighLatency:threshold",
+      "verdict": "contradicts",
+      "observed": "1.2",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:6",
+      "tags": []
+    },
+    {
+      "rule_id": "ci-job",
+      "page_id": "1001",
+      "kind": "command",
+      "subject": "job:rollback-production",
+      "verdict": "contradicts",
+      "observed": "no CI job named 'rollback-production'; the declared jobs are build, deploy-production, deploy-staging, drain-print-queue, manual-rollback, replay-failed-batch, test",
+      "evidence": "fixtures/infra/service-repos:1",
+      "tags": []
+    },
+    {
+      "rule_id": "escalation-policy",
+      "page_id": "1002",
+      "kind": "escalation",
+      "subject": "escalation:Payments Platform",
+      "verdict": "contradicts",
+      "observed": "no escalation policy answers to 'Payments Platform'; the declared rotas are Fulfilment, Payments Core, Tracking",
+      "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:1",
+      "tags": []
+    },
+    {
+      "rule_id": "workload-name",
+      "page_id": "1003",
+      "kind": "resource",
+      "subject": "workload:tracking-api:name",
+      "verdict": "contradicts",
+      "observed": "tracking-ingest",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/tracking/deployment.yaml:7",
+      "tags": [
+        "renamed",
+        "via:former-name"
+      ]
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1004",
+      "kind": "threshold",
+      "subject": "alert:LabelPrinterQueueDepth:threshold",
+      "verdict": "contradicts",
+      "observed": "500",
+      "evidence": "fixtures/infra/platform-infra/monitoring/fulfilment.rules.yml:4",
+      "tags": [
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "dashboard-link",
+      "page_id": "1004",
+      "kind": "link",
+      "subject": "dashboard:zzz999",
+      "verdict": "contradicts",
+      "observed": "no dashboard with uid 'zzz999' is declared in the repository. This tool reads dashboards from git, not from Grafana, so a dashboard that exists only in the Grafana database will look like this too",
+      "evidence": "fixtures/infra/platform-infra/dashboards/payments-overview.json:1",
+      "tags": []
+    },
+    {
+      "rule_id": "instructions-to-automation",
+      "page_id": "1005",
+      "kind": "directive",
+      "subject": "page:1005:instructions-to-automation",
+      "verdict": "contradicts",
+      "observed": "page content is data to this tool, never instruction",
+      "evidence": "confluence:page:1005:1",
+      "tags": [
+        "injection",
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "orphan-runbook",
+      "page_id": "1005",
+      "kind": "resource",
+      "subject": "service:notify-gateway",
+      "verdict": "contradicts",
+      "observed": "no deployment, no catalog entry, no former-name annotation",
+      "evidence": "fixtures/infra/platform-infra/kubernetes:1",
+      "tags": [
+        "orphan",
+        "comment-only"
+      ]
+    },
+    {
+      "rule_id": "backup-retention",
+      "page_id": "1006",
+      "kind": "threshold",
+      "subject": "measure:automated-backup-retention",
+      "verdict": "contradicts",
+      "observed": "14",
+      "evidence": "fixtures/infra/platform-infra/terraform/payments.tf:5",
+      "tags": []
+    },
+    {
+      "rule_id": "alert-threshold",
+      "page_id": "1007",
+      "kind": "threshold",
+      "subject": "alert:PaymentsApiHighLatency:threshold",
+      "verdict": "contradicts",
+      "observed": "1.2",
+      "evidence": "fixtures/infra/platform-infra/monitoring/payments.rules.yml:6",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1003",
+      "kind": "command",
+      "subject": "namespace:<your-namespace>",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1003:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1005",
+      "kind": "threshold",
+      "subject": "alert:NotifyGatewayDeliveryFailures:threshold",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1005:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1005",
+      "kind": "escalation",
+      "subject": "escalation:Messaging",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1005:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1005",
+      "kind": "command",
+      "subject": "namespace:messaging",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1005:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1005",
+      "kind": "resource",
+      "subject": "workload:notify-gateway:namespace",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1005:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1005",
+      "kind": "resource",
+      "subject": "workload:notify-gateway:replicas",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1005:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1006",
+      "kind": "threshold",
+      "subject": "measure:rpo",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1006:1",
+      "tags": []
+    },
+    {
+      "rule_id": "unmatched",
+      "page_id": "1006",
+      "kind": "threshold",
+      "subject": "measure:rto",
+      "verdict": "unverifiable",
+      "observed": null,
+      "evidence": "confluence:page:1006:1",
+      "tags": []
+    }
+  ]
+}
