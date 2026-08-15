@@ -28,6 +28,7 @@ eventually call in a test.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from itertools import pairwise
 
 
 class SpliceRefused(RuntimeError):
@@ -104,6 +105,77 @@ def assert_single_change(old: str, new: str, expected_start: int, expected_end: 
             f"approved passage at {expected_start}:{expected_end}. Refusing to write."
         )
     return change
+
+
+def changed_ranges(old: str, new: str) -> list[Change]:
+    """Every contiguous difference, not just the first.
+
+    `diff_range` collapses a document with two edits in it into one enormous
+    range spanning both, which is the right behaviour for refusing a single
+    write and useless for describing a page that legitimately received three
+    approved fixes. `SequenceMatcher` gives the real answer, and the count is
+    what the end-of-page assertion checks: **a page that received three
+    approvals must differ in exactly three places.**
+    """
+    from difflib import SequenceMatcher
+
+    out: list[Change] = []
+    for tag, i1, i2, j1, j2 in SequenceMatcher(None, old, new, autojunk=False).get_opcodes():
+        if tag == "equal":
+            continue
+        out.append(
+            Change(start=i1, end_old=i2, end_new=j2, old_text=old[i1:i2], new_text=new[j1:j2])
+        )
+    return out
+
+
+def assert_only_these_ranges_changed(old: str, new: str, edits: list[tuple[int, int, str]]) -> None:
+    """Everything outside the approved passages is byte-identical. Exactly.
+
+    The last thing checked before a page is sent, and the one that catches what
+    the per-splice assertions cannot: an off-by-one in the *order* the splices
+    were applied, which corrupts a later offset without any single splice
+    looking wrong on its own.
+
+    This started life as "the page must differ in exactly N places", counted
+    with `difflib`. That is not the same statement and it does not hold: a
+    character-level diff of `rollback-production` → `manual-rollback` reports
+    three opcodes, because the two strings share `ll`, `back` and `o`. One
+    logical edit, three ranges, and an assertion that refuses a correct write —
+    which is the kind of assertion somebody deletes rather than fixes.
+
+    So this reconstructs instead of counting. Given the edits that were meant to
+    happen, in old-body coordinates, every byte between them must survive
+    unchanged. There is nothing to tune and nothing to be clever about.
+    """
+    ordered = sorted(edits)
+    for (a_start, a_end, _), (b_start, _, _) in pairwise(ordered):
+        if a_end > b_start:
+            raise SpliceRefused(
+                f"approved passages {a_start}:{a_end} and {b_start}:… overlap; "
+                f"refusing to write a page whose edits collide"
+            )
+
+    old_at = new_at = 0
+    for start, end, replacement in ordered:
+        gap = start - old_at
+        if old[old_at:start] != new[new_at : new_at + gap]:
+            raise SpliceRefused(
+                f"the document changed between {old_at} and {start}, outside every "
+                f"approved passage. Refusing to write."
+            )
+        if new[new_at + gap : new_at + gap + len(replacement)] != replacement:
+            raise SpliceRefused(
+                f"the passage at {start}:{end} does not hold the approved replacement. "
+                f"Refusing to write."
+            )
+        old_at, new_at = end, new_at + gap + len(replacement)
+
+    if old[old_at:] != new[new_at:]:
+        raise SpliceRefused(
+            "the document after the last approved passage is not byte-identical. "
+            "Refusing to write."
+        )
 
 
 def assert_untouched_outside(old: str, new: str, start: int, end: int) -> None:
