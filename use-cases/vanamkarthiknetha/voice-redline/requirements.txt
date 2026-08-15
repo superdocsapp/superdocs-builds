@@ -1,0 +1,8 @@
+# Server (the SuperDocs client itself is stdlib-only)
+fastapi>=0.115
+uvicorn[standard]>=0.30
+python-multipart>=0.0.9
+
+# Tests
+pytest>=8
+httpx>=0.27

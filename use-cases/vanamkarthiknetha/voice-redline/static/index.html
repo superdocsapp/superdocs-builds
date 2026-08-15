@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VoiceRedline — hands-free redlining on SuperDocs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232dd4bf'/%3E%3Cpath d='M8 13v6M13 9v14M18 6v20M23 11v10' stroke='%2304201c' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0a0e14; --panel:#10161f; --panel2:#151d29; --panel3:#1b2534;
+    --line:#223041; --line-soft:#1a2432;
+    --text:#e9eff7; --dim:#8e9db1; --faint:#64748b;
+    --accent:#2dd4bf; --accent-hi:#5eead4; --accent-ink:#04201c;
+    --accent-soft:rgba(45,212,191,.12);
+    --amber:#fbbf24; --amber-soft:rgba(251,191,36,.12);
+    --red:#f87171; --red-soft:rgba(248,113,113,.12);
+    --green:#4ade80; --green-soft:rgba(74,222,128,.12);
+    --paper:#fdfdfb; --radius:14px;
+    --shadow:0 10px 30px -12px rgba(0,0,0,.55);
+    --font:"Inter","Segoe UI",system-ui,-apple-system,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"Cascadia Code",Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  /* Author rules with an id selector outrank the UA's [hidden]{display:none},
+     so `el.hidden = true` silently does nothing on #empty/#preview. Restore it. */
+  [hidden]{display:none !important}
+  body{
+    background:
+      radial-gradient(1100px 520px at 88% -12%, rgba(45,212,191,.08), transparent 60%),
+      radial-gradient(900px 520px at -12% 112%, rgba(59,130,246,.07), transparent 60%),
+      var(--bg);
+    color:var(--text);font:14.5px/1.55 var(--font);
+    height:100vh;display:flex;flex-direction:column;overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:rgba(45,212,191,.28)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#263242;border-radius:99px;border:2px solid var(--bg)}
+  ::-webkit-scrollbar-thumb:hover{background:#33445a}
+  button{font-family:inherit}
+  button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* ---------- header ---------- */
+  header{display:flex;align-items:center;gap:12px;padding:0 18px;height:60px;flex:0 0 auto;
+    border-bottom:1px solid var(--line-soft);background:rgba(16,22,31,.85);backdrop-filter:blur(10px)}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mark{width:34px;height:34px;border-radius:10px;flex:0 0 auto;display:grid;place-items:center;
+    background:linear-gradient(135deg,#2dd4bf,#0ea5e9);box-shadow:0 4px 14px -4px rgba(45,212,191,.5)}
+  .brand h1{font-size:16.5px;font-weight:700;letter-spacing:-.02em}
+  .brand h1 span{background:linear-gradient(90deg,var(--accent-hi),#38bdf8);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand .tag{font-size:10px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-top:1px}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:5px 12px;
+    border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--dim);
+    white-space:nowrap;transition:all .25s}
+  .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--faint);transition:all .25s}
+  .pill.listening{color:var(--accent-hi);border-color:rgba(45,212,191,.4);background:var(--accent-soft)}
+  .pill.listening::before{background:var(--accent);box-shadow:0 0 8px var(--accent);animation:blink 1.6s infinite}
+  .pill.working{color:var(--amber);border-color:rgba(251,191,36,.4);background:var(--amber-soft)}
+  .pill.working::before{background:var(--amber);animation:blink 1s infinite}
+  .pill.review{color:var(--accent-hi);border-color:rgba(45,212,191,.4);background:var(--accent-soft)}
+  .pill.review::before{background:var(--accent-hi)}
+  @keyframes blink{50%{opacity:.35}}
+  #docname{font-size:12.5px;color:var(--dim);margin-left:auto;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;max-width:260px;background:var(--panel2);border:1px solid var(--line-soft);
+    padding:5px 11px;border-radius:8px}
+  #docname:empty{display:none}
+  header button,.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:9px;
+    padding:7px 13px;font-size:13px;font-weight:550;cursor:pointer;transition:all .18s;white-space:nowrap}
+  header button:not(:disabled):hover,.btn:not(:disabled):hover{border-color:rgba(45,212,191,.55);
+    color:var(--accent-hi);transform:translateY(-1px)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  header button.primary,.btn.primary{background:linear-gradient(135deg,var(--accent),#14b8a6);
+    border-color:transparent;color:var(--accent-ink);font-weight:650}
+  header button.primary:not(:disabled):hover,.btn.primary:not(:disabled):hover{filter:brightness(1.1);
+    color:var(--accent-ink)}
+
+  /* ---------- layout ---------- */
+  main{flex:1;display:flex;min-height:0;padding:16px;gap:16px}
+  #docpane{flex:1.15;border:1px solid var(--line-soft);border-radius:var(--radius);background:var(--panel);
+    display:flex;flex-direction:column;min-width:0;overflow:hidden;box-shadow:var(--shadow)}
+  #docpane .label{display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:11px;font-weight:700;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line-soft);
+    background:var(--panel2)}
+  .livedot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(74,222,128,.7)}
+  .label .note{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:500}
+  #preview{flex:1;border:0;background:var(--paper)}
+  #empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    color:var(--dim);font-size:14px;text-align:center;padding:32px}
+  #empty .orb{width:92px;height:92px;border-radius:28px;display:grid;place-items:center;color:var(--accent);
+    background:linear-gradient(145deg,var(--panel3),var(--panel2));border:1px solid var(--line);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 16px 40px -16px rgba(45,212,191,.3)}
+  #empty h2{font-size:19px;font-weight:650;letter-spacing:-.01em;color:var(--text)}
+  #empty p{max-width:430px;font-size:13.5px;line-height:1.6}
+  #empty .cta{display:flex;gap:10px;margin-top:8px}
+
+  /* ---------- chat pane ---------- */
+  #chatpane{flex:1;display:flex;flex-direction:column;min-width:430px;border:1px solid var(--line-soft);
+    border-radius:var(--radius);background:var(--panel);overflow:hidden;box-shadow:var(--shadow)}
+  #log{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+  /* Flex children shrink by default: without this, tall change cards get
+     squashed to a sliver and their diff panes clip instead of the log scrolling. */
+  #log>*{flex-shrink:0}
+  .msg{max-width:88%;padding:9px 13px;border-radius:13px;font-size:13.5px;white-space:pre-wrap;
+    animation:rise .25s ease both;box-shadow:0 2px 8px -4px rgba(0,0,0,.4)}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .msg.user{align-self:flex-end;color:#d9f7f1;border:1px solid rgba(45,212,191,.35);
+    border-bottom-right-radius:4px;background:linear-gradient(135deg,rgba(45,212,191,.18),rgba(14,165,233,.14))}
+  .msg.sys{align-self:flex-start;background:var(--panel2);border:1px solid var(--line-soft);
+    color:var(--dim);border-bottom-left-radius:4px}
+  .msg.err{align-self:flex-start;background:var(--red-soft);border:1px solid rgba(248,113,113,.45);
+    color:#fca5a5;border-bottom-left-radius:4px}
+
+  /* ---------- change cards ---------- */
+  .card{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel2);overflow:hidden;
+    animation:rise .3s ease both;transition:border-color .2s,box-shadow .2s}
+  .card.current{border-color:rgba(45,212,191,.6);
+    box-shadow:0 0 0 1px rgba(45,212,191,.35),0 14px 34px -14px rgba(45,212,191,.25)}
+  .card .head{display:flex;align-items:center;gap:9px;padding:10px 14px;background:var(--panel3);
+    font-size:12.5px;border-bottom:1px solid var(--line-soft)}
+  .card .head b{font-family:var(--mono);font-size:11.5px;font-weight:600;letter-spacing:.05em;
+    text-transform:uppercase;color:var(--dim)}
+  .card .head .chip{margin-left:auto}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;letter-spacing:.09em;
+    text-transform:uppercase;padding:3px 10px;border-radius:99px;border:1px solid var(--line);
+    color:var(--faint);background:var(--panel2)}
+  .chip.ok{color:var(--green);border-color:rgba(74,222,128,.45);background:var(--green-soft)}
+  .chip.no{color:var(--red);border-color:rgba(248,113,113,.45);background:var(--red-soft)}
+  .chip.warn{color:var(--amber);border-color:rgba(251,191,36,.5);background:var(--amber-soft)}
+  .card .gloss{padding:11px 14px;font-size:13px;color:var(--dim);border-bottom:1px solid var(--line-soft);
+    background:rgba(255,255,255,.015)}
+  .glossnote{display:flex;align-items:center;gap:6px;font-size:11px;margin-top:7px;color:var(--faint)}
+  .diff{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line-soft)}
+  .diff>div{padding:12px 14px;min-width:0;background:var(--panel2)}
+  .diff h4{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;text-transform:uppercase;
+    letter-spacing:.12em;margin-bottom:8px}
+  .diff h4::before{content:"";width:7px;height:7px;border-radius:50%}
+  .diff .old h4{color:var(--red)} .diff .old h4::before{background:var(--red)}
+  .diff .new h4{color:var(--green)} .diff .new h4::before{background:var(--green)}
+  /* Cap the rendered panes: a tall change (signature tables, long clauses)
+     otherwise pushes the card's Approve/Reject row off screen. */
+  .diff .doc{color:#1a2230;background:var(--paper);border:1px solid #e4e1d8;border-radius:9px;
+    padding:11px 12px;font-size:12.5px;line-height:1.55;overflow-wrap:break-word;max-height:230px;
+    overflow:auto;box-shadow:inset 0 1px 3px rgba(0,0,0,.06)}
+  .diff .doc::-webkit-scrollbar-thumb{background:#c9c4b8;border-color:var(--paper)}
+  .diff .doc table{border-collapse:collapse} .diff .doc td,.diff .doc th{border:1px solid #b9b4a6;padding:3px 7px}
+  .card .acts{display:flex;gap:9px;padding:11px 14px;border-top:1px solid var(--line-soft);
+    background:rgba(255,255,255,.015)}
+  .acts button{flex:1;padding:9px 12px;font-weight:600}
+  .acts .approve{color:var(--green);border-color:rgba(74,222,128,.35)}
+  .acts .approve:not(:disabled):hover{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+  .acts .reject{color:var(--red);border-color:rgba(248,113,113,.35)}
+  .acts .reject:not(:disabled):hover{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+
+  /* ---------- review bar / composer / hints ---------- */
+  #reviewbar{display:none;padding:12px 16px;border-top:1px solid var(--line-soft);background:var(--panel2);
+    font-size:13px;align-items:center;gap:12px}
+  #reviewbar.on{display:flex;animation:rise .25s ease both}
+  #reviewinfo{font-size:12.5px;font-weight:600;color:var(--dim);white-space:nowrap}
+  .rprog{flex:1;height:5px;border-radius:99px;background:var(--panel3);overflow:hidden;min-width:50px}
+  .rprog>div{height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),#38bdf8);
+    transition:width .3s ease}
+  #composer{display:flex;gap:11px;padding:14px 16px;border-top:1px solid var(--line-soft);
+    background:var(--panel);align-items:flex-end}
+  #box{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--text);
+    padding:12px 14px;font:inherit;font-size:13.5px;resize:none;height:60px;
+    transition:border-color .2s,box-shadow .2s}
+  #box::placeholder{color:var(--faint)}
+  #box:focus{outline:none;border-color:rgba(45,212,191,.6);box-shadow:0 0 0 3px rgba(45,212,191,.15)}
+  #mic{width:60px;height:60px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);
+    cursor:pointer;color:var(--dim);display:grid;place-items:center;flex:0 0 auto;transition:all .2s}
+  #mic:hover{color:var(--accent-hi);border-color:rgba(45,212,191,.5)}
+  #mic.on{background:linear-gradient(135deg,var(--accent),#0ea5e9);border-color:transparent;
+    color:var(--accent-ink);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,212,191,.45)}70%{box-shadow:0 0 0 16px rgba(45,212,191,0)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+  #composer #send{height:60px;padding:0 22px;border-radius:12px}
+  #hints{padding:10px 18px 12px;font-size:11.5px;line-height:1.7;color:var(--faint);
+    background:var(--panel);border-top:1px solid var(--line-soft)}
+  #hints b{color:var(--accent);font-weight:600}
+  #hints i{font-style:normal;color:var(--line);margin:0 8px}
+  #hints .hinttail{display:block;margin-top:3px}
+  kbd{background:var(--panel3);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;
+    padding:1px 6px;font-size:10.5px;font-family:var(--mono);color:var(--dim)}
+  a{color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+  @media (max-width:980px){
+    body{overflow:auto;height:auto;min-height:100vh}
+    main{flex-direction:column;overflow:visible}
+    #docpane{min-height:52vh}
+    #chatpane{min-width:0;min-height:60vh}
+    #docname,.brand .tag{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#04201c" stroke-width="2.4" stroke-linecap="round">
+        <path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 10v4"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Voice<span>Redline</span></h1>
+      <div class="tag">SuperDocs · human-in-the-loop</div>
+    </div>
+  </div>
+  <span class="pill" id="status">idle</span>
+  <span id="docname"></span>
+  <button id="loadsample">Load sample MSA</button>
+  <button id="upload">Upload…</button>
+  <input type="file" id="file" accept=".docx,.html,.txt,.md" hidden>
+  <button id="blank">Blank doc</button>
+  <button id="exportbtn" class="primary" disabled>Export .docx</button>
+</header>
+<main>
+  <section id="docpane">
+    <div class="label"><span class="livedot"></span>Live document preview<span class="note">refreshes after each applied round · exports are non-billable</span></div>
+    <div id="empty">
+      <div class="orb">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2.5" width="6" height="11" rx="3"/>
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0"/>
+          <path d="M12 17.5V21"/>
+          <path d="M8.5 21h7"/>
+        </svg>
+      </div>
+      <h2>Redline contracts with your voice</h2>
+      <p>Load the sample MSA, upload a .docx, or start blank — then click the mic and talk. Every SuperDocs edit comes back here for your approval before it lands.</p>
+      <div class="cta">
+        <button class="btn primary" id="emptysample">Load sample MSA</button>
+        <button class="btn" id="emptyupload">Upload a file</button>
+      </div>
+    </div>
+    <iframe id="preview" sandbox="allow-same-origin" hidden></iframe>
+  </section>
+  <section id="chatpane">
+    <div id="log"></div>
+    <div id="reviewbar"><span id="reviewinfo"></span>
+      <div class="rprog"><div id="rprogfill"></div></div>
+      <button class="btn" id="approveall">Approve all</button>
+      <button class="btn" id="rejectall">Reject all</button>
+      <button class="btn primary" id="applybtn">Apply decisions</button>
+    </div>
+    <div id="composer">
+      <textarea id="box" placeholder="Click the mic and speak an edit — or type here…"></textarea>
+      <button id="mic" title="Toggle voice (Ctrl+M)" aria-label="Toggle microphone">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="2.5" width="6" height="11" rx="3"/>
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0"/>
+          <path d="M12 17.5V21"/>
+          <path d="M8.5 21h7"/>
+        </svg>
+      </button>
+      <button class="btn primary" id="send">Send</button>
+    </div>
+    <div id="hints"><span>Say <b>“find the sentence about twenty-four month renewal and make it twelve months”</b>, then <b>send it</b></span><i>·</i><span>review with <b>approve</b> / <b>reject</b> / <b>next</b> / <b>read the text</b></span><i>·</i><span>finish with <b>apply</b>, then <b>export</b></span><span class="hinttail">Tip: name the exact text you want changed — “in Section 2…” phrasing can target the heading instead of the clause. Mic toggle: <kbd>Ctrl</kbd>+<kbd>M</kbd></span></div>
+  </section>
+</main>
+<script>
+"use strict";
+/* ---------- tiny helpers ---------- */
+const $ = id => document.getElementById(id);
+const log = $("log");
+function say(cls, text){ const d=document.createElement("div"); d.className="msg "+cls; d.textContent=text; log.appendChild(d); log.scrollTop=log.scrollHeight; return d; }
+function setStatus(t, cls){ const p=$("status"); p.textContent=t; p.className="pill "+(cls||""); }
+async function api(path, opts){ const r=await fetch(path,opts); if(!r.ok){ let m=r.statusText; try{m=(await r.json()).detail||m}catch(e){} throw new Error(m);} return r.json(); }
+function sanitize(html){
+  const doc=new DOMParser().parseFromString(html||"","text/html");
+  doc.querySelectorAll("script,iframe,object,embed,link,meta").forEach(n=>n.remove());
+  doc.querySelectorAll("*").forEach(n=>{ [...n.attributes].forEach(a=>{ if(/^on/i.test(a.name)||/javascript:/i.test(a.value)) n.removeAttribute(a.name); }); });
+  return doc.body.innerHTML;
+}
+function textOf(html){ const doc=new DOMParser().parseFromString(html||"","text/html"); return (doc.body.textContent||"").replace(/\s+/g," ").trim(); }
+
+/* ---------- speech out (TTS), echo-guarded ---------- */
+let speaking=false;
+function speak(text, then){
+  if(!("speechSynthesis" in window)){ if(then)then(); return; }
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=1.05;
+  speaking=true; pauseRec();                 // don't let the mic hear the TTS
+  u.onend=u.onerror=()=>{ speaking=false; resumeRec(); if(then)then(); };
+  speechSynthesis.speak(u);
+}
+
+/* ---------- speech in (recognition) ---------- */
+const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+let rec=null, micOn=false, recActive=false;
+function initRec(){
+  if(!SR){ say("err","This browser has no Web Speech API — use Chrome or Edge. Buttons still work."); return null; }
+  const r=new SR();
+  r.lang="en-US"; r.continuous=true; r.interimResults=true;
+  r.onresult=e=>{
+    let fin="";
+    for(let i=e.resultIndex;i<e.results.length;i++) if(e.results[i].isFinal) fin+=e.results[i][0].transcript;
+    if(fin.trim()) onSpeech(fin.trim());
+  };
+  r.onend=()=>{ recActive=false; if(micOn&&!speaking) startRec(); };  // auto-restart
+  r.onerror=e=>{ if(e.error==="not-allowed"){ say("err","Microphone permission denied."); micToggle(false);} };
+  return r;
+}
+function startRec(){ if(rec&&!recActive){ try{rec.start();recActive=true;}catch(e){} } }
+function pauseRec(){ if(rec&&recActive){ try{rec.stop();}catch(e){} recActive=false; } }
+function resumeRec(){ if(micOn) startRec(); }
+function micToggle(on){
+  micOn = on===undefined ? !micOn : on;
+  if(micOn && !rec) rec=initRec();
+  if(micOn && rec){ startRec(); $("mic").classList.add("on"); setStatus("listening","listening"); }
+  else { pauseRec(); $("mic").classList.remove("on"); if(state.phase==="idle") setStatus("idle"); }
+}
+
+/* ---------- app state ---------- */
+const state={ phase:"idle", docId:null, editId:null, pending:[], decisions:{}, idx:0, gated:false };
+
+function norm(s){ return s.toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim(); }
+
+/* ---------- voice routing ---------- */
+function onSpeech(text){
+  const t=norm(text);
+  if(state.phase==="review"){ if(!reviewCommand(t)) say("sys",`(unrecognized: “${text}” — say approve, reject, next, read the text, or apply)`); return; }
+  // dictation-mode global commands
+  if(/^(send it|send that|send|go ahead|do it)$/.test(t)) return sendInstruction();
+  if(/^(clear|scratch that|start over)$/.test(t)){ $("box").value=""; return; }
+  if(/^(export|download|export the document|download the document)$/.test(t)) return doExport();
+  if(/^(load the sample|open the sample|load sample)$/.test(t)) return loadSample();
+  if(/^(new blank document|blank document|new document)$/.test(t)) return newBlank();
+  // otherwise: dictation accumulates into the instruction box
+  const b=$("box"); b.value=(b.value?b.value+" ":"")+text;
+}
+
+function reviewCommand(t){
+  const cur=state.pending[state.idx];
+  if(/^(approve|yes|accept|approved|looks good)( this| it| this one)?$/.test(t)) return decideCurrent(true);
+  if(/^(reject|no|skip|decline|rejected)( this| it| this one)?$/.test(t))       return decideCurrent(false);
+  if(/^(approve all|accept all|approve everything|approve the rest)$/.test(t))  return decideAll(true);
+  if(/^(reject all|reject everything|reject the rest)$/.test(t))                return decideAll(false);
+  if(/^(next|next change)$/.test(t))            return gotoChange(state.idx+1);
+  if(/^(back|previous|previous change)$/.test(t))return gotoChange(state.idx-1);
+  if(/^(repeat|read it|read the change)$/.test(t)){ announceChange(state.idx); return true; }
+  if(/^(read the text|read the actual text|read the edit)$/.test(t)){
+    // B3: the AI gloss can paraphrase - on request, read the REAL new text.
+    speak(cur ? ("The exact new text is: "+ (textOf(cur.new_html)||"empty")) : "No change selected."); return true;
+  }
+  if(/^(apply|finish|done|apply decisions|finalize)$/.test(t)) return applyDecisions();
+  if(/^(export|download)$/.test(t)) return doExport();
+  return false;
+}
+
+/* ---------- document lifecycle ---------- */
+async function uploadFile(file){
+  setStatus("uploading","working");
+  const fd=new FormData(); if(file) fd.append("file",file);
+  try{
+    const r=await api("/api/documents",{method:"POST",body:fd});
+    state.docId=r.doc_id; state.phase="ready";
+    $("docname").textContent=r.filename; $("exportbtn").disabled=false;
+    say("sys",`Loaded “${r.filename}”. Speak an edit instruction.`);
+    speak(file?`Document loaded. What should I change?`:`Blank document ready. Tell me what to draft.`);
+    refreshPreview();
+  }catch(e){ say("err","Upload failed: "+e.message); }
+  setStatus(micOn?"listening":"ready", micOn?"listening":"");
+}
+async function loadSample(){ const b=await (await fetch("/sample")).blob(); await uploadFile(new File([b],"northvoice-brightline-msa.html",{type:"text/html"})); }
+function newBlank(){ return uploadFile(null); }
+async function refreshPreview(){
+  if(!state.docId) return;
+  try{
+    const r=await fetch(`/api/documents/${state.docId}/preview`); const html=await r.text();
+    $("empty").hidden=true; const f=$("preview"); f.hidden=false; f.srcdoc=sanitize(html);
+  }catch(e){/* preview is best-effort */}
+}
+
+/* ---------- edit round ---------- */
+async function sendInstruction(){
+  const text=$("box").value.trim();
+  if(!state.docId){ say("err","Load a document first (sample, upload, or blank)."); return; }
+  if(!text){ say("sys","(nothing to send)"); return; }
+  $("box").value="";
+  say("user",text);
+  setStatus("working","working");
+  try{
+    const r=await api(`/api/documents/${state.docId}/edits`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({instruction:text})});
+    state.editId=r.edit_id; state.phase="working";
+    speak("Working on it.");
+    pollEdit();
+  }catch(e){ say("err",e.message); state.phase="ready"; }
+}
+let progressMsg=null;
+async function pollEdit(){
+  try{
+    const r=await api(`/api/edits/${state.editId}`);
+    if(r.status==="working"||r.status==="applying"){
+      if(r.progress){ if(!progressMsg) progressMsg=say("sys",r.progress); else progressMsg.textContent=r.progress; }
+      setTimeout(pollEdit,2000); return;
+    }
+    if(progressMsg){ progressMsg.remove(); progressMsg=null; }  // drop the stale "Requesting edit..." line
+    if(r.status==="failed"){ say("err","Edit failed: "+(r.error||"unknown")); speak("The edit failed."); backToReady(); return; }
+    if(r.status==="awaiting"){ enterReview(r); return; }
+    if(r.status==="done"&&state.phase==="applying"){ finishApplied(); return; }
+    if(r.status==="done"){ // chat answer with no document change
+      if(r.response) say("sys",r.response);
+      speak(r.response ? "Answered in the log. No document change was proposed." : "Done. No document change was proposed.");
+      backToReady(); return;
+    }
+    if(r.status==="rejected"){ say("sys","All changes rejected — document untouched."); speak("Rejected. The document is unchanged."); backToReady(); }
+  }catch(e){ say("err",e.message); backToReady(); }
+}
+function backToReady(){ state.phase="ready"; setStatus(micOn?"listening":"ready", micOn?"listening":""); $("reviewbar").classList.remove("on"); }
+
+/* ---------- review ---------- */
+function isNoop(c){ return (c.old_html||"").replace(/\s+/g," ").trim() === (c.new_html||"").replace(/\s+/g," ").trim(); }
+function enterReview(r){
+  state.phase="review"; state.pending=r.pending||[]; state.decisions={}; state.idx=0; state.gated=r.gated_draft;
+  setStatus("review — "+state.pending.length+" change"+(state.pending.length>1?"s":""),"review");
+  $("reviewbar").classList.add("on");
+  renderReview();
+  const n=state.pending.length;
+  const noops=state.pending.filter(isNoop).length;
+  // Found while building this app: positional instructions ("In Section 2,
+  // change X") can come back as the section HEADING replaced by itself, with a
+  // success gloss - a no-op sold as an edit. The gate calls it out loud.
+  const warn=noops?` Warning: ${noops===n?(n>1?"all of them propose":"it proposes"):noops+" of them propose"} no actual difference - the explanation claims an edit, but before and after are identical. I suggest rejecting and rephrasing as: find the exact sentence, then replace it.`:"";
+  speak(`${n} change${n>1?"s":""} proposed.${warn} `+(state.gated?"This is drafted content, gated locally. ":"")+`Change 1: ${glossFor(0)}. Say approve, reject, or read the text.`);
+}
+function glossFor(i){ const c=state.pending[i]; if(!c) return "no change"; const g=c.ai_explanation||"no explanation given"; return isNoop(c)?g+". Caution: this change is a no-op.":g; }
+function renderReview(){
+  document.querySelectorAll(".card").forEach(n=>n.remove());
+  state.pending.forEach((c,i)=>{
+    const card=document.createElement("div"); card.className="card"+(i===state.idx?" current":""); card.id="card-"+i;
+    const dec=state.decisions[c.change_id];
+    const noop=isNoop(c)?`<span class="chip warn" title="old and new HTML are identical">⚠ no-op</span>`:"";
+    card.innerHTML=`<div class="head"><b>Change ${i+1} / ${state.pending.length}</b>${noop}
+        <span class="chip ${dec===true?"ok":dec===false?"no":""}">${dec===true?"approved":dec===false?"rejected":"undecided"}</span></div>
+      <div class="gloss">${sanitize(c.ai_explanation||"")||"<i>no AI explanation</i>"}
+        <div class="glossnote">⚠ gloss may paraphrase — the panes below are the real edit (B3)</div></div>
+      <div class="diff">
+        <div class="old"><h4>Before</h4><div class="doc">${sanitize(c.old_html)||"<i>(empty — new content)</i>"}</div></div>
+        <div class="new"><h4>After</h4><div class="doc">${sanitize(c.new_html)||"<i>(deleted)</i>"}</div></div>
+      </div>
+      <div class="acts">
+        <button class="btn approve" onclick="gotoChange(${i});decideCurrent(true)">✓ Approve</button>
+        <button class="btn reject" onclick="gotoChange(${i});decideCurrent(false)">✗ Reject</button>
+      </div>`;
+    log.appendChild(card);
+  });
+  updateReviewBar();
+  const cur=document.getElementById("card-"+state.idx); if(cur) cur.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function updateReviewBar(){
+  const total=state.pending.length, done=Object.keys(state.decisions).length;
+  $("reviewinfo").textContent=`${done}/${total} decided`;
+  $("rprogfill").style.width=(total?done/total*100:0)+"%";
+}
+function gotoChange(i){
+  if(i<0){ speak("Already at the first change."); return true; }
+  if(i>=state.pending.length){ speak("That was the last change. Say apply to finalize."); return true; }
+  state.idx=i; renderReview(); announceChange(i); return true;
+}
+function announceChange(i){ speak(`Change ${i+1}: ${glossFor(i)}`); }
+function decideCurrent(ok){
+  const c=state.pending[state.idx]; if(!c) return true;
+  state.decisions[c.change_id]=ok;
+  renderReview();
+  const left=state.pending.length-Object.keys(state.decisions).length;
+  if(left===0){ speak(`${ok?"Approved":"Rejected"}. All changes decided. Say apply to finalize.`); }
+  else { state.idx=nextUndecided(); renderReview(); speak(`${ok?"Approved":"Rejected"}. Change ${state.idx+1}: ${glossFor(state.idx)}`); }
+  return true;
+}
+function nextUndecided(){ for(let i=0;i<state.pending.length;i++) if(!(state.pending[i].change_id in state.decisions)) return i; return state.idx; }
+function decideAll(ok){ state.pending.forEach(c=>state.decisions[c.change_id]=ok); renderReview(); speak(`All ${ok?"approved":"rejected"}. Say apply to finalize.`); return true; }
+async function applyDecisions(){
+  const undecided=state.pending.filter(c=>!(c.change_id in state.decisions)).length;
+  if(undecided){ speak(`${undecided} change${undecided>1?"s are":" is"} undecided. Say approve all, reject all, or decide each.`); return true; }
+  const decisions=state.pending.map(c=>({change_id:c.change_id,approved:!!state.decisions[c.change_id]}));
+  state.phase="applying"; setStatus("applying","working");
+  $("reviewbar").classList.remove("on");
+  try{
+    await api(`/api/edits/${state.editId}/decisions`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({decisions})});
+    pollEdit();
+  }catch(e){ say("err",e.message); backToReady(); }
+  return true;
+}
+function finishApplied(){
+  const ok=Object.values(state.decisions).filter(Boolean).length;
+  const no=Object.values(state.decisions).length-ok;
+  document.querySelectorAll(".card").forEach(n=>n.remove());
+  say("sys",`Applied ${ok} change${ok!==1?"s":""}${no?`, skipped ${no}`:""}.`);
+  speak(`Applied ${ok} change${ok!==1?"s":""}${no?`, skipped ${no}`:""}. Say export to download, or give the next edit.`);
+  refreshPreview();
+  backToReady();
+}
+
+/* ---------- export ---------- */
+function doExport(){
+  if(!state.docId){ say("err","Nothing to export yet."); return true; }
+  speak("Exporting the document.");
+  window.location=`/api/documents/${state.docId}/export?fmt=docx`;
+  return true;
+}
+
+/* ---------- wiring ---------- */
+$("mic").onclick=()=>micToggle();
+document.addEventListener("keydown",e=>{ if(e.ctrlKey&&e.key.toLowerCase()==="m"){e.preventDefault();micToggle();} });
+$("send").onclick=sendInstruction;
+$("box").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendInstruction();} });
+$("loadsample").onclick=loadSample;
+$("blank").onclick=newBlank;
+$("upload").onclick=()=>$("file").click();
+$("file").onchange=e=>{ if(e.target.files[0]) uploadFile(e.target.files[0]); e.target.value=""; };
+$("exportbtn").onclick=doExport;
+$("approveall").onclick=()=>decideAll(true);
+$("rejectall").onclick=()=>decideAll(false);
+$("applybtn").onclick=applyDecisions;
+$("emptysample").onclick=loadSample;
+$("emptyupload").onclick=()=>$("file").click();
+window.gotoChange=gotoChange; window.decideCurrent=decideCurrent;
+say("sys","Welcome. Load the sample MSA (or upload a .docx), click the mic, and speak. Every SuperDocs change comes back here for your approval before it lands.");
+</script>
+</body>
+</html>
