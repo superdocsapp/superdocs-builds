@@ -113,16 +113,22 @@ It seeds a runbook with seven planted contradictions into your own Confluence sp
 human gate, shows the byte-level diff, sweeps again to show the drift gone, shows that
 a clean estate spends nothing — then deletes the page.
 
-A real run on 2026-08-16: all seven found, **six written, one escalated**, and
+A real run on 2026-08-16: all seven found, **five worded and two escalated**, and the
+edits confined to a handful of ranges in a 2,708-byte body — everything else identical.
 
-```
-page 557058 · 8 changed range(s) out of 2708 bytes
-2678 of 2708 bytes untouched.
-```
+The two escalations are the honest part, and they are two different honest answers. The
+dead dashboard link has no correct replacement at all, so no wording will ever be
+produced for it. The stale rota is a case where the service kept returning the whole list
+of valid rotas — `Fulfilment, Payments Core, Tracking` — and the guard refused it, because
+one value becoming a list is not a correction. Both go to a human rather than into the
+page.
 
-The escalated one is the honest part: a dead dashboard link has no correct replacement,
-so it goes to a human instead of being guessed at. Stage 11 then reports *nothing to
-propose* — zero operations on an estate with nothing left wrong.
+That guard exists because an earlier run of this same walkthrough got past a weaker one
+and wrote `latency stays above 1.2 for 10 minutes` into the page, having dropped the unit
+the estate does not store. See [BUGS.md](BUGS.md) and `edit._sane`.
+
+Stage 11 then reports *nothing to propose* — zero operations on an estate with nothing
+left wrong.
 
 ### The claim register is the spine
 
