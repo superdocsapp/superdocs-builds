@@ -166,3 +166,56 @@ while "7 operations, one for each of these pages" is a number they can decide
 about. It also makes the zero-spend property visible at the command line rather
 than only in a test — a clean estate prints "nothing to propose" and there is
 no path from there to a request.
+
+## 2026-08-15 — rule 6 does not work the way the plan said it would
+
+**Question.** The plan is specific about how the watcher avoids re-triggering on
+its own writes: `read:user:confluence` is "load-bearing — it gives our own
+accountId". Ignore the page version whose `version.authorId` is us. Does that
+work?
+
+**Call.** No, and the mechanism is now a version ledger in the register:
+`apply.py` records the exact version number each of its PUTs produced, in the
+same transaction that marks the finding applied, and the watcher asks
+`register.wrote_version(page_id, version)`. `account_id()` is kept as a second
+filter for the classic-token case and is never the only one.
+
+**Reasoning.** Checked against the live site rather than assumed. The author id
+is genuinely in the v2 page payload, so the idea was sound — but every route to
+"who am I" is refused for a scoped API token:
+
+    GET /wiki/api/v2/users/current   -> 401 Unauthorized; scope does not match
+    GET /wiki/rest/api/user/current  -> 401 Unauthorized; scope does not match
+    GET https://api.atlassian.com/me -> 401 Unauthorized
+
+with `read:user:confluence` granted. `read:me` is an Atlassian *account* scope
+rather than a product one and is not grantable to an API token at all.
+
+The replacement is better evidence anyway, which is worth saying rather than
+presenting it as a consolation. An author id would only establish that the
+integration account made the edit — a colleague using the same service account
+is indistinguishable from us. The version number establishes that this exact
+byte-for-byte version is the one our own PUT returned. Unknown authorship is
+treated as somebody else's edit throughout: the cost of being wrong that way is
+one unnecessary sweep, which is free, and the cost of the other way is a
+runbook changing with nobody told.
+
+## 2026-08-15 — the CI action and the git hook ship as templates, not installed
+
+**Question.** Stage 9 wants a CI action and a pre-commit hook. Both normally
+live at a repository root — `.github/workflows/` and `.git/hooks/`.
+
+**Call.** Both ship inside this project folder as files to copy: `ci/`
+and `hooks/pre-commit`, each carrying its own install line.
+
+**Reasoning.** `CONTRIBUTING.md` says to build inside my own folder and modify
+nothing outside it. Beyond the rule, a workflow at the root of a repository full
+of other people's submissions would run on every push to all of them, which is
+precisely the kind of thing that rule exists to prevent. The hook is a template
+for the same reason plus a better one: it belongs in the repository that holds
+the infrastructure, which is not this one.
+
+The hook always exits zero, and that is the whole design rather than a caveat.
+A blocking hook that costs thirty seconds gets `--no-verify` the first time and
+uninstalled the second, and then the tool is absent from the one moment it had
+the engineer's attention. It also prints nothing at all unless there is drift.

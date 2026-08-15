@@ -307,6 +307,56 @@ def test_a_crash_between_the_write_and_the_record_is_detected(
     assert register.finding(finding.finding_id).applied_at is not None
 
 
+def test_a_successful_write_is_recorded_as_ours(workspace: Path, register: Register) -> None:
+    """Rule 6's other end: the watcher can only ignore what apply recorded.
+
+    Without this row the watcher sees the version bump its own sweep caused,
+    treats it as somebody's edit, and sweeps again — forever. The version
+    recorded has to be the one the page ended up at, not the one it was read at.
+    """
+    source = LocalSource(workspace)
+    finding = next(f for f in seed(register, source, "1001") if f.subject.endswith(":threshold"))
+    version_before = source.read("1001").version
+    approve(register, finding, "1.2s")
+
+    apply_approved(register, source)
+
+    version_after = source.read("1001").version
+    assert version_after == version_before + 1
+    assert register.wrote_version("1001", version_after)
+    assert not register.wrote_version("1001", version_before)
+
+
+def test_a_write_that_never_landed_is_not_recorded_as_ours(
+    workspace: Path, register: Register
+) -> None:
+    """A conflict means somebody else's version is current.
+
+    Recording it as ours anyway would make the watcher ignore a real edit by a
+    real person — the one failure mode of a version ledger, and the reason the
+    row is written after the PUT returns rather than alongside it.
+
+    The conflict has to be injected at the write itself: `_prepare` re-reads the
+    page, so an edit that landed *before* apply started is not a conflict, it is
+    just the current version.
+    """
+    source = LocalSource(workspace)
+    finding = next(f for f in seed(register, source, "1001") if f.subject.endswith(":threshold"))
+    approve(register, finding, "1.2s")
+    current = source.read("1001").version
+
+    def conflicting_write(page_id: str, body: str, expected_version: int) -> int:
+        raise VersionConflict("somebody else got there first")
+
+    source.write = conflicting_write  # type: ignore[method-assign]
+    result = apply_approved(register, source)
+
+    assert result.conflicts == ["1001"]
+    assert not register.wrote_version("1001", current)
+    assert not register.wrote_version("1001", current + 1)
+    assert register.approved_unapplied(), "the work must survive for the next run"
+
+
 # ------------------------------------------------------------- assertions ----
 
 

@@ -72,6 +72,9 @@ class PagePlan:
     #: `(start, end, replacement)` in ORIGINAL-body coordinates, which stay valid
     #: only because the splices are applied from the end backwards.
     edits: list[tuple[int, int, str]] = field(default_factory=list)
+    #: What the page's version became once written. Recorded so the watcher can
+    #: recognise the bump as ours rather than re-sweeping on it.
+    new_version: int = 0
 
 
 @dataclass
@@ -138,7 +141,7 @@ def apply_approved(
     written: list[PagePlan] = []
     for plan in plans:
         try:
-            source.write(plan.page_id, plan.updated, plan.version)
+            plan.new_version = source.write(plan.page_id, plan.updated, plan.version)
         except VersionConflict:
             result.conflicts.append(plan.page_id)
             _rollback(written, source, result)
@@ -150,6 +153,11 @@ def apply_approved(
 
     with register.transaction():
         for plan in written:
+            # Rule 6: the watcher has to be able to tell this version bump was
+            # ours. Recorded in the same transaction as the applied mark so the
+            # two cannot disagree after a crash.
+            if plan.new_version:
+                register.record_page_write(plan.page_id, plan.new_version)
             for finding_id in plan.finding_ids:
                 register.mark_applied(finding_id)
                 result.applied.append(finding_id)

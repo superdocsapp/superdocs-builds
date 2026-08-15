@@ -193,13 +193,27 @@ class ConfluenceSource:
     # -------------------------------------------------------------- reads --
 
     def account_id(self) -> str | None:
-        """Our own account id, which is how we ignore our own writes.
+        """Our own account id, when the token can be told. Usually it cannot.
 
-        Rule 6 has two halves. The register's identity scheme covers the case
-        where a fix lands and the claim stops existing; this covers the watcher,
-        which would otherwise see the version bump from its own PUT and start
-        the whole sweep again. `read:user:confluence` is on the token's scope
-        list for this one call and no other.
+        **This was designed to be how rule 6 works, and it is not.** The plan
+        was to ignore a page version whose `version.authorId` is us. The author
+        id is genuinely there in the v2 page payload, so the idea is sound --
+        but every route to "who am I" is refused for a scoped API token:
+
+            GET /wiki/api/v2/users/current      -> 401 scope does not match
+            GET /wiki/rest/api/user/current     -> 401 scope does not match
+            GET https://api.atlassian.com/me    -> 401 Unauthorized
+
+        with `read:user:confluence` granted on the token. `read:me` is an
+        account scope rather than a product one and is not grantable to an API
+        token at all, which is the underlying reason.
+
+        So this returns None on a scoped token and rule 6 does not rest on it:
+        `register.page_writes` records the exact version each of our PUTs
+        produced, and the watcher compares against that. Kept because it does
+        work with a classic token, where it is a useful second filter -- a
+        colleague editing through the same integration account is invisible to
+        the version ledger and visible here.
         """
         if self._account_id is None:
             try:
@@ -240,13 +254,18 @@ class ConfluenceSource:
                 labels = self.labels(page_id)
                 if self.label and self.label not in labels:
                     continue
+                version = entry.get("version") or {}
                 out.append(
                     PageRef(
                         page_id=page_id,
                         title=str(entry.get("title", "")),
-                        version=int((entry.get("version") or {}).get("number", 1)),
+                        version=int(version.get("number", 1)),
                         labels=labels,
                         url=str((entry.get("_links") or {}).get("webui", "")),
+                        # Present and correct in the v2 payload, and useless on
+                        # its own -- see `account_id` for why the watcher cannot
+                        # usually learn which id is ours.
+                        author_id=str(version.get("authorId", "")),
                     )
                 )
             cursor = _cursor(page)

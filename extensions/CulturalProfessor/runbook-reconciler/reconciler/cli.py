@@ -220,6 +220,32 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
     return 0 if outcome.ok else 1
 
 
+def _cmd_watch(args: argparse.Namespace) -> int:
+    """Sweep whenever the estate changes. Free: it never proposes on its own.
+
+    Deliberately does not spend. A watcher that could open a paid session on a
+    file save is a watcher that bills somebody for a rebase, so this reports and
+    stops — `rr propose` is still a thing a person types.
+    """
+    from reconciler.watch import Watcher
+
+    config = _configure(args)
+    source = page_source(config)
+    print(f"watching against {describe_source(source)}")
+    try:
+        with Register(config.register_path) as register:
+            Watcher(
+                config,
+                register,
+                source,
+                interval=args.interval,
+                quiet=args.quiet,
+            ).loop()
+    finally:
+        _close(source)
+    return 0
+
+
 def _cmd_status(_: argparse.Namespace) -> int:
     """What the register holds, including the things that go wrong quietly."""
     config = Config.load()
@@ -292,6 +318,7 @@ COMMANDS: dict[str, tuple[str, Handler]] = {
         _cmd_propose,
     ),
     "review": ("decide finding by finding, then write only what was approved", _cmd_review),
+    "watch": ("sweep whenever the estate changes, debounced and coalesced (free)", _cmd_watch),
     "status": ("what the register holds, and what is parked (free)", _cmd_status),
     "measure": ("score the checker against fixtures/expected.yaml", _cmd_measure),
     "version": ("print the version and exit", _cmd_version),
@@ -343,6 +370,21 @@ _OPTIONS: dict[str, list[tuple[tuple[str, ...], dict]]] = {
         ),
     ],
     "review": [_AUTO, _CORPUS],
+    "watch": [
+        _CORPUS,
+        (
+            ("--interval",),
+            {"type": float, "default": 10.0, "help": "seconds between polls (default: 10)"},
+        ),
+        (
+            ("--quiet",),
+            {
+                "type": float,
+                "default": 2.0,
+                "help": "seconds everything must hold still before sweeping (default: 2)",
+            },
+        ),
+    ],
     "propose": [
         (
             ("--yes",),

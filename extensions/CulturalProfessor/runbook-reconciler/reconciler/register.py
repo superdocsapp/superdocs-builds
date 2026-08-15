@@ -127,6 +127,28 @@ CREATE TABLE IF NOT EXISTS proposals (
 
 CREATE INDEX IF NOT EXISTS proposals_by_job ON proposals(job_id);
 
+-- Every version of every page this tool has written, and the mechanism behind
+-- rule 6: never re-trigger on our own writes.
+--
+-- The plan expected `client.account_id()` to do this job -- see the page in
+-- the runbook, ignore the version whose author is us. That endpoint turns out
+-- to be unreachable with a scoped API token (`401 Unauthorized; scope does not
+-- match` from /wiki/api/v2/users/current, /wiki/rest/api/user/current and
+-- api.atlassian.com/me alike, with read:user:confluence granted), so the
+-- watcher cannot ask who wrote a version.
+--
+-- It can ask what *we* wrote, which is strictly better evidence anyway: an
+-- author id says a human sharing the integration account edited the page, and
+-- this says the byte-exact version number our own PUT produced. Recorded in
+-- the same transaction that marks the finding applied, so a crash cannot leave
+-- a write the watcher does not recognise as its own.
+CREATE TABLE IF NOT EXISTS page_writes (
+    page_id    TEXT NOT NULL,
+    version    INTEGER NOT NULL,
+    written_at TEXT NOT NULL,
+    PRIMARY KEY (page_id, version)
+);
+
 -- Cost and timing accounting. Behaviour ten of the brief: a run can report
 -- what it spent and where the time went, stage by stage. Kept in the register
 -- rather than printed and forgotten so `rr report` can answer it afterwards,
@@ -509,6 +531,28 @@ class Register:
             "UPDATE proposals SET settled_at = ? WHERE job_id = ? AND settled_at IS NULL",
             (utcnow(), job_id),
         )
+
+    # --------------------------------------------------------- our own writes --
+
+    def record_page_write(self, page_id: str, version: int) -> None:
+        """The version our own PUT produced. See the `page_writes` schema note."""
+        self._conn.execute(
+            "INSERT INTO page_writes (page_id, version, written_at) VALUES (?,?,?) "
+            "ON CONFLICT(page_id, version) DO NOTHING",
+            (page_id, int(version), utcnow()),
+        )
+
+    def wrote_version(self, page_id: str, version: int) -> bool:
+        """Did this tool produce that exact version of that page?
+
+        Rule 6, as a query. The watcher asks it before deciding a version bump
+        is somebody else's work worth re-sweeping for.
+        """
+        row = self._conn.execute(
+            "SELECT 1 FROM page_writes WHERE page_id = ? AND version = ?",
+            (page_id, int(version)),
+        ).fetchone()
+        return row is not None
 
     # ----------------------------------------------------------- accounting --
 

@@ -31,6 +31,10 @@ class PageRef:
     version: int
     labels: tuple[str, ...]
     url: str = ""
+    #: Who last edited the page, where the source can say. Empty from the
+    #: corpus, and empty from Confluence too when the token cannot resolve it —
+    #: the watcher treats "unknown" as "not us" rather than guessing.
+    author_id: str = ""
 
 
 class VersionConflict(RuntimeError):

@@ -1,0 +1,104 @@
+# Runbook Reconciler as a pull-request gate.
+#
+# Copy to `.github/workflows/runbook-reconciler.yml` in the repository that
+# holds your infrastructure config. It is not installed at the root of this
+# repository on purpose: CONTRIBUTING.md says to build inside my own folder, and
+# a workflow that runs on every push to a repo full of other people's projects
+# is exactly the kind of thing that rule exists to prevent.
+#
+# ## What this does and does not do
+#
+# It runs the **free** layer only: read the estate, extract claims, check them,
+# report. No model, no SuperDocs key, no spend, and no write to any document.
+# Wording a fix costs an operation and lands in a wiki, and neither belongs in
+# an unattended job that fires on every push — `rr propose` is a thing a person
+# types, and `rr review` is where a human decides.
+#
+# So the gate's honest claim is narrow: *this pull request changes
+# infrastructure in a way that makes a runbook wrong.* That is a fact a
+# deterministic checker can establish, and it is worth failing a build over.
+
+name: runbook drift
+
+on:
+  pull_request:
+    paths:
+      # Only when the estate actually moved. A CI job that runs on every README
+      # edit is a CI job somebody adds `[skip ci]` to.
+      - "**/*.tf"
+      - "**/*.yaml"
+      - "**/*.yml"
+      - "**/catalog-info.yaml"
+  schedule:
+    # Drift is not only introduced by pull requests: a runbook goes stale when
+    # somebody edits the *page*, which no code change will ever trigger on.
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install
+        working-directory: extensions/CulturalProfessor/runbook-reconciler
+        run: pip install -e .
+
+      - name: Check runbooks against the estate
+        id: check
+        working-directory: extensions/CulturalProfessor/runbook-reconciler
+        env:
+          # Reads only. The token needs read:page, read:space, read:label and
+          # read:content — nothing that can write. A gate that holds write
+          # credentials is a gate that can be talked into using them.
+          CONFLUENCE_BASE_URL: ${{ secrets.CONFLUENCE_BASE_URL }}
+          CONFLUENCE_EMAIL: ${{ secrets.CONFLUENCE_EMAIL }}
+          CONFLUENCE_API_TOKEN: ${{ secrets.CONFLUENCE_READ_ONLY_TOKEN }}
+          CONFLUENCE_SPACE_KEY: ${{ secrets.CONFLUENCE_SPACE_KEY }}
+          INFRA_REPO_PATHS: ${{ github.workspace }}
+          # Deliberately absent: SUPERDOCS_API_KEY. Nothing in this job can
+          # spend, because there is nothing here to spend with.
+        run: |
+          set -o pipefail
+          python -m reconciler.cli check --verbose | tee findings.txt
+
+      - name: Comment the findings on the pull request
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync(
+              'extensions/CulturalProfessor/runbook-reconciler/findings.txt', 'utf8');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: [
+                '### Runbook drift',
+                '',
+                'This change makes one or more runbooks disagree with the estate.',
+                'Nothing has been edited — `rr propose` and `rr review` are where a',
+                'human decides what to do about it.',
+                '',
+                '```',
+                body.slice(0, 60000),
+                '```',
+              ].join('\n'),
+            });
+
+      - name: Keep the findings whatever the outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runbook-findings
+          path: extensions/CulturalProfessor/runbook-reconciler/findings.txt
