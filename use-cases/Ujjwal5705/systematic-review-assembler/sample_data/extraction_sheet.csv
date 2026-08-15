@@ -1,0 +1,4 @@
+study_id,author_year,design,n_participants,intervention,comparator,primary_outcome,result
+S01,"Alvarez 2021",RCT,214,Low-calorie diet,Standard care,HbA1c reduction,"-1.2% (95% CI -1.6 to -0.8)"
+S02,"Bianchi 2022",RCT,156,Bariatric surgery,Standard care,Diabetes remission at 12mo,"58% vs 12%, p<0.001"
+S03,"Chen 2020",Cohort,489,Intensive lifestyle program,Usual care,Diabetes remission at 24mo,"34% vs 9%"

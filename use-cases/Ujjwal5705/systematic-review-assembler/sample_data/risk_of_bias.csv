@@ -1,0 +1,4 @@
+study_id,randomization,deviations,missing_data,outcome_measurement,selective_reporting,overall
+S01,Low,Low,Low,Some concerns,Low,Some concerns
+S02,Low,Low,Low,Low,Low,Low
+S03,High,Some concerns,Low,Some concerns,Low,High

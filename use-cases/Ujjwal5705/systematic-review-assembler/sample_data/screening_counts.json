@@ -1,0 +1,22 @@
+{
+  "databases": [
+    {"name": "PubMed", "records_identified": 842},
+    {"name": "Embase", "records_identified": 611},
+    {"name": "Cochrane Library", "records_identified": 203}
+  ],
+  "other_sources_identified": 14,
+  "duplicates_removed": 298,
+  "records_screened_title_abstract": 1372,
+  "records_excluded_title_abstract": 1189,
+  "reports_sought_for_retrieval": 183,
+  "reports_not_retrieved": 6,
+  "reports_assessed_full_text": 177,
+  "reports_excluded_full_text": [
+    {"reason": "Wrong population", "count": 61},
+    {"reason": "Wrong outcome measures", "count": 34},
+    {"reason": "Not peer-reviewed", "count": 12},
+    {"reason": "Duplicate publication", "count": 9}
+  ],
+  "studies_included_in_review": 61,
+  "studies_included_in_synthesis": 58
+}
