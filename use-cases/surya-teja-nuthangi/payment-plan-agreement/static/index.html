@@ -11,28 +11,31 @@
       <div><p class="eyebrow">PAYMENT PLAN AGREEMENT</p><h1>Turn billing terms into a verified agreement.</h1><p class="lede">Calculate the schedule once. Keep every amount and date consistent through AI editing, human review, and Word export.</p></div>
       <div class="trust-card"><span>Correctness contract</span><strong>TABLE FACTS = PROSE FACTS</strong><p>One canonical plan drives both views. Independent checks block factual drift.</p></div>
     </section>
-    <nav class="steps" aria-label="Workflow"><span class="active">1 <b>Terms</b></span><span>2 <b>Schedule</b></span><span>3 <b>Review</b></span><span>4 <b>Export</b></span></nav>
+    <nav class="steps" aria-label="Workflow"><span class="active">1 <b>Terms</b></span><span>2 <b>Schedule</b></span><span>3 <b>Agreement seed</b></span><span>4 <b>SuperDocs edit</b></span><span>5 <b>Review</b></span><span>6 <b>Verify</b></span><span>7 <b>Export</b></span></nav>
     <section class="workspace">
       <form id="terms-form" class="panel form-panel">
-        <div class="panel-head"><div><p class="eyebrow">STEP 1</p><h2>Payment terms</h2></div><span id="mode-badge" class="badge fake">OFFLINE DEMO</span></div>
+        <div class="panel-head"><div><p class="eyebrow">STEP 1</p><h2>Payment terms</h2></div><span id="mode-badge" class="badge fake">OFFLINE TEST MODE</span></div>
         <div class="grid two"><label>Creditor<input name="creditor" value="Northstar Health Services" required></label><label>Debtor<input name="debtor" value="Alex Morgan" required></label></div>
         <div class="grid three"><label>Currency<select name="currency"><option>USD</option><option>EUR</option><option>GBP</option><option>INR</option></select></label><label>Original balance<input name="original_balance" type="number" min="0.01" step="0.01" value="1000.00" required></label><label>Upfront payment<input name="upfront_payment" type="number" min="0" step="0.01" value="100.00" required></label></div>
         <div class="grid three"><label>Installments<input name="installment_count" type="number" min="1" max="120" value="4" required></label><label>Cadence<select name="frequency"><option value="monthly">Monthly</option><option value="biweekly">Biweekly</option><option value="weekly">Weekly</option></select></label><label>First due date<input name="first_due_date" type="date" value="2026-09-15" required></label></div>
         <div class="grid four"><label>Agreement date<input name="agreement_date" type="date" value="2026-08-15" required></label><label>Late fee<select name="late_fee_kind"><option value="none">None</option><option value="fixed">Fixed amount</option><option value="percent">Percentage</option></select></label><label>Fee value<input name="late_fee_value" type="number" min="0" step="0.01" placeholder="If applicable"></label><label>Grace period (days)<input name="grace_days" type="number" min="0" max="365" value="0"></label></div>
         <div class="grid two"><label>Reference ID <small>Optional</small><input name="reference_id" value="INV-1000"></label><label>Additional terms <small>Optional</small><input name="additional_terms" placeholder="Non-financial notes only"></label></div>
-        <div id="error" class="error" hidden></div>
+        <div id="error" class="error" role="alert" hidden></div>
         <div class="actions"><button type="button" id="preview">Calculate schedule</button><label class="mode-toggle"><input id="live-mode" type="checkbox"> Use live SuperDocs</label></div>
       </form>
       <aside class="panel schedule-panel">
         <div class="panel-head"><div><p class="eyebrow">STEP 2</p><h2>Authoritative schedule</h2></div><span id="schedule-state" class="status neutral">READY TO CALCULATE</span></div>
         <div id="empty" class="empty"><div>∑</div><strong>Your deterministic schedule appears here</strong><p>No AI is used for contract arithmetic.</p></div>
-        <div id="schedule" hidden><div class="summary"><div><small>FINANCED</small><strong id="financed">—</strong></div><div><small>INSTALLMENTS</small><strong id="count">—</strong></div><div><small>VERIFIER</small><strong class="pass">PASS</strong></div></div><table><thead><tr><th>#</th><th>Due date</th><th>Amount</th><th>Balance</th></tr></thead><tbody id="schedule-body"></tbody><tfoot><tr><td colspan="2">Total scheduled</td><td id="total"></td><td></td></tr></tfoot></table><button id="generate" class="primary">Generate agreement</button></div>
+        <div id="schedule" hidden><div class="summary"><div><small>FINANCED</small><strong id="financed">—</strong></div><div><small>INSTALLMENTS</small><strong id="count">—</strong></div><div><small>DIFFERENCE</small><strong id="difference" class="pass">—</strong></div></div><table><thead><tr><th scope="col">#</th><th scope="col">Due date</th><th scope="col">Amount</th><th scope="col">Remaining balance</th></tr></thead><tbody id="schedule-body"></tbody><tfoot><tr><td colspan="2">Total scheduled</td><td id="total"></td><td></td></tr></tfoot></table><section class="canonical" aria-label="Canonical plan summary"><h3>Canonical plan</h3><p id="canonical-summary"></p><code id="canonical-fingerprint"></code></section><button id="generate" class="primary">Generate agreement</button></div>
       </aside>
     </section>
     <section id="review-panel" class="panel review-panel" hidden>
-      <div class="panel-head"><div><p class="eyebrow">STEP 3</p><h2>Review proposed changes</h2></div><span id="job-state" class="status">AWAITING REVIEW</span></div>
-      <div class="review-grid"><div id="proposals"></div><aside class="verification"><h3>Independent verifier</h3><div class="check">✓ Schedule totals <b>PASS</b></div><div class="check">✓ Table / prose consistency <b>PASS</b></div><div class="check">✓ Protected facts <b>PASS</b></div><div class="check">✓ Unsupported fees / dates <b>NONE</b></div><p id="fingerprint"></p></aside></div>
+      <div class="panel-head"><div><p class="eyebrow">STEP 3-6</p><h2>SuperDocs edit, review, and verification</h2></div><span id="job-state" class="status" aria-live="polite">AWAITING REVIEW</span></div>
+      <div id="processing-note" class="processing-note" hidden><strong id="processing-title">SuperDocs is processing the document.</strong><span id="elapsed">Elapsed: 0s</span><p>This run is preserved. Waiting does not resubmit the edit.</p></div>
+      <div id="batch-summary" class="batch-summary" aria-live="polite"></div>
+      <div class="review-grid"><div id="proposals"></div><aside class="verification"><h3>Independent verifier</h3><div id="verification-checks"></div><p id="fingerprint"></p><p id="document-hash"></p></aside></div>
       <div class="actions right"><button id="apply" class="primary">Apply review decisions</button><button id="export" hidden>Export DOCX</button></div>
+      <section id="final-panel" class="final-panel" hidden><div class="panel-head"><div><p class="eyebrow">VERIFIED DOCUMENT</p><h2>Final agreement representation</h2></div><span class="status pass">READY TO EXPORT</span></div><p>This is the verified HTML representation returned by the workflow, not a native Word preview.</p><iframe id="final-document" title="Verified final agreement" sandbox=""></iframe><div id="export-result" class="export-result" role="status"></div></section>
     </section>
   </main>
   <footer>Built for transparent, human-reviewed document automation. Not legal advice.</footer>

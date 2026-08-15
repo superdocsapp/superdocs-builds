@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "browser": "Codex in-app browser",
+  "mode": "OFFLINE TEST MODE",
+  "validated": ["specific form validation", "deterministic schedule", "zero schedule difference", "canonical fingerprint", "proposal review", "human decisions", "final verification", "sandboxed final document", "DOCX export"],
+  "console_errors": 0,
+  "screenshots": ["screenshots/payment-plan-evaluator-final.png", "screenshots/payment-plan-verifier.png"]
+}

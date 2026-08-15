@@ -3,7 +3,7 @@ import json
 import pytest
 
 from payment_plan_agreement.models import ReviewDecision
-from payment_plan_agreement.superdocs import EditJob, FakeSuperDocsClient, HttpSuperDocsClient, SuperDocsMalformedProposal, parse_proposal, poll_job
+from payment_plan_agreement.superdocs import EditJob, FakeSuperDocsClient, HttpSuperDocsClient, SuperDocsExportFailed, SuperDocsMalformedProposal, SuperDocsTimeout, SuperDocsUnauthorized, parse_proposal, poll_job
 from payment_plan_agreement.workflow import AgreementWorkflow, Lifecycle
 
 
@@ -113,3 +113,26 @@ def test_workflow_ignores_stale_same_batch_after_approval(request_factory):
     workflow = AgreementWorkflow(ApprovalRaceClient()); run = workflow.start(request_factory())
     workflow.review(run, [ReviewDecision(change_id="change_1", approved=True)], timeout_seconds=1, poll_interval_seconds=0)
     assert run.state == Lifecycle.FINAL_VERIFIED and workflow.client.polls == 2
+
+
+def test_missing_key_fails_before_any_external_request(monkeypatch):
+    monkeypatch.delenv("SUPERDOCS_API_KEY", raising=False)
+    with pytest.raises(SuperDocsUnauthorized, match="no external request was made"):
+        HttpSuperDocsClient()
+
+
+def test_timeout_names_preserved_recovery_state():
+    class NeverCompletes:
+        def get_job(self, job_id):
+            return EditJob(job_id=job_id, session_id="session", status="in_progress", progress=95)
+    with pytest.raises(SuperDocsTimeout, match="work and job id are preserved"):
+        poll_job(NeverCompletes(), "job", terminal_statuses={"completed"}, timeout_seconds=0)
+
+
+def test_export_failure_preserves_verified_document(request_factory):
+    workflow = AgreementWorkflow(FakeSuperDocsClient(mode="export_failure")); run = workflow.start(request_factory())
+    workflow.review(run, [ReviewDecision(change_id="change_1", approved=True)])
+    before = run.final_html
+    with pytest.raises(SuperDocsExportFailed, match="verified final HTML is preserved"):
+        workflow.export(run)
+    assert run.state == Lifecycle.FINAL_VERIFIED and run.final_html == before

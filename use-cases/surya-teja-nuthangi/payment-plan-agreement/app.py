@@ -4,6 +4,7 @@ import json
 import mimetypes
 import os
 import re
+import time
 from dataclasses import dataclass
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -34,6 +35,8 @@ class StoredRun:
     workflow: AgreementWorkflow
     run: AgreementRun
     mode: str
+    started_at: float
+    batch_number: int = 1
 
 
 RUNS: dict[str, StoredRun] = {}
@@ -55,6 +58,8 @@ def _run_json(stored: StoredRun) -> dict:
         "job": run.job.model_dump(mode="json") if run.job else None,
         "verification": run.verification.model_dump(mode="json") if run.verification else None,
         "decisions": [item.model_dump(mode="json") for item in run.decisions],
+        "batch_number": stored.batch_number,
+        "elapsed_seconds": round(time.time() - stored.started_at),
     }
 
 
@@ -118,7 +123,7 @@ class Handler(BaseHTTPRequestHandler):
                 run = workflow.start(_request(payload))
                 if mode == "live" and run.state.value == "superdocs_processing":
                     workflow.wait_for_review(run)
-                RUNS[run.run_id] = StoredRun(workflow, run, mode)
+                RUNS[run.run_id] = StoredRun(workflow, run, mode, time.time())
                 self._json(_run_json(RUNS[run.run_id]), HTTPStatus.CREATED)
                 return
             review = re.fullmatch(r"/api/runs/([a-zA-Z0-9_]+)/review", self.path)
@@ -128,6 +133,8 @@ class Handler(BaseHTTPRequestHandler):
                     self._json({"error": "Run not found."}, HTTPStatus.NOT_FOUND); return
                 decisions = [ReviewDecision.model_validate(item) for item in payload.get("decisions", [])]
                 stored.workflow.review(stored.run, decisions)
+                if stored.run.state.value == "awaiting_human":
+                    stored.batch_number += 1
                 self._json(_run_json(stored)); return
             export = re.fullmatch(r"/api/runs/([a-zA-Z0-9_]+)/export", self.path)
             if export:
@@ -139,6 +146,7 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_header("Content-Type", document.mime_type)
                 self.send_header("Content-Disposition", f'attachment; filename="{document.filename}"')
                 self.send_header("Content-Length", str(len(document.content)))
+                self.send_header("Access-Control-Expose-Headers", "Content-Disposition, Content-Length")
                 self.end_headers(); self.wfile.write(document.content); return
             self._json({"error": "Route not found."}, HTTPStatus.NOT_FOUND)
         except (ValidationError, ValueError, json.JSONDecodeError) as exc:

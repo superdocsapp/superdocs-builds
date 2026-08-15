@@ -4,7 +4,7 @@ Built by **Surya Teja Nuthangi** for the SuperDocs community builds repository.
 
 This use case turns structured billing terms into a plain-language payment-plan agreement. A deterministic engine calculates the authoritative schedule, renders both its table and prose from one canonical plan, and independently verifies protected facts before and after SuperDocs editing.
 
-![Evaluator view](artifacts/screenshots/payment-plan-evaluator.png)
+![Evaluator view](artifacts/screenshots/payment-plan-evaluator-final.png)
 
 ## Who it serves
 
@@ -38,7 +38,7 @@ Open `http://127.0.0.1:8000`. On macOS/Linux, use `./.venv/bin/python`.
 
 ## Modes and SuperDocs integration
 
-Offline demo mode is the default, requires no credentials, and labels itself `OFFLINE DEMO`. For live use, set the key only in the server environment and restart:
+Offline demo mode is the default, requires no credentials, and labels itself `OFFLINE TEST MODE`. For live use, set the key only in the server environment and restart:
 
 ```powershell
 $env:SUPERDOCS_API_KEY = "your-key-here"
@@ -65,7 +65,7 @@ The synthetic end-to-end path was verified on 2026-08-15: one async edit job, du
 .\.venv\Scripts\python.exe -m pytest
 ```
 
-The suite covers arithmetic, rounding, dates, projections, verifier failures, malformed proposals, item review, bounded polling, current approval/export payloads, and offline DOCX export.
+Final regression on Python 3.14.6: **36 passed in 1.06s**. The suite covers arithmetic, rounding, dates, projections, verifier failures, malformed proposals, missing-key failure before network access, timeout state preservation, repeated decisions, multiple proposal batches, normalized HTML, item review, current approval/export payloads, and export-failure preservation.
 
 ## Environment variables
 
