@@ -4,6 +4,16 @@
 communications leads. Difficulty band S2. Surfaces touched: API, templates,
 multi-document, export.
 
+Built for the SuperDocs Round 2 Full-Stack AI Engineer take-home by Rahul
+Dhakshin.
+
+![Real export from output/F2_ar.pdf, generated via SuperDocs' /v1/documents/export API, showing the district template correctly right-to-left for Arabic](output/screenshot_arabic_export.png)
+
+*Rendered from `output/F2_ar.pdf` — the actual PDF this engine's `export`
+command produced by calling SuperDocs' live `/v1/documents/export` endpoint,
+not a mockup. This is the RTL fix (see item 2 below) visible in the real
+output.*
+
 Report-card comment sheets, permission slips, and district notices need to
 reach families in their home language, merged with the child's and
 teacher's details, with the district's layout and branding intact. This
@@ -32,11 +42,15 @@ produces both individual per-family PDFs and one combined print run.
 export SUPERDOCS_API_KEY=sk_...
 python family_letters.py generate                  # generates every family with status "pending"
 python family_letters.py edit-comment C1 "new text" # edits the comment bank, regenerates ONLY pending letters that use it
-python family_letters.py export                     # per-family + combined print-run PDFs
+python family_letters.py export                     # per-family PDFs via SuperDocs' own export API, + combined print-run
 ```
 
-`export` needs `soffice` (LibreOffice) and `pdfunite` (poppler-utils) on
-PATH; both are common Linux package-manager installs.
+`export` calls SuperDocs' real `/v1/documents/export` endpoint for each
+per-family PDF (not a local conversion tool) — the actual product surface
+for the "approve → export" half of the upload/edit/approve/export contract.
+The combined print run is still assembled locally with `pdfunite`
+(poppler-utils), since exporting-and-merging multiple documents into one
+paginated file isn't something a single-document export endpoint does.
 
 ## What "strong" required here, and what actually happened testing it
 

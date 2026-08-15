@@ -10,6 +10,9 @@ output ready for an external e-signature step. The disclosure is verified,
 not just assumed, to contain no unrelated clauses (waivers, liability
 language, releases) — that separation is the part real employers get wrong,
 per the assignment brief, so this generator checks for it automatically.
+Export goes through SuperDocs' own `/v1/documents/export` endpoint
+(docx/pdf/html/markdown/txt, free of operation cost), not a local
+conversion tool — see cmd_export() below.
 
 LEGAL NOTE: this produces a structural template for testing/demo purposes.
 It is not legal advice and the FCRA Summary of Rights text here is a clearly
@@ -30,7 +33,8 @@ import subprocess
 import sys
 import urllib.request
 
-API_URL = "https://api.superdocs.app/v1/chat"
+CHAT_API_URL = "https://api.superdocs.app/v1/chat"
+EXPORT_API_URL = "https://api.superdocs.app/v1/documents/export"
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 
@@ -79,12 +83,12 @@ def merge_fields(template: str, fields: dict) -> str:
     return out
 
 
-def call_superdocs(message: str, document_html: str, session_id: str, api_key: str) -> str:
+def call_superdocs_chat(message: str, document_html: str, session_id: str, api_key: str) -> str:
     body = json.dumps(
         {"message": message, "session_id": session_id, "document_html": document_html}
     ).encode("utf-8")
     req = urllib.request.Request(
-        API_URL,
+        CHAT_API_URL,
         data=body,
         method="POST",
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
@@ -92,6 +96,32 @@ def call_superdocs(message: str, document_html: str, session_id: str, api_key: s
     with urllib.request.urlopen(req, timeout=60) as resp:
         data = json.loads(resp.read())
     return data["document_changes"]["updated_html"]
+
+
+def call_superdocs_export(html: str, fmt: str, filename: str, api_key: str) -> bytes:
+    """Calls SuperDocs' real /v1/documents/export endpoint -- the actual
+    product surface for turning edited HTML into a downloadable file, per
+    docs.superdocs.app/concepts/documents#exporting-documents. Exports are
+    free (don't consume the monthly operation allowance). Returns the raw
+    file bytes; caller writes them to disk."""
+    body = json.dumps(
+        {"html": html, "format": fmt, "options": {"filename": filename}}
+    ).encode("utf-8")
+    req = urllib.request.Request(
+        EXPORT_API_URL,
+        data=body,
+        method="POST",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(req, timeout=90) as resp:
+        warnings_header = resp.headers.get("X-Export-Warnings")
+        if warnings_header:
+            import base64
+
+            warnings = json.loads(base64.b64decode(warnings_header))
+            for w in warnings:
+                print(f"  export warning: {w.get('code')}: {w.get('message')}")
+        return resp.read()
 
 
 def cmd_generate(api_key: str) -> None:
@@ -112,7 +142,7 @@ def cmd_generate(api_key: str) -> None:
             "present below. Preserve every existing sentence's meaning exactly; "
             "formatting only."
         )
-        html = call_superdocs(message, merged, f"bgcheck-{doc_name}", api_key)
+        html = call_superdocs_chat(message, merged, f"bgcheck-{doc_name}", api_key)
         out_path = os.path.join(OUTPUT_DIR, f"{doc_name}.html")
         with open(out_path, "w", encoding="utf-8") as f:
             f.write(f"<html><body>{html}</body></html>")
@@ -163,17 +193,23 @@ def cmd_verify() -> bool:
     return True
 
 
-def cmd_export() -> None:
+def cmd_export(api_key: str) -> None:
+    """Each PDF comes from SuperDocs' own /v1/documents/export endpoint,
+    not a local conversion tool -- this is the real product surface for the
+    "approve -> export" half of the four-call contract (upload, edit,
+    approve, export) described in the task brief."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     for doc_name in DOCUMENTS:
         html_path = os.path.join(OUTPUT_DIR, f"{doc_name}.html")
         if not os.path.exists(html_path):
             continue
-        subprocess.run(
-            ["soffice", "--headless", "--convert-to", "pdf", "--outdir", OUTPUT_DIR, html_path],
-            check=True,
-        )
-        print(f"exported {html_path.replace('.html', '.pdf')}")
+        with open(html_path, encoding="utf-8") as f:
+            html = f.read()
+        pdf_bytes = call_superdocs_export(html, "pdf", doc_name, api_key)
+        pdf_path = html_path.replace(".html", ".pdf")
+        with open(pdf_path, "wb") as f:
+            f.write(pdf_bytes)
+        print(f"exported {pdf_path} (via SuperDocs /v1/documents/export)")
 
 
 def main() -> None:
@@ -190,7 +226,10 @@ def main() -> None:
         ok = cmd_verify()
         sys.exit(0 if ok else 1)
     elif args.command == "export":
-        cmd_export()
+        api_key = os.environ.get("SUPERDOCS_API_KEY")
+        if not api_key:
+            sys.exit("Set SUPERDOCS_API_KEY first.")
+        cmd_export(api_key)
 
 
 if __name__ == "__main__":

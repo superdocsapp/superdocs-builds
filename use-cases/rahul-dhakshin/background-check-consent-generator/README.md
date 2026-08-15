@@ -4,6 +4,15 @@
 **Difficulty:** S2 — real employer compliance pain (FCRA disclosure/authorization
 separation), genuine document generation, a real correctness bar to hit.
 
+Built for the SuperDocs Round 2 Full-Stack AI Engineer take-home by Rahul
+Dhakshin.
+
+![Real export from output/disclosure.pdf, generated via SuperDocs' /v1/documents/export API](output/screenshot_disclosure_export.png)
+
+*Rendered from `output/disclosure.pdf` — the actual PDF this generator's
+`export` command produced by calling SuperDocs' live `/v1/documents/export`
+endpoint, not a mockup.*
+
 ## What this is
 
 Employers running background checks must, under the FCRA, give candidates a
@@ -28,7 +37,11 @@ disclosure stayed clean.
    release/authorization language, sentence-by-sentence, negation-aware — see
    `output/RECONCILIATION_REPORT.md` for the real bug this caught in the
    verifier itself during testing, and how it was fixed.
-4. `cmd_export()` renders all three to PDF via `soffice --headless`.
+4. `cmd_export()` sends each generated document's HTML to SuperDocs' real
+   `POST /v1/documents/export` endpoint (format `"pdf"`) — the actual product
+   surface for the "approve → export" half of the upload/edit/approve/export
+   contract — not a local `soffice`/LibreOffice conversion. Exports don't
+   consume the monthly operation allowance.
 
 ## Run it
 
@@ -76,5 +89,6 @@ output/disclosure.{html,pdf}   live SuperDocs output, verified clean
 output/authorization.{html,pdf}
 output/rights_notice.{html,pdf}
 output/RECONCILIATION_REPORT.md  field-merge + verification evidence
+output/screenshot_disclosure_export.png  real export rendered above
 tests/test_verify_stdlib.py    6 stdlib tests, all passing
 ```

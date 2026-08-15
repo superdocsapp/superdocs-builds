@@ -43,14 +43,24 @@ entry in `comment_bank.json` at generation time.
    document while preserving its structure. Every output above was
    generated with this corrected, two-step approach.
 
-2. **PDF export doesn't inherit RTL layout automatically.** SuperDocs'
-   translated HTML for Arabic carries no `dir`/text-alignment markup of its
-   own (correct — that's a rendering concern, not a translation one), and
-   LibreOffice's HTML→PDF path (used for export here) does not infer
-   right-to-left paragraph alignment from a single `dir="rtl"` on `<html>`.
-   The first export rendered Arabic script correctly but left every
-   paragraph left-aligned. Fixed by applying `dir="rtl"` and explicit
-   `text-align: right` per block element before export — confirmed visually
-   in `F2_ar.pdf`, fully right-aligned, script correct. This is the actual
-   place "layout survives right-to-left scripts" has to be made true, not
-   assumed true.
+2. **SuperDocs' translated HTML carries no RTL/layout-direction markup of
+   its own.** Calling `POST /v1/chat` to translate the merged letter into
+   Arabic returns correctly right-to-left *text*, but the response HTML has
+   no `dir` attribute or text-alignment anywhere on it — a naive HTML→PDF
+   export renders the words correctly but every paragraph left-aligned. This
+   was first observed against a local LibreOffice HTML→PDF conversion (the
+   export path used when this report was originally written); the fix —
+   applying explicit `dir="rtl"` and `text-align: right` per block element
+   before export, in `wrap_html()` — is applied unconditionally, before
+   *any* renderer sees the HTML, specifically because it's not safe to
+   assume any HTML→PDF renderer (including SuperDocs' own
+   `/v1/documents/export`, now used for all export in this build) will
+   infer right-to-left paragraph alignment from a single `dir="rtl"` on
+   `<html>` alone. Confirmed visually in the current `F2_ar.pdf` (produced
+   via SuperDocs' real export endpoint, with this defensive tagging
+   applied): fully right-aligned, script correct. Whether SuperDocs'
+   export endpoint would have handled an *untagged* `dir="rtl"` correctly
+   on its own was not tested in isolation — the root, reportable issue is
+   that the translate endpoint's own output HTML carries no direction
+   markup, which is what downstream renderers of any kind then have to
+   compensate for.
