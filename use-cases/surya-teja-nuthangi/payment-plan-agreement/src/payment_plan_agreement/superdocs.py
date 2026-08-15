@@ -92,7 +92,7 @@ class HttpSuperDocsClient:
         if result.get("status") == "failed": raise SuperDocsJobFailed("SuperDocs edit failed; seed and canonical plan are preserved; inspect the job error before retry")
         if result.get("status") == "cancelled": raise SuperDocsJobFailed("SuperDocs edit was cancelled; seed and canonical plan are preserved")
         metadata = result.get("metadata") or {}
-        proposals = [parse_proposal(x) for x in metadata.get("pending_changes", [])]
+        proposals = [parse_proposal(x) for x in (metadata.get("pending_changes") or [])]
         job_result = result.get("result") or {}
         document_changes = job_result.get("document_changes") or {}
         return EditJob(
@@ -164,3 +164,20 @@ def poll_job(client: SuperDocsClient, job_id: str, *, terminal_statuses: set[str
         time.sleep(interval_seconds)
     progress = last.progress if last else 0
     raise SuperDocsTimeout(f"SuperDocs job did not reach {sorted(terminal_statuses)} before the timeout (last progress {progress}%); work and job id are preserved")
+
+
+def poll_after_approval(client: SuperDocsClient, job_id: str, decided_change_ids: set[str], *, timeout_seconds: float = 300, interval_seconds: float = 2) -> EditJob:
+    """Wait past the stale awaiting-approval state until completion or a genuinely new batch."""
+    deadline = time.monotonic() + timeout_seconds
+    last: EditJob | None = None
+    while time.monotonic() < deadline:
+        last = client.get_job(job_id)
+        if last.status == "completed":
+            return last
+        if last.status == "awaiting_approval":
+            pending_ids = {item.change_id for item in last.proposals}
+            if pending_ids and pending_ids != decided_change_ids:
+                return last
+        time.sleep(interval_seconds)
+    progress = last.progress if last else 0
+    raise SuperDocsTimeout(f"SuperDocs job did not advance after approval before the timeout (last progress {progress}%); work and job id are preserved")

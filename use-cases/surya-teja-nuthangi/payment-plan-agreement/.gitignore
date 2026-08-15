@@ -7,3 +7,5 @@ __pycache__/
 .hypothesis/
 artifacts/live/
 artifacts/live-superdocs-report.json
+artifacts/live-resume-state.json
+artifacts/live-verification-failure.json

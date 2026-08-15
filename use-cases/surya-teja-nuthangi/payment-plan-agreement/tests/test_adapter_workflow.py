@@ -67,3 +67,49 @@ def test_http_adapter_uses_current_approval_and_export_shapes():
     client.export(html="<h1>Agreement</h1>", filename="agreement.docx")
     assert client.calls[0][2] == {"job_id": "job", "approved": False, "changes": [{"change_id": "c1", "approved": False, "feedback": "conflicts"}]}
     assert client.calls[1][2]["options"]["filename"] == "agreement"
+
+
+def test_http_adapter_accepts_null_pending_changes_while_processing():
+    class ProcessingClient(HttpSuperDocsClient):
+        def __init__(self): pass
+        def _request(self, method, path, body=None, binary=False):
+            return {"status": "in_progress", "session_id": "session", "progress": 25, "metadata": {"pending_changes": None}, "result": None}
+    job = ProcessingClient().get_job("job")
+    assert job.status == "in_progress" and job.progress == 25 and job.proposals == []
+
+
+def test_workflow_returns_to_review_for_second_proposal_batch(request_factory):
+    class MultiBatchClient(FakeSuperDocsClient):
+        def __post_init__(self):
+            super().__post_init__(); self.approvals = 0
+        def approve(self, session_id, job_id, decisions):
+            self.approvals += 1
+            if self.approvals == 1:
+                second = self.jobs[job_id].proposals[0].model_copy(update={"change_id": "change_2", "new_html": "Contact the Creditor as soon as practical"})
+                job = self.jobs[job_id].model_copy(update={"status": "awaiting_approval", "proposals": [second]})
+                self.jobs[job_id] = job
+                return job
+            return super().approve(session_id, job_id, decisions)
+    workflow = AgreementWorkflow(MultiBatchClient()); run = workflow.start(request_factory())
+    workflow.review(run, [ReviewDecision(change_id="change_1", approved=True)], timeout_seconds=0.1)
+    assert run.state == Lifecycle.AWAITING_HUMAN and run.job.proposals[0].change_id == "change_2"
+    workflow.review(run, [ReviewDecision(change_id="change_2", approved=True)], timeout_seconds=0.1)
+    assert run.state == Lifecycle.FINAL_VERIFIED and [item.change_id for item in run.decisions] == ["change_1", "change_2"]
+
+
+def test_workflow_ignores_stale_same_batch_after_approval(request_factory):
+    class ApprovalRaceClient(FakeSuperDocsClient):
+        def __post_init__(self):
+            super().__post_init__(); self.polls = 0
+        def approve(self, session_id, job_id, decisions):
+            return self.jobs[job_id]
+        def get_job(self, job_id):
+            self.polls += 1
+            if self.polls == 1:
+                return self.jobs[job_id]
+            job = self.jobs[job_id].model_copy(update={"status": "completed", "document_html": next(iter(self.documents.values()))})
+            self.jobs[job_id] = job
+            return job
+    workflow = AgreementWorkflow(ApprovalRaceClient()); run = workflow.start(request_factory())
+    workflow.review(run, [ReviewDecision(change_id="change_1", approved=True)], timeout_seconds=1, poll_interval_seconds=0)
+    assert run.state == Lifecycle.FINAL_VERIFIED and workflow.client.polls == 2

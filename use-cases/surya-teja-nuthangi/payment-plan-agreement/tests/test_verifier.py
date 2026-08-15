@@ -38,3 +38,12 @@ def test_parse_failure_is_not_no_findings(request_factory):
     plan = PaymentPlanService().calculate(request_factory())
     report = AgreementVerifier().verify(plan, "<p>not an agreement</p>")
     assert report.status == "blocked" and "SCHEDULE_TABLE_NOT_FOUND" in _codes(report)
+
+
+def test_superdocs_normalized_chunk_markers_remain_verifiable(request_factory):
+    plan = PaymentPlanService().calculate(request_factory())
+    normalized = render_seed_html(plan)
+    for section in ("parties", "amounts", "payment-schedule", "payment-terms", "late-fee", "general", "signatures"):
+        normalized = normalized.replace(f' data-agreement-section="{section}"', "")
+    normalized = normalized.replace(' data-payment-schedule="v1"', "")
+    assert AgreementVerifier().verify(plan, normalized).status == "pass"

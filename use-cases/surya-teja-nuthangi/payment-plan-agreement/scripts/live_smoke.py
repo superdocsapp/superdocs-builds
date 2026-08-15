@@ -27,6 +27,8 @@ def main() -> int:
         ),
     )
     started = time.monotonic()
+    proposal_ids: set[str] = set()
+    repair_attempts = 0
     workflow = AgreementWorkflow(HttpSuperDocsClient())
     run = workflow.start(request)
     assert run.plan.terms.original_balance == Decimal("1000.00")
@@ -34,11 +36,17 @@ def main() -> int:
     assert run.plan.financed_balance == Decimal("900.00")
     assert len(run.plan.installments) == 4
     assert sum(item.amount for item in run.plan.installments) == Decimal("900.00")
+    assert [item.due_date for item in run.plan.installments] == [date(2026, 9, 15), date(2026, 10, 15), date(2026, 11, 15), date(2026, 12, 15)]
     if run.state == Lifecycle.PROCESSING:
         workflow.wait_for_review(run)
-    if run.state == Lifecycle.AWAITING_HUMAN:
+    for _ in range(5):
+        if run.state != Lifecycle.AWAITING_HUMAN or not run.job:
+            break
+        proposal_ids.update(item.change_id for item in run.job.proposals)
         decisions = [ReviewDecision(change_id=item.change_id, approved=not item.blocked, feedback="Conflicts with canonical payment plan" if item.blocked else None) for item in run.job.proposals]
         workflow.review(run, decisions)
+    if run.state == Lifecycle.AWAITING_HUMAN:
+        raise RuntimeError("SuperDocs produced more than five proposal batches; no further approval or export was attempted")
     if run.state != Lifecycle.FINAL_VERIFIED:
         raise RuntimeError(f"Final verification did not pass: {run.state.value}")
     exported = workflow.export(run)
@@ -46,12 +54,12 @@ def main() -> int:
     artifact_dir.mkdir(parents=True, exist_ok=True)
     (artifact_dir / "payment-plan-demo.docx").write_bytes(exported.content)
     report = {
-        "live": True, "test_data": "synthetic", "canonical_fingerprint": run.plan.semantic_fingerprint,
-        "job_completed": bool(run.job and run.job.status == "completed"),
-        "proposal_count": len(run.job.proposals) if run.job else 0,
+        "live": True, "synthetic_data": True, "canonical_fingerprint": run.plan.semantic_fingerprint,
+        "edit_completed": bool(run.job and run.job.status == "completed"),
+        "proposal_count": len(proposal_ids),
         "approved_count": sum(item.approved for item in run.decisions),
         "rejected_count": sum(not item.approved for item in run.decisions),
-        "final_verification": "pass", "export_format": "docx", "export_bytes": len(exported.content),
+        "repair_attempts": repair_attempts, "final_verification": "pass", "export_format": "docx", "export_bytes": len(exported.content),
         "elapsed_ms": round((time.monotonic() - started) * 1000),
     }
     Path("artifacts").mkdir(exist_ok=True)

@@ -55,6 +55,10 @@ Run the single synthetic live smoke path with:
 
 Successful live artifacts are written under `artifacts/live/` and git-ignored.
 
+### Live verification evidence
+
+The synthetic end-to-end path was verified on 2026-08-15: one async edit job, durable polling, 14 item-level proposals, 14 approvals, zero rejections, zero repairs, independent final verification with zero findings, and a valid 37,329-byte DOCX export. During verification, the adapter was hardened for nullable proposal arrays, multi-batch approval, stale post-approval status, and SuperDocs-normalized chunk markers.
+
 ## Tests
 
 ```powershell
@@ -76,5 +80,5 @@ The suite covers arithmetic, rounding, dates, projections, verifier failures, ma
 - This is not legal advice and includes no native e-signature.
 - Cadence is bounded to weekly, biweekly, and monthly in v1.
 - Local demo state is in memory; SuperDocs jobs remain durable by job ID.
-- Live editing and real export require a valid key and are not claimed as verified when it is unavailable.
+- Live editing and export require a valid server-side key; the bundled evidence uses only synthetic data and excludes credentials and document payloads.
 - Offline mode is development/evaluation infrastructure and is always labeled.

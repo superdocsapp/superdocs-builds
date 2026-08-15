@@ -7,7 +7,7 @@ from enum import Enum
 from .engine import PaymentPlanService
 from .models import CreatePlanRequest, PaymentPlan, ReviewDecision
 from .render import protected_instruction, render_seed_html
-from .superdocs import EditJob, ExportedDocument, SuperDocsClient, poll_job
+from .superdocs import EditJob, ExportedDocument, SuperDocsClient, poll_after_approval, poll_job
 from .verifier import AgreementVerifier, VerificationReport
 
 
@@ -57,7 +57,7 @@ class AgreementWorkflow:
             raise ValueError("SuperDocs completed without final document; seed and job id are preserved")
         return run
 
-    def review(self, run: AgreementRun, decisions: list[ReviewDecision]) -> AgreementRun:
+    def review(self, run: AgreementRun, decisions: list[ReviewDecision], *, timeout_seconds: float = 300, poll_interval_seconds: float = 2) -> AgreementRun:
         if run.state != Lifecycle.AWAITING_HUMAN or not run.job: raise ValueError("run is not awaiting human review")
         ids = {x.change_id for x in run.job.proposals}
         if {x.change_id for x in decisions} != ids: raise ValueError("every proposal requires one explicit item-level decision")
@@ -67,9 +67,15 @@ class AgreementWorkflow:
         run.state = Lifecycle.APPLYING_APPROVALS
         completed = self.client.approve(run.session_id, run.job.job_id, decisions)
         if completed.status != "completed":
-            completed = poll_job(self.client, run.job.job_id, terminal_statuses={"completed"}, timeout_seconds=180, interval_seconds=2)
+            completed = poll_after_approval(self.client, run.job.job_id, ids, timeout_seconds=timeout_seconds, interval_seconds=poll_interval_seconds)
+        all_decisions = [*run.decisions, *decisions]
+        if completed.status == "awaiting_approval":
+            run.job = completed.model_copy(update={"proposals": self.verifier.classify_proposals(run.plan, run.seed_html, completed.proposals)})
+            run.decisions = all_decisions
+            run.state = Lifecycle.AWAITING_HUMAN
+            return run
         if not completed.document_html: raise ValueError("approval completed without final document; work is preserved")
-        self._finalize(run, completed, decisions)
+        self._finalize(run, completed, all_decisions)
         return run
 
     def _finalize(self, run: AgreementRun, completed: EditJob, decisions: list[ReviewDecision]) -> None:

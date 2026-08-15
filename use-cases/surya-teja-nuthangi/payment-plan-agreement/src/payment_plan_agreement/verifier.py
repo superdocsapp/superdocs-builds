@@ -58,16 +58,29 @@ class ParsedDocument:
 
 
 class _AgreementParser(HTMLParser):
+    CHUNK_SECTIONS = {
+        "parties": "parties",
+        "amounts": "amounts",
+        "schedule": "payment-schedule",
+        "payment-terms": "payment-terms",
+        "late-fee": "late-fee",
+        "signatures": "signatures",
+        "general": "general",
+    }
+
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
         self.result = ParsedDocument()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         data = dict(attrs)
-        if tag == "section" and data.get("data-agreement-section"):
-            self.result.current_section = data["data-agreement-section"]
+        section = data.get("data-agreement-section")
+        if tag == "section" and not section:
+            section = self.CHUNK_SECTIONS.get(data.get("data-chunk-id") or "")
+        if tag == "section" and section:
+            self.result.current_section = section
             self.result.sections.setdefault(self.result.current_section, "")
-        if tag == "table" and data.get("data-payment-schedule") == "v1": self.result.in_schedule = True
+        if tag == "table" and (data.get("data-payment-schedule") == "v1" or self.result.current_section == "payment-schedule"): self.result.in_schedule = True
         if self.result.in_schedule and tag == "tr": self.result.in_row, self.result.row = True, []
         if self.result.in_row and tag in ("td", "th"): self.result.cell = []
 
@@ -112,7 +125,7 @@ class AgreementVerifier:
             parsed = ParsedDocument()
         required_sections = {"parties", "amounts", "payment-schedule", "payment-terms", "late-fee", "signatures"}
         missing = sorted(required_sections - parsed.sections.keys())
-        if missing: findings.append(self._finding("V020", "Required agreement sections are missing.", expected=", ".join(sorted(required_sections)), observed=", ".join(missing)))
+        if missing: findings.append(self._finding("V020", "Required agreement sections are missing.", expected=", ".join(sorted(required_sections)), observed=", ".join(sorted(parsed.sections))))
         if not parsed.rows:
             findings.append(self._finding("SCHEDULE_TABLE_NOT_FOUND", "Payment schedule table is absent or unreadable."))
         if len(parsed.rows) != len(plan.installments): findings.append(self._finding("V001", "Schedule row count does not match.", str(len(plan.installments)), str(len(parsed.rows)), "payment-schedule"))
