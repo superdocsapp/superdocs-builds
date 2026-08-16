@@ -1,0 +1,24 @@
+{
+  "name": "jupyter-notebook-to-paper",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SuperDocs Task 2.2: turn an executed Jupyter notebook into a structured paper section.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "verify": "npm run build && npm test",
+    "dev": "tsx src/cli.ts",
+    "mcp": "tsx src/cli.ts mcp"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
