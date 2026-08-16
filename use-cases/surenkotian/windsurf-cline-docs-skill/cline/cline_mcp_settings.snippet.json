@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "superdocs": {
+      "type": "streamableHttp",
+      "url": "https://api.superdocs.app/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:SUPERDOCS_API_KEY}"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

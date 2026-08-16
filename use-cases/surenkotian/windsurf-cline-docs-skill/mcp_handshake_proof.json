@@ -1,0 +1,29 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "protocolVersion": "2024-11-05",
+    "capabilities": {
+      "experimental": {},
+      "logging": {},
+      "prompts": {
+        "listChanged": true
+      },
+      "resources": {
+        "subscribe": false,
+        "listChanged": true
+      },
+      "tools": {
+        "listChanged": true
+      },
+      "extensions": {
+        "io.modelcontextprotocol/ui": {}
+      }
+    },
+    "serverInfo": {
+      "name": "SuperDocs",
+      "version": "3.4.0"
+    },
+    "instructions": "SuperDocs is a structured document editor available via 38 MCP tools. Capabilities: chunk-precise editing of styled .docx/PDF/HTML/MD/RTF documents (preserves tables, borders, shading, fonts, alternating row colors), multi-document sessions with persistent state, multi-format export, pre-signed URL upload/download (avoids context bloat for files >100KB), compact response mode (response_mode='compact') for large documents, multimodal vision on attachments, human-in-the-loop approval via chat_async + approve_change.\n\nFOR OPTIMAL RESULTS \u00e2\u20ac\u201d multi-step workflows like \"draft a complete document from scratch\", \"edit a 100-page doc efficiently\", \"HITL approval flow\", or \"convert format with style preservation\" \u00e2\u20ac\u201d load the SuperDocs skill which teaches recommended patterns:\n\n  - Skill markdown: https://docs.superdocs.app/skill.mdx\n  - Cross-tool install: npx skills add superdocsapp/superdocs-plugin\n  - Claude Code (bundles MCP + skill + 4 prompts): claude plugin marketplace add superdocsapp/superdocs-plugin && claude plugin install superdocs@superdocs-plugin\n\nWithout the skill, common mistakes: drafting full document HTML in your context before upload (wastes tokens, skips formatting layer), using base64 for files >100KB (use request_upload_url instead), bolding \"first paragraph\" without specifying exact text (chunk boundaries can span multiple paragraphs), asking chat to re-type exact content you already hold (pass it in chat's document_html or upload it instead \u00e2\u20ac\u201d a verbatim load can never come back paraphrased or placeholder-shaped).\n\nUse natural language to describe edits. Don't invent chunk IDs \u00e2\u20ac\u201d receive them in responses (pending_changes, chunk_diffs) and pass back where SuperDocs already issued them. session_id is sticky: use the same one across calls for one document."
+  }
+}

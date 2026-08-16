@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "superdocs": {
+      "serverUrl": "https://api.superdocs.app/mcp",
+      "headers": {
+        "Authorization": "Bearer ${env:SUPERDOCS_API_KEY}"
+      }
+    }
+  }
+}

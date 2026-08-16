@@ -1,0 +1,8 @@
+{
+  "generated_at": "2026-08-02T09:00:00Z",
+  "services": [
+    {"name": "API Gateway", "status": "operational", "latency_ms": 41},
+    {"name": "Auth Service", "status": "operational", "latency_ms": 58},
+    {"name": "Billing Worker", "status": "operational", "latency_ms": 121}
+  ]
+}
