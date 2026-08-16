@@ -1,0 +1,12 @@
+crew_id,crew_type,home_base,headcount,mobilized_at,released_at,mutual_aid,sources
+CR-A01,line,Hirapur,6,2026-04-24T17:10:00,2026-04-26T12:20:00,false,EL-0005
+CR-A02,line,Burnpur,6,2026-04-24T17:10:00,2026-04-26T12:20:00,false,EL-0005
+CR-A03,line,Kulti,5,2026-04-24T17:10:00,2026-04-25T23:00:00,false,EL-0005
+CR-A04,line,Raniganj,5,2026-04-24T17:10:00,2026-04-26T11:00:00,false,EL-0005
+CR-A05,line,Jamuria,5,2026-04-24T17:10:00,2026-04-25T18:00:00,false,EL-0005
+CR-A06,line,Salanpur,5,2026-04-24T17:10:00,2026-04-26T12:20:00,false,EL-0005
+CR-A07,tree,Asansol,4,2026-04-24T18:00:00,2026-04-26T10:00:00,false,EL-0002
+CR-A08,tree,Barakar,4,2026-04-25T20:30:00,2026-04-26T10:00:00,false,EL-0023
+CR-A09,damage_assessment,Asansol,3,2026-04-24T21:45:00,2026-04-26T04:00:00,false,EL-0011
+CR-A10,line,Durgapur Circle,10,,2026-04-26T09:00:00,true,EL-0010;EL-0014
+CR-A11,line,Purulia Circle,8,,,true,EL-0010

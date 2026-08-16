@@ -1,0 +1,9 @@
+crew_id,crew_type,home_base,headcount,mobilized_at,released_at,mutual_aid,sources
+CR-B01,line,Hirapur,6,2026-08-11T16:10:00,2026-08-13T02:40:00,false,EL-0007
+CR-B02,line,Burnpur,6,2026-08-11T16:10:00,2026-08-12T20:00:00,false,EL-0007
+CR-B03,line,Raniganj,5,2026-08-11T16:10:00,2026-08-13T02:40:00,false,EL-0007
+CR-B04,line,Jamuria,5,2026-08-11T16:10:00,2026-08-13T02:40:00,false,EL-0007
+CR-B05,line,Kulti,5,2026-08-11T16:10:00,2026-08-12T18:00:00,false,EL-0007
+CR-B06,tree,Asansol,4,2026-08-11T16:10:00,2026-08-13T02:40:00,false,EL-0007
+CR-B07,damage_assessment,Asansol,3,2026-08-11T18:00:00,2026-08-12T15:20:00,false,EL-0002
+CR-B08,line,Durgapur Circle,10,,2026-08-13T02:40:00,true,EL-0011;EL-0013

@@ -1,0 +1,4 @@
+lesson_id,title,owner,detail,sources
+LL-A1,"Mutual-aid gang arrival times are not captured","Distribution Operations, Asansol Division","Two mutual-aid gangs were requested from neighbouring circles and both worked the event, but neither crew record carries a mobilisation time, so mutual-aid gang-hours cannot be computed from the records.",EL-0010;EL-0014
+LL-A2,"Time to first consumer notification exceeded the two-hour target","Consumer Services Wing","The first outage was recorded at 16:52 and the first consumer notification was issued at 19:33, an interval of 2 hours 41 minutes against a two-hour internal target.",EL-0004;EL-0007
+LL-A3,"Outage management system link was lost with no fallback capture","SCADA and IT Wing","The link to the Asansol data centre was unavailable for 3 hours 30 minutes and no manual consumer counts were taken during the gap, leaving a hole in the restoration curve that cannot be reconstructed.",EL-0013;EL-0015

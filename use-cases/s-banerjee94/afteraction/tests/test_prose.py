@@ -1,0 +1,73 @@
+"""The report has to read like something a utility would file.
+
+These caught real defects in the first drafted report: "1 mutual-aid crews",
+"0 hours 38 minutes", "25 hours 0 minutes", and a log note whose proper noun was
+mangled to "northbank Power" by a lead-in that downcased its first letter. None of
+them are crashes, and all of them would be the first thing a reader noticed.
+"""
+
+from __future__ import annotations
+
+import re
+
+import pytest
+
+from afteraction.corpus import available_events, load_corpus
+from afteraction.facts import TIMELINE, _duration, build_facts
+
+ALL_EVENTS = available_events()
+
+
+@pytest.fixture(scope="module", params=ALL_EVENTS)
+def facts(request):
+    return build_facts(load_corpus(request.param))
+
+
+@pytest.mark.parametrize(
+    ("hours", "expected"),
+    [
+        (0.6333, "38 minutes"),
+        (25.0, "25 hours"),
+        (1.0, "1 hour"),
+        (2.6833, "2 hours 41 minutes"),
+        (3.5, "3 hours 30 minutes"),
+        (0.0166, "1 minute"),
+    ],
+)
+def test_durations_read_naturally(hours, expected):
+    assert _duration(hours) == expected
+
+
+def test_no_claim_says_zero_hours_or_zero_minutes(facts):
+    for claim in facts.claims:
+        # word-bounded: "20 hours" is fine and contains "0 hours" as a substring
+        assert not re.search(r"\b0 hours\b", claim.text), claim.text
+        assert not re.search(r"\b0 minutes\b", claim.text), claim.text
+
+
+def test_counts_agree_with_their_nouns(facts):
+    """No '1 crews', no '1 channels'."""
+    for claim in facts.claims:
+        bad = re.findall(r"\b1 (crews|channels|consumer counts|consumer communications)\b", claim.text)
+        assert not bad, f"{claim.claim_id}: {bad} in {claim.text!r}"
+
+
+def test_log_notes_are_quoted_without_being_re_cased(facts):
+    """The note is the record. A timeline entry quotes it as written."""
+    for claim in facts.for_section(TIMELINE):
+        quoted = claim.text.split(": ", 1)[1]
+        entry = facts.corpus.entry(claim.sources[0])
+        assert entry.note.startswith(quoted[:40])
+
+
+def test_proper_nouns_survive_into_the_timeline(facts):
+    """'Durgapur Circle' must never appear as 'durgapur Circle'."""
+    for claim in facts.for_section(TIMELINE):
+        assert "durgapur" not in claim.text
+        assert "burnpur" not in claim.text
+
+
+def test_large_numbers_are_grouped(facts):
+    """A commission reads 41,250, not 41250."""
+    for claim in facts.claims:
+        assert not re.search(r"\b\d{5,}\b", claim.text), claim.text

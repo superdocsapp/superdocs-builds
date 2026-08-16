@@ -1,0 +1,6 @@
+comm_id,sent_at,channel,audience,subject,sources
+CC-B01,2026-08-11T14:43:00,SMS,4260,"Supply interruption acknowledged, gangs deployed",EL-0005
+CC-B02,2026-08-11T14:43:00,IVR,1800,"Supply interruption acknowledged, gangs deployed",EL-0005
+CC-B03,2026-08-12T08:45:00,WhatsApp,10200,"Estimated restoration times published",EL-0015
+CC-B04,2026-08-12T08:45:00,web,10200,"Consumer portal updated with estimated restoration times",EL-0015
+CC-B05,2026-08-13T10:00:00,email,33400,"All clear: supply restored across the division",EL-0022
