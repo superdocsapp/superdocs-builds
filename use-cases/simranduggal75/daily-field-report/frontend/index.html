@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <title>Daily Field Report</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Daily Field Report</h1>
+    <p class="subtitle">Rough notes + photos in, a reviewed daily report out.</p>
+  </header>
+
+  <main id="app">
+
+    <!-- STEP 1: Intake form -->
+    <section id="intake-section" class="card">
+      <h2>1. Field notes &amp; photos</h2>
+      <form id="intake-form">
+        <label for="project">Project (optional)</label>
+        <input
+          type="text"
+          id="project"
+          name="project"
+          placeholder="e.g. Riverside Tower"
+          autocomplete="off"
+        />
+
+        <label for="notes">Field notes</label>
+        <textarea
+          id="notes"
+          name="notes"
+          rows="6"
+          placeholder="Dictate or type what happened on site today: crew, work performed, delays, weather, safety..."
+        ></textarea>
+
+        <label for="photos">Site photos</label>
+        <input
+          type="file"
+          id="photos"
+          name="photos"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          capture="environment"
+        />
+        <div id="photo-preview" class="photo-preview"></div>
+
+        <p class="hint">Provide notes, photos, or both.</p>
+
+        <button type="submit" id="submit-btn">Generate report</button>
+      </form>
+    </section>
+
+    <!-- Loading / status banner -->
+    <section id="status-section" class="card status-card hidden">
+      <div class="spinner"></div>
+      <p id="status-message">Processing...</p>
+      <p id="status-elapsed" class="hint"></p>
+      <p class="hint">
+        SuperDocs edits can take from a few seconds up to several minutes.
+        This is normal - it has not crashed.
+      </p>
+    </section>
+
+    <!-- Error banner -->
+    <section id="error-section" class="card error-card hidden">
+      <strong>Something went wrong</strong>
+      <p id="error-message"></p>
+      <button id="error-dismiss" type="button">Dismiss</button>
+    </section>
+
+    <!-- STEP 2: Structured report -->
+    <section id="report-section" class="card hidden">
+      <h2>2. Structured report</h2>
+      <div id="report-meta"></div>
+      <div id="report-body"></div>
+    </section>
+
+    <!-- STEP 3: Photo captions -->
+    <section id="captions-section" class="card hidden">
+      <h2>3. Photo captions</h2>
+      <div id="captions-body" class="captions-grid"></div>
+    </section>
+
+    <!-- STEP 4: SuperDocs proposed changes -->
+    <section id="changes-section" class="card hidden">
+      <h2>4. SuperDocs proposed changes</h2>
+      <p class="hint" id="changes-empty-hint"></p>
+      <div id="changes-body"></div>
+      <button id="approve-btn" type="button" class="hidden">Approve all changes</button>
+    </section>
+
+    <!-- STEP 5: Export -->
+    <section id="export-section" class="card hidden">
+      <h2>5. Export</h2>
+      <p id="export-status"></p>
+      <a id="download-link" class="button-link hidden" href="#" target="_blank" rel="noopener">
+        Download PDF
+      </a>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
