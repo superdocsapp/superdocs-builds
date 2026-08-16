@@ -29,12 +29,14 @@ that the tool can echo itself — and reports claims checked, traced and flagged
 storm-a   ok  26/26 claims traced (100%), 0 flagged     offline
 storm-b   ok  20/20 claims traced (100%), 0 flagged     offline
 storm-a   ok  28/28 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
+storm-b   ok  23/23 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
 ```
 
-The live run is the same code path with `--live`: seven edit turns, 268 seconds, every citation
-preserved by the model, a real Google-hosted curve image, and a real Word `.docx` whose
-`word/media/image1.png` is byte-identical to the curve this tool rendered. `docs/live-storm-a-report.docx`
-is that file.
+The live runs are the same code path with `--live`: seven edit turns each, 188 and 206 seconds,
+every citation preserved by the model, a real Google-hosted curve image, and real Word `.docx` files
+whose `word/media/image1.png` is byte-identical to the curve this tool rendered.
+`docs/live-storm-a-report.docx` and `docs/live-storm-b-report.docx` are those files — and the second
+one is the carry-forward working over the wire, not just offline.
 
 A verifier that only ever says "clean" is worse than none, so the offline mock can be told to draft
 badly, and the suite proves each failure is caught:
@@ -99,6 +101,34 @@ spacing between readings. A quiet stretch overnight is a reporting cadence, not 
 guessing from spacing cannot tell the two apart — the utility already recorded which it was, so the
 tool reads that rather than second-guessing it.
 
+## The report is a designed document, and the design is a file
+
+A report a utility files with its commission has to look like one, so the skeleton uploaded at the
+start of a run is not bare markup. `src/afteraction/templates/report.html` holds the whole design —
+a masthead, a metadata block, the legend that tells a reader how to read the two kinds of statement,
+and a five-column carry-forward table with a coloured header and zebra striping. Open it in a browser
+and you see the report with its slots showing. Nothing else in the project contains a style
+attribute; `template.py` fills slots and adds no styling of its own.
+
+**Styling is inline because that is the kind SuperDocs keeps.** Measured before the template was
+written, by uploading the same document three ways and reading back what the service returned:
+
+| Sent as | Survives upload | Reaches the `.docx` |
+|---|---|---|
+| `<style>` block in `<head>` | no, dropped | no |
+| `style="…"` on the element | yes | yes |
+
+Inline declarations arrive as native Word formatting — `background-color` becomes `w:shd` cell
+shading, `border-bottom` becomes `w:tcBorders`, `padding` becomes `w:tcMar`, `font-family` becomes
+`w:rFonts`. A stylesheet would have looked right locally and arrived unstyled, which is a failure
+that shows up only in the exported file. The live Storm B export carries 23 teal headings, five
+amber *Assessed* headings, a teal table header and its striping through the AI edit and out the
+other side.
+
+That colour split is not decoration. **Observed** headings are teal, **Assessed** amber, and *What
+the records do not show* grey, so the distinction the whole build exists to protect is visible to a
+reader who is skimming rather than reading.
+
 ---
 
 ## Run it
@@ -110,7 +140,7 @@ command — the virtualenv and the exact pinned dependencies in `uv.lock` are cr
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, showing the carry-forward
-uv run pytest                        # 87 tests, no key, no network
+uv run pytest                        # 103 tests, no key, no network
 ```
 
 Without uv, the same thing in a virtualenv of your own:
@@ -221,7 +251,10 @@ src/afteraction/
   corpus.py     load three record sets, cross-check every reference
   facts.py      compute claims and gaps from the records
   curve.py      the restoration curve, broken across declared gaps
-  sections.py   the skeleton, and one bounded instruction per section
+  sections.py   what each section may say, and one bounded instruction per section
+  template.py   fills the design's slots; holds no styling itself
+  templates/
+    report.html the report's design — every style attribute in the project lives here
   trace.py      the traceability pass
   lessons.py    the carry-forward store
   client.py     the four SuperDocs calls

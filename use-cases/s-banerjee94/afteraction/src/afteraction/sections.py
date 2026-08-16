@@ -13,6 +13,7 @@ traceability pass a meaningful signal rather than a formality.
 
 from __future__ import annotations
 
+from . import template as T
 from .facts import SECTION_TITLES, FactSet
 from .models import Kind, Lesson, LessonStatus
 
@@ -46,40 +47,44 @@ def skeleton_html(facts: FactSet, inherited: list[Lesson]) -> str:
     Deliberately a skeleton of headings and short placeholders: uploading a document
     is not billable, and a targeted edit into an existing section is a smaller, more
     reviewable change than asking for a document to be written from nothing.
+
+    Which headings appear is decided here, from the records: a section gets an Assessed
+    heading only when it has a judgement to make, and a gaps heading only when the
+    records genuinely fall short. How those headings look is decided in
+    `templates/report.html`, and nowhere else.
     """
     event = facts.corpus.event
-    parts: list[str] = [
-        f"<h1>Storm Restoration After-Action Report</h1>",
-        f"<p><strong>{event.name}</strong> — {event.utility}</p>",
-        f"<p>Event period: {event.started_at:%d %B %Y %H:%M} to {event.ended_at:%d %B %Y %H:%M}. "
-        f"Consumers served: {event.consumers_served:,}.</p>",
-        "<p>This report separates <em>observed</em> statements, each traceable to a numbered "
-        "event-log entry, from <em>assessed</em> statements, which are the response team's "
-        "judgement. Citations in square brackets refer to entries in the event log.</p>",
-    ]
+    body: list[str] = []
 
     for n, (key, title) in enumerate(SECTION_TITLES.items(), start=1):
-        parts.append(f"<h2>{n}. {title}</h2>")
-        parts.append("<h3>Observed</h3>")
-        parts.append("<p>Placeholder for observed statements.</p>")
+        inner = [T.fill("observed")]
         if any(c.kind is Kind.ASSESSED for c in facts.for_section(key)):
-            parts.append("<h3>Assessed</h3>")
-            parts.append("<p>Placeholder for assessed statements.</p>")
+            inner.append(T.fill("assessed"))
         if facts.gaps_for(key):
-            parts.append("<h3>What the records do not show</h3>")
-            parts.append("<p>Placeholder for gaps.</p>")
+            inner.append(T.fill("gaps"))
+        body.append(_section(n, title, inner))
 
-    parts.append(f"<h2>{len(SECTION_TITLES) + 1}. Restoration Curve</h2>")
-    parts.append("<p>Placeholder for the restoration curve.</p>")
+    body.append(_section(len(SECTION_TITLES) + 1, "Restoration Curve", [T.fill("curve")]))
 
-    parts.append(f"<h2>{len(SECTION_TITLES) + 2}. Lessons Learned</h2>")
+    lessons = []
     if inherited:
-        parts.append("<h3>Carried forward from previous events</h3>")
-        parts.append(_lessons_table(inherited))
-    parts.append("<h3>Raised by this event</h3>")
-    parts.append("<p>Placeholder for items raised by this event.</p>")
+        lessons.append(T.fill("carried_heading"))
+        lessons.append(_lessons_table(inherited))
+    lessons.append(T.fill("raised_heading"))
+    body.append(_section(len(SECTION_TITLES) + 2, "Lessons Learned", lessons))
 
-    return "\n".join(parts)
+    return T.fill(
+        "document",
+        utility=event.utility,
+        event_name=event.name,
+        period=f"{event.started_at:%d %B %Y %H:%M} to {event.ended_at:%d %B %Y %H:%M}",
+        consumers=f"{event.consumers_served:,}",
+        body_html="\n".join(body),
+    )
+
+
+def _section(number: int, title: str, parts: list[str]) -> str:
+    return T.fill("section", number=str(number), title=title, body_html="\n".join(parts))
 
 
 def _qualified(sources: list[str], event_id: str | None) -> list[str]:
@@ -101,11 +106,8 @@ def _lessons_table(lessons: list[Lesson]) -> str:
     Status is a matter of record, not of phrasing, so it is rendered directly and the
     model is never asked to restate it.
     """
-    rows = [
-        "<table><thead><tr><th>Item</th><th>Raised in</th><th>Owner</th>"
-        "<th>Status</th><th>Note</th></tr></thead><tbody>"
-    ]
-    for x in lessons:
+    rows: list[str] = []
+    for i, x in enumerate(lessons):
         if x.status is LessonStatus.CLOSED:
             status = f"Closed in {x.closed_in_event}" if x.closed_in_event else "Closed"
             note = x.closed_note
@@ -119,11 +121,16 @@ def _lessons_table(lessons: list[Lesson]) -> str:
             )
         suffix = f" [{', '.join(cites)}]" if cites else ""
         rows.append(
-            f"<tr><td>{x.lesson_id}: {x.title}</td><td>{x.opened_in_event}</td>"
-            f"<td>{x.owner}</td><td>{status}</td><td>{(note or '—')}{suffix}</td></tr>"
+            T.fill(
+                "carry_row_shaded" if i % 2 else "carry_row",
+                item=f"{x.lesson_id}: {x.title}",
+                raised_in=x.opened_in_event,
+                owner=x.owner,
+                status=status,
+                note=f"{note or '—'}{suffix}",
+            )
         )
-    rows.append("</tbody></table>")
-    return "".join(rows)
+    return T.fill("carry_table", rows_html="\n".join(rows))
 
 
 def instruction_for(facts: FactSet, section: str) -> str | None:

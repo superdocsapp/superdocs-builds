@@ -1,10 +1,21 @@
+Barakar Valley Power Distribution Limited
+
+
 # Storm Restoration After-Action Report
 
-August Monsoon Depression — Barakar Valley Power Distribution Limited
+August Monsoon Depression
 
-Event period: 11 August 2026 09:15 to 13 August 2026 10:00. Consumers served: 342,000.
 
-This report separates observed statements, each traceable to a numbered event-log entry, from assessed statements, which are the response team's judgement. Citations in square brackets refer to entries in the event log.
+Event period | 11 August 2026 09:15 to 13 August 2026 10:00
+
+Consumers served | 342,000
+
+
+
+
+This report keeps two kinds of statement apart.Observed statements are traceable to a numbered event-log entry and carry that entry in square brackets.Assessed statements are the response team's judgement and carry no log entry because none supports them.Where the records cannot answer a question, the report says so rather than estimating.
+
+
 
 ## 1. Event Overview
 
@@ -68,7 +79,9 @@ Consumers without supply over the course of August Monsoon Depression, peaking a
 Item | Raised in | Owner | Status | Note
 
 LL-A1: Mutual-aid gang arrival times are not captured | storm-a | Distribution Operations, Asansol Division | Open | Mutual-aid gangs were requested and arrived again with no per-gang mobilisation time recorded. [storm-b/EL-0011, storm-b/EL-0013]
+
 LL-A2: Time to first consumer notification exceeded the two-hour target | storm-a | Consumer Services Wing | Closed in storm-b | First consumer notification was issued 38 minutes after the first recorded outage, inside the two-hour target. [storm-b/EL-0004, storm-b/EL-0005]
+
 LL-A3: Outage management system link was lost with no fallback capture | storm-a | SCADA and IT Wing | Open | The link held for this event, so the gap did not recur, but the manual fallback capture procedure remains undeveloped. [storm-b/EL-0020]
 
 ### Raised by this event

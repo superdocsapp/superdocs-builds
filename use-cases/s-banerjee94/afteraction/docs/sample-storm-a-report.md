@@ -1,10 +1,21 @@
+Barakar Valley Power Distribution Limited
+
+
 # Storm Restoration After-Action Report
 
-Kalbaisakhi Squall — Barakar Valley Power Distribution Limited
+Kalbaisakhi Squall
 
-Event period: 24 April 2026 13:30 to 26 April 2026 16:00. Consumers served: 342,000.
 
-This report separates observed statements, each traceable to a numbered event-log entry, from assessed statements, which are the response team's judgement. Citations in square brackets refer to entries in the event log.
+Event period | 24 April 2026 13:30 to 26 April 2026 16:00
+
+Consumers served | 342,000
+
+
+
+
+This report keeps two kinds of statement apart.Observed statements are traceable to a numbered event-log entry and carry that entry in square brackets.Assessed statements are the response team's judgement and carry no log entry because none supports them.Where the records cannot answer a question, the report says so rather than estimating.
+
+
 
 ## 1. Event Overview
 

@@ -117,8 +117,7 @@ class MockSuperDocs:
 
         html = self.documents.get(session_id, "")
         for change in approved:
-            if change.old_html and change.old_html in html:
-                html = html.replace(change.old_html, change.new_html or "", 1)
+            html = _apply(html, change)
         self.documents[session_id] = html
 
         return {
@@ -157,7 +156,7 @@ class MockSuperDocs:
                     change_id="mock-curve",
                     operation="edit",
                     chunk_id="curve",
-                    old_html="<p>Placeholder for the restoration curve.</p>",
+                    old_html="Placeholder for the restoration curve.",
                     new_html=body,
                     explanation="Inserted the restoration curve and its caption.",
                 )
@@ -165,10 +164,10 @@ class MockSuperDocs:
 
         buckets = _buckets(message)
         placeholders = {
-            "observed": "<p>Placeholder for observed statements.</p>",
-            "assessed": "<p>Placeholder for assessed statements.</p>",
-            "gaps": "<p>Placeholder for gaps.</p>",
-            "raised": "<p>Placeholder for items raised by this event.</p>",
+            "observed": "Placeholder for observed statements.",
+            "assessed": "Placeholder for assessed statements.",
+            "gaps": "Placeholder for gaps.",
+            "raised": "Placeholder for items raised by this event.",
         }
 
         changes: list[ProposedChange] = []
@@ -203,6 +202,28 @@ class MockSuperDocs:
         return text[0].upper() + text[1:]
 
 
+def _apply(html: str, change: ProposedChange) -> str:
+    """Replace the placeholder paragraph the change targets, keeping how it is styled.
+
+    The live service edits chunks, so a paragraph's own formatting survives the edit and
+    the drafted prose inherits it. Matching a literal `<p>...</p>` string here would not:
+    it would miss any styled paragraph and silently leave the placeholder in place. So
+    the placeholder is found by its text, and the opening tag it was wearing is reused.
+    """
+    target = (change.old_html or "").strip()
+    if not target:
+        return html
+    para = re.compile(r"<p\b([^>]*)>\s*" + re.escape(target) + r"\s*</p>")
+
+    def swap(match: re.Match[str]) -> str:
+        new = change.new_html or ""
+        inner = re.fullmatch(r"<p\b[^>]*>(.*)</p>", new, re.S)
+        # prose keeps the paragraph; a block replacement, such as the curve, takes over
+        return f"<p{match.group(1)}>{inner.group(1)}</p>" if inner else new
+
+    return para.sub(swap, html, count=1)
+
+
 def _buckets(message: str) -> dict[str, list[str]]:
     """Split an instruction's bullets by the heading they were listed under."""
     buckets: dict[str, list[str]] = {"observed": [], "assessed": [], "gaps": [], "raised": []}
@@ -226,19 +247,22 @@ def _buckets(message: str) -> dict[str, list[str]]:
 
 
 def _standalone(body: str) -> str:
-    """Wrap the document body so it reads like a filed report in a browser."""
+    """Wrap the document body in page chrome so it reads like a filed report in a browser.
+
+    Chrome only. The document carries its own styling inline, from `templates/report.html`,
+    and the live HTML export ships that styling with it — so a stylesheet here would be a
+    second opinion about the design, overriding whatever the document did not happen to
+    set. It sets the page, and nothing that belongs to the report.
+    """
     return (
         "<!doctype html><meta charset='utf-8'>"
         "<title>Storm Restoration After-Action Report</title><style>"
-        "body{font:16px/1.6 Georgia,serif;max-width:52rem;margin:3rem auto;padding:0 1.5rem;color:#14181e}"
-        "h1{font-size:1.9rem;margin-bottom:.2rem}h2{font-size:1.3rem;margin-top:2.2rem;"
-        "border-bottom:1px solid #d5dce4;padding-bottom:.3rem}"
-        "h3{font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:#5b6672;margin-top:1.5rem}"
-        "img{max-width:100%;height:auto;border:1px solid #d5dce4;border-radius:3px}"
-        "table{border-collapse:collapse;width:100%;font-size:.9rem;margin-top:.5rem}"
-        "th,td{border:1px solid #d5dce4;padding:.5rem .7rem;text-align:left;vertical-align:top}"
-        "th{background:#eef1f5;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em}"
-        "em{color:#5b6672}</style>\n" + body
+        "body{margin:0;background:#eef1f4}"
+        "img{max-width:100%;height:auto}"
+        "@media print{body{background:#fff}}</style>\n"
+        "<div style='max-width:52rem;margin:0 auto;padding:2.5rem 3rem;background:#fff'>\n"
+        + body
+        + "\n</div>"
     )
 
 
@@ -249,6 +273,13 @@ def html_to_markdown(html: str) -> str:
     same document text on both paths.
     """
     text = html
+    # a table row is one line in the real export, however the template lays its cells out
+    text = re.sub(
+        r"<tr\b[^>]*>.*?</tr>",
+        lambda m: re.sub(r"\s*\n\s*", "", m.group(0)),
+        text,
+        flags=re.S,
+    )
     text = re.sub(r"<h1[^>]*>(.*?)</h1>", r"\n# \1\n", text, flags=re.S)
     text = re.sub(r"<h2[^>]*>(.*?)</h2>", r"\n## \1\n", text, flags=re.S)
     text = re.sub(r"<h3[^>]*>(.*?)</h3>", r"\n### \1\n", text, flags=re.S)

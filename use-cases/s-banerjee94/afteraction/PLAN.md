@@ -78,6 +78,8 @@ event log + crew records + customer comms      (synthetic, committed)
                     │
                     ├──► restoration curve ──► PNG ──► uploaded as an image
                     │
+                    ├──► templates/report.html ──► the styled skeleton that is uploaded
+                    │
                     ▼
         one instruction per section, carrying only that section's log lines
                     │
@@ -167,6 +169,19 @@ run commands, and the SuperDocs features used. Pull request into `superdocsapp/s
   outage data, no third party's records.
 - **Numbers are never written by a model.** Restoration percentages, customer counts and durations
   are computed from the records and passed in. The model writes prose around figures it is given.
+- **The report's design is a file, not a string in Python.** `src/afteraction/templates/report.html`
+  holds every style attribute in the project; `template.py` fills its slots and adds none. Changing
+  how the report looks is an edit to a file a designer can open in a browser. What *appears* — which
+  sections get an Assessed heading, which get a gaps heading — stays in `sections.py`, because that
+  is decided from the records, not from taste.
+- **Styling is inline, because that is the kind that survives.** Measured before the template was
+  written: the same document was uploaded three ways and the parsed result read back. A `<style>`
+  block in the head is dropped on upload; `style="…"` attributes are kept, and arrive in the `.docx`
+  as native Word formatting (`w:shd`, `w:tcBorders`, `w:tcMar`, `w:rFonts`). A stylesheet would look
+  correct locally and arrive unstyled — a failure visible only in the exported file, which is the
+  worst place to find one.
+- **Observed, Assessed and gaps are colour-coded.** Teal, amber and grey. The distinction the build
+  exists to protect should survive a reader who skims.
 
 ## Risks
 
