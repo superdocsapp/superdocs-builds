@@ -1,0 +1,13 @@
+[project]
+name = "rights-talent-generator"
+version = "0.2.0"
+description = "SuperDocs rights and talent agreement generator use case."
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.7"]
+
+[project.optional-dependencies]
+superdocs = ["superdocs-python>=0.1.0"]
+dev = ["pytest>=8.2", "ruff>=0.5", "mypy>=1.10"]
+
+[project.scripts]
+rights-talent-generator = "rights_talent_generator.cli:main"
