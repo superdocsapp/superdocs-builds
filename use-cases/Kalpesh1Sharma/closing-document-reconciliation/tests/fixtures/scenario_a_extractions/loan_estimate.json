@@ -1,0 +1,118 @@
+{
+  "session_id": "mortgage-scenario-a-d8b0cb79",
+  "document_id": "doc_primary",
+  "filename": "loan_estimate.docx",
+  "raw_extraction": {
+    "document_type": "loan_estimate",
+    "borrower_names": {
+      "raw_value": "John A. Carter and Emily Carter",
+      "supporting_quote": "Applicants John A. Carter and Emily Carter"
+    },
+    "property_address": {
+      "raw_value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "supporting_quote": "Property Location 812 Cedar Grove Drive, Austin, TX 78704"
+    },
+    "loan_amount": {
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Amount of Loan $420,000.00"
+    },
+    "interest_rate": {
+      "raw_value": "6.500%",
+      "supporting_quote": "Interest Rate 6.500%"
+    },
+    "term": {
+      "raw_value": "30 years",
+      "supporting_quote": "Loan Term 30 years"
+    },
+    "escrow": {
+      "raw_value": "Yes",
+      "supporting_quote": "Escrow Account Yes"
+    },
+    "fees": {
+      "origination": {
+        "raw_value": "$4,200.00",
+        "supporting_quote": "Origination Charges $4,200.00"
+      },
+      "title_services": {
+        "raw_value": "$2,850.00",
+        "supporting_quote": "Title & Settlement Services $2,850.00"
+      }
+    },
+    "cash_to_close": {
+      "raw_value": "$91,700.00",
+      "supporting_quote": "Estimated Cash to Close $91,700.00"
+    },
+    "rules": []
+  },
+  "canonical": {
+    "document_type": "loan_estimate",
+    "filename": "loan_estimate.docx",
+    "borrower_names": {
+      "value": "John A. Carter and Emily Carter",
+      "raw_value": "John A. Carter and Emily Carter",
+      "supporting_quote": "Applicants John A. Carter and Emily Carter",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "property_address": {
+      "value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "raw_value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "supporting_quote": "Property Location 812 Cedar Grove Drive, Austin, TX 78704",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "loan_amount": {
+      "value": 420000.0,
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Amount of Loan $420,000.00",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "interest_rate": {
+      "value": 6.5,
+      "raw_value": "6.500%",
+      "supporting_quote": "Interest Rate 6.500%",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "term_months": {
+      "value": 360,
+      "raw_value": "30 years",
+      "supporting_quote": "Loan Term 30 years",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "escrow": {
+      "value": true,
+      "raw_value": "Yes",
+      "supporting_quote": "Escrow Account Yes",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "fees": {
+      "origination": {
+        "value": 4200.0,
+        "raw_value": "$4,200.00",
+        "supporting_quote": "Origination Charges $4,200.00",
+        "source_document": "loan_estimate.docx",
+        "confidence": null
+      },
+      "title_services": {
+        "value": 2850.0,
+        "raw_value": "$2,850.00",
+        "supporting_quote": "Title & Settlement Services $2,850.00",
+        "source_document": "loan_estimate.docx",
+        "confidence": null
+      }
+    },
+    "cash_to_close": {
+      "value": 91700.0,
+      "raw_value": "$91,700.00",
+      "supporting_quote": "Estimated Cash to Close $91,700.00",
+      "source_document": "loan_estimate.docx",
+      "confidence": null
+    },
+    "rules": [],
+    "extraction_notes": []
+  }
+}

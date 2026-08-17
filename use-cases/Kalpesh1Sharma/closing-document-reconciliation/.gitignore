@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+outputs/*
+
+PATCH_NOTES.txt
+extract_loan_estimate.py
+extract_scenario_a.py
+recover_closing_disclosure.py
+smoke_test.py
+upload_scenario_a.py

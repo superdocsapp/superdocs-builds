@@ -1,0 +1,6 @@
+requests
+python-dotenv
+pydantic
+streamlit
+pytest
+python-docx
