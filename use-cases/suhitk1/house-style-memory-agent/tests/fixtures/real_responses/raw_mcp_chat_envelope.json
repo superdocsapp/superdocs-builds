@@ -1,0 +1,49 @@
+{
+  "note": "Captured verbatim from api.superdocs.app on 2026-08-13. The MCP result's content[0].text is a JSON-ENCODED STRING; parsing it once yields the object. This is the second parse (the JSON-RPC envelope was the first). Nothing below is hand-written.",
+  "mcp_result": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"response\":\"Understood. I'm here if you need help with your document.\",\"session_id\":\"session_init_21e43fa22a84\",\"document_changes\":{\"updated_html\":\"<h1 data-chunk-id=\\\"26de9df6-7a46-4ae4-93fd-3d56395255fb\\\">H</h1>\\n<p data-chunk-id=\\\"ed1ff8aa-12e0-4eee-bf42-0771d0d4a20b\\\">The team reviewed scope, budget and timeline.</p>\",\"version_id\":\"09be09a7-164b-4ca0-98e5-e6b558727444\",\"changes_summary\":\"Document updated by AI\",\"requires_approval\":null,\"pending_changes\":null,\"changes\":null,\"chunk_diffs\":null,\"concurrent_merges\":null,\"focused_document_id\":\"doc_primary\"},\"usage\":{\"monthly_used\":5,\"monthly_limit\":500,\"monthly_remaining\":495,\"was_billable\":false,\"ops_charged\":0,\"quota_exhausted\":false,\"subscription_tier\":\"free\",\"bucket_used\":null,\"redemption_id\":null,\"promotions\":[{\"redemption_id\":\"66c01c8f-8a62-4d87-b0e3-dbc66eb317f3\",\"name\":\"Round 2 Builders - August 2026\",\"ops_remaining\":9989,\"ops_granted\":10000,\"expires_at\":\"2026-09-05T18:20:13.970942\"}],\"agent_handoff_hint\":null},\"hint\":null}"
+      }
+    ],
+    "structuredContent": {
+      "response": "Understood. I'm here if you need help with your document.",
+      "session_id": "session_init_21e43fa22a84",
+      "document_changes": {
+        "updated_html": "<h1 data-chunk-id=\"26de9df6-7a46-4ae4-93fd-3d56395255fb\">H</h1>\n<p data-chunk-id=\"ed1ff8aa-12e0-4eee-bf42-0771d0d4a20b\">The team reviewed scope, budget and timeline.</p>",
+        "version_id": "09be09a7-164b-4ca0-98e5-e6b558727444",
+        "changes_summary": "Document updated by AI",
+        "requires_approval": null,
+        "pending_changes": null,
+        "changes": null,
+        "chunk_diffs": null,
+        "concurrent_merges": null,
+        "focused_document_id": "doc_primary"
+      },
+      "usage": {
+        "monthly_used": 5,
+        "monthly_limit": 500,
+        "monthly_remaining": 495,
+        "was_billable": false,
+        "ops_charged": 0,
+        "quota_exhausted": false,
+        "subscription_tier": "free",
+        "bucket_used": null,
+        "redemption_id": null,
+        "promotions": [
+          {
+            "redemption_id": "66c01c8f-8a62-4d87-b0e3-dbc66eb317f3",
+            "name": "Round 2 Builders - August 2026",
+            "ops_remaining": 9989,
+            "ops_granted": 10000,
+            "expires_at": "2026-09-05T18:20:13.970942"
+          }
+        ],
+        "agent_handoff_hint": null
+      },
+      "hint": null
+    },
+    "isError": false
+  }
+}

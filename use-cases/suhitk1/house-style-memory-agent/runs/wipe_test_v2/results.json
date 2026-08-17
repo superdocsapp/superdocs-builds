@@ -1,0 +1,291 @@
+{
+  "wiped_key": "measurement_meridian_memory_on",
+  "removed": 1,
+  "document": "doc_18.md",
+  "post_wipe_score_before": 12,
+  "run": {
+    "document": "doc_18.md",
+    "arm": "memory_on",
+    "session_id": "session_init_7fe9adbed071",
+    "edit_billed": true,
+    "edit_ops_charged": 1,
+    "score_before": {
+      "rubric_id": "meridian",
+      "rubric_version": "1.0.3",
+      "content_hash": "3a422f53417a16d9",
+      "rules": {
+        "H1": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "Transitioning to bi-weekly reporting will reduce overhead, allowing us to redirect resources toward core analysis and strategic advisory work, as weekly updates often yield minimal progress."
+          ]
+        },
+        "H2": {
+          "count_raw": 3,
+          "count_capped": 3,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "Optimizing Client Reporting Cadences",
+            "Recommendation for Adjusted Reporting Cadence",
+            "Strategic Implementation Roadmap"
+          ]
+        },
+        "H3": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "llm",
+          "status": "ok",
+          "spans": []
+        },
+        "H4": {
+          "count_raw": 2,
+          "count_capped": 2,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "twelve",
+            "3 successful"
+          ]
+        },
+        "H5": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "12%"
+          ]
+        },
+        "H6": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "August 13, 2026"
+          ]
+        },
+        "H7": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "(see Harlow 2024)"
+          ]
+        },
+        "H8": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H9": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H10": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "seamless"
+          ]
+        },
+        "H11": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H12": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H13": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "NRR"
+          ]
+        },
+        "H14": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "I"
+          ]
+        }
+      },
+      "totals": {
+        "deterministic_capped": 12,
+        "deterministic_raw": 12,
+        "llm_capped": 0,
+        "llm_raw": 0,
+        "total_capped": 12,
+        "total_raw": 12
+      }
+    },
+    "corrections_sent": 8,
+    "rules_violated": 9,
+    "correction_billed": true,
+    "correction_ops_charged": 1,
+    "score_after": {
+      "rubric_id": "meridian",
+      "rubric_version": "1.0.3",
+      "content_hash": "fa115bfbaf3ad747",
+      "rules": {
+        "H1": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "Transitioning to bi-weekly reporting will reduce overhead, allowing us to redirect resources toward core analysis and strategic advisory work, as weekly updates often yield minimal progress."
+          ]
+        },
+        "H2": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H3": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "llm",
+          "status": "ok",
+          "spans": [
+            "the team distributed a summary of findings to all requested stakeholders prior to the close of the review window"
+          ]
+        },
+        "H4": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H5": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H6": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H7": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "(see Harlow, 2024)"
+          ]
+        },
+        "H8": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H9": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H10": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H11": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H12": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H13": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H14": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "I"
+          ]
+        }
+      },
+      "totals": {
+        "deterministic_capped": 3,
+        "deterministic_raw": 3,
+        "llm_capped": 1,
+        "llm_raw": 1,
+        "total_capped": 4,
+        "total_raw": 4
+      }
+    },
+    "total_ops": 2
+  },
+  "ledger": {
+    "calls": {
+      "clear_cross_session_memory": 1,
+      "init_session": 1,
+      "upload_document_base64": 1,
+      "chat": 2,
+      "export_document": 2
+    },
+    "billed": {
+      "chat": 2
+    },
+    "total_operations": 2,
+    "errors": 0,
+    "unbilled_chats": 0,
+    "free_retries": 0,
+    "costs_confirmed_by_probe": true,
+    "cost_model_measured_on": "2026-08-13"
+  }
+}

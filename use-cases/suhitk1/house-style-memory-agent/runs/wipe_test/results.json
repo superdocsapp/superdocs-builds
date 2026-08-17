@@ -1,0 +1,403 @@
+{
+  "a_teach": {
+    "label": "A_teach",
+    "session_id": "session_init_2ff621fc102a",
+    "edit_ops_charged": 1,
+    "score_before": {
+      "rubric_id": "meridian",
+      "rubric_version": "1.0.3",
+      "content_hash": "8012c1cadcd57e49",
+      "rules": {
+        "H1": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H2": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "Retention Analysis Review"
+          ]
+        },
+        "H3": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "llm",
+          "status": "ok",
+          "spans": []
+        },
+        "H4": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H5": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H6": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H7": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "(see Harlow 2024)"
+          ]
+        },
+        "H8": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H9": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H10": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H11": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H12": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H13": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "ARR"
+          ]
+        },
+        "H14": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        }
+      },
+      "totals": {
+        "deterministic_capped": 3,
+        "deterministic_raw": 3,
+        "llm_capped": 0,
+        "llm_raw": 0,
+        "total_capped": 3,
+        "total_raw": 3
+      }
+    },
+    "corrections_sent": 2,
+    "correction_ops_charged": 1,
+    "target_violations_before": 2
+  },
+  "b_pre_wipe": {
+    "label": "B_pre_wipe",
+    "session_id": "session_init_cc08b3a798fa",
+    "edit_ops_charged": 1,
+    "score_before": {
+      "rubric_id": "meridian",
+      "rubric_version": "1.0.3",
+      "content_hash": "f93377b93ea7d594",
+      "rules": {
+        "H1": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H2": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "Project Delivery Review"
+          ]
+        },
+        "H3": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "llm",
+          "status": "ok",
+          "spans": []
+        },
+        "H4": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H5": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H6": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H7": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "(Okafor 2023)"
+          ]
+        },
+        "H8": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H9": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H10": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H11": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H12": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H13": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "NRR"
+          ]
+        },
+        "H14": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        }
+      },
+      "totals": {
+        "deterministic_capped": 3,
+        "deterministic_raw": 3,
+        "llm_capped": 0,
+        "llm_raw": 0,
+        "total_capped": 3,
+        "total_raw": 3
+      }
+    },
+    "corrections_sent": 0,
+    "correction_ops_charged": 0,
+    "target_violations_before": 2
+  },
+  "wipe_removed": 1,
+  "c_post_wipe": {
+    "label": "C_post_wipe",
+    "session_id": "session_init_cca149870668",
+    "edit_ops_charged": 1,
+    "score_before": {
+      "rubric_id": "meridian",
+      "rubric_version": "1.0.3",
+      "content_hash": "62dd521ac712dd8e",
+      "rules": {
+        "H1": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H2": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H3": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "llm",
+          "status": "ok",
+          "spans": []
+        },
+        "H4": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H5": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H6": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H7": {
+          "count_raw": 1,
+          "count_capped": 1,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": [
+            "(see Delgado, 2025)"
+          ]
+        },
+        "H8": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H9": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H10": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H11": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H12": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H13": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        },
+        "H14": {
+          "count_raw": 0,
+          "count_capped": 0,
+          "detector": "deterministic",
+          "status": "ok",
+          "spans": []
+        }
+      },
+      "totals": {
+        "deterministic_capped": 1,
+        "deterministic_raw": 1,
+        "llm_capped": 0,
+        "llm_raw": 0,
+        "total_capped": 1,
+        "total_raw": 1
+      }
+    },
+    "corrections_sent": 0,
+    "correction_ops_charged": 0,
+    "target_violations_before": 1
+  },
+  "verdict": {
+    "signal_established": true,
+    "learning_observed_pre_wipe": false,
+    "wipe_confirmed_by_behavioural_reversion": null,
+    "note": "wipe_confirmed is None when no learning signal was ever established (nothing to wipe), True/False only when a genuine before/after behavioural comparison was possible."
+  },
+  "ledger": {
+    "calls": {
+      "init_session": 3,
+      "chat": 4,
+      "export_document": 3,
+      "clear_cross_session_memory": 1
+    },
+    "billed": {
+      "chat": 4
+    },
+    "total_operations": 4,
+    "errors": 0,
+    "unbilled_chats": 0,
+    "free_retries": 0,
+    "costs_confirmed_by_probe": true,
+    "cost_model_measured_on": "2026-08-13"
+  }
+}

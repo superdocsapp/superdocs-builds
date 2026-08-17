@@ -1,0 +1,40 @@
+{
+  "date": "2026-08-13",
+  "method": "One call per measurement window, bracketed by counter reads. Cheapest-risk-first order. Hard ceiling 20 operations.",
+  "instrument_correction": {
+    "first_instrument": "get_account_status.quota.used",
+    "why_it_was_wrong": "It reports the FREE-TIER monthly bucket (500/month). Charges draw from the BUILDER26 promo bucket, so this counter stayed flat at 5 through every billable call and reported every cost as 0.",
+    "correct_instrument": "usage.promotions[0].ops_remaining, returned inside the chat response",
+    "free_counter_read": "A chat that makes no edit is not billable (was_billable=false, ops_charged=0) and still returns the usage block. This is a zero-cost way to read the promo counter, confirmed over 3 consecutive reads with the counter flat at 9990."
+  },
+  "account": {
+    "promo": "Round 2 Builders - August 2026",
+    "ops_granted": 10000,
+    "ops_remaining_at_probe_end": 9990,
+    "expires_at": "2026-09-05T18:20:13",
+    "note": "get_account_status reports tier 'free' with a 500/month limit; that bucket is NOT what the run spends. The promo bucket is."
+  },
+  "confirmed_costs": {
+    "chat (document edited)": 1,
+    "chat (no edit produced)": 0,
+    "chat (cross_session_search=true)": 1,
+    "chat (errored, HTTP 422)": 0,
+    "init_session": 0,
+    "upload_document_base64": 0,
+    "export_document": 0,
+    "request_download_url": 0,
+    "clear_cross_session_memory": 0,
+    "list_documents": 0,
+    "get_document_detail": 0,
+    "get_account_status": 0
+  },
+  "evidence": {
+    "null_probe": "two get_account_status reads, delta 0",
+    "chat_edit_charges_one": "three sequential edit chats: remaining 9994 -> 9993 -> 9992, ops_charged=1 each",
+    "non_chat_calls_are_free": "7 non-chat calls bracketed by two no-edit reader chats; promo delta 0",
+    "search_adds_no_surcharge": "chat with cross_session_memory+cross_session_search on: ops_charged=1, remaining 9992 -> 9991",
+    "errored_call_not_billed": "chat missing required 'message' returned HTTP 422; next reader showed delta of exactly 1, attributable to the reader's own edit"
+  },
+  "total_spent_by_probe": 5,
+  "ceiling": 20
+}

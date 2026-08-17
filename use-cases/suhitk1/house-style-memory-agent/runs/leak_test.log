@@ -1,0 +1,29 @@
+=== Northwind (5 documents) ===
+  wiped 'leak_northwind': removed=0 (expected 0, never used before)
+    doc_01.md: own-rubric before=7 corrections_sent=3 ops=2
+    doc_02.md: own-rubric before=4 corrections_sent=4 ops=2
+    doc_03.md: own-rubric before=8 corrections_sent=4 ops=2
+    doc_04.md: own-rubric before=2 corrections_sent=2 ops=2
+    doc_05.md: own-rubric before=5 corrections_sent=2 ops=2
+
+=== Ember (5 documents) ===
+  wiped 'leak_ember': removed=0 (expected 0, never used before)
+    doc_01.md: own-rubric before=12 corrections_sent=8 ops=2
+    doc_02.md: own-rubric before=10 corrections_sent=7 ops=2
+    doc_03.md: own-rubric before=8 corrections_sent=3 ops=2
+    doc_04.md: own-rubric before=1 corrections_sent=1 ops=2
+    doc_05.md: own-rubric before=1 corrections_sent=1 ops=2
+
+=== seed baseline (scanned before any live call) ===
+  doc_01.md: northwind-fp {'L6': 2, 'L7': 1}  ember-fp {'L7': 4}
+  doc_02.md: northwind-fp {'L6': 2, 'L10': 1}  ember-fp {'L7': 2}
+  doc_03.md: northwind-fp {'L6': 1, 'L10': 1}  ember-fp {'L7': 3}
+  doc_04.md: northwind-fp {'L6': 3, 'L10': 1}  ember-fp {'L7': 2}
+  doc_05.md: northwind-fp {'L6': 1, 'L10': 1}  ember-fp {'L7': 2}
+
+=== fingerprint scan: final documents vs seed baseline ===
+Northwind markers found in Ember's output, NET of seed baseline (strong): 0  (raw final, unadjusted: 1)
+Ember markers found in Northwind's output, NET of seed baseline (strong): 0  (raw final, unadjusted: 0)
+
+written: /Users/suhit/Desktop/Personal Projects/SuperDocs/superdocs-editor-agent/runs/leak_test/results.json
+total SuperDocs operations spent: 20

@@ -1,0 +1,117 @@
+{
+  "job_id": "19b72a81-5a2b-4c39-8d7a-fb697da55f97",
+  "organization_id": null,
+  "user_id": "d7eb8a05-7d42-4d1f-b257-86efcbec58c4",
+  "session_id": "session_init_82a22946eb21",
+  "job_type": "chat",
+  "status": "completed",
+  "created_at": "2026-08-13T03:25:54.297105",
+  "updated_at": "2026-08-13T03:26:05.398947",
+  "progress": 100,
+  "result": {
+    "response": "\u2705 I have added the comma to the list as requested.",
+    "session_id": "session_init_82a22946eb21",
+    "document_changes": {
+      "updated_html": "<h1 data-chunk-id=\"731fc6c6-41a1-405f-97a6-1d60db3203ce\">Quarterly Review</h1>\n<p data-chunk-id=\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\">The team reviewed scope, budget, and timeline.</p>",
+      "version_id": "b27ca71f-288d-4d04-bde2-2fb947d34210",
+      "changes_summary": "1 section edited, rest untouched",
+      "requires_approval": null,
+      "pending_changes": null,
+      "changes": [
+        {
+          "status": "approved",
+          "chunk_id": "8111b40a-d26a-4d79-8c39-a2404a6fb0ca",
+          "new_html": "<p data-chunk-id=\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\">The team reviewed scope, budget, and timeline.</p>",
+          "old_html": "<p data-chunk-id=\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\">The team reviewed scope, budget and timeline.</p>",
+          "change_id": "61257ef1-52ab-4716-8374-7f22b76dae00",
+          "operation": "edit",
+          "document_id": "doc_primary",
+          "ai_explanation": "\u2705 I have added the comma to the list as requested.",
+          "new_plain_text": "The team reviewed scope, budget, and timeline.",
+          "edit_instruction": "Change the phrase 'scope, budget and timeline.' to 'scope, budget, and timeline.' in the last sentence. Keep all other text and formatting identical."
+        }
+      ],
+      "chunk_diffs": null,
+      "concurrent_merges": null,
+      "focused_document_id": "doc_primary"
+    },
+    "usage": {
+      "monthly_used": 5,
+      "monthly_limit": 500,
+      "monthly_remaining": 495,
+      "was_billable": true,
+      "ops_charged": 1,
+      "quota_exhausted": false,
+      "subscription_tier": "free",
+      "bucket_used": "promo",
+      "redemption_id": "66c01c8f-8a62-4d87-b0e3-dbc66eb317f3",
+      "promotions": [
+        {
+          "redemption_id": "66c01c8f-8a62-4d87-b0e3-dbc66eb317f3",
+          "name": "Round 2 Builders - August 2026",
+          "ops_remaining": 9989,
+          "ops_granted": 10000,
+          "expires_at": "2026-09-05T18:20:13.970942"
+        }
+      ],
+      "agent_handoff_hint": null
+    },
+    "attachment_id": null
+  },
+  "error": null,
+  "metadata": {
+    "filename": null,
+    "file_size": null,
+    "content_type": null,
+    "message": "Add a comma before 'and' in the list.",
+    "document_html_provided": false,
+    "pending_changes": null,
+    "intermediate_responses": [
+      {
+        "type": "user_facing",
+        "content": "I will read the document to locate the list and add the comma for you.",
+        "context": "supervisor_decision",
+        "sequence": 1,
+        "timestamp": "2026-08-13T03:25:57.125423+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "I've prepared a change for your review.",
+        "context": "supervisor_decision_hitl",
+        "sequence": 2,
+        "timestamp": "2026-08-13T03:26:00.171327+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"61257ef1-52ab-4716-8374-7f22b76dae00\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"61257ef1-52ab-4716-8374-7f22b76dae00\", \"operation\": \"edit\", \"chunk_id\": \"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\", \"old_html\": \"<p data-chunk-id=\\\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\\\">The team reviewed scope, budget and timeline.</p>\", \"new_html\": \"<p data-chunk-id=\\\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\\\">The team reviewed scope, budget, and timeline.</p>\", \"ai_explanation\": \"\\u2705 I have added the comma to the list as requested.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 3,
+        "timestamp": "2026-08-13T03:26:01.252293+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"61257ef1-52ab-4716-8374-7f22b76dae00\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"61257ef1-52ab-4716-8374-7f22b76dae00\", \"operation\": \"edit\", \"chunk_id\": \"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\", \"old_html\": \"<p data-chunk-id=\\\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\\\">The team reviewed scope, budget and timeline.</p>\", \"new_html\": \"<p data-chunk-id=\\\"8111b40a-d26a-4d79-8c39-a2404a6fb0ca\\\">The team reviewed scope, budget, and timeline.</p>\", \"ai_explanation\": \"\\u2705 I have added the comma to the list as requested.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 4,
+        "timestamp": "2026-08-13T03:26:04.946433+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "\u2705 Successfully updated all 1 sections.",
+        "context": null,
+        "sequence": 5,
+        "timestamp": "2026-08-13T03:26:05.153697+00:00"
+      }
+    ],
+    "user_id": null,
+    "model_tier": "core",
+    "session_id": "session_init_82a22946eb21",
+    "response_mode": "full",
+    "thinking_depth": null,
+    "request_message": "Add a comma before 'and' in the list.",
+    "cumulative_tokens": 155219,
+    "initial_doc_version": null,
+    "last_real_progress_ts": "2026-08-13T03:26:05.391149+00:00",
+    "user_turn_index_pre_inserted": 0
+  }
+}

@@ -1,0 +1,182 @@
+[
+  {
+    "document": "doc_01.md",
+    "topic": "a migration of the client onboarding workflow to a new internal tool",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:33.458411+00:00",
+    "sha256": "07072eadcd801fa1"
+  },
+  {
+    "document": "doc_02.md",
+    "topic": "the results of a two-week discovery sprint for a retail client",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:35.814067+00:00",
+    "sha256": "86c0c946503a6897"
+  },
+  {
+    "document": "doc_03.md",
+    "topic": "a review of turnaround times in the document handling team",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:38.483104+00:00",
+    "sha256": "412796ed8d2ccdd6"
+  },
+  {
+    "document": "doc_04.md",
+    "topic": "the outcome of a pilot programme for automated intake triage",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:41.005205+00:00",
+    "sha256": "561d19f7b3dd7e14"
+  },
+  {
+    "document": "doc_05.md",
+    "topic": "a review of meeting load across the delivery practice",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:50:45.081088+00:00",
+    "sha256": "5964db566c825325"
+  },
+  {
+    "document": "doc_06.md",
+    "topic": "the status of a data quality clean-up in the records team",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:45.870772+00:00",
+    "sha256": "cf6a77ed9f4804d3"
+  },
+  {
+    "document": "doc_07.md",
+    "topic": "a retrospective on the spring release of an internal portal",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:49.261795+00:00",
+    "sha256": "61588105d749e59e"
+  },
+  {
+    "document": "doc_08.md",
+    "topic": "the findings of a staffing review across two delivery pods",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:51.808864+00:00",
+    "sha256": "a4b53284b047e185"
+  },
+  {
+    "document": "doc_09.md",
+    "topic": "a proposal to consolidate three overlapping status reports",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:54.829742+00:00",
+    "sha256": "23e94a8796f82fe6"
+  },
+  {
+    "document": "doc_10.md",
+    "topic": "the results of a customer satisfaction survey for a support desk",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:57.082136+00:00",
+    "sha256": "ed5b4bc296f94d28"
+  },
+  {
+    "document": "doc_11.md",
+    "topic": "an assessment of backlog growth in the change request queue",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:48:59.647921+00:00",
+    "sha256": "5308880389e02833"
+  },
+  {
+    "document": "doc_12.md",
+    "topic": "a review of onboarding time for new analysts in the practice",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:02.336954+00:00",
+    "sha256": "5057b1376b64d590"
+  },
+  {
+    "document": "doc_13.md",
+    "topic": "the outcome of a trial of asynchronous stand-up updates",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:04.929784+00:00",
+    "sha256": "5cda5e892692dbc6"
+  },
+  {
+    "document": "doc_14.md",
+    "topic": "a summary of cost variance across two client engagements",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:08.485359+00:00",
+    "sha256": "62ba59116513e2df"
+  },
+  {
+    "document": "doc_15.md",
+    "topic": "the status of an accessibility audit for an internal tool",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:11.172702+00:00",
+    "sha256": "2f12e01cae6c288c"
+  },
+  {
+    "document": "doc_16.md",
+    "topic": "a review of handover quality between two project phases",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:13.879278+00:00",
+    "sha256": "9ecba4dffb346466"
+  },
+  {
+    "document": "doc_17.md",
+    "topic": "the findings of a workshop on estimation accuracy",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:16.513109+00:00",
+    "sha256": "fb4ba3758068a8d6"
+  },
+  {
+    "document": "doc_18.md",
+    "topic": "a proposal to change the cadence of client progress reports",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:18.980414+00:00",
+    "sha256": "7ad84f5073b5d9ea"
+  },
+  {
+    "document": "doc_19.md",
+    "topic": "the results of a pilot for a shared knowledge repository",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:22.147111+00:00",
+    "sha256": "de441f3e4945f49d"
+  },
+  {
+    "document": "doc_20.md",
+    "topic": "an assessment of tooling overlap across the delivery teams",
+    "model": "gemini-3.5-flash-lite",
+    "prompt_version": "seed_draft_v2",
+    "temperature": 0,
+    "generated_at": "2026-08-13T02:49:24.730977+00:00",
+    "sha256": "4bd30d53d9d1972a"
+  }
+]

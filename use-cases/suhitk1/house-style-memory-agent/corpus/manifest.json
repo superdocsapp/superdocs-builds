@@ -1,0 +1,2923 @@
+{
+  "rubric_version": "1.0.3",
+  "profile_version": "1.0.0",
+  "targets": {
+    "H1": 2,
+    "H2": 1,
+    "H3": 2,
+    "H4": 2,
+    "H5": 1,
+    "H6": 1,
+    "H7": 1,
+    "H8": 3,
+    "H9": 1,
+    "H10": 3,
+    "H11": 2,
+    "H12": 2,
+    "H13": 1,
+    "H14": 2
+  },
+  "total_per_document": 24,
+  "documents": [
+    {
+      "source": "doc_01.md",
+      "output": "doc_01.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Internal Project Memo: Client Onboarding Migration"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "data mapping errors between databases"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "User resistance to procedural changes."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_02.md",
+      "output": "doc_02.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Discovery Sprint Results for Apex Retail"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "automated inventory tracking systems"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Cloud-based payment gateway integration."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_03.md",
+      "output": "doc_03.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Internal Memorandum: Document Handling Turnaround Review"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "automate initial file routing"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Standardize client template structures."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 2,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_04.md",
+      "output": "doc_04.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Pilot Outcome Memo"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "upgrade the core database connectors"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Hire external developers for 2 weeks."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_05.md",
+      "output": "doc_05.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Review of Delivery Practice Meeting Load"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "implement mandatory meeting-free Fridays"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Reduce standard sync durations to 15 minutes."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 0,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_06.md",
+      "output": "doc_06.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Internal Memo on Records Data Quality"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "merging duplicate client profiles"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Appending missing telephone numbers."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_07.md",
+      "output": "doc_07.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Internal Portal Spring Release Retrospective"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "upgrading the search index architecture"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Simplifying the primary navigation menu."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_08.md",
+      "output": "doc_08.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Internal Staffing Review for Delivery Pods"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "reallocate four senior analysts from pod alpha to pod beta"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Implement automated time tracking tools across all active projects."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_09.md",
+      "output": "doc_09.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Project Memo on Status Report Consolidation"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "reduced administrative overhead"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Clearer metrics for stakeholders."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 2,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_10.md",
+      "output": "doc_10.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Customer Satisfaction Survey Results for Support Desk"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "slow initial response times"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "High agent technical competence."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 0,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_11.md",
+      "output": "doc_11.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Change Request Backlog Assessment"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "restrict new submissions until capacity normalizes"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Prioritize high-value items above minor enhancements."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 3,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_12.md",
+      "output": "doc_12.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Onboarding Analysis for New Analysts"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "outdated software tutorials"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Unclear expectations for independent study."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_13.md",
+      "output": "doc_13.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Internal Memo: Async Stand-up Trial Results"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "clear ownership for urgent blockers"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Defined windows for daily posting."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 3,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_14.md",
+      "output": "doc_14.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Cost Variance Summary for Active Client Engagements"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "enforce strict change order protocols"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Review milestone allocations every 14 days."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 2,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_15.md",
+      "output": "doc_15.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Accessibility Audit Status for Internal Time Tracker"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "fix keyboard focus traps in modal windows"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Add proper aria labels to icon buttons."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_16.md",
+      "output": "doc_16.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Phase Handover Review"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "mandatory sign-off templates for all project managers"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Centralized storage for client deliverables."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 2,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_17.md",
+      "output": "doc_17.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Estimation Accuracy Workshop Results"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "require dual sign-off on technical estimates"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Update baseline labor rates for junior analysts."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_18.md",
+      "output": "doc_18.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Project Memo: Updating Client Reporting Cadences"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "reduced administrative overhead for consulting staff"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Clearer milestones between major deliverable drops."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 0,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_19.md",
+      "output": "doc_19.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Pilot Results for the Knowledge Repository"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "slow initial content migration"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "High engagement from senior analysts."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    },
+    {
+      "source": "doc_20.md",
+      "output": "doc_20.md",
+      "base_profile": {},
+      "final_profile": {
+        "H1": 2,
+        "H2": 1,
+        "H3": 2,
+        "H4": 2,
+        "H5": 1,
+        "H6": 1,
+        "H7": 1,
+        "H8": 3,
+        "H9": 1,
+        "H10": 3,
+        "H11": 2,
+        "H12": 2,
+        "H13": 1,
+        "H14": 2
+      },
+      "injections": [
+        {
+          "rule": "H2",
+          "method": "transform",
+          "span": "Tooling Overlap Assessment Across Delivery Teams"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "audit active user accounts"
+        },
+        {
+          "rule": "H12",
+          "method": "transform",
+          "span": "Export historical project data."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The team reviewed scope, budget and timeline."
+        },
+        {
+          "rule": "H1",
+          "method": "insert",
+          "span": "The group compared cost, quality and speed."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The summary was approved by the review group."
+        },
+        {
+          "rule": "H3",
+          "method": "insert",
+          "span": "The schedule was revised by the delivery team."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We ran 3 sessions in the period."
+        },
+        {
+          "rule": "H4",
+          "method": "insert",
+          "span": "We logged twelve findings in total."
+        },
+        {
+          "rule": "H5",
+          "method": "insert",
+          "span": "Adoption rose 12% across the period."
+        },
+        {
+          "rule": "H6",
+          "method": "insert",
+          "span": "The window closed on August 13, 2026."
+        },
+        {
+          "rule": "H7",
+          "method": "insert",
+          "span": "The figure appears in the register (see Harlow 2024)."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "It's ready for the next stage."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "We don't expect further delay."
+        },
+        {
+          "rule": "H8",
+          "method": "insert",
+          "span": "That's the position at present."
+        },
+        {
+          "rule": "H9",
+          "method": "insert",
+          "span": "The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "We leverage the same process here."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The approach remains robust in practice."
+        },
+        {
+          "rule": "H10",
+          "method": "insert",
+          "span": "The handover was seamless for the group."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The team met the deadline - narrowly."
+        },
+        {
+          "rule": "H11",
+          "method": "insert",
+          "span": "The scope held firm - mostly."
+        },
+        {
+          "rule": "H13",
+          "method": "insert",
+          "span": "NRR held for the period."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "I reviewed the draft before circulation."
+        },
+        {
+          "rule": "H14",
+          "method": "insert",
+          "span": "The reader will find the summary useful."
+        }
+      ],
+      "seed_deterministic": 1,
+      "seed_h3": 0
+    }
+  ]
+}

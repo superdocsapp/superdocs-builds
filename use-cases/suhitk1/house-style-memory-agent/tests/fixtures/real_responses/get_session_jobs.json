@@ -1,0 +1,53 @@
+{
+  "jobs": [
+    {
+      "job_id": "952f218f-c166-4199-a33a-37a3d1e8711b",
+      "organization_id": null,
+      "user_id": "d7eb8a05-7d42-4d1f-b257-86efcbec58c4",
+      "session_id": "session_init_34d7cc1106b0",
+      "job_type": "sync_chat",
+      "status": "completed",
+      "created_at": "2026-08-13T03:23:20.376903",
+      "updated_at": "2026-08-13T03:23:28.302981",
+      "progress": 47,
+      "result": null,
+      "error": null,
+      "metadata": {
+        "filename": null,
+        "file_size": null,
+        "content_type": null,
+        "message": null,
+        "document_html_provided": null,
+        "pending_changes": null,
+        "intermediate_responses": [
+          {
+            "type": "user_facing",
+            "content": "I'll read the document to find the list and add the comma for you.",
+            "context": "supervisor_decision",
+            "sequence": 1,
+            "timestamp": "2026-08-13T03:23:22.857890+00:00"
+          },
+          {
+            "type": "user_facing",
+            "content": "I've prepared a change for your review.",
+            "context": "supervisor_decision_hitl",
+            "sequence": 2,
+            "timestamp": "2026-08-13T03:23:27.102875+00:00"
+          },
+          {
+            "type": "proposed_change_batch",
+            "content": "{\"type\": \"single_approval\", \"batch_id\": \"99e4e380-89a9-4b1f-ac70-08fe582a5483\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"99e4e380-89a9-4b1f-ac70-08fe582a5483\", \"operation\": \"edit\", \"chunk_id\": \"c2f14299-3a88-4bdb-b231-9d06a808ea39\", \"old_html\": \"<p data-chunk-id=\\\"c2f14299-3a88-4bdb-b231-9d06a808ea39\\\">The team reviewed scope, budget and timeline.</p>\", \"new_html\": \"<p data-chunk-id=\\\"c2f14299-3a88-4bdb-b231-9d06a808ea39\\\">The team reviewed scope, budget, and timeline.</p>\", \"ai_explanation\": \"\\u2705 I have updated the list to include the comma, so it now reads: 'The team reviewed scope, budget, and timeline.'\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+            "context": null,
+            "sequence": 3,
+            "timestamp": "2026-08-13T03:23:28.139698+00:00"
+          }
+        ],
+        "endpoint": "v1/chat",
+        "model_tier": "core",
+        "request_id": "93f3270b566a4af6",
+        "last_real_progress_ts": "2026-08-13T03:23:28.139713+00:00"
+      }
+    }
+  ],
+  "total": 1
+}
