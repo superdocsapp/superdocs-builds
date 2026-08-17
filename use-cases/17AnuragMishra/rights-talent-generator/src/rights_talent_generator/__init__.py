@@ -1,0 +1,1 @@
+"""Rights/talent contract generator."""
