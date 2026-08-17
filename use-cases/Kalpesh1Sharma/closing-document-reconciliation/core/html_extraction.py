@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import re
+from pathlib import Path
 
 
 """Deterministic field extraction from SuperDocs processed HTML.

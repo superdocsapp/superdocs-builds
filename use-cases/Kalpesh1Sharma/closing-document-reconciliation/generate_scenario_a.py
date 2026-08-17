@@ -383,7 +383,12 @@ def create_ground_truth() -> None:
                 "status": "match",
                 "canonical_value": True,
             },
-            "title_fees": {
+            "origination": {
+                "status": "match",
+                "loan_estimate": 4200.00,
+                "closing_disclosure": 4200.00,
+            },
+            "title_services": {
                 "status": "tolerable",
                 "loan_estimate": 2850.00,
                 "closing_disclosure": 3000.00,

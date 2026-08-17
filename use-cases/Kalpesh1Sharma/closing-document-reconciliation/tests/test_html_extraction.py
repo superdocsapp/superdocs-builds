@@ -27,6 +27,16 @@ def test_underwriting_title_wins_over_rule_reference_to_loan_estimate():
     )
 
 
+
+def test_filename_fallback_detects_document_type_without_header():
+    assert (
+        infer_document_type(
+            filename="loan_estimate.docx",
+            lines=["No recognizable header"],
+        )
+        == "loan_estimate"
+    )
+
 def test_table_cells_are_split_into_logical_lines():
     html = """
     <table>

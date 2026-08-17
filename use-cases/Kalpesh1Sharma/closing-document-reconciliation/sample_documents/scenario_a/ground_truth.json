@@ -25,7 +25,12 @@
       "status": "match",
       "canonical_value": true
     },
-    "title_fees": {
+    "origination": {
+      "status": "match",
+      "loan_estimate": 4200.0,
+      "closing_disclosure": 4200.0
+    },
+    "title_services": {
       "status": "tolerable",
       "loan_estimate": 2850.0,
       "closing_disclosure": 3000.0,

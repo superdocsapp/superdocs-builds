@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 
 from core.models import (
     Classification,
@@ -29,17 +30,11 @@ def reconcile_numeric_field(
     field_name: str,
     observations: list[FieldObservation],
     reference_document: DocumentType,
-    tolerance: float = 0.0,
+    tolerance: float | None = None,
     applicable_rule: FileRule | None = None,
     curable_action: str | None = None,
 ) -> ReconciliationFinding:
-    """
-    Compare numeric values against one designated reference document.
-
-    Missing values are preserved in observations but excluded from the
-    numeric comparison. The function never fills missing values using
-    another document.
-    """
+    """Compare numeric values without inferring missing evidence or rules."""
 
     reference = _find_reference(
         observations,
@@ -86,7 +81,6 @@ def reconcile_numeric_field(
         )
 
     reference_value = float(reference.value)
-
     differences: list[tuple[FieldObservation, float]] = []
 
     for observation in valid_observations:
@@ -126,8 +120,6 @@ def reconcile_numeric_field(
         for _, difference in differences
     )
 
-    # Use the largest observed discrepancy so one acceptable document
-    # cannot hide another document that exceeds the rule.
     evaluation = evaluate_numeric_tolerance(
         reference_value=reference_value,
         observed_value=reference_value + largest_difference,
@@ -156,9 +148,6 @@ def reconcile_numeric_field(
     )
 
 
-from collections.abc import Callable
-
-
 def reconcile_text_field(
     *,
     field_name: str,
@@ -167,12 +156,7 @@ def reconcile_text_field(
     comparator: Callable[[str, str], bool],
     applicable_rule: FileRule | None = None,
 ) -> ReconciliationFinding:
-    """
-    Reconcile textual fields using an explicit comparison strategy.
-
-    The comparator performs normalization only. Any allowed difference
-    should be backed by the supplied file rule.
-    """
+    """Reconcile textual fields using an explicitly selected comparator."""
 
     reference = _find_reference(
         observations,
@@ -216,7 +200,6 @@ def reconcile_text_field(
         )
 
     reference_value = str(reference.value)
-
     mismatches = []
 
     for observation in supported:

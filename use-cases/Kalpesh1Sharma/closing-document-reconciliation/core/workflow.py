@@ -9,11 +9,23 @@ from core.models import (
 )
 from core.normalize import (
     addresses_match,
+    addresses_match_exact,
+    borrower_sets_match_exact,
     borrower_sets_match_under_middle_initial_rule,
 )
 from core.reconcile import (
     reconcile_numeric_field,
     reconcile_text_field,
+)
+from core.rule_config import (
+    NUMERIC_RECONCILIATION_CONFIGS,
+    TEXT_RECONCILIATION_CONFIGS,
+)
+from core.rules import (
+    numeric_tolerance_from_rule,
+    rule_supports_address_abbreviations,
+    rule_supports_correction,
+    rule_supports_middle_initial_omission,
 )
 
 
@@ -116,12 +128,12 @@ def build_reconciliation_report(
     scenario_id: str,
 ) -> ReconciliationReport:
     """
-    Reconcile a mortgage closing file using only:
+    Reconcile the file using extracted evidence and the file's own rules.
 
-    - values supported by the extracted documents
-    - file-specific rules extracted from the file
-
-    No external mortgage-law rules are applied here.
+    Numeric field/reference mappings live in ``core.rule_config``. Numeric
+    tolerances are parsed from the actual rule text at runtime; they are not
+    hardcoded in this workflow. Text normalizations are enabled only when the
+    corresponding rule text explicitly supports that normalization.
     """
 
     required_types = {
@@ -150,50 +162,25 @@ def build_reconciliation_report(
             )
         )
 
-    r001 = find_rule(
-        documents,
-        "R-001",
-    )
-    r002 = find_rule(
-        documents,
-        "R-002",
-    )
-    r003 = find_rule(
-        documents,
-        "R-003",
-    )
-    r004 = find_rule(
-        documents,
-        "R-004",
-    )
-    r005 = find_rule(
-        documents,
-        "R-005",
-    )
-    r006 = find_rule(
-        documents,
-        "R-006",
-    )
-    r007 = find_rule(
-        documents,
-        "R-007",
-    )
-    r008 = find_rule(
-        documents,
-        "R-008",
-    )
+    configured_rule_ids = {
+        config.rule_id
+        for config in NUMERIC_RECONCILIATION_CONFIGS
+        if config.rule_id is not None
+    } | {
+        config.rule_id
+        for config in TEXT_RECONCILIATION_CONFIGS
+    }
 
-    for rule_id, rule in [
-        ("R-001", r001),
-        ("R-002", r002),
-        ("R-003", r003),
-        ("R-004", r004),
-        ("R-005", r005),
-        ("R-006", r006),
-        ("R-007", r007),
-        ("R-008", r008),
-    ]:
-        if rule is None:
+    rules = {
+        rule_id: find_rule(
+            documents,
+            rule_id,
+        )
+        for rule_id in configured_rule_ids
+    }
+
+    for rule_id in sorted(configured_rule_ids):
+        if rules[rule_id] is None:
             warnings.append(
                 f"{rule_id} was not found in the file."
             )
@@ -201,336 +188,133 @@ def build_reconciliation_report(
     findings = []
 
     # ---------------------------------------------------------
-    # Loan amount
+    # Numeric / boolean fields, including each fee category.
     # ---------------------------------------------------------
+    for config in NUMERIC_RECONCILIATION_CONFIGS:
+        observations = []
 
-    findings.append(
-        reconcile_numeric_field(
-            field_name="loan_amount",
-            observations=_without_none([
-                _field_observation(
+        for document_type in config.observation_documents:
+            if config.source_kind == "fee":
+                observation = _fee_observation(
                     documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "loan_amount",
-                ),
-                _field_observation(
+                    document_type,
+                    config.source_key,
+                )
+            else:
+                observation = _field_observation(
                     documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "loan_amount",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.PROMISSORY_NOTE,
-                    "loan_amount",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.SETTLEMENT_STATEMENT,
-                    "loan_amount",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.UNDERWRITING_APPROVAL,
-                    "loan_amount",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.UNDERWRITING_APPROVAL
-            ),
-            tolerance=0,
-            applicable_rule=r001,
-            curable_action=(
-                "Correct the inconsistent loan amount "
-                "before funding."
-            ),
+                    document_type,
+                    config.source_key,
+                )
+
+            observations.append(observation)
+
+        applicable_rule = (
+            rules.get(config.rule_id)
+            if config.rule_id is not None
+            else None
         )
-    )
 
-    # ---------------------------------------------------------
-    # Interest rate
-    # ---------------------------------------------------------
-
-    findings.append(
-        reconcile_numeric_field(
-            field_name="interest_rate",
-            observations=_without_none([
-                _field_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "interest_rate",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "interest_rate",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.PROMISSORY_NOTE,
-                    "interest_rate",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.UNDERWRITING_APPROVAL,
-                    "interest_rate",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.UNDERWRITING_APPROVAL
-            ),
-            tolerance=0,
-            applicable_rule=r002,
-            curable_action=(
-                "Request a revised Closing Disclosure "
-                "reflecting the approved interest rate."
-            ),
+        tolerance = numeric_tolerance_from_rule(
+            applicable_rule
         )
-    )
 
-    # ---------------------------------------------------------
-    # Term
-    # ---------------------------------------------------------
+        curable_action = None
 
-    findings.append(
-        reconcile_numeric_field(
-            field_name="term",
-            observations=_without_none([
-                _field_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "term_months",
+        if (
+            config.curable_action is not None
+            and rule_supports_correction(
+                applicable_rule
+            )
+        ):
+            curable_action = config.curable_action
+
+        findings.append(
+            reconcile_numeric_field(
+                field_name=config.field_name,
+                observations=_without_none(
+                    observations
                 ),
-                _field_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "term_months",
+                reference_document=(
+                    config.reference_document
                 ),
-                _field_observation(
-                    documents,
-                    DocumentType.PROMISSORY_NOTE,
-                    "term_months",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.UNDERWRITING_APPROVAL,
-                    "term_months",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.UNDERWRITING_APPROVAL
-            ),
-            tolerance=0,
-            applicable_rule=r003,
-            curable_action=(
-                "Correct the inconsistent loan term "
-                "before funding."
-            ),
+                tolerance=tolerance,
+                applicable_rule=applicable_rule,
+                curable_action=curable_action,
+            )
         )
-    )
 
     # ---------------------------------------------------------
-    # Escrow
+    # Text fields. Rule text decides whether permissive
+    # normalization is allowed; otherwise comparison is strict.
     # ---------------------------------------------------------
-
-    findings.append(
-        reconcile_numeric_field(
-            field_name="escrow",
-            observations=_without_none([
-                _field_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "escrow",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "escrow",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.PROMISSORY_NOTE,
-                    "escrow",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.SETTLEMENT_STATEMENT,
-                    "escrow",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.UNDERWRITING_APPROVAL,
-                    "escrow",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.UNDERWRITING_APPROVAL
-            ),
-            tolerance=0,
-            applicable_rule=r004,
-            curable_action=(
-                "Review and correct the escrow setting "
-                "before funding."
-            ),
+    for config in TEXT_RECONCILIATION_CONFIGS:
+        rule = rules.get(
+            config.rule_id
         )
-    )
 
-    # ---------------------------------------------------------
-    # Title / settlement services
-    # ---------------------------------------------------------
+        if (
+            config.semantics
+            == "middle_initial_omission"
+        ):
+            supported_rule = (
+                rule
+                if rule_supports_middle_initial_omission(
+                    rule
+                )
+                else None
+            )
 
-    findings.append(
-        reconcile_numeric_field(
-            field_name="title_services",
-            observations=_without_none([
-                _fee_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "title_services",
-                ),
-                _fee_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "title_services",
-                ),
-                _fee_observation(
-                    documents,
-                    DocumentType.SETTLEMENT_STATEMENT,
-                    "title_services",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.LOAN_ESTIMATE
-            ),
-            tolerance=250,
-            applicable_rule=r005,
-            curable_action=(
-                "Review and correct the "
-                "title-services charge before funding."
-            ),
-        )
-    )
-
-    # ---------------------------------------------------------
-    # Cash to close
-    # ---------------------------------------------------------
-
-    findings.append(
-        reconcile_numeric_field(
-            field_name="cash_to_close",
-            observations=_without_none([
-                _field_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "cash_to_close",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "cash_to_close",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.SETTLEMENT_STATEMENT,
-                    "cash_to_close",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.LOAN_ESTIMATE
-            ),
-            tolerance=500,
-            applicable_rule=r006,
-            curable_action=(
-                "Prepare a revised disclosure request "
-                "for the cash-to-close variance."
-            ),
-        )
-    )
-
-    # ---------------------------------------------------------
-    # Borrower names
-    # ---------------------------------------------------------
-
-    findings.append(
-        reconcile_text_field(
-            field_name="borrower_names",
-            observations=_without_none([
-                _field_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "borrower_names",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "borrower_names",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.PROMISSORY_NOTE,
-                    "borrower_names",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.SETTLEMENT_STATEMENT,
-                    "borrower_names",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.UNDERWRITING_APPROVAL,
-                    "borrower_names",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.UNDERWRITING_APPROVAL
-            ),
-            comparator=(
+            comparator = (
                 borrower_sets_match_under_middle_initial_rule
-            ),
-            applicable_rule=r007,
-        )
-    )
+                if supported_rule is not None
+                else borrower_sets_match_exact
+            )
 
-    # ---------------------------------------------------------
-    # Property address
-    # ---------------------------------------------------------
+        elif (
+            config.semantics
+            == "address_abbreviations"
+        ):
+            supported_rule = (
+                rule
+                if rule_supports_address_abbreviations(
+                    rule
+                )
+                else None
+            )
 
-    findings.append(
-        reconcile_text_field(
-            field_name="property_address",
-            observations=_without_none([
-                _field_observation(
-                    documents,
-                    DocumentType.LOAN_ESTIMATE,
-                    "property_address",
+            comparator = (
+                addresses_match
+                if supported_rule is not None
+                else addresses_match_exact
+            )
+
+        else:  # pragma: no cover - config is type constrained.
+            supported_rule = None
+            raise ValueError(
+                f"Unsupported text semantics: {config.semantics}"
+            )
+
+        observations = _without_none([
+            _field_observation(
+                documents,
+                document_type,
+                config.source_key,
+            )
+            for document_type in config.observation_documents
+        ])
+
+        findings.append(
+            reconcile_text_field(
+                field_name=config.field_name,
+                observations=observations,
+                reference_document=(
+                    config.reference_document
                 ),
-                _field_observation(
-                    documents,
-                    DocumentType.CLOSING_DISCLOSURE,
-                    "property_address",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.PROMISSORY_NOTE,
-                    "property_address",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.SETTLEMENT_STATEMENT,
-                    "property_address",
-                ),
-                _field_observation(
-                    documents,
-                    DocumentType.UNDERWRITING_APPROVAL,
-                    "property_address",
-                ),
-            ]),
-            reference_document=(
-                DocumentType.UNDERWRITING_APPROVAL
-            ),
-            comparator=addresses_match,
-            applicable_rule=r008,
+                comparator=comparator,
+                applicable_rule=supported_rule,
+            )
         )
-    )
 
     return ReconciliationReport(
         scenario_id=scenario_id,

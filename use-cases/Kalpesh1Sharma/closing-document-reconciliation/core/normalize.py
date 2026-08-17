@@ -118,24 +118,16 @@ def normalize_boolean(value: str | bool | None) -> bool | None:
 
 
 def normalize_person_name(name: str) -> str:
-    """
-    Basic textual normalization only.
+    """Basic textual normalization only; no rule decisions happen here."""
 
-    This deliberately does NOT decide whether omission of a middle
-    initial is legally acceptable. That decision belongs to the
-    file-rule layer.
-    """
     name = name.lower().strip()
-
     name = re.sub(r"[.,]", "", name)
     name = re.sub(r"\s+", " ", name)
-
     return name
 
 
 def name_without_middle_initial(name: str) -> str:
     normalized = normalize_person_name(name)
-
     parts = normalized.split()
 
     if len(parts) == 3 and len(parts[1]) == 1:
@@ -154,14 +146,26 @@ def names_compatible_under_middle_initial_rule(
     )
 
 
-def normalize_address(value: str | None) -> str | None:
+def _normalize_address_literal(value: str | None) -> str | None:
+    """Normalize only case/punctuation/spacing, not abbreviations."""
+
     if value is None:
         return None
 
     text = value.lower().strip()
-
-    # Remove punctuation while preserving alphanumeric tokens.
     text = re.sub(r"[,.]", "", text)
+    text = re.sub(r"\s+", " ", text)
+    return text
+
+
+def normalize_address(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    text = _normalize_address_literal(value)
+
+    if text is None:
+        return None
 
     words = text.split()
     normalized_words = []
@@ -174,6 +178,15 @@ def normalize_address(value: str | None) -> str | None:
     return " ".join(normalized_words)
 
 
+def addresses_match_exact(left: str | None, right: str | None) -> bool:
+    """Compare addresses without applying file-rule abbreviation aliases."""
+
+    if left is None or right is None:
+        return False
+
+    return _normalize_address_literal(left) == _normalize_address_literal(right)
+
+
 def addresses_match(left: str | None, right: str | None) -> bool:
     if left is None or right is None:
         return False
@@ -182,15 +195,6 @@ def addresses_match(left: str | None, right: str | None) -> bool:
 
 
 def split_borrower_names(value: str | None) -> list[str]:
-    """
-    Split common multi-borrower formats used in our declared input set.
-
-    Examples:
-    "John A. Carter and Emily Carter"
-    "John A. Carter; Emily Carter"
-    "John Carter & Emily Carter"
-    "John A. Carter / Emily Carter"
-    """
     if not value:
         return []
 
@@ -207,6 +211,30 @@ def split_borrower_names(value: str | None) -> list[str]:
         for part in parts
         if part.strip()
     ]
+
+
+def borrower_sets_match_exact(
+    left: str | None,
+    right: str | None,
+) -> bool:
+    """Compare borrower sets without dropping middle initials."""
+
+    if not left or not right:
+        return False
+
+    left_names = split_borrower_names(left)
+    right_names = split_borrower_names(right)
+
+    if len(left_names) != len(right_names):
+        return False
+
+    return sorted(
+        normalize_person_name(name)
+        for name in left_names
+    ) == sorted(
+        normalize_person_name(name)
+        for name in right_names
+    )
 
 
 def borrower_sets_match_under_middle_initial_rule(
