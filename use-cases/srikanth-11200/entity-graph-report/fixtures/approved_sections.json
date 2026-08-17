@@ -1,0 +1,28 @@
+[
+  {
+    "section_index": 0,
+    "title": "Bramblewood Studios",
+    "body": "The message is addressed to Bramblewood Studios.",
+    "citations": [
+      {
+        "filename": "superdocs_live_demo_invoice_2091.txt",
+        "chunk_index": 0,
+        "evidence_text": "to Bramblewood Studios"
+      }
+    ],
+    "insufficient_evidence": false
+  },
+  {
+    "section_index": 1,
+    "title": "GST",
+    "body": "The invoice includes GST.",
+    "citations": [
+      {
+        "filename": "superdocs_live_demo_invoice_2091.txt",
+        "chunk_index": 0,
+        "evidence_text": "This invoice reflects GST"
+      }
+    ],
+    "insufficient_evidence": false
+  }
+]
