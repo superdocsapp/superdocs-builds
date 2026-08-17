@@ -1,0 +1,55 @@
+{
+  "document": "doc_01",
+  "violations_before": 24,
+  "violations_after": 24,
+  "per_rule_before": {
+    "H1": 2,
+    "H2": 1,
+    "H3": 2,
+    "H4": 2,
+    "H5": 1,
+    "H6": 1,
+    "H7": 1,
+    "H8": 3,
+    "H9": 1,
+    "H10": 3,
+    "H11": 2,
+    "H12": 2,
+    "H13": 1,
+    "H14": 2
+  },
+  "per_rule_after": {
+    "H1": 2,
+    "H2": 1,
+    "H3": 2,
+    "H4": 2,
+    "H5": 1,
+    "H6": 1,
+    "H7": 1,
+    "H8": 3,
+    "H9": 1,
+    "H10": 3,
+    "H11": 2,
+    "H12": 2,
+    "H13": 1,
+    "H14": 2
+  },
+  "pending_changes": 7,
+  "ledger": {
+    "calls": {
+      "init_session": 1,
+      "upload_document_base64": 1,
+      "export_document": 2,
+      "chat_async": 1,
+      "get_job": 9,
+      "approve_change": 7
+    },
+    "billed": {},
+    "total_operations": 0,
+    "errors": 0,
+    "unbilled_chats": 1,
+    "free_retries": 0,
+    "costs_confirmed_by_probe": true,
+    "cost_model_measured_on": "2026-08-13"
+  }
+}

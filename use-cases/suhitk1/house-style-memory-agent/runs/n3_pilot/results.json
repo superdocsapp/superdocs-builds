@@ -1,0 +1,1665 @@
+{
+  "n": 3,
+  "arms": [
+    "memory_off",
+    "memory_on"
+  ],
+  "versions": {
+    "rubric": "1.0.3",
+    "templates": "1.0.1",
+    "h3_prompt": "h3_passive_v1"
+  },
+  "documents": [
+    "doc_01.md",
+    "doc_02.md",
+    "doc_03.md"
+  ],
+  "results": {
+    "memory_off": {
+      "memory_wipe_removed": null,
+      "total_ops": 6,
+      "documents": [
+        {
+          "document": "doc_01.md",
+          "arm": "memory_off",
+          "session_id": "session_init_d40aefd2c226",
+          "edit_billed": true,
+          "edit_ops_charged": 1,
+          "score_before": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "c71a0ad0da9b32b1",
+            "rules": {
+              "H1": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Furthermore, the team prepared a comprehensive overview of the work completed during this period and distributed it to all stakeholders prior to the conclusion of the review window.",
+                  "During the system integration process, we identified and addressed several key risks."
+                ]
+              },
+              "H2": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Client Onboarding Migration: Project Overview",
+                  "Project Background and Current Status",
+                  "Implementation Roadmap and Risk Assessment"
+                ]
+              },
+              "H3": {
+                "count_raw": 5,
+                "count_capped": 5,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "The project summary has been formally approved by the review group.",
+                  "the submission window officially closed on August 13, 2026",
+                  "NRR has been maintained for the reporting period.",
+                  "twelve findings have been logged",
+                  "the relevant figure is available in the register"
+                ]
+              },
+              "H4": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "twelve"
+                ]
+              },
+              "H5": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "12%"
+                ]
+              },
+              "H6": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "August 13, 2026"
+                ]
+              },
+              "H7": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "(see Harlow 2024)"
+                ]
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "leverage",
+                  "seamless",
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Risks associated with potential data mapping inaccuracies between integrated databases.",
+                  "Challenges regarding user adoption and resistance to revised operational procedures.",
+                  "Operational risks related to potential system downtime during the final cutover phase."
+                ]
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 17,
+              "deterministic_raw": 17,
+              "llm_capped": 5,
+              "llm_raw": 5,
+              "total_capped": 22,
+              "total_raw": 22
+            }
+          },
+          "corrections_sent": 8,
+          "rules_violated": 11,
+          "correction_billed": true,
+          "correction_ops_charged": 1,
+          "score_after": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "de1364e4e8d83e7e",
+            "rules": {
+              "H1": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Furthermore, the team prepared a comprehensive overview of the work completed during this period and distributed it to all stakeholders prior to the conclusion of the review window.",
+                  "During the system integration process, we identified and addressed several key risks."
+                ]
+              },
+              "H2": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Client onboarding migration: Project overview"
+                ]
+              },
+              "H3": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "llm",
+                "status": "ok",
+                "spans": []
+              },
+              "H4": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "seamless",
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Potential data mapping inaccuracies between integrated databases pose risks.",
+                  "User adoption challenges and resistance to revised operational procedures may arise.",
+                  "Potential system downtime during the final cutover phase creates operational risks."
+                ]
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 10,
+              "deterministic_raw": 10,
+              "llm_capped": 0,
+              "llm_raw": 0,
+              "total_capped": 10,
+              "total_raw": 10
+            }
+          },
+          "total_ops": 2
+        },
+        {
+          "document": "doc_02.md",
+          "arm": "memory_off",
+          "session_id": "session_init_345b9bad27d6",
+          "edit_billed": true,
+          "edit_ops_charged": 1,
+          "score_before": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "000c7cb13235a8e3",
+            "rules": {
+              "H1": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H2": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Apex Retail: Discovery Sprint Results",
+                  "Summary of Findings",
+                  "Recommended Next Steps"
+                ]
+              },
+              "H3": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "12 findings were identified",
+                  "Three sessions were conducted"
+                ]
+              },
+              "H4": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H5": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "12%"
+                ]
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "(see Harlow, 2024)"
+                ]
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "seamless",
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H13": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 8,
+              "deterministic_raw": 8,
+              "llm_capped": 2,
+              "llm_raw": 2,
+              "total_capped": 10,
+              "total_raw": 10
+            }
+          },
+          "corrections_sent": 6,
+          "rules_violated": 6,
+          "correction_billed": true,
+          "correction_ops_charged": 1,
+          "score_after": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "bc3cfa0b39ab4d34",
+            "rules": {
+              "H1": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H2": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H3": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "Three sessions were conducted during this period"
+                ]
+              },
+              "H4": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H13": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H14": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              }
+            },
+            "totals": {
+              "deterministic_capped": 1,
+              "deterministic_raw": 1,
+              "llm_capped": 1,
+              "llm_raw": 1,
+              "total_capped": 2,
+              "total_raw": 2
+            }
+          },
+          "total_ops": 2
+        },
+        {
+          "document": "doc_03.md",
+          "arm": "memory_off",
+          "session_id": "session_init_1a2a1740ac67",
+          "edit_billed": true,
+          "edit_ops_charged": 1,
+          "score_before": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "ebeff3d2a3014bb2",
+            "rules": {
+              "H1": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "As noted by Smith (2025), operational friction within the formatting and quality assurance stages contributes to this delay.",
+                  "To enhance operational efficiency, we recommend three immediate adjustments designed to reduce administrative overhead and accelerate delivery timelines.",
+                  "The implementation of these steps requires an investment of USD 45,000 for software licenses and training."
+                ]
+              },
+              "H2": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Internal Memorandum: Review of Document Handling Turnaround Times",
+                  "Summary of Findings",
+                  "Remediation Measures"
+                ]
+              },
+              "H3": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "the submission window closed on August 13, 2026",
+                  "the project handover was completed successfully",
+                  "the deadline was met narrowly"
+                ]
+              },
+              "H4": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "twelve",
+                  "3 sessions"
+                ]
+              },
+              "H5": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "12%"
+                ]
+              },
+              "H6": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "August 13, 2026"
+                ]
+              },
+              "H7": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "(see Harlow 2024)",
+                  "(2025)"
+                ]
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "robust",
+                  "leveraging"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Automate initial file routing processes.",
+                  "Standardize client template structures.",
+                  "Reassign three analysts to peak-load queues."
+                ]
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 19,
+              "deterministic_raw": 19,
+              "llm_capped": 3,
+              "llm_raw": 3,
+              "total_capped": 22,
+              "total_raw": 22
+            }
+          },
+          "corrections_sent": 8,
+          "rules_violated": 11,
+          "correction_billed": true,
+          "correction_ops_charged": 1,
+          "score_after": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "ac04b9f1abd03e40",
+            "rules": {
+              "H1": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "The implementation of these steps requires an investment of USD 45,000 for software licenses and training."
+                ]
+              },
+              "H2": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H3": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "project handover was completed successfully",
+                  "deadline was met narrowly"
+                ]
+              },
+              "H4": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "(2025)"
+                ]
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "leveraging"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Automate initial file routing processes.",
+                  "Standardize client template structures.",
+                  "Reassign three analysts to peak-load queues."
+                ]
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 8,
+              "deterministic_raw": 8,
+              "llm_capped": 2,
+              "llm_raw": 2,
+              "total_capped": 10,
+              "total_raw": 10
+            }
+          },
+          "total_ops": 2
+        }
+      ]
+    },
+    "memory_on": {
+      "memory_wipe_removed": 0,
+      "total_ops": 6,
+      "documents": [
+        {
+          "document": "doc_01.md",
+          "arm": "memory_on",
+          "session_id": "session_init_822a7eca6657",
+          "edit_billed": true,
+          "edit_ops_charged": 1,
+          "score_before": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "83fb4e95aac19097",
+            "rules": {
+              "H1": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H2": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Internal Project Memo: Client Onboarding Migration",
+                  "Background and Current Status",
+                  "Implementation Strategy and Risk Assessment"
+                ]
+              },
+              "H3": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "Several risks were identified during the system integration process",
+                  "These figures are documented in the register"
+                ]
+              },
+              "H4": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "twelve"
+                ]
+              },
+              "H5": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "12%"
+                ]
+              },
+              "H6": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "August 13, 2026"
+                ]
+              },
+              "H7": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "(see Harlow 2024)"
+                ]
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "seamless",
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 3,
+                "count_capped": 3,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Data mapping errors between databases.",
+                  "User resistance to procedural changes.",
+                  "Potential downtime during final cutover."
+                ]
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 14,
+              "deterministic_raw": 14,
+              "llm_capped": 2,
+              "llm_raw": 2,
+              "total_capped": 16,
+              "total_raw": 16
+            }
+          },
+          "corrections_sent": 8,
+          "rules_violated": 10,
+          "correction_billed": true,
+          "correction_ops_charged": 1,
+          "score_after": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "a29dd4910f24f527",
+            "rules": {
+              "H1": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H2": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Background and Current Status",
+                  "Implementation Strategy and Risk Assessment"
+                ]
+              },
+              "H3": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "llm",
+                "status": "ok",
+                "spans": [
+                  "conducted during this period",
+                  "These figures are documented in the register"
+                ]
+              },
+              "H4": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "User resistance to procedural changes.",
+                  "Potential downtime during final cutover."
+                ]
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 7,
+              "deterministic_raw": 7,
+              "llm_capped": 2,
+              "llm_raw": 2,
+              "total_capped": 9,
+              "total_raw": 9
+            }
+          },
+          "total_ops": 2
+        },
+        {
+          "document": "doc_02.md",
+          "arm": "memory_on",
+          "session_id": "session_init_da5fd9d98cf3",
+          "edit_billed": true,
+          "edit_ops_charged": 1,
+          "score_before": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "8b9df063f46c0e28",
+            "rules": {
+              "H1": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H2": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Discovery sprint results for Apex Retail"
+                ]
+              },
+              "H3": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "llm",
+                "status": "ok",
+                "spans": []
+              },
+              "H4": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "nine months"
+                ]
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "(see Harlow, 2024)"
+                ]
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "leverage",
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H13": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "NRR"
+                ]
+              },
+              "H14": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "I"
+                ]
+              }
+            },
+            "totals": {
+              "deterministic_capped": 7,
+              "deterministic_raw": 7,
+              "llm_capped": 0,
+              "llm_raw": 0,
+              "total_capped": 7,
+              "total_raw": 7
+            }
+          },
+          "corrections_sent": 6,
+          "rules_violated": 6,
+          "correction_billed": true,
+          "correction_ops_charged": 1,
+          "score_after": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "f7e1ae83d7837c4e",
+            "rules": {
+              "H1": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H2": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Discovery sprint results for Apex Retail"
+                ]
+              },
+              "H3": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "llm",
+                "status": "ok",
+                "spans": []
+              },
+              "H4": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "nine months"
+                ]
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H13": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H14": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              }
+            },
+            "totals": {
+              "deterministic_capped": 3,
+              "deterministic_raw": 3,
+              "llm_capped": 0,
+              "llm_raw": 0,
+              "total_capped": 3,
+              "total_raw": 3
+            }
+          },
+          "total_ops": 2
+        },
+        {
+          "document": "doc_03.md",
+          "arm": "memory_on",
+          "session_id": "session_init_4c72aa07469e",
+          "edit_billed": true,
+          "edit_ops_charged": 1,
+          "score_before": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "1ce7741500c11e56",
+            "rules": {
+              "H1": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Implementing these steps requires a USD 45,000 investment in software licenses and training."
+                ]
+              },
+              "H2": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H3": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "llm",
+                "status": "ok",
+                "spans": []
+              },
+              "H4": {
+                "count_raw": 2,
+                "count_capped": 2,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "four days",
+                  "two days"
+                ]
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "robust"
+                ]
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H13": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H14": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              }
+            },
+            "totals": {
+              "deterministic_capped": 4,
+              "deterministic_raw": 4,
+              "llm_capped": 0,
+              "llm_raw": 0,
+              "total_capped": 4,
+              "total_raw": 4
+            }
+          },
+          "corrections_sent": 3,
+          "rules_violated": 3,
+          "correction_billed": true,
+          "correction_ops_charged": 1,
+          "score_after": {
+            "rubric_id": "meridian",
+            "rubric_version": "1.0.3",
+            "content_hash": "7633e4614f509a0e",
+            "rules": {
+              "H1": {
+                "count_raw": 1,
+                "count_capped": 1,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": [
+                  "Implementing these steps requires a USD 45,000 investment in software licenses and training."
+                ]
+              },
+              "H2": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H3": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "llm",
+                "status": "ok",
+                "spans": []
+              },
+              "H4": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H5": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H6": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H7": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H8": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H9": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H10": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H11": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H12": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H13": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              },
+              "H14": {
+                "count_raw": 0,
+                "count_capped": 0,
+                "detector": "deterministic",
+                "status": "ok",
+                "spans": []
+              }
+            },
+            "totals": {
+              "deterministic_capped": 1,
+              "deterministic_raw": 1,
+              "llm_capped": 0,
+              "llm_raw": 0,
+              "total_capped": 1,
+              "total_raw": 1
+            }
+          },
+          "total_ops": 2
+        }
+      ]
+    }
+  },
+  "ledger": {
+    "calls": {
+      "init_session": 6,
+      "upload_document_base64": 6,
+      "chat": 12,
+      "export_document": 12,
+      "clear_cross_session_memory": 1
+    },
+    "billed": {
+      "chat": 12
+    },
+    "total_operations": 12,
+    "errors": 0,
+    "unbilled_chats": 0,
+    "free_retries": 0,
+    "costs_confirmed_by_probe": true,
+    "cost_model_measured_on": "2026-08-13"
+  }
+}

@@ -1,0 +1,1517 @@
+{
+  "seed_documents": [
+    "doc_01.md",
+    "doc_02.md",
+    "doc_03.md",
+    "doc_04.md",
+    "doc_05.md"
+  ],
+  "northwind": {
+    "memory_key": "leak_northwind",
+    "wipe_removed": 0,
+    "total_ops": 10,
+    "documents": [
+      {
+        "document": "doc_01.md",
+        "client": "northwind",
+        "session_id": "session_init_457424ce74db",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "northwind",
+          "rubric_version": "1.0.0",
+          "content_hash": "e1b5f25b38b664d8",
+          "rules": {
+            "N1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N2": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Project Memorandum: Client Onboarding Migration Strategy",
+                "Background and Current Status",
+                "Implementation Phase: Procedures and Risk Assessment"
+              ]
+            },
+            "N3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N4": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N7": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "your",
+                "your",
+                "you"
+              ]
+            },
+            "N8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N9": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Smith, 2025)"
+              ]
+            },
+            "N12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 7,
+            "deterministic_raw": 7,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 7,
+            "total_raw": 7
+          }
+        },
+        "corrections_sent": 3,
+        "correction_ops_charged": 1,
+        "final_text": "# Project memorandum: client onboarding migration strategy\n\n## Background and current status\n\nThe client onboarding workflow migration was officially initiated on 4 August 2026. This transition replaces the legacy software, which had historically contributed to processing delays, with the modern Apex System platform to enhance overall operational efficiency. It is confirmed that the initial phase of this migration has been completed ahead of schedule.\n\nSuccessful data migration necessitates diligent cross-departmental coordination. During the initial week of implementation, 12 client profiles were migrated. The newly deployed software has demonstrated a 45 percent reduction in manual data entry requirements. Preliminary feedback from internal stakeholders reflects improved user satisfaction.\n\n## Implementation phase: procedures and risk assessment\n\nRegarding staff training, the project team is currently addressing minor challenges. Three orientation sessions have been scheduled for next week, and the project team requests assistance in ensuring the attendance of direct reports. Please note that the migration timeline remains on schedule for full completion by 31 August 2026.\n\nDuring system integration, the project team identified several potential risks.\n\n* Data mapping discrepancies encountered between database systems\n* Organizational resistance regarding upcoming procedural changes\n* Risk of operational downtime during the final system cutover\n\nIt is imperative that consultants prioritize these items for immediate attention. According to recent industry research, the implementation of proactive change management strategies is essential to ensuring project success.\n\nShould the client have any questions, please direct them to the project office. The project office anticipates providing a subsequent update this coming Monday."
+      },
+      {
+        "document": "doc_02.md",
+        "client": "northwind",
+        "session_id": "session_init_71d4be0f1d8f",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "northwind",
+          "rubric_version": "1.0.0",
+          "content_hash": "181da3c2cc7c5fb5",
+          "rules": {
+            "N1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N2": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Apex Retail: Discovery Sprint Outcomes"
+              ]
+            },
+            "N3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N4": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "nine months"
+              ]
+            },
+            "N5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N7": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "your"
+              ]
+            },
+            "N8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N9": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Chen, 2024)"
+              ]
+            },
+            "N12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 4,
+            "deterministic_raw": 4,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 4,
+            "total_raw": 4
+          }
+        },
+        "corrections_sent": 4,
+        "correction_ops_charged": 1,
+        "final_text": "# Apex Retail: Discovery sprint outcomes\n\n## Overview of findings\n\nThe two-week discovery sprint concluded on 14 November 2026. Our analysis of current operations has isolated three primary bottlenecks: supply chain delays, manual inventory audits, and legacy payment systems. Collectively, these inefficiencies represent an estimated annual cost of USD 450,000 to the business.\n\nCurrent data indicates that inventory discrepancies are currently at 12 percent across regional warehouses [1]. Consequently, store managers are required to dedicate 15 hours per week to manual stock reconciliation. Furthermore, customers are experiencing frequent checkout failures, as the legacy payment infrastructure is failing to process transactions reliably during periods of peak traffic.\n\n## Recommended next steps\n\nTo effectively remediate the identified structural challenges, we recommend authorizing a 12-week implementation phase. This initiative is designed to modernize the client technical infrastructure and optimize warehouse operations. The proposed scope of engagement encompasses the following key workstreams:\n\n* Implementation of automated inventory tracking systems\n* Integration of a secure, cloud-based payment gateway\n* Standardization of supplier contract renegotiation protocols\n\nWe anticipate a full return on investment within nine months of deployment. Kindly review this report in advance of our scheduled alignment call on 20 November 2026."
+      },
+      {
+        "document": "doc_03.md",
+        "client": "northwind",
+        "session_id": "session_init_8e2f656d0cb9",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "northwind",
+          "rubric_version": "1.0.0",
+          "content_hash": "a3a0850b229a1a74",
+          "rules": {
+            "N1": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Implementation of these steps will cost the client USD 45,000 for software licenses and training."
+              ]
+            },
+            "N2": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Internal memorandum: Document handling turnaround review"
+              ]
+            },
+            "N3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N4": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "1",
+                "four days",
+                "two days"
+              ]
+            },
+            "N5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N9": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Automate initial file routing for the client.",
+                "Standardize client template structures.",
+                "Reassign three analysts to peak queues to assist the client."
+              ]
+            },
+            "N10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N11": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 8,
+            "deterministic_raw": 8,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 8,
+            "total_raw": 8
+          }
+        },
+        "corrections_sent": 4,
+        "correction_ops_charged": 1,
+        "final_text": "# Internal memorandum: document handling turnaround review\n\n## Overview of findings\n\nTurnaround times across the document handling team were evaluated on 14 August 2026. This analysis encompassed 45 distinct workflows and measured the processing duration from initial receipt to the final delivery for the client. Significant bottlenecks were identified during peak billing cycles.\n\nClient intake requests now take four days on average. That delay exceeds the target threshold by two days. The data indicates operational friction in formatting and quality assurance steps.[1]\n\n## Corrective actions\n\nThree immediate changes are recommended to enhance efficiency. These adjustments will reduce administrative overhead and accelerate delivery speeds. The client is requested to review the operational plan below.\n\n* Automate initial file routing for the client\n* Standardize client template structures\n* Reassign three analysts to peak queues to assist the client\n\nImplementation of these steps will cost the client USD 45,000 for software licenses and training. A 30 percent reduction in processing times is expected by the end of next month.\n\nThe client\u2019s continued support during the refinement of internal operations is appreciated. The client may contact the organization should further details regarding this assessment be required."
+      },
+      {
+        "document": "doc_04.md",
+        "client": "northwind",
+        "session_id": "session_init_d2a0d7c4430c",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "northwind",
+          "rubric_version": "1.0.0",
+          "content_hash": "f39aa81a39f53fe7",
+          "rules": {
+            "N1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N2": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N4": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "three months"
+              ]
+            },
+            "N5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N9": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Smith, 2025)"
+              ]
+            },
+            "N12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 2,
+            "deterministic_raw": 2,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 2,
+            "total_raw": 2
+          }
+        },
+        "corrections_sent": 2,
+        "correction_ops_charged": 1,
+        "final_text": "# Pilot project outcome memorandum\n\n## Overview of findings\n\nBetween 10 January 2025 and 10 April 2025, a pilot programme for automated intake triage was conducted to evaluate the software's ability to process client requests with greater efficiency than manual staff workflows. The tool was deployed across three departments to establish and measure initial performance metrics for the client.\n\nOver the past three months, the software successfully processed 450 client requests. The system achieved 88 percent accuracy in standard case categorisation, enabling the client\u2019s staff to save an average of four hours per week on administrative tasks.\n\n## Operational implications and recommendations for the client\n\nThe pilot program identified several operational bottlenecks within the client's current workflow. Specifically, the intake software encountered difficulties processing unstructured data inputs from legacy systems. Furthermore, staff resources were diverted to correct misclassified files, creating a hidden cost that diminished the initial time savings realized during the pilot.\n\nThese technical limitations must be addressed before the client scales the software firm-wide. Pilot data indicates clear financial benefits upon the resolution of integration errors [1]. The total deployment cost for the trial period was USD 45,000.\n\nWe recommend that the client proceed with the following actions:\n\n\\* Upgrade the core database connectors\n\n\\* Engage external developers for a two-week period\n\n\\* Retrain staff members on new protocols\n\nThe client will receive the final budget breakdown by 30 April 2025. Please direct any inquiries to the project steering committee."
+      },
+      {
+        "document": "doc_05.md",
+        "client": "northwind",
+        "session_id": "session_init_d7cb85db4d49",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "northwind",
+          "rubric_version": "1.0.0",
+          "content_hash": "7a24f432e323bbc1",
+          "rules": {
+            "N1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N2": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N4": {
+              "count_raw": 2,
+              "count_capped": 2,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "1",
+                "fifteen"
+              ]
+            },
+            "N5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N9": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "The client shall implement mandatory meeting-free Fridays.",
+                "The client shall reduce standard meeting durations to fifteen minutes.",
+                "The client shall require clear agendas for every calendar invite."
+              ]
+            },
+            "N10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N11": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "N12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 5,
+            "deterministic_raw": 5,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 5,
+            "total_raw": 5
+          }
+        },
+        "corrections_sent": 2,
+        "correction_ops_charged": 1,
+        "final_text": "# Review of delivery practices regarding meeting load\n\n## Findings and analysis\n\nOn 14 October 2026, the firm completed an internal audit of calendar data within the delivery practice. During the prior quarter, consultants dedicated twenty-four hours per week to internal discussions. This excessive scheduling negatively impacted billable output and diminished team morale, matters currently being addressed to optimize the client's service delivery.\n\nClient engagements have yielded significant value; however, internal status updates have constrained critical capacity. The financial impact, quantified based on average billing rates, demonstrates that this loss in productivity costs the client USD 4,500 per employee each month.\n\n## Action plan and recommended next steps\n\nInternal coordination will be streamlined immediately to protect profit margins. Department leadership has formulated three corrective actions to reduce meeting frequency. The client is requested to review these operational changes prior to the next leadership call.\n\n* The client shall implement mandatory meeting-free Fridays\n* The client shall reduce standard meeting durations to fifteen minutes\n* The client shall require clear agendas for every calendar invite\n\nThe firm anticipates that these measures will reclaim 10 hours of billable time weekly for each consultant. Previous research confirms that schedule interventions improve overall employee retention.[1]\n\nThe client should direct any inquiries regarding these schedule adjustments to the operations group. The firm appreciates the client's cooperation as it optimizes daily delivery workflows."
+      }
+    ]
+  },
+  "ember": {
+    "memory_key": "leak_ember",
+    "wipe_removed": 0,
+    "total_ops": 10,
+    "documents": [
+      {
+        "document": "doc_01.md",
+        "client": "ember",
+        "session_id": "session_init_b91acb34b06e",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "ember",
+          "rubric_version": "1.0.0",
+          "content_hash": "b184ef2c5f290008",
+          "rules": {
+            "E1": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "The new platform facilitates a 45 percent reduction in manual data entry, and early feedback from internal stakeholders confirms improved user satisfaction."
+              ]
+            },
+            "E2": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E4": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "three"
+              ]
+            },
+            "E5": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "percent"
+              ]
+            },
+            "E6": {
+              "count_raw": 2,
+              "count_capped": 2,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "4 August 2026",
+                "31 August 2026"
+              ]
+            },
+            "E7": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "the client"
+              ]
+            },
+            "E8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E9": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Data mapping discrepancies between databases",
+                "Resistance to procedural changes among users",
+                "Potential service interruption during final cutover"
+              ]
+            },
+            "E10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Smith, 2025)"
+              ]
+            },
+            "E12": {
+              "count_raw": 2,
+              "count_capped": 2,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "The migration of the client onboarding workflow commenced on 4 August 2026, transitioning from legacy systems that historically impeded operational efficiency.",
+                "The new platform facilitates a 45 percent reduction in manual data entry, and early feedback from internal stakeholders confirms improved user satisfaction."
+              ]
+            }
+          },
+          "totals": {
+            "deterministic_capped": 12,
+            "deterministic_raw": 12,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 12,
+            "total_raw": 12
+          }
+        },
+        "corrections_sent": 8,
+        "correction_ops_charged": 1,
+        "final_text": "# Project Memorandum: Onboarding Migration Strategy\n\n## Project Background and Current Status\n\nThe migration of your onboarding workflow commenced on Aug 4, 2026. This transitioned from legacy systems that historically impeded operational efficiency. Per your directive, we have successfully migrated to the Apex System platform. The initial phase was completed ahead of schedule.\n\nData migration necessitates precise cross-departmental coordination. During the initial week, we successfully imported 12 client profiles. The new platform facilitates a 45% reduction in manual data entry. Early feedback from internal stakeholders confirms improved user satisfaction.\n\n## Implementation Methodology and Risk Assessment\n\nWhile the project team addresses minor challenges concerning staff training, we have scheduled 3 orientation sessions for next week. Please ensure your direct reports attend these workshops. The migration timeline remains on track. Full completion is expected by Aug 31, 2026.\n\nOur assessment during the system integration phase identified several potential risks.\n\n* Data mapping discrepancies exist between databases.\n* Resistance to procedural changes persists among users.\n* Potential service interruption may occur during final cutover.\n\nConsultants are required to prioritize these action items. Industry analysis indicates that proactive change management is essential to project success [Smith, 2025](https://example.com/smith2025).\n\nPlease direct all inquiries to the project office. We anticipate providing a subsequent status update next Monday."
+      },
+      {
+        "document": "doc_02.md",
+        "client": "ember",
+        "session_id": "session_init_a407c533de74",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "ember",
+          "rubric_version": "1.0.0",
+          "content_hash": "6c1b3863c17276b7",
+          "rules": {
+            "E1": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Analysis of current operations identified 3 primary bottlenecks: supply chain delays, manual inventory audits, and legacy payment systems."
+              ]
+            },
+            "E2": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E4": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "two"
+              ]
+            },
+            "E5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E6": {
+              "count_raw": 2,
+              "count_capped": 2,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "14 November 2026",
+                "20 November 2026"
+              ]
+            },
+            "E7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E9": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Automated inventory management systems",
+                "Cloud-based payment gateway integration",
+                "Supplier contract renegotiation protocols"
+              ]
+            },
+            "E10": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "USD 4"
+              ]
+            },
+            "E11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Chen, 2024)"
+              ]
+            },
+            "E12": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Inventory discrepancies across regional warehouses currently reach 12% (Chen, 2024), requiring store managers to spend 15 hours weekly on manual reconciliation."
+              ]
+            }
+          },
+          "totals": {
+            "deterministic_capped": 10,
+            "deterministic_raw": 10,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 10,
+            "total_raw": 10
+          }
+        },
+        "corrections_sent": 7,
+        "correction_ops_charged": 1,
+        "final_text": "# Apex Retail: Discovery Sprint Results\n\n## Executive Summary\n\nThe 2-week discovery sprint concluded on Nov 14, 2026. Analysis of current operations identified 3 primary bottlenecks: supply chain delays, manual inventory audits and legacy payment systems. These inefficiencies result in an estimated annual cost of $450,000.\n\nInventory discrepancies across regional warehouses currently reach 12% ([Chen, 2024](url)). Store managers must spend 15 hours weekly on manual reconciliation. Furthermore, legacy payment software frequently drops transactions during peak traffic. This results in recurring checkout failures for customers.\n\n## Recommended Next Steps\n\nWe recommend authorizing a 12-week implementation phase to resolve these structural challenges. This initiative will modernize your technical infrastructure and optimize warehouse operations. The proposed scope encompasses the following workstreams:\n\n* Automated inventory management systems.\n* Cloud-based payment gateway integration.\n* Supplier contract renegotiation protocols.\n\nWe project a full return on investment within 9 months of deployment. Please review this report in advance of our 20 November 2026 alignment call."
+      },
+      {
+        "document": "doc_03.md",
+        "client": "ember",
+        "session_id": "session_init_47291f66c461",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "ember",
+          "rubric_version": "1.0.0",
+          "content_hash": "55f759451925b101",
+          "rules": {
+            "E1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E2": {
+              "count_raw": 3,
+              "count_capped": 3,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "Internal memorandum: document handling turnaround review",
+                "Overview of findings",
+                "Corrective actions"
+              ]
+            },
+            "E3": {
+              "count_raw": 4,
+              "count_capped": 4,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "You will",
+                "You will",
+                "You will",
+                "You will"
+              ]
+            },
+            "E4": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E9": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Smith, 2025)"
+              ]
+            },
+            "E12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 8,
+            "deterministic_raw": 8,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 8,
+            "total_raw": 8
+          }
+        },
+        "corrections_sent": 3,
+        "correction_ops_charged": 1,
+        "final_text": "# Internal memorandum: document handling turnaround review\n\n## Overview of findings\n\nWe evaluated your turnaround times on Aug 14, 2026. Our review covered 45 distinct workflows. We measured processing times from receipt to client delivery. We identified significant bottlenecks during peak billing cycles.\n\nYou currently experience a 4 day average for client intake requests. This duration exceeds our target threshold by 2 days. We identified operational friction during formatting and quality assurance (Smith, 2025).\n\n## Corrective actions\n\nYou should implement 3 immediate changes to improve efficiency. These adjustments will reduce administrative overhead and accelerate delivery speeds. Please review the operational plan below.\n\n* You will automate initial file routing.\n* You will standardize your client template structures.\n* You will reassign 3 analysts to peak queues.\n\nYou will spend $45,000 on software licenses and training for these steps. You can expect a 30% reduction in processing times by Aug 31, 2026.\n\nThank you for your ongoing support as we refine our internal operations. Please contact us if you need more details about this assessment."
+      },
+      {
+        "document": "doc_04.md",
+        "client": "ember",
+        "session_id": "session_init_5d2fe41e43d6",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "ember",
+          "rubric_version": "1.0.0",
+          "content_hash": "717074db30ab8ae9",
+          "rules": {
+            "E1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E2": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E4": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E9": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E10": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "USD 4"
+              ]
+            },
+            "E11": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 1,
+            "deterministic_raw": 1,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 1,
+            "total_raw": 1
+          }
+        },
+        "corrections_sent": 1,
+        "correction_ops_charged": 1,
+        "final_text": "# Pilot Outcome Memo\n\n## Overview of Findings\n\nWe piloted automated intake triage from Jan 10, 2025 to Apr 10, 2025. This project tested if software processes requests faster than our staff. We deployed the tool in 3 departments to measure performance.\n\nThe software processed 450 client requests over 3 months. System accuracy hit 88% for standard case categorisation. Staff saved 4 hours weekly on admin tasks.\n\n## Operational Impacts and Next Steps\n\nThe pilot revealed operational bottlenecks in our current workflow. The intake software struggled with unstructured legacy data. Staff spent time correcting misclassified files. This hidden cost reduced the expected time savings.\n\nWe must fix technical limits before scaling software firm-wide. Pilot data shows clear financial gains after fixing integration errors ([Smith, 2025](https://example.com/smith-2025)). The trial period cost $45,000.\n\nWe recommend these actions:\n\n\\* We\u2019ll upgrade the core database connectors.\n\n\\* We\u2019ll hire external developers for 2 weeks.\n\n\\* We\u2019ll retrain staff on new protocols.\n\nYou'll receive the final budget breakdown by Apr 30, 2025. Please direct your questions to the project steering committee."
+      },
+      {
+        "document": "doc_05.md",
+        "client": "ember",
+        "session_id": "session_init_76c946f2dc4a",
+        "edit_ops_charged": 1,
+        "score_before_own_rubric": {
+          "rubric_id": "ember",
+          "rubric_version": "1.0.0",
+          "content_hash": "e929433a4ca44ba1",
+          "rules": {
+            "E1": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E2": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E3": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E4": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E5": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E6": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E7": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E8": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E9": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E10": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            },
+            "E11": {
+              "count_raw": 1,
+              "count_capped": 1,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": [
+                "(Smith, 2024)"
+              ]
+            },
+            "E12": {
+              "count_raw": 0,
+              "count_capped": 0,
+              "detector": "deterministic",
+              "status": "ok",
+              "spans": []
+            }
+          },
+          "totals": {
+            "deterministic_capped": 1,
+            "deterministic_raw": 1,
+            "llm_capped": 0,
+            "llm_raw": 0,
+            "total_capped": 1,
+            "total_raw": 1
+          }
+        },
+        "corrections_sent": 1,
+        "correction_ops_charged": 1,
+        "final_text": "# Review of Delivery Practice Meeting Load\n\n## Findings and Analysis\n\nWe audited delivery practice calendar data on October 14, 2026. Last quarter consultants spent 24 hours weekly in internal meetings. This schedule reduced billable output and lowered team morale.\n\nClient engagements provided significant value. Yet internal status updates absorbed critical capacity. We quantified the financial impact through average billing rates. Lost productivity cost $4,500 per employee monthly.\n\n## Action Plan and Next Steps\n\nWe are streamlining internal coordination to protect margins. Leadership identified three actions to reduce meeting frequency. Please review these operational changes before our next call.\n\n* Implement mandatory Meeting-Free Fridays.\n* Restrict standard sync meetings to 15 minutes.\n* Require detailed agendas for every calendar invitation.\n\nThese measures will recover 10 hours of weekly billable time per consultant. Research indicates schedule interventions improve employee retention ([Smith, 2024](reference)).\n\nPlease direct inquiries regarding schedule adjustments to our operations group. We appreciate your cooperation as we optimize delivery workflows."
+      }
+    ]
+  },
+  "seed_baseline": {
+    "northwind_fingerprints": {
+      "doc_01.md": {
+        "strong": {
+          "L6": 2,
+          "L7": 1
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_02.md": {
+        "strong": {
+          "L6": 2,
+          "L10": 1
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_03.md": {
+        "strong": {
+          "L6": 1,
+          "L10": 1
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_04.md": {
+        "strong": {
+          "L6": 3,
+          "L10": 1
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_05.md": {
+        "strong": {
+          "L6": 1,
+          "L10": 1
+        },
+        "medium": {},
+        "weak": {}
+      }
+    },
+    "ember_fingerprints": {
+      "doc_01.md": {
+        "strong": {
+          "L7": 4
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_02.md": {
+        "strong": {
+          "L7": 2
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_03.md": {
+        "strong": {
+          "L7": 3
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_04.md": {
+        "strong": {
+          "L7": 2
+        },
+        "medium": {},
+        "weak": {}
+      },
+      "doc_05.md": {
+        "strong": {
+          "L7": 2
+        },
+        "medium": {},
+        "weak": {}
+      }
+    }
+  },
+  "contamination": {
+    "northwind_markers_in_ember_output": [
+      {
+        "document": "doc_01.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L6": 2,
+            "L7": 1
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_02.md",
+        "final": {
+          "strong": {
+            "L6": 1
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L6": 2,
+            "L10": 1
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_03.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L6": 1,
+            "L10": 1
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_04.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L6": 3,
+            "L10": 1
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_05.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L6": 1,
+            "L10": 1
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      }
+    ],
+    "ember_markers_in_northwind_output": [
+      {
+        "document": "doc_01.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L7": 4
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_02.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L7": 2
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_03.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L7": 3
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_04.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L7": 2
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      },
+      {
+        "document": "doc_05.md",
+        "final": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        },
+        "seed_baseline": {
+          "strong": {
+            "L7": 2
+          },
+          "medium": {},
+          "weak": {}
+        },
+        "net": {
+          "strong": {},
+          "medium": {},
+          "weak": {}
+        }
+      }
+    ],
+    "strong_hit_totals_net_of_baseline": {
+      "northwind_into_ember": 0,
+      "ember_into_northwind": 0
+    },
+    "strong_hit_totals_raw_unadjusted": {
+      "northwind_into_ember": 1,
+      "ember_into_northwind": 0
+    }
+  },
+  "limitation": "Seed prose was generated under MERIDIAN's own conventions (day-first dates, 'you' addressing the reader), which pre-existed as hits on Northwind's L6 and Ember's L7 strong fingerprints BEFORE any live call was made \u2014 confirmed by scanning the seed before this run. The headline metric is therefore net-of-seed-baseline, not the raw final count. This is a static baseline, not a live memory-off noise-floor pass on these documents \u2014 the operator's 5-stage plan did not include running the leak corpus memory-off; flagged rather than silently upgraded.",
+  "ledger": {
+    "calls": {
+      "clear_cross_session_memory": 2,
+      "init_session": 10,
+      "upload_document_base64": 10,
+      "chat": 20,
+      "export_document": 20
+    },
+    "billed": {
+      "chat": 20
+    },
+    "total_operations": 20,
+    "errors": 0,
+    "unbilled_chats": 0,
+    "free_retries": 0,
+    "costs_confirmed_by_probe": true,
+    "cost_model_measured_on": "2026-08-13"
+  }
+}

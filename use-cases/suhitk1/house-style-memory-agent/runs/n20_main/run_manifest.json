@@ -1,0 +1,12 @@
+{
+  "arms": [
+    0,
+    1,
+    2
+  ],
+  "versions": {
+    "h3_prompt": "h3_passive_v1",
+    "rubric": "1.0.3",
+    "templates": "1.1.0"
+  }
+}

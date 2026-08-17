@@ -1,0 +1,22 @@
+1. Document A: teach H13/H7 under a fresh key
+   target violations before correction: 2  corrections_sent=2
+
+2. Document B: fresh session, SAME key, generic instruction only (positive control, pre-wipe)
+   target violations (should be LOWER than A's if memory helped): 2
+
+3. Wipe
+   clear_cross_session_memory('wipe_test_probe') -> removed=1
+
+4. Document C: fresh session, SAME key, generic instruction only (post-wipe)
+   target violations (should be back to A-like if wipe worked): 1
+
+=== verdict ===
+{
+  "signal_established": true,
+  "learning_observed_pre_wipe": false,
+  "wipe_confirmed_by_behavioural_reversion": null,
+  "note": "wipe_confirmed is None when no learning signal was ever established (nothing to wipe), True/False only when a genuine before/after behavioural comparison was possible."
+}
+
+written: /Users/suhit/Desktop/Personal Projects/SuperDocs/superdocs-editor-agent/runs/wipe_test/results.json
+total SuperDocs operations spent: 4

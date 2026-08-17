@@ -1,0 +1,26 @@
+{
+  "response": "I've prepared changes for your review. Please approve or deny them.",
+  "session_id": "session_init_6205383d28c9",
+  "document_changes": {
+    "updated_html": null,
+    "version_id": null,
+    "changes_summary": null,
+    "requires_approval": true,
+    "pending_changes": [
+      {
+        "change_id": "6d07d1c5-bdac-4027-8da7-5afcfdc99806",
+        "operation": "edit",
+        "chunk_id": "c71de0b2-457a-4b74-ae1c-a49e1c819229",
+        "document_id": "doc_primary",
+        "old_html": "<p data-chunk-id=\"c71de0b2-457a-4b74-ae1c-a49e1c819229\">The team reviewed scope, budget and timeline.</p>",
+        "new_html": "<p data-chunk-id=\"c71de0b2-457a-4b74-ae1c-a49e1c819229\">The team reviewed scope, budget, and timeline.</p>",
+        "ai_explanation": "\u2705 I have added the comma to the list in the second section, so it now reads 'scope, budget, and timeline'."
+      }
+    ],
+    "changes": null,
+    "chunk_diffs": null,
+    "concurrent_merges": null
+  },
+  "usage": null,
+  "hint": null
+}

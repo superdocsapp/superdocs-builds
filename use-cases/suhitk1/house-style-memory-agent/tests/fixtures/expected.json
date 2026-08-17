@@ -1,0 +1,214 @@
+{
+  "_note": "Hand-computed BEFORE the checker was run against these fixtures. Every fixture asserts a FULL vector across all 14 rules, not just its target rule, so cross-talk between detectors is caught. Counts are {rule: [count_raw, count_capped]}; rules absent from a vector are asserted to be [0, 0]. Any change to a number here must be justified in PROGRESS.md, never fitted to the instrument's output.",
+  "h1_oxford.md": {
+    "target": "H1",
+    "vector": {
+      "H1": [
+        1,
+        1
+      ]
+    }
+  },
+  "h1_adverbial_list.md": {
+    "target": "H1",
+    "why": "Adverbial lead AND a genuine three-item list in the same sentence. Line 1 must count (the guard must not swallow it); line 2 must not (adverbial comma, no list). Added after a mutation test showed the guard was uncovered in this shape.",
+    "vector": {
+      "H1": [
+        1,
+        1
+      ]
+    }
+  },
+  "h2_headings.md": {
+    "target": "H2",
+    "vector": {
+      "H2": [
+        1,
+        1
+      ]
+    }
+  },
+  "h3_passive.md": {
+    "target": "H3",
+    "vector": {
+      "H3": [
+        1,
+        1
+      ]
+    }
+  },
+  "h4_numbers.md": {
+    "target": "H4",
+    "vector": {
+      "H4": [
+        2,
+        2
+      ]
+    }
+  },
+  "h4_date_daynumber.md": {
+    "target": "H4",
+    "why": "REGRESSION. Real Gemini prose wrote 'between January 1 and March 31'; H4 flagged the bare '1' as a spell-out-under-ten violation. Nobody writes 'January one'. Day numbers inside a date are date components, not prose numbers, and must be masked. Both lines must score zero.",
+    "vector": {}
+  },
+  "h4_unit_gap.md": {
+    "target": "H4",
+    "why": "REGRESSION. Real prose wrote '5 business days'. H4 required the unit to follow the numeral IMMEDIATELY, so an adjective between them turned a compliant numerals-with-units usage into a violation. The unit is now sought within the next three tokens. Line 1 and line 2 must score zero; line 3 ('3 critical risks', no unit anywhere near) remains a true violation.",
+    "vector": {
+      "H4": [
+        1,
+        1
+      ]
+    }
+  },
+  "h5_percent.md": {
+    "target": "H5",
+    "vector": {
+      "H5": [
+        1,
+        1
+      ]
+    }
+  },
+  "h5_span.md": {
+    "target": "H5",
+    "why": "REGRESSION. The H5 pattern matched only the final digit before the symbol, so a 30% violation reported its span as '0%'. Spans feed the correction messages the agent learns from, so a truncated span degrades every correction built on it. Count is 1; the span assertion lives in test_checker.py.",
+    "vector": {
+      "H5": [
+        1,
+        1
+      ]
+    }
+  },
+  "h6_dates.md": {
+    "target": "H6",
+    "vector": {
+      "H6": [
+        2,
+        2
+      ]
+    }
+  },
+  "h7_citations.md": {
+    "target": "H7",
+    "vector": {
+      "H7": [
+        2,
+        2
+      ]
+    }
+  },
+  "h8_contractions.md": {
+    "target": "H8",
+    "vector": {
+      "H8": [
+        2,
+        2
+      ]
+    }
+  },
+  "h9_length.md": {
+    "target": "H9",
+    "vector": {
+      "H9": [
+        1,
+        1
+      ]
+    }
+  },
+  "h10_hype.md": {
+    "target": "H10",
+    "vector": {
+      "H10": [
+        2,
+        2
+      ]
+    }
+  },
+  "h11_dashes.md": {
+    "target": "H11",
+    "vector": {
+      "H11": [
+        4,
+        4
+      ]
+    }
+  },
+  "h12_bullets.md": {
+    "target": "H12",
+    "vector": {
+      "H12": [
+        2,
+        2
+      ]
+    }
+  },
+  "h13_acronyms.md": {
+    "target": "H13",
+    "vector": {
+      "H13": [
+        1,
+        1
+      ]
+    }
+  },
+  "h14_person.md": {
+    "target": "H14",
+    "vector": {
+      "H14": [
+        2,
+        2
+      ]
+    }
+  },
+  "h14_sentence_initial.md": {
+    "target": "H14",
+    "why": "REGRESSION. H14 patterns were matched case-sensitively, so 'The reader' and 'One should' at the start of a sentence were invisible while the same words mid-sentence counted. Found by the injector round-trip, not by the fixture suite. Both lines are violations.",
+    "vector": {
+      "H14": [
+        2,
+        2
+      ]
+    }
+  },
+  "clean_document.md": {
+    "target": "silence",
+    "why": "A fully compliant document. The most important fixture in the suite: an instrument that fires on clean text inflates both arms and flattens the curve.",
+    "vector": {}
+  },
+  "false_positive_guards.md": {
+    "target": "guards",
+    "why": "Every documented false-positive shape, one per line: H1 sentence-initial adverbial comma, H8 possessive 's, H3 adjectival participle, H11 numeric range. All four must score zero.",
+    "vector": {}
+  },
+  "dirty_document.md": {
+    "target": "capping",
+    "why": "H10 carries 8 hype words against a cap of 5, so capped and uncapped counts must differ. This is the fixture that proves the cap is applied and the raw count is still recorded.",
+    "vector": {
+      "H1": [
+        1,
+        1
+      ],
+      "H2": [
+        1,
+        1
+      ],
+      "H5": [
+        1,
+        1
+      ],
+      "H6": [
+        1,
+        1
+      ],
+      "H10": [
+        8,
+        5
+      ]
+    },
+    "totals": {
+      "deterministic_raw": 12,
+      "deterministic_capped": 9
+    }
+  }
+}

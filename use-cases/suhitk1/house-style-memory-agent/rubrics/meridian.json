@@ -1,0 +1,463 @@
+{
+  "id": "meridian",
+  "name": "Meridian House Style",
+  "version": "1.0.3",
+  "created": "2026-08-13",
+  "role": "main_curve",
+  "description": "House style for the fictional agency Meridian. Formal-professional analyst-report register. This is the rubric the twenty-document memory-off vs memory-on curve is measured against. Fictional client; all corpus documents are fabricated.",
+  "counting": {
+    "unit": "violation instance",
+    "cap_per_rule_per_document": 5,
+    "record_uncapped": true,
+    "record_uncapped_note": "The checker MUST emit both `count_capped` (min(raw, 5)) and `count_raw` (uncapped) per rule per document. The cap prevents a single runaway rule from dominating the correction count; the raw count preserves the true magnitude of an early improvement, which the cap would otherwise silently compress. Both are reported in the write-up.",
+    "document_max_capped": 70,
+    "reporting_split": [
+      "deterministic_subset: H1, H2, H4, H5, H6, H7, H8, H9, H10, H11, H12, H13, H14 (13 rules, no model call)",
+      "llm_subset: H3 (1 rule, model judgment)"
+    ],
+    "reporting_split_note": "Headline curve is reported for the deterministic subset and for the full set separately, so the noisiest rule cannot be mistaken for the signal."
+  },
+  "checker_contract": {
+    "separate_from_editing_agent": true,
+    "blind_to_arm": true,
+    "blinding_note": "The checker process receives only document text and a rubric id. It is never passed the arm label (memory on/off), the run id, the document ordinal, the client id, or any prior score. Documents are submitted to the checker in a shuffled order with opaque content-hash filenames so the arm cannot be inferred from ordering or naming.",
+    "prompts_fixed_and_committed": true,
+    "prompt_directory": "checker/prompts/",
+    "prompt_change_policy": "A checker prompt is immutable once a real run has used it. Any change requires a new version file (e.g. h3_passive_v2.md), a new checker_prompt_version value here, a new rubric version, and re-scoring of all prior documents with the new version before any cross-version comparison is made. Mixed-version scores are never compared."
+  },
+  "proper_noun_allowlist": [
+    "Meridian",
+    "SuperDocs",
+    "Northwind",
+    "Ember",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q4",
+    "ARR",
+    "EU",
+    "UK",
+    "US",
+    "API",
+    "AI"
+  ],
+  "rules": [
+    {
+      "id": "H1",
+      "rule": "Oxford comma required in lists of three or more items.",
+      "detector": "deterministic",
+      "method": "regex",
+      "counting_unit": "each list that omits the serial comma",
+      "cap": 5,
+      "pattern": "\\b\\w+(?:\\s+\\w+){0,2},\\s+(?:\\w+\\s+){0,3}\\w+\\s+(?:and|or)\\s+\\w+",
+      "flags": [
+        "IGNORECASE"
+      ],
+      "guard": "Suppress when the comma is sentence-initial adverbial (match starts within the first 3 words of the sentence) or is followed by a clause containing a finite verb on both sides of the conjunction.",
+      "false_positive_notes": "Fires on 'In 2020, revenue and costs rose' (adverbial comma, not a list) and on compound predicates. Guard above reduces but does not eliminate this. Fixture tests in tests/fixtures/h1_*.txt must pin both the true-positive and the known false-positive shapes before this rule is used in a scored run.",
+      "examples": {
+        "violation": [
+          "We reviewed scope, budget and timeline."
+        ],
+        "compliant": [
+          "We reviewed scope, budget, and timeline."
+        ]
+      }
+    },
+    {
+      "id": "H2",
+      "rule": "Headings use sentence case: first word and proper nouns capitalized, nothing else.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "counting_unit": "each non-conforming heading",
+      "cap": 5,
+      "procedure": "For each heading node: tokenize on whitespace. A violation is recorded if any token after the first begins with an uppercase letter and is not in proper_noun_allowlist and is not fully uppercase acronym of length 2-5.",
+      "false_positive_notes": "Proper nouns outside the allowlist will false-positive. The allowlist is fixed at rubric version time and covers every proper noun appearing in the committed corpus; corpus generation must not introduce proper nouns absent from the list.",
+      "examples": {
+        "violation": [
+          "## Reviewing The Quarterly Numbers"
+        ],
+        "compliant": [
+          "## Reviewing the quarterly numbers",
+          "## Reviewing the Q3 numbers for Meridian"
+        ]
+      }
+    },
+    {
+      "id": "H3",
+      "rule": "Active voice. No passive constructions.",
+      "detector": "llm",
+      "method": "model_judgment",
+      "counting_unit": "each passive clause",
+      "cap": 5,
+      "checker_prompt": "checker/prompts/h3_passive_v1.md",
+      "checker_prompt_version": "h3_passive_v1",
+      "model": "gemini-3.5-flash-lite",
+      "temperature": 0,
+      "reported_separately": true,
+      "false_positive_notes": "The be-verb + past-participle heuristic over-fires on adjectival participles ('is required', 'was founded in 1997') and on legitimate agentless passives. This is the noisiest rule in the rubric and the only one requiring a model call. Its per-document contribution is reported as its own column so the curve can be read with and without it.",
+      "examples": {
+        "violation": [
+          "The report was approved by the committee."
+        ],
+        "compliant": [
+          "The committee approved the report."
+        ]
+      }
+    },
+    {
+      "id": "H4",
+      "rule": "Spell out zero through nine; use numerals for 10 and above; always use numerals when the number is paired with a unit of measure.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "counting_unit": "each violating number",
+      "cap": 5,
+      "procedure": "Violation if (a) a numeral 0-9 appears in prose with no unit token within the next three tokens, or (b) a number word for ten or above appears in prose, or (c) a number word zero-nine is immediately followed by a unit token.",
+      "unit_tokens": [
+        "px",
+        "kg",
+        "km",
+        "m",
+        "cm",
+        "ms",
+        "s",
+        "GB",
+        "MB",
+        "percent",
+        "days",
+        "weeks",
+        "months",
+        "years",
+        "hours"
+      ],
+      "scope_exclusions": [
+        "citation years",
+        "code spans",
+        "date day-numbers",
+        "headings",
+        "table cells",
+        "version strings"
+      ],
+      "examples": {
+        "violation": [
+          "We ran 3 sessions.",
+          "We ran twelve sessions."
+        ],
+        "compliant": [
+          "We ran three sessions.",
+          "We ran 12 sessions.",
+          "The window is 3 days."
+        ]
+      }
+    },
+    {
+      "id": "H5",
+      "rule": "Write 'percent' in prose. The % symbol is not used in body text.",
+      "detector": "deterministic",
+      "method": "regex",
+      "counting_unit": "each % symbol in prose",
+      "cap": 5,
+      "pattern": "\\d[\\d,]*(?:\\.\\d+)?\\s*%",
+      "pattern_note": "Matches the whole number, not just the digit before the symbol. The narrower \\d\\s*% reported a span of '0%' for a '30%' violation; spans are quoted verbatim into correction messages, so a truncated span degrades every correction built on it. Count is unaffected. Pinned by tests/fixtures/h5_span.md.",
+      "flags": [],
+      "scope_exclusions": [
+        "tables",
+        "code spans"
+      ],
+      "examples": {
+        "violation": [
+          "Adoption rose 12%."
+        ],
+        "compliant": [
+          "Adoption rose 12 percent."
+        ]
+      }
+    },
+    {
+      "id": "H6",
+      "rule": "Dates are written 13 August 2026. No ordinals, no slashes, no month-first ordering.",
+      "detector": "deterministic",
+      "method": "regex",
+      "counting_unit": "each non-conforming date",
+      "cap": 5,
+      "pattern": "\\b(?:\\d{1,2}(?:st|nd|rd|th)\\s+\\w+|\\d{1,2}/\\d{1,2}/\\d{2,4}|(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\\.?\\s+\\d{1,2},?\\s+\\d{4})\\b",
+      "flags": [
+        "IGNORECASE"
+      ],
+      "examples": {
+        "violation": [
+          "August 13, 2026",
+          "13th August 2026",
+          "13/08/2026"
+        ],
+        "compliant": [
+          "13 August 2026"
+        ]
+      }
+    },
+    {
+      "id": "H7",
+      "rule": "Citations are inline parenthetical (Author, Year). Bare URLs do not appear in body text.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "counting_unit": "each bare URL, plus each citation-like construct not matching (Author, Year)",
+      "cap": 5,
+      "patterns": {
+        "bare_url": "https?://\\S+",
+        "wellformed_citation": "\\([A-Z][A-Za-z&.\\- ]+,\\s*(?:19|20)\\d{2}\\)",
+        "citation_like": "\\((?:see\\s+)?[^)]*(?:19|20)\\d{2}[^)]*\\)"
+      },
+      "procedure": "Count every bare_url match. Then count every citation_like match that is not also a wellformed_citation match.",
+      "examples": {
+        "violation": [
+          "(see Harlow 2024)",
+          "https://example.com/report"
+        ],
+        "compliant": [
+          "(Harlow, 2024)"
+        ]
+      }
+    },
+    {
+      "id": "H8",
+      "rule": "No contractions.",
+      "detector": "deterministic",
+      "method": "regex",
+      "counting_unit": "each contraction",
+      "cap": 5,
+      "pattern": "\\b\\w+['\u2019](?:s|t|re|ve|ll|d|m)\\b",
+      "flags": [
+        "IGNORECASE"
+      ],
+      "guard": "Exclude possessive 's on nouns: suppress when the token before 's is a capitalized noun or is followed by a noun and the sentence has no auxiliary reading. Possessive/contraction disambiguation for 's is documented as a known imperfection; corpus generation avoids possessive 's to keep this rule clean.",
+      "false_positive_notes": "Possessive 's is the only ambiguous case. Corpus documents are generated without possessive 's so that this rule is exact on the measured set.",
+      "examples": {
+        "violation": [
+          "It's ready and we don't expect delays."
+        ],
+        "compliant": [
+          "It is ready and we do not expect delays."
+        ]
+      }
+    },
+    {
+      "id": "H9",
+      "rule": "No sentence exceeds 30 words.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "counting_unit": "each sentence over the limit",
+      "cap": 5,
+      "procedure": "Split on sentence-final punctuation followed by whitespace and a capital letter, with an abbreviation exception list. Count whitespace-delimited tokens containing at least one alphanumeric character. Violation if count > 30.",
+      "limit": 30,
+      "examples": {
+        "violation": [
+          "<a 31+ word sentence>"
+        ],
+        "compliant": [
+          "<any sentence of 30 words or fewer>"
+        ]
+      }
+    },
+    {
+      "id": "H10",
+      "rule": "Banned hype vocabulary.",
+      "detector": "deterministic",
+      "method": "wordlist",
+      "counting_unit": "each occurrence",
+      "cap": 5,
+      "wordlist": [
+        "leverage",
+        "leveraging",
+        "utilize",
+        "utilizing",
+        "robust",
+        "seamless",
+        "seamlessly",
+        "best-in-class",
+        "synergy",
+        "synergies",
+        "cutting-edge",
+        "revolutionize",
+        "revolutionary",
+        "delve",
+        "unlock",
+        "game-changing",
+        "world-class"
+      ],
+      "flags": [
+        "IGNORECASE",
+        "WORD_BOUNDARY"
+      ],
+      "examples": {
+        "violation": [
+          "We leverage a robust, seamless workflow."
+        ],
+        "compliant": [
+          "We use a reliable workflow."
+        ]
+      }
+    },
+    {
+      "id": "H11",
+      "rule": "Parenthetical breaks use an unspaced em dash. Spaced hyphens, double hyphens, and spaced en dashes are not used.",
+      "detector": "deterministic",
+      "method": "regex",
+      "counting_unit": "each non-conforming dash",
+      "cap": 5,
+      "pattern": "(?:\\s-{1,2}\\s|\\s\u2013\\s|\\s\u2014\\s)",
+      "flags": [],
+      "scope_exclusions": [
+        "bullet markers at line start",
+        "numeric ranges",
+        "code spans"
+      ],
+      "examples": {
+        "violation": [
+          "The result - unexpectedly - held.",
+          "The result \u2014 unexpectedly \u2014 held."
+        ],
+        "compliant": [
+          "The result\u2014unexpectedly\u2014held."
+        ]
+      }
+    },
+    {
+      "id": "H12",
+      "rule": "Bullet items begin with a capital letter and carry no terminal punctuation.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "counting_unit": "each non-conforming bullet item",
+      "cap": 5,
+      "procedure": "For each list item: violation if the first alphabetic character is lowercase, or if the item ends in . ! ? ; or :. One violation per item even if both halves fail.",
+      "examples": {
+        "violation": [
+          "- reviews the draft."
+        ],
+        "compliant": [
+          "- Reviews the draft"
+        ]
+      }
+    },
+    {
+      "id": "H13",
+      "rule": "Acronyms are expanded on first use with the acronym in parentheses; bare thereafter.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "counting_unit": "each acronym whose first occurrence in the document is unexpanded",
+      "cap": 5,
+      "procedure": "Find all tokens matching [A-Z]{2,5} that are not in the never_expand list. For each distinct acronym, locate its first occurrence; violation if it is not immediately preceded by an expansion of the form 'Words Words (ACRONYM)'.",
+      "never_expand": [
+        "AI",
+        "CEO",
+        "EU",
+        "EUR",
+        "GBP",
+        "IT",
+        "PDF",
+        "UK",
+        "URL",
+        "US",
+        "USD"
+      ],
+      "examples": {
+        "violation": [
+          "ARR grew this year."
+        ],
+        "compliant": [
+          "Annual Recurring Revenue (ARR) grew this year."
+        ]
+      }
+    },
+    {
+      "id": "H14",
+      "rule": "Person: 'we' for the firm, 'you' for the reader. Never 'I', never 'one' as a pronoun, never 'the reader'.",
+      "detector": "deterministic",
+      "method": "wordlist",
+      "counting_unit": "each occurrence",
+      "cap": 5,
+      "banned_patterns": [
+        {
+          "pattern": "\\bI\\b",
+          "ignore_case": false,
+          "note": "case-sensitive: lowercase 'i' is not the pronoun"
+        },
+        {
+          "pattern": "\\bmy\\b",
+          "ignore_case": true
+        },
+        {
+          "pattern": "\\bone (?:should|must|can|may|will)\\b",
+          "ignore_case": true
+        },
+        {
+          "pattern": "\\bthe reader\\b",
+          "ignore_case": true
+        }
+      ],
+      "flags": [
+        "WORD_BOUNDARY"
+      ],
+      "examples": {
+        "violation": [
+          "I recommend that one should review the draft."
+        ],
+        "compliant": [
+          "We recommend that you review the draft."
+        ]
+      }
+    }
+  ],
+  "changelog": [
+    {
+      "version": "1.0.3",
+      "date": "2026-08-13",
+      "changes": [
+        "H14 banned_patterns become objects carrying their own case sensitivity. The patterns were matched case-sensitively, so a sentence-initial 'The reader' or 'One should' was missed while mid-sentence occurrences counted. '\\\\bI\\\\b' must stay case-sensitive (lowercase 'i' is not a violation), so a blanket IGNORECASE was not available. Found by the injector round-trip; pinned by tests/fixtures/h14_sentence_initial.md.",
+        "No scored run has used any earlier version, so no re-scoring is owed."
+      ]
+    },
+    {
+      "version": "1.0.2",
+      "date": "2026-08-13",
+      "changes": [
+        "H4 (a): the unit token may now be separated from the numeral by up to two modifiers ('5 business days'). Requiring adjacency turned compliant numerals-with-units prose into violations. Found against real model prose; pinned by tests/fixtures/h4_unit_gap.md.",
+        "No scored run has used any earlier version, so no re-scoring is owed."
+      ]
+    },
+    {
+      "version": "1.0.1",
+      "date": "2026-08-13",
+      "changes": [
+        "H5 pattern widened to match the whole number, not the digit adjacent to the symbol. Counts unaffected; spans are quoted into correction messages and a '30%' violation was reporting '0%'.",
+        "H13 never_expand gains IT, alongside US/UK/EU/AI/CEO/PDF/URL. 'Information Technology (IT)' is pedantic beyond the list's stated intent. Found when real model prose wrote 'the IT department'.",
+        "No scored run has used version 1.0.0, so no re-scoring is owed."
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "date": "2026-08-13",
+      "changes": [
+        "Initial rubric."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "_note": "Twenty fixed topics, one per document, in fixed order. All fictional. Document order is FIXED (not randomized) so each document is a matched pair across arms; difficulty drift is defended by the uniform injected profile, the raw-document verification pass, and the repeated memory-off arm instead.",
+  "version": "1.0.0",
+  "topics": [
+    "a migration of the client onboarding workflow to a new internal tool",
+    "the results of a two-week discovery sprint for a retail client",
+    "a review of turnaround times in the document handling team",
+    "the outcome of a pilot programme for automated intake triage",
+    "a summary of vendor evaluation for a reporting platform",
+    "the status of a data quality clean-up in the records team",
+    "a retrospective on the spring release of an internal portal",
+    "the findings of a staffing review across two delivery pods",
+    "a proposal to consolidate three overlapping status reports",
+    "the results of a customer satisfaction survey for a support desk",
+    "an assessment of backlog growth in the change request queue",
+    "a review of onboarding time for new analysts in the practice",
+    "the outcome of a trial of asynchronous stand-up updates",
+    "a summary of cost variance across two client engagements",
+    "the status of an accessibility audit for an internal tool",
+    "a review of handover quality between two project phases",
+    "the findings of a workshop on estimation accuracy",
+    "a proposal to change the cadence of client progress reports",
+    "the results of a pilot for a shared knowledge repository",
+    "an assessment of tooling overlap across the delivery teams"
+  ],
+  "_spares_note": "Replacement topics. A seed draft is rejected when the model ignores a structural requirement (doc_05 under v2 came back with no bulleted list, so the H12 injection had nothing to transform). Temperature is 0, so regenerating the same topic returns the same draft; a rejected document is therefore replaced from this list, and the substitution is recorded in provenance.json.",
+  "spares": [
+    "a review of meeting load across the delivery practice",
+    "the outcome of a trial of paired document review",
+    "a summary of template adoption across client teams",
+    "the findings of a review of intake form completeness",
+    "an assessment of duplicate reporting in the weekly pack"
+  ]
+}

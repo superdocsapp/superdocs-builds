@@ -1,0 +1,1 @@
+The team prepared a summary of the work that the group had completed over the past period and then shared that summary with every person who had asked to see it before the close of the review window. The team shared the summary.

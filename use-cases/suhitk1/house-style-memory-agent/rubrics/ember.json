@@ -1,0 +1,355 @@
+{
+  "id": "ember",
+  "name": "Ember",
+  "version": "1.0.0",
+  "created": "2026-08-13",
+  "role": "leakage_test_client_b",
+  "description": "Fictional consumer-app client. Casual, second person, short sentences. Paired with `northwind` as the deliberately opposed client for the cross-customer leakage test. Every rule on axes L1-L11 is mutually exclusive with Northwind's rule on the same axis: no document can satisfy both. All corpus documents are fabricated.",
+  "opposed_to": "northwind",
+  "counting": {
+    "unit": "violation instance",
+    "cap_per_rule_per_document": 5,
+    "record_uncapped": true,
+    "document_max_capped": 60
+  },
+  "checker_contract": {
+    "separate_from_editing_agent": true,
+    "blind_to_arm": true,
+    "blind_to_client": false,
+    "prompts_fixed_and_committed": true,
+    "prompt_directory": "checker/prompts/"
+  },
+  "rules": [
+    {
+      "id": "E1",
+      "axis": "L1",
+      "rule": "No serial comma. Lists of three or more take no comma before the final conjunction.",
+      "detector": "deterministic",
+      "method": "regex",
+      "cap": 5,
+      "pattern": ",\\s+(?:and|or)\\s+\\w+",
+      "guard": "Suppress when the comma closes a parenthetical clause rather than a list item.",
+      "examples": {
+        "compliant": [
+          "scope, budget and timeline"
+        ],
+        "violation": [
+          "scope, budget, and timeline"
+        ]
+      }
+    },
+    {
+      "id": "E2",
+      "axis": "L2",
+      "rule": "Headings in Title Case: capitalize every word except articles, prepositions under five letters, and conjunctions.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "cap": 5,
+      "minor_words": [
+        "a",
+        "an",
+        "the",
+        "and",
+        "but",
+        "or",
+        "nor",
+        "for",
+        "as",
+        "at",
+        "by",
+        "in",
+        "of",
+        "off",
+        "on",
+        "per",
+        "to",
+        "up",
+        "via"
+      ],
+      "procedure": "For each heading: violation if any non-minor word after the first begins lowercase, or if the first word begins lowercase.",
+      "examples": {
+        "compliant": [
+          "## Getting Started With Ember"
+        ],
+        "violation": [
+          "## Getting started with Ember"
+        ]
+      }
+    },
+    {
+      "id": "E3",
+      "axis": "L3",
+      "rule": "Use contractions. Expanded forms of common contractions read as stiff and are corrected.",
+      "detector": "deterministic",
+      "method": "wordlist",
+      "cap": 5,
+      "banned_patterns": [
+        "\\bit is\\b",
+        "\\bdo not\\b",
+        "\\bdoes not\\b",
+        "\\bcannot\\b",
+        "\\bcan not\\b",
+        "\\byou will\\b",
+        "\\byou are\\b",
+        "\\bwe will\\b",
+        "\\bwe are\\b",
+        "\\bis not\\b",
+        "\\bwill not\\b"
+      ],
+      "flags": [
+        "IGNORECASE",
+        "WORD_BOUNDARY"
+      ],
+      "examples": {
+        "compliant": [
+          "It's ready and you'll see it now."
+        ],
+        "violation": [
+          "It is ready and you will see it now."
+        ]
+      }
+    },
+    {
+      "id": "E4",
+      "axis": "L4",
+      "rule": "Numerals always, including zero through nine.",
+      "detector": "deterministic",
+      "method": "wordlist",
+      "cap": 5,
+      "banned_patterns": [
+        "\\b(?:zero|one|two|three|four|five|six|seven|eight|nine)\\b"
+      ],
+      "flags": [
+        "IGNORECASE",
+        "WORD_BOUNDARY"
+      ],
+      "guard": "Suppress inside idioms on a fixed exception list ('one-off', 'no one', 'one another'). Exception list is fixed at rubric version time.",
+      "examples": {
+        "compliant": [
+          "3 taps"
+        ],
+        "violation": [
+          "three taps"
+        ]
+      }
+    },
+    {
+      "id": "E5",
+      "axis": "L5",
+      "rule": "Use the % symbol. The word 'percent' is not used.",
+      "detector": "deterministic",
+      "method": "regex",
+      "cap": 5,
+      "pattern": "\\bpercent\\b",
+      "flags": [
+        "IGNORECASE"
+      ],
+      "examples": {
+        "compliant": [
+          "12%"
+        ],
+        "violation": [
+          "12 percent"
+        ]
+      }
+    },
+    {
+      "id": "E6",
+      "axis": "L6",
+      "rule": "Dates as `Aug 13, 2026` \u2014 abbreviated month first, comma before year.",
+      "detector": "deterministic",
+      "method": "regex",
+      "cap": 5,
+      "violation_pattern": "\\b(?:\\d{1,2}\\s+(?:January|February|March|April|May|June|July|August|September|October|November|December)\\s+\\d{4}|\\d{1,2}(?:st|nd|rd|th)\\s+\\w+|\\d{1,2}/\\d{1,2}/\\d{2,4})\\b",
+      "compliant_pattern": "\\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \\d{1,2}, \\d{4}\\b",
+      "examples": {
+        "compliant": [
+          "Aug 13, 2026"
+        ],
+        "violation": [
+          "13 August 2026"
+        ]
+      }
+    },
+    {
+      "id": "E7",
+      "axis": "L7",
+      "rule": "Second person. The reader is 'you'. Third-person reference to the reader is forbidden.",
+      "detector": "deterministic",
+      "method": "wordlist",
+      "cap": 5,
+      "banned_patterns": [
+        "\\bthe user\\b",
+        "\\bthe customer\\b",
+        "\\bthe client\\b",
+        "\\bthe reader\\b",
+        "\\busers should\\b"
+      ],
+      "flags": [
+        "IGNORECASE",
+        "WORD_BOUNDARY"
+      ],
+      "examples": {
+        "compliant": [
+          "You can turn this off anytime."
+        ],
+        "violation": [
+          "The user can turn this off at any time."
+        ]
+      }
+    },
+    {
+      "id": "E8",
+      "axis": "L8",
+      "rule": "Spaced en dash ` \u2013 ` for parenthetical breaks. Em dashes and hyphens are not used for this.",
+      "detector": "deterministic",
+      "method": "regex",
+      "cap": 5,
+      "violation_pattern": "(?:\u2014|\\s-{1,2}\\s)",
+      "compliant_pattern": "\\s\u2013\\s",
+      "examples": {
+        "compliant": [
+          "It's fast \u2013 really fast \u2013 now"
+        ],
+        "violation": [
+          "It's fast\u2014really fast\u2014now"
+        ]
+      }
+    },
+    {
+      "id": "E9",
+      "axis": "L9",
+      "rule": "Bullet items are full sentences with terminal periods.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "cap": 5,
+      "procedure": "For each list item: violation if it does not end in '.', '!' or '?', or if it contains no finite verb (heuristic: no token from the auxiliary/verb-suffix set).",
+      "false_positive_notes": "The finite-verb heuristic is the one soft edge in Ember's rule set. Corpus generation keeps bullet items simple so the heuristic is reliable on the measured corpus.",
+      "examples": {
+        "compliant": [
+          "- Tap Settings to begin."
+        ],
+        "violation": [
+          "- Tapping Settings"
+        ]
+      }
+    },
+    {
+      "id": "E10",
+      "axis": "L10",
+      "rule": "Currency with the symbol: `$1,200`. ISO codes are not used.",
+      "detector": "deterministic",
+      "method": "regex",
+      "cap": 5,
+      "violation_pattern": "\\b(?:USD|GBP|EUR)\\s?\\d",
+      "compliant_pattern": "[$\u00a3\u20ac]\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?",
+      "examples": {
+        "compliant": [
+          "$1,200"
+        ],
+        "violation": [
+          "USD 1,200"
+        ]
+      }
+    },
+    {
+      "id": "E11",
+      "axis": "L11",
+      "rule": "Links are inline markdown `[text](url)`. No footnote markers, no author-year citations.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "cap": 5,
+      "patterns": {
+        "compliant_link": "\\[[^\\]]+\\]\\(https?://[^)]+\\)",
+        "violation_footnote": "\\[\\d{1,2}\\](?!\\()",
+        "violation_author_year": "\\([A-Z][A-Za-z&.\\- ]+,\\s*(?:19|20)\\d{2}\\)",
+        "violation_bare_url": "https?://(?!\\S*\\))\\S+"
+      },
+      "examples": {
+        "compliant": [
+          "see [the guide](https://example.com)"
+        ],
+        "violation": [
+          "see the guide [1]"
+        ]
+      }
+    },
+    {
+      "id": "E12",
+      "axis": null,
+      "rule": "No sentence exceeds 20 words.",
+      "detector": "deterministic",
+      "method": "procedure",
+      "cap": 5,
+      "limit": 20,
+      "client_specific": true,
+      "procedure": "Same sentence splitter and token counter as meridian.H9, limit 20.",
+      "examples": {
+        "compliant": [
+          "Tap Settings to turn this off."
+        ],
+        "violation": [
+          "If you want to turn this off you can go into the settings menu and find the toggle near the bottom and switch it off whenever you like."
+        ]
+      }
+    }
+  ],
+  "leak_fingerprints": {
+    "note": "Patterns that, if found in NORTHWIND's output, indicate Ember conventions crossed the customer boundary. Same strength classification and same noise-floor requirement as northwind.json.",
+    "strong": [
+      {
+        "axis": "L6",
+        "pattern": "\\b(?:Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \\d{1,2}, \\d{4}\\b",
+        "why": "US abbreviated month-first dates are explicitly forbidden by Northwind."
+      },
+      {
+        "axis": "L10",
+        "pattern": "[$\u00a3\u20ac]\\s?\\d",
+        "why": "Currency symbols are forbidden by Northwind and distinctive of Ember."
+      },
+      {
+        "axis": "L7",
+        "pattern": "\\byou\\b|\\byour\\b",
+        "why": "Second-person address in a compliance document is a strong Ember artefact."
+      },
+      {
+        "axis": "L11",
+        "pattern": "\\[[^\\]]+\\]\\(https?://[^)]+\\)",
+        "why": "Inline markdown links where Northwind requires numbered footnotes."
+      }
+    ],
+    "medium": [
+      {
+        "axis": "L2",
+        "why": "Title Case headings where Northwind requires sentence case"
+      },
+      {
+        "axis": "L3",
+        "why": "contractions where Northwind forbids them"
+      },
+      {
+        "axis": "L5",
+        "why": "% symbol where Northwind requires the word"
+      },
+      {
+        "axis": "L8",
+        "why": "spaced en dash where Northwind requires an unspaced em dash"
+      },
+      {
+        "axis": "L4",
+        "why": "numerals below ten where Northwind spells them out"
+      }
+    ],
+    "weak": [
+      {
+        "axis": "L1",
+        "why": "absence of the serial comma is a plausible base-model default"
+      },
+      {
+        "axis": "L9",
+        "why": "full-sentence bullets are a common default"
+      }
+    ],
+    "noise_floor_requirement": "Identical to northwind.json: Northwind's corpus is scored for these fingerprints with cross_session_memory OFF first, establishing the base rate. A leak is only claimed where the memory-on rate exceeds that base rate."
+  }
+}
