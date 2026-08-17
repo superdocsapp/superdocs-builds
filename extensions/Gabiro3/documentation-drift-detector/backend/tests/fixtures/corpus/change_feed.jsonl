@@ -1,0 +1,7 @@
+{
+  "tool_to_call": "superdocs_chat",
+  "description": "A change feed for test: npm renamed to pnpm in v2.0, default port changed to 8080 in v2.1"
+}
+{"type": "renamed", "old_value": "npm", "new_value": "pnpm", "source_ref": "CHANGELOG.md#v2.0", "evidence_span": "v2.0: Renamed npm to pnpm for performance"}
+{"type": "default_changed", "old_value": "3000", "new_value": "8080", "source_ref": "CHANGELOG.md#v2.1", "evidence_span": "v2.1: Default port changed from 3000 to 8080"}
+{"type": "added", "old_value": null, "new_value": "/api/v2/health", "source_ref": "CHANGELOG.md#v2.2", "evidence_span": "v2.2: New health check endpoint added — decoy, should not match any doc"}
