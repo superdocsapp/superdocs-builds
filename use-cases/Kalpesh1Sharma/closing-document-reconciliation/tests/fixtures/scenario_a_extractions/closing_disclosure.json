@@ -1,0 +1,119 @@
+{
+  "session_id": "mortgage-scenario-a-d8b0cb79",
+  "document_id": "doc_05cb494ed2",
+  "filename": "closing_disclosure.docx",
+  "recovered_from_saved_response": true,
+  "raw_extraction": {
+    "document_type": "closing_disclosure",
+    "borrower_names": {
+      "raw_value": "John A. Carter and Emily Carter",
+      "supporting_quote": "Borrowers: John A. Carter and Emily Carter"
+    },
+    "property_address": {
+      "raw_value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "supporting_quote": "Property Address: 812 Cedar Grove Drive, Austin, TX 78704"
+    },
+    "loan_amount": {
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Loan Amount: $420,000.00"
+    },
+    "interest_rate": {
+      "raw_value": "6.625%",
+      "supporting_quote": "Interest Rate: 6.625%"
+    },
+    "term": {
+      "raw_value": "360 months",
+      "supporting_quote": "Loan Term: 360 months"
+    },
+    "escrow": {
+      "raw_value": "Yes",
+      "supporting_quote": "Escrow Property Costs: Yes"
+    },
+    "fees": {
+      "origination": {
+        "raw_value": "$4,200.00",
+        "supporting_quote": "Origination Charges: $4,200.00"
+      },
+      "title_services": {
+        "raw_value": "$3,000.00",
+        "supporting_quote": "Title Services: $3,000.00"
+      }
+    },
+    "cash_to_close": {
+      "raw_value": "$93,050.00",
+      "supporting_quote": "Cash to Close: $93,050.00"
+    },
+    "rules": []
+  },
+  "canonical": {
+    "document_type": "closing_disclosure",
+    "filename": "closing_disclosure.docx",
+    "borrower_names": {
+      "value": "John A. Carter and Emily Carter",
+      "raw_value": "John A. Carter and Emily Carter",
+      "supporting_quote": "Borrowers: John A. Carter and Emily Carter",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "property_address": {
+      "value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "raw_value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "supporting_quote": "Property Address: 812 Cedar Grove Drive, Austin, TX 78704",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "loan_amount": {
+      "value": 420000.0,
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Loan Amount: $420,000.00",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "interest_rate": {
+      "value": 6.625,
+      "raw_value": "6.625%",
+      "supporting_quote": "Interest Rate: 6.625%",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "term_months": {
+      "value": 360,
+      "raw_value": "360 months",
+      "supporting_quote": "Loan Term: 360 months",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "escrow": {
+      "value": true,
+      "raw_value": "Yes",
+      "supporting_quote": "Escrow Property Costs: Yes",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "fees": {
+      "origination": {
+        "value": 4200.0,
+        "raw_value": "$4,200.00",
+        "supporting_quote": "Origination Charges: $4,200.00",
+        "source_document": "closing_disclosure.docx",
+        "confidence": null
+      },
+      "title_services": {
+        "value": 3000.0,
+        "raw_value": "$3,000.00",
+        "supporting_quote": "Title Services: $3,000.00",
+        "source_document": "closing_disclosure.docx",
+        "confidence": null
+      }
+    },
+    "cash_to_close": {
+      "value": 93050.0,
+      "raw_value": "$93,050.00",
+      "supporting_quote": "Cash to Close: $93,050.00",
+      "source_document": "closing_disclosure.docx",
+      "confidence": null
+    },
+    "rules": [],
+    "extraction_notes": []
+  }
+}

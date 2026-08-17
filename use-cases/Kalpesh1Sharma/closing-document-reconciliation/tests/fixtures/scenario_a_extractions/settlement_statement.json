@@ -1,0 +1,118 @@
+{
+  "session_id": "mortgage-scenario-a-d8b0cb79",
+  "document_id": "doc_78db475964",
+  "filename": "settlement_statement.docx",
+  "raw_extraction": {
+    "document_type": "settlement_statement",
+    "borrower_names": {
+      "raw_value": "John Carter & Emily Carter",
+      "supporting_quote": "Field Value Borrower(s) John Carter & Emily Carter"
+    },
+    "property_address": {
+      "raw_value": "812 Cedar Grove Dr., Austin, TX 78704",
+      "supporting_quote": "Settlement Property 812 Cedar Grove Dr., Austin, TX 78704"
+    },
+    "loan_amount": {
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Principal Amount of New Loan $420,000.00"
+    },
+    "interest_rate": {
+      "raw_value": null,
+      "supporting_quote": null
+    },
+    "term": {
+      "raw_value": null,
+      "supporting_quote": null
+    },
+    "escrow": {
+      "raw_value": "Yes",
+      "supporting_quote": "Escrow Collected Yes"
+    },
+    "fees": {
+      "origination": {
+        "raw_value": null,
+        "supporting_quote": null
+      },
+      "title_services": {
+        "raw_value": "$3,000.00",
+        "supporting_quote": "Settlement / Title Charges $3,000.00"
+      }
+    },
+    "cash_to_close": {
+      "raw_value": "$93,050.00",
+      "supporting_quote": "Amount Due From Borrower $93,050.00"
+    },
+    "rules": []
+  },
+  "canonical": {
+    "document_type": "settlement_statement",
+    "filename": "settlement_statement.docx",
+    "borrower_names": {
+      "value": "John Carter & Emily Carter",
+      "raw_value": "John Carter & Emily Carter",
+      "supporting_quote": "Field Value Borrower(s) John Carter & Emily Carter",
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "property_address": {
+      "value": "812 Cedar Grove Dr., Austin, TX 78704",
+      "raw_value": "812 Cedar Grove Dr., Austin, TX 78704",
+      "supporting_quote": "Settlement Property 812 Cedar Grove Dr., Austin, TX 78704",
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "loan_amount": {
+      "value": 420000.0,
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Principal Amount of New Loan $420,000.00",
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "interest_rate": {
+      "value": null,
+      "raw_value": null,
+      "supporting_quote": null,
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "term_months": {
+      "value": null,
+      "raw_value": null,
+      "supporting_quote": null,
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "escrow": {
+      "value": true,
+      "raw_value": "Yes",
+      "supporting_quote": "Escrow Collected Yes",
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "fees": {
+      "origination": {
+        "value": null,
+        "raw_value": null,
+        "supporting_quote": null,
+        "source_document": "settlement_statement.docx",
+        "confidence": null
+      },
+      "title_services": {
+        "value": 3000.0,
+        "raw_value": "$3,000.00",
+        "supporting_quote": "Settlement / Title Charges $3,000.00",
+        "source_document": "settlement_statement.docx",
+        "confidence": null
+      }
+    },
+    "cash_to_close": {
+      "value": 93050.0,
+      "raw_value": "$93,050.00",
+      "supporting_quote": "Amount Due From Borrower $93,050.00",
+      "source_document": "settlement_statement.docx",
+      "confidence": null
+    },
+    "rules": [],
+    "extraction_notes": []
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "scenario_id": "SCENARIO-A-001",
+  "synthetic": true,
+  "expected_results": {
+    "loan_amount": {
+      "status": "match",
+      "canonical_value": 420000.0
+    },
+    "interest_rate": {
+      "status": "curable",
+      "expected_values": {
+        "loan_estimate": 6.5,
+        "closing_disclosure": 6.625,
+        "promissory_note": 6.5,
+        "underwriting_approval": 6.5
+      },
+      "rule_id": "R-002",
+      "reason": "Closing Disclosure rate differs from the approved 6.500% rate."
+    },
+    "term": {
+      "status": "match",
+      "canonical_months": 360
+    },
+    "escrow": {
+      "status": "match",
+      "canonical_value": true
+    },
+    "origination": {
+      "status": "match",
+      "loan_estimate": 4200.0,
+      "closing_disclosure": 4200.0
+    },
+    "title_services": {
+      "status": "tolerable",
+      "loan_estimate": 2850.0,
+      "closing_disclosure": 3000.0,
+      "difference": 150.0,
+      "rule_id": "R-005"
+    },
+    "cash_to_close": {
+      "status": "curable",
+      "loan_estimate": 91700.0,
+      "closing_disclosure": 93050.0,
+      "settlement_statement": 93050.0,
+      "difference": 1350.0,
+      "rule_id": "R-006"
+    },
+    "borrower_names": {
+      "status": "match_after_normalization",
+      "rule_id": "R-007"
+    },
+    "property_address": {
+      "status": "match_after_normalization",
+      "rule_id": "R-008"
+    }
+  }
+}

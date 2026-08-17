@@ -1,0 +1,208 @@
+{
+  "session_id": "mortgage-scenario-a-d8b0cb79",
+  "document_id": "doc_58406efc47",
+  "filename": "underwriting_approval.docx",
+  "raw_extraction": {
+    "document_type": "underwriting_approval",
+    "borrower_names": {
+      "raw_value": "John A. Carter / Emily Carter",
+      "supporting_quote": "Approved Borrowers John A. Carter / Emily Carter"
+    },
+    "property_address": {
+      "raw_value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "supporting_quote": "Approved Property 812 Cedar Grove Drive, Austin, TX 78704"
+    },
+    "loan_amount": {
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Approved Principal $420,000.00"
+    },
+    "interest_rate": {
+      "raw_value": "6.500%",
+      "supporting_quote": "Approved Note Rate 6.500%"
+    },
+    "term": {
+      "raw_value": "360 months",
+      "supporting_quote": "Amortization Term 360 months"
+    },
+    "escrow": {
+      "raw_value": "Required",
+      "supporting_quote": "Escrow Requirement Required"
+    },
+    "fees": {
+      "origination": {
+        "raw_value": null,
+        "supporting_quote": null
+      },
+      "title_services": {
+        "raw_value": null,
+        "supporting_quote": null
+      }
+    },
+    "cash_to_close": {
+      "raw_value": null,
+      "supporting_quote": null
+    },
+    "rules": [
+      {
+        "rule_id": "R-001",
+        "rule_text": "The final loan amount must exactly match the approved principal amount.",
+        "supporting_quote": "R-001 The final loan amount must exactly match the approved principal amount."
+      },
+      {
+        "rule_id": "R-002",
+        "rule_text": "The final interest rate must exactly match the approved note rate. Any discrepancy requires a revised Closing Disclosure before funding.",
+        "supporting_quote": "R-002 The final interest rate must exactly match the approved note rate. Any discrepancy requires a revised Closing Disclosure before funding."
+      },
+      {
+        "rule_id": "R-003",
+        "rule_text": "The amortization term must exactly match the approved term.",
+        "supporting_quote": "R-003 The amortization term must exactly match the approved term."
+      },
+      {
+        "rule_id": "R-004",
+        "rule_text": "Escrow must remain enabled unless a later written underwriting condition explicitly waives it.",
+        "supporting_quote": "R-004 Escrow must remain enabled unless a later written underwriting condition explicitly waives it."
+      },
+      {
+        "rule_id": "R-005",
+        "rule_text": "A Title & Settlement Services fee difference of up to $250.00 from the Loan Estimate is tolerable. A difference greater than $250.00 requires review and correction.",
+        "supporting_quote": "R-005 A Title & Settlement Services fee difference of up to $250.00 from the Loan Estimate is tolerable. A difference greater than $250.00 requires review and correction."
+      },
+      {
+        "rule_id": "R-006",
+        "rule_text": "A final cash-to-close difference greater than $500.00 from the Loan Estimate requires review and a revised disclosure request before funding.",
+        "supporting_quote": "R-006 A final cash-to-close difference greater than $500.00 from the Loan Estimate requires review and a revised disclosure request before funding."
+      },
+      {
+        "rule_id": "R-007",
+        "rule_text": "A borrower's middle initial may be omitted if the first and last names otherwise match.",
+        "supporting_quote": "R-007 A borrower's middle initial may be omitted if the first and last names otherwise match."
+      },
+      {
+        "rule_id": "R-008",
+        "rule_text": "Standard postal street abbreviations such as Drive/Dr. and state-name abbreviations do not constitute a property-address variance when the street number, street name, city, state, and ZIP otherwise match.",
+        "supporting_quote": "R-008 Standard postal street abbreviations such as Drive/Dr. and state-name abbreviations do not constitute a property-address variance when the street number, street name, city, state, and ZIP otherwise match."
+      }
+    ]
+  },
+  "canonical": {
+    "document_type": "underwriting_approval",
+    "filename": "underwriting_approval.docx",
+    "borrower_names": {
+      "value": "John A. Carter / Emily Carter",
+      "raw_value": "John A. Carter / Emily Carter",
+      "supporting_quote": "Approved Borrowers John A. Carter / Emily Carter",
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "property_address": {
+      "value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "raw_value": "812 Cedar Grove Drive, Austin, TX 78704",
+      "supporting_quote": "Approved Property 812 Cedar Grove Drive, Austin, TX 78704",
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "loan_amount": {
+      "value": 420000.0,
+      "raw_value": "$420,000.00",
+      "supporting_quote": "Approved Principal $420,000.00",
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "interest_rate": {
+      "value": 6.5,
+      "raw_value": "6.500%",
+      "supporting_quote": "Approved Note Rate 6.500%",
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "term_months": {
+      "value": 360,
+      "raw_value": "360 months",
+      "supporting_quote": "Amortization Term 360 months",
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "escrow": {
+      "value": true,
+      "raw_value": "Required",
+      "supporting_quote": "Escrow Requirement Required",
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "fees": {
+      "origination": {
+        "value": null,
+        "raw_value": null,
+        "supporting_quote": null,
+        "source_document": "underwriting_approval.docx",
+        "confidence": null
+      },
+      "title_services": {
+        "value": null,
+        "raw_value": null,
+        "supporting_quote": null,
+        "source_document": "underwriting_approval.docx",
+        "confidence": null
+      }
+    },
+    "cash_to_close": {
+      "value": null,
+      "raw_value": null,
+      "supporting_quote": null,
+      "source_document": "underwriting_approval.docx",
+      "confidence": null
+    },
+    "rules": [
+      {
+        "rule_id": "R-001",
+        "rule_text": "The final loan amount must exactly match the approved principal amount.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-001 The final loan amount must exactly match the approved principal amount."
+      },
+      {
+        "rule_id": "R-002",
+        "rule_text": "The final interest rate must exactly match the approved note rate. Any discrepancy requires a revised Closing Disclosure before funding.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-002 The final interest rate must exactly match the approved note rate. Any discrepancy requires a revised Closing Disclosure before funding."
+      },
+      {
+        "rule_id": "R-003",
+        "rule_text": "The amortization term must exactly match the approved term.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-003 The amortization term must exactly match the approved term."
+      },
+      {
+        "rule_id": "R-004",
+        "rule_text": "Escrow must remain enabled unless a later written underwriting condition explicitly waives it.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-004 Escrow must remain enabled unless a later written underwriting condition explicitly waives it."
+      },
+      {
+        "rule_id": "R-005",
+        "rule_text": "A Title & Settlement Services fee difference of up to $250.00 from the Loan Estimate is tolerable. A difference greater than $250.00 requires review and correction.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-005 A Title & Settlement Services fee difference of up to $250.00 from the Loan Estimate is tolerable. A difference greater than $250.00 requires review and correction."
+      },
+      {
+        "rule_id": "R-006",
+        "rule_text": "A final cash-to-close difference greater than $500.00 from the Loan Estimate requires review and a revised disclosure request before funding.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-006 A final cash-to-close difference greater than $500.00 from the Loan Estimate requires review and a revised disclosure request before funding."
+      },
+      {
+        "rule_id": "R-007",
+        "rule_text": "A borrower's middle initial may be omitted if the first and last names otherwise match.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-007 A borrower's middle initial may be omitted if the first and last names otherwise match."
+      },
+      {
+        "rule_id": "R-008",
+        "rule_text": "Standard postal street abbreviations such as Drive/Dr. and state-name abbreviations do not constitute a property-address variance when the street number, street name, city, state, and ZIP otherwise match.",
+        "source_document": "underwriting_approval.docx",
+        "supporting_quote": "R-008 Standard postal street abbreviations such as Drive/Dr. and state-name abbreviations do not constitute a property-address variance when the street number, street name, city, state, and ZIP otherwise match."
+      }
+    ],
+    "extraction_notes": []
+  }
+}
