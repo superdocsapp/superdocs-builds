@@ -319,11 +319,24 @@ class SuperDocsClient:
         self._post(f"/v1/chat/{session_id}/approve", payload)
 
     def export(self, session_id: str, out_path: Path, fmt: str = "docx") -> Path:
-        """Export the finished document. Exports never cost operations."""
+        """Export the finished document. Exports never cost operations.
+
+        A4 because the reader is an Indian state regulator, and narrow margins because
+        page count is a property of the deliverable: a commission reads a two-page
+        after-action report and skims a five-page one.
+        """
         self.usage.calls += 1
         response = self._http.post(
             "/v1/documents/export",
-            json={"session_id": session_id, "format": fmt, "options": {"filename": out_path.stem}},
+            json={
+                "session_id": session_id,
+                "format": fmt,
+                "options": {
+                    "filename": out_path.stem,
+                    "paper_size": "A4",
+                    "margins": "narrow",
+                },
+            },
         )
         if response.status_code >= 400:
             raise SuperDocsError(f"export -> {response.status_code}: {response.text[:400]}")

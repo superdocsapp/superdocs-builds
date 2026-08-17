@@ -129,6 +129,15 @@ def _report(result) -> None:
             typer.style(f"    [{flagged.verdict}] ", fg=typer.colors.RED)
             + f"({flagged.section}) {flagged.sentence[:110]}"
         )
+    for problem in result.drift[:8]:
+        typer.echo(typer.style("    [drift] ", fg=typer.colors.RED) + problem)
+    if result.retried:
+        typer.echo(
+            typer.style(
+                f"  re-issued after an edit did not land: {', '.join(result.retried)}",
+                fg=typer.colors.YELLOW,
+            )
+        )
     typer.echo(
         f"  carried forward: {result.carry['inherited']} inherited "
         f"({result.carry['inherited_open']} open, {result.carry['inherited_closed']} closed), "

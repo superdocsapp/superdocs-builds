@@ -160,6 +160,28 @@ def citation_spans(sentences: list[str]) -> list[str]:
     return units
 
 
+# The `| --- | --- |` rule under a markdown table's header row.
+_TABLE_RULE = re.compile(r"^\s*\|[\s\-:|]+\|\s*$")
+
+
+def strip_table_headers(text: str) -> str:
+    """Drop a markdown table's header row and the rule beneath it.
+
+    A header row names the columns; it asserts nothing and cites nothing, so scoring it
+    would report `| Time | Event |` as an unsourced claim. The rule line is what
+    identifies it — the row above a `| --- | --- |` is a header by definition — which is
+    narrower than exempting anything that merely looks structural.
+    """
+    lines = text.replace("\r", "").split("\n")
+    drop: set[int] = set()
+    for i, line in enumerate(lines):
+        if _TABLE_RULE.match(line) and "-" in line:
+            drop.add(i)
+            if i and lines[i - 1].lstrip().startswith("|"):
+                drop.add(i - 1)
+    return "\n".join(line for i, line in enumerate(lines) if i not in drop)
+
+
 def verify(narrative: str, facts: FactSet, section: str, allowed: list[str] | None = None) -> TraceReport:
     """Check one drafted section against the log entries it was permitted to use."""
     corpus: Corpus = facts.corpus
@@ -170,7 +192,7 @@ def verify(narrative: str, facts: FactSet, section: str, allowed: list[str] | No
     # Grouped per paragraph: a citation belongs to the paragraph it sits in and cannot
     # vouch for assertions made in a different one.
     units: list[str] = []
-    for paragraph in narrative.replace("\r", "").split("\n"):
+    for paragraph in strip_table_headers(narrative).split("\n"):
         sentences = [s for s in split_sentences(paragraph) if not _STRUCTURAL.match(s)]
         units.extend(citation_spans(sentences))
 
@@ -231,3 +253,62 @@ def verify_document(sections: dict[str, str], facts: FactSet) -> TraceReport:
     for section, narrative in sections.items():
         whole.results.extend(verify(narrative, facts, section).results)
     return whole
+
+
+# A heading in the exported document. The skeleton's own headings are numbered.
+_ANY_HEADING = re.compile(r"^#{1,3}\s+(.+?)\s*$", re.MULTILINE)
+_LEFTOVER = re.compile(r"placeholder\s+for\b|please fill", re.IGNORECASE)
+
+
+def structural_drift(markdown: str, expected: list[str], drafted: list[str]) -> list[str]:
+    """Headings and leftovers that should not be in the finished document.
+
+    Checking citations inside the sections we know about leaves a hole: a model that
+    invents a *new* heading can write whatever it likes underneath, and the traceability
+    pass never looks there, because it only reads the sections it recognises. A run that
+    scored full marks did exactly that once — it added a duplicate section heading and a
+    line reading "Please fill", and every claim still traced.
+
+    So the document's shape is checked as well as its contents. Every heading must be one
+    the skeleton put there, and no section that was drafted may still be carrying its
+    placeholder — an edit that silently failed to land looks identical to one that was
+    never asked for.
+    """
+    allowed = {h.strip().casefold() for h in expected}
+    drift = [
+        f"unexpected heading: {found.strip()}"
+        for found in _ANY_HEADING.findall(markdown)
+        if found.strip().casefold() not in allowed
+    ]
+    drift += [f"placeholder text survived in: {s}" for s in unfilled(markdown, drafted)]
+    return drift
+
+
+def unfilled(markdown: str, sections: list[str]) -> list[str]:
+    """Sections that were drafted but still hold their placeholder.
+
+    An edit that is proposed, approved and then does not land leaves the document exactly
+    as it was, and the run reads as successful right up until someone opens the file. So
+    the document is asked rather than the API: whatever the service reported, a section
+    still carrying "Placeholder for…" was not written.
+    """
+    return [s for s in sections if _LEFTOVER.search(markdown_after(markdown, s) or "")]
+
+
+def markdown_after(markdown: str, heading: str) -> str:
+    """The text under one heading, up to the next heading of the same or higher level."""
+    lines = markdown.replace("\r", "").split("\n")
+    wanted = heading.strip().casefold()
+    for i, line in enumerate(lines):
+        found = _ANY_HEADING.match(line)
+        if not found or found.group(1).strip().casefold() != wanted:
+            continue
+        level = len(line) - len(line.lstrip("#"))
+        body: list[str] = []
+        for rest in lines[i + 1 :]:
+            nxt = _ANY_HEADING.match(rest)
+            if nxt and (len(rest) - len(rest.lstrip("#"))) <= level:
+                break
+            body.append(rest)
+        return "\n".join(body).strip()
+    return ""

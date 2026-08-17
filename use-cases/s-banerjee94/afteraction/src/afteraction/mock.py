@@ -30,10 +30,10 @@ from .client import Approver, ProposedChange, Usage, approve_all
 BULLET = re.compile(r"^-\s+(.*)$")
 SECTION_NAME = re.compile(r"section\s+[“\"]([^”\"]+)[”\"]")
 IMG_TAG = re.compile(r"<img[^>]+>")
-# Typographic quotes only. A straight quote also closes an HTML attribute, so accepting
-# both let this match the `"` ending alt="..." and swallow the instruction prose after
-# it straight into the document.
-CAPTION = re.compile(r"“([^”]*\[EL-\d{4}\][^”]*)”")
+# The instruction hands over the caption already marked up, so it is lifted rather than
+# extracted from prose. An earlier version matched a quoted run of text, which also
+# matched the `"` closing alt="..." and swallowed the instruction into the document.
+CAPTION = re.compile(r"<p><em>(.*?)</em></p>", re.S)
 
 
 class MockSuperDocs:
@@ -43,6 +43,7 @@ class MockSuperDocs:
         self,
         misbehave: str | None = None,
         reject_first: bool = False,
+        stall: str | None = None,
         sleep: Callable[[float], None] = lambda _: None,
     ) -> None:
         self.documents: dict[str, str] = {}
@@ -50,6 +51,11 @@ class MockSuperDocs:
         self.instructions: list[str] = []
         self.misbehave = misbehave
         self.reject_first = reject_first
+        # `stall` names a section whose first edit reports success and changes nothing —
+        # the live failure that left a section holding its placeholder while the run
+        # reported clean. The second attempt lands, so a retry can be shown to fix it.
+        self.stall = stall
+        self.stalled: set[str] = set()
         self.rejections: list[str] = []
         self.usage = Usage(operations_before=0, operations_after=0)
         self._sleep = sleep
@@ -117,6 +123,11 @@ class MockSuperDocs:
 
         html = self.documents.get(session_id, "")
         for change in approved:
+            section = change.chunk_id.partition("|")[0]
+            if self.stall and section == self.stall and section not in self.stalled:
+                # reported as applied, changed nothing — exactly how the live failure looked
+                self.stalled.add(section)
+                continue
             html = _apply(html, change)
         self.documents[session_id] = html
 
@@ -155,12 +166,15 @@ class MockSuperDocs:
                 ProposedChange(
                     change_id="mock-curve",
                     operation="edit",
-                    chunk_id="curve",
+                    chunk_id="Restoration Curve|curve",
                     old_html="Placeholder for the restoration curve.",
                     new_html=body,
                     explanation="Inserted the restoration curve and its caption.",
                 )
             ]
+
+        named = SECTION_NAME.search(message)
+        section = named.group(1) if named else ""
 
         buckets = _buckets(message)
         placeholders = {
@@ -170,18 +184,24 @@ class MockSuperDocs:
             "raised": "Placeholder for items raised by this event.",
         }
 
+        shapes = _shapes(message)
+
         changes: list[ProposedChange] = []
         for n, (bucket, statements) in enumerate(buckets.items(), start=1):
             if not statements:
                 continue
-            prose = " ".join(self._sentence(s, bucket) for s in statements)
+            written = [self._sentence(s, bucket) for s in statements]
+            if shapes.get(bucket) == "list":
+                body = "<ul>" + "".join(f"<li>{s}</li>" for s in written) + "</ul>"
+            else:
+                body = f"<p>{' '.join(written)}</p>"
             changes.append(
                 ProposedChange(
                     change_id=f"mock-{bucket}-{n}",
                     operation="edit",
-                    chunk_id=f"{bucket}-{n}",
+                    chunk_id=f"{section}|{bucket}-{n}",
                     old_html=placeholders[bucket],
-                    new_html=f"<p>{prose}</p>",
+                    new_html=body,
                     explanation=f"Drafted {len(statements)} {bucket} statement(s).",
                 )
             )
@@ -205,14 +225,26 @@ class MockSuperDocs:
 def _apply(html: str, change: ProposedChange) -> str:
     """Replace the placeholder paragraph the change targets, keeping how it is styled.
 
+    Two things this has to get right, both learned from defects.
+
     The live service edits chunks, so a paragraph's own formatting survives the edit and
-    the drafted prose inherits it. Matching a literal `<p>...</p>` string here would not:
-    it would miss any styled paragraph and silently leave the placeholder in place. So
-    the placeholder is found by its text, and the opening tag it was wearing is reused.
+    the drafted prose inherits it. Matching a literal `<p>...</p>` string would not: it
+    would miss any styled paragraph and silently leave the placeholder in place. So the
+    placeholder is found by its text and the opening tag it was wearing is reused.
+
+    And every section carries the *same* placeholder wording, so a document-wide "replace
+    the first match" writes each section's prose into whichever section is still empty
+    highest up the page. One rejected change was enough to shift every later section by
+    one and leave the last one blank. The live service has chunk ids and no such problem;
+    here the edit is scoped to the section the instruction named.
     """
     target = (change.old_html or "").strip()
     if not target:
         return html
+    section, _, _bucket = change.chunk_id.partition("|")
+    start, end = _section_bounds(html, section)
+    head, body, tail = html[:start], html[start:end], html[end:]
+
     para = re.compile(r"<p\b([^>]*)>\s*" + re.escape(target) + r"\s*</p>")
 
     def swap(match: re.Match[str]) -> str:
@@ -221,7 +253,47 @@ def _apply(html: str, change: ProposedChange) -> str:
         # prose keeps the paragraph; a block replacement, such as the curve, takes over
         return f"<p{match.group(1)}>{inner.group(1)}</p>" if inner else new
 
-    return para.sub(swap, html, count=1)
+    return head + para.sub(swap, body, count=1) + tail
+
+
+def _section_bounds(html: str, title: str) -> tuple[int, int]:
+    """Where one section starts and ends, by its `<h2>` heading. Whole document if unnamed."""
+    if not title:
+        return 0, len(html)
+    opening = re.search(r"<h2\b[^>]*>[^<]*" + re.escape(title) + r"[^<]*</h2>", html)
+    if not opening:
+        return 0, len(html)
+    following = re.search(r"<h2\b", html[opening.end() :])
+    return opening.end(), (opening.end() + following.start() if following else len(html))
+
+
+# The line that opens each bucket in an instruction, upper-cased for matching. One
+# definition, so the splitter and the shape detector below cannot drift apart.
+_HEADERS = {
+    "observed": "OBSERVED STATEMENTS",
+    "assessed": "ASSESSED STATEMENTS",
+    "gaps": "WHAT THE RECORDS DO NOT SHOW",
+    "raised": "ITEMS RAISED BY",
+}
+
+
+def _shapes(message: str) -> dict[str, str]:
+    """What shape the instruction asked each bucket to take: a list, or prose.
+
+    The live service is an AI editor and is told the form each section should take, not
+    only its content. A mock that always produced one paragraph would hide the
+    difference, and a timeline of eighteen entries reads very differently as a table than
+    as a single paragraph. So the mock obeys the same directive it sends.
+    """
+    shapes: dict[str, str] = {}
+    for bucket, header in _HEADERS.items():
+        for line in message.splitlines():
+            if not line.strip().upper().startswith(header):
+                continue
+            low = line.lower()
+            shapes[bucket] = "list" if "bulleted list" in low else "prose"
+    return shapes
+
 
 
 def _buckets(message: str) -> dict[str, list[str]]:
@@ -231,14 +303,9 @@ def _buckets(message: str) -> dict[str, list[str]]:
     for line in message.splitlines():
         stripped = line.strip()
         upper = stripped.upper()
-        if upper.startswith("OBSERVED STATEMENTS"):
-            current = "observed"
-        elif upper.startswith("ASSESSED STATEMENTS"):
-            current = "assessed"
-        elif upper.startswith("WHAT THE RECORDS DO NOT SHOW"):
-            current = "gaps"
-        elif stripped.startswith("Items raised by"):
-            current = "raised"
+        opened = next((b for b, h in _HEADERS.items() if upper.startswith(h)), None)
+        if opened:
+            current = opened
         elif match := BULLET.match(stripped):
             value = match.group(1).strip()
             if value and value != "(none)":
@@ -272,20 +339,33 @@ def html_to_markdown(html: str) -> str:
     Only the constructs the skeleton actually uses, so the traceability pass reads the
     same document text on both paths.
     """
-    text = html
-    # a table row is one line in the real export, however the template lays its cells out
-    text = re.sub(
-        r"<tr\b[^>]*>.*?</tr>",
-        lambda m: re.sub(r"\s*\n\s*", "", m.group(0)),
-        text,
-        flags=re.S,
-    )
+    text = re.sub(r"<tr\b[^>]*>.*?</tr>", _markdown_row, html, flags=re.S)
     text = re.sub(r"<h1[^>]*>(.*?)</h1>", r"\n# \1\n", text, flags=re.S)
     text = re.sub(r"<h2[^>]*>(.*?)</h2>", r"\n## \1\n", text, flags=re.S)
     text = re.sub(r"<h3[^>]*>(.*?)</h3>", r"\n### \1\n", text, flags=re.S)
     text = re.sub(r"<img[^>]*alt=\"([^\"]*)\"[^>]*>", r"\n![\1]\n", text)
-    text = re.sub(r"</(p|tr|table|tbody|thead)>", "\n", text)
-    text = re.sub(r"</t[dh]>", " | ", text)
+    text = re.sub(r"<li[^>]*>", "\n- ", text)
+    text = re.sub(r"</(p|li|ul|ol|table|tbody|thead)>", "\n", text)
     text = re.sub(r"<[^>]+>", "", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
-    return "\n".join(line.rstrip(" |").strip() for line in text.splitlines()).strip() + "\n"
+    return "\n".join(line.rstrip().strip() for line in text.splitlines()).strip() + "\n"
+
+
+def _markdown_row(match: re.Match[str]) -> str:
+    """One `<tr>` as a markdown table row, with the rule line under a header row.
+
+    The live export renders tables as real markdown tables, so the offline one does too —
+    otherwise the traceability pass reads a different document on each path, and the
+    table-header rule it relies on would never fire offline.
+    """
+    row = match.group(0)
+    cells = [
+        re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", cell)).strip()
+        for cell in re.findall(r"<t[dh]\b[^>]*>(.*?)</t[dh]>", row, re.S)
+    ]
+    if not cells:
+        return "\n"
+    line = "| " + " | ".join(cells) + " |"
+    if "<th" in row:
+        line += "\n| " + " | ".join("---" for _ in cells) + " |"
+    return f"\n{line}\n"

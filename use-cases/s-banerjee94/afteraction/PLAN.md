@@ -182,6 +182,21 @@ run commands, and the SuperDocs features used. Pull request into `superdocsapp/s
   worst place to find one.
 - **Observed, Assessed and gaps are colour-coded.** Teal, amber and grey. The distinction the build
   exists to protect should survive a reader who skims.
+- **SuperDocs is an AI editor, so form is asked for rather than assembled.** Each instruction states
+  the shape its section should take — a bulleted list for the timeline and the restoration figures,
+  a short paragraph elsewhere — and the concision rules travel with it. Building the markup here and
+  sending it as text would waste the one thing the service is for. The offline mock obeys the same
+  directive, so the two paths produce the same document rather than only the same words.
+- **The finished document is checked for shape, not only for citations.** Every heading must be one
+  the skeleton wrote, and no drafted section may still hold its placeholder. Citations inside known
+  sections say nothing about content invented outside them, and a model that adds its own heading
+  can write anything underneath it.
+- **An edit that reports success and changes nothing is re-issued once.** Exports are free, so the
+  document is read back before it is called finished. Bounded to one pass: a second failure is
+  reported, because each retry costs an operation. A section a *person* rejected is never retried —
+  that is a decision the gate exists to record.
+- **Page count is a property of the deliverable.** A4, narrow margins, a wide and short curve.
+  Three pages for both storms.
 
 ## Risks
 

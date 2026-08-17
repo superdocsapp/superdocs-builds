@@ -29,7 +29,8 @@ RULES = (
     "Rules that override any other consideration:\n"
     "1. Use ONLY the statements listed. Do not add facts, context or background from "
     "general knowledge, however plausible.\n"
-    "2. Keep every [EL-nnnn] citation, every [assessed] marker and every [no record] "
+    "2. Keep every log citation in square brackets (for example [EL-0004]), every "
+    "[assessed] marker and every [no record] "
     "marker exactly where it sits, attached to the statement it supports. Never move, "
     "merge, invent or drop one.\n"
     "3. Never alter a number, a time or a name. They are computed from the records and "
@@ -37,8 +38,31 @@ RULES = (
     "4. Keep the two kinds of statement in their own paragraphs, under the sub-headings "
     "given. Never blend an assessed judgement into an observed paragraph.\n"
     "5. Write plain professional prose for a utility commission. No marketing tone, no "
-    "adjectives that the records do not support."
+    "adjectives that the records do not support.\n"
+    "6. Be concise. No lead-in sentence restating the heading, no closing summary, no "
+    "connective prose carrying no fact. Every sentence must carry at least one of the "
+    "statements listed. A commission reads a two-page report; it does not read a "
+    "six-page one.\n"
+    "7. Write only the section named. Do not add a heading, a table, a date line, a note "
+    "to the author, or any content of your own invention anywhere in the document.\n"
+    "8. Leave every existing heading exactly as it is — same words, same capitalisation. "
+    "The labels below are labels for you, not text to copy into the document."
 )
+
+# What shape each section should take. SuperDocs is an AI editor, not a text-replacement
+# pipe: it will judge form as well as write prose, so form is asked for rather than
+# assembled here. A timeline of eighteen entries is a list — asking for prose produced one
+# eighteen-sentence paragraph that no commission would read.
+FORM = {
+    "event_overview": "one paragraph, at most three sentences",
+    "timeline": (
+        "a bulleted list — one bullet per statement, in the order given, no lead-in "
+        "paragraph and no bullet of your own"
+    ),
+    "crew_mobilisation": "one paragraph, at most four sentences",
+    "restoration_performance": "a bulleted list — one bullet per statement",
+    "consumer_communications": "one paragraph, at most three sentences",
+}
 
 
 def skeleton_html(facts: FactSet, inherited: list[Lesson]) -> str:
@@ -151,9 +175,9 @@ def instruction_for(facts: FactSet, section: str) -> str | None:
         "",
         RULES,
         "",
-        "OBSERVED statements — every one traceable to the cited log entry. Write these "
-        "under the “Observed” sub-heading as flowing prose, keeping each citation with "
-        "its statement:",
+        f"OBSERVED statements — every one traceable to the cited log entry. Write these "
+        f"under the existing “Observed” sub-heading as {FORM[section]}, keeping each citation with "
+        f"its statement:",
     ]
     lines += [f"- {c.rendered()}" for c in observed] or ["- (none)"]
 
@@ -161,23 +185,25 @@ def instruction_for(facts: FactSet, section: str) -> str | None:
         lines += [
             "",
             "ASSESSED statements — the response team's judgement, not established by the "
-            "records. Write these under the “Assessed” sub-heading and keep the "
-            "[assessed] marker on each:",
+            "records. Write these under the existing “Assessed” sub-heading in at most two "
+            "sentences, keeping the [assessed] marker on each:",
         ]
         lines += [f"- {c.rendered()}" for c in assessed]
 
     if gaps:
+        shape = "as a bulleted list, one bullet each" if len(gaps) > 1 else "in one sentence"
         lines += [
             "",
-            "WHAT THE RECORDS DO NOT SHOW — write these under that sub-heading, plainly, "
-            "without speculating about what the missing data would have shown. Keep the "
-            "[no record] marker on each:",
+            f"WHAT THE RECORDS DO NOT SHOW — write these {shape} under the existing "
+            "“What the records do not show” sub-heading, leaving that heading's wording "
+            "unchanged. State them plainly, without speculating about what the missing "
+            "data would have shown, and keep the [no record] marker on each:",
         ]
         lines += [f"- {g.detail} [no record]" for g in gaps]
 
     lines += [
         "",
-        "Change nothing outside this section.",
+        "Change nothing outside this section. Do not touch any other heading.",
     ]
     return "\n".join(lines)
 
@@ -186,14 +212,18 @@ def curve_instruction(image_url: str, facts: FactSet) -> str:
     """Place the rendered curve inside the document."""
     event = facts.corpus.event
     peak = max(facts.readings, key=lambda r: r.consumers_out)
+    caption = (
+        f"Consumers without supply over the course of {event.name}, peaking at "
+        f"{peak.consumers_out:,} at {peak.at:%H:%M on %d %B %Y} [{peak.entry_id}]."
+    )
     return (
-        f"In section “Restoration Curve”, replace the placeholder paragraph with this "
-        f"image, full width:\n\n"
-        f'<img src="{image_url}" alt="Restoration curve for {event.name}" />\n\n'
-        f"Below the image add one caption sentence, exactly this text and nothing more: "
-        f"“Consumers without supply over the course of {event.name}, peaking at "
-        f"{peak.consumers_out:,} at {peak.at:%H:%M on %d %B %Y} [{peak.entry_id}].”\n\n"
-        "Change nothing outside this section."
+        f"In section “Restoration Curve”, replace the placeholder paragraph with exactly "
+        f"these two elements and nothing else:\n\n"
+        f'<img src="{image_url}" alt="Restoration curve for {event.name}" />\n'
+        f"<p><em>{caption}</em></p>\n\n"
+        "Reproduce that caption verbatim. Do not analyse the curve, do not add a heading, "
+        "and do not add any further sentence.\n\n"
+        "Change nothing outside this section. Do not touch any other heading."
     )
 
 
@@ -205,7 +235,9 @@ def lessons_instruction(facts: FactSet, raised: list[Lesson], inherited: list[Le
     event = facts.corpus.event
     lines = [
         "In section “Lessons Learned”, under the sub-heading “Raised by this event”, "
-        "replace the placeholder with one short paragraph per item below.",
+        "replace the placeholder with one short paragraph per item below. Each item is a "
+        "plain paragraph opening with its identifier — never a heading, never a table "
+        "row, and never a bulleted list.",
         "",
         GUARD,
         "",

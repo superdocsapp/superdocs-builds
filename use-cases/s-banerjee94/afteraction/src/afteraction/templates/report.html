@@ -21,32 +21,32 @@
   Slots are `{{name}}`. `template.py` fills them; it never adds styling of its own.
 -->
 <body style="margin:0;background-color:#eef1f4;">
-<div style="max-width:52rem;margin:0 auto;padding:2.5rem 3rem;background-color:#ffffff;">
+<div style="max-width:52rem;margin:0 auto;padding:2rem 2.5rem;background-color:#ffffff;">
 
 <!-- block:document -->
-<div style="border-bottom:3px solid #14505f;padding-bottom:0.6rem;margin-bottom:1.4rem;">
+<div style="border-bottom:3px solid #14505f;padding-bottom:0.4rem;margin-bottom:0.9rem;">
   <p style="margin:0 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;letter-spacing:0.12em;text-transform:uppercase;color:#5b6672;">{{utility}}</p>
-  <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:22pt;font-weight:normal;color:#14505f;">Storm Restoration After-Action Report</h1>
-  <p style="margin:0.4rem 0 0;font-family:Georgia,'Times New Roman',serif;font-size:13pt;color:#1b2430;">{{event_name}}</p>
+  <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:18pt;font-weight:normal;color:#14505f;">Storm Restoration After-Action Report</h1>
+  <p style="margin:0.25rem 0 0;font-family:Georgia,'Times New Roman',serif;font-size:12pt;color:#1b2430;">{{event_name}}</p>
 </div>
 
-<table style="border-collapse:collapse;width:100%;margin-bottom:1.5rem;">
+<table style="border-collapse:collapse;width:100%;margin-bottom:0.9rem;">
   <tbody>
     <tr>
-      <td style="width:34%;padding:6px 10px 6px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Event period</td>
-      <td style="padding:6px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{period}}</td>
+      <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Event period</td>
+      <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{period}}</td>
     </tr>
     <tr>
-      <td style="width:34%;padding:6px 10px 6px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Consumers served</td>
-      <td style="padding:6px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{consumers}}</td>
+      <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Consumers served</td>
+      <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{consumers}}</td>
     </tr>
   </tbody>
 </table>
 
-<table style="border-collapse:collapse;width:100%;margin-bottom:2rem;">
+<table style="border-collapse:collapse;width:100%;margin-bottom:1.2rem;">
   <tbody>
     <tr>
-      <td style="background-color:#f2f6f8;border-left:3px solid #14505f;padding:12px 16px;font-family:Calibri,'Segoe UI',sans-serif;font-size:10.5pt;color:#3c4753;">
+      <td style="background-color:#f2f6f8;border-left:3px solid #14505f;padding:9px 12px;font-family:Calibri,'Segoe UI',sans-serif;font-size:9.5pt;color:#3c4753;">
         This report keeps two kinds of statement apart.
         <b style="color:#14505f;">Observed</b> statements are traceable to a numbered event-log entry and carry that entry in square brackets.
         <b style="color:#8a5a1e;">Assessed</b> statements are the response team's judgement and carry no log entry because none supports them.
@@ -59,46 +59,46 @@
 <!-- /block:document -->
 
 <!-- block:section -->
-<h2 style="margin:2rem 0 0.9rem;padding-bottom:0.35rem;border-bottom:1px solid #c9d4da;font-family:Georgia,'Times New Roman',serif;font-size:15pt;font-weight:normal;color:#14505f;">{{number}}. {{title}}</h2>
+<h2 style="margin:1.1rem 0 0.5rem;padding-bottom:0.25rem;border-bottom:1px solid #c9d4da;font-family:Georgia,'Times New Roman',serif;font-size:12.5pt;font-weight:normal;color:#14505f;">{{number}}. {{title}}</h2>
 {{body_html}}
 <!-- /block:section -->
 
 <!-- block:observed -->
-<h3 style="margin:1.1rem 0 0.4rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Observed</h3>
-<p style="margin:0 0 0.9rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;line-height:1.55;color:#1b2430;">Placeholder for observed statements.</p>
+<h3 style="margin:0.7rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Observed</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for observed statements.</p>
 <!-- /block:observed -->
 
 <!-- block:assessed -->
-<h3 style="margin:1.1rem 0 0.4rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#8a5a1e;">Assessed</h3>
-<p style="margin:0 0 0.9rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;line-height:1.55;color:#1b2430;">Placeholder for assessed statements.</p>
+<h3 style="margin:0.7rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#8a5a1e;">Assessed</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for assessed statements.</p>
 <!-- /block:assessed -->
 
 <!-- block:gaps -->
-<h3 style="margin:1.1rem 0 0.4rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#6b7683;">What the records do not show</h3>
-<p style="margin:0 0 0.9rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;line-height:1.55;color:#3c4753;">Placeholder for gaps.</p>
+<h3 style="margin:0.7rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#6b7683;">What the records do not show</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#3c4753;">Placeholder for gaps.</p>
 <!-- /block:gaps -->
 
 <!-- block:curve -->
-<p style="margin:0 0 0.9rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;line-height:1.55;color:#1b2430;">Placeholder for the restoration curve.</p>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for the restoration curve.</p>
 <!-- /block:curve -->
 
 <!-- block:carried_heading -->
-<h3 style="margin:1.1rem 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Carried forward from previous events</h3>
+<h3 style="margin:0.7rem 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Carried forward from previous events</h3>
 <!-- /block:carried_heading -->
 
 <!-- block:raised_heading -->
-<h3 style="margin:1.4rem 0 0.4rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Raised by this event</h3>
-<p style="margin:0 0 0.9rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;line-height:1.55;color:#1b2430;">Placeholder for items raised by this event.</p>
+<h3 style="margin:0.9rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Raised by this event</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for items raised by this event.</p>
 <!-- /block:raised_heading -->
 
 <!-- block:carry_table -->
-<table style="border-collapse:collapse;width:100%;margin:0 0 1rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;">
+<table style="border-collapse:collapse;width:100%;margin:0 0 0.6rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;">
 <thead><tr>
-<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:8px 10px;font-size:9pt;letter-spacing:0.06em;text-transform:uppercase;">Item</th>
-<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:8px 10px;font-size:9pt;letter-spacing:0.06em;text-transform:uppercase;">Raised in</th>
-<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:8px 10px;font-size:9pt;letter-spacing:0.06em;text-transform:uppercase;">Owner</th>
-<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:8px 10px;font-size:9pt;letter-spacing:0.06em;text-transform:uppercase;">Status</th>
-<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:8px 10px;font-size:9pt;letter-spacing:0.06em;text-transform:uppercase;">Note</th>
+<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Item</th>
+<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Raised in</th>
+<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Owner</th>
+<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Status</th>
+<th style="background-color:#14505f;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Note</th>
 </tr></thead>
 <tbody>{{rows_html}}</tbody>
 </table>
@@ -106,21 +106,21 @@
 
 <!-- block:carry_row -->
 <tr>
-<td style="border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#1b2430;">{{item}}</td>
-<td style="border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{raised_in}}</td>
-<td style="border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{owner}}</td>
-<td style="border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{status}}</td>
-<td style="border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{note}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#1b2430;">{{item}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{raised_in}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{owner}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{status}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{note}}</td>
 </tr>
 <!-- /block:carry_row -->
 
 <!-- block:carry_row_shaded -->
 <tr>
-<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#1b2430;">{{item}}</td>
-<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{raised_in}}</td>
-<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{owner}}</td>
-<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{status}}</td>
-<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:8px 10px;color:#3c4753;">{{note}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#1b2430;">{{item}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{raised_in}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{owner}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{status}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{note}}</td>
 </tr>
 <!-- /block:carry_row_shaded -->
 

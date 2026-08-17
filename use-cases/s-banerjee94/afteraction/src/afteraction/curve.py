@@ -52,7 +52,10 @@ def render_curve(facts: FactSet, out_path: Path) -> Path:
     if current:
         runs.append(current)
 
-    fig, ax = plt.subplots(figsize=(10, 4.6), dpi=160)
+    # Wide and short. The curve sits inside a report that has to stay near two pages, and
+    # a chart's height is page space; the shape it has to show is a decline over time,
+    # which reads fine in a band.
+    fig, ax = plt.subplots(figsize=(10, 3.1), dpi=160)
 
     for run in runs:
         if len(run) == 1:

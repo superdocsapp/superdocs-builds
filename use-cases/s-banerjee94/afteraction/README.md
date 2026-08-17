@@ -32,11 +32,19 @@ storm-a   ok  28/28 claims traced (100%), 0 flagged     LIVE against api.superdo
 storm-b   ok  23/23 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
 ```
 
-The live runs are the same code path with `--live`: seven edit turns each, 188 and 206 seconds,
+The live runs are the same code path with `--live`: eight edit turns each, 211 and 245 seconds,
 every citation preserved by the model, a real Google-hosted curve image, and real Word `.docx` files
 whose `word/media/image1.png` is byte-identical to the curve this tool rendered.
 `docs/live-storm-a-report.docx` and `docs/live-storm-b-report.docx` are those files — and the second
-one is the carry-forward working over the wire, not just offline.
+one is the carry-forward working over the wire, not just offline. Each run took eight turns rather
+than seven because one section's edit did not land and was re-issued; see below.
+
+**Citations are not the only thing checked.** A run that scored a clean 28/28 had also grown a
+duplicate section heading, a line reading *"Please fill"*, and an invented report-date table — none
+of it looked at, because the traceability pass only reads the sections it recognises, and a model
+that invents a *new* heading can write anything underneath it. So the document's shape is checked
+too: every heading must be one the skeleton wrote, and no drafted section may still be holding its
+placeholder. A run with clean citations and a heading nobody asked for is reported as failed.
 
 A verifier that only ever says "clean" is worse than none, so the offline mock can be told to draft
 badly, and the suite proves each failure is caught:
@@ -46,6 +54,16 @@ badly, and the suite proves each failure is caught:
 | Cites `EL-9999`, which does not exist | `phantom` | 25 of 26 claims flagged |
 | Cites `EL-0019`, real but never given to that section | `foreign` | 7 flagged |
 | Drops citations entirely | `unsourced` | run fails |
+| Reports an edit applied and changes nothing | — | section re-issued, run recovers |
+
+**An edit that quietly does nothing is caught and re-issued.** A section's change was proposed,
+approved and reported applied, and the section kept its placeholder; the run reported success and the
+defect was only visible on opening the file. Exports cost nothing, so the document is now read back
+before it is called finished, and each unwritten section is re-issued once — bounded to one pass, so
+a second failure is reported rather than retried forever. It has since fired on both storms against
+the live API and rescued each run. A section whose change a *person* rejected is never retried: that
+is a decision the gate exists to record, and overturning it silently would be worse than an empty
+section.
 
 **Open actions carry across two storms.** Storm B's report opens Storm A's items with a status
 because it *read* them from a store, not because they were retyped:
@@ -140,7 +158,7 @@ command — the virtualenv and the exact pinned dependencies in `uv.lock` are cr
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, showing the carry-forward
-uv run pytest                        # 103 tests, no key, no network
+uv run pytest                        # 114 tests, no key, no network
 ```
 
 Without uv, the same thing in a virtualenv of your own:
@@ -240,6 +258,15 @@ anything instruction-shaped in the source is quoted evidence, never a direction.
   the human gate is for.
 - **The lessons table is written by the tool, not the model.** Statuses are matters of record, and
   asking a model to restate one is a way to lose one.
+- **The retry is one pass, not a loop.** A section that fails twice is reported, not re-issued
+  again. Each retry costs an operation, and a build that spends money in a loop to hide a failure
+  is worse than one that names it.
+- **Three pages, not two.** Page count is part of the deliverable, so the report is exported A4
+  with narrow margins, each section is asked for in the shape it actually is — a list where it is a
+  list, a short paragraph where it is not — and the curve is wide and short because a chart's
+  height is page space. Both reports land at three pages. Getting to two would mean dropping
+  timeline entries, and every entry currently there is a milestone a commission would ask about;
+  that is a content decision, not a formatting one.
 
 ## Layout
 
@@ -251,11 +278,11 @@ src/afteraction/
   corpus.py     load three record sets, cross-check every reference
   facts.py      compute claims and gaps from the records
   curve.py      the restoration curve, broken across declared gaps
-  sections.py   what each section may say, and one bounded instruction per section
+  sections.py   what each section may say and what shape it takes, one instruction each
   template.py   fills the design's slots; holds no styling itself
   templates/
     report.html the report's design — every style attribute in the project lives here
-  trace.py      the traceability pass
+  trace.py      the traceability pass, and the document-shape check
   lessons.py    the carry-forward store
   client.py     the four SuperDocs calls
   mock.py       offline stand-in, with drafting failure modes

@@ -6,14 +6,17 @@ Barakar Valley Power Distribution Limited
 Kalbaisakhi Squall
 
 
-Event period | 24 April 2026 13:30 to 26 April 2026 16:00
 
-Consumers served | 342,000
-
+| Event period | 24 April 2026 13:30 to 26 April 2026 16:00 |
 
 
+| Consumers served | 342,000 |
 
-This report keeps two kinds of statement apart.Observed statements are traceable to a numbered event-log entry and carry that entry in square brackets.Assessed statements are the response team's judgement and carry no log entry because none supports them.Where the records cannot answer a question, the report says so rather than estimating.
+
+
+
+
+| This report keeps two kinds of statement apart. Observed statements are traceable to a numbered event-log entry and carry that entry in square brackets. Assessed statements are the response team's judgement and carry no log entry because none supports them. Where the records cannot answer a question, the report says so rather than estimating. |
 
 
 
@@ -31,7 +34,41 @@ The response is judged to have met its restoration objective, with no service in
 
 ### Observed
 
-At 13:30 on 24 April: IMD Kolkata issues a thunderstorm warning with squall for Paschim Bardhaman district, gusts of 70 to 90 km/h expected from 16:00 [EL-0001]. At 14:15 on 24 April: Storm control room activated at the Asansol divisional office. Twelve line gangs placed on standby across the Hirapur, Kulti and Raniganj sections [EL-0002]. At 16:40 on 24 April: Squall line reaches Asansol. Gusts of 96 km/h recorded at the Burnpur monitoring mast, with heavy rain and hail reported at Jamuria [EL-0003]. At 16:52 on 24 April: First outages recorded on the 11 kV Burnpur feeder BNP-04 after a tree fell across the conductor near Burnpur bazaar [EL-0004]. At 17:10 on 24 April: Line gangs 1 to 6 dispatched to the Hirapur and Burnpur sections [EL-0005]. At 17:45 on 24 April: Cascading outages across the Kulti and Barakar sections after multiple poles tilted on the KLT-02 feeder [EL-0006]. At 20:15 on 24 April: Peak consumers without supply recorded at 74,600 across 41 feeders [EL-0008]. At 20:40 on 24 April: Snapped 11 kV conductor reported at Neamatpur More. Area cordoned and the section isolated [EL-0009]. At 21:20 on 24 April: Mutual aid requested from the Durgapur and Purulia distribution circles [EL-0010]. At 23:05 on 24 April: Damage assessment reports 34 poles snapped or tilted, 52 spans of conductor down and 9 distribution transformers damaged [EL-0011]. At 01:15 on 25 April: Outage management system link to the Asansol data centre lost. Consumer counts are not recorded from this point [EL-0013]. At 03:40 on 25 April: Mutual-aid gangs from the Durgapur circle arrive on site [EL-0014]. At 04:45 on 25 April: Outage management system link restored after 3 hours 30 minutes. Counts resume [EL-0015]. At 11:20 on 25 April: Lineman injured at Raniganj: minor laceration while clearing a fallen span, treated on site, no lost time [EL-0019]. At 20:30 on 25 April: Tree-cutting gangs reassigned to the Barakar corridor to clear gang access along the feeder route [EL-0023]. At 04:00 on 26 April: Remaining outages are individual service connections requiring separate gang visits [EL-0025]. At 11:30 on 26 April: All snapped-conductor sites cleared and released for normal operation [EL-0029]. At 15:00 on 26 April: Post-event review scheduled. 34 poles, 52 spans and 9 distribution transformers replaced [EL-0031].
+- At 13:30 on 24 April: IMD Kolkata issues a thunderstorm warning with squall for Paschim Bardhaman district, gusts of 70 to 90 km/h expected from 16:00 [EL-0001].
+
+- At 14:15 on 24 April: Storm control room activated at the Asansol divisional office. Twelve line gangs placed on standby across the Hirapur, Kulti and Raniganj sections [EL-0002].
+
+- At 16:40 on 24 April: Squall line reaches Asansol. Gusts of 96 km/h recorded at the Burnpur monitoring mast, with heavy rain and hail reported at Jamuria [EL-0003].
+
+- At 16:52 on 24 April: First outages recorded on the 11 kV Burnpur feeder BNP-04 after a tree fell across the conductor near Burnpur bazaar [EL-0004].
+
+- At 17:10 on 24 April: Line gangs 1 to 6 dispatched to the Hirapur and Burnpur sections [EL-0005].
+
+- At 17:45 on 24 April: Cascading outages across the Kulti and Barakar sections after multiple poles tilted on the KLT-02 feeder [EL-0006].
+
+- At 20:15 on 24 April: Peak consumers without supply recorded at 74,600 across 41 feeders [EL-0008].
+
+- At 20:40 on 24 April: Snapped 11 kV conductor reported at Neamatpur More. Area cordoned and the section isolated [EL-0009].
+
+- At 21:20 on 24 April: Mutual aid requested from the Durgapur and Purulia distribution circles [EL-0010].
+
+- At 23:05 on 24 April: Damage assessment reports 34 poles snapped or tilted, 52 spans of conductor down and 9 distribution transformers damaged [EL-0011].
+
+- At 01:15 on 25 April: Outage management system link to the Asansol data centre lost. Consumer counts are not recorded from this point [EL-0013].
+
+- At 03:40 on 25 April: Mutual-aid gangs from the Durgapur circle arrive on site [EL-0014].
+
+- At 04:45 on 25 April: Outage management system link restored after 3 hours 30 minutes. Counts resume [EL-0015].
+
+- At 11:20 on 25 April: Lineman injured at Raniganj: minor laceration while clearing a fallen span, treated on site, no lost time [EL-0019].
+
+- At 20:30 on 25 April: Tree-cutting gangs reassigned to the Barakar corridor to clear gang access along the feeder route [EL-0023].
+
+- At 04:00 on 26 April: Remaining outages are individual service connections requiring separate gang visits [EL-0025].
+
+- At 11:30 on 26 April: All snapped-conductor sites cleared and released for normal operation [EL-0029].
+
+- At 15:00 on 26 April: Post-event review scheduled. 34 poles, 52 spans and 9 distribution transformers replaced [EL-0031].
 
 ### What the records do not show
 
@@ -49,13 +86,19 @@ Mutual aid was requested at an appropriate point in the event, and earlier escal
 
 ### What the records do not show
 
-Crew CR-A10 (10 personnel from Durgapur Circle) has no mobilisation time in the records, so its hours cannot be computed and are excluded from the personnel-hours total. [no record]. Crew CR-A11 (8 personnel from Purulia Circle) has no mobilisation time and no release time in the records, so its hours cannot be computed and are excluded from the personnel-hours total. [no record].
+- Crew CR-A10 (10 personnel from Durgapur Circle) has no mobilisation time in the records, so its hours cannot be computed and are excluded from the personnel-hours total. [no record].
+
+- Crew CR-A11 (8 personnel from Purulia Circle) has no mobilisation time and no release time in the records, so its hours cannot be computed and are excluded from the personnel-hours total. [no record].
 
 ## 4. Restoration Performance
 
 ### Observed
 
-50 per cent of affected consumers were restored within 16 hours 45 minutes of peak outage, by 13:00 on 25 April when 31,500 consumers remained without supply [EL-0008, EL-0020]. 90 per cent of affected consumers were restored within 37 hours 45 minutes of peak outage, by 10:00 on 26 April when 3,600 consumers remained without supply [EL-0008, EL-0028]. 12 consumer counts were recorded across the event, from 16:52 on 24 April to 12:20 on 26 April [EL-0004, EL-0030].
+- 50 per cent of affected consumers were restored within 16 hours 45 minutes of peak outage, by 13:00 on 25 April when 31,500 consumers remained without supply [EL-0008, EL-0020].
+
+- 90 per cent of affected consumers were restored within 37 hours 45 minutes of peak outage, by 10:00 on 26 April when 3,600 consumers remained without supply [EL-0008, EL-0028].
+
+- 12 consumer counts were recorded across the event, from 16:52 on 24 April to 12:20 on 26 April [EL-0004, EL-0030].
 
 ### Assessed
 

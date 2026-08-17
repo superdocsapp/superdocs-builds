@@ -23,7 +23,7 @@ from .curve import render_curve
 from .facts import SECTION_TITLES, FactSet, build_facts
 from .lessons import apply_event, inherited, load_store, raised_here, save_store, summarise
 from .models import Lesson
-from .trace import TraceReport, verify
+from .trace import TraceReport, structural_drift, unfilled, verify
 
 TITLE_TO_KEY = {title: key for key, title in SECTION_TITLES.items()}
 HEADING = re.compile(r"^##\s+\d+\.\s+(.*)$")
@@ -45,15 +45,54 @@ class RunResult:
     store: list[Lesson]
     exports: dict[str, Path] = field(default_factory=dict)
     trace: TraceReport | None = None
+    drift: list[str] = field(default_factory=list)
     carry: dict[str, int] = field(default_factory=dict)
     skipped: list[str] = field(default_factory=list)
+    retried: list[str] = field(default_factory=list)
     seconds: float = 0.0
     operations: int | None = None
     edits: int = 0
 
     @property
     def ok(self) -> bool:
-        return self.trace is not None and self.trace.clean
+        """Clean citations are not enough. A document carrying a heading nobody asked
+        for, or a placeholder an edit failed to replace, has not been produced correctly
+        however well its claims trace."""
+        return self.trace is not None and self.trace.clean and not self.drift
+
+
+def _watch(approver: Approver) -> tuple[Approver, list[str]]:
+    """The same gate, plus a record of what it turned down.
+
+    Needed to tell an edit that failed from an edit a person refused. Both leave the
+    section holding its placeholder, and only the first should ever be retried.
+    """
+    rejected: list[str] = []
+
+    def gate(change):  # type: ignore[no-untyped-def]
+        ok, why = approver(change)
+        if not ok:
+            rejected.append(change.change_id)
+        return ok, why
+
+    return gate, rejected
+
+
+def expected_headings(carried: list[Lesson]) -> list[str]:
+    """Every heading the skeleton put in the document, and no others.
+
+    The skeleton decides the document's shape, so this list is derivable from it. A
+    heading in the export that is not here was written by the model.
+    """
+    titles = ["Storm Restoration After-Action Report"]
+    for n, title in enumerate(SECTION_TITLES.values(), start=1):
+        titles.append(f"{n}. {title}")
+    titles.append(f"{len(SECTION_TITLES) + 1}. Restoration Curve")
+    titles.append(f"{len(SECTION_TITLES) + 2}. Lessons Learned")
+    titles += ["Observed", "Assessed", "What the records do not show", "Raised by this event"]
+    if carried:
+        titles.append("Carried forward from previous events")
+    return titles
 
 
 def markdown_sections(markdown: str) -> dict[str, str]:
@@ -128,6 +167,7 @@ def run_event(
     edits = 0
     drafted: list[str] = []
     skipped: list[str] = []
+    refused: set[str] = set()
     for key in SECTION_TITLES:
         if sections_limit is not None and edits >= sections_limit:
             skipped.append(key)
@@ -136,7 +176,10 @@ def run_event(
         if not instruction:
             continue
         note("draft", f"{SECTION_TITLES[key]} ({len(facts.sources_for(key))} log lines supplied)")
-        backend.chat(session_id, instruction, approver=approver, model_tier=model_tier, on_event=on_event)
+        gate, rejected = _watch(approver)
+        backend.chat(session_id, instruction, approver=gate, model_tier=model_tier, on_event=on_event)
+        if rejected:
+            refused.add(key)
         drafted.append(key)
         edits += 1
     if skipped:
@@ -164,6 +207,32 @@ def run_event(
         )
         edits += 1
 
+    # --- an edit that was approved but did not land leaves the section untouched, and
+    # the run reads as clean until someone opens the file. Exports are free, so the
+    # document is checked before it is called finished, and each unwritten section is
+    # re-issued once. Bounded at one pass: a second failure is reported, not retried
+    # forever.
+    numbered = {key: f"{n}. {title}" for n, (key, title) in enumerate(SECTION_TITLES.items(), 1)}
+    check = backend.export(session_id, out_dir / f"{event_id}-check.md", "markdown")
+    still_empty = unfilled(check.read_text(encoding="utf-8"), [numbered[k] for k in drafted])
+    check.unlink(missing_ok=True)
+    # A section whose change a person rejected is empty *because they said so*. Re-issuing
+    # it would quietly overturn the decision the gate exists to record, so a refusal ends
+    # the matter and only an unexplained empty section is retried.
+    stalled = [k for k in drafted if numbered[k] in still_empty and k not in refused]
+    for key in stalled:
+        if sections_limit is not None and edits >= sections_limit:
+            break
+        note("retry", f"{SECTION_TITLES[key]} still holds its placeholder; re-issuing")
+        backend.chat(
+            session_id,
+            S.instruction_for(facts, key),
+            approver=approver,
+            model_tier=model_tier,
+            on_event=on_event,
+        )
+        edits += 1
+
     # --- export (free) then verify what was actually produced
     exports = {
         "markdown": backend.export(session_id, out_dir / f"{event_id}-after-action.md", "markdown"),
@@ -176,7 +245,8 @@ def run_event(
     # says nothing about drafting quality — the undrafted sections are named instead,
     # so nothing goes quiet.
     report = TraceReport()
-    written = markdown_sections(exports["markdown"].read_text(encoding="utf-8"))
+    markdown = exports["markdown"].read_text(encoding="utf-8")
+    written = markdown_sections(markdown)
     for key, text in written.items():
         if key in drafted:
             report.results.extend(verify(text, facts, key).results)
@@ -185,6 +255,11 @@ def run_event(
         report.summary()
         + (f"; {len(skipped)} sections not drafted" if skipped else ""),
     )
+
+    # Citations inside known sections say nothing about content invented outside them.
+    drift = structural_drift(markdown, expected_headings(carried), [numbered[k] for k in drafted])
+    for problem in drift:
+        note("drift", problem)
 
     save_store(store, store_path)
 
@@ -196,8 +271,10 @@ def run_event(
         store=store,
         exports=exports,
         trace=report,
+        drift=drift,
         carry=counts,
         skipped=skipped,
+        retried=[SECTION_TITLES[k] for k in stalled],
         seconds=time.monotonic() - started,
         operations=(
             operations_after - operations_before
