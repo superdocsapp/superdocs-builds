@@ -1,0 +1,21 @@
+version: 1
+gateway:
+  tools:
+    allowed:
+      - upload
+      - chat
+      - approve
+      - export
+
+  sensitive_content:
+    enabled: true
+    action: block
+
+  quotas:
+    default:
+      limit: 100
+
+  audit:
+    enabled: true
+    include_cost: true
+    store_document_content: false
