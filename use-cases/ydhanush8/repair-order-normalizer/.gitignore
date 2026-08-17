@@ -1,0 +1,53 @@
+# ---------------------------------------------------------------
+# Secrets
+#
+# This folder becomes a pull request into a PUBLIC repository.
+# A key committed here is a key published to everyone.
+# ---------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials.json
+
+# ---------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+dist/
+build/
+
+# ---------------------------------------------------------------
+# Generated output
+#
+# sample-data/ and tests/fixtures/ ARE committed — they are the
+# evidence behind the batch numbers claimed in the README.
+# ---------------------------------------------------------------
+output/
+.batch-state/
+*.local.json
+
+# ---------------------------------------------------------------
+# Logs, caches, OS, editor
+# ---------------------------------------------------------------
+*.log
+logs/
+.cache/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*~

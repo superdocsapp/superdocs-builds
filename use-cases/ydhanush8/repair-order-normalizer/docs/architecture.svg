@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 760" width="1240" height="760" font-family="Inter, Helvetica Neue, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3d3a36"/>
+    </marker>
+    <marker id="acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b45309"/>
+    </marker>
+  </defs>
+
+  <rect width="1240" height="760" fill="#fbfaf8"/>
+
+  <!-- header -->
+  <text x="44" y="54" font-size="25" font-weight="700" fill="#1c1a17">Repair-Order Narrative Normalizer</text>
+  <text x="44" y="82" font-size="15" fill="#5c554d">Technician shorthand becomes a warranty narrative — assembled word for word from the technician's own note.</text>
+  <text x="1196" y="54" font-size="13" fill="#8a8178" text-anchor="end">Built on SuperDocs</text>
+  <text x="1196" y="76" font-size="13" fill="#8a8178" text-anchor="end">127 tests · 12/12 documents live</text>
+  <line x1="44" y1="102" x2="1196" y2="102" stroke="#ded8d0"/>
+
+  <!-- the note -->
+  <rect x="44" y="140" width="196" height="118" rx="7" fill="#fff" stroke="#c9c2b8" stroke-width="1.2"/>
+  <text x="142" y="166" font-size="13" font-weight="700" fill="#1c1a17" text-anchor="middle">REPAIR ORDER</text>
+  <text x="60" y="192" font-size="11" fill="#8a8178">technician note</text>
+  <text x="60" y="210" font-size="11" fill="#8a8178">DTC codes · vehicle</text>
+  <line x1="60" y1="222" x2="224" y2="222" stroke="#e6e0d8"/>
+  <text x="60" y="240" font-size="10.5" font-style="italic" fill="#5c554d">"Cust states CEL on.</text>
+  <text x="60" y="254" font-size="10.5" font-style="italic" fill="#5c554d">P0302. Parts on order."</text>
+
+  <!-- normalizer -->
+  <rect x="284" y="130" width="252" height="138" rx="7" fill="#fff" stroke="#3d3a36" stroke-width="1.7"/>
+  <text x="410" y="157" font-size="14" font-weight="700" fill="#1c1a17" text-anchor="middle">NORMALIZER</text>
+  <text x="302" y="182" font-size="11.5" fill="#5c554d">split the note into spans, with offsets</text>
+  <text x="302" y="202" font-size="11.5" fill="#5c554d">classify each span</text>
+  <text x="302" y="222" font-size="11.5" fill="#5c554d">assemble verbatim — never rewrite</text>
+  <text x="302" y="242" font-size="11.5" fill="#5c554d">flag what the note does not support</text>
+  <text x="302" y="260" font-size="11.5" fill="#5c554d">score confidence from evidence</text>
+  <line x1="240" y1="199" x2="282" y2="199" stroke="#3d3a36" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <!-- three outputs -->
+  <rect x="584" y="130" width="212" height="42" rx="6" fill="#fff" stroke="#c9c2b8" stroke-width="1.2"/>
+  <text x="598" y="149" font-size="11.5" font-weight="700" fill="#1c1a17">COMPLAINT</text>
+  <text x="598" y="165" font-size="10.5" fill="#5c554d">"Cust states CEL on."  ✓ supported</text>
+
+  <rect x="584" y="180" width="212" height="42" rx="6" fill="#fff" stroke="#c9c2b8" stroke-width="1.2"/>
+  <text x="598" y="199" font-size="11.5" font-weight="700" fill="#1c1a17">CAUSE</text>
+  <text x="598" y="215" font-size="10.5" fill="#5c554d">"P0302 stored."  ✓ supported</text>
+
+  <rect x="584" y="230" width="212" height="46" rx="6" fill="#fff7ed" stroke="#b45309" stroke-width="1.7"/>
+  <text x="598" y="249" font-size="11.5" font-weight="700" fill="#7c2d12">CORRECTION</text>
+  <text x="598" y="266" font-size="10.5" fill="#9a3412">MISSING — nothing was repaired</text>
+  <line x1="536" y1="199" x2="582" y2="199" stroke="#3d3a36" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <!-- the gate -->
+  <rect x="844" y="130" width="188" height="146" rx="7" fill="#fff7ed" stroke="#b45309" stroke-width="2"/>
+  <text x="938" y="157" font-size="13.5" font-weight="700" fill="#7c2d12" text-anchor="middle">THE GATE</text>
+  <text x="938" y="182" font-size="11.5" fill="#9a3412" text-anchor="middle">supported → sent</text>
+  <text x="938" y="202" font-size="11.5" font-weight="700" fill="#7c2d12" text-anchor="middle">unsupported → never sent</text>
+  <line x1="862" y1="216" x2="1014" y2="216" stroke="#f0d9bd"/>
+  <text x="938" y="236" font-size="10.5" font-style="italic" fill="#9a3412" text-anchor="middle">a change that reaches</text>
+  <text x="938" y="251" font-size="10.5" font-style="italic" fill="#9a3412" text-anchor="middle">the API is a change</text>
+  <text x="938" y="266" font-size="10.5" font-style="italic" fill="#9a3412" text-anchor="middle">that lands</text>
+  <line x1="796" y1="199" x2="842" y2="199" stroke="#b45309" stroke-width="1.6" marker-end="url(#acc)"/>
+
+  <!-- SuperDocs -->
+  <rect x="284" y="336" width="524" height="162" rx="8" fill="#f4f1ec" stroke="#3d3a36" stroke-width="1.7"/>
+  <text x="546" y="363" font-size="14" font-weight="700" fill="#1c1a17" text-anchor="middle">SUPERDOCS</text>
+
+  <rect x="304" y="380" width="112" height="52" rx="6" fill="#fff" stroke="#c9c2b8"/>
+  <text x="360" y="401" font-size="11.5" font-weight="600" fill="#1c1a17" text-anchor="middle">upload</text>
+  <text x="360" y="417" font-size="9.5" fill="#8a8178" text-anchor="middle">note as .html</text>
+
+  <rect x="428" y="380" width="112" height="52" rx="6" fill="#fff" stroke="#c9c2b8"/>
+  <text x="484" y="401" font-size="11.5" font-weight="600" fill="#1c1a17" text-anchor="middle">edit</text>
+  <text x="484" y="417" font-size="9.5" fill="#8a8178" text-anchor="middle">one instruction</text>
+
+  <rect x="552" y="380" width="112" height="52" rx="6" fill="#fff" stroke="#c9c2b8"/>
+  <text x="608" y="401" font-size="11.5" font-weight="600" fill="#1c1a17" text-anchor="middle">approve</text>
+  <text x="608" y="417" font-size="9.5" fill="#8a8178" text-anchor="middle">per job</text>
+
+  <rect x="676" y="380" width="112" height="52" rx="6" fill="#fff" stroke="#c9c2b8"/>
+  <text x="732" y="401" font-size="11.5" font-weight="600" fill="#1c1a17" text-anchor="middle">export</text>
+  <text x="732" y="417" font-size="9.5" fill="#8a8178" text-anchor="middle">free</text>
+
+  <text x="546" y="452" font-size="10.5" fill="#8a8178" text-anchor="middle">approval_mode is sent but does not gate: six values measured,</text>
+  <text x="546" y="467" font-size="10.5" fill="#8a8178" text-anchor="middle">every change returned auto_approved</text>
+  <text x="546" y="482" font-size="10.5" font-style="italic" fill="#8a8178" text-anchor="middle">so the gate sits on our side of the wire</text>
+
+  <path d="M 938 276 L 938 310 L 546 310 L 546 334" fill="none" stroke="#b45309" stroke-width="1.6" marker-end="url(#acc)"/>
+
+  <!-- verify -->
+  <rect x="856" y="336" width="196" height="162" rx="7" fill="#fff" stroke="#3d3a36" stroke-width="1.7"/>
+  <text x="954" y="363" font-size="13" font-weight="700" fill="#1c1a17" text-anchor="middle">VERIFY BY EXPORT</text>
+  <text x="872" y="388" font-size="11" fill="#5c554d">export the finished document</text>
+  <text x="872" y="408" font-size="11" fill="#5c554d">compare each section against</text>
+  <text x="872" y="424" font-size="11" fill="#5c554d">its exact source span</text>
+  <text x="872" y="448" font-size="11" fill="#5c554d">missing → retry on a clean doc</text>
+  <text x="872" y="468" font-size="11" fill="#5c554d">still missing → say so, exit ≠ 0</text>
+  <line x1="808" y1="411" x2="854" y2="411" stroke="#3d3a36" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <path d="M 954 496 L 954 524 L 484 524 L 484 500" fill="none" stroke="#b45309" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#acc)"/>
+  <text x="719" y="542" font-size="11" fill="#b45309" text-anchor="middle">bounded at 3 attempts · 7 of 12 landed first time, 5 needed a retry</text>
+
+  <!-- why -->
+  <line x1="44" y1="562" x2="1196" y2="562" stroke="#ded8d0"/>
+  <text x="44" y="596" font-size="12" font-weight="700" fill="#b45309" letter-spacing="1.5">WHY IT IS BUILT THIS WAY</text>
+
+  <rect x="44" y="614" width="366" height="112" rx="7" fill="#fff" stroke="#c9c2b8" stroke-width="1.2"/>
+  <text x="62" y="639" font-size="12.5" font-weight="700" fill="#1c1a17">Verbatim spans, never rewritten</text>
+  <text x="62" y="661" font-size="11" fill="#5c554d">Every sentence carries offsets into the note, so</text>
+  <text x="62" y="678" font-size="11" fill="#5c554d">"no fact invented" is checkable, not asserted.</text>
+  <text x="62" y="702" font-size="11" fill="#8a8178">Cost: reads like a tidied note, not prose.</text>
+  <text x="62" y="718" font-size="11" fill="#8a8178">Benefit: the property an audit depends on.</text>
+
+  <rect x="436" y="614" width="366" height="112" rx="7" fill="#fff" stroke="#c9c2b8" stroke-width="1.2"/>
+  <text x="454" y="639" font-size="12.5" font-weight="700" fill="#1c1a17">The note reaches a second model</text>
+  <text x="454" y="661" font-size="11" fill="#5c554d">It is uploaded with the document, so SuperDocs'</text>
+  <text x="454" y="678" font-size="11" fill="#5c554d">own agent reads it. Injected text is quarantined</text>
+  <text x="454" y="695" font-size="11" fill="#5c554d">from extraction, and the instruction says the</text>
+  <text x="454" y="712" font-size="11" fill="#5c554d">document is a record, not a set of instructions.</text>
+
+  <rect x="828" y="614" width="368" height="112" rx="7" fill="#fff" stroke="#c9c2b8" stroke-width="1.2"/>
+  <text x="846" y="639" font-size="12.5" font-weight="700" fill="#1c1a17">Never trust a report of success</text>
+  <text x="846" y="661" font-size="11" fill="#5c554d">Jobs report completed having written nothing, or</text>
+  <text x="846" y="678" font-size="11" fill="#5c554d">having truncated a sentence mid-word.</text>
+  <text x="846" y="702" font-size="11" fill="#8a8178">Only the exported document counts. Exports are</text>
+  <text x="846" y="718" font-size="11" fill="#8a8178">free, so every write is checked.</text>
+</svg>
