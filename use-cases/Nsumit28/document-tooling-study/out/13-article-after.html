@@ -1,0 +1,53 @@
+<h1 data-chunk-id="48d3d429-0f9b-454f-b8cd-572a92ca3d7b">Tracked changes disappear when a document round-trips through markdown</h1>
+<p data-chunk-id="64351552-aed0-4a95-b7ca-5cad35c0f7c3">You export a .docx, run it through markdown or HTML, edit it, convert it back.
+Word opens the result and every revision mark is gone. Not rejected — gone. The
+edits are sitting there as ordinary text, as if someone had accepted them all
+and never said so.</p>
+<p data-chunk-id="02abcf9a-0908-4088-be5b-bed3a2c8142c">Here is what Word had before the trip:</p>
+<pre data-chunk-id="317795a8-4df1-4bcc-bffb-44030e5ce733"><code class="language-xml">&lt;w:p&gt;
+  &lt;w:ins w:id="41" w:author="Priya" w:date="2026-08-14T09:12:00Z"&gt;
+    &lt;w:r&gt;&lt;w:t&gt;net thirty days&lt;/w:t&gt;&lt;/w:r&gt;
+  &lt;/w:ins&gt;
+  &lt;w:del w:id="42" w:author="Priya" w:date="2026-08-14T09:12:00Z"&gt;
+    &lt;w:r&gt;&lt;w:delText&gt;net sixty days&lt;/w:delText&gt;&lt;/w:r&gt;
+  &lt;/w:del&gt;
+&lt;/w:p&gt;
+</code></pre>
+<p data-chunk-id="b10b50c5-c39e-48b9-9b98-3a01f986a3a8">Two things there have no equivalent in markdown. The <code>w:ins</code> and <code>w:del</code>
+elements, which are what makes a change a <em>tracked</em> change rather than a fact.
+And <code>w:delText</code>, which is where deleted text lives — a deleted run does not use
+<code>w:t</code> at all. Convert that paragraph to markdown and you get one line of prose.
+Convert it back and you get one run of plain text. The wrappers are not corrupted
+in transit; there is simply nowhere to put them.</p>
+<p data-chunk-id="fa5cc5c7-c7d9-482f-a591-e09851580bd5">Comments go the same way and are easier to miss. A comment isn't stored in the
+paragraph — it lives in <code>word/comments.xml</code>, and the body only holds anchors
+pointing at it:</p>
+<pre data-chunk-id="15041900-43d7-461f-9dd6-22d84ae5704d"><code class="language-xml">&lt;w:commentRangeStart w:id="7"/&gt;
+&lt;w:r&gt;&lt;w:t&gt;indemnity&lt;/w:t&gt;&lt;/w:r&gt;
+&lt;w:commentRangeEnd w:id="7"/&gt;
+&lt;w:r&gt;&lt;w:commentReference w:id="7"/&gt;&lt;/w:r&gt;
+</code></pre>
+<p data-chunk-id="ef4d49e5-7941-4ce4-ad11-eb22108a4c7d">Drop the anchors and <code>comments.xml</code> is still in the file, still valid, and
+attached to nothing. The document opens cleanly and the review thread is gone.</p>
+<h2 data-chunk-id="2215b72b-5338-41c2-81b0-70cb4b67a690">How to tell whether your pipeline does this</h2>
+<p data-chunk-id="54c55ab1-1822-46f4-8ecc-ff24bd16e6ec">Take a document with one tracked insertion and one comment. Send it through your
+pipeline. Then unzip the result and look: Note that a document with no tracked changes in the first place will also show zero, so the test needs a document that definitely has them.</p>
+<pre data-chunk-id="3480f335-75c9-4511-9319-d4305d6eeadb"><code class="language-bash">unzip -o out.docx -d out/
+grep -c "w:ins\|w:del" out/word/document.xml
+grep -c "commentReference" out/word/document.xml
+</code></pre>
+<p data-chunk-id="f5e37d5a-c517-4b48-894b-275a4c595477">Zero on either line means the pipeline flattened your review history. Do this
+before it runs on anything that matters, because the failure is silent: the file
+opens, the text is right, and nothing warns you.</p>
+<h2 data-chunk-id="3698fdca-7644-47bc-8d19-c7d1d3748b16">What to do instead</h2>
+<p data-chunk-id="1b14e8ba-d312-40d7-a62d-6964f0029c99">If the changes matter, don't round-trip through a format that can't hold them.
+Edit the OOXML in place, or use a tool that reads and writes the document as a
+document. If you must convert, convert a copy and treat the result as a new
+draft rather than the same document with edits applied — because that is what it
+is.</p>
+<p data-chunk-id="6aa1c1ff-57b0-474a-99da-2be5b3539359">This is also the part of document tooling that is least settled. Converting
+files between formats has been answered for a decade. Keeping tracked changes
+and comments alive through an edit is being worked out in open pull requests
+right now, which is why it is worth checking rather than assuming.</p>
+<p data-chunk-id="4da8aca8-5075-4883-bdd7-43244a9647cf"><em>Written 17 August 2026 by Sumit Negi, while applying for a role at SuperDocs.
+The XML above is from a test document I made; the author name is invented.</em></p>

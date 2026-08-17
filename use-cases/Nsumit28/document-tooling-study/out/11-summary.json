@@ -1,0 +1,14 @@
+{
+  "pages": 15,
+  "platforms": {
+    "GitHub": 4,
+    "Hacker News": 3,
+    "Stack Overflow": 8
+  },
+  "problem_areas": 13,
+  "median_words": 181,
+  "with_code": 11,
+  "question_shaped_titles": 2,
+  "stackoverflow_views_total": 652284,
+  "active_2024_or_later": 13
+}

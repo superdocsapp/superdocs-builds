@@ -1,0 +1,96 @@
+name: Submit a build
+description: Add a project to the "Built with SuperDocs" gallery
+title: "[submission] "
+labels: ["submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every field below maps to one of the three tests in
+        [CURATION.md](../blob/main/CURATION.md). They are here so a reviewer can
+        reach a verdict without a round of questions — and so you can tell,
+        before you spend the time, whether your project will pass.
+
+        Reviewed within seven days. If it can't be verified in that window it is
+        declined **R8**, which is an invitation to resubmit, not a judgement.
+
+  - type: input
+    id: project
+    attributes:
+      label: Project name
+    validations:
+      required: true
+
+  - type: input
+    id: link
+    attributes:
+      label: Link to the document, page, or repository
+      description: >
+        Test 1 — something a reviewer can open. A published page, a repository,
+        a file in a release, a public export. Not a screenshot, not a private link.
+      placeholder: https://
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: surfaces
+    attributes:
+      label: Which SuperDocs surfaces did the work
+      description: Test 2 — name what actually did the work.
+      options:
+        - label: Editing inside the document
+        - label: Tracked changes
+        - label: Export
+        - label: The API
+        - label: The MCP surface
+        - label: Something else (say which below)
+
+  - type: textarea
+    id: counterfactual
+    attributes:
+      label: What could a plain text editor not have done here, at the same risk?
+      description: >
+        Test 2, stated as the counterfactual. This is the question most
+        submissions are declined on (**R3**), so answer it concretely.
+        "I opened it in SuperDocs" is not an answer. "Revising one clause without
+        disturbing the eleven around it, and being able to show the others were
+        untouched" is.
+    validations:
+      required: true
+
+  - type: input
+    id: evidence
+    attributes:
+      label: Evidence link
+      description: >
+        Test 3 — a second link that lets a stranger check the answer above.
+        A commit, a diff, an exported file, a public write-up, a PR.
+      placeholder: https://
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: preconditions
+    attributes:
+      label: Before you submit
+      options:
+        - label: >
+            I built this project, or I speak for the people who did. Nothing here
+            is submitted on someone else's behalf without their say-so.
+          required: true
+        - label: >
+            Both links are safe to publish — no credentials, no personal data,
+            nothing under an NDA, and no private individual named.
+          required: true
+        - label: >
+            Everything I've claimed about SuperDocs is something it actually does.
+          required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        **What happens next.** A human opens both links and applies the three
+        tests in order, stopping at the first failure. The verdict is written
+        into `gallery/manifest.json` — listed or declined, with the reason — and
+        merged **either way**. Declines are recorded in public with a numbered
+        reason you can read and answer, not closed in silence.

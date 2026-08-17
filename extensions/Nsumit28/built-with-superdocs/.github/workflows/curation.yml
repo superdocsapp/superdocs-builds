@@ -1,0 +1,53 @@
+# Runs on every pull request that touches the gallery.
+#
+# This is the difference between a curation rule and a curation essay. The bar in
+# CURATION.md needs a human — no workflow can judge whether SuperDocs did work
+# that mattered. But the paper trail does not need a human, and it is the part
+# that decays first: the entry merged in a hurry with an empty reason field, the
+# decline citing a code the submitter was never shown. Those fail here instead.
+name: curation
+
+on:
+  pull_request:
+    paths:
+      - "gallery/**"
+      - "index.html"
+      - "badge.svg"
+      - "*.py"
+  push:
+    branches: [main]
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Every entry carries a decision, evidence and a reason
+        run: python3 lint_manifest.py
+
+      - name: The rule's own gate is not decoration
+        run: python3 test_lint.py
+
+      - name: The badge still satisfies camo's policy
+        run: python3 verify_badge.py
+
+      - name: The badge checker is not decoration either
+        run: python3 test_verify.py
+
+      - name: The page is regenerated from the manifest, not hand-edited
+        run: |
+          python3 make_gallery.py
+          git diff --exit-code index.html || {
+            echo "::error::index.html does not match what the manifest generates."
+            echo "Run 'python3 make_gallery.py' and commit the result — the page is"
+            echo "built from the manifest so an entry cannot be added by editing HTML"
+            echo "and skipping review."
+            exit 1
+          }
+
+      - name: The page requests nothing on the reader's behalf
+        run: python3 verify_gallery.py

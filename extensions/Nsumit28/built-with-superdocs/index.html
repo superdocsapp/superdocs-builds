@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Built with SuperDocs</title>
+<meta name="description" content="Projects that used SuperDocs to do real work on a real document. Every entry is submitted by the person who built it, and every entry links to somethi">
+<style>
+:root {
+  --coral: #f97766; --ink: #110b0b; --paper: #fbfaf6; --muted: #6f6864;
+  --rule: #e8e5e1; --card: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --ink: #f4f1ed; --paper: #14100f; --muted: #a09b97;
+           --rule: #2a2422; --card: #1b1615; }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 46rem; margin: 0 auto; padding: 4rem 1.5rem 5rem; }
+header { border-bottom: 1px solid var(--rule); padding-bottom: 2.5rem; }
+h1 { font-size: clamp(2rem, 6vw, 2.75rem); line-height: 1.1; letter-spacing: -0.02em;
+     margin: 0 0 1rem; }
+.standfirst { font-size: 1.125rem; color: var(--muted); margin: 0 0 2rem; max-width: 34rem; }
+.badge-strip { display: flex; align-items: center; gap: 0.875rem; flex-wrap: wrap; }
+.badge-strip svg { display: block; }
+.badge-strip span { font-size: 0.8125rem; color: var(--muted); }
+h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+     color: var(--muted); margin: 3.5rem 0 1.25rem; font-weight: 600; }
+.entry {
+  background: var(--card); border: 1px solid var(--rule); border-radius: 10px;
+  padding: 1.5rem 1.5rem 1.25rem; margin-bottom: 1rem;
+}
+.entry h3 { margin: 0 0 0.5rem; font-size: 1.1875rem; letter-spacing: -0.01em; }
+.entry h3 a { color: inherit; text-decoration: none;
+               border-bottom: 2px solid var(--coral); }
+.entry h3 a:hover { color: var(--coral); }
+.entry p { margin: 0 0 1rem; color: var(--muted); }
+.did { margin: 0 0 1rem; padding: 0; list-style: none;
+        border-left: 2px solid var(--coral); padding-left: 0.875rem; }
+.did li { font-size: 0.9375rem; margin-bottom: 0.25rem; }
+.meta { display: flex; gap: 1.25rem; flex-wrap: wrap; font-size: 0.8125rem;
+         color: var(--muted); border-top: 1px solid var(--rule); padding-top: 0.875rem; }
+.meta a { color: var(--coral); }
+.note { font-size: 0.9375rem; font-style: italic; color: var(--muted);
+         margin: 0 0 1rem; }
+.conflict { font-size: 0.875rem; color: var(--muted); margin: 0 0 1rem;
+             background: rgba(249,119,102,0.08); border-radius: 6px;
+             padding: 0.75rem 0.875rem; }
+.conflict strong { color: var(--coral); }
+.declined { border-style: dashed; background: transparent; }
+.declined h3 { color: var(--muted); font-size: 1.0625rem; }
+.code { display: inline-block; font: 600 0.75rem/1 ui-monospace, monospace;
+         color: var(--coral); border: 1px solid var(--coral); border-radius: 4px;
+         padding: 0.25rem 0.375rem; margin-right: 0.5rem; vertical-align: 0.1em; }
+.bar { font-size: 0.9375rem; color: var(--muted); }
+.bar a { color: var(--coral); }
+footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--rule);
+          font-size: 0.8125rem; color: var(--muted); }
+footer a { color: var(--coral); }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Built with SuperDocs</h1>
+  <p class="standfirst">Projects that used SuperDocs to do real work on a real document. Every entry is submitted by the person who built it, and every entry links to something you can open and check.</p>
+  <div class="badge-strip">
+    <svg xmlns="http://www.w3.org/2000/svg" width="133" height="20" viewBox="0 0 133 20" role="img" aria-label="built with SuperDocs">
+<title>built with SuperDocs</title>
+<clipPath id="bws-clip"><rect width="133" height="20" rx="3"/></clipPath>
+<g clip-path="url(#bws-clip)">
+<rect width="62" height="20" fill="#110b0b"/>
+<rect x="62" width="71" height="20" fill="#f97766"/>
+</g>
+<path transform="translate(7 0)" fill="#fbfaf6" d="M3.77 14.12Q3.23 14.12 2.89 13.93Q2.54 13.75 2.35 13.5Q2.15 13.25 2.04 13.06H1.95V14H0.79V6H1.98V8.97H2.04Q2.15 8.79 2.34 8.54Q2.53 8.29 2.87 8.11Q3.21 7.92 3.77 7.92Q4.5 7.92 5.06 8.29Q5.63 8.65 5.96 9.34Q6.28 10.04 6.28 11.01Q6.28 11.98 5.96 12.68Q5.64 13.37 5.07 13.75Q4.51 14.12 3.77 14.12ZM3.51 13.11Q4.03 13.11 4.38 12.83Q4.72 12.56 4.9 12.08Q5.08 11.6 5.08 11Q5.08 10.41 4.9 9.94Q4.73 9.47 4.38 9.2Q4.03 8.93 3.51 8.93Q3.01 8.93 2.66 9.19Q2.31 9.45 2.13 9.91Q1.96 10.38 1.96 11Q1.96 11.63 2.14 12.1Q2.32 12.58 2.67 12.85Q3.01 13.11 3.51 13.11ZM9.64 14.08Q9.03 14.08 8.57 13.82Q8.11 13.56 7.85 13.06Q7.59 12.55 7.59 11.81V8H8.78V11.66Q8.78 12.31 9.12 12.68Q9.46 13.05 10.04 13.05Q10.45 13.05 10.76 12.87Q11.07 12.7 11.26 12.36Q11.44 12.03 11.44 11.55V8H12.62V14H11.49L11.49 12.53H11.6Q11.34 13.35 10.83 13.71Q10.33 14.08 9.64 14.08ZM14.21 14V8H15.39V14ZM14.81 7.08Q14.5 7.08 14.28 6.87Q14.06 6.67 14.06 6.38Q14.06 6.08 14.28 5.88Q14.5 5.68 14.81 5.68Q15.11 5.68 15.33 5.88Q15.55 6.08 15.55 6.38Q15.55 6.67 15.33 6.87Q15.11 7.08 14.81 7.08ZM18.16 6V14H16.98V6ZM22.49 8V8.96H19.23V8ZM20.11 6.57H21.29V12.38Q21.29 12.74 21.44 12.91Q21.59 13.08 21.94 13.08Q22.03 13.08 22.18 13.06Q22.33 13.04 22.44 13.01L22.65 13.96Q22.46 14.02 22.25 14.05Q22.03 14.08 21.82 14.08Q21 14.08 20.55 13.66Q20.11 13.24 20.11 12.47ZM27.91 14 26.1 8H27.35L28.01 10.48Q28.16 11.04 28.32 11.73Q28.49 12.41 28.64 13.27H28.47Q28.63 12.44 28.79 11.76Q28.96 11.07 29.11 10.48L29.77 8H30.96L31.61 10.48Q31.75 11.05 31.92 11.74Q32.08 12.43 32.24 13.27H32.06Q32.22 12.44 32.38 11.75Q32.54 11.06 32.69 10.48L33.35 8H34.61L32.8 14H31.61L30.87 11.42Q30.76 11.03 30.65 10.6Q30.55 10.17 30.44 9.73Q30.34 9.28 30.24 8.84H30.47Q30.37 9.27 30.27 9.72Q30.16 10.17 30.06 10.6Q29.95 11.04 29.84 11.42L29.09 14ZM35.71 14V8H36.89V14ZM36.31 7.08Q36 7.08 35.78 6.87Q35.56 6.67 35.56 6.38Q35.56 6.08 35.78 5.88Q36 5.68 36.31 5.68Q36.61 5.68 36.83 5.88Q37.05 6.08 37.05 6.38Q37.05 6.67 36.83 6.87Q36.61 7.08 36.31 7.08ZM41.05 8V8.96H37.8V8ZM38.67 6.57H39.86V12.38Q39.86 12.74 40.01 12.91Q40.16 13.08 40.51 13.08Q40.6 13.08 40.75 13.06Q40.9 13.04 41.01 13.01L41.22 13.96Q41.03 14.02 40.81 14.05Q40.6 14.08 40.39 14.08Q39.57 14.08 39.12 13.66Q38.67 13.24 38.67 12.47ZM43.42 10.44V14H42.24V6H43.41V9.47H43.25Q43.52 8.66 44.01 8.29Q44.51 7.92 45.22 7.92Q45.83 7.92 46.3 8.18Q46.76 8.44 47.01 8.94Q47.27 9.44 47.27 10.19V14H46.08V10.33Q46.08 9.68 45.74 9.32Q45.41 8.95 44.82 8.95Q44.42 8.95 44.1 9.12Q43.78 9.3 43.6 9.63Q43.42 9.97 43.42 10.44Z"/>
+<path transform="translate(69 0)" fill="#110b0b" d="M3.4 14Q2.51 14 1.83 13.68Q1.14 13.37 0.76 12.77Q0.37 12.18 0.37 11.34V11.03H1.8V11.34Q1.8 12.04 2.23 12.38Q2.66 12.73 3.4 12.73Q4.15 12.73 4.52 12.43Q4.88 12.13 4.88 11.67Q4.88 11.35 4.7 11.16Q4.52 10.96 4.17 10.83Q3.83 10.7 3.33 10.59L3.08 10.54Q2.29 10.36 1.72 10.09Q1.16 9.82 0.85 9.38Q0.55 8.94 0.55 8.24Q0.55 7.54 0.89 7.04Q1.22 6.54 1.83 6.27Q2.44 6 3.27 6Q4.09 6 4.74 6.28Q5.38 6.56 5.75 7.11Q6.12 7.67 6.12 8.5V8.83H4.69V8.5Q4.69 8.06 4.52 7.79Q4.34 7.53 4.03 7.4Q3.71 7.27 3.27 7.27Q2.61 7.27 2.29 7.52Q1.98 7.77 1.98 8.2Q1.98 8.48 2.13 8.68Q2.28 8.88 2.57 9.01Q2.87 9.14 3.33 9.24L3.59 9.3Q4.41 9.47 5.02 9.75Q5.63 10.02 5.97 10.47Q6.31 10.92 6.31 11.63Q6.31 12.33 5.96 12.87Q5.6 13.4 4.94 13.7Q4.29 14 3.4 14ZM9.51 13.94Q8.88 13.94 8.4 13.65Q7.92 13.36 7.66 12.84Q7.39 12.32 7.39 11.65V8.39H8.78V11.54Q8.78 12.16 9.08 12.46Q9.38 12.77 9.94 12.77Q10.58 12.77 10.93 12.35Q11.29 11.93 11.29 11.17V8.39H12.67V13.85H11.31V13.13H11.11Q10.98 13.41 10.61 13.67Q10.25 13.94 9.51 13.94ZM14.21 16.05V8.39H15.58V9.05H15.77Q15.96 8.73 16.36 8.49Q16.75 8.24 17.49 8.24Q18.15 8.24 18.71 8.56Q19.27 8.89 19.61 9.52Q19.95 10.14 19.95 11.03V11.21Q19.95 12.1 19.61 12.73Q19.27 13.36 18.71 13.68Q18.15 14 17.49 14Q16.99 14 16.66 13.89Q16.32 13.77 16.12 13.59Q15.92 13.41 15.8 13.22H15.6V16.05ZM17.07 12.79Q17.72 12.79 18.14 12.38Q18.57 11.97 18.57 11.18V11.07Q18.57 10.28 18.14 9.86Q17.71 9.45 17.07 9.45Q16.43 9.45 16 9.86Q15.58 10.28 15.58 11.07V11.18Q15.58 11.97 16 12.38Q16.43 12.79 17.07 12.79ZM23.72 14Q22.9 14 22.28 13.66Q21.66 13.31 21.31 12.68Q20.97 12.05 20.97 11.19V11.06Q20.97 10.2 21.31 9.57Q21.65 8.93 22.26 8.59Q22.88 8.24 23.69 8.24Q24.5 8.24 25.09 8.6Q25.68 8.96 26.01 9.59Q26.34 10.22 26.34 11.06V11.53H22.37Q22.4 12.09 22.79 12.44Q23.19 12.79 23.76 12.79Q24.34 12.79 24.62 12.54Q24.89 12.29 25.04 11.98L26.17 12.57Q26.01 12.86 25.72 13.2Q25.43 13.53 24.95 13.77Q24.46 14 23.72 14ZM22.38 10.49H24.94Q24.89 10.02 24.56 9.74Q24.22 9.45 23.68 9.45Q23.12 9.45 22.79 9.74Q22.46 10.02 22.38 10.49ZM27.58 13.85V8.39H28.94V9.01H29.14Q29.26 8.68 29.54 8.53Q29.82 8.37 30.2 8.37H30.85V9.6H30.17Q29.64 9.6 29.3 9.88Q28.96 10.16 28.96 10.75V13.85ZM31.67 13.85V12.57H32.68V7.43H31.67V6.15H34.84Q36.39 6.15 37.2 6.94Q38 7.72 38 9.27V10.73Q38 12.28 37.2 13.06Q36.39 13.85 34.84 13.85ZM34.13 12.53H34.86Q35.74 12.53 36.15 12.07Q36.55 11.61 36.55 10.77V9.23Q36.55 8.38 36.15 7.93Q35.74 7.47 34.86 7.47H34.13ZM41.85 14Q41.04 14 40.39 13.67Q39.74 13.34 39.37 12.72Q38.99 12.09 38.99 11.21V11.03Q38.99 10.15 39.37 9.53Q39.74 8.9 40.39 8.57Q41.04 8.24 41.85 8.24Q42.67 8.24 43.32 8.57Q43.97 8.9 44.34 9.53Q44.71 10.15 44.71 11.03V11.21Q44.71 12.09 44.34 12.72Q43.97 13.34 43.32 13.67Q42.67 14 41.85 14ZM41.85 12.77Q42.49 12.77 42.91 12.36Q43.33 11.95 43.33 11.18V11.07Q43.33 10.3 42.92 9.88Q42.5 9.47 41.85 9.47Q41.22 9.47 40.8 9.88Q40.38 10.3 40.38 11.07V11.18Q40.38 11.95 40.8 12.36Q41.22 12.77 41.85 12.77ZM48.55 14Q47.76 14 47.12 13.67Q46.47 13.34 46.1 12.72Q45.73 12.09 45.73 11.2V11.04Q45.73 10.15 46.1 9.53Q46.47 8.9 47.12 8.57Q47.76 8.24 48.55 8.24Q49.33 8.24 49.9 8.52Q50.46 8.79 50.8 9.27Q51.15 9.75 51.26 10.35L49.92 10.64Q49.87 10.31 49.72 10.04Q49.57 9.78 49.29 9.63Q49 9.47 48.59 9.47Q48.17 9.47 47.83 9.65Q47.5 9.84 47.31 10.19Q47.11 10.55 47.11 11.07V11.18Q47.11 11.69 47.31 12.05Q47.5 12.41 47.83 12.59Q48.17 12.77 48.59 12.77Q49.21 12.77 49.54 12.45Q49.86 12.12 49.95 11.59L51.29 11.91Q51.15 12.5 50.8 12.98Q50.46 13.45 49.9 13.73Q49.33 14 48.55 14ZM54.7 14Q53.64 14 52.95 13.54Q52.27 13.08 52.13 12.22L53.4 11.89Q53.48 12.28 53.66 12.5Q53.84 12.72 54.11 12.81Q54.38 12.9 54.7 12.9Q55.19 12.9 55.42 12.73Q55.65 12.56 55.65 12.31Q55.65 12.06 55.43 11.92Q55.21 11.78 54.72 11.69L54.42 11.64Q53.84 11.53 53.37 11.34Q52.9 11.14 52.61 10.8Q52.33 10.46 52.33 9.92Q52.33 9.11 52.92 8.67Q53.51 8.24 54.48 8.24Q55.4 8.24 56 8.65Q56.61 9.05 56.79 9.71L55.51 10.11Q55.42 9.69 55.15 9.52Q54.88 9.34 54.48 9.34Q54.09 9.34 53.88 9.48Q53.67 9.62 53.67 9.86Q53.67 10.12 53.89 10.25Q54.11 10.37 54.48 10.44L54.79 10.49Q55.41 10.61 55.91 10.79Q56.41 10.97 56.7 11.3Q56.99 11.64 56.99 12.21Q56.99 13.07 56.37 13.54Q55.75 14 54.7 14Z"/>
+<rect x=".5" y=".5" width="132" height="19" rx="2.5" fill="none" stroke="#fbfaf6" stroke-opacity=".25"/>
+</svg>
+    <span>The badge every listed project may display.</span>
+  </div>
+</header>
+
+<h2>Listed</h2>
+
+<article class="entry">
+  <h3><a href="https://nsumit28.github.io/docx-notes/tracked-changes-lost-in-conversion/">Tracked changes disappear when a document round-trips through markdown</a></h3>
+  <p>A note on why w:ins, w:del and comment anchors don&#x27;t survive a conversion through markdown, and a two-line check for whether your own pipeline drops them.</p>
+  <ul class="did"><li>Editing inside the document (POST /v1/chat) — drafted the caveat in the testing section</li><li>HTML export of the finished document</li></ul>
+  <p class="note">Meets the bar: the page is public, SuperDocs drafted content into a named section while the rest stayed put, and the study behind it is published with its sources linked. The sentence SuperDocs wrote was kept; I moved it to the position I had asked for, which it ignored.</p>
+  <p class="conflict"><strong>Conflict:</strong> Submitted and reviewed by the same person — this is the curator&#x27;s own project. Held to the same three tests as anything else, and disclosed here because the disclosure is the only thing that keeps a one-entry gallery honest.</p>
+  <div class="meta">
+    <span>Submitted by the project&#x27;s author</span>
+    <span>Reviewed 2026-08-17</span>
+    <span><a href="https://nsumit28.github.io/docx-notes/what-people-are-stuck-on/">Evidence</a></span>
+  </div>
+</article>
+<p class="bar">This gallery opens with one entry. That is the honest state of it: entries are submitted by their owners and verified against a written bar, and exactly one project has met it so far. Padding the list with builds whose owners never asked to be listed would make the badge mean less, which is the only thing the gallery has to protect.</p>
+
+<h2>Not in the gallery</h2>
+<article class="entry declined">
+  <h3><span class="code">R5</span>This gallery, and the badge it hands out</h3>
+  <p>It is the gallery, so R5 applies whatever else is true of it. Stated precisely rather than flatteringly: SuperDocs was used on this project — the curation rule was revised through the API and exported — but both sentences it drafted were rejected on review and the one that shipped was written by hand. A gallery that lists itself to look busier is the exact failure the bar exists to prevent.</p>
+  <div class="meta"><span>Declined 2026-08-16</span></div>
+</article>
+
+<h2>Getting listed</h2>
+<p class="bar">
+  The bar is written down, and so are the reasons an entry is declined — see
+  <a href="CURATION.md">the curation rule</a>, then
+  <a href="SUBMITTING.md">submit a build</a>.
+  Submissions come from the person who built the project. Nothing is harvested,
+  and nothing is listed that its owner did not offer. A decline is answered in
+  public with a numbered reason, not closed in silence.
+</p>
+
+<footer>
+  Built and curated by Sumit Negi as a Round 2 candidate submission for
+  <a href="https://twitter.com/superdocsapp">@superdocsapp</a>. Not an official
+  SuperDocs property. Updated 2026-08-17.
+</footer>
+</div>
+</body>
+</html>

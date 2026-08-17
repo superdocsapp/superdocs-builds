@@ -1,0 +1,8 @@
+# Raw SuperDocs API responses carry a promo redemption_id and account
+# identifiers. The HTML evidence is published; the raw responses are not.
+out/*.json
+
+.fonts/
+__pycache__/
+*.py[cod]
+.DS_Store

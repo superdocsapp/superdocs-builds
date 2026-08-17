@@ -1,0 +1,53 @@
+<h1>Tracked changes disappear when a document round-trips through markdown</h1>
+<p>You export a .docx, run it through markdown or HTML, edit it, convert it back.
+Word opens the result and every revision mark is gone. Not rejected — gone. The
+edits are sitting there as ordinary text, as if someone had accepted them all
+and never said so.</p>
+<p>Here is what Word had before the trip:</p>
+<pre><code class="language-xml">&lt;w:p&gt;
+  &lt;w:ins w:id=&quot;41&quot; w:author=&quot;Priya&quot; w:date=&quot;2026-08-14T09:12:00Z&quot;&gt;
+    &lt;w:r&gt;&lt;w:t&gt;net thirty days&lt;/w:t&gt;&lt;/w:r&gt;
+  &lt;/w:ins&gt;
+  &lt;w:del w:id=&quot;42&quot; w:author=&quot;Priya&quot; w:date=&quot;2026-08-14T09:12:00Z&quot;&gt;
+    &lt;w:r&gt;&lt;w:delText&gt;net sixty days&lt;/w:delText&gt;&lt;/w:r&gt;
+  &lt;/w:del&gt;
+&lt;/w:p&gt;
+</code></pre>
+<p>Two things there have no equivalent in markdown. The <code>w:ins</code> and <code>w:del</code>
+elements, which are what makes a change a <em>tracked</em> change rather than a fact.
+And <code>w:delText</code>, which is where deleted text lives — a deleted run does not use
+<code>w:t</code> at all. Convert that paragraph to markdown and you get one line of prose.
+Convert it back and you get one run of plain text. The wrappers are not corrupted
+in transit; there is simply nowhere to put them.</p>
+<p>Comments go the same way and are easier to miss. A comment isn't stored in the
+paragraph — it lives in <code>word/comments.xml</code>, and the body only holds anchors
+pointing at it:</p>
+<pre><code class="language-xml">&lt;w:commentRangeStart w:id=&quot;7&quot;/&gt;
+&lt;w:r&gt;&lt;w:t&gt;indemnity&lt;/w:t&gt;&lt;/w:r&gt;
+&lt;w:commentRangeEnd w:id=&quot;7&quot;/&gt;
+&lt;w:r&gt;&lt;w:commentReference w:id=&quot;7&quot;/&gt;&lt;/w:r&gt;
+</code></pre>
+<p>Drop the anchors and <code>comments.xml</code> is still in the file, still valid, and
+attached to nothing. The document opens cleanly and the review thread is gone.</p>
+<h2>How to tell whether your pipeline does this</h2>
+<p>Take a document with one tracked insertion and one comment. Send it through your
+pipeline. Then unzip the result and look:</p>
+<pre><code class="language-bash">unzip -o out.docx -d out/
+grep -c &quot;w:ins\|w:del&quot; out/word/document.xml
+grep -c &quot;commentReference&quot; out/word/document.xml
+</code></pre>
+<p>Zero on either line means the pipeline flattened your review history. Do this
+before it runs on anything that matters, because the failure is silent: the file
+opens, the text is right, and nothing warns you.</p>
+<h2>What to do instead</h2>
+<p>If the changes matter, don't round-trip through a format that can't hold them.
+Edit the OOXML in place, or use a tool that reads and writes the document as a
+document. If you must convert, convert a copy and treat the result as a new
+draft rather than the same document with edits applied — because that is what it
+is.</p>
+<p>This is also the part of document tooling that is least settled. Converting
+files between formats has been answered for a decade. Keeping tracked changes
+and comments alive through an edit is being worked out in open pull requests
+right now, which is why it is worth checking rather than assuming.</p>
+<p><em>Written 17 August 2026 by Sumit Negi, while applying for a role at SuperDocs.
+The XML above is from a test document I made; the author name is invented.</em></p>
