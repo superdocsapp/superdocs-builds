@@ -188,6 +188,11 @@ def main() -> None:
         action="store_true",
         help="Automatically approve all proposed changes without prompt",
     )
+    parser.add_argument(
+        "--mock-superdocs",
+        action="store_true",
+        help="Use a local mock instead of the real SuperDocs API (no API key required)",
+    )
 
     args = parser.parse_args()
 
@@ -205,19 +210,20 @@ def main() -> None:
         with open(decision_text, "r", encoding="utf-8") as f:
             decision_text = f.read()
 
-    # Configure SuperDocs client
-    sd_api_key = os.getenv("SUPERDOCS_API_KEY")
-    sd_base_url = os.getenv("SUPERDOCS_BASE_URL", "https://use.superdocs.app/api")
-    superdocs = SuperDocsClient(api_key=sd_api_key, base_url=sd_base_url)
-
     # Configure Wiki adapter
+    _sample_sections = [
+        ("Deployment", "Production deployments happen every Friday."),
+        ("Database", "Production uses PostgreSQL on AWS RDS."),
+        ("Incident Response", "The on-call engineer must acknowledge incidents within 30 minutes."),
+    ]
+
     if args.adapter == "nuclino":
         nuclino_api_key = os.getenv("NUCLINO_API_KEY")
         nuclino_base_url = os.getenv("NUCLINO_BASE_URL", "https://api.nuclino.com/v0")
         wiki = NuclinoWikiAdapter(api_key=nuclino_api_key, base_url=nuclino_base_url)
     else:
         wiki = MemoryWikiAdapter()
-        # Seed default sample doc if running against memory
+        # Seed default sample Engineering Handbook
         wiki.seed_document(
             WikiDocument(
                 doc_id=args.doc_id,
@@ -231,6 +237,58 @@ def main() -> None:
                 content_version="1",
             )
         )
+
+    # Configure SuperDocs client
+    if args.mock_superdocs or (args.adapter == "memory" and not os.getenv("SUPERDOCS_API_KEY")):
+        # Local mock: scan decision text for keywords to propose matching section changes.
+        # This simulates what SuperDocs AI would return so you can try the full flow locally.
+        def _local_mock_handler(action: str, params: dict):
+            if action == "upload":
+                return {"document_id": "mock-sd-session"}
+            if action == "chat":
+                decision_lower = decision_text.lower()
+                changes = []
+                keywords = {
+                    "Deployment": [
+                        "deploy", "deployment", "release", "ship", "pipeline", "ci", "cd",
+                        "friday", "daily", "weekly", "rollout",
+                    ],
+                    "Incident Response": [
+                        "incident", "on-call", "oncall", "sla", "acknowledge",
+                        "pager", "alert", "response", "escalat",
+                    ],
+                    "Database": [
+                        "database", "postgres", "postgresql", "rds", "mysql",
+                        "redis", "mongo", "sql", "db",
+                    ],
+                }
+                section_snippets = dict(_sample_sections)
+                for section, kws in keywords.items():
+                    if any(kw in decision_lower for kw in kws):
+                        changes.append({
+                            "change_id": f"mock_{section.lower().replace(' ', '_')}",
+                            "target_section": section,
+                            "old_snippet": section_snippets[section],
+                            "new_snippet": f"[SuperDocs AI would update this based on: '{decision_text[:80]}...']",
+                            "explanation": f"The decision appears to affect the {section} section.",
+                        })
+                if not changes:
+                    print(
+                        "\n[Mock SuperDocs] Decision does not appear to affect any tracked section."
+                        " Returning NOOP.\n"
+                    )
+                return {"proposed_changes": changes}
+            if action == "approve":
+                return {"success": True}
+            return {}
+
+        if args.mock_superdocs:
+            print("[Mock SuperDocs] Running in local mock mode — no API key required.\n")
+        superdocs = SuperDocsClient(mock_handler=_local_mock_handler)
+    else:
+        sd_api_key = os.getenv("SUPERDOCS_API_KEY")
+        sd_base_url = os.getenv("SUPERDOCS_BASE_URL", "https://api.superdocs.app/v1")
+        superdocs = SuperDocsClient(api_key=sd_api_key, base_url=sd_base_url)
 
     agent = LiveDocAgent(wiki_adapter=wiki, superdocs_client=superdocs)
 

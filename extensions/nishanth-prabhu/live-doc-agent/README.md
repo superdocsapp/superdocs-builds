@@ -108,7 +108,7 @@ cp .env.example .env
 ```env
 # SuperDocs API Configuration
 SUPERDOCS_API_KEY=your-superdocs-api-key
-SUPERDOCS_BASE_URL=https://use.superdocs.app/api
+SUPERDOCS_BASE_URL=https://api.superdocs.app/v1
 
 # Wiki Host Configuration (Nuclino)
 NUCLINO_API_KEY=your-nuclino-api-key
@@ -132,7 +132,174 @@ python -m live_doc_agent.cli \
 
 ---
 
-## 6. Safety Guarantees & Edge Cases
+## 6. End-to-End Reproduction Example
+
+This section shows a **complete reproducible run** against the real SuperDocs API using the built-in in-memory wiki (no Nuclino account required).
+
+### Prerequisites
+
+| Requirement | Where to get it |
+|---|---|
+| SuperDocs API key | [superdocs.app](https://superdocs.app) → Settings → API Keys |
+| Python 3.11+ | `python --version` |
+| Activated venv | `source .venv/bin/activate` |
+
+### Step 1 — Clone & install
+
+```bash
+git clone https://github.com/Nishanth307/superdocs-builds.git
+cd superdocs-builds/extensions/nishanth-prabhu/live-doc-agent
+
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+### Step 2 — Configure API keys
+
+```bash
+cp .env.example .env
+# Edit .env and fill in your keys
+```
+
+`.env` contents:
+
+```env
+SUPERDOCS_API_KEY=sk_your_key_here
+SUPERDOCS_BASE_URL=https://api.superdocs.app/v1
+```
+
+### Step 3 — Run the zero-credential evaluator demo (no API keys needed)
+
+```bash
+python -m live_doc_agent.cli demo
+```
+
+Expected output:
+
+```text
+==================================================
+ Live Doc Agent — Evaluator Demo (Zero-Credential)
+==================================================
+
+Decision:
+  All deployments must now use the automated CI/CD pipeline.
+
+Human Approval Gate:
+  -> APPROVED
+
+Proposed changes:
+  [1] Section: [Deployment]
+      - Deployments happen manually.
+      + Deployments must use the automated CI/CD pipeline.
+      Explanation: Switch from manual deployment to automated CI/CD pipeline.
+
+Result Status:
+  APPLIED
+
+Changed sections:
+  - Deployment
+
+Untouched sections:
+  ✓ Authentication
+  ✓ On-call
+
+Document Version:
+  1 → 2
+
+==================================================
+ Invariant Verified: Untouched sections preserved
+==================================================
+```
+
+### Step 4 — Run against the real SuperDocs API (auto-approve)
+
+This makes a live call to SuperDocs and applies two surgical patches:
+
+```bash
+set -a && source .env && set +a
+
+python -m live_doc_agent.cli \
+  --doc-id "handbook-live" \
+  --decision "Production deployments will now happen daily instead of every Friday. The incident acknowledgement SLA is now 15 minutes." \
+  --auto-approve
+```
+
+Expected output:
+
+```text
+Running Live Doc Agent for document 'handbook-live'...
+
+Result Status: APPLIED
+Successfully applied 2 surgical patches.
+
+--- Updated Document Content ---
+# Engineering Handbook
+
+## Deployment
+Production deployments happen daily.
+
+## Database
+Production uses PostgreSQL on AWS RDS.
+
+## Incident Response
+The on-call engineer must acknowledge incidents within 15 minutes.
+```
+
+Note: `## Database` is **untouched** — the agent only edits sections affected by the decision.
+
+### Step 5 — Interactive human approval gate
+
+Run without `--auto-approve` to step through the approval UI:
+
+```bash
+set -a && source .env && set +a
+
+python -m live_doc_agent.cli \
+  --doc-id "handbook-interactive" \
+  --decision "Production deployments will now happen weekly on Mondays. The on-call rotation is now biweekly."
+```
+
+The agent will pause at each proposed change and prompt:
+
+```text
+=======================================================
+ Human Approval Gate: 2 Proposed Surgical Changes
+ Document: 'Engineering Handbook' (Version 1)
+=======================================================
+
+[1/2] Section: [Deployment]
+  Old Snippet : "Production deployments happen every Friday."
+  New Snippet : "Production deployments happen every Monday."
+  Explanation : Deployment schedule changed from Friday to Monday.
+Approve this change? [y/n/e(dit)]: y
+  -> Approved.
+
+[2/2] Section: [Incident Response]
+  Old Snippet : "The on-call engineer must acknowledge incidents within 30 minutes."
+  New Snippet : "The on-call rotation is now biweekly."
+  Explanation : On-call rotation frequency has changed.
+Approve this change? [y/n/e(dit)]: n
+  Reason for rejection (optional): not the right section
+  -> Rejected.
+
+Result Status: APPLIED
+Successfully applied 1 surgical patches.
+```
+
+Approve, reject, or type `e` to provide your own replacement text for any change.
+
+### Step 6 — Run the automated test suite
+
+```bash
+pytest -q
+```
+
+All 13 test files run in under 5 seconds with zero credentials.
+
+---
+
+## 7. Safety Guarantees & Edge Cases
 
 | Scenario | Behavior / Status | Guarantee |
 | :--- | :--- | :--- |
@@ -148,7 +315,7 @@ python -m live_doc_agent.cli \
 
 ---
 
-## 7. Limitations & Honest Engineering Choices
+## 8. Limitations & Honest Engineering Choices
 
 1. **Source of Truth**: The host wiki remains authoritative. SuperDocs is used for AI proposal generation and human review.
 2. **Sequential Multi-Patch Application**: Patches are applied sequentially with optimistic version verification on each step. If a race condition occurs midway, the operation halts with `CONFLICT` and reports previously applied patches rather than silently clobbering.
@@ -156,7 +323,7 @@ python -m live_doc_agent.cli \
 
 ---
 
-## 8. Repository Structure
+## 9. Repository Structure
 
 ```text
 live-doc-agent/
