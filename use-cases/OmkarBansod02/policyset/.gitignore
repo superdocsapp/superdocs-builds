@@ -1,0 +1,10 @@
+.private/
+.env
+.env.local
+.DS_Store
+node_modules/
+.next/
+out/
+coverage/
+tmp/
+*.tsbuildinfo
