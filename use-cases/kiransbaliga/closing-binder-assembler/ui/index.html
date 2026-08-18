@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>M&A Closing-Binder Assembler | SuperDocs Deal Engine</title>
+  <style>
+    :root {
+      --navy-primary: #0B1B3D;
+      --navy-dark: #071126;
+      --gold-accent: #C5A059;
+      --gold-hover: #D8B26E;
+      --slate-bg: #0F172A;
+      --card-bg: #1E293B;
+      --card-border: #334155;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --success-green: #22C55E;
+      --warning-amber: #F59E0B;
+      --danger-red: #EF4444;
+      --border-radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--slate-bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy-primary) 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: rgba(197, 160, 89, 0.2);
+      color: var(--gold-accent);
+      border: 1px solid var(--gold-accent);
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-gold {
+      background-color: var(--gold-accent);
+      color: #000;
+    }
+    .btn-gold:hover {
+      background-color: var(--gold-hover);
+      box-shadow: 0 0 15px rgba(197, 160, 89, 0.4);
+    }
+
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--gold-accent);
+    }
+
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px 40px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .hero-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius);
+      padding: 24px 30px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .deal-info h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .deal-meta {
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 20px;
+    }
+
+    .readiness-meter {
+      text-align: right;
+    }
+    .meter-val {
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--gold-accent);
+    }
+    .meter-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 25px;
+    }
+
+    .sidebar-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar-section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gold-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--card-border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.4);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dropzone:hover {
+      border-color: var(--gold-accent);
+      background: rgba(197, 160, 89, 0.05);
+    }
+
+    .dropzone p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .table-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 14px;
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-executed {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success-green);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+    .badge-partial {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-unsigned {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger-red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .badge-cert {
+      background: rgba(148, 163, 184, 0.15);
+      color: #CBD5E1;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .badge-missing {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger-red);
+      border: 1px solid var(--danger-red);
+    }
+
+    .deliverables-box {
+      margin-top: 25px;
+      background: rgba(11, 27, 61, 0.4);
+      border: 1px solid var(--gold-accent);
+      border-radius: var(--border-radius);
+      padding: 20px 25px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .deliverable-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-title">
+      <span>⚖️ SuperDocs M&A Assembler</span>
+      <span class="brand-badge">S3 Closing Engine</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" id="loadSampleBtn" onclick="loadSampleDeal()">⚡ Load Sample Project Titan Deal</button>
+      <button class="btn btn-gold" id="assembleBtn" onclick="assembleBinder()">🚀 Assemble Closing Binder</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+
+    <!-- Hero Deal Banner -->
+    <div class="hero-panel">
+      <div class="deal-info">
+        <h2 id="dealTitle">Project Titan: $450M Acquisition of CloudScale Technologies</h2>
+        <div class="deal-meta">
+          <span id="dealBuyer">Buyer: <b>Apex Holdings LLC</b></span>
+          <span id="dealTarget">Target: <b>CloudScale Technologies, Inc.</b></span>
+          <span id="dealDate">Closing: <b>August 18, 2026</b></span>
+          <span id="dealCounsel">Counsel: <b>Sullivan & Cromwell LLP</b></span>
+        </div>
+      </div>
+      <div class="readiness-meter">
+        <div class="meter-val" id="readinessScore">--%</div>
+        <div class="meter-label">Closing Readiness</div>
+      </div>
+    </div>
+
+    <!-- Output Deliverables Download Box -->
+    <div class="deliverables-box" id="deliverablesPanel">
+      <div>
+        <h4 style="color: var(--gold-accent); font-size: 16px; margin-bottom: 4px;">🎉 Closing Binder Assembled Successfully</h4>
+        <p style="font-size: 13px; color: var(--text-muted);">All 3 deliverables compiled with hyperlinked TOC, dividers, and client-ready report.</p>
+      </div>
+      <div class="deliverable-links">
+        <a href="/api/download/binder-pdf" target="_blank" class="btn btn-gold">📕 Download Master PDF</a>
+        <a href="/api/download/per-document-zip" class="btn btn-outline">📦 Download Files ZIP</a>
+        <a href="/api/download/outstanding-report-pdf" target="_blank" class="btn btn-outline">📄 Outstanding Report</a>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="workflow-grid" style="margin-top: 25px;">
+      
+      <!-- Sidebar / Controls -->
+      <div class="sidebar-card">
+        <div>
+          <div class="sidebar-section-title">1. Closing Checklist</div>
+          <div class="dropzone" onclick="document.getElementById('checklistInput').click()">
+            <input type="file" id="checklistInput" style="display:none" onchange="handleChecklistUpload(event)">
+            <strong>Upload Checklist File</strong>
+            <p>JSON, Markdown, or CSV table (60–200 items)</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="sidebar-section-title">2. Executed File Bundle</div>
+          <div class="dropzone" onclick="document.getElementById('bundleInput').click()">
+            <input type="file" id="bundleInput" multiple style="display:none" onchange="handleBundleUpload(event)">
+            <strong>Upload Executed Files</strong>
+            <p>PDF, DOCX, Scans, Signatures (Multi-select)</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="sidebar-section-title">Quick Actions</div>
+          <button class="btn btn-outline" style="width:100%; margin-bottom: 8px;" onclick="loadSampleDeal()">⚡ Load 65-Item Sample Deal</button>
+          <button class="btn btn-gold" style="width:100%" onclick="assembleBinder()">🚀 Generate Full Binder</button>
+        </div>
+      </div>
+
+      <!-- Main Match & Audit Table -->
+      <div class="content-card">
+        <div class="table-header">
+          <div>
+            <h3>Semantic Document-to-Checklist Match Matrix</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Content-based matching & signature execution audit.</p>
+          </div>
+          <span id="itemCountBadge" class="badge badge-cert">0 Items</span>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 80px;">Tab</th>
+                <th>Checklist Item Title</th>
+                <th>Category</th>
+                <th>Matched File</th>
+                <th style="width: 140px;">Execution Status</th>
+                <th style="width: 80px;">Score</th>
+              </tr>
+            </thead>
+            <tbody id="matchTableBody">
+              <tr>
+                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                  Click <b>"⚡ Load Sample Project Titan Deal"</b> or upload files to begin semantic matching.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <footer>
+    Built for <b>SuperDocs Task 2</b> · Senior Engineer Build by Kiran Baliga · MIT License
+  </footer>
+
+  <script>
+    async function loadSampleDeal() {
+      try {
+        const checkRes = await fetch('/api/checklist/load-sample', { method: 'POST' });
+        const checkData = await checkRes.json();
+
+        const corpusRes = await fetch('/api/documents/load-sample-corpus', { method: 'POST' });
+        const corpusData = await corpusRes.json();
+
+        updateDealHeader(checkData);
+        await refreshMatches();
+      } catch (err) {
+        alert('Error loading sample deal: ' + err);
+      }
+    }
+
+    async function refreshMatches() {
+      try {
+        const res = await fetch('/api/matches');
+        const data = await res.json();
+        renderMatchTable(data.matches);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function updateDealHeader(data) {
+      document.getElementById('dealTitle').innerText = data.deal_name;
+      document.getElementById('dealBuyer').innerHTML = `Buyer: <b>${data.buyer}</b>`;
+      document.getElementById('dealTarget').innerHTML = `Target: <b>${data.target}</b>`;
+      document.getElementById('itemCountBadge').innerText = `${data.total_items} Items`;
+    }
+
+    function renderMatchTable(matches) {
+      const tbody = document.getElementById('matchTableBody');
+      tbody.innerHTML = '';
+
+      let satisfied = 0;
+
+      matches.forEach(m => {
+        const tr = document.createElement('tr');
+
+        let statusBadge = '';
+        if (m.execution_status === 'FULLY_EXECUTED') {
+          statusBadge = '<span class="badge badge-executed">FULLY EXECUTED</span>';
+          satisfied++;
+        } else if (m.execution_status === 'PARTIALLY_EXECUTED') {
+          statusBadge = '<span class="badge badge-partial">PARTIALLY SIGNED</span>';
+        } else if (m.execution_status === 'UNSIGNED_DRAFT') {
+          statusBadge = '<span class="badge badge-unsigned">UNSIGNED DRAFT</span>';
+        } else if (m.execution_status === 'NON_SIGNATURE_DOC') {
+          statusBadge = '<span class="badge badge-cert">STATE CERTIFICATE</span>';
+          satisfied++;
+        } else {
+          statusBadge = '<span class="badge badge-missing">MISSING ITEM</span>';
+        }
+
+        const scorePercent = Math.round(m.score * 100);
+        const fileName = m.matched_filename ? `<code>${m.matched_filename}</code>` : '<span style="color:var(--danger-red)">[Missing Deliverable]</span>';
+
+        tr.innerHTML = `
+          <td><b>Tab ${String(m.tab_number).padStart(2, '0')}</b></td>
+          <td><b>${m.checklist_item_id}</b></td>
+          <td><span style="color:var(--text-muted)">Tab Item</span></td>
+          <td>${fileName}</td>
+          <td>${statusBadge}</td>
+          <td><b>${scorePercent}%</b></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const readiness = Math.round((satisfied / matches.length) * 100);
+      document.getElementById('readinessScore').innerText = `${readiness}%`;
+      document.getElementById('itemCountBadge').innerText = `${matches.length} Items`;
+    }
+
+    async function assembleBinder() {
+      const btn = document.getElementById('assembleBtn');
+      btn.innerText = '⏳ Assembling PDF...';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch('/api/assemble', { method: 'POST' });
+        const data = await res.json();
+        
+        document.getElementById('deliverablesPanel').style.display = 'flex';
+        document.getElementById('readinessScore').innerText = `${data.readiness_percentage}%`;
+        btn.innerText = '✓ Assembled!';
+        setTimeout(() => { btn.innerText = '🚀 Assemble Closing Binder'; btn.disabled = false; }, 3000);
+      } catch (err) {
+        alert('Assembly failed: ' + err);
+        btn.innerText = '🚀 Assemble Closing Binder';
+        btn.disabled = false;
+      }
+    }
+
+    async function handleChecklistUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/checklist/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      updateDealHeader(data);
+      await refreshMatches();
+    }
+
+    async function handleBundleUpload(event) {
+      const files = event.target.files;
+      if (!files.length) return;
+      const formData = new FormData();
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+      await fetch('/api/documents/upload-bundle', { method: 'POST', body: formData });
+      await refreshMatches();
+    }
+  </script>
+</body>
+</html>
