@@ -1,0 +1,53 @@
+{
+  "game": {
+    "title": "Ashvale",
+    "studio": "Copper Lantern",
+    "genre": "Tactical adventure",
+    "release_date": "March 12, 2027",
+    "platforms": ["PC"],
+    "price": "$19.99",
+    "availability": "Digital worldwide"
+  },
+  "descriptions": {
+    "core": "Ashvale is a tactical adventure about a courier crossing a storm-scarred valley to reconnect isolated settlements."
+  },
+  "features": [
+    "Navigate a storm-scarred valley connected by old trade roads.",
+    "Plan encounters around weather and terrain.",
+    "Reconnect settlements by restoring damaged relay towers.",
+    "Discover local stories through letters and abandoned camps.",
+    "Customize the courier's route and equipment."
+  ],
+  "history_and_inspiration": {
+    "history": "Ashvale began as a prototype about route planning before expanding into a tactical adventure.",
+    "inspiration": "The team drew inspiration from mountain trade routes, travel journals and changing weather."
+  },
+  "quote": {
+    "text": "Every road in Ashvale should feel like a decision worth remembering.",
+    "attribution": "Ira Sen, Creative Director, Copper Lantern"
+  },
+  "awards": [
+    {"name": "Indie Routes — Best Strategy Demo", "year": 2026}
+  ],
+  "coverage": [
+    {
+      "publication": "PlayLedger",
+      "headline": "Ashvale turns route planning into an adventure",
+      "url": "https://example.com/playledger/ashvale"
+    }
+  ],
+  "assets": [
+    {
+      "filename": "ashvale-key-art.jpg",
+      "type": "key_art",
+      "caption": "Key art showing the courier overlooking the storm-scarred valley.",
+      "credit": "Copper Lantern"
+    },
+    {
+      "filename": "ashvale-relay.jpg",
+      "type": "screenshot",
+      "caption": "Gameplay screenshot showing the courier restoring a relay tower.",
+      "credit": "Copper Lantern"
+    }
+  ]
+}
