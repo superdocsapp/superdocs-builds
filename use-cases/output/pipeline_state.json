@@ -1,0 +1,10 @@
+{
+  "fingerprint": "92a5554baff775c94598155b1f8f0a92509f1bbeafd649edb85b77b43c09f7e1",
+  "completed_stages": [
+    "source_validated",
+    "press_kit_generated",
+    "html_rendered",
+    "localized",
+    "local_pipeline_complete"
+  ]
+}

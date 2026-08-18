@@ -1,0 +1,81 @@
+{
+  "game": {
+    "title": "Emberfall",
+    "studio": "Northstar Forge",
+    "genre": "Action-adventure RPG",
+    "release_date": "October 15, 2026",
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S"
+    ],
+    "price": "$29.99",
+    "availability": "Digital worldwide"
+  },
+  "descriptions": {
+    "core": "Emberfall is an action-adventure RPG about a young firekeeper crossing a ruined kingdom to restore ancient beacons and uncover the truth behind the fall of her homeland."
+  },
+  "features": [
+    "Explore a ruined fantasy kingdom connected by ancient beacon routes.",
+    "Master fire-based combat abilities and combine them with environmental interactions.",
+    "Restore ancient beacons to unlock new regions and fast-travel routes.",
+    "Discover hidden lore through optional ruins, journals and environmental storytelling.",
+    "Customize abilities through a flexible skill system."
+  ],
+  "history_and_inspiration": {
+    "history": "Emberfall began as a small prototype focused on fire-based exploration mechanics before expanding into a full action-adventure RPG.",
+    "inspiration": "The team drew inspiration from illustrated fantasy novels, ruined medieval architecture and the feeling of exploring abandoned places."
+  },
+  "quote": {
+    "text": "We wanted every ember in Emberfall to feel like a small piece of hope in a world that has almost forgotten how to survive.",
+    "attribution": "Maya Rao, Creative Director, Northstar Forge"
+  },
+  "awards": [
+    {
+      "name": "Indie Horizon Showcase — Best Visual Direction",
+      "year": 2026
+    },
+    {
+      "name": "PixelForge Awards — Most Anticipated Indie",
+      "year": 2026
+    }
+  ],
+  "coverage": [
+    {
+      "publication": "GameFrame",
+      "headline": "Emberfall brings atmospheric exploration to the indie RPG scene",
+      "url": "https://example.com/gameframe/emberfall"
+    },
+    {
+      "publication": "IndieScope",
+      "headline": "Five upcoming indie adventures worth watching",
+      "url": "https://example.com/indiescope/emberfall"
+    }
+  ],
+  "assets": [
+    {
+      "filename": "emberfall-key-art.jpg",
+      "type": "key_art",
+      "caption": "Key art showing the protagonist standing before a restored beacon overlooking the ruined kingdom.",
+      "credit": "Northstar Forge"
+    },
+    {
+      "filename": "emberfall-beacon.jpg",
+      "type": "screenshot",
+      "caption": "Gameplay screenshot showing the protagonist activating an ancient beacon.",
+      "credit": "Northstar Forge"
+    },
+    {
+      "filename": "emberfall-combat.jpg",
+      "type": "screenshot",
+      "caption": "Gameplay screenshot showing fire-based combat against a corrupted guardian.",
+      "credit": "Northstar Forge"
+    },
+    {
+      "filename": "emberfall-trailer-still.jpg",
+      "type": "trailer_still",
+      "caption": "Trailer still showing the protagonist entering the Ember Cathedral.",
+      "credit": "Northstar Forge"
+    }
+  ]
+}

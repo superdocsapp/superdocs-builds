@@ -1,0 +1,93 @@
+{
+  "title": "Emberfall",
+  "fact_sheet": {
+    "studio": "Northstar Forge",
+    "release_date": "October 15, 2026",
+    "platforms": [
+      "PC",
+      "PlayStation 5",
+      "Xbox Series X|S"
+    ],
+    "price": "$29.99",
+    "availability": "Digital worldwide"
+  },
+  "descriptions": {
+    "one_line": "Emberfall es un RPG de acción y aventura sobre una joven guardiana del fuego que atraviesa un reino en ruinas para restaurar antiguos faros y descubrir la verdad detrás de la caída de su tierra natal.",
+    "one_paragraph": "Emberfall es un RPG de acción y aventura sobre una joven guardiana del fuego que atraviesa un reino en ruinas para restaurar antiguos faros y descubrir la verdad detrás de la caída de su tierra natal. Las características principales incluyen explorar un reino de fantasía en ruinas conectado por antiguas rutas de faros, dominar habilidades de combate basadas en el fuego y restaurar antiguos faros para desbloquear nuevas regiones.",
+    "long_form": "Emberfall es un RPG de acción y aventura sobre una joven guardiana del fuego que atraviesa un reino en ruinas para restaurar antiguos faros y descubrir la verdad detrás de la caída de su tierra natal. Desarrollado por Northstar Forge, Emberfall es un RPG de acción y aventura. Emberfall comenzó como un pequeño prototipo centrado en mecánicas de exploración basadas en el fuego antes de convertirse en un RPG completo de acción y aventura. El equipo se inspiró en novelas de fantasía ilustradas, la arquitectura medieval en ruinas y la sensación de explorar lugares abandonados. Las características principales incluyen explorar un reino de fantasía en ruinas conectado por antiguas rutas de faros, dominar habilidades de combate basadas en el fuego, restaurar antiguos faros, descubrir conocimientos ocultos y personalizar habilidades mediante un sistema flexible."
+  },
+  "features": [
+    "Explora un reino de fantasía en ruinas conectado por antiguas rutas de faros.",
+    "Domina habilidades de combate basadas en el fuego y combínalas con interacciones ambientales.",
+    "Restaura antiguos faros para desbloquear nuevas regiones y rutas de viaje rápido.",
+    "Descubre conocimientos ocultos mediante ruinas opcionales, diarios y narrativa ambiental.",
+    "Personaliza tus habilidades mediante un sistema de habilidades flexible."
+  ],
+  "history_and_inspiration": {
+    "history": "Emberfall comenzó como un pequeño prototipo centrado en mecánicas de exploración basadas en el fuego antes de convertirse en un RPG completo de acción y aventura.",
+    "inspiration": "El equipo se inspiró en novelas de fantasía ilustradas, la arquitectura medieval en ruinas y la sensación de explorar lugares abandonados."
+  },
+  "quote": {
+    "text": "We wanted every ember in Emberfall to feel like a small piece of hope in a world that has almost forgotten how to survive.",
+    "attribution": "Maya Rao, Creative Director, Northstar Forge"
+  },
+  "awards": [
+    {
+      "name": "Indie Horizon Showcase — Best Visual Direction",
+      "year": 2026
+    },
+    {
+      "name": "PixelForge Awards — Most Anticipated Indie",
+      "year": 2026
+    }
+  ],
+  "coverage": [
+    {
+      "publication": "GameFrame",
+      "headline": "Emberfall brings atmospheric exploration to the indie RPG scene",
+      "url": "https://example.com/gameframe/emberfall"
+    },
+    {
+      "publication": "IndieScope",
+      "headline": "Five upcoming indie adventures worth watching",
+      "url": "https://example.com/indiescope/emberfall"
+    }
+  ],
+  "asset_index": [
+    {
+      "filename": "emberfall-key-art.jpg",
+      "type": "key_art",
+      "caption": "Key art showing the protagonist standing before a restored beacon overlooking the ruined kingdom.",
+      "credit": "Northstar Forge"
+    },
+    {
+      "filename": "emberfall-beacon.jpg",
+      "type": "screenshot",
+      "caption": "Gameplay screenshot showing the protagonist activating an ancient beacon.",
+      "credit": "Northstar Forge"
+    },
+    {
+      "filename": "emberfall-combat.jpg",
+      "type": "screenshot",
+      "caption": "Gameplay screenshot showing fire-based combat against a corrupted guardian.",
+      "credit": "Northstar Forge"
+    },
+    {
+      "filename": "emberfall-trailer-still.jpg",
+      "type": "trailer_still",
+      "caption": "Trailer still showing the protagonist entering the Ember Cathedral.",
+      "credit": "Northstar Forge"
+    }
+  ],
+  "provenance": {
+    "fact_sheet": "game.*",
+    "descriptions.core": "descriptions.core",
+    "features": "features[]",
+    "history_and_inspiration.history": "history_and_inspiration.history",
+    "history_and_inspiration.inspiration": "history_and_inspiration.inspiration",
+    "quote": "quote.*",
+    "awards": "awards[]",
+    "coverage": "coverage[]",
+    "asset_index": "assets[]"
+  }
+}
