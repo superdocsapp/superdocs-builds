@@ -1,0 +1,205 @@
+# Bluepeak Consumer Goods — Carrier Contract Playbook
+# Fictional shipper, fabricated positions. Every rule is data: adding a rule or
+# changing a position must never require a code change.
+#
+# Fields:
+#   id                unique rule id, cited in the redline author tag and the summary
+#   name              short human label
+#   clause_keywords   lowercase phrases; a clause containing any of them is governed by this rule
+#   required_position what Bluepeak must end up with (drives the AI's evaluation)
+#   fallback_wording  exact wording to insert when the carrier's position is unacceptable
+#   when_missing      insert | ignore — what to do when no clause matches the keywords
+#   severity          deal_breaker | standard | preferred
+
+shipper: Bluepeak Consumer Goods, Inc.
+author_tag: Redline Desk
+rules:
+  - id: R-101
+    name: Liability cap
+    clause_keywords: ["liability", "cargo loss", "loss or damage"]
+    required_position: >
+      Carrier is liable for the full actual invoice value of lost or damaged
+      cargo, up to at least $250,000 per shipment. Caps below $250,000 or
+      per-pound released rates are unacceptable.
+    fallback_wording: >
+      Carrier shall be liable for cargo loss or damage in the amount of the
+      full actual invoice value of the affected goods, up to $250,000 per
+      shipment. No released rates or per-pound limitations shall apply unless
+      agreed by Shipper in a signed writing.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-102
+    name: Carmack governs claims
+    clause_keywords: ["carmack", "49 u.s.c.", "claims for loss"]
+    required_position: >
+      Cargo claims are governed by the Carmack Amendment, 49 U.S.C. § 14706.
+      Any clause disclaiming Carmack or substituting a lighter regime is
+      unacceptable.
+    fallback_wording: >
+      All claims for cargo loss, damage, or delay shall be governed by the
+      Carmack Amendment, 49 U.S.C. § 14706. Nothing in this Agreement waives
+      Shipper's rights thereunder.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-103
+    name: Cargo insurance
+    clause_keywords: ["cargo insurance", "insurance coverage", "certificate of insurance"]
+    required_position: >
+      Carrier maintains cargo insurance of at least $250,000 per occurrence
+      and delivers certificates naming Shipper as certificate holder before
+      the first load. Lower limits are unacceptable.
+    fallback_wording: >
+      Carrier shall maintain cargo insurance with limits of not less than
+      $250,000 per occurrence and shall furnish Shipper certificates of
+      insurance, naming Shipper as certificate holder, prior to the first
+      shipment hereunder.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-104
+    name: Auto liability insurance
+    clause_keywords: ["automobile liability", "auto liability"]
+    required_position: >
+      Commercial automobile liability insurance of at least $1,000,000
+      combined single limit.
+    fallback_wording: >
+      Carrier shall maintain commercial automobile liability insurance with a
+      combined single limit of not less than $1,000,000 per occurrence.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-105
+    name: Detention terms
+    clause_keywords: ["detention", "free time"]
+    required_position: >
+      At least 3 hours of free time at each facility; detention thereafter at
+      no more than $65 per hour, capped at $400 per calendar day. Less free
+      time, higher rates, or an uncapped daily amount are unacceptable.
+    fallback_wording: >
+      Shipper allows three (3) hours of free time for loading or unloading at
+      each facility. Detention accrues thereafter at $65 per hour or fraction
+      thereof, not to exceed $400 per calendar day, invoiced with supporting
+      arrival and departure records.
+    when_missing: insert
+    severity: standard
+
+  - id: R-106
+    name: Fuel surcharge basis
+    clause_keywords: ["fuel surcharge", "fuel adjustment"]
+    required_position: >
+      Fuel surcharge follows the U.S. DOE national average diesel index,
+      adjusted weekly, per Shipper's published matrix. Flat-percentage or
+      carrier-discretionary surcharges are unacceptable.
+    fallback_wording: >
+      The fuel surcharge shall be calculated from the U.S. Department of
+      Energy national average diesel price index, adjusted weekly, in
+      accordance with Shipper's published fuel surcharge matrix.
+    when_missing: insert
+    severity: standard
+
+  - id: R-107
+    name: Payment terms
+    clause_keywords: ["payment", "invoice", "net fifteen", "net 15", "net 45"]
+    required_position: >
+      Payment net 45 days from receipt of a complete, accurate invoice with
+      required documentation. Late-fee percentages and unilateral quick-pay
+      deductions are unacceptable.
+    fallback_wording: >
+      Shipper shall pay undisputed invoices within forty-five (45) days of
+      receipt of a complete and accurate invoice accompanied by the signed
+      proof of delivery. No late fees, interest, or quick-pay deductions
+      shall apply unless agreed in a signed writing.
+    when_missing: insert
+    severity: standard
+
+  - id: R-108
+    name: Mutual indemnity
+    clause_keywords: ["indemnif", "hold harmless"]
+    required_position: >
+      Indemnity must be mutual and proportionate to each party's negligence.
+      One-way indemnity in the carrier's favor, or shipper indemnifying for
+      the carrier's own negligence, is unacceptable.
+    fallback_wording: >
+      Each party shall indemnify, defend, and hold harmless the other from
+      third-party claims to the extent caused by the indemnifying party's
+      negligence or willful misconduct, including that of its employees,
+      agents, and subcontractors.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-109
+    name: Claims filing window
+    clause_keywords: ["claims must be filed", "claim filing", "notice of claim"]
+    required_position: >
+      Shipper has at least nine (9) months from delivery (or scheduled
+      delivery) to file cargo claims, consistent with Carmack minimums.
+      Shorter windows are unacceptable.
+    fallback_wording: >
+      Claims for loss or damage shall be filed within nine (9) months of the
+      date of delivery or, in the case of non-delivery, the scheduled
+      delivery date. Suit may be instituted within two (2) years from claim
+      denial.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-110
+    name: Termination for convenience
+    clause_keywords: ["termination", "terminate this agreement"]
+    required_position: >
+      Either party may terminate without cause on 30 days' written notice;
+      Shipper may terminate immediately on lapse of required insurance or
+      operating authority. Longer lock-ins or carrier-only termination rights
+      are unacceptable.
+    fallback_wording: >
+      Either party may terminate this Agreement without cause upon thirty
+      (30) days' prior written notice. Shipper may terminate immediately upon
+      written notice if Carrier's required insurance or operating authority
+      lapses.
+    when_missing: insert
+    severity: standard
+
+  - id: R-111
+    name: Rate confidentiality
+    clause_keywords: ["confidential", "confidentiality"]
+    required_position: >
+      Rates and agreement terms are confidential between the parties, with
+      disclosure permitted to advisors and as required by law. A standard
+      mutual confidentiality clause is acceptable as-is.
+    fallback_wording: >
+      The rates and terms of this Agreement are confidential and shall not be
+      disclosed to third parties except to a party's professional advisors or
+      as required by law.
+    when_missing: ignore
+    severity: preferred
+
+  - id: R-112
+    name: Governing law
+    clause_keywords: ["governing law", "governed by the laws"]
+    required_position: >
+      Illinois law governs, with venue in Cook County, Illinois. Any other
+      governing law or venue is unacceptable.
+    fallback_wording: >
+      This Agreement shall be governed by the laws of the State of Illinois,
+      without regard to conflict-of-law rules. Exclusive venue for disputes
+      shall lie in the state and federal courts sitting in Cook County,
+      Illinois.
+    when_missing: insert
+    severity: standard
+
+  - id: R-113
+    name: Safety and compliance
+    clause_keywords: ["safety rating", "fmcsa", "operating authority"]
+    required_position: >
+      Carrier maintains valid FMCSA operating authority and at least a
+      Satisfactory safety rating, and must notify Shipper within 48 hours of
+      any downgrade, revocation, or out-of-service order.
+    fallback_wording: >
+      Carrier represents that it holds valid FMCSA operating authority and a
+      Satisfactory safety rating (or is unrated with no pending downgrade).
+      Carrier shall notify Shipper in writing within forty-eight (48) hours
+      of any change in its safety rating, authority, or insurance, or of any
+      out-of-service order.
+    when_missing: insert
+    severity: deal_breaker
