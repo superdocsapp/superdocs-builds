@@ -126,6 +126,7 @@ function attachControl(response) {
     try {
       const state = await send({ type: "POLL_CONVERSATION" });
       if (state.state === "processing") { setLoading(button, true); return schedulePoll(button); }
+      if (state.state === "migrated") return finishAdd(button);
       if (state.hasDocument || state.state === "complete") return addResponse(button, response);
       await chooser(button, response);
     } catch (error) { statusFor(button, error.message, "error"); }

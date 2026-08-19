@@ -1,4 +1,4 @@
-import { appendCapturedResponse, appendInstruction, conversationKey, createDocument, createInstruction, newSessionId } from "../shared/document.js";
+import { appendCapturedResponse, appendInstruction, containsCapturedResponse, conversationKey, createDocument, createInstruction, newSessionId } from "../shared/document.js";
 import { BridgeClient, decisionsFromForm, finalHtml, focusedSessionDocument, jobState, pendingChanges, savedDocumentExists } from "../shared/superdocs.js";
 
 function log(event, details = {}) {
@@ -19,6 +19,10 @@ async function addResponse(message, sender) {
   const state = await storedState();
   const existing = state.documents[key];
   if (!existing && message.template && (typeof message.template.id !== "string" || typeof message.template.name !== "string")) throw new Error("The selected template is invalid.");
+  if (existing && containsCapturedResponse(existing.html, message.html)) {
+    log("duplicate capture skipped", { conversationKey: key, sessionId: existing.sessionId, htmlBytes: message.html.length });
+    return { state: "complete", duplicate: true };
+  }
   const existingUsesTemplate = existing?.mode === "template" && existing.template;
   if (!message.template && !existingUsesTemplate) return saveDirectDocument({ key, existing, message, state });
   const sessionId = existing?.sessionId ?? newSessionId();
@@ -73,7 +77,8 @@ async function pollConversation(sender) {
   const existing = state.documents[key];
   if (!active && existing?.mode === "template" && !existing.template) {
     log("migrating stored null-template conversation to a durable File", { conversationKey: key, sessionId: existing.sessionId });
-    return saveHtmlAsDurableDocument({ key, state, sessionId: existing.sessionId, html: existing.html });
+    const migrated = await saveHtmlAsDurableDocument({ key, state, sessionId: existing.sessionId, html: existing.html });
+    return { ...migrated, state: "migrated" };
   }
   if (!active) return { state: "idle", hasDocument: Boolean(existing) };
   const job = await bridge(state).getJob(active.jobId);

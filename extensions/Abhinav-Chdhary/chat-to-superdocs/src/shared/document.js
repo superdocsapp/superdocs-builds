@@ -19,6 +19,10 @@ export function appendCapturedResponse(documentHtml, capturedHtml) {
     : `${documentHtml}${capture}`;
 }
 
+export function containsCapturedResponse(documentHtml, capturedHtml) {
+  return documentHtml.includes(`<section data-chat-to-superdocs-capture="true">${capturedHtml}</section>`);
+}
+
 export function conversationKey(url) {
   const parsed = new URL(url);
   return `${parsed.origin}${parsed.pathname.replace(/\/$/, "") || "/"}`;

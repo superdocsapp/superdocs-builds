@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { appendCapturedResponse, appendInstruction, conversationKey, createDocument, createInstruction } from "../src/shared/document.js";
+import { appendCapturedResponse, appendInstruction, containsCapturedResponse, conversationKey, createDocument, createInstruction } from "../src/shared/document.js";
 import { BridgeClient, decisionsFromForm, finalHtml, focusedSessionDocument, jobState, normalizeSessionDocuments, normalizeTemplateList, parseProposedChangeBatch, pendingChanges, savedDocumentExists } from "../src/shared/superdocs.js";
 
 test("creates a styled document without flattening structured captured HTML", () => {
@@ -19,6 +19,12 @@ test("appends captured markup without flattening the existing conversation docum
   const appended = appendCapturedResponse("<html><body><h1>Notes</h1></body></html>", "<h2>Second answer</h2><pre><code>x</code></pre>");
   assert.match(appended, /<h1>Notes<\/h1>/);
   assert.match(appended, /<section data-chat-to-superdocs-capture="true"><h2>Second answer<\/h2><pre><code>x<\/code><\/pre><\/section>/);
+});
+
+test("recognizes an existing captured response before appending it again", () => {
+  const captured = "<p>Already saved</p>";
+  const document = appendCapturedResponse("<html><body></body></html>", captured);
+  assert.equal(containsCapturedResponse(document, captured), true);
 });
 
 test("uses a stable conversation key while ignoring query strings and fragments", () => {
