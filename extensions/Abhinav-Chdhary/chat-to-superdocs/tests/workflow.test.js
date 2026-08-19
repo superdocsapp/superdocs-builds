@@ -4,9 +4,9 @@ import { appendCapturedResponse, appendInstruction, containsCapturedResponse, co
 import { BridgeClient, decisionsFromForm, finalHtml, focusedSessionDocument, jobState, normalizeSessionDocuments, normalizeTemplateList, parseProposedChangeBatch, pendingChanges, savedDocumentExists } from "../src/shared/superdocs.js";
 
 test("creates a styled document without flattening structured captured HTML", () => {
-  const captured = "<h2>Plan</h2><ul><li>One<ul><li>Nested</li></ul></li></ul><table><tr><th>A</th></tr></table><pre><code>const x = 1;</code></pre><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mfrac><mi>x</mi><mi>h</mi></mfrac></math>";
+  const captured = "<h2>Plan</h2><ul><li>One<ul><li>Nested</li></ul></li></ul><table><tr><th>A</th></tr></table><pre><code>const x = 1;</code></pre><span data-latex=\"\\\\frac{x}{h}\" data-type=\"block-math\">\\\\frac{x}{h}</span>";
   const document = createDocument({ capturedHtml: captured });
-  for (const fragment of ["<ul>", "<table>", "<pre><code>", "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\"><mfrac>"]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  for (const fragment of ["<ul>", "<table>", "<pre><code>", "data-latex=\"\\\\frac{x}{h}\" data-type=\"block-math\""]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(document, /<h1>/);
 });
 

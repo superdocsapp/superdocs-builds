@@ -34,20 +34,20 @@ function sanitizeAnswer(element) {
   const copy = element.cloneNode(true);
   copy.querySelectorAll("button, nav, script, style, svg, form, textarea, iframe, object, embed, [aria-hidden='true']").forEach((node) => node.remove());
   copy.querySelectorAll("[data-testid*='copy'], [data-testid*='branch']").forEach((node) => node.remove());
-  // KaTeX includes presentation MathML alongside its browser-only visual spans.
-  // Keep that standards-based MathML intact: SuperDocs accepts HTML, whereas the
-  // previous data-latex wrapper was an extension-private attribute it discarded.
+  // SuperDocs' equation nodes use the KaTeX source plus a data-type marker.
+  // MathML alone is not an editor node, so it is silently dropped on import.
   copy.querySelectorAll(".katex").forEach((node) => {
-    const math = node.querySelector("math");
-    if (!math) return;
-    const replacement = math.cloneNode(true);
-    replacement.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
+    const latex = node.querySelector("annotation[encoding='application/x-tex']")?.textContent?.trim();
+    if (!latex) return;
+    const replacement = copy.ownerDocument.createElement("span");
+    replacement.setAttribute("data-latex", latex);
+    replacement.setAttribute("data-type", node.closest(".katex-display") ? "block-math" : "inline-math");
+    replacement.textContent = latex;
     node.replaceWith(replacement);
   });
   copy.querySelectorAll("*").forEach((node) => {
-    if (node.namespaceURI === "http://www.w3.org/1998/Math/MathML") return;
     for (const attribute of [...node.attributes]) {
-      if (!["href", "colspan", "rowspan", "start"].includes(attribute.name.toLowerCase())) node.removeAttribute(attribute.name);
+      if (!["href", "colspan", "rowspan", "start", "data-latex", "data-type"].includes(attribute.name.toLowerCase())) node.removeAttribute(attribute.name);
     }
   });
   return copy.innerHTML.trim();
