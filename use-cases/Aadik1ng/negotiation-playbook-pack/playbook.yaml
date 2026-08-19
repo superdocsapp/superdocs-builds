@@ -1,0 +1,154 @@
+# Negotiation playbook: GPU-compute / cloud SLA vendor contracts.
+# Deal-desk-facing document, not a clause library: for each of 15 points,
+# what we open at, what we'll concede to, what we want in trade, who has to
+# sign off past a line, and the language to use in the room.
+
+- id: uptime_commitment
+  topic: "Uptime / availability commitment"
+  opening_position: "99.95% monthly uptime, measured per-instance."
+  concession_sequence:
+    - "99.9% monthly uptime, per-instance"
+    - "99.9% measured fleet-wide instead of per-instance"
+  trade: "Give up per-instance measurement only for a committed-use discount."
+  approver_role: "VP Infrastructure"
+  words_to_use: "State the SLO and the measurement window in the same sentence, or it isn't a commitment."
+
+- id: downtime_definition
+  topic: "What counts as downtime"
+  opening_position: "Any period the service is unreachable or error rate exceeds 0.1%."
+  concession_sequence:
+    - "Same, but excludes scheduled maintenance with 72h+ notice"
+    - "Also excludes single-instance loss if we declined redundancy"
+  trade: "Widen the exclusion list only for shorter maintenance-notice windows."
+  approver_role: "none (self-approve)"
+  words_to_use: "Downtime is what the customer experienced, not what the status page admits to."
+
+- id: service_credits
+  topic: "Remedy for an SLA breach"
+  opening_position: "Tiered credits, 10% of that month's fees at the first breach tier."
+  concession_sequence:
+    - "5% at first tier, escalating on repeat breaches"
+    - "Credit-only (no cash), but credits never expire and stack"
+  trade: "Accept credit-only if credits are non-expiring and freely applicable."
+  approver_role: "Finance"
+  words_to_use: "Credits escalate on repeat breaches or they're not a deterrent, just a rounding error."
+
+- id: claim_window
+  topic: "Deadline to file an SLA claim"
+  opening_position: "30 calendar days from the incident."
+  concession_sequence:
+    - "14 calendar days"
+    - "7 business days, if the vendor proactively notifies within 24h"
+  trade: "Shorter window only in exchange for vendor-initiated incident notice."
+  approver_role: "none (self-approve)"
+  words_to_use: "A short claim window is fair only if you tell us about the incident first."
+
+- id: liability_cap
+  topic: "Overall liability cap"
+  opening_position: "12 months of fees paid; uncapped for gross negligence, data loss, security breach."
+  concession_sequence:
+    - "6 months of fees"
+    - "3 months of fees, carve-outs for data loss/confidentiality stay uncapped"
+  trade: "Lower the cap only if the security/data carve-out survives uncapped."
+  approver_role: "General Counsel"
+  words_to_use: "The cap moves. The carve-out for our data does not."
+
+- id: indemnification
+  topic: "IP / third-party claim indemnification"
+  opening_position: "Mutual; vendor indemnifies for IP infringement by their platform or models."
+  concession_sequence:
+    - "One-directional, vendor-only, IP claims only"
+    - "Vendor indemnification capped at the liability cap"
+  trade: "Accept a cap on indemnification only if the liability cap is high enough to matter."
+  approver_role: "General Counsel"
+  words_to_use: "We won't carry unlimited exposure for infrastructure we don't control the source of."
+
+- id: termination_convenience
+  topic: "Termination without cause"
+  opening_position: "Either party, 30 days notice, no penalty."
+  concession_sequence:
+    - "60 days notice"
+    - "90 days notice, with pro-rated refund of prepaid/committed fees"
+  trade: "Accept longer notice only if unused committed spend is refunded pro-rata."
+  approver_role: "none (self-approve)"
+  words_to_use: "Longer notice is fine. A one-way lock-in on our prepaid spend is not."
+
+- id: termination_cause
+  topic: "Cure period before termination for breach"
+  opening_position: "30 days after written notice of material breach."
+  concession_sequence:
+    - "15 days"
+    - "Immediate termination allowed, but only for security/data-handling breaches"
+  trade: "Shorten the general cure period only if non-security breaches keep a real cure window."
+  approver_role: "none (self-approve)"
+  words_to_use: "Fast termination is reasonable for a security failure, not for a missed feature."
+
+- id: data_deletion
+  topic: "Data deletion after contract end"
+  opening_position: "Full deletion within 30 days, with written certification."
+  concession_sequence:
+    - "60 days, certification still required"
+    - "60 days, certification available on request rather than automatic"
+  trade: "Accept a longer window if certification stays contractually guaranteed on request."
+  approver_role: "Security/Compliance"
+  words_to_use: "We need proof of deletion, not a promise of deletion."
+
+- id: data_portability
+  topic: "Data export rights during and after the contract"
+  opening_position: "Full export in open formats, any time, no fee, no lock-in."
+  concession_sequence:
+    - "Any time, but limited to formats the vendor already supports"
+    - "One free export at termination; additional exports billed"
+  trade: "Accept per-export fees post-termination if the first export stays free."
+  approver_role: "none (self-approve)"
+  words_to_use: "Our data leaves on our schedule. Format and frequency can flex; the right can't."
+
+- id: price_lock
+  topic: "Duration of quoted pricing"
+  opening_position: "Locked for the full 12-month term, no mid-term increases."
+  concession_sequence:
+    - "Locked, except documented pass-through costs (power/hardware) with 60 days notice"
+    - "Locked 6 months; renewal capped at CPI+3%"
+  trade: "Allow narrow pass-through increases only if renewal pricing is capped."
+  approver_role: "none (self-approve)"
+  words_to_use: "We'll absorb a documented pass-through cost. We won't absorb a re-negotiation wearing its clothes."
+
+- id: capacity_guarantee
+  topic: "Guaranteed capacity / no silent reclamation"
+  opening_position: "Reserved capacity cannot be reclaimed or reduced without our consent."
+  concession_sequence:
+    - "Guaranteed for reserved tier only; best-effort on-demand"
+    - "Reclamation allowed with 14 days notice, plus a credit if notice is missed"
+  trade: "Accept notice-based reclamation only if a missed notice triggers an automatic credit."
+  approver_role: "VP Infrastructure"
+  words_to_use: "Reserved has to mean reserved. Silent reclamation of paid capacity is a breach, not an inconvenience."
+
+- id: maintenance_notice
+  topic: "Advance notice for planned maintenance"
+  opening_position: "72 hours notice for anything affecting availability."
+  concession_sequence:
+    - "48 hours"
+    - "24 hours for low-impact windows; 72 hours stays for capacity-affecting work"
+  trade: "Shorter notice for low-impact work only if capacity-affecting work keeps the long window."
+  approver_role: "none (self-approve)"
+  words_to_use: "Notice length should scale with how much of our workload the window touches."
+
+- id: force_majeure
+  topic: "Force majeure scope"
+  opening_position: "Limited to events genuinely outside vendor control; explicitly excludes the vendor's own upstream supplier failures."
+  concession_sequence:
+    - "Allow upstream failure as force majeure only if the vendor shows it kept reasonable redundancy"
+    - "Accept broad standard language if the liability cap and credits stay intact regardless"
+  trade: "Broaden the carve-out only if it doesn't also waive the credit/remedy obligations."
+  approver_role: "none (self-approve)"
+  words_to_use: "Force majeure excuses the delay. It doesn't waive the credit — different clause."
+
+- id: audit_rights
+  topic: "Right to audit vendor security/compliance posture"
+  opening_position: "Annual right to a current SOC 2 / ISO 27001 report plus a security questionnaire."
+  concession_sequence:
+    - "Report available on request rather than automatic delivery"
+    - "A public trust-center page instead of a bespoke report, if kept current and dated"
+  trade: "Accept a trust-center page only if the vendor commits to keeping it current and dated."
+  approver_role: "none (self-approve)"
+  words_to_use: "We don't need a bespoke audit if the public page is genuinely current — but it has to be dated."
