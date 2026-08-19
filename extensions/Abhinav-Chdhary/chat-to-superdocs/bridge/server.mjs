@@ -42,6 +42,10 @@ const server = createServer(async (request, response) => {
     if (!allowOrigin(request, response)) return sendJson(response, 403, { error: "Untrusted extension origin." });
     if (request.method === "OPTIONS") return response.writeHead(204).end();
     const path = new URL(request.url, "http://localhost").pathname;
+    if (request.method === "GET" && path === "/api/templates") {
+      const upstreamResponse = await upstream("/v1/templates");
+      return sendJson(response, 200, await upstreamResponse.json());
+    }
     if (request.method === "POST" && path === "/api/jobs") {
       const body = await jsonBody(request);
       const upstreamResponse = await upstream("/v1/chat/async", { method: "POST", body: JSON.stringify(body) });

@@ -14,18 +14,21 @@ async function addResponse(message, sender) {
   const key = conversationKey(sender.tab.url);
   const state = await storedState();
   const existing = state.documents[key];
+  if (!existing && (!message.template || typeof message.template.id !== "string" || typeof message.template.name !== "string")) {
+    throw new Error("Choose one of your saved SuperDocs templates before creating this conversation document.");
+  }
   const sessionId = existing?.sessionId ?? newSessionId();
   const documentHtml = existing
     ? appendCapturedResponse(existing.html, message.html)
-    : createDocument({ templateId: message.templateId, title: documentTitle(sender.tab.url), capturedHtml: message.html });
+    : createDocument({ title: documentTitle(sender.tab.url), capturedHtml: message.html });
   const bridge = new BridgeClient(state.bridgeUrl);
   const started = await bridge.startJob({
     session_id: sessionId,
     document_html: documentHtml,
-    message: existing ? appendInstruction() : createInstruction(),
+    message: existing ? appendInstruction() : createInstruction(message.template),
     approval_mode: "ask_every_time",
   });
-  state.jobs[key] = { jobId: started.job_id, sessionId, documentHtml, templateId: existing?.templateId ?? message.templateId };
+  state.jobs[key] = { jobId: started.job_id, sessionId, documentHtml, template: existing?.template ?? message.template };
   await chrome.storage.local.set({ jobs: state.jobs });
   return { state: "processing", conversationKey: key };
 }
@@ -43,10 +46,10 @@ async function pollConversation(sender) {
   if (stateName === "completed") {
     const html = finalHtml(job);
     if (!html) throw new Error("The completed job did not return document HTML.");
-    state.documents[key] = { sessionId: active.sessionId, html, templateId: active.templateId };
+    state.documents[key] = { sessionId: active.sessionId, html, template: active.template };
     delete state.jobs[key];
     await chrome.storage.local.set({ documents: state.documents, jobs: state.jobs });
-    return { state: "complete", templateId: active.templateId };
+    return { state: "complete", template: active.template };
   }
   throw new Error(job.error || `The job ended with status: ${job.status}.`);
 }
@@ -65,6 +68,11 @@ async function decide(message, sender) {
   return { state: "processing" };
 }
 
+async function listTemplates() {
+  const state = await storedState();
+  return { templates: await new BridgeClient(state.bridgeUrl).listTemplates() };
+}
+
 async function exportConversation(sender) {
   if (!sender.tab?.url) throw new Error("This action must originate from an AI chat tab.");
   const state = await storedState();
@@ -78,7 +86,7 @@ async function exportConversation(sender) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const handlers = { ADD_RESPONSE: () => addResponse(message, sender), POLL_CONVERSATION: () => pollConversation(sender), DECIDE_CHANGES: () => decide(message, sender), EXPORT_CONVERSATION: () => exportConversation(sender) };
+  const handlers = { ADD_RESPONSE: () => addResponse(message, sender), LIST_TEMPLATES: () => listTemplates(), POLL_CONVERSATION: () => pollConversation(sender), DECIDE_CHANGES: () => decide(message, sender), EXPORT_CONVERSATION: () => exportConversation(sender) };
   if (!handlers[message?.type]) return;
   handlers[message.type]().then((result) => sendResponse({ ok: true, ...result })).catch((error) => sendResponse({ ok: false, error: error instanceof Error ? error.message : "Extension action failed." }));
   return true;

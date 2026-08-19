@@ -4,12 +4,6 @@ const RESPONSE_SELECTORS = {
   default: ["[data-message-author-role='assistant']", ".model-response-text", ".assistant-message", ".response-content", "article .markdown", ".standard-markdown"],
 };
 
-const TEMPLATES = [
-  ["brief", "Decision brief"],
-  ["notes", "Research notes"],
-  ["blank", "Blank document"],
-];
-
 let pollTimer = null;
 let lastReviewedChangeIds = "";
 
@@ -66,21 +60,29 @@ function statusFor(button, message, tone = "") {
 
 function removeChooser(button) { button.parentElement.querySelector(":scope > .cts-chooser")?.remove(); }
 
-function chooser(button, response) {
+async function chooser(button, response) {
   removeChooser(button);
   const panel = document.createElement("div"); panel.className = "cts-chooser"; panel.setAttribute("role", "dialog");
-  const label = document.createElement("p"); label.textContent = "Start this chat document with"; panel.append(label);
-  for (const [id, labelText] of TEMPLATES) {
-    const template = document.createElement("button"); template.type = "button"; template.textContent = labelText;
-    template.addEventListener("click", () => addResponse(button, response, id)); panel.append(template);
+  const label = document.createElement("p"); label.textContent = "Loading your SuperDocs templates…"; panel.append(label); button.parentElement.append(panel);
+  try {
+    const { templates } = await send({ type: "LIST_TEMPLATES" });
+    label.textContent = templates.length ? "Start this chat document with" : "No saved SuperDocs templates found.";
+    for (const template of templates) {
+      const templateButton = document.createElement("button"); templateButton.type = "button"; templateButton.textContent = template.name;
+      templateButton.addEventListener("click", () => addResponse(button, response, template)); panel.append(templateButton);
+    }
+    if (!templates.length) {
+      const note = document.createElement("span"); note.className = "cts-template-note"; note.textContent = "Create or upload a template in SuperDocs, then try again."; panel.append(note);
+    }
+  } catch (error) {
+    label.textContent = error.message;
   }
-  button.parentElement.append(panel);
 }
 
-async function addResponse(button, response, templateId) {
+async function addResponse(button, response, template) {
   removeChooser(button); button.disabled = true; statusFor(button, "Adding to document…");
   try {
-    await send({ type: "ADD_RESPONSE", html: sanitizeAnswer(response), templateId });
+    await send({ type: "ADD_RESPONSE", html: sanitizeAnswer(response), template });
     button.setAttribute("aria-label", "Adding to doc"); schedulePoll(button);
   } catch (error) { button.disabled = false; statusFor(button, error.message, "error"); }
 }
@@ -148,7 +150,7 @@ function attachControl(response) {
       if (state.state === "review") return reviewPanel(button, state.changes);
       if (state.state === "processing") { statusFor(button, "Document is still being styled…"); return schedulePoll(button); }
       if (state.hasDocument || state.state === "complete") return addResponse(button, response);
-      chooser(button, response);
+      await chooser(button, response);
     } catch (error) { statusFor(button, error.message, "error"); }
   });
   rail.append(button); block.prepend(rail);
@@ -164,7 +166,7 @@ function injectStyles() {
     .cts-add:hover { background:#df5e50; border-color:#df5e50; transform:translate(1px,-1px); } .cts-export:hover,.cts-chooser button:hover,.cts-review button:hover { background:#18315d; border-color:#18315d; color:#fff; } .cts-add:focus-visible,.cts-export:focus-visible,.cts-chooser button:focus-visible,.cts-review button:focus-visible { outline:3px solid #e6a56b; outline-offset:2px; }
     .cts-status { display:block; width:190px; color:#526176; font:500 11px/1.3 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; } .cts-status.success { color:#1d6b52; } .cts-status.error { color:#a2362c; }
     .cts-chooser,.cts-review { position:absolute; left:0; top:30px; z-index:99999; width:240px; padding:11px; border:1px solid #b9c7df; border-radius:12px; background:#f8fbff; box-shadow:0 12px 28px #162a4b2b; color:#18315d; font-family:ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
-    .cts-chooser p { margin:0 0 8px; font-size:11px; font-weight:650; } .cts-chooser button { display:block; width:100%; margin-top:5px; text-align:left; }
+    .cts-chooser p { margin:0 0 8px; font-size:11px; font-weight:650; } .cts-chooser button { display:block; width:100%; margin-top:5px; text-align:left; } .cts-template-note { display:block; color:#526176; font-size:11px; line-height:1.35; }
     .cts-review strong { display:block; margin-bottom:7px; font-size:12px; } .cts-review label { display:flex; gap:6px; align-items:flex-start; margin:7px 0; font-size:11px; line-height:1.3; } .cts-review button { margin-top:6px; }
     @media (prefers-reduced-motion: reduce) { .cts-add,.cts-export,.cts-chooser button,.cts-review button { transition:none; } }
   `;

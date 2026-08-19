@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { appendCapturedResponse, appendInstruction, conversationKey, createDocument } from "../src/shared/document.js";
-import { decisionsFromForm, finalHtml, jobState, parseProposedChangeBatch, pendingChanges } from "../src/shared/superdocs.js";
+import { appendCapturedResponse, appendInstruction, conversationKey, createDocument, createInstruction } from "../src/shared/document.js";
+import { decisionsFromForm, finalHtml, jobState, normalizeTemplateList, parseProposedChangeBatch, pendingChanges } from "../src/shared/superdocs.js";
 
 test("creates a styled document without flattening structured captured HTML", () => {
   const captured = "<h2>Plan</h2><ul><li>One<ul><li>Nested</li></ul></li></ul><table><tr><th>A</th></tr></table><pre><code>const x = 1;</code></pre><span data-latex=\"x^2\">x²</span>";
-  const document = createDocument({ templateId: "brief", title: "Weekly update", capturedHtml: captured });
-  for (const fragment of ["<h1>Weekly update</h1>", "<h2>Context</h2>", "<ul>", "<table>", "<pre><code>", "data-latex=\"x^2\""]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  const document = createDocument({ title: "Weekly update", capturedHtml: captured });
+  for (const fragment of ["<h1>Weekly update</h1>", "<ul>", "<table>", "<pre><code>", "data-latex=\"x^2\""]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 });
 
 test("append instruction protects existing content and requests review", () => {
@@ -22,6 +22,13 @@ test("appends captured markup without flattening the existing conversation docum
 
 test("uses a stable conversation key while ignoring query strings and fragments", () => {
   assert.equal(conversationKey("https://chatgpt.com/c/abc-123?model=fast#latest"), "https://chatgpt.com/c/abc-123");
+});
+
+test("uses a saved SuperDocs template rather than an extension-owned template", () => {
+  const template = { id: "tpl_brand", name: "Acme branded memo" };
+  assert.match(createInstruction(template), /Acme branded memo/);
+  assert.match(createInstruction(template), /tpl_brand/);
+  assert.deepEqual(normalizeTemplateList({ templates: [template] }), [template]);
 });
 
 test("double parses a documented proposed-change batch", () => {

@@ -25,6 +25,16 @@ export function pendingChanges(job) {
   return Array.isArray(changes) ? changes : [];
 }
 
+export function normalizeTemplateList(payload) {
+  const candidates = Array.isArray(payload)
+    ? payload
+    : [payload?.templates, payload?.items, payload?.data].find(Array.isArray) ?? [];
+  return candidates.map((template) => ({
+    id: template.id ?? template.template_id,
+    name: template.name ?? template.filename ?? template.file_name,
+  })).filter((template) => typeof template.id === "string" && typeof template.name === "string");
+}
+
 export function finalHtml(job) {
   return job?.result?.document_changes?.updated_html
     ?? job?.metadata?.document_html
@@ -55,6 +65,11 @@ export class BridgeClient {
 
   async startJob(payload) {
     return (await this.request("/api/jobs", { method: "POST", body: JSON.stringify(payload) })).json();
+  }
+
+  async listTemplates() {
+    const payload = await (await this.request("/api/templates")).json();
+    return normalizeTemplateList(payload);
   }
 
   async getJob(jobId) {

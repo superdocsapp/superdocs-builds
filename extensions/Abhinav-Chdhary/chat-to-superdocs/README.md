@@ -4,12 +4,12 @@ Created by **Abhinav Choudhary**.
 
 Chat to SuperDocs is a Chrome/Chromium extension for people who are tired of pasting AI answers into documents and repairing the formatting. It puts a small **Add** button to the left of every AI response's first readable block. One click turns that response into structured content in a growing SuperDocs document for the current chat.
 
-It keeps headings, nested lists, tables, code blocks, and maths intact; the first answer picks a template, and every later answer in the same conversation inherits that styling.
+It keeps headings, nested lists, tables, code blocks, and maths intact. On the first answer, it lists the templates saved in the user’s SuperDocs account; every later answer in the same conversation inherits the selected template’s styling.
 
 The extension proves the reviewable SuperDocs workflow:
 
 1. Adds inline controls to responses on ChatGPT and Claude, with generic semantic selectors for other Markdown-based AI chat interfaces.
-2. On the first click in a conversation, offers an inline template picker; it creates a conversation-scoped document.
+2. On the first click in a conversation, lists the user’s saved SuperDocs templates in an inline picker; it creates a conversation-scoped document from the selected template.
 3. On later clicks, appends the selected response to that same document and preserves the established template styling.
 4. Sends an async edit request, visibly waits while it processes, and keeps human review for every proposed change.
 5. Keeps the completed HTML per conversation and exports it as DOCX from the in-chat control.
@@ -20,7 +20,7 @@ SuperDocs API keys must remain server-side. This extension never reads, stores, 
 
 ## Run it
 
-Requirements: Node 18+ and a SuperDocs API key. Do not put the key in this repository or in the extension.
+Requirements: Node 18+, a SuperDocs API key, and at least one template saved in SuperDocs. Do not put the key in this repository or in the extension.
 
 1. Load the extension:
    - Open `chrome://extensions` (or Chromium equivalent), enable **Developer mode**, and choose **Load unpacked**.
@@ -34,10 +34,11 @@ Requirements: Node 18+ and a SuperDocs API key. Do not put the key in this repos
    node bridge/server.mjs
    ```
 
-3. Open a completed ChatGPT or Claude conversation. The extension adds an **Add** button just left of each assistant response.
-4. Click **Add** beside the first answer and choose a template in the small in-page menu.
-5. Approve or reject the proposed changes in the in-page review card. Later **Add** clicks append to the same conversation document without asking for the template again.
-6. Click **Export DOCX** beside a completed addition when you want to download the growing document.
+3. In SuperDocs, create or upload the branded template you want to use. The extension lists only templates available to the account behind `SUPERDOCS_API_KEY`.
+4. Open a completed ChatGPT or Claude conversation. The extension adds an **Add** button just left of each assistant response.
+5. Click **Add** beside the first answer and choose a saved SuperDocs template in the small in-page menu.
+6. Approve or reject the proposed changes in the in-page review card. Later **Add** clicks append to the same conversation document without asking for the template again.
+7. Click **Export DOCX** beside a completed addition when you want to download the growing document.
 
 The extension toolbar icon opens settings only; the document workflow itself never uses a popup. The options page deliberately permits only `http://127.0.0.1:8787` in this first draft, avoiding the accidental transfer of document content to an arbitrary endpoint.
 
@@ -52,6 +53,7 @@ The tests are offline and cover rich-structure preservation in the document enve
 ## SuperDocs features used
 
 - Async chat editing (`POST /v1/chat/async`)
+- Saved-template listing (`GET /v1/templates`)
 - Job polling (`GET /v1/jobs/{job_id}`)
 - Human approval of proposed changes (`POST /v1/chat/{session_id}/approve`)
 - DOCX export (`POST /v1/documents/export`)
