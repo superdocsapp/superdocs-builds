@@ -1,0 +1,62 @@
+{
+  "demo_notice": "DEMONSTRATION ONLY — This record is entirely fabricated and is not a real patient record.",
+  "patient": {
+    "name": "Demo Patient",
+    "date_of_birth": "1990-01-01",
+    "record_id": "DEMO-001"
+  },
+  "encounter": {
+    "date": "2026-08-19",
+    "type": "Outpatient follow-up",
+    "reason": "Follow-up after diagnostic testing"
+  },
+  "clinician": {
+    "name": "Dr. Alex Morgan",
+    "specialty": "Internal Medicine",
+    "facility": "Example Health Clinic"
+  },
+  "clinical_summary": {
+    "presenting_issue": "Intermittent fatigue and reduced exercise tolerance",
+    "history": "The patient reports several weeks of intermittent fatigue. No acute symptoms were reported during the demonstration encounter.",
+    "assessment": "Demonstration assessment: further outpatient evaluation is appropriate.",
+    "plan": [
+      "Continue routine outpatient follow-up.",
+      "Review laboratory results with the patient.",
+      "Refer to a specialist for additional evaluation."
+    ]
+  },
+  "results": [
+    {
+      "test": "Complete Blood Count",
+      "result": "Within demonstration reference range",
+      "interpretation": "No significant abnormality identified in this fabricated record."
+    },
+    {
+      "test": "Basic Metabolic Panel",
+      "result": "Within demonstration reference range",
+      "interpretation": "No significant abnormality identified in this fabricated record."
+    }
+  ],
+  "referral": {
+    "specialty": "Cardiology",
+    "reason": "Additional evaluation of reported reduced exercise tolerance"
+  },
+  "insurance": {
+    "provider": "Example Insurance Co.",
+    "member_id": "DEMO-MEMBER-001",
+    "requested_service": "Specialist consultation",
+    "medical_necessity_summary": "The consultation is requested for further evaluation of the reported symptoms."
+  },
+  "correspondence_requirements": [
+    "Referral letter",
+    "Discharge summary",
+    "Results letter to patient in plain language",
+    "Prior-authorisation letter"
+  ],
+  "sign_off": {
+    "required": true,
+    "clinician_name": "Dr. Alex Morgan",
+    "role": "Demonstration Clinician",
+    "signature_status": "Pending human approval"
+  }
+}
