@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pre-Submission Paper Checklist</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap');
+    
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-hover: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.5);
+      --gradient: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* Hero Section with Gradient Glow */
+    .hero-section {
+      position: relative;
+      padding: 100px 20px 60px;
+      text-align: center;
+      background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15) 0%, transparent 60%);
+    }
+
+    .hero-tag {
+      display: inline-block;
+      padding: 6px 16px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5rem;
+      margin: 0 0 20px 0;
+      line-height: 1.1;
+      font-weight: 700;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 650px;
+      margin: 0 auto 40px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .copy-btn {
+      background: var(--gradient);
+      color: #0f172a;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px var(--accent-glow);
+    }
+
+    .copy-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .copy-btn.success {
+      background: #22c55e;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Glassmorphic Narrative Box */
+    .narrative-box {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 60px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .narrative-box h3 {
+      font-family: 'Outfit', sans-serif;
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: #fff;
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .feature-card h4 {
+      font-family: 'Outfit', sans-serif;
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #fff;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feature-card h4::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--muted);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      color: #fff;
+      font-size: 2rem;
+      margin-top: 60px;
+      margin-bottom: 24px;
+    }
+
+    /* Template Preview */
+    .template-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 60px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .template-header {
+      background: rgba(15, 23, 42, 0.5);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .template-header h3 {
+      font-family: 'JetBrains Mono', monospace;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .template-body {
+      padding: 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    /* Audit Prompt Box */
+    .audit-prompt {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--accent);
+      padding: 32px;
+      border-radius: 12px;
+      margin-bottom: 60px;
+      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .audit-prompt::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: var(--gradient);
+    }
+
+    .audit-prompt-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    .footer-cta {
+      text-align: center;
+      padding: 60px 20px;
+      background: rgba(30, 41, 59, 0.3);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .footer-disclosure {
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .features-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. Hero Section -->
+  <section class="hero-section">
+    <div class="hero-tag">Free Research Resource</div>
+    <h1>The Pre-Submission Paper Checklist</h1>
+    <p class="subtitle">A simple, pre-flight checklist designed to catch mismatched numbers and missing data before you submit your paper to Nature, IEEE, or a grant committee.</p>
+    <div class="btn-group">
+      <button id="heroCopyBtn" class="copy-btn" onclick="copyTemplate()">📋 Copy Markdown</button>
+      <button class="copy-btn btn-secondary" onclick="downloadMarkdown()">⬇️ Download .md</button>
+    </div>
+  </section>
+
+  <div class="container">
+    
+    <!-- 2. Narrative Section -->
+    <div class="narrative-box">
+      <h3>What it does & how it helps</h3>
+      <p style="margin-bottom: 0;">When multiple co-authors work on a 40-page draft, mistakes happen. You might update a learning rate in Section 3, but forget to update it in Section 6. Missing a simple Data Availability Statement can delay your paper for weeks. We built this checklist to stress-test your manuscript and catch these errors before the reviewers do.</p>
+    </div>
+
+    <!-- 3. Features -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <h4>Abstract Checker</h4>
+        <p>Ensures every claim in your abstract matches the actual data and tables in your results section.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Number Tracker</h4>
+        <p>Makes sure your numbers (like sample sizes and test scores) match perfectly across every single section of the paper.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Compliance Check</h4>
+        <p>Reminds you to include required data links and ethics approvals so your paper isn't rejected on day one.</p>
+      </div>
+      <div class="feature-card">
+        <h4>Reviewer Prep</h4>
+        <p>A quick test to make sure you have answered common questions reviewers always ask (like reproducibility and fairness).</p>
+      </div>
+    </div>
+
+    <!-- 4. The Template -->
+    <h2>The Master Template</h2>
+    <p style="color: var(--muted); margin-bottom: 24px; font-size: 1.1rem;">Copy the raw markdown template below and paste it directly into your workspace. Fill it out systematically before your final PDF compile.</p>
+
+    <div class="template-preview">
+      <div class="template-header">
+        <h3>Dossier_Template.md</h3>
+        <div class="btn-group" style="gap: 8px;">
+          <button id="copyBtn" class="copy-btn" onclick="copyTemplate()" style="padding: 8px 16px; font-size: 0.9rem;">Copy</button>
+        </div>
+      </div>
+      <div class="template-body"># The Pre-Submission Paper Checklist
+*A Simple Pre-Flight Checklist for High-Stakes Scientific & Technical Publications*
+
+## Document Overview & Pre-Flight Metadata
+
+| Metadata Field | Specification / Value |
+|---|---|
+| **Working Title** | `[Insert Target Manuscript / Proposal Title]` |
+| **Primary Corresponding Author** | `[Lead PI / Author Role]` |
+| **Target Journal / Granting Agency** | `[e.g. Nature Machine Intelligence / NIH R01]` |
+| **Submission Deadline** | `[Date & Timezone]` |
+
+## 1. Abstract Checker
+
+| Abstract Claim Statement | Supporting Result Section / Table | Statistical Significance / Effect Size | Status |
+|---|---|---|---|
+| | | | `[ ]` |
+| | | | `[ ]` |
+
+## 2. Number Tracker (Parameter Sync)
+
+| Parameter Name | Abstract Reference | Methodology (Sec 3) | Results (Sec 4) | Appendix | Status |
+|---|---|---|---|---|---|
+| **Sample Size ($N$)** | | | | | `[ ]` |
+| **Learning Rate ($\eta$)** | | | | | `[ ]` |
+| **Hardware Topology** | | | | | `[ ]` |
+
+## 3. Bibliography & Citation Integrity Audit
+1. **DOI Resolution**: Every citation must resolve to an active DOI.
+2. **Prior Art Fairness**: Top 3 competing frameworks from 2024–2026 are cited.
+
+## 4. Compliance Check (Data & Ethics)
+- [ ] **Data Availability Statement (DAS)** explicitly links to a public repository (e.g., Zenodo, GitHub, OSF).
+- [ ] **Ethics Committee / IRB Approval Number** is explicitly cited.
+- [ ] **Code & Weights**: All custom code and weights are included in supplementary material.
+
+## 5. Reviewer Prep Checklist
+- [ ] Methodological Reproducibility (random seeds, hardware explicitly documented).
+- [ ] Statistical Rigor (error bars defined, multiple testing corrections applied).
+- [ ] Clarity & Flow (abbreviations defined, consistent mathematical notation).
+</div>
+    </div>
+
+    <!-- 5. The Prompt (Moved to the bottom, new text) -->
+    <h2>The AI Audit Prompt</h2>
+    <p style="color: var(--muted); margin-bottom: 24px; font-size: 1.1rem;">Once you have filled out the checklist, drop your manuscript and this dossier into <a href="https://superdocs.app" target="_blank" style="color: var(--accent); font-weight: 500;">SuperDocs</a> and use the prompt below to automatically verify your entire paper.</p>
+    
+    <div class="audit-prompt">
+      <div class="audit-prompt-code">
+        "Audit my attached manuscript using the rules in the Pre-Submission Checklist Dossier. Flag any parameter drift across sections, missing Data Availability Statements, or abstract claims that are not supported by the results."
+      </div>
+    </div>
+
+  </div> <!-- End Container -->
+
+  <!-- 6. Footer CTA -->
+  <div class="footer-cta">
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 2rem; color: #fff; margin-bottom: 32px; margin-top: 0;">Ready to pre-flight your paper?</h3>
+      <div class="btn-group">
+        <button id="footerCopyBtn" class="copy-btn" onclick="copyTemplate()">📋 Copy Markdown</button>
+        <button class="copy-btn btn-secondary" onclick="downloadMarkdown()">⬇️ Download .md</button>
+      </div>
+  </div>
+
+  <div class="footer-disclosure">
+    <strong>Affiliation Disclosure:</strong> Built by Rohit as a free open-source resource for the research community. Created using SuperDocs. You are free to copy, modify, and distribute this checklist without attribution.
+  </div>
+
+  <!-- Hidden Raw Markdown for Copying/Downloading -->
+  <script type="text/markdown" id="raw-markdown">
+# The Pre-Submission Paper Checklist
+*A Simple Pre-Flight Checklist for High-Stakes Scientific & Technical Publications*
+
+> **Author / Affiliation Disclosure**: *Created by Rohit as a free open resource for the scientific research community. Built using SuperDocs (a document-native AI editing environment). You are free to copy, modify, and distribute this checklist without attribution.*
+
+---
+
+## Document Overview & Pre-Flight Metadata
+
+| Metadata Field | Specification / Value |
+|---|---|
+| **Working Title** | `[Insert Target Manuscript / Proposal Title]` |
+| **Primary Corresponding Author** | `[Lead PI / Author Role]` |
+| **Target Journal / Granting Agency** | `[e.g. Nature Machine Intelligence / NIH R01 / NSF CISE]` |
+| **Submission Deadline** | `[Date & Timezone]` |
+| **Manuscript Word Count / Page Ceiling** | `[e.g. 8,500 words / 20 pages max]` |
+| **Primary Code / Dataset Repository** | `[DOI / Zenodo / GitHub Link]` |
+
+---
+
+## 1. Abstract Checker
+
+*Goal: Ensure that every factual claim made in the Abstract is explicitly supported by empirical data in the Results section and not contradicted in the Discussion.*
+
+| Abstract Claim Statement | Supporting Result Section / Table | Statistical Significance / Effect Size | Status (Verified / Needs Revision) |
+|---|---|---|---|
+| | | | `[ ]` |
+| | | | `[ ]` |
+| | | | `[ ]` |
+
+---
+
+## 2. Number Tracker (Parameter Sync)
+
+*Goal: Prevent parameter drift across independently written sections (e.g., hyperparameter changes in Section 3 that were forgotten in Section 5 or the Abstract).*
+
+| Parameter Name | Abstract Reference | Methodology (Sec 3) | Results (Sec 4) | Appendix / Compute | Status |
+|---|---|---|---|---|---|
+| **Sample Size ($N$)** | | | | | `[ ]` |
+| **Learning Rate ($\eta$)** | | | | | `[ ]` |
+| **Hardware Topology** | | | | | `[ ]` |
+
+---
+
+## 3. Bibliography & Citation Integrity Audit
+
+1. **DOI Resolution**: Every citation must resolve to an active DOI or permanent arXiv ID.
+2. **Prior Art Fairness**: Ensure top 3 competing frameworks from 2024–2026 are cited in Section 2 (Related Work) with fair baseline comparisons.
+3. **No Phantom Citations**: Verify that all bracketed reference keys `[1..N]` correspond to an existing entry in the References section.
+
+---
+
+## 4. Compliance Check (Data & Ethics)
+
+*Goal: Ensure all modern open-science and ethical mandates required by top-tier journals (e.g., Nature, NeurIPS, IEEE) are met before submission.*
+
+- [ ] **Data Availability Statement (DAS)** explicitly links to a public repository (e.g., Zenodo, GitHub, OSF).
+- [ ] **Ethics Committee / IRB Approval Number** is explicitly cited in the Methodology section (or an exemption statement is provided).
+- [ ] **Code & Weights**: All custom code, pre-trained weights, and training hyperparameters are included in the supplementary material or a linked repository.
+- [ ] **Funding & Conflicts of Interest**: All grant numbers and potential conflicts are declared in the acknowledgements.
+
+---
+
+## 5. Reviewer Prep Checklist
+
+- [ ] **Methodological Reproducibility**:
+  - [ ] Are random seeds and hardware environments explicitly documented?
+  - [ ] Is the data pre-processing pipeline described with sufficient detail for an independent lab to reproduce?
+- [ ] **Statistical Rigor**:
+  - [ ] Are error bars (SD or SEM) defined in all figure captions?
+  - [ ] Have appropriate multiple testing corrections (e.g., Bonferroni, FDR) been applied?
+- [ ] **Clarity & Flow**:
+  - [ ] Are all abbreviations defined on first use?
+  - [ ] Do mathematical symbols adhere strictly to standardized notation throughout all equations?
+  </script>
+
+  <script>
+    function copyTemplate() {
+      const templateMarkdown = document.getElementById('raw-markdown').textContent.trim();
+      navigator.clipboard.writeText(templateMarkdown).then(() => {
+        const btns = [document.getElementById('copyBtn'), document.getElementById('heroCopyBtn'), document.getElementById('footerCopyBtn')];
+        btns.forEach(btn => {
+          if(btn) {
+            const originalText = btn.innerText;
+            btn.innerText = '✓ Copied!';
+            btn.classList.add('success');
+            setTimeout(() => {
+              btn.innerText = originalText;
+              btn.classList.remove('success');
+            }, 3000);
+          }
+        });
+      });
+    }
+
+    function downloadMarkdown() {
+      const templateMarkdown = document.getElementById('raw-markdown').textContent.trim();
+      const blob = new Blob([templateMarkdown], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Peer_Review_Audit_Dossier.md';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEC Handover & Material Sync Pack | SuperDocs</title>
+    <!-- Architectural Minimalist Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-primary: #f8f7f5; /* Warm concrete / plaster */
+            --bg-secondary: #ffffff;
+            --text-primary: #1c1c1c; /* Deep charcoal */
+            --text-secondary: #5c5c5c;
+            --accent: #e64a19; /* Construction / Safety orange */
+            --border: #d4d4d4;
+            --code-bg: #ecece8;
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hero Section */
+        header {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            background: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="1" fill="%23d4d4d4"/></svg>');
+        }
+
+        .hero-tag {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin: 0 0 1.5rem 0;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+
+        header p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            color: var(--text-secondary);
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: 'Manrope', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: 2px solid var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0,0,0,0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+        main {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 2rem; }
+            header h1 { font-size: 2.5rem; }
+        }
+
+        /* Typography & Blocks */
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .lead-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-block {
+            background-color: var(--text-primary);
+            color: var(--bg-primary);
+            padding: 3rem;
+            border-left: 8px solid var(--accent);
+        }
+        
+        .stat-block h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            font-weight: 800;
+        }
+
+        /* Template Preview */
+        .template-preview {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            margin-bottom: 6rem;
+            box-shadow: 12px 12px 0px rgba(0,0,0,0.05);
+        }
+
+        .template-header {
+            background: var(--code-bg);
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .template-header h3 {
+            font-family: 'IBM Plex Mono', monospace;
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .template-body {
+            padding: 3rem;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        /* Audit Prompt Box */
+        .audit-prompt {
+            background: var(--bg-secondary);
+            border: 2px solid var(--text-primary);
+            padding: 3rem;
+            margin-bottom: 6rem;
+            position: relative;
+        }
+
+        .audit-prompt::before {
+            content: 'AI COMMAND INSTRUCTION';
+            position: absolute;
+            top: -12px;
+            left: 32px;
+            background: var(--bg-primary);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .audit-prompt-code {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer-cta {
+            text-align: center;
+            padding: 6rem 2rem;
+            background: var(--code-bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-cta h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            margin-top: 0;
+        }
+
+        .footer-disclosure {
+            text-align: center;
+            padding: 3rem 2rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--border);
+        }
+
+        /* Toast */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: center;
+            padding: 16px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            font-weight: 700;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+            font-family: 'Manrope', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="hero-tag">AEC Pre-Flight Framework</div>
+        <h1>Material Sync Pack</h1>
+        <p>A zero-liability handover template for Principal Architects & Technical PMs to prevent material drift before final PDF dispatch.</p>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="copyTemplate()">📋 Copy Markdown</button>
+            <button class="btn btn-secondary" onclick="downloadTemplate()">⬇️ Download .md</button>
+        </div>
+    </header>
+
+    <main>
+        <div class="grid-2">
+            <!-- Left: The Narrative & Pain Point -->
+            <section class="narrative">
+                <h2>The Liability Gap</h2>
+                <p class="lead-text">
+                    In high-stakes architecture, <strong>document drift</strong> is the leading cause of contractor disputes. 
+                </p>
+                <p class="lead-text">
+                    If a client changes a material spec from <em>Brick</em> to <em>Pre-cast Concrete</em> in the Design Narrative, but that change is not manually synced to the Structural Load calculations or the Final Budget Sheet, the General Contractor will build the wrong spec—and your firm assumes the liability.
+                </p>
+            </section>
+
+            <!-- Right: Stat Block -->
+            <section>
+                <div class="stat-block">
+                    <h3>Pre-Flight Your Handover</h3>
+                    <p style="font-size: 1.1rem; line-height: 1.7;">This blank Markdown template provides a strict Material Consistency Matrix and Safety Code compliance checklist to audit your final PDFs before ground-break. Use it manually, or automate the verification.</p>
+                </div>
+            </section>
+        </div>
+
+        <h2>The Master Template</h2>
+        <p class="lead-text" style="margin-bottom: 2rem;">Exported as raw Markdown. Fill it out in your preferred editor before compiling the final client deliverables.</p>
+        
+        <div class="template-preview">
+            <div class="template-header">
+                <h3>Project_Handover_Template.md</h3>
+                <button class="btn btn-secondary" onclick="copyTemplate()" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Copy</button>
+            </div>
+            <div class="template-body"># The AEC Construction Handover & Material Sync Pack
+*A Pre-Flight Audit Framework for Principal Architects & Technical PMs*
+
+## Document Overview & Pre-Flight Metadata
+
+| Metadata Field | Specification / Value |
+|---|---|
+| **Project Name / ID** | `[Insert Project Name]` |
+| **Principal Architect** | `[Lead Architect Name]` |
+| **Target General Contractor** | `[GC Firm Name]` |
+| **Submission Deadline** | `[Date & Timezone]` |
+| **Primary CAD / BIM Repository** | `[Procore / Autodesk Link]` |
+
+## 1. Material Consistency & Budget Matrix
+
+*Goal: Ensure that every core material specified in the Design Narrative matches the Structural Calculations and the Final Budget Sheet. "Document drift" in materials is the #1 cause of contractor disputes.*
+
+| Material Component | Design Narrative (Sec 2) | Structural Specs (Sec 5) | Budget Sheet (Sec 8) | Status |
+|---|---|---|---|---|
+| **Exterior Cladding** |  |  |  | `[ ]` |
+| **Load-Bearing Columns** |  |  |  | `[ ]` |
+| **HVAC Routing** |  |  |  | `[ ]` |
+| **Flooring System** |  |  |  | `[ ]` |
+
+## 2. Safety & Liability Compliance Checklist
+
+*Goal: Ensure all local building codes and safety regulations are explicitly cited alongside structural dimensions.*
+
+- [ ] **Fire Safety (IBC 2024)**: Exit corridor widths verified and cited in Section 4.
+- [ ] **ADA Compliance**: Ramp gradients and restroom clearances explicitly noted.
+- [ ] **Environmental (LEED)**: Material sourcing certifications attached in Appendix B.
+- [ ] **Wind/Seismic Load**: Load tolerances cross-referenced with local municipal codes.
+</div>
+        </div>
+
+        <h2>The AI Audit Prompt</h2>
+        <p class="lead-text" style="margin-bottom: 2rem;">If you are using a document-native AI editor like <a href="https://superdocs.app" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: none;">SuperDocs</a>, attach your completed dossier alongside your final manuscript and run this exact command to automate the audit:</p>
+        
+        <div class="audit-prompt">
+            <div class="audit-prompt-code">
+                "Audit my attached handover pack against the final PDF specs. Flag any material drift across sections, missing safety code citations, or budgetary discrepancies before we send this to the General Contractor."
+            </div>
+        </div>
+
+    </main>
+
+    <div class="footer-cta">
+        <h3>Secure Your Final Handover</h3>
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="copyTemplate()">📋 Copy Markdown</button>
+            <button class="btn btn-secondary" onclick="downloadTemplate()">⬇️ Download .md</button>
+        </div>
+    </div>
+
+    <footer class="footer-disclosure">
+        <strong>Affiliation Disclosure:</strong> Created by Rohit as a free open resource for the architecture community. Built using SuperDocs. You are free to copy, modify, and distribute this checklist without attribution.
+    </footer>
+
+    <div id="toast">Copied to clipboard!</div>
+
+    <!-- The Raw Blank Template Data (No Fake Data) -->
+    <script type="text/markdown" id="raw-markdown">
+# The AEC Construction Handover & Material Sync Pack
+*A Pre-Flight Audit Framework for Principal Architects & Technical PMs*
+
+> **Author / Affiliation Disclosure**: *Created by Rohit as a free open resource for the architecture community. Built using SuperDocs (a document-native AI editing environment). You are free to copy, modify, and distribute this checklist without attribution.*
+
+---
+
+## Document Overview & Pre-Flight Metadata
+
+| Metadata Field | Specification / Value |
+|---|---|
+| **Project Name / ID** | `[Insert Project Name]` |
+| **Principal Architect** | `[Lead Architect Name]` |
+| **Target General Contractor** | `[GC Firm Name]` |
+| **Submission Deadline** | `[Date & Timezone]` |
+| **Primary CAD / BIM Repository** | `[Procore / Autodesk Link]` |
+
+---
+
+## 1. Material Consistency & Budget Matrix
+
+*Goal: Ensure that every core material specified in the Design Narrative matches the Structural Calculations and the Final Budget Sheet. "Document drift" in materials is the #1 cause of contractor disputes.*
+
+| Material Component | Design Narrative (Sec 2) | Structural Specs (Sec 5) | Budget Sheet (Sec 8) | Status |
+|---|---|---|---|---|
+| **Exterior Cladding** |  |  |  | `[ ]` |
+| **Load-Bearing Columns** |  |  |  | `[ ]` |
+| **HVAC Routing** |  |  |  | `[ ]` |
+| **Flooring System** |  |  |  | `[ ]` |
+
+---
+
+## 2. Safety & Liability Compliance Checklist
+
+*Goal: Ensure all local building codes and safety regulations are explicitly cited alongside structural dimensions.*
+
+- [ ] **Fire Safety (IBC 2024)**: Exit corridor widths verified and cited in Section 4.
+- [ ] **ADA Compliance**: Ramp gradients and restroom clearances explicitly noted.
+- [ ] **Environmental (LEED)**: Material sourcing certifications attached in Appendix B.
+- [ ] **Wind/Seismic Load**: Load tolerances cross-referenced with local municipal codes.
+    </script>
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        function copyTemplate() {
+            const mdContent = document.getElementById('raw-markdown').textContent.trim();
+            navigator.clipboard.writeText(mdContent).then(() => {
+                showToast("Template copied to clipboard!");
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showToast("Failed to copy template.");
+            });
+        }
+
+        function downloadTemplate() {
+            const mdContent = document.getElementById('raw-markdown').textContent.trim();
+            const blob = new Blob([mdContent], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Architecture_Handover_Template.md';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast("Download started!");
+        }
+    </script>
+</body>
+</html>
