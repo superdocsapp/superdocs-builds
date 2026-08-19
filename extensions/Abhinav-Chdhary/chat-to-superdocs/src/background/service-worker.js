@@ -5,6 +5,10 @@ async function storedState() {
   return chrome.storage.local.get({ bridgeUrl: "http://127.0.0.1:8787", documents: {}, jobs: {} });
 }
 
+function bridge(state) {
+  return new BridgeClient(state.bridgeUrl, chrome.runtime.id);
+}
+
 function documentTitle(url) {
   return `${new URL(url).hostname.replace(/^www\./, "")} chat`;
 }
@@ -21,8 +25,7 @@ async function addResponse(message, sender) {
   const documentHtml = existing
     ? appendCapturedResponse(existing.html, message.html)
     : createDocument({ title: documentTitle(sender.tab.url), capturedHtml: message.html });
-  const bridge = new BridgeClient(state.bridgeUrl);
-  const started = await bridge.startJob({
+  const started = await bridge(state).startJob({
     session_id: sessionId,
     document_html: documentHtml,
     message: existing ? appendInstruction() : createInstruction(message.template),
@@ -39,7 +42,7 @@ async function pollConversation(sender) {
   const state = await storedState();
   const active = state.jobs[key];
   if (!active) return { state: "idle", hasDocument: Boolean(state.documents[key]) };
-  const job = await new BridgeClient(state.bridgeUrl).getJob(active.jobId);
+  const job = await bridge(state).getJob(active.jobId);
   const stateName = jobState(job);
   if (stateName === "processing") return { state: "processing" };
   if (stateName === "review") return { state: "review", changes: pendingChanges(job) };
@@ -60,7 +63,7 @@ async function decide(message, sender) {
   const state = await storedState();
   const active = state.jobs[key];
   if (!active) throw new Error("There is no pending review for this conversation.");
-  await new BridgeClient(state.bridgeUrl).decide(active.sessionId, {
+  await bridge(state).decide(active.sessionId, {
     job_id: active.jobId,
     approved: true,
     changes: decisionsFromForm(message.changes, new Set(message.approvedIds)),
@@ -70,7 +73,7 @@ async function decide(message, sender) {
 
 async function listTemplates() {
   const state = await storedState();
-  return { templates: await new BridgeClient(state.bridgeUrl).listTemplates() };
+  return { templates: await bridge(state).listTemplates() };
 }
 
 async function exportConversation(sender) {
@@ -78,7 +81,7 @@ async function exportConversation(sender) {
   const state = await storedState();
   const document = state.documents[conversationKey(sender.tab.url)];
   if (!document) throw new Error("Add and approve an answer before exporting this conversation document.");
-  const response = await new BridgeClient(state.bridgeUrl).exportDocument({ html: document.html, format: "docx", filename: "chat-to-superdocs.docx" });
+  const response = await bridge(state).exportDocument({ html: document.html, format: "docx", filename: "chat-to-superdocs.docx" });
   const objectUrl = URL.createObjectURL(await response.blob());
   await chrome.downloads.download({ url: objectUrl, filename: "chat-to-superdocs.docx", saveAs: true });
   setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);

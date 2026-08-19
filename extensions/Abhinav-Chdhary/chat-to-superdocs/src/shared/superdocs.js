@@ -50,14 +50,19 @@ export function decisionsFromForm(changes, selectedIds) {
 }
 
 export class BridgeClient {
-  constructor(baseUrl) {
+  constructor(baseUrl, extensionId = null) {
     this.baseUrl = baseUrl.replace(/\/$/, "");
+    this.extensionId = extensionId;
   }
 
   async request(path, init = {}) {
     const response = await fetch(`${this.baseUrl}${path}`, {
       ...init,
-      headers: { "content-type": "application/json", ...(init.headers ?? {}) },
+      headers: {
+        "content-type": "application/json",
+        ...(this.extensionId ? { "x-chat-to-superdocs-origin": `chrome-extension://${this.extensionId}` } : {}),
+        ...(init.headers ?? {}),
+      },
     });
     if (!response.ok) throw new Error(await response.text() || `Bridge request failed (${response.status}).`);
     return response;

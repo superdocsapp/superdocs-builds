@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { appendCapturedResponse, appendInstruction, conversationKey, createDocument, createInstruction } from "../src/shared/document.js";
-import { decisionsFromForm, finalHtml, jobState, normalizeTemplateList, parseProposedChangeBatch, pendingChanges } from "../src/shared/superdocs.js";
+import { BridgeClient, decisionsFromForm, finalHtml, jobState, normalizeTemplateList, parseProposedChangeBatch, pendingChanges } from "../src/shared/superdocs.js";
 
 test("creates a styled document without flattening structured captured HTML", () => {
   const captured = "<h2>Plan</h2><ul><li>One<ul><li>Nested</li></ul></li></ul><table><tr><th>A</th></tr></table><pre><code>const x = 1;</code></pre><span data-latex=\"x^2\">x²</span>";
@@ -29,6 +29,16 @@ test("uses a saved SuperDocs template rather than an extension-owned template", 
   assert.match(createInstruction(template), /Acme branded memo/);
   assert.match(createInstruction(template), /tpl_brand/);
   assert.deepEqual(normalizeTemplateList({ templates: [template] }), [template]);
+});
+
+test("sends the extension identity to the local bridge when Origin is unavailable", async () => {
+  const originalFetch = globalThis.fetch;
+  let request;
+  globalThis.fetch = async (_url, init) => { request = init; return new Response(JSON.stringify({ status: "completed" }), { status: 200 }); };
+  try {
+    await new BridgeClient("http://127.0.0.1:8787", "extension-id").getJob("job-1");
+    assert.equal(request.headers["x-chat-to-superdocs-origin"], "chrome-extension://extension-id");
+  } finally { globalThis.fetch = originalFetch; }
 });
 
 test("double parses a documented proposed-change batch", () => {

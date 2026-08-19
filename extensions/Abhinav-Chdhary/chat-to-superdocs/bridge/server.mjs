@@ -11,14 +11,15 @@ if (!API_KEY || !ALLOWED_ORIGIN) {
 
 function allowOrigin(request, response) {
   const receivedOrigin = request.headers.origin ?? "(no Origin header)";
-  if (receivedOrigin !== ALLOWED_ORIGIN) {
-    console.warn(`Rejected bridge request: expected ${ALLOWED_ORIGIN}; received ${receivedOrigin}.`);
+  const extensionOrigin = request.headers["x-chat-to-superdocs-origin"];
+  if (receivedOrigin !== ALLOWED_ORIGIN && extensionOrigin !== ALLOWED_ORIGIN) {
+    console.warn(`Rejected bridge request: expected ${ALLOWED_ORIGIN}; received Origin ${receivedOrigin}; extension header ${extensionOrigin ?? "(missing)"}.`);
     response.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
     return false;
   }
   response.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
   response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  response.setHeader("Access-Control-Allow-Headers", "content-type");
+  response.setHeader("Access-Control-Allow-Headers", "content-type, x-chat-to-superdocs-origin");
   return true;
 }
 
@@ -44,10 +45,15 @@ function sendJson(response, status, body) {
 
 const server = createServer(async (request, response) => {
   try {
-    if (!allowOrigin(request, response)) {
-      return sendJson(response, 403, { error: "Untrusted extension origin.", expected_origin: ALLOWED_ORIGIN, received_origin: request.headers.origin ?? null });
+    if (request.method === "OPTIONS") {
+      response.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+      response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+      response.setHeader("Access-Control-Allow-Headers", "content-type, x-chat-to-superdocs-origin");
+      return response.writeHead(204).end();
     }
-    if (request.method === "OPTIONS") return response.writeHead(204).end();
+    if (!allowOrigin(request, response)) {
+      return sendJson(response, 403, { error: "Untrusted extension origin.", expected_origin: ALLOWED_ORIGIN, received_origin: request.headers.origin ?? null, received_extension_origin: request.headers["x-chat-to-superdocs-origin"] ?? null });
+    }
     const path = new URL(request.url, "http://localhost").pathname;
     if (request.method === "GET" && path === "/api/templates") {
       const upstreamResponse = await upstream("/v1/templates");
