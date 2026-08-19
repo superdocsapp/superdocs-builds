@@ -1,0 +1,148 @@
+{
+  "_note": "Every person, company and institution here is invented. No real individual's reference material is used anywhere in this repository. Two intakes per band so the eval can report per-band behaviour without a single case dominating.",
+  "cases": [
+    {
+      "id": "strong-01",
+      "writerName": "Dr Ingrid Halloway",
+      "writerEmail": "i.halloway@northmoor.example.edu",
+      "writerRole": "Professor of Computational Biology, Northmoor University",
+      "subjectName": "Rasheed Okonjo",
+      "subjectRole": "PhD candidate",
+      "relationship": "I supervised his doctoral research for four years and co-authored three papers with him.",
+      "relationshipDurationMonths": 48,
+      "purpose": "fellowship_or_award",
+      "strengthBand": "strong",
+      "evidence": [
+        { "claim": "Designed the protein-folding pipeline the lab now runs on", "evidence": "Replaced a manual workflow; cut turnaround from 6 days to 4 hours, still in daily use by 11 people" },
+        { "claim": "Published as first author in a top-tier venue", "evidence": "First-author paper accepted at the 2024 international structural biology conference, 340 submissions, 41 accepted" },
+        { "claim": "Trains other students unprompted", "evidence": "Ran a weekly clinic for junior students for two years without being asked or paid" }
+      ],
+      "reservations": "",
+      "lengthPreference": "standard"
+    },
+    {
+      "id": "strong-02",
+      "writerName": "Marta Lindqvist",
+      "writerEmail": "marta@fenwick-systems.example.com",
+      "writerRole": "VP Engineering, Fenwick Systems",
+      "subjectName": "Dara Whitfield",
+      "subjectRole": "Staff Engineer",
+      "relationship": "Dara reported to me for three years and was my technical lead on the payments rewrite.",
+      "relationshipDurationMonths": 38,
+      "purpose": "job",
+      "strengthBand": "strong",
+      "evidence": [
+        { "claim": "Led the payments rewrite end to end", "evidence": "18-month migration off the legacy processor, zero customer-visible downtime, delivered one month early" },
+        { "claim": "Is the person other teams escalate to", "evidence": "Named on 40% of our incident postmortems as the resolving engineer despite being one of 60 engineers" }
+      ],
+      "reservations": "",
+      "lengthPreference": "standard"
+    },
+    {
+      "id": "solid-01",
+      "writerName": "Dr Peter Obuya",
+      "writerEmail": "p.obuya@brackenhill.example.edu",
+      "writerRole": "Senior Lecturer in Economics, Brackenhill College",
+      "subjectName": "Wen Zhao",
+      "subjectRole": "Undergraduate, final year",
+      "relationship": "Wen took two of my modules and I supervised her dissertation.",
+      "relationshipDurationMonths": 20,
+      "purpose": "graduate_school",
+      "strengthBand": "solid",
+      "evidence": [
+        { "claim": "Consistently strong coursework", "evidence": "Upper second in both my modules, 67 and 69" },
+        { "claim": "Chose a genuinely difficult dissertation topic", "evidence": "Worked on regional labour mobility using a dataset she had to clean herself over six weeks" }
+      ],
+      "reservations": "",
+      "lengthPreference": "standard"
+    },
+    {
+      "id": "solid-02",
+      "writerName": "Aisling Brennan",
+      "writerEmail": "a.brennan@corveth.example.com",
+      "writerRole": "Head of Operations, Corveth Logistics",
+      "subjectName": "Tomas Rivera",
+      "subjectRole": "Operations Analyst",
+      "relationship": "Tomas reported to me for two years in a team of nine.",
+      "relationshipDurationMonths": 26,
+      "purpose": "job",
+      "strengthBand": "solid",
+      "evidence": [
+        { "claim": "Reliable on recurring reporting work", "evidence": "Owned the weekly capacity report for two years; missed the deadline once, when he was on leave" },
+        { "claim": "Improved a manual process", "evidence": "Automated the depot reconciliation spreadsheet, saving roughly a day a month" }
+      ],
+      "reservations": "",
+      "lengthPreference": "standard"
+    },
+    {
+      "id": "mixed-01",
+      "writerName": "Dr Susanne Ferreira",
+      "writerEmail": "s.ferreira@holloway-inst.example.edu",
+      "writerRole": "Research Fellow, Holloway Institute",
+      "subjectName": "Callum Byrne",
+      "subjectRole": "Research Assistant",
+      "relationship": "Callum worked in my group for eighteen months on a single project.",
+      "relationshipDurationMonths": 18,
+      "purpose": "graduate_school",
+      "strengthBand": "mixed",
+      "evidence": [
+        { "claim": "Technically capable at the bench", "evidence": "Ran the assay protocol independently after four weeks, faster than most new starters" },
+        { "claim": "Good at documenting his work", "evidence": "His lab notebooks were the ones I used as the example for new joiners" }
+      ],
+      "reservations": "He missed three internal deadlines over eighteen months and did not flag any of them in advance. When the project direction changed he found it hard to adapt and needed considerably more direction than I would expect at this stage.",
+      "lengthPreference": "standard"
+    },
+    {
+      "id": "mixed-02",
+      "writerName": "Devika Raghavan",
+      "writerEmail": "devika@arrowmill.example.com",
+      "writerRole": "Design Director, Arrowmill Studio",
+      "subjectName": "Jonah Pike",
+      "subjectRole": "Product Designer",
+      "relationship": "Jonah was on my team for a year and a half.",
+      "relationshipDurationMonths": 19,
+      "purpose": "job",
+      "strengthBand": "mixed",
+      "evidence": [
+        { "claim": "Strong visual craft", "evidence": "His work on the onboarding redesign is the version we still ship" }
+      ],
+      "reservations": "Jonah struggled to take critique in group review sessions and twice reworked designs after sign-off without telling anyone, which cost the engineering team about a week each time. He improved on this in his final quarter but I would not describe it as resolved.",
+      "lengthPreference": "standard"
+    },
+    {
+      "id": "reluctant-01",
+      "writerName": "Professor Alan Teversham",
+      "writerEmail": "a.teversham@kellwood.example.edu",
+      "writerRole": "Professor of History, Kellwood University",
+      "subjectName": "Marion Vale",
+      "subjectRole": "MA student",
+      "relationship": "Marion took one module with me and asked me to write this letter.",
+      "relationshipDurationMonths": 5,
+      "purpose": "graduate_school",
+      "strengthBand": "reluctant",
+      "evidence": [
+        { "claim": "Completed the module", "evidence": "Passed with a mark of 54" },
+        { "claim": "Attended consistently", "evidence": "Present at 10 of 11 seminars" }
+      ],
+      "reservations": "I taught Marion for a single term and cannot speak to her research ability at all. Her essay work was descriptive rather than analytical and did not engage with the historiography. I agreed to write this because she had few other options, and I would not want the reader to take this as an endorsement of her readiness for doctoral work.",
+      "lengthPreference": "brief"
+    },
+    {
+      "id": "reluctant-02",
+      "writerName": "Ruth Castellanos",
+      "writerEmail": "r.castellanos@pellmore.example.com",
+      "writerRole": "Regional Manager, Pellmore Retail Group",
+      "subjectName": "Simon Achterberg",
+      "subjectRole": "Assistant Store Manager",
+      "relationship": "Simon reported to me for eight months before I moved regions.",
+      "relationshipDurationMonths": 8,
+      "purpose": "job",
+      "strengthBand": "reluctant",
+      "evidence": [
+        { "claim": "Handled day-to-day store operations", "evidence": "Ran opening and closing without incident during his tenure" }
+      ],
+      "reservations": "Simon was placed on a performance plan for stock accuracy four months in and the plan had not concluded when I left, so I cannot say whether it was resolved. He also had difficulty managing the two staff who reported to him and both raised concerns with me separately. I would want any employer to speak to my successor as well as to me.",
+      "lengthPreference": "brief"
+    }
+  ]
+}
