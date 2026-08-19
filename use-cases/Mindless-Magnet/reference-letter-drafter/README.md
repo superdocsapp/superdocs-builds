@@ -102,6 +102,37 @@ are different answers and the app never conflates them.
 
 ---
 
+## At the review page
+
+Three things added after the initial build, all at the review screen:
+
+**Full letter view** (`components/LetterPreview.tsx`). The diff cards show what changed as text; this
+renders the actual HTML, through DOMPurify, so formatting-only changes (paragraph spacing, emphasis) are
+visible at all — a text diff can't show a `margin-bottom` that was added to a `<p>` tag, and a real one
+of those changes looking identical in a text-only view is exactly what prompted this. See "No
+`dangerouslySetInnerHTML` almost anywhere," below, for why this is the one exception. Before the current
+batch is approved it is labelled a preview, built from the batch's `new_html`, because it has not been
+written yet; once the job is `completed` it reads the actual committed document.
+
+**Ask for a change** (`components/ReviseBox.tsx`, `POST /api/revise`). A freeform message box for
+requests the structured intake has no field for — "make the second paragraph shorter." It sends another
+`chat/async` turn on the same session, same `ask_every_time` gate, so the result lands as ordinary diff
+cards on the same page rather than being applied directly. Disabled while a batch is still undecided, so
+a new request cannot land on top of one nobody has answered yet.
+
+**Past letters** (`lib/history.ts`, `components/HistoryList.tsx`). A local list — `localStorage`, not a
+database — of session id, job id, subject name, writer name, band and dates, written whenever a draft
+starts, a revision is sent, or a job completes. It does NOT store the intake content: no evidence, no
+reservations, no tone notes. Those still live only in `sessionStorage` and are gone on tab close, per the
+original privacy call (see "Engineering decisions," below) — this list is a pointer back to a SuperDocs
+session, not a copy of what was typed. From the list you can re-export a finished letter, or resume
+review of one still in progress; resuming reconstructs a minimal `Intake` from what history actually
+kept, so a resumed calibration audit has less to check against (no evidence, no reservations) than the
+original session had. That tradeoff is the reason this list is opt-in in spirit: nothing here claims to
+be the intake you originally typed.
+
+---
+
 ## Architecture
 
 See [`docs/architecture.md`](docs/architecture.md) for the diagram and the failure paths.
@@ -128,12 +159,13 @@ SuperDocs, not a version of SuperDocs.
 | Upload | `POST /documents/upload`, starter document per session |
 | Chat (async) | `POST /chat/async` with `approval_mode: "ask_every_time"` |
 | Chat (verifier) | Second `POST /chat/async` call, fresh session, `approval_mode: "approve_all"`, told not to edit its scratch document — the second-reader calibration check |
+| Chat (revise) | Another `POST /chat/async` call, same session, same `ask_every_time` gate — the "ask for a change" box at the review page |
 | Approve | `POST /chat/{session}/approve`, item by item |
 | Export | `POST /documents/export`, `.docx` |
 | Continue | `POST /chat/{session}/continue` for large-edit prompts |
 | Templates | `GET/POST /templates` — a prior letter carries the writer's voice |
 | Cross-session memory | `cross_session_memory_key` scoped to the writer's email |
-| Usage | `GET /users/limits`, shown before you spend |
+| Usage | `GET /agents/whoami`, shown before you spend |
 
 ---
 
@@ -144,11 +176,20 @@ here buys nothing and costs the clone-to-running-in-minutes property. `sessionSt
 `localStorage` on purpose: the intake contains a third party's performance history and should not
 outlive the browser tab.
 
-**No `dangerouslySetInnerHTML` anywhere.** The first version rendered proposed-change HTML behind a
-sanitizer that silently no-opped during SSR. That HTML comes from a model that has just read intake
-text a third party may have written. Rather than fix the sanitizer, the review UI now renders a
-word-level LCS diff over extracted text (`lib/diff.ts`). The XSS class is gone rather than filtered,
-and the diff reads better than a before/after pair. `dompurify` was dropped as a dependency.
+**No `dangerouslySetInnerHTML` almost anywhere.** The first version rendered proposed-change HTML behind
+a sanitizer that silently no-opped during SSR. That HTML comes from a model that has just read intake
+text a third party may have written. Rather than fix the sanitizer, the per-change diff cards render a
+word-level LCS diff over extracted text instead (`lib/diff.ts`) — that XSS class is gone rather than
+filtered there, and the diff reads better than a before/after pair for judging a content edit.
+
+`dompurify` came back for exactly one view: the full letter preview (`components/LetterPreview.tsx`,
+`lib/sanitizeHtml.ts`), added after a text-only view made a real formatting change (added paragraph
+spacing) look like nothing had happened at all — confirmed by diffing the exported `.docx` XML before
+and after, which showed the change had genuinely landed even though the app's text view couldn't show
+it. `style` is on the sanitizer's allowlist so spacing survives; DOMPurify still strips dangerous CSS out
+of whatever the attribute contains, so allowing it is not the same as trusting its contents. This is the
+one `dangerouslySetInnerHTML` in the repository, scoped to a view that exists to show formatting, not to
+judge content — the diff cards, where the actual approve/reject decisions happen, are still text-only.
 
 **The double-parse is handled on the server, once.** SuperDocs delivers proposed changes as a
 JSON-encoded string. `lib/parsePendingChanges.ts` accepts a plain array, a JSON string, a
@@ -184,15 +225,18 @@ sheet, which they should know about.
 
 ## What I cut, and why
 
-- **No multi-letter dashboard or letter history.** One letter at a time. Storing past letters is a
-  document management system, which the brief explicitly rules out.
 - **No auth.** Single-user local app. Deploying this for real users needs auth in front of
   `/api/draft` before anything else, since it spends money per call. Stated rather than pretended.
-- **No revision loop from findings.** `buildRevisionInstruction` exists and is tested but is not wired
-  to a button. Rejecting a change with feedback already lets SuperDocs revise on the next pass, and a
-  second revision path would have been a shallower version of something that already works.
+- **No structured revision loop from findings.** `buildRevisionInstruction` exists and is tested but is
+  not wired to a button that turns a specific finding into a revision automatically. Rejecting a change
+  with feedback already lets SuperDocs revise on the next pass, and the freeform "ask for a change" box
+  (below) covers the general case; a third, narrower path would have been a shallower version of
+  something that already works twice over.
 - **No streaming (SSE).** Polling with backoff is enough for a job that returns in seconds to minutes,
   and it survives a dropped connection without reconnect logic.
+- **No document management system.** Letter history (below) is a local list of session ids and two
+  names, not a store of letter content. A real archive with search, sharing and retention policy is out
+  of scope for the same reason it was originally cut: it is a different product.
 
 ---
 
@@ -216,6 +260,10 @@ Written before you find it yourself.
 - **No test covers the real SuperDocs API.** Every test runs against a local HTTP server or pure
   functions. The wire contract is exercised only by running the app and the eval, so a breaking
   upstream change would not be caught by `npm test`.
+- **The full letter preview trusts DOMPurify, not a zero-XSS-surface design.** Every other view in this
+  app closes the class entirely by never parsing AI-returned HTML as markup; this one view accepts a
+  sanitizer's word for it instead, because a formatting-only change has no other way to be visible. A
+  DOMPurify bypass here is a real, if narrow, risk this app did not have before.
 
 ---
 
@@ -231,16 +279,24 @@ npm run eval -- --n 3 --arms both --resume
 ```
 
 **Method.** Eight synthetic intakes, two per band, all fictional people. The drafter produces a letter;
-a separate blind verifier infers its band. Drift is inferred rank minus declared rank on a four-point
-scale. Positive drift means the letter reads warmer than the writer meant, which is the failure this
-tool exists to catch, so it is reported signed rather than as absolute error.
+a second, isolated SuperDocs chat pass infers its band blind. Drift is inferred rank minus declared rank
+on a four-point scale. Positive drift means the letter reads warmer than the writer meant, which is the
+failure this tool exists to catch, so it is reported signed rather than as absolute error.
 
 The harness has a hard `--max-ops` stopping rule, appends to `evals/results/runs.jsonl` after every
 letter so a killed run keeps what it paid for, and `--resume` continues from where it stopped.
 
-> **Results have not been generated yet.** Running `npm run eval` writes `evals/results/latest.md`
-> and commits the raw per-run data alongside it. No numbers are quoted in this README until that file
-> exists, because a number nobody measured is worse than no number.
+**Results, `--n 1` (one letter per band, 16 letters total, 16 SuperDocs operations):**
+
+| | Exact band match | Mean signed drift | Severe inflations |
+| --- | --- | --- | --- |
+| Baseline (band stated in the prompt only) | 85.7% | +0.143 | 0 |
+| Audited (calibration gate applied) | 100.0% | +0 | 0 |
+
+Full report, per-band breakdown and the stated limits of this measurement: [`evals/results/latest.md`](evals/results/latest.md).
+Raw per-run data: [`evals/results/runs.jsonl`](evals/results/runs.jsonl) (committed, both re-generated by
+`npm run eval`). Read this at n=8 total, not n=1000: one misread letter moves the mean noticeably, so
+treat it as directional evidence, not a significance claim — the report says the same thing.
 
 ---
 

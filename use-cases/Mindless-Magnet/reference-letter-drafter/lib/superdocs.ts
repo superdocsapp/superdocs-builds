@@ -206,10 +206,17 @@ export async function uploadTemplate(file: File): Promise<SuperDocsTemplate> {
  * Shown in the UI before a draft is started, because a free tier that runs out
  * halfway through a demo is a bad surprise, and because "it knows what it cost"
  * is only meaningful if you can see the number before you spend it.
+ *
+ * `GET /agents/whoami`, not `/users/limits` — the latter 404s against the
+ * live API despite matching what the integration notes describe. Confirmed
+ * directly with curl: `/agents/whoami` is what actually carries the quota.
  */
 export async function getUsage(): Promise<UsageStatus> {
   try {
-    const data = await requestJson<Record<string, unknown>>(`${BASE_URL}/users/limits`, {
+    const data = await requestJson<{
+      tier?: string;
+      quota?: { used?: number; remaining?: number; monthly_limit?: number };
+    }>(`${BASE_URL}/agents/whoami`, {
       operation: "usage check",
       headers: authHeaders(),
       cache: "no-store",
@@ -217,18 +224,10 @@ export async function getUsage(): Promise<UsageStatus> {
       retries: 1,
     });
 
-    const num = (...keys: string[]): number | undefined => {
-      for (const key of keys) {
-        const value = data[key];
-        if (typeof value === "number") return value;
-      }
-      return undefined;
-    };
-
-    const remaining = num("operations_remaining", "remaining_operations", "remaining");
+    const remaining = data.quota?.remaining;
     return {
-      tier: typeof data.tier === "string" ? data.tier : undefined,
-      operationsUsed: num("operations_used", "used_operations", "used"),
+      tier: data.tier,
+      operationsUsed: data.quota?.used,
       operationsRemaining: remaining,
       lowBudget: typeof remaining === "number" && remaining <= 3,
     };

@@ -7,8 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { FindingsPanel } from "@/components/FindingsPanel";
+import { LetterPreview } from "@/components/LetterPreview";
+import { ReviseBox } from "@/components/ReviseBox";
+import { ExportButton } from "@/components/ExportButton";
 import { wordDiff, isNoOpChange } from "@/lib/diff";
 import { textFromHtml } from "@/lib/textFromHtml";
+import { filenameFor } from "@/lib/filename";
+import { groupChanges, type ChangeGroup } from "@/lib/groupChanges";
 import type { ApproveDecision, AuditReport, Intake, PendingChange } from "@/lib/types";
 
 interface JobView {
@@ -77,21 +82,29 @@ function DiffBody({ change }: { change: PendingChange }) {
 }
 
 function DiffCard({
-  change,
+  group,
   decision,
   onDecide,
 }: {
-  change: PendingChange;
+  group: ChangeGroup;
   decision: ApproveDecision | undefined;
   onDecide: (decision: ApproveDecision | null) => void;
 }) {
   const [feedback, setFeedback] = useState("");
+  const grouped = group.changeIds.length > 1;
 
   return (
     <Card className={decision ? "opacity-70" : undefined}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
-          <CardTitle className="text-sm font-medium">{change.ai_explanation}</CardTitle>
+          <div>
+            <CardTitle className="text-sm font-medium">{group.explanation}</CardTitle>
+            {grouped && (
+              <p className="text-muted-foreground mt-1 text-xs">
+                Applies to {group.changeIds.length} identical edits — one decision covers all of them.
+              </p>
+            )}
+          </div>
           {decision && (
             <Badge variant={decision.approved ? "default" : "secondary"}>
               {decision.approved ? "approved" : "rejected"}
@@ -101,7 +114,7 @@ function DiffCard({
       </CardHeader>
 
       <CardContent className="flex flex-col gap-3">
-        <DiffBody change={change} />
+        <DiffBody change={group.sample} />
 
         {!decision && (
           <>
@@ -112,21 +125,21 @@ function DiffCard({
               rows={2}
             />
             <div className="flex gap-2">
-              <Button size="sm" onClick={() => onDecide({ change_id: change.change_id, approved: true })}>
-                Approve
+              <Button size="sm" onClick={() => onDecide({ change_id: group.changeIds[0], approved: true })}>
+                {grouped ? `Approve all ${group.changeIds.length}` : "Approve"}
               </Button>
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() =>
                   onDecide({
-                    change_id: change.change_id,
+                    change_id: group.changeIds[0],
                     approved: false,
                     feedback: feedback.trim() || undefined,
                   })
                 }
               >
-                Reject
+                {grouped ? `Reject all ${group.changeIds.length}` : "Reject"}
               </Button>
             </div>
           </>
@@ -147,11 +160,13 @@ export function ReviewPanel({
   jobId,
   intake,
   onCompleted,
+  onRevised,
 }: {
   sessionId: string;
   jobId: string;
   intake: Intake;
   onCompleted: () => void;
+  onRevised: (jobId: string) => void;
 }) {
   const queryClient = useQueryClient();
   const [decisions, setDecisions] = useState<Record<string, ApproveDecision>>({});
@@ -176,6 +191,18 @@ export function ReviewPanel({
   });
 
   const pendingChanges = useMemo(() => job?.pendingChanges ?? [], [job]);
+  const changeGroups = useMemo(() => groupChanges(pendingChanges), [pendingChanges]);
+  const memoryKey = intake.writerEmail || intake.writerName;
+
+  const letterPreview = useMemo(() => {
+    if (job?.status === "completed" && job.documentHtml) {
+      return { html: job.documentHtml, final: true };
+    }
+    if (pendingChanges.length) {
+      return { html: pendingChanges.map((c) => c.new_html).join("\n"), final: false };
+    }
+    return { html: "", final: false };
+  }, [job, pendingChanges]);
 
   // Fingerprint the proposal so the audit runs once per distinct proposal, not
   // once per poll. Auditing costs a verifier call.
@@ -313,12 +340,22 @@ export function ReviewPanel({
   }
 
   if (job.status === "completed") {
-    return <p className="text-muted-foreground text-sm">The letter is ready. Export it below.</p>;
+    return (
+      <div className="flex flex-col gap-4">
+        <p className="text-muted-foreground text-sm">
+          Everything you approved has been written. Nothing you rejected was applied.
+        </p>
+        <LetterPreview html={letterPreview.html} final={letterPreview.final} />
+        <ExportButton sessionId={sessionId} filename={filenameFor(intake.subjectName)} />
+        <ReviseBox sessionId={sessionId} memoryKey={memoryKey} onRevised={onRevised} />
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-4">
       <FindingsPanel report={audit} loading={auditing} />
+      <LetterPreview html={letterPreview.html} final={letterPreview.final} />
 
       {job.parseProblem && (
         <Card>
@@ -329,20 +366,23 @@ export function ReviewPanel({
       )}
 
       <p className="text-muted-foreground text-sm">
-        {pendingChanges.length} proposed change{pendingChanges.length === 1 ? "" : "s"}. Nothing is written
-        to the letter until you submit. Rejecting one does not discard the others.
+        {pendingChanges.length} proposed change{pendingChanges.length === 1 ? "" : "s"}
+        {changeGroups.length !== pendingChanges.length ? `, grouped into ${changeGroups.length} to review` : ""}.
+        Nothing is written to the letter until you submit. Rejecting one does not discard the others.
       </p>
 
-      {pendingChanges.map((change) => (
+      {changeGroups.map((group) => (
         <DiffCard
-          key={change.change_id}
-          change={change}
-          decision={decisions[change.change_id]}
+          key={group.key}
+          group={group}
+          decision={decisions[group.changeIds[0]]}
           onDecide={(decision) =>
             setDecisions((prev) => {
               const next = { ...prev };
-              if (decision === null) delete next[change.change_id];
-              else next[decision.change_id] = decision;
+              for (const id of group.changeIds) {
+                if (decision === null) delete next[id];
+                else next[id] = { ...decision, change_id: id };
+              }
               return next;
             })
           }
@@ -365,6 +405,14 @@ export function ReviewPanel({
           </span>
         )}
       </div>
+
+      <ReviseBox
+        sessionId={sessionId}
+        memoryKey={memoryKey}
+        onRevised={onRevised}
+        disabled={pendingChanges.length > 0 && !allDecided}
+        disabledReason="Decide on the changes above first, so a new request does not land on top of an undecided one."
+      />
     </div>
   );
 }

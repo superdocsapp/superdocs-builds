@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { Intake } from "@/lib/types";
 
-export type Stage = "intake" | "review" | "done";
+export type Stage = "intake" | "review" | "history";
 
 interface SessionState {
   stage: Stage;

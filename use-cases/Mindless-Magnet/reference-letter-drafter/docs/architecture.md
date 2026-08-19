@@ -9,14 +9,17 @@ step fails.
 flowchart TB
     subgraph browser["Browser"]
         FORM["Intake form<br/>band, evidence, reservations"]
-        REVIEW["Review<br/>word-level text diffs"]
+        REVIEW["Review<br/>word-level text diffs, full letter view"]
         FINDINGS["Calibration findings"]
+        REVISEBOX["Ask for a change"]
         EXPORT["Export"]
+        HISTORY["Past letters<br/>localStorage: ids + names only"]
     end
 
     subgraph server["Next.js route handlers"]
         SESSION["/api/session"]
         DRAFT["/api/draft<br/>validate + idempotency key"]
+        REVISEAPI["/api/revise<br/>freeform message, idempotency key"]
         JOBS["/api/jobs/[id]<br/>double-parse happens here"]
         AUDIT["/api/audit"]
         APPROVE["/api/approve"]
@@ -27,7 +30,7 @@ flowchart TB
     subgraph calib["Calibration (lib/calibration)"]
         LEX["Lexicon audit<br/>deterministic, free, ~1ms"]
         INJ["Injection scan<br/>deterministic, free"]
-        VER["Blind verifier<br/>second model, no band given"]
+        VER["SuperDocs verifier<br/>second, isolated chat call, no band given"]
     end
 
     subgraph sd["SuperDocs"]
@@ -42,17 +45,25 @@ flowchart TB
     FORM --> SESSION
     SESSION --> SDUP
     DRAFT --> SDCHAT
+    DRAFT -.writes.-> HISTORY
+    REVISEBOX --> REVISEAPI
+    REVISEAPI --> SDCHAT
+    REVISEAPI -.writes.-> HISTORY
     JOBS --> SDJOB
     REVIEW <--> JOBS
+    REVIEW --> REVISEBOX
     REVIEW --> AUDIT
     AUDIT --> LEX
     AUDIT --> INJ
     AUDIT --> VER
+    VER --> SDCHAT
     AUDIT --> FINDINGS
     REVIEW --> APPROVE
     APPROVE --> SDAPP
     EXPORT --> EXPORTAPI
     EXPORTAPI --> SDEXP
+    HISTORY -.resume.-> REVIEW
+    HISTORY -.re-export.-> EXPORT
     USAGE -.-> FORM
 ```
 
@@ -67,11 +78,15 @@ point: they are only useful while the gate is still closed.
 | The letter | SuperDocs | yes | yes |
 | Session + job id | `sessionStorage` | yes | no (tab close) |
 | Intake | `sessionStorage` | yes | no (tab close) |
+| Letter history: session id, job id, subject name, writer name, band, dates | `localStorage` | yes | yes |
 | Idempotency keys | Node process memory | n/a | no |
 | Findings | React state, recomputed | no | no |
 
-This app stores no letters and no personal data server-side. The intake is deliberately scoped to the
-browser tab, because it contains a third party's performance history.
+This app stores no letters and no personal data server-side. The intake — evidence, reservations, tone
+notes — is deliberately scoped to the browser tab, because it contains a third party's performance
+history, and stays in `sessionStorage` only. The history list in `localStorage` is the one exception to
+"nothing outlives the tab," and it is scoped tightly on purpose: two names, a band, and ids that only
+resolve to anything by calling SuperDocs again.
 
 ## Failure paths
 
@@ -87,7 +102,8 @@ browser tab, because it contains a third party's performance history.
 | Change missing id or content | That change is refused; the others still render. |
 | Job asks whether to continue a large edit | Surfaced as a choice with the cost stated. Not a dead end. |
 | Page refreshed mid-draft | Session and job id persist. The review resumes against the still-running job. |
-| Browser tab closed | The job keeps running on SuperDocs. The ids are gone, so that letter is unreachable from this machine. Honest limitation, not handled. |
+| Browser tab closed | The job keeps running on SuperDocs. `sessionStorage` is gone, but if the draft had already started, its session and job id were written to the `localStorage` history list — reachable again from "Past letters" on this machine. Without that (job never got past starting), the letter is unreachable. |
+| Revision request sent while a batch is undecided | Blocked client-side with a stated reason, not sent. A second `chat/async` turn landing on top of an unresolved one would make the change queue ambiguous about which batch a decision applies to. |
 | Export warnings header malformed | Noted, document still delivered. A decode bug must not lose the file the user is waiting for. |
 
 ## Cost model
@@ -96,10 +112,13 @@ browser tab, because it contains a third party's performance history.
 | --- | --- | --- |
 | Start a session | 0 (upload) | 0 |
 | Draft a letter | ~1 | 0 |
-| Run the calibration audit | 0 | 1 |
+| Send a revision ("ask for a change") | ~1 | 0 |
+| Run the calibration audit | 0 | ~1 (usually 0, see below) |
 | Approve or reject changes | 0 | 0 |
 | Export `.docx` | 0 | 0 |
 | Continue a large edit | ~1 | 0 |
 
-The deterministic half of the audit costs nothing and runs on every draft. The verifier is the only
-recurring non-SuperDocs cost, and it runs once per distinct proposal rather than once per poll.
+The deterministic half of the audit costs nothing and runs on every draft or revision. The verifier is a
+second SuperDocs chat call, not a separate service — confirmed against the live API, a pure Q&A turn like
+this (told not to edit its scratch document) is not billed as an operation, so its typical cost is 0. It
+runs once per distinct proposal rather than once per poll, so a slow reviewer does not pay for it twice.
