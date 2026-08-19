@@ -16,7 +16,7 @@ For this assigned build, we developed **The Pre-Submission Peer-Review & Manuscr
 2. **[`Resource/Section_Audit_Checklists.md`](./Resource/Section_Audit_Checklists.md)**: Granular editorial and reproducibility checklists covering Abstract, Methods, Results, and Ethics.
 3. **[`Resource/Sample_Rendered_Pack.md`](./Resource/Sample_Rendered_Pack.md)**: A concrete, realistic worked example for a machine learning manuscript.
 4. **[`Launch Plan.md`](./Launch%20Plan.md)**: The distribution and community launch plan for r/MachineLearning, Hugging Face, and Open Science communities with strict rule compliance and upfront affiliation disclosure.
-5. **[`Exported_Resource_Preview.html`](./Exported_Resource_Preview.html)**: Standalone exportable HTML preview demonstrating clean document styling and visual hierarchy.
+5. **[`index.html`](./index.html)**: Standalone exportable HTML preview demonstrating clean document styling and visual hierarchy.
 
 ---
 

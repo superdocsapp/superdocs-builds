@@ -13,7 +13,7 @@ For this extra credit build, we developed **The AEC Construction Handover & Mate
 ### Key Deliverables in this Directory:
 1. **[`Resource/Project_Handover_Template.md`](./Resource/Project_Handover_Template.md)**: The core multi-section audit framework, including a Material Consistency Matrix and Safety Code checklist.
 2. **[`Launch_Plan.md`](./Launch_Plan.md)**: The distribution and community launch plan targeting LinkedIn AEC Groups and ArchDaily forums with strict upfront affiliation disclosure.
-3. **[`Exported_Resource_Preview.html`](./Exported_Resource_Preview.html)**: Standalone exportable HTML preview demonstrating a clean, Bauhaus-inspired aesthetic for architects.
+3. **[`index.html`](./index.html)**: Standalone exportable HTML preview demonstrating a clean, Bauhaus-inspired aesthetic for architects.
 
 ---
 
