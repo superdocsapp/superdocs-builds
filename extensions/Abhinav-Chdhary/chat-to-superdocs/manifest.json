@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Chat to SuperDocs",
+  "description": "Capture a ChatGPT or Claude answer and review it in a growing SuperDocs document.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "Chat to SuperDocs",
+    "default_popup": "src/popup/popup.html"
+  },
+  "options_page": "src/options/options.html",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "http://127.0.0.1:8787/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+      "js": ["src/content/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
