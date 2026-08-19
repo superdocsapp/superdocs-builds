@@ -66,14 +66,12 @@ async function chooser(button, response) {
   const label = document.createElement("p"); label.textContent = "Loading your SuperDocs templates…"; panel.append(label); button.parentElement.append(panel);
   try {
     const { templates } = await send({ type: "LIST_TEMPLATES" });
-    label.textContent = templates.length ? "Start this chat document with" : "No saved SuperDocs templates found.";
+    label.textContent = templates.length ? "Start this chat document with" : "No saved SuperDocs templates found. Adding to a blank document…";
     for (const template of templates) {
       const templateButton = document.createElement("button"); templateButton.type = "button"; templateButton.textContent = template.name;
       templateButton.addEventListener("click", () => addResponse(button, response, template)); panel.append(templateButton);
     }
-    if (!templates.length) {
-      const note = document.createElement("span"); note.className = "cts-template-note"; note.textContent = "Create or upload a template in SuperDocs, then try again."; panel.append(note);
-    }
+    if (!templates.length) window.setTimeout(() => addResponse(button, response, null), 250);
   } catch (error) {
     label.textContent = error.message;
   }

@@ -31,6 +31,10 @@ test("uses a saved SuperDocs template rather than an extension-owned template", 
   assert.deepEqual(normalizeTemplateList({ templates: [template] }), [template]);
 });
 
+test("creates a clean blank document when no saved template is available", () => {
+  assert.match(createInstruction(null), /without a saved template/);
+});
+
 test("sends the extension identity to the local bridge when Origin is unavailable", async () => {
   const originalFetch = globalThis.fetch;
   let request;

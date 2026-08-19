@@ -18,9 +18,7 @@ async function addResponse(message, sender) {
   const key = conversationKey(sender.tab.url);
   const state = await storedState();
   const existing = state.documents[key];
-  if (!existing && (!message.template || typeof message.template.id !== "string" || typeof message.template.name !== "string")) {
-    throw new Error("Choose one of your saved SuperDocs templates before creating this conversation document.");
-  }
+  if (!existing && message.template && (typeof message.template.id !== "string" || typeof message.template.name !== "string")) throw new Error("The selected template is invalid.");
   const sessionId = existing?.sessionId ?? newSessionId();
   const documentHtml = existing
     ? appendCapturedResponse(existing.html, message.html)

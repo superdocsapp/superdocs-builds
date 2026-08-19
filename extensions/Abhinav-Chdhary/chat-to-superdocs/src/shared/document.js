@@ -30,7 +30,10 @@ export function appendInstruction() {
 }
 
 export function createInstruction(template) {
-  return `Use my saved SuperDocs template named "${template.name}" (template ID: ${template.id}) as the document's styling source. The captured answer is in the section marked data-chat-to-superdocs-capture. Turn it into a polished document section using that template. Preserve headings, nested lists, tables, code blocks, and math exactly. Propose every change for review.`;
+  const styling = template
+    ? `Use my saved SuperDocs template named "${template.name}" (template ID: ${template.id}) as the document's styling source.`
+    : "Use clean, consistent document styling without a saved template.";
+  return `${styling} The captured answer is in the section marked data-chat-to-superdocs-capture. Turn it into a polished document section. Preserve headings, nested lists, tables, code blocks, and math exactly. Propose every change for review.`;
 }
 
 export function newSessionId() {

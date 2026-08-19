@@ -4,7 +4,7 @@ Created by **Abhinav Choudhary**.
 
 Chat to SuperDocs is a Chrome/Chromium extension for people who are tired of pasting AI answers into documents and repairing the formatting. It puts a small **Add** button to the left of every AI response's first readable block. One click turns that response into structured content in a growing SuperDocs document for the current chat.
 
-It keeps headings, nested lists, tables, code blocks, and maths intact. On the first answer, it lists the templates saved in the user’s SuperDocs account; every later answer in the same conversation inherits the selected template’s styling.
+It keeps headings, nested lists, tables, code blocks, and maths intact. On the first answer, it lists templates saved in the user’s SuperDocs account; if none exist, it creates a clean blank document instead. Every later answer in the same conversation inherits the chosen styling.
 
 The extension proves the reviewable SuperDocs workflow:
 
@@ -20,7 +20,7 @@ SuperDocs API keys must remain server-side. This extension never reads, stores, 
 
 ## Run it
 
-Requirements: Node 18+, a SuperDocs API key, and at least one template saved in SuperDocs. Do not put the key in this repository or in the extension.
+Requirements: Node 18+ and a SuperDocs API key. Saved SuperDocs templates are optional. Do not put the key in this repository or in the extension.
 
 1. Load the extension:
    - Open `chrome://extensions` (or Chromium equivalent), enable **Developer mode**, and choose **Load unpacked**.
@@ -34,7 +34,7 @@ Requirements: Node 18+, a SuperDocs API key, and at least one template saved in 
    node bridge/server.mjs
    ```
 
-3. In SuperDocs, create or upload the branded template you want to use. The extension lists only templates available to the account behind `SUPERDOCS_API_KEY`.
+3. Optionally, create or upload a branded template in SuperDocs. The extension lists only templates available to the account behind `SUPERDOCS_API_KEY`; when none exist, it uses a blank document.
 4. Open a completed ChatGPT or Claude conversation. The extension adds an **Add** button just left of each assistant response.
 5. Click **Add** beside the first answer and choose a saved SuperDocs template in the small in-page menu.
 6. Approve or reject the proposed changes in the in-page review card. Later **Add** clicks append to the same conversation document without asking for the template again.
