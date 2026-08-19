@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Example Health Clinic - Clinical Correspondence</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 48px;
+            color: #222;
+            line-height: 1.5;
+        }
+
+        .letterhead {
+            border-bottom: 2px solid #333;
+            padding-bottom: 16px;
+            margin-bottom: 32px;
+        }
+
+        .clinic-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .clinic-subtitle {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .document-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+
+        .metadata {
+            margin-bottom: 24px;
+        }
+
+        .signature {
+            margin-top: 40px;
+        }
+
+        .notice {
+            margin-top: 40px;
+            padding: 12px;
+            border: 1px solid #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="letterhead">
+    <div class="clinic-name">Example Health Clinic</div>
+    <div class="clinic-subtitle">
+        Clinical Correspondence Demonstration
+    </div>
+</header>
+
+<main>
+    <div class="document-title">
+        {{DOCUMENT_TITLE}}
+    </div>
+
+    <div class="metadata">
+        <strong>Date:</strong> {{DATE}}<br>
+        <strong>Patient:</strong> Demo Patient<br>
+        <strong>Record ID:</strong> DEMO-001
+    </div>
+
+    {{CONTENT}}
+
+    <div class="signature">
+        <strong>Human Sign-off</strong><br><br>
+        Signature: _______________________________<br>
+        Name: Dr. Alex Morgan<br>
+        Role: Demonstration Clinician<br>
+        Approval status: Pending human approval
+    </div>
+
+    <div class="notice">
+        <strong>Demonstration only:</strong>
+        This document was generated from fabricated records.
+        It is not a clinical record, medical advice, or a certified
+        clinical system.
+    </div>
+</main>
+
+</body>
+</html>
