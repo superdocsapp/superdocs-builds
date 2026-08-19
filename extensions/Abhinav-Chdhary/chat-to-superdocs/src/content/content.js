@@ -34,13 +34,20 @@ function sanitizeAnswer(element) {
   const copy = element.cloneNode(true);
   copy.querySelectorAll("button, nav, script, style, svg, form, textarea, iframe, object, embed, [aria-hidden='true']").forEach((node) => node.remove());
   copy.querySelectorAll("[data-testid*='copy'], [data-testid*='branch']").forEach((node) => node.remove());
-  copy.querySelectorAll(".katex, mjx-container").forEach((node) => {
-    const latex = node.querySelector("annotation[encoding='application/x-tex']")?.textContent?.trim();
-    if (latex) node.outerHTML = `<span data-latex="${latex.replace(/[&<\"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", "\"": "&quot;" })[character])}">${node.innerHTML}</span>`;
+  // KaTeX includes presentation MathML alongside its browser-only visual spans.
+  // Keep that standards-based MathML intact: SuperDocs accepts HTML, whereas the
+  // previous data-latex wrapper was an extension-private attribute it discarded.
+  copy.querySelectorAll(".katex").forEach((node) => {
+    const math = node.querySelector("math");
+    if (!math) return;
+    const replacement = math.cloneNode(true);
+    replacement.setAttribute("xmlns", "http://www.w3.org/1998/Math/MathML");
+    node.replaceWith(replacement);
   });
   copy.querySelectorAll("*").forEach((node) => {
+    if (node.namespaceURI === "http://www.w3.org/1998/Math/MathML") return;
     for (const attribute of [...node.attributes]) {
-      if (!["href", "colspan", "rowspan", "start", "data-latex"].includes(attribute.name.toLowerCase())) node.removeAttribute(attribute.name);
+      if (!["href", "colspan", "rowspan", "start"].includes(attribute.name.toLowerCase())) node.removeAttribute(attribute.name);
     }
   });
   return copy.innerHTML.trim();
