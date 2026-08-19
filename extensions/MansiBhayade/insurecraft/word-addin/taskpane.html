@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        http-equiv="X-UA-Compatible"
+        content="IE=Edge"
+    >
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>InsureCraft</title>
+
+    <link
+        rel="stylesheet"
+        href="taskpane.css"
+    >
+
+    <script
+        src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js">
+    </script>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+        <div>
+
+            <h1>InsureCraft</h1>
+
+            <p>
+                Insurance Policy &amp; Endorsement Builder
+            </p>
+
+        </div>
+
+        <span
+            id="statusBadge"
+            class="status"
+        >
+            Ready
+        </span>
+
+    </header>
+
+
+    <!-- =====================================================
+         POLICY BUILDER
+    ====================================================== -->
+
+    <section class="card">
+
+        <h2>Policy Builder</h2>
+
+        <p class="description">
+            Build an insurance policy from carrier wording
+            and risk-specific variables.
+        </p>
+
+
+        <!-- Named Insured -->
+
+        <div class="form-group">
+
+            <label for="namedInsured">
+                Named Insured
+            </label>
+
+            <input
+                id="namedInsured"
+                type="text"
+                placeholder="ABC Manufacturing Pvt Ltd"
+            >
+
+        </div>
+
+
+        <!-- Policy Number -->
+
+        <div class="form-group">
+
+            <label for="policyNumber">
+                Policy Number
+            </label>
+
+            <input
+                id="policyNumber"
+                type="text"
+                placeholder="POL-2026-001"
+            >
+
+        </div>
+
+
+        <!-- Territory -->
+
+        <div class="form-group">
+
+            <label for="territory">
+                Territory
+            </label>
+
+            <input
+                id="territory"
+                type="text"
+                value="India"
+            >
+
+        </div>
+
+
+        <!-- Dates -->
+
+        <div class="row">
+
+            <div class="form-group">
+
+                <label for="effectiveDate">
+                    Effective Date
+                </label>
+
+                <input
+                    id="effectiveDate"
+                    type="date"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="expiryDate">
+                    Expiry Date
+                </label>
+
+                <input
+                    id="expiryDate"
+                    type="date"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- Liability Limit -->
+
+        <div class="form-group">
+
+            <label for="liabilityLimit">
+                Liability Limit
+            </label>
+
+            <input
+                id="liabilityLimit"
+                type="text"
+                placeholder="INR 5,00,00,000"
+            >
+
+        </div>
+
+
+        <!-- Deductible -->
+
+        <div class="form-group">
+
+            <label for="deductible">
+                Deductible
+            </label>
+
+            <input
+                id="deductible"
+                type="text"
+                placeholder="INR 10,00,000"
+            >
+
+        </div>
+
+
+        <!-- Coverage Forms -->
+
+        <div class="form-group">
+
+            <label>
+                Coverage Forms
+            </label>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    name="coverage"
+                    value="Commercial General Liability"
+                >
+
+                Commercial General Liability
+
+            </label>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    name="coverage"
+                    value="Property"
+                >
+
+                Property
+
+            </label>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    name="coverage"
+                    value="Professional Liability"
+                >
+
+                Professional Liability
+
+            </label>
+
+        </div>
+
+
+        <!-- Endorsements -->
+
+        <div class="form-group">
+
+            <label>
+                Endorsements
+            </label>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    name="endorsement"
+                    value="Increased Liability Limit"
+                >
+
+                Increased Liability Limit
+
+            </label>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    name="endorsement"
+                    value="Additional Insured"
+                >
+
+                Additional Insured
+
+            </label>
+
+
+            <label class="checkbox">
+
+                <input
+                    type="checkbox"
+                    name="endorsement"
+                    value="Territory Extension"
+                >
+
+                Territory Extension
+
+            </label>
+
+        </div>
+
+
+        <button
+            id="buildPolicyButton"
+            class="primary"
+            type="button"
+        >
+            Build Policy
+        </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         REVIEW EXISTING POLICY
+    ====================================================== -->
+
+    <section class="card">
+
+        <h2>
+            Review Existing Policy
+        </h2>
+
+
+        <p class="description">
+            Send the current Word document to SuperDocs
+            for policy review and proposed changes.
+        </p>
+
+
+        <div class="form-group">
+
+            <label for="reviewInstruction">
+                Review Instruction
+            </label>
+
+
+            <textarea
+                id="reviewInstruction"
+                rows="6"
+                placeholder="Example: Increase the liability limit from INR 5,00,00,000 to INR 10,00,00,000. Keep the deductible unchanged and ensure every reference uses the same value."
+            ></textarea>
+
+        </div>
+
+
+        <button
+            id="reviewButton"
+            class="secondary"
+            type="button"
+        >
+            Review with SuperDocs
+        </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         ENDORSEMENT BUILDER
+    ====================================================== -->
+
+    <section class="card">
+
+        <h2>
+            Endorsement Builder
+        </h2>
+
+
+        <p class="description">
+            Draft an endorsement that amends the existing
+            in-force policy wording.
+        </p>
+
+
+        <div class="form-group">
+
+            <label for="endorsementName">
+                Endorsement Name
+            </label>
+
+
+            <input
+                id="endorsementName"
+                type="text"
+                placeholder="Increased Liability Limit"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="amendmentInstruction">
+                Amendment Instruction
+            </label>
+
+
+            <textarea
+                id="amendmentInstruction"
+                rows="6"
+                placeholder="Example: Amend the liability limit from INR 5,00,00,000 to INR 10,00,00,000."
+            ></textarea>
+
+        </div>
+
+
+        <button
+            id="endorsementButton"
+            class="secondary"
+            type="button"
+        >
+            Draft Endorsement
+        </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         SUPERDOCS REVIEW / APPROVAL
+    ====================================================== -->
+
+    <section
+        id="reviewSection"
+        class="card hidden"
+    >
+
+        <h2>
+            SuperDocs Review
+        </h2>
+
+
+        <div
+            id="reviewMessage"
+            class="message"
+        ></div>
+
+
+        <div
+            id="changesContainer"
+        ></div>
+
+
+        <!-- Approval Controls -->
+
+        <div
+            id="approvalControls"
+            class="approval-controls hidden"
+        >
+
+            <button
+                id="approveButton"
+                class="approve"
+                type="button"
+            >
+                Approve Changes
+            </button>
+
+
+            <button
+                id="rejectButton"
+                class="reject"
+                type="button"
+            >
+                Reject Changes
+            </button>
+
+        </div>
+
+
+        <!-- Insert Approved Document -->
+
+        <button
+            id="insertButton"
+            class="primary hidden"
+            type="button"
+        >
+            Insert Approved Document into Word
+        </button>
+
+
+        <!-- Export -->
+
+        <button
+            id="exportButton"
+            class="secondary hidden"
+            type="button"
+        >
+            Export Document
+        </button>
+
+    </section>
+
+
+    <!-- =====================================================
+         ACTIVITY
+    ====================================================== -->
+
+    <section class="card">
+
+        <h2>
+            Activity
+        </h2>
+
+
+        <div
+            id="activity"
+            class="activity"
+        >
+            InsureCraft ready.
+        </div>
+
+    </section>
+
+
+</div>
+
+
+<!-- =========================================================
+     TASKPANE JAVASCRIPT
+========================================================== -->
+
+<script src="taskpane.js"></script>
+
+
+</body>
+
+</html>
