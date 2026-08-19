@@ -6,6 +6,7 @@ const RESPONSE_SELECTORS = {
 };
 
 let pollTimer = null;
+let chooserOutsideListener = null;
 function send(message) {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(message, (response) => {
@@ -64,7 +65,13 @@ function statusFor(button, message, tone = "") {
   return status;
 }
 
-function removeChooser(button) { button.parentElement.querySelector(":scope > .cts-chooser")?.remove(); }
+function removeChooser(button) {
+  button.parentElement.querySelector(":scope > .cts-chooser")?.remove();
+  if (chooserOutsideListener) {
+    document.removeEventListener("pointerdown", chooserOutsideListener, true);
+    chooserOutsideListener = null;
+  }
+}
 
 async function chooser(button, response) {
   removeChooser(button); setLoading(button, true); let handedOff = false;
@@ -78,6 +85,12 @@ async function chooser(button, response) {
       templateButton.addEventListener("click", () => addResponse(button, response, template)); panel.append(templateButton);
     }
     button.parentElement.append(panel);
+    window.setTimeout(() => {
+      chooserOutsideListener = (event) => {
+        if (!panel.contains(event.target) && !button.contains(event.target)) removeChooser(button);
+      };
+      document.addEventListener("pointerdown", chooserOutsideListener, true);
+    }, 0);
   } catch (error) {
     statusFor(button, error.message, "error");
   } finally {
