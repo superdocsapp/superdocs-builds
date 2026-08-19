@@ -9,7 +9,12 @@ let pollTimer = null;
 let chooserOutsideListener = null;
 function send(message) {
   return new Promise((resolve, reject) => {
-    chrome.runtime.sendMessage(message, (response) => {
+    const runtime = globalThis.chrome?.runtime;
+    if (!runtime?.sendMessage) {
+      reject(new Error("The extension was reloaded. Refresh this chat page, then try again."));
+      return;
+    }
+    runtime.sendMessage(message, (response) => {
       if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
       if (!response?.ok) return reject(new Error(response?.error || "Extension action failed."));
       resolve(response);
