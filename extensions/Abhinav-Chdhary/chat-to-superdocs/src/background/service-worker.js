@@ -27,7 +27,7 @@ async function addResponse(message, sender) {
     session_id: sessionId,
     document_html: documentHtml,
     message: existing ? appendInstruction() : createInstruction(message.template),
-    approval_mode: "ask_every_time",
+    approval_mode: "approve_all",
   });
   state.jobs[key] = { jobId: started.job_id, sessionId, documentHtml, template: existing?.template ?? message.template };
   await chrome.storage.local.set({ jobs: state.jobs });
@@ -43,7 +43,15 @@ async function pollConversation(sender) {
   const job = await bridge(state).getJob(active.jobId);
   const stateName = jobState(job);
   if (stateName === "processing") return { state: "processing" };
-  if (stateName === "review") return { state: "review", changes: pendingChanges(job) };
+  if (stateName === "review") {
+    const changes = pendingChanges(job);
+    await bridge(state).decide(active.sessionId, {
+      job_id: active.jobId,
+      approved: true,
+      changes: decisionsFromForm(changes, new Set(changes.map((change) => change.change_id))),
+    });
+    return { state: "processing" };
+  }
   if (stateName === "completed") {
     const html = finalHtml(job);
     if (!html) throw new Error("The completed job did not return document HTML.");
@@ -55,20 +63,6 @@ async function pollConversation(sender) {
   throw new Error(job.error || `The job ended with status: ${job.status}.`);
 }
 
-async function decide(message, sender) {
-  if (!sender.tab?.url) throw new Error("This action must originate from an AI chat tab.");
-  const key = conversationKey(sender.tab.url);
-  const state = await storedState();
-  const active = state.jobs[key];
-  if (!active) throw new Error("There is no pending review for this conversation.");
-  await bridge(state).decide(active.sessionId, {
-    job_id: active.jobId,
-    approved: true,
-    changes: decisionsFromForm(message.changes, new Set(message.approvedIds)),
-  });
-  return { state: "processing" };
-}
-
 async function listTemplates() {
   const state = await storedState();
   return { templates: await bridge(state).listTemplates() };
@@ -78,7 +72,7 @@ async function exportConversation(sender) {
   if (!sender.tab?.url) throw new Error("This action must originate from an AI chat tab.");
   const state = await storedState();
   const document = state.documents[conversationKey(sender.tab.url)];
-  if (!document) throw new Error("Add and approve an answer before exporting this conversation document.");
+  if (!document) throw new Error("Add an answer before exporting this conversation document.");
   const response = await bridge(state).exportDocument({ html: document.html, format: "docx", filename: "chat-to-superdocs.docx" });
   const objectUrl = URL.createObjectURL(await response.blob());
   await chrome.downloads.download({ url: objectUrl, filename: "chat-to-superdocs.docx", saveAs: true });
@@ -87,7 +81,7 @@ async function exportConversation(sender) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const handlers = { ADD_RESPONSE: () => addResponse(message, sender), LIST_TEMPLATES: () => listTemplates(), POLL_CONVERSATION: () => pollConversation(sender), DECIDE_CHANGES: () => decide(message, sender), EXPORT_CONVERSATION: () => exportConversation(sender) };
+  const handlers = { ADD_RESPONSE: () => addResponse(message, sender), LIST_TEMPLATES: () => listTemplates(), POLL_CONVERSATION: () => pollConversation(sender), EXPORT_CONVERSATION: () => exportConversation(sender) };
   if (!handlers[message?.type]) return;
   handlers[message.type]().then((result) => sendResponse({ ok: true, ...result })).catch((error) => sendResponse({ ok: false, error: error instanceof Error ? error.message : "Extension action failed." }));
   return true;

@@ -9,9 +9,9 @@ test("creates a styled document without flattening structured captured HTML", ()
   for (const fragment of ["<h1>Weekly update</h1>", "<ul>", "<table>", "<pre><code>", "data-latex=\"x^2\""]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 });
 
-test("append instruction protects existing content and requests review", () => {
+test("append instruction protects existing content and applies changes automatically", () => {
   assert.match(appendInstruction(), /Do not rewrite earlier content/);
-  assert.match(appendInstruction(), /Propose every change for review/);
+  assert.match(appendInstruction(), /Apply the changes automatically/);
 });
 
 test("appends captured markup without flattening the existing conversation document", () => {

@@ -5,8 +5,6 @@ const RESPONSE_SELECTORS = {
 };
 
 let pollTimer = null;
-let lastReviewedChangeIds = "";
-
 function send(message) {
   return new Promise((resolve, reject) => {
     chrome.runtime.sendMessage(message, (response) => {
@@ -61,52 +59,30 @@ function statusFor(button, message, tone = "") {
 function removeChooser(button) { button.parentElement.querySelector(":scope > .cts-chooser")?.remove(); }
 
 async function chooser(button, response) {
-  removeChooser(button);
-  const panel = document.createElement("div"); panel.className = "cts-chooser"; panel.setAttribute("role", "dialog");
-  const label = document.createElement("p"); label.textContent = "Loading your SuperDocs templates…"; panel.append(label); button.parentElement.append(panel);
+  removeChooser(button); setLoading(button, true); let handedOff = false;
   try {
     const { templates } = await send({ type: "LIST_TEMPLATES" });
-    label.textContent = templates.length ? "Start this chat document with" : "No saved SuperDocs templates found. Adding to a blank document…";
+    if (!templates.length) { handedOff = true; return await addResponse(button, response, null); }
+    const panel = document.createElement("div"); panel.className = "cts-chooser"; panel.setAttribute("role", "dialog");
+    const label = document.createElement("p"); label.textContent = "Choose a template"; panel.append(label);
     for (const template of templates) {
       const templateButton = document.createElement("button"); templateButton.type = "button"; templateButton.textContent = template.name;
       templateButton.addEventListener("click", () => addResponse(button, response, template)); panel.append(templateButton);
     }
-    if (!templates.length) window.setTimeout(() => addResponse(button, response, null), 250);
+    button.parentElement.append(panel);
   } catch (error) {
-    label.textContent = error.message;
+    statusFor(button, error.message, "error");
+  } finally {
+    if (!handedOff) setLoading(button, false);
   }
 }
 
 async function addResponse(button, response, template) {
-  removeChooser(button); button.disabled = true; statusFor(button, "Adding to document…");
+  removeChooser(button); button.disabled = true; setLoading(button, true);
   try {
     await send({ type: "ADD_RESPONSE", html: sanitizeAnswer(response), template });
     button.setAttribute("aria-label", "Adding to doc"); schedulePoll(button);
-  } catch (error) { button.disabled = false; statusFor(button, error.message, "error"); }
-}
-
-function reviewPanel(button, changes) {
-  const key = changes.map((change) => change.change_id).join(",");
-  if (key === lastReviewedChangeIds) return;
-  lastReviewedChangeIds = key;
-  button.parentElement.querySelector(":scope > .cts-review")?.remove();
-  const panel = document.createElement("section"); panel.className = "cts-review";
-  const heading = document.createElement("strong"); heading.textContent = "Review proposed changes"; panel.append(heading);
-  for (const change of changes) {
-    const label = document.createElement("label");
-    const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.value = change.change_id; checkbox.checked = true;
-    const copy = document.createElement("span"); copy.textContent = change.ai_explanation || `${change.operation ?? "Edit"} document content`;
-    label.append(checkbox, copy); panel.append(label);
-  }
-  const apply = document.createElement("button"); apply.type = "button"; apply.textContent = "Apply selected";
-  apply.addEventListener("click", async () => {
-    const allChanges = changes.map((change) => ({ change_id: change.change_id }));
-    const approvedIds = [...panel.querySelectorAll("input:checked")].map((input) => input.value);
-    apply.disabled = true;
-    try { await send({ type: "DECIDE_CHANGES", changes: allChanges, approvedIds }); panel.remove(); statusFor(button, "Applying selected changes…"); schedulePoll(button); }
-    catch (error) { apply.disabled = false; statusFor(button, error.message, "error"); }
-  });
-  panel.append(apply); button.parentElement.append(panel); statusFor(button, "Changes are ready to review.");
+  } catch (error) { button.disabled = false; setLoading(button, false); statusFor(button, error.message, "error"); }
 }
 
 function exportAction(button) {
@@ -115,7 +91,7 @@ function exportAction(button) {
   exportButton = document.createElement("button"); exportButton.type = "button"; exportButton.className = "cts-export"; exportButton.textContent = "Export DOCX";
   exportButton.addEventListener("click", async () => {
     exportButton.disabled = true;
-    try { await send({ type: "EXPORT_CONVERSATION" }); statusFor(button, "Export download started."); }
+    try { await send({ type: "EXPORT_CONVERSATION" }); }
     catch (error) { exportButton.disabled = false; statusFor(button, error.message, "error"); }
   });
   button.parentElement.append(exportButton);
@@ -126,11 +102,15 @@ function schedulePoll(button) {
   pollTimer = setTimeout(async () => {
     try {
       const result = await send({ type: "POLL_CONVERSATION" });
-      if (result.state === "processing") { statusFor(button, "Document is being styled…"); schedulePoll(button); return; }
-      if (result.state === "review") { reviewPanel(button, result.changes); return; }
-      if (result.state === "complete") { button.disabled = false; button.setAttribute("aria-label", "Add to doc"); statusFor(button, "Added to this chat’s document.", "success"); exportAction(button); return; }
-    } catch (error) { button.disabled = false; statusFor(button, error.message, "error"); }
+      if (result.state === "processing") { schedulePoll(button); return; }
+      if (result.state === "complete") { button.disabled = false; setLoading(button, false); button.setAttribute("aria-label", "Add to doc"); exportAction(button); return; }
+    } catch (error) { button.disabled = false; setLoading(button, false); statusFor(button, error.message, "error"); }
   }, 900);
+}
+
+function setLoading(button, isLoading) {
+  button.toggleAttribute("data-loading", isLoading);
+  button.setAttribute("aria-busy", String(isLoading));
 }
 
 function attachControl(response) {
@@ -145,8 +125,7 @@ function attachControl(response) {
     event.preventDefault(); event.stopPropagation();
     try {
       const state = await send({ type: "POLL_CONVERSATION" });
-      if (state.state === "review") return reviewPanel(button, state.changes);
-      if (state.state === "processing") { statusFor(button, "Document is still being styled…"); return schedulePoll(button); }
+      if (state.state === "processing") { setLoading(button, true); return schedulePoll(button); }
       if (state.hasDocument || state.state === "complete") return addResponse(button, response);
       await chooser(button, response);
     } catch (error) { statusFor(button, error.message, "error"); }
@@ -159,14 +138,14 @@ function injectStyles() {
   const style = document.createElement("style"); style.id = "chat-to-superdocs-styles";
   style.textContent = `
     .cts-rail { position:absolute; left:-42px; top:0; z-index:3; display:flex; flex-direction:column; align-items:flex-start; gap:6px; font-family:ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
-    .cts-add,.cts-export,.cts-chooser button,.cts-review button { border:1px solid #b9c7df; border-radius:999px; background:#f8fbff; color:#18315d; cursor:pointer; font:600 11px/1 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; letter-spacing:.01em; padding:6px 9px; box-shadow:0 1px 2px #162a4b1c; }
-    .cts-add { display:grid; place-items:center; width:27px; height:27px; padding:0; border-color:#f97766; background:#f97766; color:#fff; } .cts-add svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:2.2; }
-    .cts-add:hover { background:#df5e50; border-color:#df5e50; transform:translate(1px,-1px); } .cts-export:hover,.cts-chooser button:hover,.cts-review button:hover { background:#18315d; border-color:#18315d; color:#fff; } .cts-add:focus-visible,.cts-export:focus-visible,.cts-chooser button:focus-visible,.cts-review button:focus-visible { outline:3px solid #e6a56b; outline-offset:2px; }
+    .cts-add,.cts-export,.cts-chooser button { border:1px solid #b9c7df; border-radius:999px; background:#f8fbff; color:#18315d; cursor:pointer; font:600 11px/1 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; letter-spacing:.01em; padding:6px 9px; box-shadow:0 1px 2px #162a4b1c; }
+    .cts-add { position:relative; display:grid; place-items:center; width:27px; height:27px; padding:0; border-color:#f97766; background:#f97766; color:#fff; } .cts-add svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:2.2; } .cts-add[data-loading]::after { content:""; position:absolute; inset:-5px; border:2px solid #f97766; border-right-color:transparent; border-radius:50%; animation:cts-spin .75s linear infinite; }
+    .cts-add:hover { background:#df5e50; border-color:#df5e50; transform:translate(1px,-1px); } .cts-export:hover,.cts-chooser button:hover { background:#18315d; border-color:#18315d; color:#fff; } .cts-add:focus-visible,.cts-export:focus-visible,.cts-chooser button:focus-visible { outline:3px solid #e6a56b; outline-offset:2px; }
     .cts-status { display:block; width:190px; color:#526176; font:500 11px/1.3 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; } .cts-status.success { color:#1d6b52; } .cts-status.error { color:#a2362c; }
-    .cts-chooser,.cts-review { position:absolute; left:0; top:30px; z-index:99999; width:240px; padding:11px; border:1px solid #b9c7df; border-radius:12px; background:#f8fbff; box-shadow:0 12px 28px #162a4b2b; color:#18315d; font-family:ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
+    .cts-chooser { position:absolute; left:0; top:30px; z-index:99999; width:240px; padding:11px; border:1px solid #b9c7df; border-radius:12px; background:#f8fbff; box-shadow:0 12px 28px #162a4b2b; color:#18315d; font-family:ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
     .cts-chooser p { margin:0 0 8px; font-size:11px; font-weight:650; } .cts-chooser button { display:block; width:100%; margin-top:5px; text-align:left; } .cts-template-note { display:block; color:#526176; font-size:11px; line-height:1.35; }
-    .cts-review strong { display:block; margin-bottom:7px; font-size:12px; } .cts-review label { display:flex; gap:6px; align-items:flex-start; margin:7px 0; font-size:11px; line-height:1.3; } .cts-review button { margin-top:6px; }
-    @media (prefers-reduced-motion: reduce) { .cts-add,.cts-export,.cts-chooser button,.cts-review button { transition:none; } }
+    @keyframes cts-spin { to { transform:rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .cts-add[data-loading]::after { animation:none; border-right-color:#f97766; } .cts-add,.cts-export,.cts-chooser button { transition:none; } }
   `;
   document.head.append(style);
 }
