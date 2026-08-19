@@ -30,8 +30,8 @@ For this assigned build, we developed **The Pre-Submission Peer-Review & Manuscr
 ---
 
 ## 🖼️ Preview
-*(Replace the placeholder below with an actual screenshot of the HTML output before submitting the PR)*
-![Resource Preview](./screenshot.png)
+![Resource Preview 1](./assi1.png)
+![Resource Preview 2](./assi2.png)
 
 ---
 

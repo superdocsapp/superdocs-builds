@@ -24,6 +24,10 @@ For this extra credit build, we developed **The AEC Construction Handover & Mate
 - **Upfront Disclosure**: Affiliation disclosure sits proudly in the top banner (first paragraph), honoring community trust.
 - **Design Aesthetic**: Architects are highly visual. The HTML export uses a strict geometric design (Space Grotesk typography, stark contrasts) tailored perfectly to their taste, proving deep audience empathy.
 
+## 🖼️ Preview
+![Resource Preview 1](./arch1.png)
+![Resource Preview 2](./arch2.png)
+
 ---
 
 **Credit**: I built this for the SuperDocs task.
