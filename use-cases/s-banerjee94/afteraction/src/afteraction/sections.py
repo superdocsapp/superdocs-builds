@@ -46,7 +46,8 @@ RULES = (
     "7. Write only the section named. Do not add a heading, a table, a date line, a note "
     "to the author, or any content of your own invention anywhere in the document.\n"
     "8. Leave every existing heading exactly as it is — same words, same capitalisation. "
-    "The labels below are labels for you, not text to copy into the document."
+    "The labels below are labels for you, not text to copy into the document, and never "
+    "repeat a sub-heading’s name in bold underneath it."
 )
 
 # What shape each section should take. SuperDocs is an AI editor, not a text-replacement
@@ -81,11 +82,16 @@ def skeleton_html(facts: FactSet, inherited: list[Lesson]) -> str:
     body: list[str] = []
 
     for n, (key, title) in enumerate(SECTION_TITLES.items(), start=1):
-        inner = [T.fill("observed")]
+        # Each placeholder names its own section. Five paragraphs reading exactly
+        # "Placeholder for observed statements." gave the service five equally good
+        # answers to "replace the placeholder", and live edits landed nowhere often
+        # enough to need a retry. Unambiguous targets are a cheaper fix than a retry.
+        where = f"{n}. {title}"  # the name the instruction uses: one paragraph, one target
+        inner = [T.fill("observed", where=where)]
         if any(c.kind is Kind.ASSESSED for c in facts.for_section(key)):
-            inner.append(T.fill("assessed"))
+            inner.append(T.fill("assessed", where=where))
         if facts.gaps_for(key):
-            inner.append(T.fill("gaps"))
+            inner.append(T.fill("gaps", where=where))
         body.append(_section(n, title, inner))
 
     body.append(_section(len(SECTION_TITLES) + 1, "Restoration Curve", [T.fill("curve")]))
@@ -105,6 +111,23 @@ def skeleton_html(facts: FactSet, inherited: list[Lesson]) -> str:
         consumers=f"{event.consumers_served:,}",
         body_html="\n".join(body),
     )
+
+
+def heading_for(section: str) -> str:
+    """A section's name exactly as its heading reads in the document, number included.
+
+    Naming it any other way is an invitation to guess. "Restoration Curve" and
+    "Restoration Performance" are one word apart, and an instruction that said only
+    "Restoration Curve" put the chart into Restoration Performance on a live run,
+    overwriting that section's figures and leaving the curve's own placeholder in place.
+    The number makes each name unambiguous.
+    """
+    order = list(SECTION_TITLES)
+    if section in SECTION_TITLES:
+        return f"{order.index(section) + 1}. {SECTION_TITLES[section]}"
+    extra = {"curve": "Restoration Curve", "lessons": "Lessons Learned"}[section]
+    offset = 1 if section == "curve" else 2
+    return f"{len(SECTION_TITLES) + offset}. {extra}"
 
 
 def _section(number: int, title: str, parts: list[str]) -> str:
@@ -169,7 +192,8 @@ def instruction_for(facts: FactSet, section: str) -> str | None:
     assessed = [c for c in claims if c.kind is Kind.ASSESSED]
 
     lines = [
-        f"Rewrite section “{title}” of this report, replacing its placeholder text.",
+        f"Rewrite section “{heading_for(section)}” of this report, replacing its "
+        f"placeholder text.",
         "",
         GUARD,
         "",
@@ -217,7 +241,7 @@ def curve_instruction(image_url: str, facts: FactSet) -> str:
         f"{peak.consumers_out:,} at {peak.at:%H:%M on %d %B %Y} [{peak.entry_id}]."
     )
     return (
-        f"In section “Restoration Curve”, replace the placeholder paragraph with exactly "
+        f"In section “{heading_for('curve')}”, replace the placeholder paragraph with exactly "
         f"these two elements and nothing else:\n\n"
         f'<img src="{image_url}" alt="Restoration curve for {event.name}" />\n'
         f"<p><em>{caption}</em></p>\n\n"
@@ -234,7 +258,8 @@ def lessons_instruction(facts: FactSet, raised: list[Lesson], inherited: list[Le
         return None
     event = facts.corpus.event
     lines = [
-        "In section “Lessons Learned”, under the sub-heading “Raised by this event”, "
+        f"In section “{heading_for('lessons')}”, under the sub-heading “Raised by this "
+        "event”, "
         "replace the placeholder with one short paragraph per item below. Each item is a "
         "plain paragraph opening with its identifier — never a heading, never a table "
         "row, and never a bulleted list.",

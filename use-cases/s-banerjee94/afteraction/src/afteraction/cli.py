@@ -129,6 +129,11 @@ def _report(result) -> None:
             typer.style(f"    [{flagged.verdict}] ", fg=typer.colors.RED)
             + f"({flagged.section}) {flagged.sentence[:110]}"
         )
+    if result.surgical is not None:
+        mark = OK if result.surgical.clean else BAD
+        typer.echo(f"  {mark}  {result.surgical.summary()}")
+        for problem in result.surgical.collateral[:8]:
+            typer.echo(typer.style("    [surgical] ", fg=typer.colors.RED) + problem)
     for problem in result.drift[:8]:
         typer.echo(typer.style("    [drift] ", fg=typer.colors.RED) + problem)
     if result.retried:

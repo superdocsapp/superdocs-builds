@@ -102,7 +102,7 @@ def test_skeleton_excludes_the_local_preview_chrome(skeleton):
 def test_skeleton_keeps_the_headings_the_pipeline_and_mock_look_for(skeleton):
     assert re.search(r"<h2[^>]*>1\. Event Overview</h2>", skeleton)
     assert re.search(r"<h3[^>]*>Observed</h3>", skeleton)
-    assert "Placeholder for observed statements." in skeleton
+    assert "Placeholder for observed statements in 1. Event Overview." in skeleton
     assert "Placeholder for the restoration curve." in skeleton
 
 

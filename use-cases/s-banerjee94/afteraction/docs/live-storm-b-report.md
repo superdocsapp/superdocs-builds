@@ -15,11 +15,11 @@ August Monsoon Depression
 
 ### Observed
 
-August Monsoon Depression began affecting the Barakar Valley Power Distribution Limited network at 14:05 on 11 August 2026, when the first outages were recorded on feeder 11 kV JMR-07 [EL-0004]. Consumers without supply peaked at 33,400, which is 9.8 per cent of the 342,000 consumers served, at 17:00 on 11 August [EL-0008]. Full restoration took 36 hours 35 minutes from the first recorded outage to the final consumer restored at 02:40 on 13 August [EL-0004, EL-0019].
+The August Monsoon Depression began affecting the Barakar Valley Power Distribution Limited network at 14:05 on 11 August 2026, when the first outages were recorded on feeder 11 kV JMR-07 [EL-0004]. Consumers without supply peaked at 33,400, which is 9.8 per cent of the 342,000 consumers served, at 17:00 on 11 August [EL-0008]. Full restoration took 36 hours 35 minutes from the first recorded outage to the final consumer restored at 02:40 on 13 August [EL-0004, EL-0019].
 
 ### Assessed
 
-The response is judged to have met its restoration objective, with no service interruption extending beyond the operating standard [assessed].
+The response is judged to have met its restoration objective, with no service interruption extending beyond the operating standard [assessed]
 
 ## 2. Timeline of Events
 
@@ -39,25 +39,25 @@ The response is judged to have met its restoration objective, with no service in
 * At 08:00 on 13 August: The outage management system link held for the duration of the event. The manual fallback capture procedure remains undeveloped and was not exercised [EL-0020]
 * At 09:00 on 13 August: Post-event review: 14 poles, 22 spans and 5 distribution transformers replaced [EL-0021]
 
-### Assessed
-
-The response is judged to have met its restoration objective, with no service interruption extending beyond the operating standard [assessed]
-
 ## 3. Crew Mobilisation
 
 ### Observed
 
-* 8 crews totalling 44 field personnel were mobilised for the event [EL-0002, EL-0007]
-* 1 mutual-aid crew totalling 10 personnel was requested from Durgapur Circle [EL-0011, EL-0013]
-* Crews worked approximately 1,050 personnel-hours on the event. This figure covers 7 of 8 crews; the remaining 1 has incomplete records and is excluded [EL-0002, EL-0007]
+##### Observed
+
+8 crews totalling 44 field personnel were mobilised for the event [EL-0002, EL-0007]. 1 mutual-aid crew totalling 10 personnel was requested from Durgapur Circle [EL-0011, EL-0013]. Crews worked approximately 1,050 personnel-hours on the event, covering 7 of 8 crews while the remaining 1 has incomplete records and is excluded [EL-0002, EL-0007].
 
 ### Assessed
+
+##### Assessed
 
 Mutual aid was requested at an appropriate point in the event, and earlier escalation would not have materially shortened the restoration [assessed].
 
 ### What the records do not show
 
-Crew CR-B08 (10 personnel from Durgapur Circle) has no mobilisation time in the records, so its hours cannot be computed and are excluded from the personnel-hours total. [no record]
+##### What the records do not show
+
+Crew CR-B08 (10 personnel from Durgapur Circle) has no mobilisation time in the records, so its hours cannot be computed and are excluded from the personnel-hours total [no record].
 
 ## 4. Restoration Performance
 
@@ -79,11 +79,11 @@ The first consumer notification was issued at 14:43 on 11 August, 38 minutes aft
 
 ### Assessed
 
-Message cadence was appropriate to the restoration profile, and consumers received revised estimates at the points where the estimates materially changed [assessed].
+Message cadence was appropriate to the restoration profile, and consumers received revised estimates at the points where the estimates materially changed [assessed]
 
 ## 6. Restoration Curve
 
-![Restoration curve for August Monsoon Depression](https://storage.googleapis.com/superdocs-document-images/img/3472def0f55440069305d9d4bfd6465a.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260817%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260817T130226Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=72084f117050c705d79f810ac37b2f17a4c1e29bb6ee9f10d8821856327676148138578cfebd478906b6a617d292f2c7ae0d940c07f577f98707ca063dba484ca977ac4cea0690f15a0d0aa570c9d575cdf62dccc17fd9ab9479f7234100ff29ee2961ae1e88b8f7a3995cf9a8ee6cc7ef9e83a1f1b6965183eeecb9115a35e1b96c9186dff44e3c9b29599539f5a98e3fe127f5c07ed02de373c5cf0fb6f8621cfd7fc4f574244f7cb64c89e68591845c18cce08ae85d4077f085592c9fe47b4f08490996461f30b7f9004ff638649348a3af97fbd54985f97824b9240836413d91cdd7696a351dfcfa6da29a800cff7582678d41e2f1d7db7ba29489d53e8f)
+![Restoration curve for August Monsoon Depression](https://storage.googleapis.com/superdocs-document-images/img/cd71f053d92e427ebfa34e9ba1a67b3c.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260819%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260819T165000Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=bb5ea2b5b01d2546146c7a1a7bcb33043dbbffa706d7d6e2f7e753803d19c7fb51a522a07ea1a71ce0ed0cab797268cafeca28a6f4d32f480cdfeb353babf7b741d01ce669644b6864759216951d5c31d20481f47f2f221d3b3ac5d878d303615c22dc9ec12563207c4d08e87424451a09e99ec9f806a265ec89fb5e50452c752ca97ac78ce4650673e81e09816e6c70358f1a1285d80adbf6898dbe8bfb1f7d129e054b2d08e69d5a4b42c047becf979775545885f53fb8e67ba464415f0cc84a6a99fa521017dc4aa503d292b68b1484a5a429045e10aaf6ea1c39f3eeabb6591d5ea3930ae876cd736e9a3d54146a9d895dfac5766bb2d6b108d57d4a6cc4)
 
 *Consumers without supply over the course of August Monsoon Depression, peaking at 33,400 at 17:00 on 11 August 2026 [EL-0008].*
 
@@ -97,6 +97,6 @@ Message cadence was appropriate to the restoration profile, and consumers receiv
 | LL-A2: Time to first consumer notification exceeded the two-hour target | storm-a | Consumer Services Wing | Closed in storm-b | First consumer notification was issued 38 minutes after the first recorded outage, inside the two-hour target. [storm-b/EL-0004, storm-b/EL-0005] |
 | LL-A3: Outage management system link was lost with no fallback capture | storm-a | SCADA and IT Wing | Open | The link held for this event, so the gap did not recur, but the manual fallback capture procedure remains undeveloped. [storm-b/EL-0020] |
 
-LL-B1 — Tree contact in the Nunia canal corridor initiated the event. The first outage and the largest single outage cluster both originated from tree contact in the Nunia canal corridor, which was last cleared in 2023. Owner: Line Clearance Wing. [EL-0004, EL-0007]
+### Raised by this event
 
 LL-B1 — Tree contact in the Nunia canal corridor initiated the event. The first outage and the largest single outage cluster both originated from tree contact in the Nunia canal corridor, which was last cleared in 2023. Owner: Line Clearance Wing. [EL-0004, EL-0007]

@@ -197,6 +197,21 @@ run commands, and the SuperDocs features used. Pull request into `superdocsapp/s
   that is a decision the gate exists to record.
 - **Page count is a property of the deliverable.** A4, narrow margins, a wide and short curve.
   Three pages for both storms.
+- **"Change nothing outside this section" is measured, not asserted.** The document is
+  fingerprinted per section between turns, and an edit that moves a section it was not aimed at
+  fails the run. The brief asks for exactly this — *byte-identical where you promise untouched* —
+  and a promise the tool makes in every instruction is the wrong thing to leave unchecked. The
+  comparison ignores blank-line placement and the regenerated signature on a hosted image URL,
+  because neither is content.
+- **Nothing an edit could land in is allowed to be ambiguous.** Every live defect found in this
+  build had the same root cause: the edit had more than one plausible target. Five sections carried
+  the identical paragraph "Placeholder for observed statements.", and "Restoration Curve" sits one
+  word from "Restoration Performance" — which is how the chart came to overwrite the restoration
+  figures on a live run. So each placeholder names its own section, and every section is named to
+  the model exactly as its heading reads, number included; `heading_for()` is the single source of
+  that name so an instruction and the document cannot drift apart. Three consecutive runs had
+  needed a retry before this; afterwards, none did. The retry stays as a safety net, but it was
+  treating a symptom.
 
 ## Risks
 

@@ -166,7 +166,7 @@ class MockSuperDocs:
                 ProposedChange(
                     change_id="mock-curve",
                     operation="edit",
-                    chunk_id="Restoration Curve|curve",
+                    chunk_id=f"{SECTION_NAME.search(message).group(1) if SECTION_NAME.search(message) else ''}|curve",
                     old_html="Placeholder for the restoration curve.",
                     new_html=body,
                     explanation="Inserted the restoration curve and its caption.",
@@ -177,10 +177,12 @@ class MockSuperDocs:
         section = named.group(1) if named else ""
 
         buckets = _buckets(message)
+        # The skeleton's placeholders name their own section, so each is unique in the
+        # document and an edit has exactly one place it can land.
         placeholders = {
-            "observed": "Placeholder for observed statements.",
-            "assessed": "Placeholder for assessed statements.",
-            "gaps": "Placeholder for gaps.",
+            "observed": f"Placeholder for observed statements in {section}.",
+            "assessed": f"Placeholder for assessed statements in {section}.",
+            "gaps": f"Placeholder for gaps in {section}.",
             "raised": "Placeholder for items raised by this event.",
         }
 

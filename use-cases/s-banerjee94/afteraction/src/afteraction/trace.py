@@ -43,6 +43,16 @@ _STRUCTURAL = re.compile(
     re.IGNORECASE,
 )
 
+# The sub-headings the skeleton writes inside a section. A model that repeats one as bold
+# body text below the real heading has added a label, not made a claim — scoring it would
+# report "**Observed**" as an unsourced assertion, which tells a reader nothing. It is
+# still content nobody asked for, so `structural_drift` reports it by name.
+_LABELS = ("Observed", "Assessed", "What the records do not show", "Raised by this event")
+_ECHOED_LABEL = re.compile(
+    r"^\s*[*_]{1,2}\s*(" + "|".join(re.escape(x) for x in _LABELS) + r")\s*:?\s*[*_]{1,2}\s*$",
+    re.IGNORECASE,
+)
+
 
 class Verdict(StrEnum):
     TRACED = "traced"
@@ -193,7 +203,11 @@ def verify(narrative: str, facts: FactSet, section: str, allowed: list[str] | No
     # vouch for assertions made in a different one.
     units: list[str] = []
     for paragraph in strip_table_headers(narrative).split("\n"):
-        sentences = [s for s in split_sentences(paragraph) if not _STRUCTURAL.match(s)]
+        sentences = [
+            s
+            for s in split_sentences(paragraph)
+            if not _STRUCTURAL.match(s) and not _ECHOED_LABEL.match(s)
+        ]
         units.extend(citation_spans(sentences))
 
     for sentence in units:
@@ -281,6 +295,11 @@ def structural_drift(markdown: str, expected: list[str], drafted: list[str]) -> 
         if found.strip().casefold() not in allowed
     ]
     drift += [f"placeholder text survived in: {s}" for s in unfilled(markdown, drafted)]
+    drift += [
+        f"section label repeated as body text: {found.group(1)}"
+        for line in markdown.splitlines()
+        if (found := _ECHOED_LABEL.match(line))
+    ]
     return drift
 
 

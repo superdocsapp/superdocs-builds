@@ -28,16 +28,48 @@ that the tool can echo itself — and reports claims checked, traced and flagged
 ```
 storm-a   ok  26/26 claims traced (100%), 0 flagged     offline
 storm-b   ok  20/20 claims traced (100%), 0 flagged     offline
-storm-a   ok  28/28 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
-storm-b   ok  23/23 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
+storm-a   ok  29/29 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
+storm-b   ok  22/22 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
 ```
 
-The live runs are the same code path with `--live`: eight edit turns each, 211 and 245 seconds,
+The live runs are the same code path with `--live`: seven edit turns each, 309 and 228 seconds,
 every citation preserved by the model, a real Google-hosted curve image, and real Word `.docx` files
 whose `word/media/image1.png` is byte-identical to the curve this tool rendered.
 `docs/live-storm-a-report.docx` and `docs/live-storm-b-report.docx` are those files — and the second
-one is the carry-forward working over the wire, not just offline. Each run took eight turns rather
-than seven because one section's edit did not land and was re-issued; see below.
+one is the carry-forward working over the wire, not just offline.
+
+**Every instruction promises "change nothing outside this section", and the run proves it.**
+The document is fingerprinted per section between turns, so an edit that moves a section it
+was not aimed at fails the run instead of passing quietly. Exports cost no operations, so the
+evidence is free:
+
+```
+ok  7 turns, every edit confined to its own section
+```
+
+It caught a real one on its first live failure. The curve turn put the chart into
+**Restoration Performance**, overwriting that section's figures, and left the Restoration Curve
+section holding its placeholder. The traceability pass called that "1 unsourced claim", which
+explains nothing; the fingerprint named it:
+
+```
+FAIL  8 turns, 1 unintended change(s)
+  [surgical] editing “6. Restoration Curve” also changed “4. Restoration Performance”
+```
+
+The fingerprint compares words, numbers and citations, and ignores two things that are not
+content: blank-line placement, which is how the exporter breathes, and the pre-signed
+signature on a hosted image URL, which is regenerated on every export and would otherwise
+flag the curve on every single turn.
+
+**Every defect found live had one root cause: an edit with more than one plausible place to
+land.** Five sections carried the identical paragraph *"Placeholder for observed statements."*, and
+*"Restoration Curve"* sits one word from *"Restoration Performance"*. Each placeholder now names
+its own section, and every section is named to the model exactly as its heading reads, number
+included — `heading_for()` in `sections.py` is the single source of that name, so an instruction
+and the document cannot drift apart. Three consecutive runs had needed a retry before that; the
+runs above needed none. Two tests hold the invariants: every instruction names its section with
+its number, and no two placeholders in the skeleton are identical.
 
 **Citations are not the only thing checked.** A run that scored a clean 28/28 had also grown a
 duplicate section heading, a line reading *"Please fill"*, and an invented report-date table — none
@@ -55,13 +87,15 @@ badly, and the suite proves each failure is caught:
 | Cites `EL-0019`, real but never given to that section | `foreign` | 7 flagged |
 | Drops citations entirely | `unsourced` | run fails |
 | Reports an edit applied and changes nothing | — | section re-issued, run recovers |
+| Edits a section it was not aimed at | — | run fails, both sections named |
 
 **An edit that quietly does nothing is caught and re-issued.** A section's change was proposed,
 approved and reported applied, and the section kept its placeholder; the run reported success and the
 defect was only visible on opening the file. Exports cost nothing, so the document is now read back
 before it is called finished, and each unwritten section is re-issued once — bounded to one pass, so
-a second failure is reported rather than retried forever. It has since fired on both storms against
-the live API and rescued each run. A section whose change a *person* rejected is never retried: that
+a second failure is reported rather than retried forever. It fired on three consecutive live runs
+and rescued each one; with the ambiguity above removed it now stays quiet, which is what a safety
+net should do. A section whose change a *person* rejected is never retried: that
 is a decision the gate exists to record, and overturning it silently would be worse than an empty
 section.
 
@@ -158,7 +192,7 @@ command — the virtualenv and the exact pinned dependencies in `uv.lock` are cr
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, showing the carry-forward
-uv run pytest                        # 114 tests, no key, no network
+uv run pytest                        # 125 tests, no key, no network
 ```
 
 Without uv, the same thing in a virtualenv of your own:
@@ -282,6 +316,7 @@ src/afteraction/
   template.py   fills the design's slots; holds no styling itself
   templates/
     report.html the report's design — every style attribute in the project lives here
+  surgical.py   proof that each edit stayed inside the section it was aimed at
   trace.py      the traceability pass, and the document-shape check
   lessons.py    the carry-forward store
   client.py     the four SuperDocs calls

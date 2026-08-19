@@ -23,6 +23,7 @@ from .curve import render_curve
 from .facts import SECTION_TITLES, FactSet, build_facts
 from .lessons import apply_event, inherited, load_store, raised_here, save_store, summarise
 from .models import Lesson
+from .surgical import SurgicalReport, fingerprints
 from .trace import TraceReport, structural_drift, unfilled, verify
 
 TITLE_TO_KEY = {title: key for key, title in SECTION_TITLES.items()}
@@ -49,6 +50,7 @@ class RunResult:
     carry: dict[str, int] = field(default_factory=dict)
     skipped: list[str] = field(default_factory=list)
     retried: list[str] = field(default_factory=list)
+    surgical: SurgicalReport | None = None
     seconds: float = 0.0
     operations: int | None = None
     edits: int = 0
@@ -56,9 +58,15 @@ class RunResult:
     @property
     def ok(self) -> bool:
         """Clean citations are not enough. A document carrying a heading nobody asked
-        for, or a placeholder an edit failed to replace, has not been produced correctly
-        however well its claims trace."""
-        return self.trace is not None and self.trace.clean and not self.drift
+        for, a placeholder an edit failed to replace, or a section moved by an edit that
+        was aimed somewhere else has not been produced correctly however well its claims
+        trace."""
+        return (
+            self.trace is not None
+            and self.trace.clean
+            and not self.drift
+            and (self.surgical is None or self.surgical.clean)
+        )
 
 
 def _watch(approver: Approver) -> tuple[Approver, list[str]]:
@@ -163,6 +171,36 @@ def run_event(
     backend.upload_document(session_id, f"{event_id}-after-action.html", skeleton)
     note("upload", f"skeleton uploaded, {len(skeleton):,} bytes")
 
+    # --- every chat turn goes through here, so the promise each instruction makes —
+    # "change nothing outside this section" — is measured rather than asserted. The
+    # document is fingerprinted per section between turns; exports cost no operations,
+    # so the evidence is free.
+    numbered = {key: f"{n}. {title}" for n, (key, title) in enumerate(SECTION_TITLES.items(), 1)}
+    scratch = out_dir / f"{event_id}-snapshot.md"
+    surgical = SurgicalReport()
+
+    def snapshot() -> dict[str, str]:
+        path = backend.export(session_id, scratch, "markdown")
+        text = path.read_text(encoding="utf-8")
+        path.unlink(missing_ok=True)
+        return fingerprints(text)
+
+    current = snapshot()
+
+    def turn(instruction: str, aimed_at: str, gate: Approver | None = None) -> None:
+        nonlocal current
+        backend.chat(
+            session_id,
+            instruction,
+            approver=gate or approver,
+            model_tier=model_tier,
+            on_event=on_event,
+        )
+        after = snapshot()
+        for stray in surgical.record(aimed_at, current, after):
+            note("surgical", f"editing “{aimed_at}” also changed “{stray}”")
+        current = after
+
     # --- one instruction per section
     edits = 0
     drafted: list[str] = []
@@ -177,7 +215,7 @@ def run_event(
             continue
         note("draft", f"{SECTION_TITLES[key]} ({len(facts.sources_for(key))} log lines supplied)")
         gate, rejected = _watch(approver)
-        backend.chat(session_id, instruction, approver=gate, model_tier=model_tier, on_event=on_event)
+        turn(instruction, numbered[key], gate)
         if rejected:
             refused.add(key)
         drafted.append(key)
@@ -186,34 +224,25 @@ def run_event(
         note("budget", f"stopped at {edits} edits; {len(skipped)} sections left undrafted")
 
     # --- the curve, rendered here and placed by SuperDocs
+    curve_title = f"{len(SECTION_TITLES) + 1}. Restoration Curve"
     if sections_limit is None or edits < sections_limit:
         curve_path = render_curve(facts, out_dir / "restoration-curve.png")
         url = backend.upload_image(session_id, f"{event_id}-restoration-curve.png", curve_path)
         note("curve", f"rendered and uploaded: {url[:60]}")
-        backend.chat(
-            session_id,
-            S.curve_instruction(url, facts),
-            approver=approver,
-            model_tier=model_tier,
-            on_event=on_event,
-        )
+        turn(S.curve_instruction(url, facts), curve_title)
         edits += 1
 
     # --- lessons raised by this event
     lessons_instruction = S.lessons_instruction(facts, mine, carried)
     if lessons_instruction and (sections_limit is None or edits < sections_limit):
-        backend.chat(
-            session_id, lessons_instruction, approver=approver, model_tier=model_tier, on_event=on_event
-        )
+        turn(lessons_instruction, f"{len(SECTION_TITLES) + 2}. Lessons Learned")
         edits += 1
 
     # --- an edit that was approved but did not land leaves the section untouched, and
-    # the run reads as clean until someone opens the file. Exports are free, so the
-    # document is checked before it is called finished, and each unwritten section is
-    # re-issued once. Bounded at one pass: a second failure is reported, not retried
-    # forever.
-    numbered = {key: f"{n}. {title}" for n, (key, title) in enumerate(SECTION_TITLES.items(), 1)}
-    check = backend.export(session_id, out_dir / f"{event_id}-check.md", "markdown")
+    # the run reads as clean until someone opens the file. The document is already in
+    # hand from the last snapshot, so each unwritten section is re-issued once. Bounded
+    # at one pass: a second failure is reported, not retried forever.
+    check = backend.export(session_id, scratch, "markdown")
     still_empty = unfilled(check.read_text(encoding="utf-8"), [numbered[k] for k in drafted])
     check.unlink(missing_ok=True)
     # A section whose change a person rejected is empty *because they said so*. Re-issuing
@@ -224,13 +253,7 @@ def run_event(
         if sections_limit is not None and edits >= sections_limit:
             break
         note("retry", f"{SECTION_TITLES[key]} still holds its placeholder; re-issuing")
-        backend.chat(
-            session_id,
-            S.instruction_for(facts, key),
-            approver=approver,
-            model_tier=model_tier,
-            on_event=on_event,
-        )
+        turn(S.instruction_for(facts, key), numbered[key])
         edits += 1
 
     # --- export (free) then verify what was actually produced
@@ -275,6 +298,7 @@ def run_event(
         carry=counts,
         skipped=skipped,
         retried=[SECTION_TITLES[k] for k in stalled],
+        surgical=surgical,
         seconds=time.monotonic() - started,
         operations=(
             operations_after - operations_before
