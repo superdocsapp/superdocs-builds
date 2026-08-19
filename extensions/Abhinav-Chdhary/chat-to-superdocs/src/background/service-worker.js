@@ -35,7 +35,7 @@ async function addResponse(message, sender) {
     message: existing ? appendInstruction() : createInstruction(message.template),
     approval_mode: "approve_all",
   });
-  state.jobs[key] = { jobId: started.job_id, sessionId, documentHtml, template: existing?.template ?? message.template, mode: "template" };
+  state.jobs[key] = { jobId: started.job_id, sessionId, documentHtml, capturedHtml: message.html, template: existing?.template ?? message.template, mode: "template" };
   await chrome.storage.local.set({ jobs: state.jobs });
   log("template job started", { conversationKey: key, sessionId, jobId: started.job_id, templateId: message.template?.id ?? existing?.template?.id ?? null, htmlBytes: documentHtml.length });
   return { state: "processing", conversationKey: key };
@@ -47,7 +47,7 @@ async function saveDirectDocument({ key, existing, message, state }) {
   return saveHtmlAsDurableDocument({ key, state, sessionId, html, existingDocumentId: existing?.documentId, existingDurableDocumentId: existing?.durableDocumentId });
 }
 
-async function saveHtmlAsDurableDocument({ key, state, sessionId, html, existingDocumentId = null, existingDurableDocumentId = null }) {
+async function saveHtmlAsDurableDocument({ key, state, sessionId, html, existingDocumentId = null, existingDurableDocumentId = null, mode = "direct", template = null }) {
   const client = bridge(state);
   let documentId = existingDocumentId;
   log("direct save started", { conversationKey: key, sessionId, existingDocumentId: documentId, htmlBytes: html.length });
@@ -63,10 +63,10 @@ async function saveHtmlAsDurableDocument({ key, state, sessionId, html, existing
   const durableDocumentId = saved?.durableId ?? existingDurableDocumentId;
   const files = durableDocumentId ? await client.listDocuments() : null;
   const verified = durableDocumentId ? savedDocumentExists(files, durableDocumentId) : false;
-  state.documents[key] = { mode: "direct", sessionId, documentId, durableDocumentId, html, template: null };
+  state.documents[key] = { mode, sessionId, documentId, durableDocumentId, html, template };
   await chrome.storage.local.set({ documents: state.documents });
   log("direct save completed", { conversationKey: key, sessionId, documentId, durableDocumentId, verified });
-  return { state: "complete", mode: "direct", durableDocumentId, verified };
+  return { state: "complete", mode, durableDocumentId, verified };
 }
 
 async function pollConversation(sender) {
@@ -103,11 +103,28 @@ async function pollConversation(sender) {
       await chrome.storage.local.set({ jobs: state.jobs });
       return savedDirectly;
     }
-    state.documents[key] = { mode: "template", sessionId: active.sessionId, html, template: active.template };
+    const capturedHtml = active.capturedHtml;
+    const completedHtml = capturedHtml && !containsCapturedResponse(html, capturedHtml)
+      ? appendCapturedResponse(html, capturedHtml)
+      : html;
+    if (completedHtml !== html) {
+      log("template output omitted captured response; restoring it", { conversationKey: key, sessionId: active.sessionId, jobId: active.jobId, htmlBytes: capturedHtml.length });
+    }
+    const sessionDocument = focusedSessionDocument(await bridge(state).listSessionDocuments(active.sessionId));
+    const savedTemplate = await saveHtmlAsDurableDocument({
+      key,
+      state,
+      sessionId: active.sessionId,
+      html: completedHtml,
+      existingDocumentId: sessionDocument?.id,
+      existingDurableDocumentId: sessionDocument?.durableId,
+      mode: "template",
+      template: active.template,
+    });
     delete state.jobs[key];
-    await chrome.storage.local.set({ documents: state.documents, jobs: state.jobs });
-    log("template job completed", { conversationKey: key, sessionId: active.sessionId, jobId: active.jobId, htmlBytes: html.length });
-    return { state: "complete", template: active.template };
+    await chrome.storage.local.set({ jobs: state.jobs });
+    log("template job completed", { conversationKey: key, sessionId: active.sessionId, jobId: active.jobId, htmlBytes: completedHtml.length, verified: savedTemplate.verified });
+    return { state: "complete", template: active.template, verified: savedTemplate.verified };
   }
   throw new Error(job.error || `The job ended with status: ${job.status}.`);
 }

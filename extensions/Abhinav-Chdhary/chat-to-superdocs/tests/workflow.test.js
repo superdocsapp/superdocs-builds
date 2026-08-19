@@ -27,6 +27,16 @@ test("recognizes an existing captured response before appending it again", () =>
   assert.equal(containsCapturedResponse(document, captured), true);
 });
 
+test("restores a capture omitted by a template result without disturbing its styling", () => {
+  const captured = "<p>Exact response</p>";
+  const templateResult = "<html><body><header>Branded header</header></body></html>";
+  const restored = containsCapturedResponse(templateResult, captured)
+    ? templateResult
+    : appendCapturedResponse(templateResult, captured);
+  assert.match(restored, /<header>Branded header<\/header>/);
+  assert.match(restored, /<section data-chat-to-superdocs-capture="true"><p>Exact response<\/p><\/section>/);
+});
+
 test("uses a stable conversation key while ignoring query strings and fragments", () => {
   assert.equal(conversationKey("https://chatgpt.com/c/abc-123?model=fast#latest"), "https://chatgpt.com/c/abc-123");
 });
