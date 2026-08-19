@@ -15,7 +15,9 @@ Built for the SuperDocs Round 2 engineer task.
 
 ![The drafted report — Observed in teal, Assessed in amber, every claim carrying its log entry](docs/screenshot-report.jpg)
 
-> 📸 **Screenshot placeholder** — the interactive review gate, showing a proposed change before and after, with the approve/reject prompt.
+![The human gate: every change shown before and after, approved or rejected one at a time](docs/screenshot-review-gate.jpg)
+
+*`--gate interactive`: nothing is written until a person says so, and a rejection carries a reason back to the model.*
 
 ---
 
