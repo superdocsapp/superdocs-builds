@@ -32,7 +32,7 @@ for _stream in (sys.stdout, sys.stderr):
         pass
 
 from .client import ProposedChange, SuperDocsClient
-from .corpus import available_events, load_corpus
+from .corpus import DATA_ROOT, events_in_order, load_corpus
 from .facts import SECTION_TITLES, build_facts
 from .lessons import DEFAULT_STORE, load_store
 from .mock import MockSuperDocs
@@ -198,15 +198,28 @@ def demo(
     live: bool = typer.Option(False, "--live", help="use the real SuperDocs API (costs operations)"),
     store: Path = typer.Option(Path("out") / "demo-lessons.json", help="carry-forward store"),
 ) -> None:
-    """Run both storms in order, so the carry-forward can be seen working.
+    """Run every event on disk in order, so the carry-forward can be seen working.
 
-    Storm B opens Storm A's lessons as open or closed because it read them from the
-    store, not because they were typed in again.
+    Each report opens the previous ones' lessons as open or closed because it read them
+    from the store, not because they were typed in again. The register is cleared first,
+    so what the last report inherits was demonstrably produced by this run.
+
+    Events come from `data/`, ordered by when the storm started. Adding a folder is
+    enough to include it; there is no list of names to keep in step.
     """
+    found = events_in_order()
+    if not found:
+        typer.echo(f"no events found in {DATA_ROOT} — add an event folder with an event.json")
+        raise typer.Exit(1)
+    listed = ", ".join(found)
+    summary = f"{len(found)} event(s) in order: {listed}"
+    if len(found) == 1:
+        summary += '\n  one event only, so nothing is inherited yet'
+    typer.echo(typer.style('\n' + summary, bold=True))
     if store.exists():
         store.unlink()
     failures = 0
-    for event in ("storm-a", "storm-b"):
+    for event in found:
         backend = SuperDocsClient(_load_key()) if live else MockSuperDocs()
         typer.echo(typer.style(f"\n=== {event} ===\n", bold=True))
         try:
@@ -273,10 +286,17 @@ def verify(event: str = typer.Argument(..., help="event id, e.g. storm-a")) -> N
 
 @app.command()
 def events() -> None:
-    """List the events with data on disk."""
-    for event in available_events():
+    """List the events with data on disk, oldest first."""
+    found = events_in_order()
+    if not found:
+        typer.echo(f"no events found in {DATA_ROOT} — add an event folder with an event.json")
+        return
+    for event in found:
         corpus = load_corpus(event)
-        typer.echo(f"  {event:10} {corpus.event.name} ({len(corpus.log)} log entries)")
+        typer.echo(
+            f"  {event:10} {corpus.event.started_at:%d %b %Y}  {corpus.event.name} "
+            f"({len(corpus.log)} log entries)"
+        )
 
 
 if __name__ == "__main__":

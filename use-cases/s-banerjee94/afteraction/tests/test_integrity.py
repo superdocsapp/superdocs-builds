@@ -8,6 +8,7 @@ success and changed nothing. Both happened on live runs, and both looked like a 
 
 from __future__ import annotations
 
+import json
 import re
 
 import pytest
@@ -244,3 +245,125 @@ def test_no_two_placeholders_in_the_skeleton_are_identical():
     found = re.findall(r">(Placeholder for [^<]+)<", skeleton)
     assert found
     assert len(found) == len(set(found)), f"duplicated placeholder text: {found}"
+
+
+# ------------------------------------------------------------------ any number of events
+
+
+def _event_folder(root, name, started, log_id="EL-0001"):
+    """A minimal but valid event on disk, matching the real CSV schema."""
+    d = root / name
+    d.mkdir(parents=True)
+    nl = chr(10)
+
+    def write(filename, rows):
+        (d / filename).write_text(nl.join(rows) + nl, encoding="utf-8")
+
+    (d / "event.json").write_text(
+        json.dumps(
+            {
+                "event_id": name,
+                "name": f"Storm {name}",
+                "utility": "Test Power",
+                "consumers_served": 1000,
+                "started_at": f"{started}T00:00:00",
+                "ended_at": f"{started}T12:00:00",
+                "previous_event_id": None,
+            }
+        ),
+        encoding="utf-8",
+    )
+    write(
+        "event_log.csv",
+        [
+            "entry_id,at,category,feeder,consumers_out,note,flag",
+            f"{log_id},{started}T01:00:00,outage,F-01,100,First outages recorded.,",
+            f"EL-0002,{started}T06:00:00,restoration,F-01,0,All supply restored.,",
+        ],
+    )
+    write(
+        "crew_records.csv",
+        [
+            "crew_id,crew_type,home_base,headcount,mobilized_at,released_at,mutual_aid,sources",
+            f"CR-01,line,Depot,4,{started}T01:30:00,{started}T06:00:00,false,{log_id}",
+        ],
+    )
+    write(
+        "customer_comms.csv",
+        [
+            "comm_id,sent_at,channel,audience,subject,sources",
+            f"CC-01,{started}T02:00:00,SMS,100,Supply interruption acknowledged,{log_id}",
+        ],
+    )
+    write("lessons_opened.csv", ["lesson_id,title,owner,detail,sources"])
+    write("lesson_resolutions.csv", ["lesson_id,status,note,sources"])
+    return d
+
+
+def test_no_events_on_disk_is_reported_not_crashed(tmp_path):
+    from afteraction.corpus import available_events, events_in_order
+
+    empty = tmp_path / "data"
+    empty.mkdir()
+    assert available_events(empty) == []
+    assert events_in_order(empty) == []
+
+
+def test_a_missing_data_folder_is_empty_not_an_error(tmp_path):
+    from afteraction.corpus import available_events
+
+    assert available_events(tmp_path / "nothing-here") == []
+
+
+def test_one_event_is_a_valid_corpus(tmp_path):
+    from afteraction.corpus import events_in_order
+
+    root = tmp_path / "data"
+    _event_folder(root, "only-storm", "2026-01-01")
+    assert events_in_order(root) == ["only-storm"]
+
+
+def test_events_are_ordered_by_date_not_by_folder_name(tmp_path):
+    """A folder name is a naming convention; the start date is a fact about the weather.
+    Carry-forward only means anything in chronological order."""
+    from afteraction.corpus import available_events, events_in_order
+
+    root = tmp_path / "data"
+    _event_folder(root, "zulu-storm", "2026-01-01")   # first by date, last by name
+    _event_folder(root, "alpha-storm", "2026-06-01")  # last by date, first by name
+
+    assert available_events(root) == ["alpha-storm", "zulu-storm"]  # alphabetical
+    assert events_in_order(root) == ["zulu-storm", "alpha-storm"]   # chronological
+
+
+def test_three_events_all_run_and_the_register_accumulates(tmp_path):
+    """Nothing in the pipeline assumes exactly two storms."""
+    from afteraction.corpus import events_in_order
+    from afteraction.lessons import load_store
+
+    root = tmp_path / "data"
+    for n, date in enumerate(("2026-01-01", "2026-02-01", "2026-03-01"), start=1):
+        d = _event_folder(root, f"storm-{n}", date)
+        (d / "lessons_opened.csv").write_text(
+            "lesson_id,title,owner,detail,sources\n"
+            f'LL-{n},"Item {n}","Owner {n}","Detail for item {n}.",EL-0001\n',
+            encoding="utf-8",
+        )
+
+    order = events_in_order(root)
+    assert order == ["storm-1", "storm-2", "storm-3"]
+
+    store = tmp_path / "lessons.json"
+    inherited_counts = []
+    for event in order:
+        result = run_event(
+            event,
+            MockSuperDocs(),
+            data_root=root,
+            store_path=store,
+            out_dir=tmp_path / "out" / event,
+        )
+        inherited_counts.append(result.carry["inherited"])
+
+    assert inherited_counts == [0, 1, 2]      # each report inherits everything before it
+    assert len(load_store(store)) == 3

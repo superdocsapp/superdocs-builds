@@ -195,6 +195,10 @@ run commands, and the SuperDocs features used. Pull request into `superdocsapp/s
   document is read back before it is called finished. Bounded to one pass: a second failure is
   reported, because each retry costs an operation. A section a *person* rejected is never retried —
   that is a decision the gate exists to record.
+- **The number of events is data, not code.** `demo` reads `data/` rather than naming storms, so
+  nought, one, three or twenty all work; only the two committed events happen to be two. Ordering
+  is by the event's start date, never by folder name, because carry-forward is only meaningful in
+  chronological order and a folder name is a naming convention rather than a fact.
 - **Page count is a property of the deliverable.** A4, narrow margins, a wide and short curve.
   Three pages for both storms.
 - **"Change nothing outside this section" is measured, not asserted.** The document is

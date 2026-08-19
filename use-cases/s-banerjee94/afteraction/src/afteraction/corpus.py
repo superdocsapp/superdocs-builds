@@ -157,5 +157,25 @@ def load_resolutions(event_id: str, root: Path | None = None) -> list[dict[str, 
 
 
 def available_events(root: Path | None = None) -> list[str]:
+    """Every event folder on disk, by name."""
     base = root or DATA_ROOT
+    if not base.is_dir():
+        return []
     return sorted(p.name for p in base.iterdir() if (p / "event.json").exists())
+
+
+def events_in_order(root: Path | None = None) -> list[str]:
+    """Every event on disk, oldest storm first.
+
+    Ordered by when the event actually started, never by folder name. Carry-forward only
+    means anything in chronological order — a later report closes an earlier report's
+    items — and a folder name is a naming convention, not a fact about the weather. Two
+    events called "flood-2025" and "alpha-squall" sort one way by name and the other way
+    by date, and only one of those orders produces a correct register.
+    """
+    base = root or DATA_ROOT
+    dated: list[tuple[datetime, str]] = []
+    for name in available_events(base):
+        raw = json.loads((base / name / "event.json").read_text(encoding="utf-8"))
+        dated.append((datetime.fromisoformat(raw["started_at"]), name))
+    return [name for _, name in sorted(dated)]

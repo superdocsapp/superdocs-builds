@@ -99,6 +99,14 @@ net should do. A section whose change a *person* rejected is never retried: that
 is a decision the gate exists to record, and overturning it silently would be worse than an empty
 section.
 
+**Two storms is the demo, not the limit.** `demo` runs whatever is in `data/`, ordered by when
+each storm started — nought, one, two or twenty. Adding a folder with an `event.json` is enough to
+include it; there is no list of names to keep in step. Ordering is by date rather than by folder
+name because a folder name is a naming convention and a start date is a fact: two events called
+`flood-2025` and `alpha-squall` sort one way alphabetically and the other way chronologically, and
+only one of those orders produces a correct register. Tested at nought, one and three events, the
+last deliberately named so that alphabetical order is the reverse of chronological.
+
 **Open actions carry across two storms.** Storm B's report opens Storm A's items with a status
 because it *read* them from a store, not because they were retyped:
 
@@ -192,7 +200,7 @@ command — the virtualenv and the exact pinned dependencies in `uv.lock` are cr
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, showing the carry-forward
-uv run pytest                        # 125 tests, no key, no network
+uv run pytest                        # 130 tests, no key, no network
 ```
 
 Without uv, the same thing in a virtualenv of your own:
@@ -219,11 +227,11 @@ uv run python -m afteraction build storm-a --live --gate interactive # approve o
 
 | Command | What it does |
 |---|---|
-| `uv run python -m afteraction demo` | Both storms in order, so the carry-forward can be seen working |
+| `uv run python -m afteraction demo` | Every event in `data/`, oldest first, so the carry-forward can be seen working |
 | `uv run python -m afteraction build <event>` | One event's report; `--live`, `--limit`, `--gate`, `--model-tier` |
 | `uv run python -m afteraction verify <event>` | Parse the records and show what they support, drafting nothing |
 | `uv run python -m afteraction lessons` | The register: what is open, what is closed, and where it closed |
-| `uv run python -m afteraction events` | The events with data on disk |
+| `uv run python -m afteraction events` | The events with data on disk, oldest first |
 
 Outputs land in `out/<event>/`: the `.docx` and `.md` exports and the curve PNG. The carry-forward
 register is `state/lessons.json`, committed so the two-storm behaviour is visible in the diff.
