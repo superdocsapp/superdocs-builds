@@ -1,0 +1,55 @@
+[project]
+name = "thread-resolver"
+version = "0.1.0"
+description = "Walks open comment threads in a document, drafts the edit each one implies, and closes the thread on acceptance."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+
+dependencies = [
+    "lxml>=5.3.0",               # XML parser. Comment threads live in raw OOXML; python-docx exposes no comments API.
+    "httpx>=0.28.0",             # HTTP client with async support and per-request timeouts
+    "pydantic>=2.10.0",          # runtime validation of external JSON into typed objects
+    "pydantic-settings>=2.7.0",  # typed config loaded from environment variables
+    "tenacity>=9.0.0",           # retry with exponential backoff; edit jobs can run for minutes
+    "typer>=0.15.0",             # CLI argument parsing derived from type hints
+    "rich>=13.9.0",              # terminal tables and diff rendering for the review gate
+]
+
+# Console command installed with the package: `thread-resolver ...`
+[project.scripts]
+thread-resolver = "thread_resolver.cli:app"
+
+# Development-only dependencies. Not installed for consumers of the package.
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-asyncio>=0.25.0",    # async test support
+    "ruff>=0.9.0",               # linter and formatter
+    "mypy>=1.14.0",              # static type checker
+    "lxml-stubs>=0.5.1",         # type stubs; lxml ships none of its own
+]
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+# E/F: style and undefined names. I: import order. UP: modern syntax.
+# B: common bug patterns. SIM: simplifications. RUF: ruff-specific checks.
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true            # every function must be annotated; no implicit Any
+warn_unreachable = true  # flags branches that can never execute
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"           # async tests run without a per-test decorator
+addopts = "-ra --strict-markers"  # summarise non-passing tests; reject unknown markers

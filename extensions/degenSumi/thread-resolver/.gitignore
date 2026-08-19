@@ -1,0 +1,22 @@
+# Secrets. Never committed; .env.example carries the key names only.
+.env
+.env.*
+!.env.example
+
+# Python bytecode and build artefacts
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environment, recreated by `uv sync`
+.venv
+
+# Run state and generated output
+runs.db*
+out/
+*.log
+
+.DS_Store
