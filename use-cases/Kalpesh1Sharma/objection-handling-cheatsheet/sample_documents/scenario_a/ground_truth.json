@@ -1,0 +1,33 @@
+{
+  "scenario_id": "SCENARIO-A",
+  "expected_objection_count": 6,
+  "expected_complete_count": 5,
+  "expected_missing_response_count": 1,
+  "expected_dropped_count": 0,
+  "entries": [
+    {
+      "objection": "It's too expensive",
+      "response": "Start with a small pilot rather than a full rollout."
+    },
+    {
+      "objection": "SECURITY???",
+      "response": "We encrypt data in transit and at rest."
+    },
+    {
+      "objection": "We already use another vendor",
+      "response": "Migration can be phased alongside the existing workflow."
+    },
+    {
+      "objection": "Implementation looks complicated",
+      "response": null
+    },
+    {
+      "objection": "what about support?",
+      "response": "Support is available during onboarding."
+    },
+    {
+      "objection": "Our team is too small",
+      "response": "Start with a limited team and expand later."
+    }
+  ]
+}

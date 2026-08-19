@@ -1,0 +1,25 @@
+{
+  "scenario_id": "SCENARIO-B",
+  "expected_objection_count": 4,
+  "expected_complete_count": 3,
+  "expected_missing_response_count": 1,
+  "expected_dropped_count": 0,
+  "entries": [
+    {
+      "objection": "Budget is frozen",
+      "response": "Revisit the conversation in Q4."
+    },
+    {
+      "objection": "Already using Competitor X",
+      "response": "Migration can be phased."
+    },
+    {
+      "objection": "Worried about onboarding",
+      "response": null
+    },
+    {
+      "objection": "Need training?",
+      "response": "Training is included during onboarding."
+    }
+  ]
+}
