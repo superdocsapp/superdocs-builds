@@ -19,7 +19,8 @@ async function addResponse(message, sender) {
   const state = await storedState();
   const existing = state.documents[key];
   if (!existing && message.template && (typeof message.template.id !== "string" || typeof message.template.name !== "string")) throw new Error("The selected template is invalid.");
-  if (!message.template && (!existing || existing.mode === "direct")) return saveDirectDocument({ key, existing, message, state });
+  const existingUsesTemplate = existing?.mode === "template" && existing.template;
+  if (!message.template && !existingUsesTemplate) return saveDirectDocument({ key, existing, message, state });
   const sessionId = existing?.sessionId ?? newSessionId();
   const documentHtml = existing
     ? appendCapturedResponse(existing.html, message.html)
@@ -39,9 +40,13 @@ async function addResponse(message, sender) {
 async function saveDirectDocument({ key, existing, message, state }) {
   const sessionId = existing?.sessionId ?? newSessionId();
   const html = existing ? appendCapturedResponse(existing.html, message.html) : createDocument({ capturedHtml: message.html });
+  return saveHtmlAsDurableDocument({ key, state, sessionId, html, existingDocumentId: existing?.documentId, existingDurableDocumentId: existing?.durableDocumentId });
+}
+
+async function saveHtmlAsDurableDocument({ key, state, sessionId, html, existingDocumentId = null, existingDurableDocumentId = null }) {
   const client = bridge(state);
-  let documentId = existing?.documentId;
-  log("direct save started", { conversationKey: key, sessionId, existingDocumentId: documentId ?? null, htmlBytes: html.length });
+  let documentId = existingDocumentId;
+  log("direct save started", { conversationKey: key, sessionId, existingDocumentId: documentId, htmlBytes: html.length });
   if (!documentId) {
     await client.openBlankDocument(sessionId);
     const opened = focusedSessionDocument(await client.listSessionDocuments(sessionId));
@@ -51,7 +56,7 @@ async function saveDirectDocument({ key, existing, message, state }) {
   }
   await client.saveDocument(sessionId, documentId, html);
   const saved = focusedSessionDocument(await client.listSessionDocuments(sessionId));
-  const durableDocumentId = saved?.durableId ?? existing?.durableDocumentId ?? null;
+  const durableDocumentId = saved?.durableId ?? existingDurableDocumentId;
   const files = durableDocumentId ? await client.listDocuments() : null;
   const verified = durableDocumentId ? savedDocumentExists(files, durableDocumentId) : false;
   state.documents[key] = { mode: "direct", sessionId, documentId, durableDocumentId, html, template: null };
@@ -65,7 +70,12 @@ async function pollConversation(sender) {
   const key = conversationKey(sender.tab.url);
   const state = await storedState();
   const active = state.jobs[key];
-  if (!active) return { state: "idle", hasDocument: Boolean(state.documents[key]) };
+  const existing = state.documents[key];
+  if (!active && existing?.mode === "template" && !existing.template) {
+    log("migrating stored null-template conversation to a durable File", { conversationKey: key, sessionId: existing.sessionId });
+    return saveHtmlAsDurableDocument({ key, state, sessionId: existing.sessionId, html: existing.html });
+  }
+  if (!active) return { state: "idle", hasDocument: Boolean(existing) };
   const job = await bridge(state).getJob(active.jobId);
   const stateName = jobState(job);
   if (stateName === "processing") return { state: "processing" };
@@ -81,6 +91,13 @@ async function pollConversation(sender) {
   if (stateName === "completed") {
     const html = finalHtml(job);
     if (!html) throw new Error("The completed job did not return document HTML.");
+    if (!active.template) {
+      log("migrating legacy null-template job to a durable File", { conversationKey: key, sessionId: active.sessionId, jobId: active.jobId });
+      const savedDirectly = await saveHtmlAsDurableDocument({ key, state, sessionId: active.sessionId, html });
+      delete state.jobs[key];
+      await chrome.storage.local.set({ jobs: state.jobs });
+      return savedDirectly;
+    }
     state.documents[key] = { mode: "template", sessionId: active.sessionId, html, template: active.template };
     delete state.jobs[key];
     await chrome.storage.local.set({ documents: state.documents, jobs: state.jobs });
