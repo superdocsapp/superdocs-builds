@@ -4,11 +4,14 @@
   "description": "Capture a ChatGPT or Claude answer and review it in a growing SuperDocs document.",
   "version": "0.1.0",
   "action": {
-    "default_title": "Chat to SuperDocs",
-    "default_popup": "src/popup/popup.html"
+    "default_title": "Chat to SuperDocs settings"
   },
   "options_page": "src/options/options.html",
-  "permissions": ["storage", "activeTab"],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "downloads"],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://claude.ai/*",

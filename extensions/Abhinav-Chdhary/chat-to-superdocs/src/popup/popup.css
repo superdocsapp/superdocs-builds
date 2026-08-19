@@ -1,8 +1,0 @@
-:root { color: #20252b; font: 14px/1.4 system-ui, sans-serif; background: #f7f8fa; }
-body { margin: 0; width: 370px; }
-main { display: grid; gap: 12px; padding: 16px; }
-header h1, h2 { margin: 0; font-size: 18px; } header p { margin: 4px 0 0; color: #5b6470; }
-label, fieldset { display: grid; gap: 5px; } fieldset { border: 1px solid #d7dce2; border-radius: 7px; } fieldset label { display: block; margin: 6px 0; }
-input, select, button { font: inherit; padding: 8px; border-radius: 6px; border: 1px solid #b8c1cc; } button { cursor: pointer; background: white; } button.primary { border-color: #1548aa; background: #1548aa; color: white; font-weight: 650; } button:disabled { opacity: .55; cursor: not-allowed; }
-.preview { max-height: 120px; overflow: auto; background: white; border: 1px solid #d7dce2; border-radius: 6px; padding: 8px; } .preview pre { white-space: pre-wrap; }
-.change { margin: 8px 0; padding: 9px; background: white; border: 1px solid #d7dce2; border-radius: 6px; } .change code { display: block; max-height: 70px; overflow: auto; white-space: pre-wrap; } .hint { color: #5b6470; font-size: 12px; margin: 0; }

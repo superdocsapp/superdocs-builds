@@ -28,12 +28,24 @@ export function createDocument({ templateId, title, capturedHtml }) {
   return `<!doctype html><html><body><h1>${safeTitle}</h1>${template.before}<section data-chat-to-superdocs-capture="true">${capturedHtml}</section></body></html>`;
 }
 
+export function appendCapturedResponse(documentHtml, capturedHtml) {
+  const capture = `<section data-chat-to-superdocs-capture="true">${capturedHtml}</section>`;
+  return documentHtml.includes("</body>")
+    ? documentHtml.replace("</body>", `${capture}</body>`)
+    : `${documentHtml}${capture}`;
+}
+
+export function conversationKey(url) {
+  const parsed = new URL(url);
+  return `${parsed.origin}${parsed.pathname.replace(/\/$/, "") || "/"}`;
+}
+
 export function appendInstruction() {
-  return "Append the captured answer at the end of this document. Preserve its headings, nested lists, tables, code blocks, and math exactly. Do not rewrite existing content. Propose every insertion for review.";
+  return "The newly captured answer is already present in the final section marked data-chat-to-superdocs-capture. Preserve its headings, nested lists, tables, code blocks, and math exactly. Apply the document's existing styling to that section only. Do not rewrite earlier content. Propose every change for review.";
 }
 
 export function createInstruction() {
-  return "Format the captured answer as the final section of this document. Preserve its headings, nested lists, tables, code blocks, and math exactly. Propose every change for review.";
+  return "The captured answer is in the section marked data-chat-to-superdocs-capture. Turn it into a polished document section using the selected template's styling. Preserve headings, nested lists, tables, code blocks, and math exactly. Propose every change for review.";
 }
 
 export function newSessionId() {

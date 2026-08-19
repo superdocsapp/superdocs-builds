@@ -2,15 +2,17 @@
 
 Created by **Abhinav Choudhary**.
 
-Chat to SuperDocs is a Chrome/Chromium extension that takes the latest completed answer from ChatGPT or Claude and turns it into a growing, reviewable SuperDocs document. It keeps the answer's headings, nested lists, tables, code blocks, and math markup; starts from a small template; and can append later captures to the same document.
+Chat to SuperDocs is a Chrome/Chromium extension for people who are tired of pasting AI answers into documents and repairing the formatting. It puts a small **Add** button to the left of every AI response's first readable block. One click turns that response into structured content in a growing SuperDocs document for the current chat.
+
+It keeps headings, nested lists, tables, code blocks, and maths intact; the first answer picks a template, and every later answer in the same conversation inherits that styling.
 
 The extension proves the reviewable SuperDocs workflow:
 
-1. Captures a completed answer from `chatgpt.com` or `claude.ai`.
-2. Creates a document HTML payload from a template, or reuses the approved active document in append mode.
-3. Sends a `chat/async` edit instruction with `ask_every_time` approval.
-4. Polls while the job is `pending` or `in_progress`, then shows every pending item for individual approval or rejection.
-5. Stores the returned HTML only after completion and exports it as DOCX.
+1. Adds inline controls to responses on ChatGPT and Claude, with generic semantic selectors for other Markdown-based AI chat interfaces.
+2. On the first click in a conversation, offers an inline template picker; it creates a conversation-scoped document.
+3. On later clicks, appends the selected response to that same document and preserves the established template styling.
+4. Sends an async edit request, visibly waits while it processes, and keeps human review for every proposed change.
+5. Keeps the completed HTML per conversation and exports it as DOCX from the in-chat control.
 
 ## Why a local bridge?
 
@@ -32,11 +34,12 @@ Requirements: Node 18+ and a SuperDocs API key. Do not put the key in this repos
    node bridge/server.mjs
    ```
 
-3. Open a completed ChatGPT or Claude answer and select the extension icon.
-4. Choose **Capture latest answer**, select a template or append mode, then choose **Send for review**.
-5. Approve or reject each proposed change and, once processing finishes, choose **Export DOCX**.
+3. Open a completed ChatGPT or Claude conversation. The extension adds an **Add** button just left of each assistant response.
+4. Click **Add** beside the first answer and choose a template in the small in-page menu.
+5. Approve or reject the proposed changes in the in-page review card. Later **Add** clicks append to the same conversation document without asking for the template again.
+6. Click **Export DOCX** beside a completed addition when you want to download the growing document.
 
-The options page deliberately permits only `http://127.0.0.1:8787` in this first draft. It avoids silently sending document content to an arbitrary endpoint.
+The extension toolbar icon opens settings only; the document workflow itself never uses a popup. The options page deliberately permits only `http://127.0.0.1:8787` in this first draft, avoiding the accidental transfer of document content to an arbitrary endpoint.
 
 ## Test
 
@@ -44,7 +47,7 @@ The options page deliberately permits only `http://127.0.0.1:8787` in this first
 npm test
 ```
 
-The tests are offline and cover rich-structure preservation in the document envelope, append-mode safeguards, the required double JSON parse of proposed-change events, processing/review state, item-level decisions, and completed-document extraction.
+The tests are offline and cover rich-structure preservation in the document envelope, conversation-scoped appending, append-mode safeguards, the required double JSON parse of proposed-change events, processing/review state, item-level decisions, and completed-document extraction.
 
 ## SuperDocs features used
 
@@ -55,6 +58,6 @@ The tests are offline and cover rich-structure preservation in the document enve
 
 ## Limitations / next steps
 
-- The host-page extractors are intentionally narrow and tested against the current ChatGPT and Claude page structures; a production release needs automated browser fixtures and selector maintenance.
-- A popup must remain open while a fresh job is polled. The job ID is saved, so reopening the popup resumes its status, but background polling and notifications are not implemented yet.
+- The host-page extractors use a common semantic strategy with small ChatGPT/Claude adapters. A production release needs automated browser fixtures and selector maintenance as chat sites change their markup.
+- The in-page control polls while its chat tab remains open. The job ID is saved, so reopening the conversation can resume status, but background notifications are not implemented yet.
 - This first draft has no recorded demo yet. Add a link here after a real key-backed walkthrough has been recorded.

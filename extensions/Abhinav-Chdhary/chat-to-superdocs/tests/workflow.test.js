@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { appendInstruction, createDocument } from "../src/shared/document.js";
+import { appendCapturedResponse, appendInstruction, conversationKey, createDocument } from "../src/shared/document.js";
 import { decisionsFromForm, finalHtml, jobState, parseProposedChangeBatch, pendingChanges } from "../src/shared/superdocs.js";
 
 test("creates a styled document without flattening structured captured HTML", () => {
@@ -10,8 +10,18 @@ test("creates a styled document without flattening structured captured HTML", ()
 });
 
 test("append instruction protects existing content and requests review", () => {
-  assert.match(appendInstruction(), /Do not rewrite existing content/);
-  assert.match(appendInstruction(), /Propose every insertion for review/);
+  assert.match(appendInstruction(), /Do not rewrite earlier content/);
+  assert.match(appendInstruction(), /Propose every change for review/);
+});
+
+test("appends captured markup without flattening the existing conversation document", () => {
+  const appended = appendCapturedResponse("<html><body><h1>Notes</h1></body></html>", "<h2>Second answer</h2><pre><code>x</code></pre>");
+  assert.match(appended, /<h1>Notes<\/h1>/);
+  assert.match(appended, /<section data-chat-to-superdocs-capture="true"><h2>Second answer<\/h2><pre><code>x<\/code><\/pre><\/section>/);
+});
+
+test("uses a stable conversation key while ignoring query strings and fragments", () => {
+  assert.equal(conversationKey("https://chatgpt.com/c/abc-123?model=fast#latest"), "https://chatgpt.com/c/abc-123");
 });
 
 test("double parses a documented proposed-change batch", () => {
