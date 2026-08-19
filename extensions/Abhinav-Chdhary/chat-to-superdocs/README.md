@@ -42,6 +42,8 @@ Requirements: Node 18+, a SuperDocs API key, and at least one template saved in 
 
 The extension toolbar icon opens settings only; the document workflow itself never uses a popup. The options page deliberately permits only `http://127.0.0.1:8787` in this first draft, avoiding the accidental transfer of document content to an arbitrary endpoint.
 
+If the extension reports an untrusted origin, the bridge now prints both its expected origin and the origin Chrome actually sent. Restart it with the exact received `chrome-extension://…` value as `ALLOWED_EXTENSION_ORIGIN` (without a trailing slash).
+
 ## Test
 
 ```sh

@@ -10,7 +10,12 @@ if (!API_KEY || !ALLOWED_ORIGIN) {
 }
 
 function allowOrigin(request, response) {
-  if (request.headers.origin !== ALLOWED_ORIGIN) return false;
+  const receivedOrigin = request.headers.origin ?? "(no Origin header)";
+  if (receivedOrigin !== ALLOWED_ORIGIN) {
+    console.warn(`Rejected bridge request: expected ${ALLOWED_ORIGIN}; received ${receivedOrigin}.`);
+    response.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
+    return false;
+  }
   response.setHeader("Access-Control-Allow-Origin", ALLOWED_ORIGIN);
   response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   response.setHeader("Access-Control-Allow-Headers", "content-type");
@@ -39,7 +44,9 @@ function sendJson(response, status, body) {
 
 const server = createServer(async (request, response) => {
   try {
-    if (!allowOrigin(request, response)) return sendJson(response, 403, { error: "Untrusted extension origin." });
+    if (!allowOrigin(request, response)) {
+      return sendJson(response, 403, { error: "Untrusted extension origin.", expected_origin: ALLOWED_ORIGIN, received_origin: request.headers.origin ?? null });
+    }
     if (request.method === "OPTIONS") return response.writeHead(204).end();
     const path = new URL(request.url, "http://localhost").pathname;
     if (request.method === "GET" && path === "/api/templates") {
