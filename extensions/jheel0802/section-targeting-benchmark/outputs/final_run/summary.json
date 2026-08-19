@@ -1,0 +1,54 @@
+{
+  "benchmark_run_id": 2,
+  "benchmark_run_name": "Benchmark run 2",
+  "selection_rule": "Latest execution attempt per official case in the selected benchmark run",
+  "total_cases": 40,
+  "pass": 25,
+  "fail": 15,
+  "pass_rate": 0.625,
+  "search_question": {
+    "total": 28,
+    "pass": 20,
+    "fail": 8,
+    "pass_rate": 0.7142857142857143
+  },
+  "edit": {
+    "total": 12,
+    "pass": 5,
+    "fail": 7,
+    "pass_rate": 0.4166666666666667
+  },
+  "latency_ms": {
+    "count": 40,
+    "average": 20840.72,
+    "median": 17448.55,
+    "p95": 39176.99,
+    "sample_standard_deviation": 9437.36
+  },
+  "total_api_reported_operations_charged": 28,
+  "failure_taxonomy_counts": {
+    "body_text_confusion": 2,
+    "correct_section_wrong_answer": 4,
+    "correct_section_wrong_edit_range": 1,
+    "cross_reference_confusion": 1,
+    "failed_to_clarify": 2,
+    "no_target_but_modified": 2,
+    "other": 1,
+    "semantic_reference_miss": 1,
+    "wrong_duplicate": 1
+  },
+  "expected_behavior_counts": {
+    "should_clarify": {
+      "total": 4,
+      "pass": 2,
+      "fail": 2
+    },
+    "no_target": {
+      "total": 3,
+      "pass": 1,
+      "fail": 2
+    }
+  },
+  "dollar_spend_usd": null,
+  "dollar_spend_note": "Dollar spend was not exposed by the stored API responses."
+}
