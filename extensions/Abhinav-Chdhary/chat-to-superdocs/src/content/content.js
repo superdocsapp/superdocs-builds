@@ -142,7 +142,7 @@ function attachControl(response) {
   if (getComputedStyle(block).position === "static") block.style.position = "relative";
   const rail = document.createElement("span"); rail.className = "cts-rail";
   const button = document.createElement("button"); button.type = "button"; button.className = "cts-add"; button.title = "Add to doc"; button.setAttribute("aria-label", "Add to doc");
-  button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 19 19 5M9 5h10v10"/></svg>';
+  button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>';
   button.addEventListener("click", async (event) => {
     event.preventDefault(); event.stopPropagation();
     try {
