@@ -3,3 +3,7 @@
 __pycache__/
 *.pyc
 .DS_Store
+
+# Runtime/generated files
+job.json
+job_result.json
