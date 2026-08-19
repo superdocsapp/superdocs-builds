@@ -19,14 +19,14 @@ dev = ["pytest>=8.0"]
 afteraction = "afteraction.cli:app"
 
 [build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
-[tool.setuptools.package-data]
-afteraction = ["templates/*.html"]
+# Hatchling builds in a temporary directory, so no metadata folder is left beside the
+# source. It also ships everything inside the package directory, which is what carries
+# templates/report.html — the report's design — into the installed package.
+[tool.hatch.build.targets.wheel]
+packages = ["src/afteraction"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
