@@ -89,6 +89,12 @@ async function chooser(button, response) {
       const templateButton = document.createElement("button"); templateButton.type = "button"; templateButton.textContent = template.name;
       templateButton.addEventListener("click", () => addResponse(button, response, template)); panel.append(templateButton);
     }
+    const blankButton = document.createElement("button");
+    blankButton.type = "button";
+    blankButton.className = "cts-blank-document";
+    blankButton.textContent = "Blank document";
+    blankButton.addEventListener("click", () => addResponse(button, response, null));
+    panel.append(blankButton);
     button.parentElement.append(panel);
     window.setTimeout(() => {
       chooserOutsideListener = (event) => {
