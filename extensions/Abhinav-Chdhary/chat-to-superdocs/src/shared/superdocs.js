@@ -35,6 +35,29 @@ export function normalizeTemplateList(payload) {
   })).filter((template) => typeof template.id === "string" && typeof template.name === "string");
 }
 
+export function normalizeSessionDocuments(payload) {
+  const candidates = Array.isArray(payload)
+    ? payload
+    : [payload?.documents, payload?.items, payload?.data].find(Array.isArray) ?? [];
+  return candidates.map((document) => ({
+    id: document.id ?? document.document_id,
+    durableId: document.durable_document_id ?? document.durableId ?? null,
+    focused: Boolean(document.focused ?? document.is_focused),
+  })).filter((document) => typeof document.id === "string");
+}
+
+export function focusedSessionDocument(payload) {
+  const documents = normalizeSessionDocuments(payload);
+  return documents.find((document) => document.focused) ?? documents[0] ?? null;
+}
+
+export function savedDocumentExists(payload, durableId) {
+  const candidates = Array.isArray(payload)
+    ? payload
+    : [payload?.documents, payload?.items, payload?.data].find(Array.isArray) ?? [];
+  return candidates.some((document) => (document.id ?? document.document_id) === durableId);
+}
+
 export function finalHtml(job) {
   return job?.result?.document_changes?.updated_html
     ?? job?.metadata?.document_html
@@ -75,6 +98,22 @@ export class BridgeClient {
   async listTemplates() {
     const payload = await (await this.request("/api/templates")).json();
     return normalizeTemplateList(payload);
+  }
+
+  async openBlankDocument(sessionId) {
+    return (await this.request(`/api/sessions/${encodeURIComponent(sessionId)}/documents/blank`, { method: "POST", body: "{}" })).json();
+  }
+
+  async listSessionDocuments(sessionId) {
+    return (await this.request(`/api/sessions/${encodeURIComponent(sessionId)}/documents`)).json();
+  }
+
+  async saveDocument(sessionId, documentId, html) {
+    return (await this.request(`/api/sessions/${encodeURIComponent(sessionId)}/documents/${encodeURIComponent(documentId)}/save`, { method: "POST", body: JSON.stringify({ html }) })).json();
+  }
+
+  async listDocuments() {
+    return (await this.request("/api/documents")).json();
   }
 
   async getJob(jobId) {

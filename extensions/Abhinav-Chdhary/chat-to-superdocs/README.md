@@ -14,6 +14,8 @@ The extension keeps the SuperDocs workflow out of the user’s way:
 4. Sends an async edit request and applies its changes automatically; the only in-progress signal is a revolving outline around the Add button.
 5. Keeps the completed HTML per conversation for subsequent additions.
 
+When the account has no saved templates, the extension uses SuperDocs' non-AI blank-document and save endpoints. This creates a durable File for that conversation and verifies it in the account's Files list. When saved templates exist, the first Add action still asks which template to use before starting the template-aware AI flow.
+
 ## Why a local bridge?
 
 SuperDocs API keys must remain server-side. This extension never reads, stores, or sends an API key. Instead, a tiny localhost bridge receives extension requests and adds the key from its own environment before calling SuperDocs. The bridge accepts requests only from the specific extension origin you configure.
@@ -41,6 +43,13 @@ Requirements: Node 18+ and a SuperDocs API key. Saved SuperDocs templates are op
 
 The extension toolbar icon opens settings only; the document workflow itself never uses a popup. The options page deliberately permits only `http://127.0.0.1:8787` in this first draft, avoiding the accidental transfer of document content to an arbitrary endpoint.
 
+## Debug logs
+
+The logs contain IDs, request paths, document byte counts, and verification status—never document content or API keys.
+
+- In Chrome, open `chrome://extensions`, find Chat to SuperDocs, then select the service-worker **Inspect** link to see `[Chat to SuperDocs]` entries.
+- In the terminal running the bridge, look for `[Chat to SuperDocs bridge]` entries. A successful no-template flow includes `blank document opened`, `direct save completed`, and `verified: true`.
+
 The background worker authenticates to the bridge with its extension origin because Chrome service-worker fetches omit the normal `Origin` header. Keep `ALLOWED_EXTENSION_ORIGIN` set to the exact `chrome-extension://…` value (without a trailing slash); the bridge rejects requests that do not carry that matching extension-origin value.
 
 ## Test
@@ -54,6 +63,8 @@ The tests are offline and cover rich-structure preservation in the document enve
 ## SuperDocs features used
 
 - Async chat editing (`POST /v1/chat/async`)
+- Direct blank-document creation and save (`POST /v1/sessions/{session_id}/documents/blank`, `POST /v1/sessions/{session_id}/documents/{document_id}/save`)
+- Durable Files verification (`GET /v1/documents`)
 - Saved-template listing (`GET /v1/templates`)
 - Job polling (`GET /v1/jobs/{job_id}`)
 - Automatic change application (`approval_mode: "approve_all"`)

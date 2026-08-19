@@ -81,8 +81,10 @@ async function chooser(button, response) {
 async function addResponse(button, response, template) {
   removeChooser(button); button.disabled = true; setComplete(button, false); setLoading(button, true);
   try {
-    await send({ type: "ADD_RESPONSE", html: sanitizeAnswer(response), template });
-    button.setAttribute("aria-label", "Adding to doc"); schedulePoll(button);
+    const result = await send({ type: "ADD_RESPONSE", html: sanitizeAnswer(response), template });
+    button.setAttribute("aria-label", "Adding to doc");
+    if (result.state === "complete") return finishAdd(button);
+    schedulePoll(button);
   } catch (error) { button.disabled = false; setLoading(button, false); statusFor(button, error.message, "error"); }
 }
 
@@ -92,11 +94,7 @@ function schedulePoll(button) {
     try {
       const result = await send({ type: "POLL_CONVERSATION" });
       if (result.state === "processing") { schedulePoll(button); return; }
-      if (result.state === "complete") {
-        button.disabled = false; setLoading(button, false); setComplete(button, true); button.setAttribute("aria-label", "Added to doc");
-        window.setTimeout(() => { setComplete(button, false); button.setAttribute("aria-label", "Add to doc"); }, 700);
-        return;
-      }
+      if (result.state === "complete") return finishAdd(button);
     } catch (error) { button.disabled = false; setLoading(button, false); statusFor(button, error.message, "error"); }
   }, 900);
 }
@@ -108,6 +106,11 @@ function setLoading(button, isLoading) {
 
 function setComplete(button, isComplete) {
   button.toggleAttribute("data-complete", isComplete);
+}
+
+function finishAdd(button) {
+  button.disabled = false; setLoading(button, false); setComplete(button, true); button.setAttribute("aria-label", "Added to doc");
+  window.setTimeout(() => { setComplete(button, false); button.setAttribute("aria-label", "Add to doc"); }, 700);
 }
 
 function attachControl(response) {

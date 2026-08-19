@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { appendCapturedResponse, appendInstruction, conversationKey, createDocument, createInstruction } from "../src/shared/document.js";
-import { BridgeClient, decisionsFromForm, finalHtml, jobState, normalizeTemplateList, parseProposedChangeBatch, pendingChanges } from "../src/shared/superdocs.js";
+import { BridgeClient, decisionsFromForm, finalHtml, focusedSessionDocument, jobState, normalizeSessionDocuments, normalizeTemplateList, parseProposedChangeBatch, pendingChanges, savedDocumentExists } from "../src/shared/superdocs.js";
 
 test("creates a styled document without flattening structured captured HTML", () => {
   const captured = "<h2>Plan</h2><ul><li>One<ul><li>Nested</li></ul></li></ul><table><tr><th>A</th></tr></table><pre><code>const x = 1;</code></pre><span data-latex=\"x^2\">x²</span>";
@@ -36,6 +36,13 @@ test("uses a saved SuperDocs template rather than an extension-owned template", 
 
 test("creates a clean blank document when no saved template is available", () => {
   assert.match(createInstruction(null), /Do not apply any additional styling/);
+});
+
+test("finds and verifies the durable File created by direct save", () => {
+  const roster = { documents: [{ document_id: "doc_slot", durable_document_id: "doc_durable", focused: true }] };
+  assert.deepEqual(normalizeSessionDocuments(roster), [{ id: "doc_slot", durableId: "doc_durable", focused: true }]);
+  assert.deepEqual(focusedSessionDocument(roster), { id: "doc_slot", durableId: "doc_durable", focused: true });
+  assert.equal(savedDocumentExists({ documents: [{ id: "doc_durable" }] }, "doc_durable"), true);
 });
 
 test("sends the extension identity to the local bridge when Origin is unavailable", async () => {
