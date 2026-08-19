@@ -1,338 +1,259 @@
 # afteraction
 
-**Storm restoration after-action report builder.** After a major outage, a distribution utility owes
-its regulator and its board a report: what happened, when, how crews were mobilised, how quickly
-power came back, what consumers were told, and what the organisation learned. `afteraction` reads the
-event log, crew records and consumer-communication archive, and drafts that report **inside a
-SuperDocs document** — one targeted instruction per section, reviewed and approved by a person,
-exported for the board.
+**Storm restoration after-action report builder.**
 
-**SuperDocs does the editing. This tool decides what the document should say.** That line is the
-whole design: built *on* SuperDocs, never a version *of* it. There is no second review interface,
-because the document already is one.
+After a big outage, an electricity company owes its regulator a report. What happened, when, how crews responded, how fast power came back, what customers were told, what will be fixed next time.
+
+Today someone writes that by hand from three piles of records. It takes weeks.
+
+`afteraction` reads those records and drafts the report **inside a SuperDocs document** — one instruction per section, approved by a person, exported for the board.
+
+> **SuperDocs does the editing. This tool decides what the document should say.**
+> Built *on* SuperDocs, never a version *of* it. There is no second review screen, because the document already is one.
 
 Built for the SuperDocs Round 2 engineer task.
 
----
+![The drafted report — Observed in teal, Assessed in amber, every claim carrying its log entry](docs/screenshot-report.jpg)
 
-## What makes it defensible
-
-The assignment defines a strong build as one where *every timeline claim in the narrative is
-traceable to a log entry, and open actions genuinely carry forward across two consecutive event
-reports*. Both are properties this build tests rather than promises.
-
-**Every claim resolves to a log entry, and the pass says so in numbers.** The traceability check
-runs over the *exported document* — not the instructions that were sent, which would prove only
-that the tool can echo itself — and reports claims checked, traced and flagged.
-
-```
-storm-a   ok  26/26 claims traced (100%), 0 flagged     offline
-storm-b   ok  20/20 claims traced (100%), 0 flagged     offline
-storm-a   ok  29/29 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
-storm-b   ok  22/22 claims traced (100%), 0 flagged     LIVE against api.superdocs.app
-```
-
-The live runs are the same code path with `--live`: seven edit turns each, 309 and 228 seconds,
-every citation preserved by the model, a real Google-hosted curve image, and real Word `.docx` files
-whose `word/media/image1.png` is byte-identical to the curve this tool rendered.
-`docs/live-storm-a-report.docx` and `docs/live-storm-b-report.docx` are those files — and the second
-one is the carry-forward working over the wire, not just offline.
-
-**Every instruction promises "change nothing outside this section", and the run proves it.**
-The document is fingerprinted per section between turns, so an edit that moves a section it
-was not aimed at fails the run instead of passing quietly. Exports cost no operations, so the
-evidence is free:
-
-```
-ok  7 turns, every edit confined to its own section
-```
-
-It caught a real one on its first live failure. The curve turn put the chart into
-**Restoration Performance**, overwriting that section's figures, and left the Restoration Curve
-section holding its placeholder. The traceability pass called that "1 unsourced claim", which
-explains nothing; the fingerprint named it:
-
-```
-FAIL  8 turns, 1 unintended change(s)
-  [surgical] editing “6. Restoration Curve” also changed “4. Restoration Performance”
-```
-
-The fingerprint compares words, numbers and citations, and ignores two things that are not
-content: blank-line placement, which is how the exporter breathes, and the pre-signed
-signature on a hosted image URL, which is regenerated on every export and would otherwise
-flag the curve on every single turn.
-
-**Every defect found live had one root cause: an edit with more than one plausible place to
-land.** Five sections carried the identical paragraph *"Placeholder for observed statements."*, and
-*"Restoration Curve"* sits one word from *"Restoration Performance"*. Each placeholder now names
-its own section, and every section is named to the model exactly as its heading reads, number
-included — `heading_for()` in `sections.py` is the single source of that name, so an instruction
-and the document cannot drift apart. Three consecutive runs had needed a retry before that; the
-runs above needed none. Two tests hold the invariants: every instruction names its section with
-its number, and no two placeholders in the skeleton are identical.
-
-**Citations are not the only thing checked.** A run that scored a clean 28/28 had also grown a
-duplicate section heading, a line reading *"Please fill"*, and an invented report-date table — none
-of it looked at, because the traceability pass only reads the sections it recognises, and a model
-that invents a *new* heading can write anything underneath it. So the document's shape is checked
-too: every heading must be one the skeleton wrote, and no drafted section may still be holding its
-placeholder. A run with clean citations and a heading nobody asked for is reported as failed.
-
-A verifier that only ever says "clean" is worse than none, so the offline mock can be told to draft
-badly, and the suite proves each failure is caught:
-
-| The model does this | Verdict | Caught |
-|---|---|---|
-| Cites `EL-9999`, which does not exist | `phantom` | 25 of 26 claims flagged |
-| Cites `EL-0019`, real but never given to that section | `foreign` | 7 flagged |
-| Drops citations entirely | `unsourced` | run fails |
-| Reports an edit applied and changes nothing | — | section re-issued, run recovers |
-| Edits a section it was not aimed at | — | run fails, both sections named |
-
-**An edit that quietly does nothing is caught and re-issued.** A section's change was proposed,
-approved and reported applied, and the section kept its placeholder; the run reported success and the
-defect was only visible on opening the file. Exports cost nothing, so the document is now read back
-before it is called finished, and each unwritten section is re-issued once — bounded to one pass, so
-a second failure is reported rather than retried forever. It fired on three consecutive live runs
-and rescued each one; with the ambiguity above removed it now stays quiet, which is what a safety
-net should do. A section whose change a *person* rejected is never retried: that
-is a decision the gate exists to record, and overturning it silently would be worse than an empty
-section.
-
-**Two storms is the demo, not the limit.** `demo` runs whatever is in `data/`, ordered by when
-each storm started — nought, one, two or twenty. Adding a folder with an `event.json` is enough to
-include it; there is no list of names to keep in step. Ordering is by date rather than by folder
-name because a folder name is a naming convention and a start date is a fact: two events called
-`flood-2025` and `alpha-squall` sort one way alphabetically and the other way chronologically, and
-only one of those orders produces a correct register. Tested at nought, one and three events, the
-last deliberately named so that alphabetical order is the reverse of chronological.
-
-**Open actions carry across two storms.** Storm B's report opens Storm A's items with a status
-because it *read* them from a store, not because they were retyped:
-
-```
-LL-A1  open    Mutual-aid gang arrival times are not captured
-               raised in storm-a · reviewed again in storm-b · still not recorded
-LL-A2  closed  Time to first consumer notification exceeded the two-hour target
-               closed in storm-b: issued 38 minutes after the first outage, inside target
-LL-A3  open    Outage management system link was lost with no fallback capture
-               the link held this time, but the fallback procedure remains undeveloped
-```
-
-Storm A's report says *2 hours 41 minutes* to first notification; Storm B's says *38 minutes*. Both
-are arithmetic over the records, and the second is what closes LL-A2.
+> 📸 **Screenshot placeholder** — the interactive review gate, showing a proposed change before and after, with the approve/reject prompt.
 
 ---
 
-## Observed, assessed, and what the records do not show
+## Quick start
 
-A regulator has to be able to tell evidence from judgement at a glance, so the report is structured
-in three kinds of statement rather than being asked, in a prompt, to keep them apart:
-
-- **Observed** — traceable to a numbered log entry, and carries it: *"Consumers without supply peaked at
-  74,600, which is 21.8 per cent of the 342,000 consumers served, at 20:15 on 24 April [EL-0008]."*
-- **Assessed** — the team's judgement, marked as judgement, and structurally forbidden from citing a
-  log entry as though the records proved it: *"...met its restoration objective [assessed]."*
-- **What the records do not show** — the gaps, stated rather than quietly omitted, because a reader
-  cannot otherwise tell "did not happen" from "was not recorded".
-
-The synthetic corpus contains deliberate gaps so this has something real to report. Storm A surfaces
-four: a declared outage-management-system failure with no consumer counts for 3 hours 30 minutes, two
-mutual-aid gangs with no mobilisation time, and a press briefing that appears in the communications
-archive with no corresponding log entry.
-
-**No number in the report is written by a model.** Restoration percentages, consumer counts,
-durations and personnel-hours are computed in Python from the records and passed into the
-instruction; the model writes prose around figures it is handed. A hallucinated restoration
-percentage is structurally impossible rather than merely unlikely — and where the records cannot
-support the arithmetic, the figure is not produced at all: *"This figure covers 9 of 11 crews; the
-remaining 2 have incomplete records and are excluded."*
-
-## The restoration curve
-
-Rendered here and placed inside the document through the images endpoint. The line **breaks** across
-the window where counting was interrupted — drawing through it would assert a restoration trajectory
-nobody measured.
-
-![Restoration curve for the Kalbaisakhi squall](docs/restoration-curve.png)
-
-The gap is read from the log's own `counts_lost` / `counts_resumed` flags, never inferred from the
-spacing between readings. A quiet stretch overnight is a reporting cadence, not missing data, and
-guessing from spacing cannot tell the two apart — the utility already recorded which it was, so the
-tool reads that rather than second-guessing it.
-
-## The report is a designed document, and the design is a file
-
-A report a utility files with its commission has to look like one, so the skeleton uploaded at the
-start of a run is not bare markup. `src/afteraction/templates/report.html` holds the whole design —
-a masthead, a metadata block, the legend that tells a reader how to read the two kinds of statement,
-and a five-column carry-forward table with a coloured header and zebra striping. Open it in a browser
-and you see the report with its slots showing. Nothing else in the project contains a style
-attribute; `template.py` fills slots and adds no styling of its own.
-
-**Styling is inline because that is the kind SuperDocs keeps.** Measured before the template was
-written, by uploading the same document three ways and reading back what the service returned:
-
-| Sent as | Survives upload | Reaches the `.docx` |
-|---|---|---|
-| `<style>` block in `<head>` | no, dropped | no |
-| `style="…"` on the element | yes | yes |
-
-Inline declarations arrive as native Word formatting — `background-color` becomes `w:shd` cell
-shading, `border-bottom` becomes `w:tcBorders`, `padding` becomes `w:tcMar`, `font-family` becomes
-`w:rFonts`. A stylesheet would have looked right locally and arrived unstyled, which is a failure
-that shows up only in the exported file. The live Storm B export carries 23 teal headings, five
-amber *Assessed* headings, a teal table header and its striping through the AI edit and out the
-other side.
-
-That colour split is not decoration. **Observed** headings are teal, **Assessed** amber, and *What
-the records do not show* grey, so the distinction the whole build exists to protect is visible to a
-reader who is skimming rather than reading.
-
----
-
-## Run it
-
-Python 3.11+. From a fresh clone, no API key needed. With [uv](https://docs.astral.sh/uv/) it is one
-command — the virtualenv and the exact pinned dependencies in `uv.lock` are created for you:
+No API key needed. Nothing to configure.
 
 ```bash
 cd use-cases/s-banerjee94/afteraction
 
-uv run python -m afteraction demo    # both storms, offline, showing the carry-forward
-uv run pytest                        # 130 tests, no key, no network
+uv run python -m afteraction demo    # both storms, offline, a few seconds
+uv run pytest                        # 138 tests
 ```
 
-Without uv, the same thing in a virtualenv of your own:
+That is the whole setup. [uv](https://docs.astral.sh/uv/) builds the environment from `uv.lock` on first run.
+
+<details>
+<summary>Without uv</summary>
 
 ```bash
-python -m venv .venv && .venv/Scripts/activate    # .venv/bin/activate on macOS and Linux
+python -m venv .venv && .venv/Scripts/activate   # bin/activate on macOS and Linux
 pip install -e ".[dev]"
 python -m afteraction demo
-pytest
+```
+</details>
+
+---
+
+## What it produces
+
+Two storms, run in order. The second one **remembers** the first.
+
+```
+storm-a   ok  28/28 claims traced (100%)   0 inherited, 3 raised here
+storm-b   ok  22/22 claims traced (100%)   3 inherited (2 open, 1 closed), 1 raised here
 ```
 
-Commands below are written `uv run python -m afteraction …`. The module form is used rather than
-the bare `afteraction` console script because pip installs that script into a directory that is not
-always on `PATH`; drop `uv run` if you activated a virtualenv yourself.
+Files land in `out/<event>/` — a Word `.docx`, a Markdown copy, and the chart.
 
-Everything defaults to the offline mock. Running against the live API costs operations and is
-opt-in, because a tool that spends money by default spends it by accident:
+Finished examples are committed in `docs/`, so you can judge the output without running anything.
 
-```bash
-cp .env.example .env          # then set SUPERDOCS_API_KEY
-uv run python -m afteraction build storm-a --live --limit 3          # cap billable turns
-uv run python -m afteraction build storm-a --live --gate interactive # approve or reject each change
-```
+---
+
+## The two things it is graded on
+
+The assignment defines a strong build as one where:
+
+> every timeline claim is traceable to a log entry, and open actions genuinely carry forward across two consecutive event reports
+
+Both are **tested**, not promised.
+
+### 1. Every claim points at a real log entry
+
+- Each sentence carries a reference: `[EL-0008]`
+- A checker reads the **exported document** and resolves every one
+- It reports numbers: claims checked, traced, flagged
+- Checking the instructions we *sent* would prove nothing. Only the finished file counts.
+
+### 2. Lessons carry forward between storms
+
+Storm B opens Storm A's items with a status, because it **read** them:
+
+| Item | Status | Why |
+|---|---|---|
+| LL-A1 | open | crew arrival times still not recorded |
+| LL-A2 | **closed** | notification took 38 min, inside the two-hour target |
+| LL-A3 | open | link held, but the fallback procedure is still missing |
+
+Storm A reported *2 hours 41 minutes* to first notification. Storm B reported *38 minutes*. Both are arithmetic over the records, and the second is what closes LL-A2.
+
+---
+
+## Three kinds of statement, kept apart
+
+A regulator must tell **evidence** from **judgement** at a glance.
+
+| Kind | Meaning | Example |
+|---|---|---|
+| **Observed** | traceable to a log entry | *Consumers without supply peaked at 74,600 at 20:15 on 24 April* `[EL-0008]` |
+| **Assessed** | the team's judgement | *…met its restoration objective* `[assessed]` |
+| **Not recorded** | a stated gap | *Counting was interrupted for 3 h 30 m; the records do not support a figure inside it* |
+
+In the report they are colour-coded — teal, amber, grey — so a reader skimming can still tell them apart.
+
+This is structural, not a request in a prompt:
+
+- an **observed** claim cannot exist without a source
+- an **assessed** claim cannot carry a citation
+
+Breaking either is a crash when the object is built, not a bad report later.
+
+**No number is written by a model.** Percentages, counts and durations are computed in Python and handed over. The model writes prose around figures it is given, so a wrong restoration percentage is impossible rather than unlikely.
+
+---
+
+## Four checks that can fail a run
+
+A verifier that only ever says "clean" is worse than none. Each of these has caught a real defect on a live run.
+
+| Check | Catches |
+|---|---|
+| **Traceability** | a citation that does not resolve, or one the section was never given |
+| **Shape** | a heading the model invented, or a placeholder that never got filled |
+| **Surgical** | an edit that changed a section it was not aimed at |
+| **Retry** | an edit reported as applied that changed nothing — re-issued once |
+
+The offline mock can be told to misbehave, and the tests prove each failure is caught:
+
+| Mode | What the model does | Result |
+|---|---|---|
+| `phantom` | cites `EL-9999`, which does not exist | 25 of 26 claims flagged |
+| `foreign` | cites a real entry from another section | 7 flagged |
+| `unsourced` | drops citations entirely | run fails |
+
+---
+
+## The restoration curve
+
+Drawn here, then placed **inside** the document through the images endpoint.
+
+![The curve inside the finished document, with the counting gap marked and the caption carrying its citation](docs/screenshot-curve-in-document.jpg)
+
+The line **breaks** where counting stopped. Drawing through the gap would assert a recovery nobody measured.
+
+That gap is read from the log's own `counts_lost` and `counts_resumed` flags, never guessed from the spacing between readings. A quiet night is a reporting cadence, not missing data.
+
+---
+
+## The design is a file
+
+`src/afteraction/templates/report.html` holds the whole look — masthead, metadata block, colour-coded headings, the carry-forward table. Open it in a browser and you see the report with its slots showing.
+
+**Styling is inline, because that is what SuperDocs keeps:**
+
+| Sent as | Survives upload | Reaches the `.docx` |
+|---|---|---|
+| `<style>` block in the head | no, dropped | no |
+| `style="…"` on the element | yes | yes |
+
+Measured before the template was written, by uploading the same document three ways. Inline styles arrive as **native Word formatting** — `background-color` becomes cell shading, `border-bottom` becomes a cell border, `font-family` becomes the font.
+
+---
+
+## Commands
+
+Prefix each with `uv run python -m afteraction`.
 
 | Command | What it does |
 |---|---|
-| `uv run python -m afteraction demo` | Every event in `data/`, oldest first, so the carry-forward can be seen working |
-| `uv run python -m afteraction build <event>` | One event's report; `--live`, `--limit`, `--gate`, `--model-tier` |
-| `uv run python -m afteraction verify <event>` | Parse the records and show what they support, drafting nothing |
-| `uv run python -m afteraction lessons` | The register: what is open, what is closed, and where it closed |
-| `uv run python -m afteraction events` | The events with data on disk, oldest first |
+| `events` | List the storms with data on disk, oldest first |
+| `verify <event>` | Show what the records support. Drafts nothing, calls nothing. **Best place to start** |
+| `build <event>` | Draft one event's report |
+| `demo` | Run every event in order, from a cleared register |
+| `lessons` | Show the register: what is open, what is closed, and where |
 
-Outputs land in `out/<event>/`: the `.docx` and `.md` exports and the curve PNG. The carry-forward
-register is `state/lessons.json`, committed so the two-storm behaviour is visible in the diff.
+### Flags on `build`
+
+| Flag | What it does |
+|---|---|
+| *(none)* | offline mock — free, instant, the default |
+| `--live` | the real SuperDocs API. **Costs operations** |
+| `--limit 2` | stop after 2 edits. Use this on a first live run |
+| `--gate interactive` | **you** approve or reject each change, with reasons |
+| `--gate reject-all` | refuse everything, to prove rejection really works |
+| `--model-tier` | `core` (default), `turbo`, `pro`, `max` |
+
+```bash
+cp .env.example .env                                             # then set SUPERDOCS_API_KEY
+uv run python -m afteraction build storm-a --live --limit 2      # cheap first live run
+uv run python -m afteraction build storm-a --gate interactive    # approve changes yourself
+```
+
+Offline is the default everywhere. **A tool that spends money by default spends it by accident.**
+
+Adding a storm is a data change: drop a folder into `data/` with an `event.json` and the record files, and every command picks it up. Events are ordered by their start date, never by folder name.
+
+---
 
 ## SuperDocs features used
 
-| Feature | Where |
-|---|---|
-| **Upload** (`/v1/documents/upload-base64`) | The report skeleton, loaded as the editable document |
-| **Chat** (`/v1/chat/async`) | One instruction per section, carrying only that section's log lines |
-| **Approve** (`/v1/chat/{id}/approve`) | The human gate, item by item, with rejection carrying feedback back |
-| **Export** (`/v1/documents/export`) | `.docx` and `.md`; exports never cost operations |
-| **Images** (`/v1/documents/images/upload-base64`) | The restoration curve, placed inside the document |
-| **Multi-document / memory** | Two events sharing one carry-forward register |
+| Feature | Endpoint | Used for |
+|---|---|---|
+| **Upload** | `/v1/documents/upload-base64` | the styled report skeleton |
+| **Chat** | `/v1/chat/async` | one instruction per section |
+| **Approve** | `/v1/chat/{id}/approve` | the human gate, change by change |
+| **Export** | `/v1/documents/export` | `.docx` and `.md` — never costs operations |
+| **Images** | `/v1/documents/images/upload-base64` | the restoration curve |
+| **Memory** | — | two events sharing one register |
 
-**On approval: polling, not streaming.** The SSE path delivers proposed changes as a JSON string
-nested inside an already-JSON event, and missing that second parse is the documented reason
-integrators see empty diff cards. `GET /v1/jobs/{id}` returns `metadata.pending_changes` as real
-objects, so this build avoids the trap by construction rather than by remembering to parse twice.
-Being honest about it: that means I did not have to solve the double-parse, I sidestepped it.
+**On approval: polling, not streaming.** The SSE path sends proposed changes as a JSON string nested inside a JSON event, and missing that second parse is the documented reason integrators see empty diff cards. Polling `GET /v1/jobs/{id}` returns real objects instead. Being honest about it: I *avoided* the double-parse rather than solving it.
 
-## Capacity is a retry, not a failure
+**Capacity is a retry, not a failure.** A busy instance refuses with `503` and states *"No work was performed"*. That sentence is what makes an automatic retry safe — a retry cannot duplicate an edit that never happened. The client backs off, re-submits, and gives up after a bounded number of attempts.
 
-An instance that is already running its limit of concurrent AI requests refuses new ones — `/v1/chat`
-with a `503` carrying `retry_after_seconds`, and `/v1/chat/async` with a job that ends quickly
-instead of queueing. Both refusals state explicitly that no work was performed, and that sentence is
-what makes an automatic re-submit safe rather than reckless: a retry cannot duplicate an edit that
-never happened.
+---
 
-So the client backs off and re-submits rather than surfacing an error, and gives up only after a
-bounded number of attempts, reporting that no edit was applied. Both paths are tested against a
-stubbed transport in `tests/test_client.py`, including the case where a genuine failure must *not* be
-mistaken for a capacity refusal and silently retried.
+## Trade-offs, stated plainly
 
-## Decisions and trade-offs
+- **No database.** State is two data folders and one JSON file you can read in the pull request.
+- **No UI.** The document *is* the interface. A second review screen would rebuild the product this is built on.
+- **No agent framework.** The model work happens inside SuperDocs. Wrapping it in another agent earns nothing.
+- **Instructions are bounded per section.** A section only ever sees its own log lines, which is what makes "cited an entry from elsewhere" a real signal rather than a formality.
+- **Log notes are data, not orders.** Every instruction says that anything instruction-shaped in the source is quoted evidence, never a direction.
+- **Retries are one pass.** A section that fails twice is reported, not retried forever. Each retry costs money.
+- **Three pages, not two.** A4, narrow margins, lists where lists belong. Getting to two would mean dropping timeline entries — a content decision, not a formatting one.
 
-**No database, no agent framework, no UI.** State is two data folders and one JSON file a reviewer
-can open. The model work happens inside SuperDocs through `chat`, so orchestrating a second agent
-around it would add a layer that earns nothing.
+## Limits, honestly
 
-**Instructions are bounded per section.** A section is handed only its own log lines, which is what
-makes `foreign` a meaningful verdict instead of a formality — a section that was never given
-`EL-0019` has no way to cite it.
+- **Traceability checks citations, not meaning.** It proves a claim points at a real entry the section was given. It does not prove the sentence describes that entry correctly. That is what the human gate is for.
+- **Operations billed could not be confirmed.** The quota counter read `0/500` before and after full live runs. The tool reports what the API told it rather than guessing.
+- **All data is invented.** Barakar Valley Power Distribution Limited is fictional, as are its crews and customers. The geography around Asansol is real; the records are not.
+- **Sentence splitting is deliberately simple.** Good enough for bracketed citations in report prose. A cleverer tokeniser would add a dependency and a failure mode without changing a verdict.
+- **The lessons table is written by the tool, not the model.** A status is a matter of record, and asking a model to restate one is a way to lose one.
 
-**Source notes are quoted, never re-cased.** A timeline entry reads `At 03:40 on 25 April: <the note
-exactly as logged>`. The note is the record, and re-casing it to fit a lead-in would mangle proper
-nouns — altering the record is precisely what this report must not do.
-
-**Log notes are data, not orders.** Every instruction carries a guard telling the model that
-anything instruction-shaped in the source is quoted evidence, never a direction.
-
-## What it does not do
-
-- **Operations billed could not be confirmed.** The account's quota counter read `0/500` before and
-  after a full seven-turn live run. Either the free tier does not bill these edits or the counter
-  lags; the run reports what the API told it rather than guessing.
-- **The corpus is synthetic.** Barakar Valley Power Distribution Limited is invented, as are its
-  gangs and consumers. The geography (Asansol, Burnpur, Kulti, Raniganj, Jamuria, the Nunia canal
-  corridor) and the two event types — a pre-monsoon Kalbaisakhi squall and an August monsoon
-  depression — are real for Paschim Bardhaman; the records are not. Real outage data belongs to
-  somebody.
-- **Sentence splitting is deliberately simple.** Good enough for bracketed citations in report prose;
-  a cleverer tokeniser would add a dependency and a failure mode without changing a verdict.
-- **Traceability checks citations, not semantics.** It proves a claim points at a real log entry the
-  section was given. It does not prove the sentence characterises that entry correctly — that is what
-  the human gate is for.
-- **The lessons table is written by the tool, not the model.** Statuses are matters of record, and
-  asking a model to restate one is a way to lose one.
-- **The retry is one pass, not a loop.** A section that fails twice is reported, not re-issued
-  again. Each retry costs an operation, and a build that spends money in a loop to hide a failure
-  is worse than one that names it.
-- **Three pages, not two.** Page count is part of the deliverable, so the report is exported A4
-  with narrow margins, each section is asked for in the shape it actually is — a list where it is a
-  list, a short paragraph where it is not — and the curve is wide and short because a chart's
-  height is page space. Both reports land at three pages. Getting to two would mean dropping
-  timeline entries, and every entry currently there is a milestone a commission would ask about;
-  that is a content decision, not a formatting one.
+---
 
 ## Layout
 
 ```
-uv.lock         exact pinned versions, so a stranger's install matches this one
-pyproject.toml  dependencies and the `afteraction` entry point
+data/storm-a/       Kalbaisakhi squall, Apr 2026 — 32 log entries, 11 crews, 8 messages
+data/storm-b/       August monsoon depression, Aug 2026 — 22 log entries, 8 crews, 5 messages
+state/lessons.json  the carry-forward register, committed so you can see it working
+docs/               finished reports, to judge the output without running anything
+
 src/afteraction/
-  models.py     typed records; observed/assessed enforced at construction
-  corpus.py     load three record sets, cross-check every reference
-  facts.py      compute claims and gaps from the records
-  curve.py      the restoration curve, broken across declared gaps
-  sections.py   what each section may say and what shape it takes, one instruction each
-  template.py   fills the design's slots; holds no styling itself
-  templates/
-    report.html the report's design — every style attribute in the project lives here
-  surgical.py   proof that each edit stayed inside the section it was aimed at
-  trace.py      the traceability pass, and the document-shape check
-  lessons.py    the carry-forward store
-  client.py     the four SuperDocs calls
-  mock.py       offline stand-in, with drafting failure modes
-  pipeline.py   one event, end to end
-  cli.py        afteraction demo | build | verify | lessons | events
-data/storm-a/   Kalbaisakhi squall, 24-26 Apr 2026 — 32 log entries, 11 gangs, 8 communications
-data/storm-b/   August monsoon depression, 11-13 Aug 2026 — 22 log entries, 8 gangs, 5 communications
+  models.py         typed records; observed/assessed enforced at construction
+  corpus.py         load three record sets, cross-check every reference
+  facts.py          compute every claim and gap from the records
+  curve.py          the restoration curve, broken across declared gaps
+  sections.py       what each section may say, and its instruction
+  template.py       fills the design's slots; holds no styling itself
+  templates/        report.html — the design; every style attribute lives here
+  trace.py          traceability, plus the document-shape check
+  surgical.py       proof that each edit stayed inside its own section
+  lessons.py        the carry-forward store
+  client.py         the four SuperDocs calls
+  mock.py           offline stand-in, with drafting failure modes
+  pipeline.py       one event, end to end
+  cli.py            demo | build | verify | lessons | events
 ```
 
 MIT, as the repository. All data fabricated.

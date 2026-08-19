@@ -167,7 +167,7 @@ def run_event(
     operations_before = backend.operations_used()
 
     # --- upload the skeleton (not billable)
-    skeleton = S.skeleton_html(facts, carried)
+    skeleton = S.skeleton_html(facts, carried, mine)
     backend.upload_document(session_id, f"{event_id}-after-action.html", skeleton)
     note("upload", f"skeleton uploaded, {len(skeleton):,} bytes")
 
@@ -233,9 +233,14 @@ def run_event(
         edits += 1
 
     # --- lessons raised by this event
+    lessons_title = f"{len(SECTION_TITLES) + 2}. Lessons Learned"
     lessons_instruction = S.lessons_instruction(facts, mine, carried)
+    # An event that raised nothing needs no turn: the skeleton already states the absence,
+    # so the section is complete on upload rather than waiting for an edit.
+    lessons_done = not mine
     if lessons_instruction and (sections_limit is None or edits < sections_limit):
-        turn(lessons_instruction, f"{len(SECTION_TITLES) + 2}. Lessons Learned")
+        turn(lessons_instruction, lessons_title)
+        lessons_done = True
         edits += 1
 
     # --- an edit that was approved but did not land leaves the section untouched, and
@@ -243,7 +248,10 @@ def run_event(
     # hand from the last snapshot, so each unwritten section is re-issued once. Bounded
     # at one pass: a second failure is reported, not retried forever.
     check = backend.export(session_id, scratch, "markdown")
-    still_empty = unfilled(check.read_text(encoding="utf-8"), [numbered[k] for k in drafted])
+    still_empty = unfilled(
+        check.read_text(encoding="utf-8"),
+        [numbered[k] for k in drafted] + ([lessons_title] if lessons_done else []),
+    )
     check.unlink(missing_ok=True)
     # A section whose change a person rejected is empty *because they said so*. Re-issuing
     # it would quietly overturn the decision the gate exists to record, so a refusal ends
@@ -255,6 +263,20 @@ def run_event(
         note("retry", f"{SECTION_TITLES[key]} still holds its placeholder; re-issuing")
         turn(S.instruction_for(facts, key), numbered[key])
         edits += 1
+
+    # The lessons section gets the same treatment. It was left out of the first version of
+    # this and a live run promptly wrote the items *above* the heading rather than over the
+    # placeholder, leaving the placeholder in a report that traced 28 of 28 claims.
+    if lessons_done and lessons_instruction and lessons_title in still_empty:
+        if sections_limit is None or edits < sections_limit:
+            note("retry", "Lessons Learned still holds its placeholder; re-issuing")
+            turn(lessons_instruction, lessons_title)
+            stalled_lessons = True
+            edits += 1
+        else:
+            stalled_lessons = False
+    else:
+        stalled_lessons = False
 
     # --- export (free) then verify what was actually produced
     exports = {
@@ -280,7 +302,11 @@ def run_event(
     )
 
     # Citations inside known sections say nothing about content invented outside them.
-    drift = structural_drift(markdown, expected_headings(carried), [numbered[k] for k in drafted])
+    # The lessons section is checked alongside the numbered ones. It is the only section
+    # whose content can be legitimately absent — an event may raise nothing — and that is
+    # exactly why a placeholder surviving there once shipped unnoticed.
+    checked_sections = [numbered[k] for k in drafted] + ([lessons_title] if lessons_done else [])
+    drift = structural_drift(markdown, expected_headings(carried), checked_sections)
     for problem in drift:
         note("drift", problem)
 
@@ -297,7 +323,7 @@ def run_event(
         drift=drift,
         carry=counts,
         skipped=skipped,
-        retried=[SECTION_TITLES[k] for k in stalled],
+        retried=[SECTION_TITLES[k] for k in stalled] + (["Lessons Learned"] if stalled_lessons else []),
         surgical=surgical,
         seconds=time.monotonic() - started,
         operations=(

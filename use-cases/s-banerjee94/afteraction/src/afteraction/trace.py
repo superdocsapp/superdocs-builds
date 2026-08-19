@@ -43,13 +43,19 @@ _STRUCTURAL = re.compile(
     re.IGNORECASE,
 )
 
-# The sub-headings the skeleton writes inside a section. A model that repeats one as bold
-# body text below the real heading has added a label, not made a claim — scoring it would
-# report "**Observed**" as an unsourced assertion, which tells a reader nothing. It is
-# still content nobody asked for, so `structural_drift` reports it by name.
+# The sub-headings the skeleton writes inside a section. A model that repeats one as body
+# text below the real heading has added a label, not made a claim — scoring it would report
+# "Observed" as an unsourced assertion, which tells a reader nothing. It is still content
+# nobody asked for, so `structural_drift` reports it by name.
+#
+# Emphasis is optional on purpose. A live run repeated the same label twice in one
+# document, once as "**What the records do not show**" and once as a bare "Assessed", and
+# a pattern that insisted on the asterisks caught the first and scored the second as a
+# claim. A line whose entire content is one of four fixed label strings is structure
+# however it happens to be styled.
 _LABELS = ("Observed", "Assessed", "What the records do not show", "Raised by this event")
 _ECHOED_LABEL = re.compile(
-    r"^\s*[*_]{1,2}\s*(" + "|".join(re.escape(x) for x in _LABELS) + r")\s*:?\s*[*_]{1,2}\s*$",
+    r"^\s*[*_]{0,2}\s*(" + "|".join(re.escape(x) for x in _LABELS) + r")\s*:?\s*[*_]{0,2}\s*$",
     re.IGNORECASE,
 )
 

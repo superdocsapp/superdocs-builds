@@ -46,9 +46,13 @@ RULES = (
     "7. Write only the section named. Do not add a heading, a table, a date line, a note "
     "to the author, or any content of your own invention anywhere in the document.\n"
     "8. Leave every existing heading exactly as it is — same words, same capitalisation. "
-    "The labels below are labels for you, not text to copy into the document, and never "
-    "repeat a sub-heading’s name in bold underneath it."
+    "The labels below are labels for you, not text to copy into the document. Never "
+    "repeat a sub-heading’s name underneath it, in any styling — the heading is "
+    "already there."
 )
+
+# The one placeholder named directly in an instruction, so it must match the template.
+RAISED_PLACEHOLDER = "Placeholder for items raised by this event."
 
 # What shape each section should take. SuperDocs is an AI editor, not a text-replacement
 # pipe: it will judge form as well as write prose, so form is asked for rather than
@@ -66,7 +70,9 @@ FORM = {
 }
 
 
-def skeleton_html(facts: FactSet, inherited: list[Lesson]) -> str:
+def skeleton_html(
+    facts: FactSet, inherited: list[Lesson], raised: list[Lesson] | None = None
+) -> str:
     """The document that gets uploaded before any editing happens.
 
     Deliberately a skeleton of headings and short placeholders: uploading a document
@@ -100,7 +106,10 @@ def skeleton_html(facts: FactSet, inherited: list[Lesson]) -> str:
     if inherited:
         lessons.append(T.fill("carried_heading"))
         lessons.append(_lessons_table(inherited))
-    lessons.append(T.fill("raised_heading"))
+    # A placeholder is a promise that an edit is coming. When this event raised nothing
+    # there will be no such edit, so the skeleton states the absence instead — otherwise
+    # the finished report ships the word "Placeholder" and calls itself complete.
+    lessons.append(T.fill("raised_heading" if raised else "raised_none"))
     body.append(_section(len(SECTION_TITLES) + 2, "Lessons Learned", lessons))
 
     return T.fill(
@@ -258,9 +267,9 @@ def lessons_instruction(facts: FactSet, raised: list[Lesson], inherited: list[Le
         return None
     event = facts.corpus.event
     lines = [
-        f"In section “{heading_for('lessons')}”, under the sub-heading “Raised by this "
-        "event”, "
-        "replace the placeholder with one short paragraph per item below. Each item is a "
+        f"In section “{heading_for('lessons')}”, replace the single paragraph that reads "
+        f"“{RAISED_PLACEHOLDER}” with one short paragraph per item below. Write them in "
+        "place of that paragraph, not above the heading it sits under. Each item is a "
         "plain paragraph opening with its identifier — never a heading, never a table "
         "row, and never a bulleted list.",
         "",

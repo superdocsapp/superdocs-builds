@@ -199,6 +199,10 @@ run commands, and the SuperDocs features used. Pull request into `superdocsapp/s
   nought, one, three or twenty all work; only the two committed events happen to be two. Ordering
   is by the event's start date, never by folder name, because carry-forward is only meaningful in
   chronological order and a folder name is a naming convention rather than a fact.
+- **An event that raises nothing must still read as finished.** Zero is a valid answer, so the
+  skeleton states the absence rather than leaving a placeholder for an edit that will never
+  arrive, and an assessed judgement is only made about something that actually happened — an
+  event handled without mutual aid says nothing about the mutual-aid decision.
 - **Page count is a property of the deliverable.** A4, narrow margins, a wide and short curve.
   Three pages for both storms.
 - **"Change nothing outside this section" is measured, not asserted.** The document is

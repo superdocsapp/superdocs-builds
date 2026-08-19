@@ -63,10 +63,7 @@ def test_a_drafted_section_is_not_reported():
 
 
 def test_a_placeholder_in_a_later_section_is_not_blamed_on_an_earlier_one():
-    document = (
-        "## 1. Event Overview\n\nDrafted prose [EL-0003].\n\n"
-        "## 2. Timeline of Events\n\nPlaceholder for observed statements.\n"
-    )
+    document = '## 1. Event Overview\n\nDrafted prose [EL-0003].\n\n## 2. Timeline of Events\n\nPlaceholder for observed statements in it.\n'
     assert unfilled(document, ["1. Event Overview", "2. Timeline of Events"]) == [
         "2. Timeline of Events"
     ]
@@ -367,3 +364,105 @@ def test_three_events_all_run_and_the_register_accumulates(tmp_path):
 
     assert inherited_counts == [0, 1, 2]      # each report inherits everything before it
     assert len(load_store(store)) == 3
+
+
+# ------------------------------------------------------ an event that raised nothing
+
+# These use a synthetic event rather than a committed one: an event with no lessons files
+# and no mutual aid is a *case*, not a dataset, and the suite must not depend on a folder
+# that may or may not be on disk.
+
+
+def _quiet_event(tmp_path, name="quiet-storm"):
+    """An event with no lessons files at all and no mutual-aid crews."""
+    root = tmp_path / "data"
+    _event_folder(root, name, "2026-05-01")
+    (root / name / "lessons_opened.csv").unlink()
+    (root / name / "lesson_resolutions.csv").unlink()
+    return root, name
+
+
+def test_missing_lessons_files_mean_no_lessons_not_an_error(tmp_path):
+    root, name = _quiet_event(tmp_path)
+    result = run_event(
+        name, MockSuperDocs(), data_root=root,
+        store_path=tmp_path / "l.json", out_dir=tmp_path / "out",
+    )
+    assert result.ok
+    assert result.carry["raised_here"] == 0
+
+
+def test_an_event_that_raised_nothing_states_the_absence(tmp_path):
+    """Leaving the placeholder there shipped the word "Placeholder" in a report that
+    reported ok, because no edit was ever going to arrive for a section with nothing
+    to say."""
+    from afteraction.sections import skeleton_html
+
+    root, name = _quiet_event(tmp_path)
+    skeleton = skeleton_html(build_facts(load_corpus(name, root)), [], [])
+
+    assert "No new lessons-learned items were raised by this event." in skeleton
+    assert "Placeholder for items raised" not in skeleton
+
+
+def test_an_event_that_raised_something_keeps_the_placeholder_for_its_edit(tmp_path):
+    from afteraction.lessons import load_store
+    from afteraction.sections import skeleton_html
+
+    store = tmp_path / "l.json"
+    run_event("storm-a", MockSuperDocs(), store_path=store, out_dir=tmp_path / "a")
+    raised = load_store(store)
+
+    skeleton = skeleton_html(build_facts(load_corpus("storm-a")), [], raised)
+    assert "Placeholder for items raised" in skeleton
+
+
+def test_an_event_with_no_lessons_ships_no_placeholder(tmp_path):
+    root, name = _quiet_event(tmp_path)
+    result = run_event(
+        name, MockSuperDocs(), data_root=root,
+        store_path=tmp_path / "l.json", out_dir=tmp_path / "out",
+    )
+    assert result.drift == []
+    assert "Placeholder" not in result.exports["markdown"].read_text(encoding="utf-8")
+
+
+def test_the_lessons_section_is_covered_by_the_drift_check():
+    """It is the one section whose content can be legitimately absent, which is exactly
+    why a surviving placeholder there went unnoticed on a live run."""
+    document = '## 7. Lessons Learned\n\n### Raised by this event\n\nPlaceholder for items raised by this event.\n'
+    assert unfilled(document, ["7. Lessons Learned"]) == ["7. Lessons Learned"]
+
+
+def test_mutual_aid_is_only_judged_when_mutual_aid_happened(tmp_path):
+    """An event handled with its own gangs has nothing to say here. Asserting that aid
+    "was requested at an appropriate point" when none was requested is a false statement
+    about something that never happened — marked [assessed], but still false."""
+    from afteraction.facts import MOBILISATION
+    from afteraction.models import Kind
+
+    def assessed(event, root=None):
+        facts = build_facts(load_corpus(event, root))
+        return [c.text for c in facts.for_section(MOBILISATION) if c.kind is Kind.ASSESSED]
+
+    root, name = _quiet_event(tmp_path)
+    assert any("Mutual aid" in c for c in assessed("storm-a"))  # storm-a called for aid
+    assert assessed(name, root) == []                           # this one did not
+
+
+def test_a_repeated_label_is_recognised_in_any_styling():
+    """A live run repeated the same label twice in one document — once as
+    "**What the records do not show**" and once as a bare "Assessed". Insisting on the
+    asterisks caught the first and scored the second as an unsourced claim."""
+    from afteraction.trace import _ECHOED_LABEL
+
+    for styling in ("Observed", "**Observed**", "*Observed*", "_Observed_", "Observed:"):
+        assert _ECHOED_LABEL.match(styling), styling
+    assert not _ECHOED_LABEL.match("Observed outages began at 16:52 [EL-0004].")
+
+
+def test_a_plain_repeated_label_is_not_scored_as_a_claim():
+    facts = build_facts(load_corpus("storm-a"))
+    report = verify('Assessed\n\nThe squall reached Asansol [EL-0003].', facts, "timeline")
+    assert report.clean
+    assert report.checked == 1

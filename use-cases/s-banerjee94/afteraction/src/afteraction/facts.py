@@ -326,16 +326,21 @@ def _mobilisation(facts: FactSet) -> None:
             )
         )
 
-    n += 1
-    _claim(
-        facts,
-        MOBILISATION,
-        n,
-        Kind.ASSESSED,
-        "Mutual aid was requested at an appropriate point in the event, and earlier escalation "
-        "would not have materially shortened the restoration",
-        [],
-    )
+    # Only judge the mutual-aid decision when there was one to judge. An event the
+    # division handled with its own gangs has nothing to say here, and asserting that aid
+    # "was requested at an appropriate point" when none was requested is a false statement
+    # about something that did not happen — marked [assessed], but still false.
+    if aid:
+        n += 1
+        _claim(
+            facts,
+            MOBILISATION,
+            n,
+            Kind.ASSESSED,
+            "Mutual aid was requested at an appropriate point in the event, and earlier "
+            "escalation would not have materially shortened the restoration",
+            [],
+        )
 
 
 def _restoration(facts: FactSet) -> None:
