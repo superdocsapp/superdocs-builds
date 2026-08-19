@@ -8,6 +8,8 @@
 
 ## 📖 What We Built
 
+**🔴 Live Demo:** [View the rendered HTML here](https://task-2-architecture-build.vercel.app/)
+
 For this extra credit build, we developed **The AEC Construction Handover & Material Sync Pack** — a pre-flight audit framework designed specifically for Principal Architects and Technical Project Managers.
 
 ### Key Deliverables in this Directory:

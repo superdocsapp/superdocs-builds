@@ -9,6 +9,8 @@
 
 ## 📖 What We Built
 
+**🔴 Live Demo:** [View the rendered HTML here](https://task-2-assigned-build.vercel.app/)
+
 For this assigned build, we developed **The Pre-Submission Peer-Review & Manuscript Audit Dossier** — a comprehensive pre-flight verification system designed specifically for researchers, PIs, and technical authors submitting high-stakes manuscripts and grant proposals.
 
 ### Key Deliverables in this Directory:
