@@ -1,0 +1,22 @@
+[project]
+name = "trade-show-recap-batch"
+version = "0.1.0"
+description = "Batch-generate one tailored post-event recap document per trade-show lead"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "pydantic-settings>=2.3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.2"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

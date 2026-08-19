@@ -1,0 +1,7 @@
+lead_id,name,company,conversation_notes,interest,next_step
+L001,Priya Nair,Meridian Logistics,"Talked for 15 min at the booth about our document review turnaround. She was frustrated with their current 3-day manual contract review cycle.",AI-assisted contract review,Send case study on logistics vendor contracts by Friday
+L002,Tom Reyes,Blackwood Underwriting,"Brief chat, grabbed a brochure, said his team handles a lot of policy wording changes.",Policy document automation,Follow up with a demo link
+L003,Sarah Kim,,,,
+L004,David Okafor,Northstar Capital,"Deep conversation about their loan file review process — huge pain point around cross-checking amendments against original terms. Wants to see the conflict-detection feature specifically.",Loan document conflict detection,Schedule a technical demo with their ops lead next week
+L005,Elena Vasquez,Riverton Health Partners,,Clinical documentation,Send general product overview
+L006,James Whitfield,Cascade Materials Co.,"Stopped by twice — very engaged. Asked pointed questions about how the system handles a 200-page supply agreement with embedded amendments. Wants pricing for their procurement team of 40.",Enterprise contract management at scale,Introduce to sales for a pricing conversation this week
