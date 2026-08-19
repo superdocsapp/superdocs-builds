@@ -12,7 +12,7 @@ The extension keeps the SuperDocs workflow out of the user’s way:
 2. On the first click in a conversation, lists the user’s saved SuperDocs templates in an inline picker; it creates a conversation-scoped document from the selected template.
 3. On later clicks, appends the selected response to that same document and preserves the established template styling.
 4. Sends an async edit request and applies its changes automatically; the only in-progress signal is a revolving outline around the Add button.
-5. Keeps the completed HTML per conversation and exports it as DOCX from the in-chat control.
+5. Keeps the completed HTML per conversation for subsequent additions.
 
 ## Why a local bridge?
 
@@ -38,7 +38,6 @@ Requirements: Node 18+ and a SuperDocs API key. Saved SuperDocs templates are op
 4. Open a completed ChatGPT or Claude conversation. The extension adds an **Add** button just left of each assistant response.
 5. Click **Add** beside the first answer and choose a saved SuperDocs template in the small in-page menu.
 6. Later **Add** clicks append to the same conversation document without asking for the template again.
-7. Click **Export DOCX** beside a completed addition when you want to download the growing document.
 
 The extension toolbar icon opens settings only; the document workflow itself never uses a popup. The options page deliberately permits only `http://127.0.0.1:8787` in this first draft, avoiding the accidental transfer of document content to an arbitrary endpoint.
 
@@ -58,7 +57,6 @@ The tests are offline and cover rich-structure preservation in the document enve
 - Saved-template listing (`GET /v1/templates`)
 - Job polling (`GET /v1/jobs/{job_id}`)
 - Automatic change application (`approval_mode: "approve_all"`)
-- DOCX export (`POST /v1/documents/export`)
 
 ## Limitations / next steps
 

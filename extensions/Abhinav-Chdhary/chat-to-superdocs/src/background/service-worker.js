@@ -68,20 +68,8 @@ async function listTemplates() {
   return { templates: await bridge(state).listTemplates() };
 }
 
-async function exportConversation(sender) {
-  if (!sender.tab?.url) throw new Error("This action must originate from an AI chat tab.");
-  const state = await storedState();
-  const document = state.documents[conversationKey(sender.tab.url)];
-  if (!document) throw new Error("Add an answer before exporting this conversation document.");
-  const response = await bridge(state).exportDocument({ html: document.html, format: "docx", filename: "chat-to-superdocs.docx" });
-  const objectUrl = URL.createObjectURL(await response.blob());
-  await chrome.downloads.download({ url: objectUrl, filename: "chat-to-superdocs.docx", saveAs: true });
-  setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
-  return { state: "exported" };
-}
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  const handlers = { ADD_RESPONSE: () => addResponse(message, sender), LIST_TEMPLATES: () => listTemplates(), POLL_CONVERSATION: () => pollConversation(sender), EXPORT_CONVERSATION: () => exportConversation(sender) };
+  const handlers = { ADD_RESPONSE: () => addResponse(message, sender), LIST_TEMPLATES: () => listTemplates(), POLL_CONVERSATION: () => pollConversation(sender) };
   if (!handlers[message?.type]) return;
   handlers[message.type]().then((result) => sendResponse({ ok: true, ...result })).catch((error) => sendResponse({ ok: false, error: error instanceof Error ? error.message : "Extension action failed." }));
   return true;

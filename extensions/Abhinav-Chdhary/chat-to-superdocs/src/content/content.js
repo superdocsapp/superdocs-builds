@@ -78,23 +78,11 @@ async function chooser(button, response) {
 }
 
 async function addResponse(button, response, template) {
-  removeChooser(button); button.disabled = true; setLoading(button, true);
+  removeChooser(button); button.disabled = true; setComplete(button, false); setLoading(button, true);
   try {
     await send({ type: "ADD_RESPONSE", html: sanitizeAnswer(response), template });
     button.setAttribute("aria-label", "Adding to doc"); schedulePoll(button);
   } catch (error) { button.disabled = false; setLoading(button, false); statusFor(button, error.message, "error"); }
-}
-
-function exportAction(button) {
-  let exportButton = button.parentElement.querySelector(":scope > .cts-export");
-  if (exportButton) return;
-  exportButton = document.createElement("button"); exportButton.type = "button"; exportButton.className = "cts-export"; exportButton.textContent = "Export DOCX";
-  exportButton.addEventListener("click", async () => {
-    exportButton.disabled = true;
-    try { await send({ type: "EXPORT_CONVERSATION" }); }
-    catch (error) { exportButton.disabled = false; statusFor(button, error.message, "error"); }
-  });
-  button.parentElement.append(exportButton);
 }
 
 function schedulePoll(button) {
@@ -103,7 +91,11 @@ function schedulePoll(button) {
     try {
       const result = await send({ type: "POLL_CONVERSATION" });
       if (result.state === "processing") { schedulePoll(button); return; }
-      if (result.state === "complete") { button.disabled = false; setLoading(button, false); button.setAttribute("aria-label", "Add to doc"); exportAction(button); return; }
+      if (result.state === "complete") {
+        button.disabled = false; setLoading(button, false); setComplete(button, true); button.setAttribute("aria-label", "Added to doc");
+        window.setTimeout(() => { setComplete(button, false); button.setAttribute("aria-label", "Add to doc"); }, 700);
+        return;
+      }
     } catch (error) { button.disabled = false; setLoading(button, false); statusFor(button, error.message, "error"); }
   }, 900);
 }
@@ -113,6 +105,10 @@ function setLoading(button, isLoading) {
   button.setAttribute("aria-busy", String(isLoading));
 }
 
+function setComplete(button, isComplete) {
+  button.toggleAttribute("data-complete", isComplete);
+}
+
 function attachControl(response) {
   if (response.dataset.ctsAttached === "true") return;
   response.dataset.ctsAttached = "true";
@@ -120,7 +116,7 @@ function attachControl(response) {
   if (getComputedStyle(block).position === "static") block.style.position = "relative";
   const rail = document.createElement("span"); rail.className = "cts-rail";
   const button = document.createElement("button"); button.type = "button"; button.className = "cts-add"; button.title = "Add to doc"; button.setAttribute("aria-label", "Add to doc");
-  button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>';
+  button.innerHTML = '<svg class="cts-plus" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg><svg class="cts-check" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12 4.5 4.5L19 7"/></svg>';
   button.addEventListener("click", async (event) => {
     event.preventDefault(); event.stopPropagation();
     try {
@@ -138,14 +134,14 @@ function injectStyles() {
   const style = document.createElement("style"); style.id = "chat-to-superdocs-styles";
   style.textContent = `
     .cts-rail { position:absolute; left:-42px; top:0; z-index:3; display:flex; flex-direction:column; align-items:flex-start; gap:6px; font-family:ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
-    .cts-add,.cts-export,.cts-chooser button { border:1px solid #b9c7df; border-radius:999px; background:#f8fbff; color:#18315d; cursor:pointer; font:600 11px/1 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; letter-spacing:.01em; padding:6px 9px; box-shadow:0 1px 2px #162a4b1c; }
-    .cts-add { position:relative; display:grid; place-items:center; width:27px; height:27px; padding:0; border-color:#f97766; background:#f97766; color:#fff; } .cts-add svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:2.2; } .cts-add[data-loading]::after { content:""; position:absolute; inset:-5px; border:2px solid #f97766; border-right-color:transparent; border-radius:50%; animation:cts-spin .75s linear infinite; }
-    .cts-add:hover { background:#df5e50; border-color:#df5e50; transform:translate(1px,-1px); } .cts-export:hover,.cts-chooser button:hover { background:#18315d; border-color:#18315d; color:#fff; } .cts-add:focus-visible,.cts-export:focus-visible,.cts-chooser button:focus-visible { outline:3px solid #e6a56b; outline-offset:2px; }
+    .cts-add,.cts-chooser button { border:1px solid #b9c7df; border-radius:999px; background:#f8fbff; color:#18315d; cursor:pointer; font:600 11px/1 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; letter-spacing:.01em; padding:6px 9px; box-shadow:0 1px 2px #162a4b1c; }
+    .cts-add { position:relative; display:grid; place-items:center; width:27px; height:27px; padding:0; border-color:#f97766; background:#f97766; color:#fff; } .cts-add svg { position:absolute; width:15px; height:15px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:2.2; transition:opacity .16s ease, transform .16s ease; } .cts-add .cts-check { opacity:0; transform:scale(.7); } .cts-add[data-complete] .cts-plus { opacity:0; transform:scale(.7) rotate(45deg); } .cts-add[data-complete] .cts-check { opacity:1; transform:scale(1); } .cts-add[data-loading]::after { content:""; position:absolute; inset:-5px; border:2px solid #f97766; border-right-color:transparent; border-radius:50%; animation:cts-spin .75s linear infinite; }
+    .cts-add:hover { background:#df5e50; border-color:#df5e50; } .cts-chooser button:hover { background:#18315d; border-color:#18315d; color:#fff; } .cts-add:focus-visible,.cts-chooser button:focus-visible { outline:3px solid #e6a56b; outline-offset:2px; }
     .cts-status { display:block; width:190px; color:#526176; font:500 11px/1.3 ui-rounded, "SF Pro Rounded", system-ui, sans-serif; } .cts-status.success { color:#1d6b52; } .cts-status.error { color:#a2362c; }
     .cts-chooser { position:absolute; left:0; top:30px; z-index:99999; width:240px; padding:11px; border:1px solid #b9c7df; border-radius:12px; background:#f8fbff; box-shadow:0 12px 28px #162a4b2b; color:#18315d; font-family:ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
     .cts-chooser p { margin:0 0 8px; font-size:11px; font-weight:650; } .cts-chooser button { display:block; width:100%; margin-top:5px; text-align:left; } .cts-template-note { display:block; color:#526176; font-size:11px; line-height:1.35; }
     @keyframes cts-spin { to { transform:rotate(360deg); } }
-    @media (prefers-reduced-motion: reduce) { .cts-add[data-loading]::after { animation:none; border-right-color:#f97766; } .cts-add,.cts-export,.cts-chooser button { transition:none; } }
+    @media (prefers-reduced-motion: reduce) { .cts-add[data-loading]::after { animation:none; border-right-color:#f97766; } .cts-add svg,.cts-chooser button { transition:none; } }
   `;
   document.head.append(style);
 }
