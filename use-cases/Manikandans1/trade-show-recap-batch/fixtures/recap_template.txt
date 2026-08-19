@@ -1,0 +1,26 @@
+SUPERDOCS · POST-EVENT FOLLOW-UP
+
+Prepared for: {{internal_owner}}
+Event: {{event_name}}
+Lead: {{lead_name}}, {{lead_company}}
+
+—
+
+WHAT WE DISCUSSED
+
+{{discussion_section}}
+
+WHAT WE PROMISED
+
+{{promised_section}}
+
+NEXT STEP
+
+{{next_step_section}}
+
+—
+
+This recap was generated from booth notes taken at {{event_name}}. If any
+section above reads as general rather than specific to this
+conversation, that means no notes were recorded for that part of the
+conversation — nothing here has been invented to fill a gap.
