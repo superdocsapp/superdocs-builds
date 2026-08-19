@@ -5,13 +5,14 @@ import { BridgeClient, decisionsFromForm, finalHtml, jobState, normalizeTemplate
 
 test("creates a styled document without flattening structured captured HTML", () => {
   const captured = "<h2>Plan</h2><ul><li>One<ul><li>Nested</li></ul></li></ul><table><tr><th>A</th></tr></table><pre><code>const x = 1;</code></pre><span data-latex=\"x^2\">x²</span>";
-  const document = createDocument({ title: "Weekly update", capturedHtml: captured });
-  for (const fragment of ["<h1>Weekly update</h1>", "<ul>", "<table>", "<pre><code>", "data-latex=\"x^2\""]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  const document = createDocument({ capturedHtml: captured });
+  for (const fragment of ["<ul>", "<table>", "<pre><code>", "data-latex=\"x^2\""]) assert.match(document, new RegExp(fragment.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  assert.doesNotMatch(document, /<h1>/);
 });
 
-test("append instruction protects existing content and applies changes automatically", () => {
-  assert.match(appendInstruction(), /Do not rewrite earlier content/);
-  assert.match(appendInstruction(), /Apply the changes automatically/);
+test("append instruction preserves the existing document exactly", () => {
+  assert.match(appendInstruction(), /Keep the supplied document HTML exactly unchanged/);
+  assert.match(appendInstruction(), /do not add a title/i);
 });
 
 test("appends captured markup without flattening the existing conversation document", () => {
@@ -28,11 +29,13 @@ test("uses a saved SuperDocs template rather than an extension-owned template", 
   const template = { id: "tpl_brand", name: "Acme branded memo" };
   assert.match(createInstruction(template), /Acme branded memo/);
   assert.match(createInstruction(template), /tpl_brand/);
+  assert.match(createInstruction(template), /do not add a title/i);
+  assert.doesNotMatch(createInstruction(template), /polished document section/i);
   assert.deepEqual(normalizeTemplateList({ templates: [template] }), [template]);
 });
 
 test("creates a clean blank document when no saved template is available", () => {
-  assert.match(createInstruction(null), /without a saved template/);
+  assert.match(createInstruction(null), /Do not apply any additional styling/);
 });
 
 test("sends the extension identity to the local bridge when Origin is unavailable", async () => {

@@ -14,12 +14,13 @@
   "permissions": ["storage"],
   "host_permissions": [
     "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
     "https://claude.ai/*",
     "http://127.0.0.1:8787/*"
   ],
   "content_scripts": [
     {
-      "matches": ["https://chatgpt.com/*", "https://claude.ai/*"],
+      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*", "https://claude.ai/*"],
       "js": ["src/content/content.js"],
       "run_at": "document_idle"
     }

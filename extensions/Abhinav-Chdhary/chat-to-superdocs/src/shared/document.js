@@ -8,9 +8,8 @@ export function escapeHtml(value) {
   })[character]);
 }
 
-export function createDocument({ title, capturedHtml }) {
-  const safeTitle = escapeHtml(title.trim() || "AI chat");
-  return `<!doctype html><html><body><h1>${safeTitle}</h1><section data-chat-to-superdocs-capture="true">${capturedHtml}</section></body></html>`;
+export function createDocument({ capturedHtml }) {
+  return `<!doctype html><html><body><section data-chat-to-superdocs-capture="true">${capturedHtml}</section></body></html>`;
 }
 
 export function appendCapturedResponse(documentHtml, capturedHtml) {
@@ -26,14 +25,14 @@ export function conversationKey(url) {
 }
 
 export function appendInstruction() {
-  return "The newly captured answer is already present in the final section marked data-chat-to-superdocs-capture. Preserve its headings, nested lists, tables, code blocks, and math exactly. Apply the document's existing styling to that section only. Do not rewrite earlier content. Apply the changes automatically.";
+  return "The newly captured answer is already present in the final section marked data-chat-to-superdocs-capture. Keep the supplied document HTML exactly unchanged: do not add a title, heading, label, summary, prefix, or any other text. Preserve headings, nested lists, tables, code blocks, and math exactly.";
 }
 
 export function createInstruction(template) {
   const styling = template
-    ? `Use my saved SuperDocs template named "${template.name}" (template ID: ${template.id}) as the document's styling source.`
-    : "Use clean, consistent document styling without a saved template.";
-  return `${styling} The captured answer is in the section marked data-chat-to-superdocs-capture. Turn it into a polished document section. Preserve headings, nested lists, tables, code blocks, and math exactly. Apply the changes automatically.`;
+    ? `If possible without changing document content, apply only the non-content visual styling from my saved SuperDocs template named "${template.name}" (template ID: ${template.id}).`
+    : "Do not apply any additional styling beyond the supplied document HTML.";
+  return `${styling} Keep the supplied document HTML exactly unchanged: do not add a title, heading, label, summary, prefix, or any other text. Preserve headings, nested lists, tables, code blocks, and math exactly.`;
 }
 
 export function newSessionId() {

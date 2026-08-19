@@ -1,7 +1,8 @@
 const RESPONSE_SELECTORS = {
   "chatgpt.com": ["[data-message-author-role='assistant']"],
-  "claude.ai": ["[data-is-streaming='false'] .standard-markdown", ".standard-markdown"],
-  default: ["[data-message-author-role='assistant']", ".model-response-text", ".assistant-message", ".response-content", "article .markdown", ".standard-markdown"],
+  "chat.openai.com": ["[data-message-author-role='assistant']"],
+  "claude.ai": ["[data-is-streaming='false'] .standard-markdown", ".font-claude-response", "[data-testid='assistant-message']", ".standard-markdown"],
+  default: ["[data-message-author-role='assistant']", ".font-claude-response", ".model-response-text", ".assistant-message", ".response-content", "article .markdown", ".standard-markdown"],
 };
 
 let pollTimer = null;

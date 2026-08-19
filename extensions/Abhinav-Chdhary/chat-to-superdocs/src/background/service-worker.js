@@ -9,10 +9,6 @@ function bridge(state) {
   return new BridgeClient(state.bridgeUrl, chrome.runtime.id);
 }
 
-function documentTitle(url) {
-  return `${new URL(url).hostname.replace(/^www\./, "")} chat`;
-}
-
 async function addResponse(message, sender) {
   if (!sender.tab?.url) throw new Error("This action must originate from an AI chat tab.");
   const key = conversationKey(sender.tab.url);
@@ -22,7 +18,7 @@ async function addResponse(message, sender) {
   const sessionId = existing?.sessionId ?? newSessionId();
   const documentHtml = existing
     ? appendCapturedResponse(existing.html, message.html)
-    : createDocument({ title: documentTitle(sender.tab.url), capturedHtml: message.html });
+    : createDocument({ capturedHtml: message.html });
   const started = await bridge(state).startJob({
     session_id: sessionId,
     document_html: documentHtml,
