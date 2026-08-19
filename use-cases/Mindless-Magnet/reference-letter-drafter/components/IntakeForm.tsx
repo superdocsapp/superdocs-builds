@@ -34,7 +34,13 @@ function emptyEvidence(): EvidenceItem {
   return { claim: "", evidence: "" };
 }
 
-export function IntakeForm({ onSubmit }: { onSubmit: (intake: Intake) => void }) {
+export function IntakeForm({
+  onSubmit,
+  disabled = false,
+}: {
+  onSubmit: (intake: Intake) => void;
+  disabled?: boolean;
+}) {
   const [writerName, setWriterName] = useState("");
   const [writerEmail, setWriterEmail] = useState("");
   const [writerRole, setWriterRole] = useState("");
@@ -265,7 +271,7 @@ export function IntakeForm({ onSubmit }: { onSubmit: (intake: Intake) => void })
         </CardContent>
       </Card>
 
-      <Button type="submit" size="lg" disabled={!canSubmit}>
+      <Button type="submit" size="lg" disabled={!canSubmit || disabled}>
         Draft letter
       </Button>
     </form>

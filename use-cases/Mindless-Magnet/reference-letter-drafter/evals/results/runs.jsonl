@@ -1,0 +1,16 @@
+{"caseId":"strong-01","declaredBand":"strong","inferredBand":"strong","lexiconFindings":0,"arm":"baseline","letterChars":2796,"ms":30763,"replicate":0}
+{"caseId":"strong-02","declaredBand":"strong","inferredBand":"strong","lexiconFindings":0,"arm":"baseline","letterChars":1877,"ms":28773,"replicate":0}
+{"caseId":"solid-01","declaredBand":"solid","inferredBand":"solid","lexiconFindings":0,"arm":"baseline","letterChars":1358,"ms":32971,"replicate":0}
+{"caseId":"solid-02","declaredBand":"solid","inferredBand":"solid","lexiconFindings":0,"arm":"baseline","letterChars":1940,"ms":23024,"replicate":0}
+{"caseId":"mixed-01","declaredBand":"mixed","inferredBand":"mixed","lexiconFindings":2,"arm":"baseline","letterChars":1716,"ms":34302,"replicate":0}
+{"caseId":"mixed-02","declaredBand":"mixed","inferredBand":"mixed","lexiconFindings":1,"arm":"baseline","letterChars":2257,"ms":41861,"replicate":0}
+{"caseId":"reluctant-01","declaredBand":"reluctant","inferredBand":null,"lexiconFindings":1,"arm":"baseline","letterChars":1634,"ms":27297,"replicate":0}
+{"caseId":"reluctant-02","declaredBand":"reluctant","inferredBand":"mixed","lexiconFindings":0,"arm":"baseline","letterChars":1171,"ms":20050,"replicate":0}
+{"caseId":"strong-01","declaredBand":"strong","inferredBand":"strong","lexiconFindings":0,"arm":"audited","letterChars":2334,"ms":23041,"replicate":0}
+{"caseId":"strong-02","declaredBand":"strong","inferredBand":"strong","lexiconFindings":0,"arm":"audited","letterChars":1873,"ms":24984,"replicate":0}
+{"caseId":"solid-01","declaredBand":"solid","inferredBand":"solid","lexiconFindings":0,"arm":"audited","letterChars":2177,"ms":36863,"replicate":0}
+{"caseId":"solid-02","declaredBand":"solid","inferredBand":"solid","lexiconFindings":0,"arm":"audited","letterChars":1780,"ms":25397,"replicate":0}
+{"caseId":"mixed-01","declaredBand":"mixed","inferredBand":"mixed","lexiconFindings":1,"arm":"audited","letterChars":2273,"ms":38603,"replicate":0}
+{"caseId":"mixed-02","declaredBand":"mixed","inferredBand":"mixed","lexiconFindings":0,"arm":"audited","letterChars":2412,"ms":32353,"replicate":0}
+{"caseId":"reluctant-01","declaredBand":"reluctant","inferredBand":"reluctant","lexiconFindings":0,"arm":"audited","letterChars":1405,"ms":24991,"replicate":0}
+{"caseId":"reluctant-02","declaredBand":"reluctant","inferredBand":"reluctant","lexiconFindings":1,"arm":"audited","letterChars":1651,"ms":31979,"replicate":0}

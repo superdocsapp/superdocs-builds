@@ -1,18 +1,23 @@
 {
   "name": "reference-letter-drafter",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "eval": "tsx --env-file=.env.local evals/run.ts",
+    "eval:dry": "tsx --env-file=.env.local evals/run.ts --dry-run",
+    "verify": "npm run typecheck && npm run test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.101.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "dompurify": "^3.4.13",
     "lucide-react": "^1.32.0",
     "next": "16.3.1",
     "radix-ui": "^1.6.7",
@@ -26,13 +31,14 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/dompurify": "^3.0.5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.19.2",
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   }
 }

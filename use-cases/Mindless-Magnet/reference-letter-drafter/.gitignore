@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Eval outputs are COMMITTED on purpose: raw data behind any reported number.
+# Nothing here is ignored. This note exists so nobody adds it later.

@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { uploadStarterDocument } from "@/lib/superdocs";
+import { errorResponse } from "@/lib/server/respond";
 
 export async function POST() {
   const sessionId = `ref-letter-${crypto.randomUUID()}`;
   try {
     const upload = await uploadStarterDocument(sessionId);
-    return NextResponse.json({ sessionId, upload });
+    return NextResponse.json({ sessionId, chunks: upload.chunks_count });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Failed to start session" },
-      { status: 502 },
-    );
+    return errorResponse(err, "Starting a document session");
   }
 }
