@@ -4,6 +4,10 @@ Created by **Abhinav Choudhary**.
 
 Chat to SuperDocs is a Chrome/Chromium extension for people who are tired of pasting AI answers into documents and repairing the formatting. It puts a small **Add** button to the left of every AI response's first readable block. One click turns that response into structured content in a growing SuperDocs document for the current chat.
 
+## Demo
+
+[Watch the walkthrough on YouTube](https://youtu.be/xb09PTm0PME)
+
 It keeps headings, nested lists, tables, code blocks, and maths intact. It does not invent a title, heading, summary, or “polished version” label. On the first answer, it lists templates saved in the user’s SuperDocs account alongside a blank-document option; if none exist, it creates a clean blank document immediately. Every later answer in the same conversation inherits the chosen styling.
 
 The extension keeps the SuperDocs workflow out of the user’s way:
