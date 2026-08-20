@@ -116,3 +116,18 @@ export interface ApplyReviewResponse {
 export interface ApiError {
     detail: string;
 }
+
+export interface DecisionResponse {
+    review_id: string;
+    finding_id: string;
+    decision: "approve" | "reject";
+    review_status: ReviewStatus;
+    remaining_findings: number;
+}
+
+export interface ApplyResponse {
+    review_id: string;
+    status: "applied";
+    applied: boolean;
+    chat_response: unknown;
+}

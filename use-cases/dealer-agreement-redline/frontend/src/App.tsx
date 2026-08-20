@@ -10,14 +10,14 @@ import {
 
 import type { AnalyzeResponse, RedlineReview } from "./types/redline";
 
+import ActionBar from "./components/ActionBar";
 import EmptyState from "./components/EmptyState";
 import FindingList from "./components/FindingList";
 import Header from "./components/Header";
 import LoadingState from "./components/LoadingState";
-import ReviewSummary from "./components/ReviewSummary";
-import ActionBar from "./components/ActionBar";
-import StatusBadge from "./components/StatusBadge";
 import ReviewProgress from "./components/ReviewProgress";
+import ReviewSummary from "./components/ReviewSummary";
+import StatusBadge from "./components/StatusBadge";
 import SuccessMessage from "./components/SuccessMessage";
 
 function App() {
@@ -31,32 +31,45 @@ function App() {
         string | null
     >(null);
 
-    const [error, setError] = useState<string | null>(null);
-
     const [applying, setApplying] = useState(false);
 
     const [exporting, setExporting] = useState(false);
 
+    const [error, setError] = useState<string | null>(null);
+
     const [success, setSuccess] = useState<string | null>(null);
 
-    async function handleStartReview() {
+    async function handleAnalyze(
+        dealerFile: File,
+        masterFile: File,
+        playbookFile: File,
+    ) {
         setLoading(true);
         setError(null);
         setSuccess(null);
 
         try {
-            const result = await analyzeRedline();
+            const result = await analyzeRedline(
+                dealerFile,
+                masterFile,
+                playbookFile,
+            );
 
             setAnalysis(result);
 
             const reviewResult = await getRedlineReview(result.review_id);
 
             setReview(reviewResult);
+
             setSuccess("Agreement analysis completed successfully.");
         } catch (err) {
             console.error(err);
 
-            setError("Failed to analyze the agreement.");
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to analyze the agreement.",
+            );
         } finally {
             setLoading(false);
         }
@@ -72,6 +85,7 @@ function App() {
 
         setProcessingFindingId(findingId);
         setError(null);
+        setSuccess(null);
 
         try {
             const result = await decideFinding(
@@ -98,6 +112,7 @@ function App() {
                     ),
                 };
             });
+
             setSuccess(
                 decision === "approve"
                     ? "Finding approved successfully."
@@ -106,7 +121,11 @@ function App() {
         } catch (err) {
             console.error(err);
 
-            setError("Failed to save the finding decision.");
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to save the finding decision.",
+            );
         } finally {
             setProcessingFindingId(null);
         }
@@ -123,6 +142,7 @@ function App() {
 
         setApplying(true);
         setError(null);
+        setSuccess(null);
 
         try {
             const result = await applyReview(review.review_id);
@@ -137,11 +157,16 @@ function App() {
                     status: result.status,
                 };
             });
+
             setSuccess("Approved changes have been applied successfully.");
         } catch (err) {
             console.error(err);
 
-            setError("Failed to apply the approved changes.");
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to apply the approved changes.",
+            );
         } finally {
             setApplying(false);
         }
@@ -158,6 +183,7 @@ function App() {
 
         setExporting(true);
         setError(null);
+        setSuccess(null);
 
         try {
             const blob = await exportReview(review.review_id);
@@ -181,23 +207,32 @@ function App() {
         } catch (err) {
             console.error(err);
 
-            setError("Failed to export the document.");
+            setError(
+                err instanceof Error
+                    ? err.message
+                    : "Failed to export the document.",
+            );
         } finally {
             setExporting(false);
         }
     }
 
+    const reviewedCount =
+        review?.findings.filter((finding) => finding.decision !== "pending")
+            .length ?? 0;
+
     return (
         <div className="min-h-screen bg-slate-50">
-            <Header loading={loading} onStartReview={handleStartReview} />
+            <Header />
 
-            <main className="mx-auto max-w-7xl px-6 py-8">
+            <main className="mx-auto max-w-7xl px-6 pb-32 pt-24">
                 {success && (
                     <SuccessMessage
                         message={success}
                         onDismiss={() => setSuccess(null)}
                     />
                 )}
+
                 {error && (
                     <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         {error}
@@ -205,7 +240,7 @@ function App() {
                 )}
 
                 {!analysis && !loading && (
-                    <EmptyState onStartReview={handleStartReview} />
+                    <EmptyState loading={loading} onAnalyze={handleAnalyze} />
                 )}
 
                 {loading && <LoadingState />}
@@ -213,7 +248,7 @@ function App() {
                 {analysis && review && !loading && (
                     <div className="space-y-8">
                         <section>
-                            <div className="flex items-end justify-between">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <p className="text-sm font-medium text-slate-500">
                                         Review
@@ -232,11 +267,7 @@ function App() {
 
                         <ReviewProgress
                             total={review.findings.length}
-                            reviewed={
-                                review.findings.filter(
-                                    (finding) => finding.decision !== "pending",
-                                ).length
-                            }
+                            reviewed={reviewedCount}
                         />
 
                         <FindingList

@@ -1,7 +1,15 @@
+import shutil
 import uuid
 from pathlib import Path
+from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    UploadFile,
+)
 from fastapi.responses import Response
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -31,112 +39,185 @@ router = APIRouter(
 )
 
 
-TEST_DATA = (
-    Path(__file__).resolve().parents[3]
-    / "test-data"
+UPLOAD_DIR = (
+    Path(__file__).resolve().parents[2]
+    / "uploads"
 )
+
+
+ALLOWED_EXTENSIONS = {
+    ".docx",
+}
 
 
 class FindingDecisionRequest(BaseModel):
     decision: str
 
 
+def validate_docx_file(
+    file: UploadFile,
+    field_name: str,
+) -> None:
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{field_name} is required.",
+        )
+
+    extension = Path(
+        file.filename
+    ).suffix.lower()
+
+    if extension not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"{field_name} must be a DOCX file."
+            ),
+        )
+
+
+async def save_upload(
+    file: UploadFile,
+    destination: Path,
+) -> None:
+    destination.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    with destination.open("wb") as output:
+        shutil.copyfileobj(
+            file.file,
+            output,
+        )
+
+
 @router.post("/analyze")
 async def analyze_redline(
+    dealer_file: UploadFile = File(...),
+    master_file: UploadFile = File(...),
+    playbook_file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Run the complete dealer agreement redline analysis.
+    Analyze uploaded dealer, master, and playbook
+    documents.
 
-    Flow:
-        1. Create a SuperDocs session.
-        2. Upload dealer agreement as active document.
-        3. Upload master agreement as reference attachment.
-        4. Upload negotiation playbook as reference attachment.
-        5. Analyze the agreements locally.
-        6. Persist the review and findings.
-        7. Return the review and SuperDocs session IDs.
+    The dealer agreement is also loaded into a
+    SuperDocs session so that the same session can
+    later be used for applying approved redlines
+    and exporting the updated document.
     """
 
-    master_file = (
-        TEST_DATA / "master-agreement.docx"
-    )
+    # --------------------------------------------------
+    # Validate uploaded files
+    # --------------------------------------------------
 
-    dealer_file = (
-        TEST_DATA / "dealer-agreement.docx"
-    )
-
-    playbook_file = (
-        TEST_DATA / "negotiation-playbook.docx"
-    )
-
-    for file in (
-        master_file,
+    validate_docx_file(
         dealer_file,
+        "dealer_file",
+    )
+
+    validate_docx_file(
+        master_file,
+        "master_file",
+    )
+
+    validate_docx_file(
         playbook_file,
-    ):
-        if not file.exists():
-            raise HTTPException(
-                status_code=404,
-                detail=f"File not found: {file}",
-            )
+        "playbook_file",
+    )
 
-    client = SuperDocsClient()
+    # --------------------------------------------------
+    # Create temporary upload directory
+    # --------------------------------------------------
 
-    # One session is used for the entire workflow.
-    session_id = str(uuid.uuid4())
+    request_id = uuid.uuid4()
+
+    request_upload_dir = (
+        UPLOAD_DIR / str(request_id)
+    )
+
+    dealer_path = (
+        request_upload_dir
+        / "dealer-agreement.docx"
+    )
+
+    master_path = (
+        request_upload_dir
+        / "master-agreement.docx"
+    )
+
+    playbook_path = (
+        request_upload_dir
+        / "negotiation-playbook.docx"
+    )
 
     try:
         # --------------------------------------------------
-        # 1. Upload dealer agreement as active document.
+        # Save uploaded documents temporarily
         # --------------------------------------------------
 
-        dealer_document = (
-            await client.upload_document(
-                file_path=dealer_file,
-                session_id=session_id,
-            )
+        await save_upload(
+            dealer_file,
+            dealer_path,
+        )
+
+        await save_upload(
+            master_file,
+            master_path,
+        )
+
+        await save_upload(
+            playbook_file,
+            playbook_path,
         )
 
         # --------------------------------------------------
-        # 2. Upload master agreement as reference.
-        # --------------------------------------------------
-
-        master_attachment = (
-            await client.upload_attachment(
-                file_path=master_file,
-                session_id=session_id,
-            )
-        )
-
-        # --------------------------------------------------
-        # 3. Upload negotiation playbook as reference.
-        # --------------------------------------------------
-
-        playbook_attachment = (
-            await client.upload_attachment(
-                file_path=playbook_file,
-                session_id=session_id,
-            )
-        )
-
-        # --------------------------------------------------
-        # 4. Run local redline analysis.
+        # Analyze documents locally
         # --------------------------------------------------
 
         analysis = analyze_agreements(
-            master_path=master_file,
-            dealer_path=dealer_file,
-            playbook_path=playbook_file,
+            master_path=master_path,
+            dealer_path=dealer_path,
+            playbook_path=playbook_path,
         )
 
         # --------------------------------------------------
-        # 5. Persist review.
+        # Create one SuperDocs session for this review
+        # --------------------------------------------------
+
+        session_id = str(uuid.uuid4())
+
+        client = SuperDocsClient()
+
+        # --------------------------------------------------
+        # Load dealer agreement into SuperDocs
         #
-        # IMPORTANT:
-        # Save the SAME SuperDocs session ID.
-        # This allows /apply to operate on the document
-        # that was actually uploaded above.
+        # This is important because the same session is
+        # later used by apply and export.
+        # --------------------------------------------------
+
+        try:
+            dealer_document = (
+                await client.upload_document(
+                    file_path=dealer_path,
+                    session_id=session_id,
+                )
+            )
+
+        except SuperDocsError as exc:
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    "SuperDocs document upload failed: "
+                    f"{exc}"
+                ),
+            )
+
+        # --------------------------------------------------
+        # Create database review
         # --------------------------------------------------
 
         review = await create_redline_review(
@@ -145,20 +226,19 @@ async def analyze_redline(
             analysis=analysis,
         )
 
+        # --------------------------------------------------
+        # Return analysis + SuperDocs document information
+        # --------------------------------------------------
+
         return {
             "review_id": str(review.id),
             "session_id": session_id,
             "dealer_document": dealer_document,
-            "master_attachment": master_attachment,
-            "playbook_attachment": playbook_attachment,
             **analysis,
         }
 
-    except SuperDocsError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=str(exc),
-        )
+    except HTTPException:
+        raise
 
     except Exception as exc:
         raise HTTPException(
@@ -166,16 +246,22 @@ async def analyze_redline(
             detail=str(exc),
         )
 
+    finally:
+        # --------------------------------------------------
+        # Delete temporary uploaded files
+        # --------------------------------------------------
+
+        shutil.rmtree(
+            request_upload_dir,
+            ignore_errors=True,
+        )
+
 
 @router.get("/reviews/{review_id}")
 async def get_redline_review(
-    review_id: uuid.UUID,
+    review_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Get a redline review and all of its findings.
-    """
-
     result = await db.execute(
         select(RedlineReview).where(
             RedlineReview.id == review_id
@@ -228,26 +314,16 @@ async def get_redline_review(
     "/reviews/{review_id}/findings/{finding_id}/decision"
 )
 async def decide_redline_finding(
-    review_id: uuid.UUID,
-    finding_id: uuid.UUID,
+    review_id: UUID,
+    finding_id: UUID,
     payload: FindingDecisionRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Approve or reject an individual redline finding.
-
-    A finding can only be decided once.
-    Decisions cannot be changed after the review
-    has been completed or applied.
-    """
-
     # --------------------------------------------------
-    # Normalize the decision.
+    # Validate decision
     # --------------------------------------------------
 
-    decision = payload.decision.strip().lower()
-
-    if decision not in {
+    if payload.decision not in {
         "approve",
         "reject",
     }:
@@ -260,7 +336,7 @@ async def decide_redline_finding(
         )
 
     # --------------------------------------------------
-    # Verify review exists.
+    # Verify review exists
     # --------------------------------------------------
 
     result = await db.execute(
@@ -278,23 +354,7 @@ async def decide_redline_finding(
         )
 
     # --------------------------------------------------
-    # Prevent decisions after review completion.
-    # --------------------------------------------------
-
-    if review.status in {
-        "completed",
-        "applied",
-    }:
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                "This review has already been "
-                "completed."
-            ),
-        )
-
-    # --------------------------------------------------
-    # Find the requested finding.
+    # Find finding
     # --------------------------------------------------
 
     result = await db.execute(
@@ -313,7 +373,7 @@ async def decide_redline_finding(
         )
 
     # --------------------------------------------------
-    # Prevent changing an already-reviewed finding.
+    # Prevent duplicate decisions
     # --------------------------------------------------
 
     if finding.decision != "pending":
@@ -325,10 +385,10 @@ async def decide_redline_finding(
             ),
         )
 
-    finding.decision = decision
+    finding.decision = payload.decision
 
     # --------------------------------------------------
-    # Check whether findings remain.
+    # Check remaining pending findings
     # --------------------------------------------------
 
     result = await db.execute(
@@ -361,18 +421,11 @@ async def decide_redline_finding(
     "/reviews/{review_id}/apply"
 )
 async def apply_review(
-    review_id: uuid.UUID,
+    review_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Apply human-approved redlines to the active
-    SuperDocs document.
-
-    All findings must have been reviewed first.
-    """
-
     # --------------------------------------------------
-    # Get review.
+    # Get review
     # --------------------------------------------------
 
     result = await db.execute(
@@ -390,17 +443,19 @@ async def apply_review(
         )
 
     # --------------------------------------------------
-    # Prevent applying the same review twice.
+    # Prevent duplicate apply
     # --------------------------------------------------
 
     if review.status == "applied":
         raise HTTPException(
             status_code=409,
-            detail="This review has already been applied.",
+            detail=(
+                "This review has already been applied."
+            ),
         )
 
     # --------------------------------------------------
-    # Make sure every finding has a decision.
+    # Make sure all findings were reviewed
     # --------------------------------------------------
 
     result = await db.execute(
@@ -422,7 +477,7 @@ async def apply_review(
         )
 
     # --------------------------------------------------
-    # Load all findings.
+    # Load findings
     # --------------------------------------------------
 
     result = await db.execute(
@@ -448,10 +503,7 @@ async def apply_review(
     ]
 
     # --------------------------------------------------
-    # Apply approved findings to SuperDocs.
-    #
-    # apply_approved_redlines() filters out findings
-    # whose decision is not "approve".
+    # Apply approved redlines in SuperDocs
     # --------------------------------------------------
 
     client = SuperDocsClient()
@@ -463,17 +515,15 @@ async def apply_review(
             findings=finding_data,
         )
 
-    except SuperDocsError as exc:
-        raise HTTPException(
-            status_code=502,
-            detail=str(exc),
-        )
-
     except Exception as exc:
         raise HTTPException(
             status_code=502,
             detail=f"SuperDocs error: {exc}",
         )
+
+    # --------------------------------------------------
+    # Mark review as applied
+    # --------------------------------------------------
 
     review.status = "applied"
 
@@ -481,22 +531,21 @@ async def apply_review(
 
     return {
         "review_id": str(review_id),
-        "session_id": review.session_id,
         "status": review.status,
         **result,
     }
 
 
-@router.get(
+@router.post(
     "/reviews/{review_id}/export"
 )
 async def export_review(
-    review_id: uuid.UUID,
+    review_id: UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Export the applied dealer agreement as DOCX.
-    """
+    # --------------------------------------------------
+    # Get review
+    # --------------------------------------------------
 
     result = await db.execute(
         select(RedlineReview).where(
@@ -513,7 +562,7 @@ async def export_review(
         )
 
     # --------------------------------------------------
-    # Export is only allowed after apply.
+    # Export only after apply
     # --------------------------------------------------
 
     if review.status != "applied":
@@ -521,28 +570,53 @@ async def export_review(
             status_code=409,
             detail=(
                 "The review must be applied "
-                "before exporting."
+                "before it can be exported."
             ),
         )
 
+    # --------------------------------------------------
+    # Export updated document from SuperDocs
+    #
+    # The review.session_id is the same session used
+    # during /analyze to load the dealer document.
+    # --------------------------------------------------
+
     client = SuperDocsClient()
 
-    filename = "dealer-agreement-redlined.docx"
+    filename = (
+        "dealer-agreement-redlined.docx"
+    )
 
     try:
-        document = await client.export_document(
-            session_id=review.session_id,
-            filename=filename,
+        document_bytes = (
+            await client.export_document(
+                session_id=review.session_id,
+                filename=filename,
+            )
         )
 
     except SuperDocsError as exc:
         raise HTTPException(
             status_code=502,
-            detail=str(exc),
+            detail=(
+                f"SuperDocs export failed: {exc}"
+            ),
         )
 
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                f"SuperDocs export failed: {exc}"
+            ),
+        )
+
+    # --------------------------------------------------
+    # Return DOCX
+    # --------------------------------------------------
+
     return Response(
-        content=document,
+        content=document_bytes,
         media_type=(
             "application/vnd.openxmlformats-"
             "officedocument.wordprocessingml.document"
