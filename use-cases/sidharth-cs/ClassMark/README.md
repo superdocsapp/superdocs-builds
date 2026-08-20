@@ -7,7 +7,7 @@ Classroom submission** via `studentSubmissions.modifyAttachments`, returns the
 submission, and verifies the result.
 
 Task 2B of the SuperDocs Full-Stack AI Engineer assignment. Self-contained —
-nothing here imports from the sibling `app/` (Task 1) or `zoom-app/` (Task 2A)
+nothing here imports from the author's other task builds
 projects; both stay untouched.
 
 Built as a demonstration of the real integration loop, not a production LMS.
@@ -17,9 +17,6 @@ Built by **Sidharth CS** for the SuperDocs Full-Stack AI Engineer task.
 **SuperDocs features used:** document upload (`upload-base64`), async review
 (`chat/async`) with native `ask_every_time` human-in-the-loop, batch approval
 (`change_id` contract), and export (`documents/export`, DOCX).
-
-<!-- TODO before opening the PR: add a screenshot of the review screen here,
-     e.g. ![Classmark review screen](docs/screenshot.png) -->
 
 ---
 
@@ -482,7 +479,7 @@ Classroom.
   expired after the server restarted. Start a new review." instead of
   pretending the workflow is still live.
 - In-memory state: a backend restart clears auth tokens and in-progress
-  workflows (teacher re-authenticates). Same decision zoom-app and Task 1
+  workflows (teacher re-authenticates). Same decision the author's other builds
   make.
 - The submission picker lists all submissions; the app requires a Drive
   file attachment and fails honestly otherwise (e.g. a `link` or
@@ -540,7 +537,7 @@ Demo" assignment, `demo/student-essay.docx` submitted by the student, and
 | Identity by stored IDs, guarded | Same-submission correctness is the core invariant; nothing is inferred from filenames. |
 | In-memory workflow registry | Matches the repo's established pattern; stated limitation. |
 | Batch approval via the `change_id` contract | The current official schema `{job_id, approved, changes: [{change_id, approved}]}` — live-verified to advance `awaiting_approval -> completed`. The old per-chunk shape is not used; a stuck job enters BLOCKED honestly. |
-| Single origin, no CORS | Same as Task 1 and zoom-app. |
+| Single origin, no CORS | Consistent with the author's other task builds. |
 
 ## 27. API references
 
@@ -642,6 +639,6 @@ now been **executed and verified**. Nothing in it remains unexecuted.
 
 ## 28. Attribution
 
-Built for the **SuperDocs Full-Stack AI Engineer task** — Task 2B, Google
-Classroom feedback add-on. Independent sibling implementation; Task 1
-(`app/`) and Task 2A (`zoom-app/`) remain untouched and unreferenced.
+Built by **Sidharth C S** for the **SuperDocs Full-Stack AI Engineer task** —
+the assigned S2 build, a Google Classroom feedback add-on. Self-contained:
+it imports nothing from the author's other task builds.
