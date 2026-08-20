@@ -18,6 +18,21 @@ Built by **Sidharth CS** for the SuperDocs Full-Stack AI Engineer task.
 (`chat/async`) with native `ask_every_time` human-in-the-loop, batch approval
 (`change_id` contract), and export (`documents/export`, DOCX).
 
+## Screenshots — a real submission through the full loop
+
+| | |
+|---|---|
+| **1. Configure the review** | **2. Teacher review (native HITL)** |
+| ![Configure review](docs/01-configure-review.png) | ![Teacher review](docs/02-teacher-review.png) |
+| **3. Export + upload to Drive** | **4. Attach + return to student** |
+| ![Export and upload](docs/03-export-upload.png) | ![Attach and return](docs/04-attach-return.png) |
+| **5. Post-return verification — all three checks pass** | |
+| ![Verified](docs/05-verified.png) | |
+
+Real run: 6 proposed changes, 1 correctly flagged as a no-op and excluded from
+the count, 4 approved, 1 rejected — `4 approved · 1 rejected` carried through
+to the final screen, all three post-return checks green.
+
 ---
 
 ## 1. What it solves
