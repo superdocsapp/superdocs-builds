@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, WorkspaceOut, fileToBase64 } from "@/lib/api";
-import { IconLayers, IconPlus, IconArrowRight, IconUpload, IconX, IconClipboard } from "./icons";
+import { IconLayers, IconPlus, IconArrowRight, IconUpload, IconX, IconClipboard, IconTrash } from "./icons";
 import { ProgressOverlay, useStagedProgress } from "./ProgressOverlay";
 
 type ProcedureDraft = { id: string; title: string; file: File | null };
@@ -44,6 +44,7 @@ export default function HomePage() {
   const [packName, setPackName] = useState("");
   const [groups, setGroups] = useState<PolicyGroupDraft[]>([emptyGroup()]);
   const [creating, setCreating] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const progressUI = useStagedProgress();
 
   useEffect(() => {
@@ -150,6 +151,28 @@ export default function HomePage() {
       setCreating(false);
     }
   };
+
+  async function handleDeleteWorkspace(e: React.MouseEvent, ws: WorkspaceOut) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (
+      !window.confirm(
+        `Delete "${ws.pack_name}" (${ws.organization_name})? This permanently removes every policy, procedure, reference, proposed change, finding, and report in this workspace. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setDeletingId(ws.id);
+    setError(null);
+    try {
+      await api.deleteWorkspace(ws.id);
+      setWorkspaces((prev) => (prev ? prev.filter((w) => w.id !== ws.id) : prev));
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <div>
@@ -264,6 +287,14 @@ export default function HomePage() {
             </div>
             <div className="row" style={{ gap: 12 }}>
               <span className={`badge ${ws.status === "ready" ? "synced" : ws.status === "needs_attention" ? "stale" : "procedure"}`}>{ws.status}</span>
+              <button
+                className="icon-btn-remove"
+                onClick={(e) => handleDeleteWorkspace(e, ws)}
+                disabled={deletingId === ws.id}
+                title="Delete compliance pack"
+              >
+                <IconTrash size={14} />
+              </button>
               <IconArrowRight size={16} />
             </div>
           </div>

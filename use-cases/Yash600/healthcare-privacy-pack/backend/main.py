@@ -1119,6 +1119,16 @@ def _delete_document_cascade(s: Session, doc: models.Document) -> dict:
         if v is not None:
             s.delete(v)
 
+    # None of Section/DocumentVersion/AnalysisJob declare an ORM
+    # Relationship() back to Document (every FK in this schema is a plain
+    # column, not a relationship -- see models.py), so SQLAlchemy has no
+    # dependency info to auto-order their deletes against the document's
+    # own delete when both are queued in the same flush, and can emit
+    # DELETE FROM document first -- a real FK violation on Postgres.
+    # Flushing here forces steps 10-14 to hit the DB before the document
+    # delete below is even queued.
+    s.flush()
+
     # 15. the document itself
     doc_id, doc_title, doc_type = doc.id, doc.title, doc.doc_type
     s.delete(doc)
@@ -1173,6 +1183,106 @@ def delete_document(document_id: str):
         )
 
         return result
+
+
+@app.delete("/workspaces/{workspace_id}")
+def delete_workspace(workspace_id: str):
+    """
+    Permanently deletes an entire compliance workspace: every document
+    (reusing _delete_document_cascade() per document, via delete_document()
+    above, so versions/sections/snapshots/references/proposed changes/
+    findings/update requests are all removed exactly the same way a
+    single-document delete removes them) plus everything left at the
+    workspace level once no document remains to anchor it -- analysis runs,
+    validation runs (and their check-result rows), reports, export records,
+    and the change-log itself. Irreversible.
+
+    Deletes every PROCEDURE before any POLICY: delete_document() refuses to
+    delete a policy that still has procedures grouped under it (a guard
+    that exists for the single-document delete UX, and stays correct here
+    too -- it just means a full wipe has to respect the same order).
+
+    ExportRecord.report_id is a foreign key into Report, so export records
+    are removed before reports. None of the tables in models.py declare an
+    ORM Relationship() back to Workspace (every workspace_id here is a
+    plain FK column, not a relationship) -- unlike a table that does have
+    one, SQLAlchemy has no dependency info to auto-order these deletes, so
+    every step below is explicit and flushed before the workspace row
+    itself is queued for deletion.
+    """
+    with Session(db.get_engine()) as s:
+        ws = s.get(models.Workspace, workspace_id)
+        if ws is None:
+            raise HTTPException(404, "workspace not found")
+        workspace_name = ws.organization_name
+
+        docs = s.exec(select(models.Document).where(models.Document.workspace_id == workspace_id)).all()
+        procedure_ids = [d.id for d in docs if d.doc_type == models.DocType.PROCEDURE]
+        policy_ids = [d.id for d in docs if d.doc_type == models.DocType.POLICY]
+
+    # delete_document() opens and commits its own Session per call (same as
+    # calling the real DELETE /documents/{id} endpoint once per document).
+    for doc_id in procedure_ids:
+        delete_document(doc_id)
+    for doc_id in policy_ids:
+        delete_document(doc_id)
+
+    with Session(db.get_engine()) as s:
+        # Each layer below is flushed before the next starts. None of these
+        # tables declare an ORM Relationship() to their parent (every FK in
+        # this schema -- AnalysisJob.run_id, ValidationCheckResult.
+        # validation_run_id, ExportRecord.report_id -- is a plain column,
+        # not a relationship), so within a single flush SQLAlchemy has no
+        # dependency info and can emit the parent's DELETE before the
+        # child's, hitting a real FK violation on Postgres (and, once
+        # autoflush fires on the next query in this same function, even
+        # against SQLite with foreign_keys=ON). Explicit flushes make the
+        # child rows hit the DB before their parent is even queued.
+        run_ids = [r.id for r in s.exec(select(models.AnalysisRun).where(models.AnalysisRun.workspace_id == workspace_id)).all()]
+        if run_ids:
+            for job in s.exec(select(models.AnalysisJob).where(models.AnalysisJob.run_id.in_(run_ids))).all():
+                s.delete(job)
+            s.flush()
+        for run in s.exec(select(models.AnalysisRun).where(models.AnalysisRun.workspace_id == workspace_id)).all():
+            s.delete(run)
+        s.flush()
+
+        # ExportRecord.report_id and Report.validation_run_id are both
+        # foreign keys (into Report and ValidationRun respectively), so
+        # exports are removed before reports, and reports before
+        # validation runs -- Report sits in the *middle* of that chain, not
+        # at either end.
+        for exp in s.exec(select(models.ExportRecord).where(models.ExportRecord.workspace_id == workspace_id)).all():
+            s.delete(exp)
+        s.flush()
+
+        for rep in s.exec(select(models.Report).where(models.Report.workspace_id == workspace_id)).all():
+            s.delete(rep)
+        s.flush()
+
+        vr_ids = [v.id for v in s.exec(select(models.ValidationRun).where(models.ValidationRun.workspace_id == workspace_id)).all()]
+        if vr_ids:
+            for vcr in s.exec(select(models.ValidationCheckResult).where(models.ValidationCheckResult.validation_run_id.in_(vr_ids))).all():
+                s.delete(vcr)
+            s.flush()
+        for vr in s.exec(select(models.ValidationRun).where(models.ValidationRun.workspace_id == workspace_id)).all():
+            s.delete(vr)
+        s.flush()
+
+        for ev in s.exec(select(models.ChangeEvent).where(models.ChangeEvent.workspace_id == workspace_id)).all():
+            s.delete(ev)
+        s.flush()
+
+        ws = s.get(models.Workspace, workspace_id)
+        s.delete(ws)
+        s.commit()
+
+    return {
+        "status": "deleted",
+        "workspace_id": workspace_id,
+        "workspace_name": workspace_name,
+        "deleted_documents": len(procedure_ids) + len(policy_ids),
+    }
 
 
 # ============================================================================

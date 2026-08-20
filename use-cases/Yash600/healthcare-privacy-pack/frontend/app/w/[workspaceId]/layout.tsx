@@ -293,6 +293,7 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const workspaceId = String(params.workspaceId);
   const [workspace, setWorkspace] = useState<WorkspaceOut | null>(null);
+  const [deletingWorkspace, setDeletingWorkspace] = useState(false);
 
   useEffect(() => {
     api
@@ -300,6 +301,25 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
       .then(setWorkspace)
       .catch(() => {});
   }, [workspaceId]);
+
+  async function handleDeleteWorkspace() {
+    if (!workspace) return;
+    if (
+      !window.confirm(
+        `Delete "${workspace.pack_name}" (${workspace.organization_name})? This permanently removes every policy, procedure, reference, proposed change, finding, and report in this workspace. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setDeletingWorkspace(true);
+    try {
+      await api.deleteWorkspace(workspaceId);
+      router.push("/");
+    } catch (e) {
+      alert(String(e));
+      setDeletingWorkspace(false);
+    }
+  }
 
   const docsHref = `/w/${workspaceId}`;
   const analyzeHref = `/w/${workspaceId}/analyze`;
@@ -310,8 +330,20 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
     <div className="app-shell">
       <aside className="app-sidebar glass">
         <div className="app-sidebar-heading">
-          <div className="name">{workspace?.pack_name || "Workspace"}</div>
-          <div className="org">{workspace?.organization_name || " "}</div>
+          <div className="row between" style={{ alignItems: "flex-start" }}>
+            <div>
+              <div className="name">{workspace?.pack_name || "Workspace"}</div>
+              <div className="org">{workspace?.organization_name || " "}</div>
+            </div>
+            <button
+              className="icon-btn-remove"
+              onClick={handleDeleteWorkspace}
+              disabled={deletingWorkspace || !workspace}
+              title="Delete compliance pack"
+            >
+              <IconTrash size={14} />
+            </button>
+          </div>
         </div>
 
         <div className="sidebar-nav-item" onClick={() => router.push("/")}>

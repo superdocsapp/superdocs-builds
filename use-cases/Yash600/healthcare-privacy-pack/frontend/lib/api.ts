@@ -190,6 +190,11 @@ export const api = {
     }),
   listWorkspaces: () => request<WorkspaceOut[]>("/workspaces"),
   getWorkspace: (id: string) => request<WorkspaceOut>(`/workspaces/${id}`),
+  deleteWorkspace: (id: string) =>
+    request<{ status: string; workspace_id: string; workspace_name: string; deleted_documents: number }>(
+      `/workspaces/${id}`,
+      { method: "DELETE" }
+    ),
 
   // -- documents -- upload is the only ingestion path, always human-triggered --
   uploadDocument: (workspaceId: string, params: {

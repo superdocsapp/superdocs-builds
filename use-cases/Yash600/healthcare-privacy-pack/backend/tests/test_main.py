@@ -13,8 +13,9 @@ from __future__ import annotations
 import base64
 
 import pytest
+from sqlalchemy import event
 from sqlalchemy.pool import StaticPool
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, SQLModel, create_engine, select
 
 import db
 import main
@@ -46,6 +47,17 @@ def engine():
     # across threads/connections rather than each connection getting its
     # own (default) private in-memory database.
     eng = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+
+    # SQLite doesn't enforce foreign keys unless told to, per-connection --
+    # real Postgres (what this app runs against in prod) always does.
+    # Turning this on catches FK-violation bugs (deleting a row something
+    # else still points at) here in tests instead of in production.
+    @event.listens_for(eng, "connect")
+    def _enable_sqlite_fk(dbapi_connection, _):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     SQLModel.metadata.create_all(eng)
     return eng
 
@@ -439,6 +451,61 @@ def test_delete_policy_with_no_procedures_preserves_audit_log(fake_client, fake_
 
     assert any(e["event_type"] == models.ChangeEventType.DOCUMENT_DELETED for e in events_after)
     assert main.list_workspace_documents(workspace_id) == []
+
+
+def test_delete_workspace_cascades_everything(fake_client, fake_llm):
+    """Full-depth regression test: build a workspace all the way through
+    analyze -> validate -> report (so AnalysisRun/AnalysisJob, ValidationRun/
+    ValidationCheckResult, and Report rows all exist), then delete the whole
+    workspace and confirm every table workspace_id touches is actually
+    empty afterward -- not just that the workspace itself is gone."""
+    ws = main.create_workspace(main.WorkspaceCreate(organization_name="Org", pack_name="Pack"))
+    workspace_id = ws["id"]
+    policy_resp = main.upload_document(
+        workspace_id,
+        main.DocumentUploadRequest(filename="p.html", file_base64=_b64(POLICY_HTML_V1), doc_type="policy", title="Policy"),
+    )
+    policy_id = policy_resp["document"]["id"]
+    proc_resp = main.upload_document(
+        workspace_id,
+        main.DocumentUploadRequest(
+            filename="pr.html", file_base64=_b64(PROCEDURE_HTML), doc_type="procedure", title="Procedure",
+            parent_policy_id=policy_id,
+        ),
+    )
+    proc_id = proc_resp["document"]["id"]
+
+    policy_sections = main.get_document(policy_id)["sections"]
+    proc_sections = main.get_document(proc_id)["sections"]
+    breach_id = next(s["id"] for s in policy_sections if s["title"] == "Breach Notification")
+    reporting_id = next(s["id"] for s in proc_sections if s["title"] == "Reporting Steps")
+    fake_llm.set_canned("Policy", "Procedure", [(reporting_id, breach_id, 0.9, "match")])
+    main.analyze_references(workspace_id)
+    main.validate_workspace(workspace_id)
+    main.generate_report(workspace_id)
+
+    result = main.delete_workspace(workspace_id)
+    assert result["status"] == "deleted"
+    assert result["deleted_documents"] == 2
+
+    with pytest.raises(Exception):
+        main.get_workspace(workspace_id)
+    assert workspace_id not in [w["id"] for w in main.list_workspaces()]
+
+    with Session(db.get_engine()) as s:
+        for model in (
+            models.Document, models.DocumentVersion, models.Section, models.SectionSnapshot,
+            models.ProcedurePolicyReference, models.AnalysisRun, models.AnalysisJob,
+            models.ValidationRun, models.ValidationCheckResult, models.Finding,
+            models.Report, models.ExportRecord, models.ChangeEvent, models.UpdateRequest, models.ProposedChange,
+        ):
+            leftover = s.exec(select(model).where(model.workspace_id == workspace_id)).all() if hasattr(model, "workspace_id") else []
+            assert leftover == [], f"{model.__name__} still has rows for the deleted workspace: {leftover}"
+
+
+def test_delete_workspace_missing_returns_404(fake_client, fake_llm):
+    with pytest.raises(Exception):
+        main.delete_workspace("does-not-exist")
 
 
 def test_low_confidence_reference_needs_review(fake_client, fake_llm):
