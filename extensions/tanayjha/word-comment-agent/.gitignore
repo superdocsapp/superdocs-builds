@@ -1,0 +1,27 @@
+# Python virtual environments & bytecode
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Package builds & caches
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.coverage
+
+# Secrets & environment
+.env
+*.key
+*.pem
+
+# Test / temporary document outputs
+*.tmp.docx
+output_*.docx
+diagnostic_*.docx
+*diagnostic*.docx
+*processed*.docx
+live_*.docx
