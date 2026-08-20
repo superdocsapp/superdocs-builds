@@ -1,0 +1,22 @@
+Deal: Blue Anchor Logistics -- Sales Debrief Call
+Date: 2026-01-14
+Participants: Priya Shah (Account Exec), Sam Okafor (Director of IT, Blue Anchor Logistics)
+
+Priya: Thanks Sam. Comp Corp was in this deal too, right? What happened there?
+
+Sam: Yeah, we shortlisted Comp Corp again this quarter. Same story as we hear from
+peers -- their pricing looked attractive on paper, but once we asked about
+sustained API throughput at our volume, their team couldn't give us a straight
+answer. Your case study on Nimbus Freight actually came up in our internal
+discussion.
+
+Priya: Any objections during the process?
+
+Sam: We pushed back on the implementation timeline again, same concern as always.
+The phased rollout approach worked for us like it apparently has for other
+customers.
+
+Priya: Deciding factor?
+
+Sam: Throughput guarantees, plain and simple. We can't risk a vendor that hand-waves
+on that number.

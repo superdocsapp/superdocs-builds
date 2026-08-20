@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "winloss-superdocs"
+version = "0.1.0"
+description = "Win-loss debrief and quarterly competitive brief, built on the SuperDocs API"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+winloss = "winloss_superdocs.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: real calls against the live SuperDocs API (requires SUPERDOCS_API_KEY)",
+]
+testpaths = ["tests"]

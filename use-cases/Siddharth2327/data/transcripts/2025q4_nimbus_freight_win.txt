@@ -1,0 +1,28 @@
+Deal: Nimbus Freight Systems -- Sales Debrief Call
+Date: 2025-11-04
+Participants: Priya Shah (Account Exec), Daniel Ortiz (VP Logistics, Nimbus Freight Systems)
+
+Priya: Thanks for making time, Daniel. Walk me through why you ultimately went with us
+over Comp Corp?
+
+Daniel: Comp Corp's quote came in about 12% cheaper, and honestly their sales team
+was very persistent. But when we ran the load test, their API choked past 200
+requests per second, and our dispatch system needs to sustain 500+ during peak season.
+Your platform handled 800 without breaking a sweat.
+
+Priya: Were there any objections from your side during the evaluation?
+
+Daniel: The main one was implementation timeline -- we were worried a migration would
+take three months and disrupt Q4 shipping. Your team proposed a phased rollout that
+only touched non-critical routes first, and that resolved it for us.
+
+Priya: What would you say was the single deciding factor?
+
+Daniel: Honestly, it was the throughput number. Comp Corp just could not credibly
+promise 500 requests per second at our scale, and that's a hard requirement for us,
+not a nice-to-have.
+
+Priya: Any pricing pushback we should know about for next time?
+
+Daniel: A little. Our CFO flagged that your per-seat pricing is steeper than Comp
+Corp's, but the throughput gap made the ROI case easy to make internally.

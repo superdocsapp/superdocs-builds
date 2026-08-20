@@ -1,0 +1,26 @@
+Deal: Solstice Retail Group -- Sales Debrief Call
+Date: 2025-11-18
+Participants: Priya Shah (Account Exec), Maria Fuentes (Head of Ops, Solstice Retail Group)
+
+Priya: Appreciate you doing this debrief, Maria. Can you tell me what tipped the
+decision toward Comp Corp?
+
+Maria: It really came down to one thing -- you don't support SSO with our identity
+provider, Okta, out of the box. We have a hard compliance requirement that every
+vendor tool integrate with our existing SSO. Comp Corp had that shipped already.
+
+Priya: Was pricing a factor at all?
+
+Maria: Not really, your pricing was actually a bit better. If the SSO gap wasn't
+there, I think we would have gone with you.
+
+Priya: Any other objections that came up?
+
+Maria: We also asked about audit logging for compliance, and were told that was on
+your roadmap but not available yet. That combined with the SSO gap made it an easy
+call for our security team to say no.
+
+Priya: What was the single deciding factor, if you had to pick one?
+
+Maria: The missing SSO integration. That's a blocker for us regardless of anything
+else on the table.

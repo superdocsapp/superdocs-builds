@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.env
+
+# Generated at runtime -- keep the folders, ignore their contents
+data/index/*.json
+outputs/debriefs/*.docx
+outputs/briefs/*.docx
+outputs/briefs/*.pdf
+!data/index/.gitkeep
+!outputs/debriefs/.gitkeep
+!outputs/briefs/.gitkeep
+
+/node_modules

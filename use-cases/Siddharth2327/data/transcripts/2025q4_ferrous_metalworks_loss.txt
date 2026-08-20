@@ -1,0 +1,25 @@
+Deal: Ferrous Metalworks Co -- Sales Debrief Call
+Date: 2025-12-09
+Participants: Priya Shah (Account Exec), Tom Baker (Plant Manager, Ferrous Metalworks Co)
+
+Priya: Thanks Tom. Who else did you evaluate for this?
+
+Tom: We looked at a smaller, more specialized vendor called Foundry Analytics who
+does a lot of work specifically in heavy manufacturing. They had pre-built
+integrations for our exact machine sensors that we would have had to build
+ourselves with your platform.
+
+Priya: Was price part of the decision?
+
+Tom: Not the main driver. Foundry Analytics was actually more expensive per seat,
+but the pre-built sensor integrations saved us an estimated six weeks of engineering
+time, and that's what our plant manager cared about.
+
+Priya: Any objections you raised with us during the process?
+
+Tom: We asked whether you had similar sensor integrations on your roadmap, and were
+told it wasn't planned in the near term. That was really the whole story here.
+
+Priya: Deciding factor in one sentence?
+
+Tom: Foundry Analytics already had the exact integration we needed; you didn't.
