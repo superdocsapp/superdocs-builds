@@ -1,0 +1,64 @@
+<h1>Acceptance Test Plan</h1>
+<p><em>The tests that decide whether the circuit is accepted, and the numbers they must meet.</em></p>
+
+<p>Service order SO-40188 &middot; circuit
+NS-ETH-40188-DUB &middot; Acme Manufacturing Holdings Ltd</p>
+<hr/>
+
+<p>These tests are run on circuit NS-ETH-40188-DUB after installation and
+before handover on 16 February 2026. Every threshold below is the committed
+service level from the order; a test that does not meet its threshold blocks
+acceptance.</p>
+
+<h2>1. Thresholds under test</h2>
+<table>
+<tr><th>Measure</th><th>Committed</th></tr>
+<tr><td>Throughput (bidirectional)</td><td>1 Gbps</td></tr>
+<tr><td>Committed information rate</td><td>1 Gbps</td></tr>
+<tr><td>Round-trip latency</td><td>&le; 12 ms</td></tr>
+<tr><td>Jitter</td><td>&le; 2 ms</td></tr>
+<tr><td>Frame loss</td><td>&le; 0.05%</td></tr>
+<tr><td>Availability (measured from handover)</td><td>&ge; 99.95%</td></tr>
+<tr><td>MTTR on a chargeable fault</td><td>&le; 4 hours</td></tr>
+</table>
+
+<h2>2. Test procedure</h2>
+<table>
+<tr><th>#</th><th>Test</th><th>Method</th><th>Pass criterion</th><th>Result</th></tr>
+<tr><td>T1</td><td>Physical presentation</td><td>Visual and optical power check at
+    both ends</td><td>1000BASE-LX single-mode LC presented, power within transceiver spec</td>
+    <td>☐</td></tr>
+<tr><td>T2</td><td>Throughput</td><td>RFC 2544 throughput, 60 seconds per frame size</td>
+    <td>1 Gbps achieved bidirectionally</td><td>☐</td></tr>
+<tr><td>T3</td><td>Latency</td><td>RFC 2544 latency at 1518-byte frames</td>
+    <td>&le; 12 ms</td><td>☐</td></tr>
+<tr><td>T4</td><td>Frame loss</td><td>RFC 2544 frame loss at 100% of CIR</td>
+    <td>&le; 0.05%</td><td>☐</td></tr>
+<tr><td>T5</td><td>Jitter</td><td>Y.1564 service configuration test</td>
+    <td>&le; 2 ms</td><td>☐</td></tr>
+<tr><td>T6</td><td>MTU</td><td>Unfragmented frame at configured MTU end to end</td>
+    <td>9000 passes without fragmentation</td><td>☐</td></tr>
+<tr><td>T7</td><td>VLAN handling</td><td>Tagged frame transparency</td>
+    <td>802.1Q tagged, transparent behaves as ordered</td><td>☐</td></tr>
+<tr><td>T8</td><td>Resilience</td><td>Break primary path, measure restoration</td>
+    <td>None — single path restores within the protection window</td><td>☐</td></tr>
+<tr><td>T9</td><td>Soak</td><td>24-hour soak at CIR</td>
+    <td>No errored seconds beyond 0.05%</td><td>☐</td></tr>
+</table>
+
+<p>Test T8 applies only where the order includes route diversity. This order
+specifies None — single path.</p>
+
+<h2>3. Acceptance</h2>
+<p>Results are issued to Dervla Ó Ríordáin
+(infrastructure@acme-manufacturing.example). The customer has
+5 days from issue to raise defects; absent a defect notice
+the service is deemed accepted and billing at
+USD 4,200.00 per month begins.</p>
+
+
+
+<hr/>
+<p><small>Generated from order record SO-40188
+(fingerprint 5074e01701af5232) for the customer pack. Every value in this
+document comes from that one record; nothing here was typed twice.</small></p>

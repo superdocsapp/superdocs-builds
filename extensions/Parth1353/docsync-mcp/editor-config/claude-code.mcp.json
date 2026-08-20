@@ -1,0 +1,16 @@
+{
+  "_comment": [
+    "Copy to .mcp.json in the root of the repository whose docs you want kept in step,",
+    "or run: claude mcp add docsync -- docsync serve --registry .",
+    "",
+    "No API key here on purpose. docsync reads SUPERDOCS_API_KEY from the .env file next",
+    "to your docsync.yaml, which is the file your .gitignore already covers. A key in an",
+    "editor config is a key in a file people commit."
+  ],
+  "mcpServers": {
+    "docsync": {
+      "command": "docsync",
+      "args": ["serve", "--registry", ".", "--max-operations", "20"]
+    }
+  }
+}

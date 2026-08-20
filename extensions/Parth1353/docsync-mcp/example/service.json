@@ -1,0 +1,11 @@
+{
+  "_note": "Synthetic example service. No real company's data.",
+  "name": "circuit-provisioning",
+  "sla": {
+    "uptime_target": "99.95%",
+    "response_minutes": {
+      "p1": 15,
+      "p2": 60
+    }
+  }
+}

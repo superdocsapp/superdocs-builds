@@ -1,0 +1,19 @@
+{
+  "// comment": [
+    "Copy to .vscode/mcp.json in your repository. VS Code's key is 'servers', not",
+    "'mcpServers', and a local server wants an explicit \"type\": \"stdio\" — the two",
+    "differences that make a config copied from Cursor fail silently.",
+    "",
+    "For every workspace instead of one, run the 'MCP: Open User Configuration' command",
+    "and put the same entry there.",
+    "",
+    "docsync reads SUPERDOCS_API_KEY from the .env beside your docsync.yaml."
+  ],
+  "servers": {
+    "docsync": {
+      "type": "stdio",
+      "command": "docsync",
+      "args": ["serve", "--registry", "${workspaceFolder}", "--max-operations", "20"]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+# The fact registry for the synthetic example service.
+#
+# Each fact is a named value, a file to read it from, and an extractor to read
+# it with. Nothing here says which document carries a fact — that is declared
+# by each document, in its own front matter, next to the prose it governs.
+#
+# Run `docsync audit --registry example` to check this file against the docs.
+
+version: 1
+
+# The SuperDocs session these documents live in. One session per repository
+# keeps the roster small and the document ids stable.
+session: docsync-example-provisioning
+
+# Hard stopping rule for a single run, in billable operations.
+budget: 20
+
+doc_globs:
+  - "docs/**/*.md"
+
+facts:
+  retry.max_attempts:
+    label: Maximum retry attempts
+    from: src/provisioning/retry.py
+    extract: python_constant:MAX_ATTEMPTS
+
+  retry.backoff_seconds:
+    label: Retry backoff interval
+    from: src/provisioning/retry.py
+    extract: python_constant:BACKOFF_SECONDS
+    # Without the format this fact renders as the bare string "30", which also
+    # happens to be the request timeout. Two facts with one spelling is the
+    # exact shape that made a live run in Task 2 of this round contradict
+    # itself. A format is the cheapest fix: it makes the anchor specific.
+    format: "{value} seconds"
+
+  api.request_timeout_seconds:
+    label: API request timeout
+    from: src/provisioning/config.py
+    extract: python_constant:REQUEST_TIMEOUT_SECONDS
+    format: "{value} seconds"
+
+  api.default_bandwidth_mbps:
+    label: Default ordered bandwidth
+    from: src/provisioning/config.py
+    extract: python_constant:DEFAULT_BANDWIDTH_MBPS
+    # Deliberately left un-formatted, so the example carries one genuinely weak
+    # anchor: "1000" is short, and the same digits are also the per-minute rate
+    # limit. `docsync audit` reports it and says what to do about it.
+
+  queue.dead_letter_topic:
+    label: Dead-letter topic
+    from: src/provisioning/config.py
+    extract: python_constant:DEAD_LETTER_TOPIC
+
+  sla.uptime_target:
+    label: Contracted uptime target
+    from: service.json
+    extract: json_path:sla.uptime_target
+
+  sla.p1_response_minutes:
+    label: P1 response time
+    from: service.json
+    extract: json_path:sla.response_minutes.p1
+    format: "{value} minutes"
+
+  api.endpoints:
+    label: provisioning API endpoints
+    from: src/provisioning/api.py
+    extract: 'regex_list:^\s+"([A-Z]+ /[^"]+)":'

@@ -1,0 +1,104 @@
+# SYNTHETIC ORDER RECORD — every party, address, contact and number below is
+# invented for this demo. No real customer, supplier or circuit is described.
+#
+# This one file is the source for all twelve documents (six per pack). Nothing
+# in the pack is typed twice, which is why a change here is a change everywhere.
+
+order:
+  reference: SO-40188
+  msa_reference: MSA-NS-2024-0912
+  signed_date: 2025-11-18
+  version: "1.0"
+
+customer:
+  legal_name: Acme Manufacturing Holdings Ltd
+  trading_name: Acme Manufacturing
+  billing_reference: PO-ACME-77413
+  primary_contact:
+    name: Dervla Ó Ríordáin
+    role: Head of Infrastructure
+    email: infrastructure@acme-manufacturing.example
+    phone: "+353 1 555 0142"
+  site_contact:
+    name: Tomás Brennan
+    phone: "+353 87 555 0198"
+
+supplier:
+  legal_name: Northstar Connectivity Group plc
+  delivery_manager:
+    name: Priya Raghunathan
+    email: delivery@northstar-connectivity.example
+  noc_number: "+353 1 555 0100"
+
+service:
+  product: Ethernet Private Line
+  circuit_id: NS-ETH-40188-DUB
+  bandwidth_mbps: 1000
+  cir_mbps: 1000
+  handoff: 1000BASE-LX single-mode LC
+  vlan_mode: 802.1Q tagged, transparent
+  mtu: 9000
+  diversity: none
+  protection: None — single path
+  cpe:
+    model: Nokia 7210 SAS-Sx
+    count: 2
+    managed: true
+
+sites:
+  a:
+    label: Acme Northbank Works
+    address: Unit 14, Northbank Industrial Estate, Dublin 12, Ireland
+    room: Comms room G-04, rack N12
+    access_hours: 08:00–18:00 weekdays
+    escort_required: true
+    power: 2 × 16A C13 feeds, A+B diverse
+  b:
+    label: Acme Docklands Data Hall
+    address: Acme Data Hall, Docklands Technology Park, Dublin 4, Ireland
+    room: Suite 2, rack D07
+    access_hours: 24×7 with 4 hours notice
+    escort_required: false
+    power: 2 × 32A C19 feeds, A+B diverse
+
+delivery:
+  survey_date: 2025-12-08
+  install_date: 2026-02-02
+  rfs_date: 2026-02-16
+  cutover_window: 22:00–04:00, any weeknight, 5 working days notice
+  acceptance_days: 5
+  liquidated_damages: 2% of the monthly recurring charge per full week of delay, capped at 10%
+
+commercial:
+  currency: USD
+  mrc: 4200.00
+  nrc: 11500.00
+  term_months: 36
+  payment_terms_days: 30
+
+sla:
+  availability_pct: 99.95
+  mttr_hours: 4
+  latency_ms: 12
+  jitter_ms: 2
+  packet_loss_pct: 0.05
+  credit_cap_pct: 15
+
+# Everything below is structurally unable to reach the customer pack. The
+# registry marks these fields internal; the renderer resolves them to a
+# redaction for a customer audience, and packet/verify.py checks that no value
+# here appears in any customer document.
+internal:
+  wholesale_circuit_ref: WSL-DUB-88213
+  wholesale_cost_mrc: 2079.00
+  gross_margin_pct: 50.5
+  provisioning_notes: >-
+    Single fibre entry at Northbank confirmed by desktop survey. Duct from the
+    footway chamber is congested; if the survey finds no spare subduct this
+    becomes a 6-week civils job and the RFS date will move.
+  build_risk: >-
+    Medium. The committed date assumes no civils at the A-end. Dublin City
+    Council road-opening licences are running at 5 weeks.
+  escalation_l1: Delivery desk, delivery@northstar-connectivity.example
+  escalation_l2: Head of Service Delivery, +353 1 555 0111
+  margin_floor_note: Do not discount below 42% gross margin without regional approval.
