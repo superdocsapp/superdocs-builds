@@ -1,0 +1,7 @@
+item_id,recipe,also_blocks
+DC-003,asset_additions,DC-004
+DC-011,equity_movement,
+DC-024,earnings_per_share,
+DC-025,lease_measurement,DC-027|DC-028
+DC-026,lease_maturity,
+DC-029,business_combination,DC-030|DC-031|DC-032

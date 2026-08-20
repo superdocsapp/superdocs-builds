@@ -1,0 +1,4 @@
+role_key,role_label,name_placeholder
+principal,Principal,{principal_name}
+agent,Agent,{agent_name}
+successor,Successor agent,{successor_name}

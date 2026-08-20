@@ -1,0 +1,17 @@
+power_id,category,label,language
+fin-banking,financial,Deposit accounts,"The Agent may open, operate and close deposit accounts held in the name of the Principal, and may draw, endorse and deposit cheques and other instruments payable to the Principal."
+fin-investments,financial,Investments,"The Agent may hold, buy and sell securities, mutual fund units and other investments held in the name of the Principal, and may give instructions in respect of them to any depository participant or registrar."
+fin-tax,financial,Tax matters,"The Agent may sign, verify and file returns and other documents with the tax authorities on behalf of the Principal, and may represent the Principal before them."
+fin-bills,financial,Recurring payments,"The Agent may receive, examine and pay bills, premiums, rents, rates and taxes payable by the Principal, out of the Principal's funds."
+fin-borrowing,financial,Borrowing,The Agent may borrow money on behalf of the Principal and give security over the Principal's assets for that borrowing.
+fin-business,financial,Business interests,"The Agent may exercise the Principal's rights as a shareholder, partner or member of a company, firm or association, including giving proxies and signing resolutions."
+health-treatment,healthcare,Consent to treatment,"The Agent may give, withhold or withdraw consent to medical and surgical treatment on behalf of the Principal, in accordance with the Principal's known wishes."
+health-records,healthcare,Health information,"The Agent may request, receive and review the Principal's medical records and health information, and may authorise their disclosure where that is needed to exercise the powers granted by this instrument."
+health-providers,healthcare,Choice of providers,"The Agent may select, engage and discharge physicians, hospitals, nursing facilities and other providers of care for the Principal, and may agree the terms on which care is provided."
+health-admission,healthcare,Admission and discharge,"The Agent may admit the Principal to, and arrange the discharge of the Principal from, a hospital, nursing facility or residential care facility."
+health-endoflife,healthcare,End-of-life care,The Agent may make decisions about life-sustaining treatment and palliative care for the Principal in accordance with the Principal's known wishes.
+rp-sale,real_property,Sale and conveyance,"The Agent may sell, convey and transfer the real property described in this instrument, and may sign every deed, receipt and instrument of transfer that the sale requires."
+rp-lease,real_property,Letting and leasing,"The Agent may let the real property described in this instrument on such terms as the Agent thinks fit, may collect the rent and may give receipts for it."
+rp-mortgage,real_property,Mortgage and charge,The Agent may mortgage or charge the real property described in this instrument as security.
+rp-management,real_property,Management and repair,"The Agent may manage, insure, repair and maintain the real property described in this instrument, and may engage and pay contractors for that purpose."
+rp-registration,real_property,Registration,"The Agent may present the real property described in this instrument for registration, may admit execution before the registering officer and may do everything the registration requires."
