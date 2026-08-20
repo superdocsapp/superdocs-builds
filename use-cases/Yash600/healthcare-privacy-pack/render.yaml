@@ -1,0 +1,40 @@
+# Render Blueprint -- deploys the FastAPI backend in one shot. In the Render
+# dashboard: New -> Blueprint -> point at this repo. Render finds this file
+# automatically at the repo root.
+#
+# This build's primary DB path is Neon (see backend/.env.example) -- so
+# unlike ttrpg-campaign-builder's render.yaml, this one does NOT provision
+# its own Render-managed Postgres (no `databases:` block below). Paste your
+# existing Neon connection string into DATABASE_URL in the Render dashboard
+# instead -- same database you already use locally, nothing to duplicate.
+# If you'd rather have Render provision + host its own free Postgres, add a
+# `databases:` block like the ttrpg-campaign-builder build's render.yaml and
+# point DATABASE_URL at it with `fromDatabase` -- just know Render's free
+# Postgres plan expires 30 days after creation (14-day grace period before
+# deletion), which Neon's free tier doesn't do.
+#
+# SUPERDOCS_API_KEY, GROQ_API_KEY, and DATABASE_URL are all `sync: false` --
+# Render will prompt for these in the dashboard instead of reading them from
+# this file, so nothing sensitive is ever committed. GROQ_API_KEY only gates
+# Analyze References (POST /workspaces/{id}/analyze); everything else works
+# without it.
+services:
+  - type: web
+    name: healthcare-privacy-pack-api
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: SUPERDOCS_API_KEY
+        sync: false
+      - key: SUPERDOCS_API_BASE
+        value: https://api.superdocs.app
+      - key: GROQ_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: CORS_ORIGIN_REGEX
+        sync: false

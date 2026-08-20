@@ -1,0 +1,14 @@
+prefix=/d/a/pgserver/pgserver/pgbuild/../src/pgserver/pginstall
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libpq
+Description: PostgreSQL libpq library
+URL: https://www.postgresql.org/
+Version: 16.2
+Requires: 
+Requires.private: 
+Cflags: -I${includedir}
+Libs: -L${libdir} -lpq
+Libs.private:  -lpgcommon -lpgport -lm -lshell32 -lws2_32 -lsecur32

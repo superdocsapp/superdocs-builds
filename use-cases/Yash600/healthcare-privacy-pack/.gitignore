@@ -1,0 +1,22 @@
+# secrets
+backend/.env
+frontend/.env.local
+
+# python
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+*.pyc
+
+# embedded postgres data (never committed -- lives outside the repo anyway
+# by default, but ignore defensively if PGDATA_DIR is ever pointed here)
+backend/.pgdata/
+
+# node / next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+npm-debug.log*
+
+# OS
+.DS_Store

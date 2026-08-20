@@ -1,0 +1,151 @@
+"""
+models.py -- SQLModel data model for the healthcare privacy policy & procedure pack.
+
+Four tables, per the assignment brief:
+
+  Document        -- one row per SuperDocs document (the policy, or a procedure)
+  PolicySection   -- one row per numbered policy section (§1..§6), chunk-addressed
+  Implements      -- the edge: a procedure's citation of the policy section it
+                     implements, carrying the content-hash staleness check
+  ChangeEvent      -- the audit log: every policy edit, every proposed change,
+                     every approve/reject decision
+
+Staleness model (the core engineering idea of this build):
+  Implements.synced_content_hash stores sha256(normalized policy chunk text)
+  at the moment the edge was last confirmed synced. Whenever the policy
+  chunk is edited, we recompute PolicySection.current_content_hash from the
+  fresh chunk text pulled from SuperDocs. Any edge whose synced_content_hash
+  != PolicySection.current_content_hash is `stale` -- a plain equality
+  check, no prose-diffing, no LLM judgment call.
+"""
+
+import enum
+import uuid
+from datetime import datetime, timezone
+from typing import List, Optional
+
+from sqlmodel import Field, Relationship, SQLModel
+
+
+def _now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _uuid() -> str:
+    return str(uuid.uuid4())
+
+
+class DocType(str, enum.Enum):
+    POLICY = "policy"
+    PROCEDURE = "procedure"
+
+
+class EdgeStatus(str, enum.Enum):
+    SYNCED = "synced"
+    STALE = "stale"
+    PENDING_REVIEW = "pending_review"  # a chat/async job is awaiting approval for this edge
+
+
+class ChangeEventType(str, enum.Enum):
+    DOCUMENT_UPLOADED = "document_uploaded"               # a human uploaded a policy/procedure file
+    POLICY_EDIT = "policy_edit"                          # a policy section was edited
+    PROCEDURE_EDIT = "procedure_edit"                     # a procedure was edited directly (not via propagation)
+    EDGE_FLAGGED_STALE = "edge_flagged_stale"             # a policy edit flipped an edge to stale
+    PROCEDURE_CHANGE_PROPOSED = "procedure_change_proposed"  # chat/async submitted for a procedure
+    PROCEDURE_CHANGE_APPROVED = "procedure_change_approved"
+    PROCEDURE_CHANGE_REJECTED = "procedure_change_rejected"
+    EDGE_RESYNCED = "edge_resynced"                       # edge flipped back to synced
+    VALIDATION_RUN = "validation_run"                     # validator executed
+
+
+class Document(SQLModel, table=True):
+    """One row per SuperDocs document: the policy, or one of the six procedures."""
+
+    id: str = Field(default_factory=_uuid, primary_key=True)
+    superdocs_document_id: str = Field(index=True, unique=True)
+    superdocs_session_id: str = Field(index=True)
+    doc_type: DocType
+    title: str
+    filename: str
+    version_id: str | None = None  # SuperDocs version_id, refreshed after every edit
+    created_at: datetime = Field(default_factory=_now)
+    updated_at: datetime = Field(default_factory=_now)
+
+    policy_sections: List["PolicySection"] = Relationship(back_populates="document")
+
+
+class PolicySection(SQLModel, table=True):
+    """
+    One numbered policy section (§1..§6) living inside the policy Document.
+    Only rows for doc_type == POLICY are pointed at from here.
+    """
+
+    id: str = Field(default_factory=_uuid, primary_key=True)
+    document_id: str = Field(foreign_key="document.id", index=True)
+    # Not globally unique: with human-uploaded documents, SuperDocs assigns
+    # chunk ids itself (we no longer control them like the hand-authored
+    # seed pack's "policy-sec-N"), and uniqueness is only guaranteed within
+    # one document, not across every policy document ever uploaded.
+    chunk_id: str = Field(index=True)
+    section_number: int
+    heading: str  # exact heading text, e.g. "Breach Notification"
+    current_content_hash: str  # sha256 of normalized chunk text, refreshed on every sync
+    last_synced_at: datetime = Field(default_factory=_now)
+
+    document: Document = Relationship(back_populates="policy_sections")
+    edges: List["Implements"] = Relationship(back_populates="policy_section")
+
+
+class Implements(SQLModel, table=True):
+    """
+    The dependency edge: procedure X implements policy section Y.
+    `synced_content_hash` is the policy chunk hash as of the last time this
+    edge was confirmed valid (initial seed, or a human-approved re-sync).
+    status is derived/stored redundantly for fast querying; the validator
+    recomputes it from scratch rather than trusting the cached value.
+    """
+
+    id: str = Field(default_factory=_uuid, primary_key=True)
+
+    procedure_document_id: str = Field(foreign_key="document.id", index=True)
+    # Chunk within the procedure doc to target for propagated edits, when we
+    # know one (the hand-authored seed pack always has one -- see
+    # content/policy_pack.py). Human-uploaded procedures don't come with a
+    # chunk id we chose ourselves, so this is nullable: when None,
+    # propagation targets the whole document and lets SuperDocs' own model
+    # find the right place to edit, rather than guessing a chunk.
+    procedure_chunk_id: str | None = Field(default=None, index=True)
+
+    policy_section_id: str = Field(foreign_key="policysection.id", index=True)
+
+    synced_content_hash: str  # hash of the policy chunk text this edge was last synced against
+    status: EdgeStatus = Field(default=EdgeStatus.SYNCED)
+
+    last_synced_at: datetime = Field(default_factory=_now)
+    last_checked_at: datetime = Field(default_factory=_now)
+
+    # set while a chat/async job is in flight for this edge, cleared on approve/reject
+    pending_job_id: str | None = None
+    pending_change_id: str | None = None
+    pending_session_id: str | None = None
+
+    policy_section: PolicySection = Relationship(back_populates="edges")
+
+
+class ChangeEvent(SQLModel, table=True):
+    """Append-only audit log. Every policy edit and every approve/reject decision lands here."""
+
+    id: str = Field(default_factory=_uuid, primary_key=True)
+    event_type: ChangeEventType
+    timestamp: datetime = Field(default_factory=_now)
+
+    policy_section_id: str | None = Field(default=None, foreign_key="policysection.id")
+    implements_edge_id: str | None = Field(default=None, foreign_key="implements.id")
+    document_id: str | None = Field(default=None, foreign_key="document.id")
+
+    superdocs_job_id: str | None = None
+    superdocs_change_id: str | None = None
+
+    actor: str = "system"  # "system" | "human:<name/email>"
+    description: str
+    approved: bool | None = None  # only meaningful for *_APPROVED / *_REJECTED events
