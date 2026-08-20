@@ -1,0 +1,17 @@
+CARGO INSURANCE UNDERWRITING POLICY
+
+This policy sets out Solstice Freight Underwriters Inc.'s standard terms
+for temperature-sensitive cargo coverage. It is a reference document
+maintained by the underwriting team and is not a client-facing
+agreement, so it should not be classified as a contract even though it
+mentions counterparties and coverage values throughout for illustration.
+
+Illustrative counterparty (not an actual party to any agreement):
+"Example Shipper LLC". Illustrative coverage value: $50,000.
+
+Synthetic policy document created for the SuperDocs Round 2 engineer
+task demo, second batch. Deliberately reuses the negation phrasing
+("not a client-facing agreement") that an earlier round's classifier bug
+mishandled, plus new sibling phrasings, to prove that fix generalized
+rather than pattern-matching the one sentence that originally surfaced
+it. Not a real policy; no real company data.

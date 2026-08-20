@@ -1,0 +1,91 @@
+/* ==========================================================================
+   LEDGER — design tokens
+   A governance console for Box metadata write-back. The subject is trust:
+   an enterprise needs to believe the metadata an AI wrote is accurate
+   enough to drive retention and legal decisions. The visual language draws
+   from the physical objects of institutional record-keeping — ledgers,
+   wax seals, card-catalog tabs, filing stamps — rather than a generic SaaS
+   dashboard look.
+   ========================================================================== */
+
+:root {
+  /* -- color: ink (structure) + paper (documents) + brass (the seal) -- */
+  --ink-950: #12151c;
+  --ink-900: #191d27;
+  --ink-850: #1f2430;
+  --ink-800: #262c3a;
+  --ink-700: #333b4d;
+  --ink-600: #454f65;
+
+  --paper: #f2ede2;
+  --paper-dim: #e8e1d2;
+
+  --text: #eae7dd;
+  --text-muted: #9aa0b0;
+  --text-faint: #656d80;
+
+  --brass: #c99a4a;
+  --brass-bright: #e0b568;
+  --brass-wash: rgba(201, 154, 74, 0.12);
+
+  --moss: #6f9a78;
+  --moss-wash: rgba(111, 154, 120, 0.14);
+
+  --rust: #c15c42;
+  --rust-wash: rgba(193, 92, 66, 0.14);
+
+  --ink-on-paper: #262230;
+
+  /* -- type -- */
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* -- layout -- */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --sidebar-w: 248px;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ink-950);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--brass-wash);
+}
+
+a {
+  color: inherit;
+}
+
+/* focus visibility, kept even in a themed UI */
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+}

@@ -1,0 +1,12 @@
+MASTER SERVICES AGREEMENT
+Counterparty: Solstice Freight Underwriters Inc.
+Effective Date: 2020-01-10
+Expiration Date: 2022-01-10
+Value: $61,000
+
+This agreement is currently subject to an active legal hold pending an
+unrelated underwriting dispute. It must not be processed, classified,
+or have any metadata written until the hold is lifted.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo,
+second batch. Not a real agreement; no real company data.

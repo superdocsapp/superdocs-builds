@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <form action="{{ url_for('generate') }}" method="post" enctype="multipart/form-data">
+    {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+    <label class="first">RFE notice (.txt)</label>
+    <input type="file" name="notice" accept=".txt" required>
+
+    <label>Prior petition arguments (.json)</label>
+    <input type="file" name="petition" accept=".json" required>
+
+    <label>New evidence catalog (.json) <span class="hint">optional</span></label>
+    <input type="file" name="evidence" accept=".json">
+
+    <label>Supporting documents <span class="hint">optional, multiple .txt files — petition letter, employer letter, expert opinion, etc.</span></label>
+    <input type="file" name="supporting_docs" accept=".txt" multiple>
+
+    <label>Case ID</label>
+    <input type="text" name="case_id" placeholder="CASE-2002" required>
+
+    <label>Client name</label>
+    <input type="text" name="client_name" placeholder="Marco Alvarez" required>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="dry_run" name="dry_run" {% if not superdocs_key_set %}checked{% endif %}>
+      <label for="dry_run" style="font-weight:600;">Dry run (parse &amp; match only, no SuperDocs API calls, no .docx)</label>
+    </div>
+    {% if not superdocs_key_set %}
+      <p class="hint">No SUPERDOCS_API_KEY is configured on this server, so only dry run is available right now.</p>
+    {% else %}
+      <p class="hint">A real run drafts each section, then takes you to a review page — nothing exports until you approve it there.</p>
+    {% endif %}
+
+    <button type="submit">Generate</button>
+  </form>
+</div>
+{% endblock %}

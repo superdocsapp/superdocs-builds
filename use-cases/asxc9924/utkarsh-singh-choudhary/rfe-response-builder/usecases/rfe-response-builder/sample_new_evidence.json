@@ -1,0 +1,25 @@
+{
+  "case_id": "CASE-2002",
+  "entries": [
+    {
+      "topic_id": "joint_lease_utilities",
+      "description": "Joint lease agreement and joint utility bills covering the same address, showing shared household commitments beyond bank statements",
+      "exhibit_label": "Joint Lease and Utility Bills"
+    },
+    {
+      "topic_id": "third_party_affidavits",
+      "description": "Signed affidavits from third parties with personal knowledge of the marital relationship (e.g. family members, friends)",
+      "exhibit_label": "Third-Party Affidavits"
+    },
+    {
+      "topic_id": "certified_translation",
+      "description": "Certified English translation of the marriage certificate, accompanied by the translator's certification of accuracy and competency",
+      "exhibit_label": "Certified Translation of Marriage Certificate"
+    },
+    {
+      "topic_id": "federal_tax_return",
+      "description": "Petitioner's most recent federal tax return (or transcript) establishing income sufficient to meet the applicable poverty guidelines",
+      "exhibit_label": "Federal Tax Return"
+    }
+  ]
+}

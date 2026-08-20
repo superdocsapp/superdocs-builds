@@ -1,0 +1,13 @@
+MASTER SERVICES AGREEMENT
+Counterparty: Solstice Freight Underwriters Inc.
+Effective Date: 2021-06-15
+Expiration Date: 2023-06-15
+Value: $97,500
+
+This Master Services Agreement governs cargo-insurance underwriting
+services provided by Meridian Cold Chain Logistics's parent group to
+Solstice Freight Underwriters Inc. for temperature-sensitive shipments
+originating from the Pacific Northwest distribution hub.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo,
+second batch. Not a real agreement; no real company data.

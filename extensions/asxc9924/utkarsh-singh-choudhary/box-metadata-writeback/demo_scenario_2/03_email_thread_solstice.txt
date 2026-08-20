@@ -1,0 +1,21 @@
+From: ops@meridiancoldchain.example
+To: underwriting@solsticefreight.example
+Subject: Re: Q1 renewal - quick question before we sign anything
+
+Hey team,
+
+Following up on the call yesterday. We're fine with the renewal terms in
+principle but want to hold off finalizing the number until procurement
+signs off, probably early next month. Can you send the updated schedule
+once your side has it? Also flagging that the temp logging vendor
+changed on our end since last cycle, not sure if that affects your risk
+model at all.
+
+Talk soon,
+Dana
+
+Synthetic correspondence for the SuperDocs Round 2 engineer task demo,
+second batch. Deliberately informal, with no cleanly labeled
+counterparty/date/value fields, to exercise "left empty rather than
+guessed" on a document shape unlike the first demo batch. Not a real
+email; no real company data.

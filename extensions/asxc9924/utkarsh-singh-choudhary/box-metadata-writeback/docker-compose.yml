@@ -1,0 +1,43 @@
+# Runs both services together, backend persistence on a named volume.
+# This is a starting point for a real deployment, not a complete one:
+# it has no TLS termination and binds to localhost only. Put a real
+# reverse proxy (Caddy, nginx, or your platform's load balancer) in
+# front of both ports for anything internet-facing, and let it
+# terminate HTTPS -- see the "Running this for real" section in
+# README.md.
+services:
+  backend:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      ENVIRONMENT: production
+      PERSISTENCE_DB_PATH: /data
+      WORKFLOW_API_KEYS: ${WORKFLOW_API_KEYS:?set WORKFLOW_API_KEYS in your environment or .env}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:4173}
+      WORKFLOW_RATE_LIMIT_PER_MINUTE: ${WORKFLOW_RATE_LIMIT_PER_MINUTE:-120}
+      TENANTS_CONFIG_PATH: ${TENANTS_CONFIG_PATH:-}
+      BOX_CLIENT_ID: ${BOX_CLIENT_ID:-}
+      BOX_CLIENT_SECRET: ${BOX_CLIENT_SECRET:-}
+      BOX_ENTERPRISE_ID: ${BOX_ENTERPRISE_ID:-}
+      BOX_JWT_PRIVATE_KEY: ${BOX_JWT_PRIVATE_KEY:-}
+      BOX_WEBHOOK_PRIMARY_KEY: ${BOX_WEBHOOK_PRIMARY_KEY:-}
+      BOX_WEBHOOK_SECONDARY_KEY: ${BOX_WEBHOOK_SECONDARY_KEY:-}
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-}
+    volumes:
+      - workflow-data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
+    ports:
+      - "127.0.0.1:4173:4173"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  workflow-data:

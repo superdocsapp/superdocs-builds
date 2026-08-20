@@ -1,0 +1,11 @@
+INVOICE
+Invoice Number: MCC-2024-0417
+Amount Due: $18,340.00
+Bill To: Northbridge Pharma Distribution LLC
+
+Freight brokerage services rendered under the Master Services Agreement
+for temperature-controlled shipments in the billing period ending
+2024-04-15. Payment due within 30 days of invoice date.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo.
+Not a real invoice; no real company data.

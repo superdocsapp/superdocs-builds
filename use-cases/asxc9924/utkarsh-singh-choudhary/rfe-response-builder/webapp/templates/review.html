@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="status-pill">Review for {{ session.case_id }} — {{ session.items|length }} RFE item(s) drafted. Nothing is exported until you approve below.</p>
+
+<form action="{{ url_for('approve_review', review_id=review_id) }}" method="post">
+  {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+
+  {% for item in session.items %}
+  <div class="item">
+    <h3>Item {{ item.request_id }} — {{ item.response_section }}</h3>
+    <p class="hint">Officer's request: {{ item.request_text }}</p>
+    {% if item.status == "failed" %}
+      <p class="hint" style="color:var(--bad);">Drafting failed for this item — it cannot be answered. {{ item.reply_text }}</p>
+    {% else %}
+      <pre>{{ item.reply_text }}</pre>
+      {% if item.status == "no_pending_change" %}
+        <p class="hint">Note: SuperDocs did not hold this as a pending change (status: completed) — approving here still requires the text to pass the substantive-answer check before it counts.</p>
+      {% endif %}
+      <div class="checkbox-row">
+        <input type="checkbox" id="approve_{{ item.request_id }}" name="approve_{{ item.request_id }}">
+        <label for="approve_{{ item.request_id }}">Approve this section</label>
+      </div>
+      <label>Feedback (optional, sent back to SuperDocs if you reject)</label>
+      <input type="text" name="feedback_{{ item.request_id }}" placeholder="e.g. needs a more specific date range">
+    {% endif %}
+    {% if item.prior_source_refs %}
+      <p class="hint">Prior petition: {{ item.prior_source_refs|join(", ") }}</p>
+    {% elif item.fuzzy_suggestions %}
+      <p class="hint">No exact prior-petition match. Possible related argument (UNVERIFIED, not cited in the draft):
+        {% for ref, conf in item.fuzzy_suggestions %}{{ ref }} ({{ (conf * 100)|round|int }}%){% if not loop.last %}, {% endif %}{% endfor %}
+      </p>
+    {% endif %}
+    {% if item.new_evidence %}
+      <p class="hint">New evidence referenced: {{ item.new_evidence|join("; ") }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="card">
+    <h3 style="margin-top:0;">Exhibit list</h3>
+    {% if session.exhibits %}
+      {% for ex in session.exhibits %}
+        <div class="exhibit"><strong>Exhibit {{ ex.number }}</strong> ({{ ex.label }}): {{ ex.description }}
+          <span class="hint">[supports item(s): {{ ex.request_ids|join(", ") }}]</span>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="hint">None identified from the supplied evidence catalog.</p>
+    {% endif %}
+  </div>
+
+  <button type="submit">Approve selected &amp; generate document</button>
+</form>
+<a class="back" href="{{ url_for('index') }}">&larr; Start over</a>
+{% endblock %}

@@ -1,0 +1,37 @@
+[project]
+name = "rfe-response-builder"
+version = "0.2.0"
+description = "Parses an officer's RFE notice, matches each request to prior petition arguments, identifies new evidence needed, assembles a numbered exhibit list, and drafts a response with a coverage checklist proving every request was answered."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "requests-mock>=1.11",
+    "ruff>=0.6",
+]
+
+[project.scripts]
+rfe-response-builder = "rfe_response_builder.generate:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["rfe_response_builder*"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

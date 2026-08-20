@@ -1,0 +1,15 @@
+fastapi>=0.110,<1.0
+uvicorn[standard]>=0.27,<1.0
+pydantic>=2.5,<3.0
+pytest>=7.4,<9.0
+httpx>=0.26,<1.0
+mcp==1.9.4
+requests>=2.31,<3.0
+
+# Real Box adapter (app/clients/real_box_client.py). Optional at runtime --
+# RealBoxClient.from_env() is only called when BOX_CLIENT_ID / SECRET /
+# ENTERPRISE_ID are set, and the app falls back to FakeBoxClient otherwise
+# (see app/api/main.py) -- but it must be importable for that fallback
+# check to even run, so it belongs in the base requirements, not a
+# separate optional file a fresh clone might skip.
+boxsdk>=3.9,<4.0
