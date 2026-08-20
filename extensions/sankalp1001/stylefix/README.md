@@ -15,8 +15,10 @@ runs a whole docs set and reports which guidance the team ignores most.
 Nothing reaches the document that has not been cleared by `guard.py`, which uses no
 model at all. It extracts the document's visible text, remembers where every
 character came from in the HTML, and refuses any change that lands in a protected
-region — `<pre>`, `<code>`, `<table>`, `<script>`, or a heading already judged
-compliant.
+region — `<pre>`, `<code>`, `<table>`, `<script>`, a heading the guide has not
+licensed a rule to touch, or a **reviewer's comment**. SuperDocs returns comments as
+`<aside data-part-type="comment">` carrying the author and date, so the linter can
+tell someone else's review note from the document's own prose and leaves it alone.
 
 The guard fails closed. If it cannot locate a change unambiguously, it drops it and
 says why. A missed fix is cosmetic; a wrong edit inside a code sample is the card's

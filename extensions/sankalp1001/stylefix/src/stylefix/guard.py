@@ -31,6 +31,13 @@ from html.parser import HTMLParser
 
 PROTECTED_TAGS = frozenset({"pre", "code", "table", "kbd", "samp", "tt", "var"})
 NON_PROSE_TAGS = frozenset({"script", "style", "template", "noscript"})
+
+# SuperDocs returns out-of-flow document parts as <aside>/<header> elements carrying
+# data-part-type, each with its own chunk id (verified against a real upload,
+# 2026-08-19). A reviewer's comment is someone else's words — quoted material, which
+# the house guide itself says never to touch — so comments are protected. Footnotes
+# and headers are the document's own prose and stay fixable.
+PROTECTED_PART_TYPES = frozenset({"comment"})
 HEADING_TAGS = frozenset({"h1", "h2", "h3", "h4", "h5", "h6"})
 VOID_TAGS = frozenset(
     {"area", "base", "br", "col", "embed", "hr", "img", "input",
@@ -80,6 +87,7 @@ class _Scanner(HTMLParser):
         super().__init__(convert_charrefs=False)
         self._compliant = compliant_headings
         self._open: list[tuple[str, int]] = []
+        self._parts: list[tuple[str, int, str]] = []
         self.chars: list[str] = []
         self.offsets: list[int] = []
         self.widths: list[int] = []
@@ -97,6 +105,9 @@ class _Scanner(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag not in VOID_TAGS:
             self._open.append((tag, self._pos()))
+        part = dict(attrs).get("data-part-type")
+        if part in PROTECTED_PART_TYPES:
+            self._parts.append((tag, self._pos(), part))
 
     def handle_endtag(self, tag):
         close = self.rawdata.find(">", self._pos())
@@ -109,6 +120,11 @@ class _Scanner(HTMLParser):
                 break
 
     def _close(self, tag: str, start: int, end: int) -> None:
+        for i in range(len(self._parts) - 1, -1, -1):
+            if self._parts[i][0] == tag and self._parts[i][1] == start:
+                self.protected.append(
+                    Span(start, end, f"a {self._parts.pop(i)[2]} is not your prose to edit"))
+                return
         if tag in NON_PROSE_TAGS:
             self.protected.append(Span(start, end, f"inside <{tag}>, not document prose"))
         elif tag in PROTECTED_TAGS:
