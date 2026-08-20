@@ -1,0 +1,9 @@
+*.pdf
+*.docx
+*.md
+!README.md
+test/
+src/
+*.log
+.git
+.gitignore

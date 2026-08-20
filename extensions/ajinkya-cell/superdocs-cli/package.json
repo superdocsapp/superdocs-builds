@@ -1,0 +1,49 @@
+{
+  "name": "@ajinkya-cell/superdocs-cli",
+  "version": "1.0.0",
+  "description": "Interactive terminal developer assistant for SuperDocs AI document intelligence & editing",
+  "type": "module",
+  "bin": {
+    "superdocs": "dist/bin/index.js"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "start": "node ./dist/bin/index.js",
+    "test": "node --test dist/test/*.test.js"
+  },
+  "keywords": [
+    "superdocs",
+    "ai",
+    "cli",
+    "documents",
+    "diff",
+    "terminal",
+    "mcp"
+  ],
+  "author": "Ajinkya Dharkar (ajinkya-cell)",
+  "license": "MIT",
+  "dependencies": {
+    "@commander-js/extra-typings": "^12.1.0",
+    "@inquirer/prompts": "^5.3.8",
+    "axios": "^1.7.9",
+    "chalk": "^5.3.0",
+    "cli-highlight": "^2.1.11",
+    "conf": "^12.0.0",
+    "diff": "^5.2.0",
+    "eventsource": "^2.0.2",
+    "form-data": "^4.0.1",
+    "ora": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.1",
+    "@types/eventsource": "^1.1.15",
+    "@types/node": "^20.14.9",
+    "typescript": "^5.5.2"
+  }
+}
