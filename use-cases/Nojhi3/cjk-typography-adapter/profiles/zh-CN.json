@@ -1,0 +1,29 @@
+{
+  "name": "zh-CN",
+  "label": "Simplified Chinese",
+  "direction": "latin-to-cjk",
+  "lang": "zh-CN",
+  "body_font": "'SimSun', 'NSimSun', serif",
+  "heading_font": "'SimHei', 'Microsoft YaHei', sans-serif",
+  "latin_font": "'Times New Roman', serif",
+  "body_size_pt": 12,
+  "heading_sizes_pt": {"h1": 16, "h2": 14, "h3": 12, "h4": 12, "h5": 12, "h6": 12},
+  "heading_bold": true,
+  "line_spacing": 1.5,
+  "paragraph_spacing_pt": 6,
+  "text_align": "justify",
+  "page": {
+    "width_mm": 210, "height_mm": 297,
+    "margin_top_mm": 37, "margin_bottom_mm": 35,
+    "margin_left_mm": 28, "margin_right_mm": 26
+  },
+  "punctuation_map": {
+    ",": "\uff0c", ".": "\u3002", "!": "\uff01", "?": "\uff1f",
+    ":": "\uff1a", ";": "\uff1b", "(": "\uff08", ")": "\uff09"
+  },
+  "quote_map": {"open": "\u201c", "close": "\u201d"},
+  "thin_space": "\u2009",
+  "kinsoku_no_line_start": "\uff0c\u3002\uff01\uff1f\uff09\u201d\u300b\u300d",
+  "kinsoku_no_line_end": "\uff08\u201c\u300a\u300c",
+  "css_extra": "p, li, td, th { line-break: strict; word-break: keep-all; overflow-wrap: normal; }"
+}

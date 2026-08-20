@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume Tailor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/superdoc/dist/style.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wordmark">
+      <span class="mark" aria-hidden="true"></span>
+      Resume Tailor
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="panel panel-input" aria-label="Inputs">
+      <h1>Match your resume to the role</h1>
+      <p class="lede">
+        Upload your resume and paste the job description. Each proposed change
+        comes back as a tracked edit with its location and reason — accept or
+        reject it from the list, nothing is rewritten silently.
+      </p>
+
+      <form id="tailor-form">
+        <label class="field">
+          <span class="field-label">Resume (.docx)</span>
+          <input type="file" name="resume" id="resume-input" accept=".docx" required />
+        </label>
+
+        <label class="field">
+          <span class="field-label">Job description</span>
+          <textarea
+            name="jobDescription"
+            id="jd-input"
+            rows="12"
+            placeholder="Paste the full job posting here"
+            required
+          ></textarea>
+        </label>
+
+        <button type="submit" id="submit-btn">Tailor resume</button>
+      </form>
+
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+
+      <ol id="revisions-list" class="revisions" hidden></ol>
+    </section>
+
+    <section class="panel panel-output" aria-label="Tailored resume">
+      <div id="empty-state" class="empty-state">
+        <span class="mark mark-large" aria-hidden="true"></span>
+        <p>
+          Your tailored resume will appear here, with every change tracked
+          and reviewable — same layout, same fonts, same page.
+        </p>
+      </div>
+      <div id="editor" class="editor" hidden></div>
+      <button id="download-btn" class="download-btn" hidden>Download .docx</button>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/superdoc/dist/superdoc.min.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "response": "\u2705 I added the Data Processing section after Section 3 with clauses covering data ownership, sub-processor approval, and deletion on termination.",
+  "session_id": "eqr_contract-02_1786987481",
+  "document_changes": {
+    "updated_html": "<h1 data-chunk-id=\"fe1a77b9-21a3-4b6f-b937-9db10afb1e42\">CloudSync Service Agreement</h1>\n<p data-chunk-id=\"51f081ab-b8fe-4f7f-9944-25f1c095c65b\"><strong>Agreement number:</strong> CSA-2026-0147<br/>\n<strong>Effective date:</strong> January 15, 2026<br/>\n<strong>Parties:</strong> CloudSync Technologies Inc. (\"Provider\") and Meridian Logistics Ltd. (\"Client\")</p>\n<h2 data-chunk-id=\"2a4ca1d7-e2cd-4d05-b540-e40b65734b05\">Section 1: Definitions</h2>\n<p data-chunk-id=\"832ef0c0-d7af-4d66-bbd1-34d0a197036d\">1.1 \"Services\" means the cloud storage and file-sync platform described in the attached service description.</p>\n<p data-chunk-id=\"ac81b80b-9a7a-4bcd-8d1c-a68618ee951a\">1.2 \"Subscription\" means the recurring service plan selected by the Client under Section 3.</p>\n<p data-chunk-id=\"767208fc-75ef-4cef-8987-ec3c5aa2839a\">1.3 \"Data\" means all information, files, and records uploaded by the Client to the Services.</p>\n<h2 data-chunk-id=\"a5b4cffe-0dcf-4ac1-9af2-e85ad98e0cc7\">Section 2: Term</h2>\n<p data-chunk-id=\"f47bff40-af80-4950-b19d-071a3687e215\">2.1 This Agreement begins on the Effective Date and continues for an initial term of twelve (12) months (the \"Initial Term\").</p>\n<p data-chunk-id=\"cf42dd2b-4525-4f86-9f24-27aeff014c82\">2.2 The Agreement automatically renews for successive twelve-month terms unless either party gives written notice at least thirty (30) days before the end of the then-current term.</p>\n<h2 data-chunk-id=\"be6850c2-7548-4193-b989-a64c3d9f3ddb\">Section 3: Fees and Payment</h2>\n<p data-chunk-id=\"dd997ceb-0bf1-415d-975e-66b730ee4d28\">3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below.</p>\n<table data-chunk-id=\"1ae0d8d9-9454-47b8-b437-ec4f7765f40f\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$49</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>\n<p data-chunk-id=\"bf251089-9325-41c7-a03d-4281d0a4ddcf\">3.2 Fees are invoiced monthly in advance and are due within fourteen (14) days of the invoice date.</p>\n<p data-chunk-id=\"a8fc92d3-db44-4f79-abff-8dbd910052b3\">3.3 Late payments accrue interest at 1.5% per month.</p>\n<div data-chunk-id=\"5e80f6cd-753c-4335-ba6e-111fcd339c45\"><h2>Section 3.4: Data Processing</h2><p>3.4.1 As between the parties, the Client retains all right, title, and interest in the Data. The Provider may process the Data only to provide, maintain, and improve the Services and in accordance with applicable data protection laws, including the GDPR where applicable.</p><p>3.4.2 The Provider shall not engage any sub-processor to process Data containing Personal Data without the Client's prior written approval, except where the sub-processor is reasonably necessary to deliver the Services and has been bound by written obligations no less protective than those set out in this Agreement.</p><p>3.4.3 Upon termination or expiry of this Agreement, the Provider shall delete or irreversibly de-identify the Data containing Personal Data within a reasonable period after the Client's export window ends, unless retention is required by applicable law.</p></div>\n<h2 data-chunk-id=\"9b621320-697c-44ef-af95-ee8154278012\">Section 4: Termination</h2>\n<p data-chunk-id=\"583ff651-e6c4-4c35-afe6-0add1c125f30\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for thirty (30) days after written notice.</p>\n<p data-chunk-id=\"715507f7-8025-4365-9513-f63fa9baa447\">4.2 Upon termination, the Client may export its Data within thirty (30) days. After that period, the Provider may delete all Data.</p>\n<h2 data-chunk-id=\"3a4322f4-e4e6-4d99-abb6-d7cc5159515c\">Section 5: Confidentiality</h2>\n<p data-chunk-id=\"572476ff-6cf0-44b1-aa17-900a55eb19ff\">5.1 Each party shall hold the other party's Confidential Information in strict confidence and use it only to perform its obligations under this Agreement.</p>\n<p data-chunk-id=\"e15c4df7-23f7-44b7-b1f7-e0e1b811bb82\">5.2 Confidential Information does not include information that is publicly available without breach of this Agreement.</p>\n<h2 data-chunk-id=\"a3b0b7ba-c52f-4426-8102-1ab80a803afa\">Section 6: Limitation of Liability</h2>\n<p data-chunk-id=\"9eff28e6-f316-4008-a8ea-12392372e539\">6.1 Neither party's aggregate liability arising out of or related to this Agreement shall exceed the total fees paid by the Client in the twelve (12) months preceding the claim.</p>\n<p data-chunk-id=\"c541c47f-786c-4cd2-b19b-fbe18504b6c3\">6.2 Nothing in this Agreement excludes liability for fraud, gross negligence, or willful misconduct.</p>",
+    "version_id": "03487a6d-f25d-4425-889e-a12786ff6ebe",
+    "changes_summary": "1 added, rest untouched",
+    "requires_approval": null,
+    "pending_changes": null,
+    "changes": [
+      {
+        "status": "approved",
+        "chunk_id": "new",
+        "new_html": "<h2>Section 3.4: Data Processing</h2><p>3.4.1 As between the parties, the Client retains all right, title, and interest in the Data. The Provider may process the Data only to provide, maintain, and improve the Services and in accordance with applicable data protection laws, including the GDPR where applicable.</p><p>3.4.2 The Provider shall not engage any sub-processor to process Data containing Personal Data without the Client's prior written approval, except where the sub-processor is reasonably necessary to deliver the Services and has been bound by written obligations no less protective than those set out in this Agreement.</p><p>3.4.3 Upon termination or expiry of this Agreement, the Provider shall delete or irreversibly de-identify the Data containing Personal Data within a reasonable period after the Client's export window ends, unless retention is required by applicable law.</p>",
+        "old_html": null,
+        "change_id": "2af48bbb-6556-480d-8a48-8ed077d93fa6",
+        "operation": "create",
+        "document_id": "doc_primary",
+        "ai_explanation": "\u2705 I added the Data Processing section after Section 3 with clauses covering data ownership, sub-processor approval, and deletion on termination.",
+        "insert_after_chunk_id": "a8fc92d3-db44-4f79-abff-8dbd910052b3",
+        "insert_before_chunk_id": null
+      }
+    ],
+    "chunk_diffs": null,
+    "concurrent_merges": null,
+    "focused_document_id": "doc_primary"
+  },
+  "usage": {
+    "monthly_used": 14,
+    "monthly_limit": 500,
+    "monthly_remaining": 486,
+    "was_billable": true,
+    "ops_charged": 1,
+    "quota_exhausted": false,
+    "subscription_tier": "free",
+    "bucket_used": "tier",
+    "redemption_id": null,
+    "promotions": [],
+    "agent_handoff_hint": null
+  },
+  "attachment_id": null
+}

@@ -1,0 +1,107 @@
+{
+  "response": "\u2705 Successfully updated all 7 sections. Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+  "session_id": "eqr_contract-04_1786987783",
+  "document_changes": {
+    "updated_html": "<h1 data-chunk-id=\"cfa8d777-ea86-4312-b783-1d1580a5b3cb\">CloudSync Service Agreement</h1>\n<p data-chunk-id=\"db4ac39c-8092-43e1-bbe4-5d13484de314\"><strong>Agreement number:</strong> CSA-2026-0147<br/>\n<strong>Effective date:</strong> January 15, 2026<br/>\n<strong>Parties:</strong> CloudSync Technologies Inc. (\"Provider\") and Meridian Logistics Ltd. (\"Client\")</p>\n<h2 data-chunk-id=\"e185d57c-161f-4eec-9ac7-80e207852c57\">Section 1: Definitions</h2>\n<p data-chunk-id=\"7f77ad31-9367-451f-9eda-2c553203cca0\">1.1 \"Services\" means the cloud storage and file-sync platform described in the attached service description.</p>\n<p data-chunk-id=\"b1408845-1414-4e1e-bb62-509a482cee31\">1.2 \"Subscription\" means the recurring service plan selected by the Client under Section 3.</p>\n<p data-chunk-id=\"60c25d0f-42ac-4686-b891-fc21f4b59b03\">1.3 \"Data\" means all information, files, and records uploaded by the Client to the Services.</p>\n<h2 data-chunk-id=\"4fee6210-09e7-43e0-b3c8-8a6e645e8269\">Section 2: Term</h2>\n<p data-chunk-id=\"160cdf33-6645-4ec6-b5da-64a322cf8e42\">2.1 This Agreement begins on the Effective Date and continues for an initial term of twelve (12) months (the \"Initial Term\"), which shall automatically renew for successive one-year periods unless the Client provides written notice of non-renewal at least thirty (30) days prior to the end of the then-current term.</p>\n<p data-chunk-id=\"f3b615a4-0e46-4986-b0e4-8a124cddf789\">2.2 The Agreement automatically renews for successive twelve-month terms unless the Client provides written notice of non-renewal at least sixty (60) days before the end of the then-current term. At least ninety (90) days prior to any renewal date, the Provider shall send the Client a reminder notice of the upcoming renewal; if the Provider fails to provide such notice, the Client may terminate the agreement at any time within thirty (30) days following the renewal date.</p>\n<h2 data-chunk-id=\"db295323-c23a-4191-87c0-5e6f08c1661d\">Section 3: Fees and Payment</h2>\n<p data-chunk-id=\"d5a262e1-81f5-49fd-8df2-2b83c3ba0d0f\">3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below. The Provider shall issue invoices at least thirty (30) days prior to the due date, and payment shall be due no earlier than thirty (30) days following the Client's receipt of a valid invoice.</p>\n<table data-chunk-id=\"c3e227dd-8113-4ed4-a4e4-1f750475ad8d\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$49</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>\n<p data-chunk-id=\"16aa2527-fe27-48d5-9221-218db2e5559e\">3.2 Fees are invoiced monthly in advance and are due within fourteen (14) days of the invoice date.</p>\n<p data-chunk-id=\"637259f8-f834-46fe-8d37-f477a3b6ff0f\">3.3 Late payments accrue interest at 1.0% per month, provided that no interest shall accrue until five days after the payment due date.</p>\n<h2 data-chunk-id=\"ed2e063b-f4c3-434a-a8ac-60981a06c373\">Section 4: Termination</h2>\n<p data-chunk-id=\"3f781a48-a3f1-40e1-9bef-9bfa8817d73c\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for ten (10) days after written notice. Additionally, the Client may terminate this Agreement for convenience at any time upon thirty (30) days' prior written notice.</p>\n<p data-chunk-id=\"9bacf349-70cb-47b6-a6d5-e1a280a4925b\">4.2 Upon termination, the Client may export its Data within ninety (90) days. After that period, the Provider may delete all Data only upon providing reasonable prior notice to the Client, ensuring the Client has sufficient access to its Data for a fair transition period.</p>\n<h2 data-chunk-id=\"2fd85287-164a-47fc-9802-374b5e428cee\">Section 5: Confidentiality</h2>\n<p data-chunk-id=\"46759720-d853-4c8e-873c-a8d0affa823d\">5.1 Each party shall hold the other party's Confidential Information in strict confidence and use it only to perform its obligations under this Agreement.</p>\n<p data-chunk-id=\"5487cc79-7eaf-4573-afe3-a36e354cdcc8\">5.2 Confidential Information does not include information that is publicly available without breach of this Agreement.</p>\n<h2 data-chunk-id=\"25e68b19-9f8c-45a9-bc51-809c19ee1d5d\">Section 6: Limitation of Liability</h2>\n<p data-chunk-id=\"807905d2-0116-4138-98cf-3cd5fbeb5334\">6.1 Neither party's aggregate liability arising out of or related to this Agreement shall exceed the total fees paid by the Client in the twelve (12) months preceding the claim; provided, however, that this cap shall not apply to any liability arising from a party's gross negligence, willful misconduct, or breach of confidentiality obligations.</p>\n<p data-chunk-id=\"72ed5d10-9386-4b25-b3c2-c0ddb521e4f1\">6.2 Nothing in this Agreement excludes liability for fraud, gross negligence, or willful misconduct.</p>",
+    "version_id": "e7bf258c-1103-4d8d-86d7-49cefe96b22a",
+    "changes_summary": "7 sections edited, rest untouched",
+    "requires_approval": null,
+    "pending_changes": null,
+    "changes": [
+      {
+        "status": "approved",
+        "chunk_id": "160cdf33-6645-4ec6-b5da-64a322cf8e42",
+        "new_html": "<p data-chunk-id=\"160cdf33-6645-4ec6-b5da-64a322cf8e42\">2.1 This Agreement begins on the Effective Date and continues for an initial term of twelve (12) months (the \"Initial Term\"), which shall automatically renew for successive one-year periods unless the Client provides written notice of non-renewal at least thirty (30) days prior to the end of the then-current term.</p>",
+        "old_html": "<p data-chunk-id=\"160cdf33-6645-4ec6-b5da-64a322cf8e42\">2.1 This Agreement begins on the Effective Date and continues for an initial term of twelve (12) months (the \"Initial Term\").</p>",
+        "change_id": "3fb93280-a7af-4dd0-8977-c369ea77c0df",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "2.1 This Agreement begins on the Effective Date and continues for an initial term of twelve (12) months (the \"Initial Term\"), which shall automatically renew for successive one-year periods unless the Client provides written notice of non-renewal at least thirty (30) days prior to the end of the then-current term."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "f3b615a4-0e46-4986-b0e4-8a124cddf789",
+        "new_html": "<p data-chunk-id=\"f3b615a4-0e46-4986-b0e4-8a124cddf789\">2.2 The Agreement automatically renews for successive twelve-month terms unless the Client provides written notice of non-renewal at least sixty (60) days before the end of the then-current term. At least ninety (90) days prior to any renewal date, the Provider shall send the Client a reminder notice of the upcoming renewal; if the Provider fails to provide such notice, the Client may terminate the agreement at any time within thirty (30) days following the renewal date.</p>",
+        "old_html": "<p data-chunk-id=\"f3b615a4-0e46-4986-b0e4-8a124cddf789\">2.2 The Agreement automatically renews for successive twelve-month terms unless either party gives written notice at least thirty (30) days before the end of the then-current term.</p>",
+        "change_id": "9953d645-7a49-42bf-a9cc-a3f9d1799b47",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "2.2 The Agreement automatically renews for successive twelve-month terms unless the Client provides written notice of non-renewal at least sixty (60) days before the end of the then-current term. At least ninety (90) days prior to any renewal date, the Provider shall send the Client a reminder notice of the upcoming renewal; if the Provider fails to provide such notice, the Client may terminate the agreement at any time within thirty (30) days following the renewal date."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "d5a262e1-81f5-49fd-8df2-2b83c3ba0d0f",
+        "new_html": "<p data-chunk-id=\"d5a262e1-81f5-49fd-8df2-2b83c3ba0d0f\">3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below. The Provider shall issue invoices at least thirty (30) days prior to the due date, and payment shall be due no earlier than thirty (30) days following the Client's receipt of a valid invoice.</p>",
+        "old_html": "<p data-chunk-id=\"d5a262e1-81f5-49fd-8df2-2b83c3ba0d0f\">3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below.</p>",
+        "change_id": "60a7c19a-3166-4f35-ac32-2d351cb587c4",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below. The Provider shall issue invoices at least thirty (30) days prior to the due date, and payment shall be due no earlier than thirty (30) days following the Client's receipt of a valid invoice."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "637259f8-f834-46fe-8d37-f477a3b6ff0f",
+        "new_html": "<p data-chunk-id=\"637259f8-f834-46fe-8d37-f477a3b6ff0f\">3.3 Late payments accrue interest at 1.0% per month, provided that no interest shall accrue until five days after the payment due date.</p>",
+        "old_html": "<p data-chunk-id=\"637259f8-f834-46fe-8d37-f477a3b6ff0f\">3.3 Late payments accrue interest at 1.5% per month.</p>",
+        "change_id": "6e6b5ccf-6498-4a46-acff-a655487c1b56",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "3.3 Late payments accrue interest at 1.0% per month, provided that no interest shall accrue until five days after the payment due date."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "3f781a48-a3f1-40e1-9bef-9bfa8817d73c",
+        "new_html": "<p data-chunk-id=\"3f781a48-a3f1-40e1-9bef-9bfa8817d73c\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for ten (10) days after written notice. Additionally, the Client may terminate this Agreement for convenience at any time upon thirty (30) days' prior written notice.</p>",
+        "old_html": "<p data-chunk-id=\"3f781a48-a3f1-40e1-9bef-9bfa8817d73c\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for thirty (30) days after written notice.</p>",
+        "change_id": "2174becf-a1a4-4568-9e43-ada649354819",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for ten (10) days after written notice. Additionally, the Client may terminate this Agreement for convenience at any time upon thirty (30) days' prior written notice."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "9bacf349-70cb-47b6-a6d5-e1a280a4925b",
+        "new_html": "<p data-chunk-id=\"9bacf349-70cb-47b6-a6d5-e1a280a4925b\">4.2 Upon termination, the Client may export its Data within ninety (90) days. After that period, the Provider may delete all Data only upon providing reasonable prior notice to the Client, ensuring the Client has sufficient access to its Data for a fair transition period.</p>",
+        "old_html": "<p data-chunk-id=\"9bacf349-70cb-47b6-a6d5-e1a280a4925b\">4.2 Upon termination, the Client may export its Data within thirty (30) days. After that period, the Provider may delete all Data.</p>",
+        "change_id": "88e848f8-e1b5-4340-821a-38049e0e8bd9",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "4.2 Upon termination, the Client may export its Data within ninety (90) days. After that period, the Provider may delete all Data only upon providing reasonable prior notice to the Client, ensuring the Client has sufficient access to its Data for a fair transition period."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "807905d2-0116-4138-98cf-3cd5fbeb5334",
+        "new_html": "<p data-chunk-id=\"807905d2-0116-4138-98cf-3cd5fbeb5334\">6.1 Neither party's aggregate liability arising out of or related to this Agreement shall exceed the total fees paid by the Client in the twelve (12) months preceding the claim; provided, however, that this cap shall not apply to any liability arising from a party's gross negligence, willful misconduct, or breach of confidentiality obligations.</p>",
+        "old_html": "<p data-chunk-id=\"807905d2-0116-4138-98cf-3cd5fbeb5334\">6.1 Neither party's aggregate liability arising out of or related to this Agreement shall exceed the total fees paid by the Client in the twelve (12) months preceding the claim.</p>",
+        "change_id": "db185c8f-128e-41c9-ad6d-5bee9ba84af1",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+        "new_plain_text": "6.1 Neither party's aggregate liability arising out of or related to this Agreement shall exceed the total fees paid by the Client in the twelve (12) months preceding the claim; provided, however, that this cap shall not apply to any liability arising from a party's gross negligence, willful misconduct, or breach of confidentiality obligations."
+      }
+    ],
+    "chunk_diffs": null,
+    "concurrent_merges": null,
+    "focused_document_id": "doc_primary"
+  },
+  "usage": {
+    "monthly_used": 15,
+    "monthly_limit": 500,
+    "monthly_remaining": 485,
+    "was_billable": true,
+    "ops_charged": 1,
+    "quota_exhausted": false,
+    "subscription_tier": "free",
+    "bucket_used": "tier",
+    "redemption_id": null,
+    "promotions": [],
+    "agent_handoff_hint": null
+  },
+  "attachment_id": null
+}

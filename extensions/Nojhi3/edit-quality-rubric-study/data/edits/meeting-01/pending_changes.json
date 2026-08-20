@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "8755b1f2-8c3e-411f-a8b8-07ceb8a94948",
+    "operation": "edit",
+    "chunk_id": "5087bd0e-3030-4230-974f-b6532f045c7f",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"5087bd0e-3030-4230-974f-b6532f045c7f\">Attendees: Alice, Bob, Charlie</p>",
+    "new_html": "<p data-chunk-id=\"5087bd0e-3030-4230-974f-b6532f045c7f\">Attendees: Alice, Bob, Charlie, Dave</p>",
+    "ai_explanation": "\u2705 I updated the attendee list to include Dave."
+  }
+]

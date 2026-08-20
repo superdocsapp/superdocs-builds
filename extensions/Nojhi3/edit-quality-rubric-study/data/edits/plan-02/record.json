@@ -1,0 +1,36 @@
+{
+  "case_id": "plan-02",
+  "doc_id": "project_plan",
+  "difficulty": "medium",
+  "instruction": "Add a Milestones section after Section 3 listing the three phases (Backend, API, Frontend) with their dates.",
+  "session_id": "eqr_plan-02_1786986202",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "chat": {
+      "job_id": "5f2bed4d-4189-47ad-b256-3691d7f23d05",
+      "usage": null
+    },
+    "pre_approval_status": "completed",
+    "approve": {
+      "ok": true,
+      "note": "no pending changes; job completed directly"
+    },
+    "chat_result": {
+      "response": "I can add the Milestones section after Section 3. What dates should I use for Backend, API, and Frontend?",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36864
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 453
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 0,
+  "final_status": "completed"
+}

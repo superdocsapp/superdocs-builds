@@ -1,0 +1,40 @@
+{
+  "case_id": "contract-01",
+  "doc_id": "service_contract",
+  "difficulty": "easy",
+  "instruction": "Update the pricing table: increase the Business plan monthly fee from $49 to $59.",
+  "session_id": "eqr_contract-01_1786987310",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "export_before_md": {
+      "ok": true,
+      "bytes": 2245
+    },
+    "chat": {
+      "job_id": "ad8461d2-b4a0-4c5b-b983-6864ecff9926",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 1
+    },
+    "chat_result": {
+      "response": "\u2705 I\u2019ve updated the pricing table \u2014 the Business plan monthly fee is now $59.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 37962
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 2245
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

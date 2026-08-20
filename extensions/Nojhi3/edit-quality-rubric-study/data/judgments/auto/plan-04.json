@@ -1,0 +1,24 @@
+{
+  "case_id": "plan-04",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The edit expands headings and task descriptions to make the plan clearer (e.g., 'Section 3: Project Tasks and Responsible Parties').",
+    "fact_accuracy": "All dates, names, and task details remain factually accurate to the source document.",
+    "content_preservation": "All core information regarding tasks, owners, dates, and sections from the source text is preserved.",
+    "structural_integrity": "The overall document structure and section order remain completely intact.",
+    "formatting_fidelity": "Markdown list structure and basic formatting are preserved and clear throughout.",
+    "language_quality": "The revised phrasing is clear, professional, and free of grammatical issues."
+  },
+  "difficulty": "ambiguous",
+  "instruction": "Make the plan clearer."
+}

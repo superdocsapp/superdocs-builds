@@ -1,0 +1,29 @@
+{
+  "name": "ja",
+  "label": "Japanese",
+  "direction": "latin-to-cjk",
+  "lang": "ja",
+  "body_font": "'Yu Mincho', 'Hiragino Mincho ProN', 'MS Mincho', serif",
+  "heading_font": "'Yu Gothic', 'Hiragino Kaku Gothic ProN', 'MS Gothic', sans-serif",
+  "latin_font": "'Times New Roman', Georgia, serif",
+  "body_size_pt": 10.5,
+  "heading_sizes_pt": {"h1": 16, "h2": 14, "h3": 12, "h4": 11, "h5": 10.5, "h6": 10.5},
+  "heading_bold": false,
+  "line_spacing": 1.5,
+  "paragraph_spacing_pt": 6,
+  "text_align": "justify",
+  "page": {
+    "width_mm": 210, "height_mm": 297,
+    "margin_top_mm": 25, "margin_bottom_mm": 25,
+    "margin_left_mm": 20, "margin_right_mm": 20
+  },
+  "punctuation_map": {
+    ",": "\u3001", ".": "\u3002", "!": "\uff01", "?": "\uff1f",
+    ":": "\uff1a", ";": "\uff1b", "(": "\uff08", ")": "\uff09"
+  },
+  "quote_map": {"open": "\u300c", "close": "\u300d"},
+  "thin_space": "\u2009",
+  "kinsoku_no_line_start": "\u3001\u3002\uff01\uff1f\uff09\u300d\u300f\u201d\u300b",
+  "kinsoku_no_line_end": "\uff08\u300c\u300e\u201c\u300a",
+  "css_extra": "p, li, td, th { line-break: strict; word-break: normal; overflow-wrap: normal; }"
+}

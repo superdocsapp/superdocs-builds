@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "152feee5-b43b-4482-8a1d-7b473d25e983",
+    "operation": "create",
+    "chunk_id": "new",
+    "document_id": "doc_primary",
+    "old_html": null,
+    "new_html": "<h2>Risks</h2><p>The database migration delay remains unmitigated and could push the project timeline back if it is not addressed before the next release milestone.</p><p><strong>Mitigation:</strong> Assign a dedicated migration owner to resolve blockers early and track progress daily until the migration is complete.</p>",
+    "ai_explanation": "\u2705 I added a Risks section after the Action Items & Decisions section, including the database migration delay risk and one mitigation."
+  }
+]

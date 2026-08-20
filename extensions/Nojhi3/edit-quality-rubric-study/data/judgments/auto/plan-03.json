@@ -1,0 +1,24 @@
+{
+  "case_id": "plan-03",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 2,
+    "fact_accuracy": 2,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The section title was updated to 'Section 2: Schedule', but the editor completely ignored the instruction to add a 2-day buffer to every date.",
+    "fact_accuracy": "The dates were not shifted by 2 days as required (August 10, 20, and September 05 remained unadjusted instead of August 12, 22, and September 07).",
+    "content_preservation": "All text outside of Section 2 remains intact without unintended edits or deletions.",
+    "structural_integrity": "The document structure and section numbering remain fully coherent.",
+    "formatting_fidelity": "Formatting is consistent and clean, using bullet points appropriately.",
+    "language_quality": "The text is clear, grammatically correct, and free of errors."
+  },
+  "difficulty": "hard",
+  "instruction": "Rewrite Section 2 (Timeline) to add a 2-day buffer to every date and rename the section to 'Schedule'."
+}

@@ -1,0 +1,24 @@
+{
+  "case_id": "contract-03",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "Termination was moved ahead of Fees and Payment to become Section 3, and cross-references (such as in Section 1.2) were accurately updated to reference Section 4.",
+    "fact_accuracy": "All factual details, dates, and agreement terms remain fully accurate.",
+    "content_preservation": "All surrounding clauses and content outside of the requested reordering remain preserved.",
+    "structural_integrity": "Section numbers and cross-references are completely coherent following the move.",
+    "formatting_fidelity": "Markdown headers, bold text, and list structures were properly maintained.",
+    "language_quality": "The document remains clear, grammatical, and professional."
+  },
+  "difficulty": "hard",
+  "instruction": "Move Section 4 (Termination) so it comes before Section 3 (Fees and Payment) and renumber all sections and all cross-references."
+}

@@ -1,0 +1,101 @@
+[
+  {
+    "change_id": "8b5a6c11-8e11-491f-8d4e-ad6fc4598be8",
+    "operation": "move",
+    "chunk_id": "66e29d52-6a1e-4932-8a5b-c55e2c4f282d",
+    "document_id": "doc_primary",
+    "old_html": "<h2 data-chunk-id=\"66e29d52-6a1e-4932-8a5b-c55e2c4f282d\">Section 4: Termination</h2>",
+    "new_html": null,
+    "ai_explanation": "\u2705 I moved Section 4 (Termination) before Section 3 and renumbered the affected sections and cross-reference accordingly."
+  },
+  {
+    "change_id": "f2e9eda5-aecb-41d9-8540-78871154d95b",
+    "operation": "move",
+    "chunk_id": "879d03db-1728-4325-8c0f-64407cd4779f",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"879d03db-1728-4325-8c0f-64407cd4779f\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for thirty (30) days after written notice.</p>",
+    "new_html": null,
+    "ai_explanation": "\u2705 I moved Section 4 (Termination) before Section 3 and renumbered the affected sections and cross-reference accordingly."
+  },
+  {
+    "change_id": "c70fcd6c-5309-468a-91ea-767c6cf61cdb",
+    "operation": "move",
+    "chunk_id": "aefa1363-7fd4-4a99-b0a7-3cc834fff103",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"aefa1363-7fd4-4a99-b0a7-3cc834fff103\">4.2 Upon termination, the Client may export its Data within thirty (30) days. After that period, the Provider may delete all Data.</p>",
+    "new_html": null,
+    "ai_explanation": "\u2705 I moved Section 4 (Termination) before Section 3 and renumbered the affected sections and cross-reference accordingly."
+  },
+  {
+    "change_id": "dba0901f-a903-492d-a2be-03d950ad3c47",
+    "operation": "edit",
+    "chunk_id": "43e636a7-849f-4cbc-9287-98c8995535af",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"43e636a7-849f-4cbc-9287-98c8995535af\">1.2 \"Subscription\" means the recurring service plan selected by the Client under Section 3.</p>",
+    "new_html": "<p data-chunk-id=\"43e636a7-849f-4cbc-9287-98c8995535af\">1.2 \"Subscription\" means the recurring service plan selected by the Client under Section 4.</p>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "1ae81cfe-f7ec-4b5e-af0d-bfb7da5e8978",
+    "operation": "edit",
+    "chunk_id": "9973756d-184b-4e07-b68a-ea66ae96e664",
+    "document_id": "doc_primary",
+    "old_html": "<h2 data-chunk-id=\"9973756d-184b-4e07-b68a-ea66ae96e664\">Section 3: Fees and Payment</h2>",
+    "new_html": "<h2 data-chunk-id=\"9973756d-184b-4e07-b68a-ea66ae96e664\">Section 4: Fees and Payment</h2>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "7ef6d77f-c9e5-442e-a71a-6222169c16ea",
+    "operation": "edit",
+    "chunk_id": "6e4b32ff-d7f2-41ab-bd43-8c540556d50b",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"6e4b32ff-d7f2-41ab-bd43-8c540556d50b\">3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below.</p>",
+    "new_html": "<p data-chunk-id=\"6e4b32ff-d7f2-41ab-bd43-8c540556d50b\">4.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below.</p>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "4e512d25-1a21-4d7e-98fc-c935c651b14c",
+    "operation": "edit",
+    "chunk_id": "a8a5e578-b270-4d15-b1f8-7812c6231c40",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"a8a5e578-b270-4d15-b1f8-7812c6231c40\">3.2 Fees are invoiced monthly in advance and are due within fourteen (14) days of the invoice date.</p>",
+    "new_html": "<p data-chunk-id=\"a8a5e578-b270-4d15-b1f8-7812c6231c40\">4.2 Fees are invoiced monthly in advance and are due within fourteen (14) days of the invoice date.</p>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "0063e816-9851-4999-aa58-e3daf386245c",
+    "operation": "edit",
+    "chunk_id": "12fc5755-3d1c-46dc-8bc1-02310f9ead11",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"12fc5755-3d1c-46dc-8bc1-02310f9ead11\">3.3 Late payments accrue interest at 1.5% per month.</p>",
+    "new_html": "<p data-chunk-id=\"12fc5755-3d1c-46dc-8bc1-02310f9ead11\">4.3 Late payments accrue interest at 1.5% per month.</p>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "42f25e5c-c9f9-411c-8ba6-65f45b5231cc",
+    "operation": "edit",
+    "chunk_id": "66e29d52-6a1e-4932-8a5b-c55e2c4f282d",
+    "document_id": "doc_primary",
+    "old_html": "<h2 data-chunk-id=\"66e29d52-6a1e-4932-8a5b-c55e2c4f282d\">Section 4: Termination</h2>",
+    "new_html": "<h2 data-chunk-id=\"66e29d52-6a1e-4932-8a5b-c55e2c4f282d\">Section 3: Termination</h2>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "9fbec989-cdb8-4a15-8697-75e01b72b86c",
+    "operation": "edit",
+    "chunk_id": "879d03db-1728-4325-8c0f-64407cd4779f",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"879d03db-1728-4325-8c0f-64407cd4779f\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for thirty (30) days after written notice.</p>",
+    "new_html": "<p data-chunk-id=\"879d03db-1728-4325-8c0f-64407cd4779f\">3.1 Either party may terminate this Agreement for material breach if the breach remains uncured for thirty (30) days after written notice.</p>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  },
+  {
+    "change_id": "44dc4f9a-09c5-4b2f-834a-3c3449a6f029",
+    "operation": "edit",
+    "chunk_id": "aefa1363-7fd4-4a99-b0a7-3cc834fff103",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"aefa1363-7fd4-4a99-b0a7-3cc834fff103\">4.2 Upon termination, the Client may export its Data within thirty (30) days. After that period, the Provider may delete all Data.</p>",
+    "new_html": "<p data-chunk-id=\"aefa1363-7fd4-4a99-b0a7-3cc834fff103\">3.2 Upon termination, the Client may export its Data within thirty (30) days. After that period, the Provider may delete all Data.</p>",
+    "ai_explanation": "Parallel edit: Preserve all wording and formatting except the specific numbering/reference\u2026"
+  }
+]

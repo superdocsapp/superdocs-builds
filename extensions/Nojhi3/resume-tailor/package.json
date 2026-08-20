@@ -1,0 +1,19 @@
+{
+  "name": "resume-tailor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Tailors a .docx resume to a job description via an LLM, applied as SuperDoc tracked changes.",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@google/generative-ai": "latest",
+    "@superdoc-dev/cli": "latest",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1"
+  }
+}

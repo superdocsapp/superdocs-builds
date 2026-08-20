@@ -1,0 +1,24 @@
+{
+  "case_id": "contract-04",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 2,
+    "content_preservation": 3,
+    "structural_integrity": 2,
+    "formatting_fidelity": 4,
+    "language_quality": 3
+  },
+  "evidence": {
+    "faithfulness": "The edit consistently added terms favoring the client/tenant (e.g., termination for convenience, longer data export window, lower interest rate, reminder notice requirement).",
+    "fact_accuracy": "Introduced direct internal contradictions regarding timeline facts: Section 2.1 requires 30 days' notice for non-renewal while Section 2.2 specifies 60 days; Section 3.1 sets payment due date at 30 days post-receipt while Section 3.2 keeps the 14-day limit.",
+    "content_preservation": "Rather than editing existing clauses cleanly, the edit retained conflicting original statements alongside new additions (e.g., leaving Section 3.2 intact while adding conflicting payment terms to Section 3.1).",
+    "structural_integrity": "Coherence is compromised by conflicting overlapping sections (2.1 vs 2.2 and 3.1 vs 3.2).",
+    "formatting_fidelity": "Markdown header hierarchy and table structure were completely preserved.",
+    "language_quality": "Individual sentences are clear and grammatical, though redundant across sections due to unedited conflicting clauses."
+  },
+  "difficulty": "ambiguous",
+  "instruction": "Make the contract more tenant-friendly."
+}

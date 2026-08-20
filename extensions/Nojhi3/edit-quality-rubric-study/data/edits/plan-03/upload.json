@@ -1,0 +1,9 @@
+{
+  "html": "<p data-chunk-id=\"f8a4eed2-333b-4e6e-b17c-395ddc9a58ce\">PROJECT ANALYSIS PLAN - BASELINE</p>\n<p data-chunk-id=\"922d4d87-6a62-4a09-8cc5-d4d3f3d7a5f9\">Project Name: Super-Docs Core Platform</p>\n<p data-chunk-id=\"78bf9b4d-7b0c-4e27-aa39-a073f5aba368\">Date: 2026-08-01</p>\n<p data-chunk-id=\"888048c4-d096-472d-a1d3-1fbce0ab0285\">Section 1: Summary</p>\n<p data-chunk-id=\"78c8849e-2155-48f1-a30c-705002f7742a\">This document outlines the core timeline and initial task allocation for the platform launch.</p>\n<p data-chunk-id=\"3af8d608-bd86-4ce1-94d4-ef794cb5da1d\">Section 2: Timeline</p>\n<li data-chunk-id=\"0400cb26-1752-4188-b171-f810ba5071f6\">Backend Setup: August 10</li>\n<li data-chunk-id=\"8f7083c3-dda7-4935-909f-0cd62c5be853\">API Integration: August 20</li>\n<li data-chunk-id=\"bd4b9bd2-7738-4e1a-8ba2-4fa9a52a3a7c\">Frontend Delivery: September 05</li>\n<p data-chunk-id=\"90f755aa-60b1-4379-875d-ce8d14a19d2f\">Section 3: Tasks &amp; Owners</p>\n<li data-chunk-id=\"f939ff8f-eb36-4dbe-94ab-840336c9d429\">Backend Setup assigned to Alice</li>\n<li data-chunk-id=\"10fc850c-db2c-4c3e-9909-04268ff9da2c\">API Integration assigned to Bob</li>\n<li data-chunk-id=\"9cb31ffd-2036-49e1-a8f0-fc5ba3f6046e\">Database migration owner: unassigned</li>",
+  "session_id": "eqr_plan-03_1786986217",
+  "filename": "project_plan.txt",
+  "chunks_count": 13,
+  "version_id": "99aaa5c5-8d5e-48b7-8b9a-c2bce961b60c",
+  "page_setup": null,
+  "persisted": true
+}

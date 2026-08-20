@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "a7102dd8-0155-46dc-8720-f6b7537e4b60",
+    "operation": "edit",
+    "chunk_id": "3af8d608-bd86-4ce1-94d4-ef794cb5da1d",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"3af8d608-bd86-4ce1-94d4-ef794cb5da1d\">Section 2: Timeline</p>",
+    "new_html": "<p data-chunk-id=\"3af8d608-bd86-4ce1-94d4-ef794cb5da1d\">Section 2: Schedule</p>",
+    "ai_explanation": "\u2705 I updated Section 2 to **Schedule** and added a 2-day buffer to every date: Backend Setup is now August 12, API Integration is now August 22, and Frontend Delivery is now September 07."
+  }
+]

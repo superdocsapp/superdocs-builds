@@ -1,0 +1,40 @@
+{
+  "case_id": "contract-03",
+  "doc_id": "service_contract",
+  "difficulty": "hard",
+  "instruction": "Move Section 4 (Termination) so it comes before Section 3 (Fees and Payment) and renumber all sections and all cross-references.",
+  "session_id": "eqr_contract-03_1786987403",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "export_before_md": {
+      "ok": true,
+      "bytes": 2245
+    },
+    "chat": {
+      "job_id": "af704e8a-2cea-43f6-9c88-13375a105f0b",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 11
+    },
+    "chat_result": {
+      "response": "\u2705 11 of 11 sections were updated. 8 had material text changes; the other 3 had formatting changes only.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 37959
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 2245
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 11,
+  "final_status": "completed"
+}

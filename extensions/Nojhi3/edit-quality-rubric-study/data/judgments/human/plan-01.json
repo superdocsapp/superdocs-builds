@@ -1,0 +1,20 @@
+{
+  "case_id": "plan-01",
+  "rater": "human-1",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "evidence: It did what was asked of it",
+    "fact_accuracy": "evidence: No it did everything as needed",
+    "content_preservation": "evidence: It retained everything ",
+    "structural_integrity": "evidence: Nothing else was changed",
+    "formatting_fidelity": "evidence: it kept it consistent",
+    "language_quality": "Evidence: It is consistent"
+  }
+}

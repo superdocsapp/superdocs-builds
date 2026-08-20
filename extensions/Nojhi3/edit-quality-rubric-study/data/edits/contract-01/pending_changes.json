@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "3b39fa2a-4e5d-4afd-891b-380205078627",
+    "operation": "edit",
+    "chunk_id": "0ae7cc33-f108-49db-90dc-9fea7e213be0",
+    "document_id": "doc_primary",
+    "old_html": "<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$49</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>",
+    "new_html": "<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$59</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>",
+    "ai_explanation": "\u2705 I\u2019ve updated the pricing table \u2014 the Business plan monthly fee is now $59."
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "case_id": "meeting-03",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 2,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The edit moved Attendees to the end, but failed to separate 'Decisions' and 'Action Items' into two distinct sections in the requested order.",
+    "fact_accuracy": "All details, dates, and names match the source document exactly.",
+    "content_preservation": "No content was added, omitted, or altered.",
+    "structural_integrity": "The document structure is clean and coherent without broken elements.",
+    "formatting_fidelity": "Markdown header and bullet formatting remains consistent with the original text.",
+    "language_quality": "The text is clear, grammatical, and free of errors."
+  },
+  "difficulty": "hard",
+  "instruction": "Restructure the notes so decisions come first, action items second, and attendees last."
+}

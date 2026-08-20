@@ -1,0 +1,41 @@
+{
+  "case_id": "contract-04",
+  "doc_id": "service_contract",
+  "difficulty": "ambiguous",
+  "instruction": "Make the contract more tenant-friendly.",
+  "session_id": "eqr_contract-04_1786987783",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "export_before_md": {
+      "ok": true,
+      "bytes": 2245
+    },
+    "chat": {
+      "job_id": "e7d00455-cc99-4767-b8ab-a30ce111d646",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "rounds": 1,
+      "final_status": "completed"
+    },
+    "chat_result": {
+      "response": "\u2705 Successfully updated all 7 sections. Parallel edit: Make this section more tenant-friendly while preserving the existing wording\u2026",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 38328
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 3440
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 7,
+  "final_status": "completed"
+}

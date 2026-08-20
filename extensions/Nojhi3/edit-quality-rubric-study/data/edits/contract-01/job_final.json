@@ -1,0 +1,109 @@
+{
+  "job_id": "ad8461d2-b4a0-4c5b-b983-6864ecff9926",
+  "organization_id": null,
+  "user_id": "a2ab81ae-c36f-4674-964e-f4f325bab2da",
+  "session_id": "eqr_contract-01_1786987310",
+  "job_type": "chat",
+  "status": "completed",
+  "created_at": "2026-08-17T17:21:52.106452",
+  "updated_at": "2026-08-17T17:22:09.702184",
+  "progress": 100,
+  "result": {
+    "response": "\u2705 I\u2019ve updated the pricing table \u2014 the Business plan monthly fee is now $59.",
+    "session_id": "eqr_contract-01_1786987310",
+    "document_changes": {
+      "updated_html": "<h1 data-chunk-id=\"100785c8-826b-43b7-9577-19db523e879e\">CloudSync Service Agreement</h1>\n<p data-chunk-id=\"523ce880-4a86-41e3-aa51-a401a337dfb3\"><strong>Agreement number:</strong> CSA-2026-0147<br/>\n<strong>Effective date:</strong> January 15, 2026<br/>\n<strong>Parties:</strong> CloudSync Technologies Inc. (\"Provider\") and Meridian Logistics Ltd. (\"Client\")</p>\n<h2 data-chunk-id=\"ddcce295-071a-490a-82fb-7ea25aa3b5fa\">Section 1: Definitions</h2>\n<p data-chunk-id=\"b6f19177-93c0-4491-a1f0-e39c4814c3d2\">1.1 \"Services\" means the cloud storage and file-sync platform described in the attached service description.</p>\n<p data-chunk-id=\"0ba0655a-6217-4e56-a582-fd19315e4418\">1.2 \"Subscription\" means the recurring service plan selected by the Client under Section 3.</p>\n<p data-chunk-id=\"2969eb7b-647a-4c91-85e4-8f1bc565f9da\">1.3 \"Data\" means all information, files, and records uploaded by the Client to the Services.</p>\n<h2 data-chunk-id=\"5fcf8b9f-aaea-4cb1-9eb7-9961858f8eb2\">Section 2: Term</h2>\n<p data-chunk-id=\"23953190-d0eb-4774-b862-225ce4cfc562\">2.1 This Agreement begins on the Effective Date and continues for an initial term of twelve (12) months (the \"Initial Term\").</p>\n<p data-chunk-id=\"106b109c-b4d3-4bf5-8848-946ecca39961\">2.2 The Agreement automatically renews for successive twelve-month terms unless either party gives written notice at least thirty (30) days before the end of the then-current term.</p>\n<h2 data-chunk-id=\"18b0917e-9a75-455c-9bd5-27ecbd8cc7da\">Section 3: Fees and Payment</h2>\n<p data-chunk-id=\"71197f43-8a33-42d7-98e6-4a1442e556cf\">3.1 The Client shall pay the Provider the applicable Subscription fees set out in the table below.</p>\n<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$59</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>\n<p data-chunk-id=\"47aaaa3d-d9d8-4853-bce4-babb3e4c1d28\">3.2 Fees are invoiced monthly in advance and are due within fourteen (14) days of the invoice date.</p>\n<p data-chunk-id=\"5db546bd-f948-42fa-af0d-45e673953fb8\">3.3 Late payments accrue interest at 1.5% per month.</p>\n<h2 data-chunk-id=\"94af0f7e-748c-451e-9150-81fd9e3fce3f\">Section 4: Termination</h2>\n<p data-chunk-id=\"d1b72242-ea85-472a-83fe-c0b598f4ada4\">4.1 Either party may terminate this Agreement for material breach if the breach remains uncured for thirty (30) days after written notice.</p>\n<p data-chunk-id=\"b835feaa-b780-4a8b-ad9c-55beab5c7b50\">4.2 Upon termination, the Client may export its Data within thirty (30) days. After that period, the Provider may delete all Data.</p>\n<h2 data-chunk-id=\"7852f638-9616-4279-a8cd-e8f5d87ca2cf\">Section 5: Confidentiality</h2>\n<p data-chunk-id=\"452e9a5c-a09f-4f69-9a3e-9b9437c772e5\">5.1 Each party shall hold the other party's Confidential Information in strict confidence and use it only to perform its obligations under this Agreement.</p>\n<p data-chunk-id=\"2e9edeea-e748-4286-ba45-4fbc86193291\">5.2 Confidential Information does not include information that is publicly available without breach of this Agreement.</p>\n<h2 data-chunk-id=\"5e002841-68aa-4ca1-ad86-051cc1aa91d2\">Section 6: Limitation of Liability</h2>\n<p data-chunk-id=\"59d23494-b8d7-4192-9897-bad066384a02\">6.1 Neither party's aggregate liability arising out of or related to this Agreement shall exceed the total fees paid by the Client in the twelve (12) months preceding the claim.</p>\n<p data-chunk-id=\"16b50eba-a71b-4edc-ae7c-4f969e6a6632\">6.2 Nothing in this Agreement excludes liability for fraud, gross negligence, or willful misconduct.</p>",
+      "version_id": "d0fd512d-5a8c-421f-ae6a-8298f99b55cc",
+      "changes_summary": "1 section edited, rest untouched",
+      "requires_approval": null,
+      "pending_changes": null,
+      "changes": [
+        {
+          "status": "approved",
+          "chunk_id": "0ae7cc33-f108-49db-90dc-9fea7e213be0",
+          "new_html": "<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$59</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>",
+          "old_html": "<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr>\n<th>Plan</th>\n<th>Monthly fee</th>\n<th>Storage</th>\n<th>Users included</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Starter</td>\n<td>$29</td>\n<td>100 GB</td>\n<td>5</td>\n</tr>\n<tr>\n<td>Business</td>\n<td>$49</td>\n<td>1 TB</td>\n<td>25</td>\n</tr>\n<tr>\n<td>Enterprise</td>\n<td>$99</td>\n<td>10 TB</td>\n<td>Unlimited</td>\n</tr>\n</tbody>\n</table>",
+          "change_id": "3b39fa2a-4e5d-4afd-891b-380205078627",
+          "operation": "edit",
+          "document_id": "doc_primary",
+          "ai_explanation": "\u2705 I\u2019ve updated the pricing table \u2014 the Business plan monthly fee is now $59.",
+          "new_plain_text": "Plan Monthly fee Storage Users included Starter $29 100 GB 5 Business $59 1 TB 25 Enterprise $99 10 TB Unlimited",
+          "edit_instruction": "Update only the Business plan monthly fee from $49 to $59. Preserve all other table content, values, formatting, and structure verbatim."
+        }
+      ],
+      "chunk_diffs": null,
+      "concurrent_merges": null,
+      "focused_document_id": "doc_primary"
+    },
+    "usage": {
+      "monthly_used": 12,
+      "monthly_limit": 500,
+      "monthly_remaining": 488,
+      "was_billable": true,
+      "ops_charged": 1,
+      "quota_exhausted": false,
+      "subscription_tier": "free",
+      "bucket_used": "tier",
+      "redemption_id": null,
+      "promotions": [],
+      "agent_handoff_hint": null
+    },
+    "attachment_id": null
+  },
+  "error": null,
+  "metadata": {
+    "filename": null,
+    "file_size": null,
+    "content_type": null,
+    "message": "Update the pricing table: increase the Business plan monthly fee from $49 to $59.",
+    "document_html_provided": false,
+    "pending_changes": null,
+    "intermediate_responses": [
+      {
+        "type": "user_facing",
+        "content": "\ud83d\udd0d I\u2019m searching the pricing table for the Business plan monthly fee so I can update it.",
+        "context": "supervisor_decision",
+        "sequence": 1,
+        "timestamp": "2026-08-17T17:21:55.364168+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "I've prepared a change for your review.",
+        "context": "supervisor_decision_hitl",
+        "sequence": 2,
+        "timestamp": "2026-08-17T17:21:59.511481+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"3b39fa2a-4e5d-4afd-891b-380205078627\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"3b39fa2a-4e5d-4afd-891b-380205078627\", \"operation\": \"edit\", \"chunk_id\": \"0ae7cc33-f108-49db-90dc-9fea7e213be0\", \"old_html\": \"<table data-chunk-id=\\\"0ae7cc33-f108-49db-90dc-9fea7e213be0\\\">\\n<thead>\\n<tr>\\n<th>Plan</th>\\n<th>Monthly fee</th>\\n<th>Storage</th>\\n<th>Users included</th>\\n</tr>\\n</thead>\\n<tbody>\\n<tr>\\n<td>Starter</td>\\n<td>$29</td>\\n<td>100 GB</td>\\n<td>5</td>\\n</tr>\\n<tr>\\n<td>Business</td>\\n<td>$49</td>\\n<td>1 TB</td>\\n<td>25</td>\\n</tr>\\n<tr>\\n<td>Enterprise</td>\\n<td>$99</td>\\n<td>10 TB</td>\\n<td>Unlimited</td>\\n</tr>\\n</tbody>\\n</table>\", \"new_html\": \"<table data-chunk-id=\\\"0ae7cc33-f108-49db-90dc-9fea7e213be0\\\">\\n<thead>\\n<tr>\\n<th>Plan</th>\\n<th>Monthly fee</th>\\n<th>Storage</th>\\n<th>Users included</th>\\n</tr>\\n</thead>\\n<tbody>\\n<tr>\\n<td>Starter</td>\\n<td>$29</td>\\n<td>100 GB</td>\\n<td>5</td>\\n</tr>\\n<tr>\\n<td>Business</td>\\n<td>$59</td>\\n<td>1 TB</td>\\n<td>25</td>\\n</tr>\\n<tr>\\n<td>Enterprise</td>\\n<td>$99</td>\\n<td>10 TB</td>\\n<td>Unlimited</td>\\n</tr>\\n</tbody>\\n</table>\", \"ai_explanation\": \"\\u2705 I\\u2019ve updated the pricing table \\u2014 the Business plan monthly fee is now $59.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 3,
+        "timestamp": "2026-08-17T17:22:03.168211+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"3b39fa2a-4e5d-4afd-891b-380205078627\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"3b39fa2a-4e5d-4afd-891b-380205078627\", \"operation\": \"edit\", \"chunk_id\": \"0ae7cc33-f108-49db-90dc-9fea7e213be0\", \"old_html\": \"<table data-chunk-id=\\\"0ae7cc33-f108-49db-90dc-9fea7e213be0\\\">\\n<thead>\\n<tr>\\n<th>Plan</th>\\n<th>Monthly fee</th>\\n<th>Storage</th>\\n<th>Users included</th>\\n</tr>\\n</thead>\\n<tbody>\\n<tr>\\n<td>Starter</td>\\n<td>$29</td>\\n<td>100 GB</td>\\n<td>5</td>\\n</tr>\\n<tr>\\n<td>Business</td>\\n<td>$49</td>\\n<td>1 TB</td>\\n<td>25</td>\\n</tr>\\n<tr>\\n<td>Enterprise</td>\\n<td>$99</td>\\n<td>10 TB</td>\\n<td>Unlimited</td>\\n</tr>\\n</tbody>\\n</table>\", \"new_html\": \"<table data-chunk-id=\\\"0ae7cc33-f108-49db-90dc-9fea7e213be0\\\">\\n<thead>\\n<tr>\\n<th>Plan</th>\\n<th>Monthly fee</th>\\n<th>Storage</th>\\n<th>Users included</th>\\n</tr>\\n</thead>\\n<tbody>\\n<tr>\\n<td>Starter</td>\\n<td>$29</td>\\n<td>100 GB</td>\\n<td>5</td>\\n</tr>\\n<tr>\\n<td>Business</td>\\n<td>$59</td>\\n<td>1 TB</td>\\n<td>25</td>\\n</tr>\\n<tr>\\n<td>Enterprise</td>\\n<td>$99</td>\\n<td>10 TB</td>\\n<td>Unlimited</td>\\n</tr>\\n</tbody>\\n</table>\", \"ai_explanation\": \"\\u2705 I\\u2019ve updated the pricing table \\u2014 the Business plan monthly fee is now $59.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 4,
+        "timestamp": "2026-08-17T17:22:08.948346+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "\u2705 Successfully updated all 1 sections.",
+        "context": null,
+        "sequence": 5,
+        "timestamp": "2026-08-17T17:22:09.190763+00:00"
+      }
+    ],
+    "user_id": null,
+    "model_tier": "pro",
+    "session_id": "eqr_contract-01_1786987310",
+    "response_mode": "full",
+    "thinking_depth": "balanced",
+    "request_message": "Update the pricing table: increase the Business plan monthly fee from $49 to $59.",
+    "cumulative_tokens": 160103,
+    "initial_doc_version": null,
+    "last_real_progress_ts": "2026-08-17T17:22:09.697910+00:00",
+    "user_turn_index_pre_inserted": 0
+  }
+}

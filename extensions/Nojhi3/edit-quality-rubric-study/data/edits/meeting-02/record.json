@@ -1,0 +1,36 @@
+{
+  "case_id": "meeting-02",
+  "doc_id": "meeting_notes",
+  "difficulty": "medium",
+  "instruction": "Add a 'Risks' section after the action items that documents the unmitigated database migration delay risk and proposes one mitigation.",
+  "session_id": "eqr_meeting-02_1786986305",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "chat": {
+      "job_id": "4815cc09-28f0-4d24-bcc0-1f01f72d285f",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 1
+    },
+    "chat_result": {
+      "response": "\u2705 I added a Risks section after the Action Items & Decisions section, including the database migration delay risk and one mitigation.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36998
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 597
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

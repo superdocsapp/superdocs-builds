@@ -1,0 +1,24 @@
+{
+  "case_id": "meeting-02",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 2,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 3,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The 'Risks' section was inserted directly under 'Action Items & Decisions:' before the action items, failing the instruction to place it 'after the action items'.",
+    "fact_accuracy": "The documented risk and proposed mitigation ('Assign a dedicated migration owner...') accurately reflect the context provided in the source text.",
+    "content_preservation": "All original text and details from the source document were completely preserved.",
+    "structural_integrity": "The placement of the Risks header interrupts the heading 'Action Items & Decisions:' and its corresponding bullet list.",
+    "formatting_fidelity": "Formatting is consistent and properly structured using Markdown headers and bullet lists.",
+    "language_quality": "The added text is clear, well-written, and grammatically correct."
+  },
+  "difficulty": "medium",
+  "instruction": "Add a 'Risks' section after the action items that documents the unmitigated database migration delay risk and proposes one mitigation."
+}

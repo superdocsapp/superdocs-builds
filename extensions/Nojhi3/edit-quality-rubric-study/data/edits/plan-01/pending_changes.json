@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "7489278b-2916-429e-9f17-c69e8414476b",
+    "operation": "edit",
+    "chunk_id": "cf53ae5c-f41b-4bad-b4b7-06a5aa62c789",
+    "document_id": "doc_primary",
+    "old_html": "<li data-chunk-id=\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\">Database migration owner: unassigned</li>",
+    "new_html": "<li data-chunk-id=\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\">Database migration owner: Dave</li>",
+    "ai_explanation": "\u2705 I've updated the Database migration owner to Dave."
+  }
+]

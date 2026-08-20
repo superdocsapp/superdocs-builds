@@ -1,0 +1,36 @@
+{
+  "case_id": "meeting-01",
+  "doc_id": "meeting_notes",
+  "difficulty": "easy",
+  "instruction": "Change the attendee list to include Dave.",
+  "session_id": "eqr_meeting-01_1786986285",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "chat": {
+      "job_id": "0e8c4f47-7534-4384-b10f-118c713dd4be",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 1
+    },
+    "chat_result": {
+      "response": "\u2705 I updated the attendee list to include Dave.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36803
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 308
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

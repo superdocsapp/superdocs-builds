@@ -1,0 +1,40 @@
+{
+  "case_id": "plan-04",
+  "doc_id": "project_plan",
+  "difficulty": "ambiguous",
+  "instruction": "Make the plan clearer.",
+  "session_id": "eqr_plan-04_1786987242",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "export_before_md": {
+      "ok": true,
+      "bytes": 453
+    },
+    "chat": {
+      "job_id": "94cf49b4-103c-4665-9811-ee5c8d95a7ee",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 10
+    },
+    "chat_result": {
+      "response": "\u2705 Successfully updated all 10 sections. Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36921
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 537
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 10,
+  "final_status": "completed"
+}
