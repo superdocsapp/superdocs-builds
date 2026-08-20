@@ -1,0 +1,26 @@
+.DS_Store
+
+# Python
+.venv/
+**/.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Local databases
+*.db
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Node
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+
+# TypeScript build cache
+*.tsbuildinfo
