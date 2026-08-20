@@ -1,0 +1,366 @@
+---
+title: "Editing a research paper with a review gate"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Editing a research paper with a review gate}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(superdocsr)
+```
+
+## The problem this solves
+
+An AI that edits your manuscript is useful right up to the moment it changes
+something you did not want changed. In a paper, that is not a cosmetic
+problem: a rewritten hedge becomes an overclaim, a "tightened" result becomes
+a different result, and neither is obvious three drafts later.
+
+So this package does not apply edits. It proposes them, shows you what they
+are, and applies exactly the ones you name. The workflow is five calls:
+
+    sd_upload()  ->  sd_edit()  ->  sd_wait()  ->  sd_changes()  ->  sd_approve()  ->  sd_export()
+
+and the gate sits in the middle of it, not as an option you can switch on.
+
+## Running this vignette
+
+Everything below actually runs, with no API key and no network. The client's
+HTTP transport is a plain function, so this vignette supplies one that returns
+recorded SuperDocs payloads. That is the same seam the package's test suite
+uses, and it is available to you: if you are building on top of `superdocsr`,
+you can test your own code the same way.
+
+```{r fake-api}
+# Recorded payloads, shaped exactly like the documented API responses.
+payloads <- list(
+  upload = list(
+    html = "<div data-chunk-id=\"c1\"><h1>Effects of X on Y</h1></div>",
+    session_id = "paper-2026", filename = "manuscript.docx",
+    chunks_count = 96, version_id = "v_1",
+    page_setup = list(width_in = 8.27, height_in = 11.69, orientation = "portrait")
+  ),
+  started = list(job_id = "job_7f3a", session_id = "paper-2026", status = "pending"),
+  review = list(
+    job_id = "job_7f3a", session_id = "paper-2026", job_type = "chat",
+    status = "awaiting_approval", progress = 60,
+    created_at = "2026-08-10T10:00:00Z", updated_at = "2026-08-10T10:01:12Z",
+    metadata = list(intermediate_responses = list(
+      list(type = "intermediate", content = "Reading the discussion...", sequence = 1),
+      # Note the shape: `content` is a JSON string inside JSON.
+      list(type = "proposed_change_batch", sequence = 2, content = jsonlite::toJSON(list(
+        type = "batch_approval", batch_id = "ch_1", batch_total = 2,
+        changes = list(
+          list(
+            change_id = "ch_1", operation = "edit", chunk_id = "c41",
+            old_html = "<p>The effect was very significant.</p>",
+            new_html = "<p>The effect was significant (p = 0.03).</p>",
+            ai_explanation = "Replaced an intensifier with the reported statistic"
+          ),
+          list(
+            change_id = "ch_2", operation = "delete", chunk_id = "c58",
+            old_html = "<p>This clearly proves the mechanism.</p>",
+            new_html = NULL,
+            ai_explanation = "Removed a causal claim the data does not support"
+          )
+        )
+      ), auto_unbox = TRUE, null = "null"))
+    ))
+  ),
+  done = list(
+    job_id = "job_7f3a", session_id = "paper-2026", job_type = "chat",
+    status = "completed", progress = 100,
+    created_at = "2026-08-10T10:00:00Z", updated_at = "2026-08-10T10:02:40Z",
+    result = list(response = "Applied 1 change.", session_id = "paper-2026")
+  )
+)
+
+json <- function(x) {
+  httr2::response(
+    status_code = 200, headers = list(`Content-Type` = "application/json"),
+    body = charToRaw(jsonlite::toJSON(x, auto_unbox = TRUE, null = "null"))
+  )
+}
+
+approved_yet <- FALSE
+transport <- function(req) {
+  path <- httr2::url_parse(req$url)$path
+  if (grepl("documents/upload", path)) return(json(payloads$upload))
+  if (grepl("chat/async", path)) return(json(payloads$started))
+  if (grepl("approve", path)) {
+    approved_yet <<- TRUE
+    return(json(list(status = "ok")))
+  }
+  if (grepl("^/v1/jobs/", path)) {
+    return(json(if (approved_yet) payloads$done else payloads$review))
+  }
+  if (grepl("documents/export", path)) {
+    return(httr2::response(200L, body = charToRaw("PK\003\004 ...docx bytes...")))
+  }
+  stop("unrecorded call: ", path)
+}
+```
+
+## The client
+
+In real use you write this and nothing else:
+
+```{r real-client, eval = FALSE}
+client <- sd_client() # reads SUPERDOCS_API_KEY
+sd_verify_key(client) # cheap check that the key works
+```
+
+Keep the key in `~/.Renviron`, never in the script. Here we point at the
+recorded transport instead, and cap the client at three operations so a mistake
+in this vignette could not cost anything even if it were live:
+
+```{r client}
+client <- sd_client(
+  api_key = "sk_not_a_real_key",
+  budget = sd_budget(max_operations = 3, max_pages = 40),
+  transport = transport
+)
+client
+```
+
+## Upload the rendered paper
+
+`sd_upload()` streams the file from disk rather than reading it into R, so a
+long manuscript with figures does not have to fit in memory twice. Uploading
+is not billable.
+
+```{r upload}
+manuscript <- tempfile(fileext = ".docx")
+writeBin(charToRaw("PK... a rendered manuscript ..."), manuscript)
+
+doc <- sd_upload(manuscript, client, session_id = "paper-2026")
+doc
+```
+
+The session id is yours to choose and worth choosing deliberately: it is how
+you come back to this document tomorrow, or after R crashes.
+
+## Ask for a targeted edit
+
+Targeted instructions land better than sweeping ones. "Improve the paper"
+gives the model licence to rewrite your argument; the instruction below does
+not.
+
+```{r edit}
+job <- sd_edit(
+  doc,
+  paste(
+    "In the discussion, replace vague intensifiers with the reported statistics,",
+    "and remove any causal claim the results section does not support.",
+    "Do not touch the methods, the citations, or the numbers."
+  )
+)
+job
+```
+
+`approval_mode` defaults to `"ask_every_time"`. Nothing has changed in the
+document yet.
+
+## Wait for it
+
+An edit on a real paper takes anywhere from ten seconds to several minutes,
+with nothing visible in between. That is the API working. `sd_wait()` polls
+with exponential backoff so a long job is not hammered, and gives up on your
+schedule rather than the server's:
+
+```{r wait}
+job <- sd_wait(job, timeout = 300, verbose = FALSE)
+job$status
+sd_awaiting_kind(job)
+```
+
+Two different pauses report `awaiting_approval`, which is why
+`sd_awaiting_kind()` exists. `"change_review"` is answered by `sd_approve()`;
+`"continue_prompt"` -- a large edit asking whether to keep going -- is answered
+by `sd_continue()`. Sending the wrong one is rejected with a 409.
+
+If `sd_wait()` times out, nothing is lost: the job keeps running server-side,
+and `sd_wait(job)` picks it back up. Jobs are deleted an hour after they are
+created, so that is the real deadline.
+
+## Read what it proposes
+
+```{r changes}
+changes <- sd_changes(job, refresh = FALSE)
+changes
+```
+
+It is an ordinary data frame, so you can filter it like one:
+
+```{r changes-df}
+changes[, c("change_id", "operation", "ai_explanation")]
+```
+
+### The second parse, and why you did not have to think about it
+
+Proposed changes reach a client in two shapes. Some arrive as ordinary JSON
+objects in `metadata$pending_changes`. The batched ones arrive inside
+`metadata$intermediate_responses`, where the payload sits in a `content` field
+that is *itself a JSON-encoded string* -- the same double encoding the SSE
+`proposed_change_batch` event uses.
+
+Parse the response once and `content` is still a character scalar; every field
+you read off it comes back empty. That is the single most common reason an
+integration renders a review UI where every row is blank. `sd_changes()` makes
+the second `jsonlite::fromJSON()` call for you. Here is the raw payload it
+started from:
+
+```{r double-parse}
+raw_event <- payloads$review$metadata$intermediate_responses[[2]]
+substr(raw_event$content, 1, 60)
+
+# One parse gets you a string. Two gets you the changes.
+class(raw_event$content)
+length(jsonlite::fromJSON(raw_event$content, simplifyVector = FALSE)$changes)
+```
+
+## Approve the part you agree with
+
+This is the gate. `change_ids` has no default, and there is no
+approve-everything switch, because an unreviewed edit to a paper you are about
+to submit is the whole thing this package exists to prevent.
+
+Here we take the statistic correction and reject the deletion, telling the
+model why:
+
+```{r approve}
+keep <- changes$change_id[changes$operation == "edit"]
+drop <- changes$change_id[changes$operation == "delete"]
+
+job <- sd_approve(job, keep)
+job <- sd_deny(job, drop, feedback = "Keep the sentence; soften it instead of cutting it.")
+job <- sd_wait(job, verbose = FALSE)
+job$status
+```
+
+Denying with feedback can produce a revised proposal, so a review can go
+several rounds. Keep polling until the status is `completed`.
+
+## Export
+
+Exports are free, so export often rather than at the end.
+
+```{r export}
+out <- file.path(tempdir(), "manuscript-revised.docx")
+sd_export(doc, format = "docx", path = out)
+file.size(out) > 0
+```
+
+`docx`, `pdf`, `html`, `markdown` and `txt` are the available formats. If the
+render hit something non-fatal -- an image that would not download, a diagram
+that timed out -- `sd_export()` raises an R warning carrying the codes rather
+than handing you a file that quietly lost a figure.
+
+## The knitr shortcut
+
+`sd_knit()` is the whole thing in one call: it renders the `.Rmd` with
+`rmarkdown::render()` and then runs upload, edit, review, approve, export over
+the result.
+
+```{r knit, eval = FALSE}
+result <- sd_knit(
+  "paper.Rmd",
+  "Tighten the discussion; keep every citation and number exactly as written.",
+  output_format = "word_document",
+  export_path = "paper-revised.docx"
+)
+result$changes
+```
+
+The review step is a function you supply. The default,
+`sd_review_console()`, asks you in an interactive session and refuses to guess
+in a script -- which means a scheduled job cannot approve anything by
+accident. Two other useful shapes:
+
+```{r review-fns, eval = FALSE}
+# Prepare the work, decide later.
+sd_knit("paper.Rmd", "...", review = sd_review_none)
+
+# A rule you can defend: accept wording edits, never accept deletions.
+sd_knit("paper.Rmd", "...", review = function(changes) {
+  changes$change_id[changes$operation == "edit"]
+})
+```
+
+Whatever the function returns, every proposed change gets an explicit decision
+-- the ids you name are approved and the rest are denied -- so a job never
+sits blocking your session waiting for a review nobody is going to give.
+
+## Not spending more than you meant to
+
+`sd_budget()` is attached to the client and enforced before requests leave your
+machine.
+
+```{r budget}
+sd_ops_used(client)
+sd_ops_remaining(client)
+
+tiny <- sd_client(api_key = "sk_x", budget = sd_budget(max_operations = 0), transport = transport)
+try(sd_edit(sd_document(tiny, "paper-2026"), "Rewrite everything."))
+```
+
+`max_pages` refuses an oversized document after the free upload and before any
+billable edit. The API reports chunks, not pages, so the gate compares against
+`ceiling(chunks_count / chunks_per_page)` -- an estimate, with a default of 12
+chunks per page that suits a double-spaced manuscript. Tune it for your
+documents:
+
+```{r pages}
+strict <- sd_client(
+  api_key = "sk_x",
+  budget = sd_budget(max_pages = 5, chunks_per_page = 12),
+  transport = transport
+)
+try(sd_upload(manuscript, strict, session_id = "paper-2026"))
+```
+
+And `small_sample = TRUE` is the cheap first run: one operation, three pages,
+fastest model tier.
+
+## Picking up after a crash
+
+Nothing about the workflow lives only in your R session. The session id and
+the job id are enough to resume:
+
+```{r resume}
+doc <- sd_document(client, session_id = "paper-2026")
+job <- sd_job(client, job_id = "job_7f3a", session_id = "paper-2026")
+
+# Poll it again to find out where it got to. Here it has already finished.
+sd_wait(job, verbose = FALSE)$status
+```
+
+Save both to disk as soon as you have them. A job id older than an hour is
+gone rather than slow -- re-run the edit in that case.
+
+## When something goes wrong
+
+Errors name the cause and the fix, and carry a class so you can branch:
+
+```{r errors, error = TRUE}
+broken <- sd_client(
+  api_key = "sk_x",
+  transport = function(req) {
+    httr2::response(
+      status_code = 415,
+      headers = list(`Content-Type` = "application/json"),
+      body = charToRaw('{"detail": "Unsupported file type: .doc"}')
+    )
+  }
+)
+tex <- tempfile(fileext = ".doc")
+writeBin(charToRaw("x"), tex)
+sd_upload(tex, broken)
+```
+
+That one never reached the network: the extension check runs locally. The
+classes are `sd_api_error` (plus `sd_http_<status>`), `sd_budget_error`,
+`sd_timeout_error` and `sd_job_failed`.
