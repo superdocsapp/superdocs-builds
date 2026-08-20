@@ -242,6 +242,11 @@ export const api = {
   },
   patchCampaign: (id: string, body: { name?: string; description?: string; genre?: string; setting?: string }) =>
     request<Campaign>(`/campaigns/${id}`, { method: "PATCH", body: JSON.stringify(body) }),
+  deleteCampaign: (id: string) =>
+    request<{ status: string; campaign_id: string; campaign_name: string; deleted_documents: number }>(
+      `/campaigns/${id}`,
+      { method: "DELETE" }
+    ),
   uploadCampaignCoverImage: (id: string, file: File) => {
     const form = new FormData();
     form.append("file", file);

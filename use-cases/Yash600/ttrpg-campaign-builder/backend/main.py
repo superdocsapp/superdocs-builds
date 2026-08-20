@@ -1155,6 +1155,56 @@ def patch_campaign(campaign_id: str, body: CampaignPatch, session: Session = Dep
     return _campaign_out(c)
 
 
+@app.delete("/campaigns/{campaign_id}")
+def delete_campaign(campaign_id: str, session: Session = Depends(db.get_session)):
+    """
+    Deletes a campaign and everything under it. Reuses delete_document()'s
+    cascade (versions, links, entity rows, entity-scoped illustrations,
+    document-scoped chat) for every document in the campaign, then cleans up
+    what's left at the campaign level: the campaign-level chat (e.g. the
+    Campaign Assistant thread, which has document_id=None so the per-document
+    cascade above never touches it), any illustrations that were generated
+    but never embedded in a document, export audit rows, and change-log
+    events. Irreversible -- there is no undo or trash/archive state.
+    """
+    campaign = _get_campaign(session, campaign_id)
+    campaign_name = campaign.name
+
+    doc_ids = [
+        d.id for d in session.exec(select(models.Document).where(models.Document.campaign_id == campaign_id)).all()
+    ]
+    for doc_id in doc_ids:
+        delete_document(doc_id, session)
+
+    for cs in session.exec(select(models.ChatSession).where(models.ChatSession.campaign_id == campaign_id)).all():
+        for m in session.exec(select(models.ChatMessage).where(models.ChatMessage.chat_session_id == cs.id)).all():
+            session.delete(m)
+        session.delete(cs)
+
+    for i in session.exec(select(models.Illustration).where(models.Illustration.campaign_id == campaign_id)).all():
+        session.delete(i)
+
+    for e in session.exec(select(models.Export).where(models.Export.campaign_id == campaign_id)).all():
+        session.delete(e)
+
+    for ev in session.exec(select(models.ChangeEvent).where(models.ChangeEvent.campaign_id == campaign_id)).all():
+        session.delete(ev)
+
+    # ChatSession/Illustration/Export/ChangeEvent have no relationship()
+    # back to Campaign (unlike Document, which does, via
+    # Campaign.documents/Document.campaign) -- without that, SQLAlchemy's
+    # unit-of-work has no dependency info telling it these rows must be
+    # deleted before the campaign row when both are queued in the same
+    # flush, and can emit DELETE FROM campaign first, hitting a real FK
+    # violation on Postgres. Flushing the cleanup deletes here forces them
+    # to hit the DB before campaign's own delete is even queued.
+    session.flush()
+
+    session.delete(campaign)
+    session.commit()
+    return {"status": "deleted", "campaign_id": campaign_id, "campaign_name": campaign_name, "deleted_documents": len(doc_ids)}
+
+
 _IMAGE_URL_KEYS = ("url", "image_url", "file_url", "public_url", "cdn_url", "src", "href")
 
 
@@ -1594,6 +1644,35 @@ def patch_document(document_id: str, body: DocumentPatch, session: Session = Dep
     return _doc_out(doc, active_version=_active_version(session, doc))
 
 
+def _detach_link_events(session: Session, link_id: str) -> None:
+    """
+    A DocumentLink can't just be deleted outright: every link creation (and
+    every staleness flip/resync) records a ChangeEvent row with link_id set
+    (see LINK_CREATED/LINK_FLAGGED_STALE/LINK_RESYNCED), and that column is a
+    real foreign key to documentlink.id. On real Postgres (Render), deleting
+    a link that still has a ChangeEvent pointing at it raises a
+    ForeignKeyViolation -- this was never caught by the test suite because
+    the in-memory SQLite fixture doesn't enforce foreign keys by default.
+    Null out link_id on those events (rather than deleting them) so the
+    change-log audit trail keeps its history even after the link itself is
+    gone -- same "preserve the audit row, detach the dangling reference"
+    pattern delete_document() already uses for embedded illustrations.
+    """
+    for ev in session.exec(select(models.ChangeEvent).where(models.ChangeEvent.link_id == link_id)).all():
+        ev.link_id = None
+        session.add(ev)
+
+
+def _detach_document_events(session: Session, document_id: str) -> None:
+    """Same problem as _detach_link_events(), one level up: DOCUMENT_CREATED/
+    IMPORTED/SAVED/etc events record document_id, also a real foreign key.
+    Deleting the document itself hits the same FK violation unless these are
+    detached first."""
+    for ev in session.exec(select(models.ChangeEvent).where(models.ChangeEvent.document_id == document_id)).all():
+        ev.document_id = None
+        session.add(ev)
+
+
 @app.delete("/documents/{document_id}")
 def delete_document(document_id: str, session: Session = Depends(db.get_session)):
     doc = _get_document(session, document_id)
@@ -1608,6 +1687,7 @@ def delete_document(document_id: str, session: Session = Depends(db.get_session)
             (models.DocumentLink.source_document_id == document_id) | (models.DocumentLink.target_document_id == document_id)
         )
     ).all():
+        _detach_link_events(session, l.id)
         session.delete(l)
 
     chat_session = session.exec(select(models.ChatSession).where(models.ChatSession.document_id == document_id)).first()
@@ -1637,6 +1717,7 @@ def delete_document(document_id: str, session: Session = Depends(db.get_session)
                     session.add(npc)
             session.delete(row)
 
+    _detach_document_events(session, document_id)
     session.delete(doc)
     session.commit()
     _record_event(session, models.ChangeEventType.DOCUMENT_DELETED, campaign_id=campaign_id, description=f"Deleted document {title!r}")
@@ -2193,6 +2274,7 @@ def delete_link(link_id: str, session: Session = Depends(db.get_session)):
     link = session.get(models.DocumentLink, link_id)
     if link is None:
         raise HTTPException(404, "link not found")
+    _detach_link_events(session, link_id)
     session.delete(link)
     session.commit()
     return {"status": "deleted"}

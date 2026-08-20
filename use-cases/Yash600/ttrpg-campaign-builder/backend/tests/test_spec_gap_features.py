@@ -379,6 +379,92 @@ def test_delete_document_removes_links_and_nulls_embedded_illustration(client):
     assert client.get(f"/links/{link['id']}").status_code == 404
 
 
+def test_delete_document_with_linked_change_event_does_not_hit_fk_violation(client):
+    """
+    Regression test for a real production bug: creating a link always
+    records a LINK_CREATED ChangeEvent with link_id set (a real FK to
+    documentlink.id). Deleting a document that owns that link deletes the
+    link too -- on real Postgres, with the ChangeEvent row still pointing at
+    it, that raised sqlalchemy.exc.IntegrityError / ForeignKeyViolation.
+    conftest.py's client fixture now enables SQLite's foreign_keys PRAGMA
+    specifically so this class of bug fails here instead of in prod.
+    """
+    campaign = _make_campaign(client)
+    a = _make_doc(client, campaign["id"], "npc", "Villain")
+    b = _make_doc(client, campaign["id"], "location", "Lair")
+    link = client.post("/links", json={"source_document_id": a["id"], "target_document_id": b["id"]}).json()
+
+    resp = client.delete(f"/documents/{a['id']}")
+    assert resp.status_code == 200, resp.text
+    assert client.get(f"/links/{link['id']}").status_code == 404
+
+    # the LINK_CREATED audit event survives, just detached from the now-gone link
+    events = client.get(f"/campaigns/{campaign['id']}/events").json()
+    link_events = [e for e in events if e["event_type"] == "link_created"]
+    assert len(link_events) == 1
+    assert link_events[0]["link_id"] is None
+
+
+def test_delete_link_endpoint_does_not_hit_fk_violation(client):
+    campaign = _make_campaign(client)
+    a = _make_doc(client, campaign["id"], "npc", "Villain")
+    b = _make_doc(client, campaign["id"], "location", "Lair")
+    link = client.post("/links", json={"source_document_id": a["id"], "target_document_id": b["id"]}).json()
+
+    resp = client.delete(f"/links/{link['id']}")
+    assert resp.status_code == 200, resp.text
+    assert client.get(f"/links/{link['id']}").status_code == 404
+
+
+def test_delete_campaign_cascades_everything(client):
+    campaign = _make_campaign(client)
+    bible = _make_doc(client, campaign["id"], "campaign_bible", "The Bible")
+    char = client.post(f"/campaigns/{campaign['id']}/characters", json={"name": "Aria"}).json()
+    npc = client.post(f"/campaigns/{campaign['id']}/npcs", json={"name": "Villain"}).json()
+    link = client.post(
+        "/links",
+        json={"source_document_id": char["document"]["id"], "target_document_id": bible["id"], "relationship_type": "references"},
+    ).json()
+
+    resp = client.delete(f"/campaigns/{campaign['id']}")
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["status"] == "deleted"
+    assert body["deleted_documents"] == 3  # bible + character sheet + npc writeup
+
+    # campaign itself is gone
+    assert client.get(f"/campaigns/{campaign['id']}").status_code == 404
+    assert campaign["id"] not in [c["id"] for c in client.get("/campaigns").json()]
+
+    # every document, and everything document-scoped, is gone too
+    assert client.get(f"/documents/{bible['id']}").status_code == 404
+    assert client.get(f"/documents/{char['document']['id']}").status_code == 404
+    assert client.get(f"/documents/{npc['document']['id']}").status_code == 404
+    assert client.get(f"/links/{link['id']}").status_code == 404
+
+
+def test_delete_campaign_removes_campaign_level_assistant_chat(client):
+    """The Campaign Assistant's chat session has document_id=None, so it is
+    NOT touched by delete_document()'s per-document cascade -- this is the
+    campaign-level cleanup delete_campaign() has to do itself."""
+    campaign = _make_campaign(client)
+    resp = client.post(f"/campaigns/{campaign['id']}/assistant", json={"message": "Suggest a plot hook"})
+    assert resp.status_code == 200, resp.text
+
+    del_resp = client.delete(f"/campaigns/{campaign['id']}")
+    assert del_resp.status_code == 200
+
+    # campaign is gone, so its assistant history is unreachable -- the real
+    # assertion is that the DELETE call itself didn't error out on the
+    # orphaned document_id=None chat session/messages.
+    assert client.get(f"/campaigns/{campaign['id']}").status_code == 404
+
+
+def test_delete_campaign_missing_returns_404(client):
+    resp = client.delete("/campaigns/does-not-exist")
+    assert resp.status_code == 404
+
+
 # -------------------------------------------------------------------------- #
 # search / filter / sort
 # -------------------------------------------------------------------------- #

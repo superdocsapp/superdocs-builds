@@ -56,6 +56,7 @@ const TABS: { id: Tab; label: string; Icon: any }[] = [
 
 export default function CampaignWorkspacePage() {
   const params = useParams();
+  const router = useRouter();
   const campaignId = params.id as string;
 
   const [campaign, setCampaign] = useState<Campaign | null>(null);
@@ -78,6 +79,7 @@ export default function CampaignWorkspacePage() {
   const [ceDescription, setCeDescription] = useState("");
   const [ceCover, setCeCover] = useState<File | null>(null);
   const [ceBusy, setCeBusy] = useState(false);
+  const [deletingCampaign, setDeletingCampaign] = useState(false);
 
   const refreshAll = useCallback(() => {
     if (!campaignId) return;
@@ -126,6 +128,26 @@ export default function CampaignWorkspacePage() {
     }
   }
 
+  async function handleDeleteCampaign() {
+    if (!campaign) return;
+    if (
+      !window.confirm(
+        `Delete "${campaign.name}"? This permanently removes every document, character, NPC, location, and illustration in this campaign. This cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    setDeletingCampaign(true);
+    setError(null);
+    try {
+      await api.deleteCampaign(campaignId);
+      router.push("/");
+    } catch (e) {
+      setError(String(e));
+      setDeletingCampaign(false);
+    }
+  }
+
   async function runValidate() {
     setBusy(true);
     try {
@@ -153,9 +175,14 @@ export default function CampaignWorkspacePage() {
             <div className="hero-eyebrow">CAMPAIGN</div>
             <h1>{campaign.name}</h1>
           </div>
-          <button className="btn ghost" onClick={editingCampaign ? () => setEditingCampaign(false) : startEditCampaign}>
-            {editingCampaign ? "Cancel" : "Edit details"}
-          </button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button className="btn ghost" onClick={editingCampaign ? () => setEditingCampaign(false) : startEditCampaign}>
+              {editingCampaign ? "Cancel" : "Edit details"}
+            </button>
+            <button className="btn ghost" onClick={handleDeleteCampaign} disabled={deletingCampaign} title="Delete campaign">
+              <IconTrash size={14} /> {deletingCampaign ? "Deleting…" : "Delete campaign"}
+            </button>
+          </div>
         </div>
 
         {editingCampaign ? (

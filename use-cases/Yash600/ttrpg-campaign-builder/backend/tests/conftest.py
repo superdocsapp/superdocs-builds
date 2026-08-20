@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import event
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 
@@ -42,6 +43,19 @@ def client(fake_client, monkeypatch):
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+
+    # SQLite does not enforce foreign keys unless told to, per-connection --
+    # real Postgres (what this app actually runs against in prod) always
+    # does. Turning this on catches FK-violation bugs (e.g. deleting a row
+    # something else still points at) here in tests instead of in
+    # production; see _detach_link_events()'s docstring in main.py for the
+    # bug this exact PRAGMA caught.
+    @event.listens_for(engine, "connect")
+    def _enable_sqlite_fk(dbapi_connection, _):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
     SQLModel.metadata.create_all(engine)
 
     def get_session_override():

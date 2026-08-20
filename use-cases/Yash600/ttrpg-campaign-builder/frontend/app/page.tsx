@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, Campaign } from "@/lib/api";
-import { IconArrowRight } from "./icons";
+import { IconArrowRight, IconTrash } from "./icons";
 import ProcessFlow from "./ProcessFlow";
 
 // The animated castle/petals/stars scene used to live here, inline, which
@@ -28,6 +28,7 @@ export default function CampaignsHomePage() {
   const [setting, setSetting] = useState("");
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState<File | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     api
@@ -58,6 +59,24 @@ export default function CampaignsHomePage() {
     } catch (e) {
       setError(String(e));
       setCreating(false);
+    }
+  }
+
+  async function handleDelete(e: React.MouseEvent, c: Campaign) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!window.confirm(`Delete "${c.name}"? This permanently removes every document, character, NPC, location, and illustration in this campaign. This cannot be undone.`)) {
+      return;
+    }
+    setDeletingId(c.id);
+    setError(null);
+    try {
+      await api.deleteCampaign(c.id);
+      setCampaigns((prev) => (prev ? prev.filter((x) => x.id !== c.id) : prev));
+    } catch (e) {
+      setError(String(e));
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -145,7 +164,18 @@ export default function CampaignsHomePage() {
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
                   <h3 style={{ margin: "0 0 4px" }}>{c.name}</h3>
-                  <IconArrowRight size={16} />
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <button
+                      className="btn ghost"
+                      onClick={(e) => handleDelete(e, c)}
+                      disabled={deletingId === c.id}
+                      title="Delete campaign"
+                      style={{ padding: "3px 5px", lineHeight: 0 }}
+                    >
+                      <IconTrash size={14} />
+                    </button>
+                    <IconArrowRight size={16} />
+                  </div>
                 </div>
                 {c.genre && <div className="badge bible">{c.genre}</div>}
                 {c.description && <p style={{ color: "var(--text-muted)", marginTop: 8 }}>{c.description}</p>}
