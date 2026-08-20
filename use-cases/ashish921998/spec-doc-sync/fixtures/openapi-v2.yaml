@@ -1,0 +1,29 @@
+openapi: 3.1.0
+info: {title: Nimbus Billing API, version: 1.5.0}
+paths:
+  /invoices:
+    post:
+      operationId: createInvoice
+      summary: Create an invoice
+      description: Creates a draft invoice for an account.
+  /invoices/{invoice_id}/finalize:
+    post:
+      operationId: finalizeInvoice
+      summary: Finalize an invoice
+      description: Locks a draft invoice and queues it for delivery.
+components:
+  schemas:
+    Invoice:
+      type: object
+      properties:
+        account_id:
+          type: string
+          description: Stable account identifier.
+        memo:
+          type: string
+          description: Free-form invoice note.
+          deprecated: true
+        delivery_method:
+          type: string
+          description: Delivery channel selected for the finalized invoice.
+
