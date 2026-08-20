@@ -1,0 +1,21 @@
+# Secrets — never commit
+.env
+credentials.json
+token.json
+*.pem
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node / frontend build output
+frontend/node_modules/
+frontend/dist/
+
+# Smoke-test artifacts
+backend/smoke_export.*
+
+# OS noise
+.DS_Store
