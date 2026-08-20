@@ -1,0 +1,41 @@
+{
+  "case_id": "contract-02",
+  "doc_id": "service_contract",
+  "difficulty": "medium",
+  "instruction": "Add a 'Data Processing' section after Section 3 with three clauses on GDPR compliance: data ownership, sub-processor approval, and deletion on termination.",
+  "session_id": "eqr_contract-02_1786987481",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "export_before_md": {
+      "ok": true,
+      "bytes": 2245
+    },
+    "chat": {
+      "job_id": "6da981f2-b911-463b-98cf-4cd188642f55",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "rounds": 1,
+      "final_status": "completed"
+    },
+    "chat_result": {
+      "response": "\u2705 I added the Data Processing section after Section 3 with clauses covering data ownership, sub-processor approval, and deletion on termination.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 38299
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 3125
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

@@ -1,0 +1,89 @@
+{
+  "rubric_name": "SuperDocs Edit Quality Rubric (S3)",
+  "version": "1.0",
+  "scale": {
+    "type": "ordinal",
+    "min": 1,
+    "max": 4,
+    "labels": {
+      "1": "Fail",
+      "2": "Poor",
+      "3": "Good",
+      "4": "Excellent"
+    }
+  },
+  "instructions": [
+    "Score each dimension independently on a 1-4 ordinal scale using the anchors below.",
+    "Judge the EDIT, not the source document: score the quality of the change relative to the instruction.",
+    "Give a one-sentence evidence citation per dimension naming the specific passage that justifies the score.",
+    "Where you cannot verify a dimension (e.g., formatting not visible), score honestly and say why in evidence."
+  ],
+  "dimensions": [
+    {
+      "id": "faithfulness",
+      "label": "Faithfulness to instruction",
+      "description": "Did the edit do what the instruction asked, at the scope the instruction implied?",
+      "anchors": {
+        "1": "Did the opposite, ignored the instruction, or edited unrelated content.",
+        "2": "Partial: did some of what was asked but missed required elements or wrong scope.",
+        "3": "Did what was asked with minor gaps or extra unrequested but harmless changes.",
+        "4": "Did exactly and only what the instruction asked, at the correct scope."
+      }
+    },
+    {
+      "id": "fact_accuracy",
+      "label": "Fact accuracy",
+      "description": "Did the edit introduce factual errors: wrong dates, numbers, names, amounts, or invented content?",
+      "anchors": {
+        "1": "Introduced one or more clear factual errors (wrong date/number/name/amount) or fabricated material facts.",
+        "2": "One noticeable factual slip, or a plausible-but-wrong derived value (e.g., arithmetic).",
+        "3": "Factually sound; derived values correct; at most cosmetic wording quibbles.",
+        "4": "Every fact, figure, and derived value is correct and consistent with the source."
+      }
+    },
+    {
+      "id": "content_preservation",
+      "label": "Content preservation",
+      "description": "Did the edit preserve untouched content — nothing lost, duplicated, or silently rewritten outside the instruction's scope?",
+      "anchors": {
+        "1": "Dropped or duplicated substantive content, or rewrote unrelated passages.",
+        "2": "One passage outside scope was altered, or a small amount of content was lost/duplicated.",
+        "3": "All untouched content survives; only trivial wording differences outside scope.",
+        "4": "Everything outside the instructed change is byte-identical to the source."
+      }
+    },
+    {
+      "id": "structural_integrity",
+      "label": "Structural integrity",
+      "description": "Are sections, order, headings, lists, and tables coherent and complete after the edit — no broken numbering, dangling content, or orphaned references?",
+      "anchors": {
+        "1": "Broken structure: misordered sections, broken numbering, orphaned references, or dangling content.",
+        "2": "One structural defect (e.g., one stale cross-reference or inconsistent numbering).",
+        "3": "Structure coherent with only cosmetic inconsistencies.",
+        "4": "Structure is fully coherent: numbering, order, and references all consistent."
+      }
+    },
+    {
+      "id": "formatting_fidelity",
+      "label": "Formatting fidelity",
+      "description": "Did the edit preserve and extend formatting consistently: headings, tables, lists, emphasis — matching the document's existing style?",
+      "anchors": {
+        "1": "Formatting broken or lost: tables flattened, headings degraded, styling inconsistent with the document.",
+        "2": "Noticeable formatting inconsistency introduced in or around the edit.",
+        "3": "Formatting largely consistent; minor style mismatches only.",
+        "4": "Formatting fully consistent: tables intact, headings styled like the rest of the document."
+      }
+    },
+    {
+      "id": "language_quality",
+      "label": "Language quality",
+      "description": "Is the edited prose clear, grammatical, and consistent in tone and terminology with the rest of the document?",
+      "anchors": {
+        "1": "Grammatical errors, unclear phrasing, or tone/terminology that clashes badly.",
+        "2": "Noticeable awkwardness or a terminology mismatch in the edited passage.",
+        "3": "Clear and grammatical with minor stylistic rough edges.",
+        "4": "Clear, grammatical, and indistinguishable in tone and terminology from the original author."
+      }
+    }
+  ]
+}

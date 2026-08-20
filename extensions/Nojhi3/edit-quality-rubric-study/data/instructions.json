@@ -1,0 +1,96 @@
+{
+  "study_name": "edit-quality-rubric",
+  "model_tier": "pro",
+  "thinking_depth": "balanced",
+  "difficulty_labels": ["easy", "medium", "hard", "ambiguous"],
+  "cases": [
+    {
+      "case_id": "plan-01",
+      "doc_id": "project_plan",
+      "doc_file": "project_plan.txt",
+      "difficulty": "easy",
+      "instruction": "Assign the database migration owner to Dave.",
+      "note": "Single targeted change in Section 3."
+    },
+    {
+      "case_id": "plan-02",
+      "doc_id": "project_plan",
+      "doc_file": "project_plan.txt",
+      "difficulty": "medium",
+      "instruction": "Add a Milestones section after Section 3 listing the three phases (Backend, API, Frontend) with their dates.",
+      "note": "Adds a section with content derived from existing dates."
+    },
+    {
+      "case_id": "plan-03",
+      "doc_id": "project_plan",
+      "doc_file": "project_plan.txt",
+      "difficulty": "hard",
+      "instruction": "Rewrite Section 2 (Timeline) to add a 2-day buffer to every date and rename the section to 'Schedule'.",
+      "note": "Date arithmetic across the whole timeline plus a rename."
+    },
+    {
+      "case_id": "plan-04",
+      "doc_id": "project_plan",
+      "doc_file": "project_plan.txt",
+      "difficulty": "ambiguous",
+      "instruction": "Make the plan clearer.",
+      "note": "Deliberately vague; no single correct interpretation."
+    },
+    {
+      "case_id": "meeting-01",
+      "doc_id": "meeting_notes",
+      "doc_file": "meeting_notes.txt",
+      "difficulty": "easy",
+      "instruction": "Change the attendee list to include Dave.",
+      "note": "Single targeted list edit."
+    },
+    {
+      "case_id": "meeting-02",
+      "doc_id": "meeting_notes",
+      "doc_file": "meeting_notes.txt",
+      "difficulty": "medium",
+      "instruction": "Add a 'Risks' section after the action items that documents the unmitigated database migration delay risk and proposes one mitigation.",
+      "note": "Adds a section synthesizing existing content plus one new proposal."
+    },
+    {
+      "case_id": "meeting-03",
+      "doc_id": "meeting_notes",
+      "doc_file": "meeting_notes.txt",
+      "difficulty": "hard",
+      "instruction": "Restructure the notes so decisions come first, action items second, and attendees last.",
+      "note": "Reorders whole sections; ambiguous edge cases in what counts as a decision."
+    },
+    {
+      "case_id": "contract-01",
+      "doc_id": "service_contract",
+      "doc_file": "service_contract.md",
+      "difficulty": "easy",
+      "instruction": "Update the pricing table: increase the Business plan monthly fee from $49 to $59.",
+      "note": "Targeted table cell edit."
+    },
+    {
+      "case_id": "contract-02",
+      "doc_id": "service_contract",
+      "doc_file": "service_contract.md",
+      "difficulty": "medium",
+      "instruction": "Add a 'Data Processing' section after Section 3 with three clauses on GDPR compliance: data ownership, sub-processor approval, and deletion on termination.",
+      "note": "Adds a section with three required elements."
+    },
+    {
+      "case_id": "contract-03",
+      "doc_id": "service_contract",
+      "doc_file": "service_contract.md",
+      "difficulty": "hard",
+      "instruction": "Move Section 4 (Termination) so it comes before Section 3 (Fees and Payment) and renumber all sections and all cross-references.",
+      "note": "Structural move plus consistent renumbering; cross-references must follow."
+    },
+    {
+      "case_id": "contract-04",
+      "doc_id": "service_contract",
+      "doc_file": "service_contract.md",
+      "difficulty": "ambiguous",
+      "instruction": "Make the contract more tenant-friendly.",
+      "note": "Vague value judgment; no single correct scope."
+    }
+  ]
+}

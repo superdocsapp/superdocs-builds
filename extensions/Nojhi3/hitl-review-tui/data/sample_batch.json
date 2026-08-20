@@ -1,0 +1,30 @@
+[
+  {
+    "change_id": "chg-001",
+    "document_id": "doc_primary",
+    "chunk_id": "0ae7cc33-f108-49db-90dc-9fea7e213be0",
+    "operation": "edit",
+    "path": "data/workspace/plan.html",
+    "old_html": "<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr><th>Plan</th><th>Monthly fee</th><th>Storage</th><th>Users included</th></tr>\n</thead>\n<tbody>\n<tr><td>Starter</td><td>$29</td><td>100 GB</td><td>5</td></tr>\n<tr><td>Business</td><td>$49</td><td>1 TB</td><td>25</td></tr>\n<tr><td>Enterprise</td><td>$99</td><td>10 TB</td><td>Unlimited</td></tr>\n</tbody>\n</table>",
+    "new_html": "<table data-chunk-id=\"0ae7cc33-f108-49db-90dc-9fea7e213be0\">\n<thead>\n<tr><th>Plan</th><th>Monthly fee</th><th>Storage</th><th>Users included</th></tr>\n</thead>\n<tbody>\n<tr><td>Starter</td><td>$29</td><td>100 GB</td><td>5</td></tr>\n<tr><td>Business</td><td>$59</td><td>1 TB</td><td>25</td></tr>\n<tr><td>Enterprise</td><td>$99</td><td>10 TB</td><td>Unlimited</td></tr>\n</tbody>\n</table>",
+    "ai_explanation": "Updated the pricing table — the Business plan monthly fee is now $59."
+  },
+  {
+    "change_id": "chg-002",
+    "document_id": "doc_primary",
+    "operation": "edit",
+    "path": "data/workspace/plan.html",
+    "old_html": "<p>The plan comparison is below.</p>",
+    "new_html": "<p>The plan comparison is below — all fees in USD.</p>",
+    "ai_explanation": "Clarified that fees are in USD."
+  },
+  {
+    "change_id": "chg-003",
+    "document_id": "doc_secondary",
+    "operation": "edit",
+    "path": "data/workspace/notes.txt",
+    "old_text": "Budget review on Tuesday.",
+    "new_text": "Budget review on Tuesday at 10:00.",
+    "ai_explanation": "Added the meeting time."
+  }
+]

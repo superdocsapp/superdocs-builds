@@ -1,0 +1,56 @@
+{"ts": 1786986093.306727, "iso": "2026-08-17T17:01:33Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986184.1049807, "iso": "2026-08-17T17:03:04Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986201.5194874, "iso": "2026-08-17T17:03:21Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:plan-01", "was_billable": true, "ops_charged": 1, "monthly_remaining": 498, "monthly_used": 2}
+{"ts": 1786986204.354774, "iso": "2026-08-17T17:03:24Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986215.9040685, "iso": "2026-08-17T17:03:35Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:plan-02", "was_billable": true, "ops_charged": 1, "monthly_remaining": 497, "monthly_used": 3}
+{"ts": 1786986218.3805072, "iso": "2026-08-17T17:03:38Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986251.9954486, "iso": "2026-08-17T17:04:11Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:plan-03", "was_billable": true, "ops_charged": 1, "monthly_remaining": 496, "monthly_used": 4}
+{"ts": 1786986255.110831, "iso": "2026-08-17T17:04:15Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986284.603711, "iso": "2026-08-17T17:04:44Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:plan-04", "was_billable": true, "ops_charged": 1, "monthly_remaining": 495, "monthly_used": 5}
+{"ts": 1786986287.0744278, "iso": "2026-08-17T17:04:47Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986304.417051, "iso": "2026-08-17T17:05:04Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:meeting-01", "was_billable": true, "ops_charged": 1, "monthly_remaining": 494, "monthly_used": 6}
+{"ts": 1786986306.8765152, "iso": "2026-08-17T17:05:06Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986330.2915852, "iso": "2026-08-17T17:05:30Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:meeting-02", "was_billable": true, "ops_charged": 1, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986377.4794352, "iso": "2026-08-17T17:06:17Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986383.252185, "iso": "2026-08-17T17:06:23Z", "endpoint": "/v1/chat/async (job result)", "tag": "judge:plan-01", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986383.6939685, "iso": "2026-08-17T17:06:23Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986394.8927004, "iso": "2026-08-17T17:06:34Z", "endpoint": "/v1/chat/async (job result)", "tag": "judge:plan-02", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986395.3344307, "iso": "2026-08-17T17:06:35Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986417.5801144, "iso": "2026-08-17T17:06:57Z", "endpoint": "/v1/chat/async (job result)", "tag": "judge:plan-03", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986418.0334563, "iso": "2026-08-17T17:06:58Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986429.213143, "iso": "2026-08-17T17:07:09Z", "endpoint": "/v1/chat/async (job result)", "tag": "judge:plan-04", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986429.7244859, "iso": "2026-08-17T17:07:09Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986435.5156963, "iso": "2026-08-17T17:07:15Z", "endpoint": "/v1/chat/async (job result)", "tag": "judge:meeting-01", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986435.98692, "iso": "2026-08-17T17:07:15Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786986447.173411, "iso": "2026-08-17T17:07:27Z", "endpoint": "/v1/chat/async (job result)", "tag": "judge:meeting-02", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986574.5747604, "iso": "2026-08-17T17:09:34Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-01_1786986569", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986581.4239297, "iso": "2026-08-17T17:09:41Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-02_1786986574", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986586.4181492, "iso": "2026-08-17T17:09:46Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-03_1786986581", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986591.643149, "iso": "2026-08-17T17:09:51Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-04_1786986586", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986596.5797033, "iso": "2026-08-17T17:09:56Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_meeting-01_1786986591", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986603.0459917, "iso": "2026-08-17T17:10:03Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_meeting-02_1786986596", "was_billable": false, "ops_charged": 0, "monthly_remaining": 493, "monthly_used": 7}
+{"ts": 1786986829.2207506, "iso": "2026-08-17T17:13:49Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-01_1786986822", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986836.5771894, "iso": "2026-08-17T17:13:56Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-02_1786986829", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986846.344077, "iso": "2026-08-17T17:14:06Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-03_1786986836", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986853.2508438, "iso": "2026-08-17T17:14:13Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-04_1786986846", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986863.0423846, "iso": "2026-08-17T17:14:23Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_meeting-01_1786986853", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986869.093285, "iso": "2026-08-17T17:14:29Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_meeting-02_1786986863", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986950.3613498, "iso": "2026-08-17T17:15:50Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-01_1786986944", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986957.1641438, "iso": "2026-08-17T17:15:57Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-02_1786986950", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986961.6790617, "iso": "2026-08-17T17:16:01Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-03_1786986957", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986967.6893554, "iso": "2026-08-17T17:16:07Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_plan-04_1786986961", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986973.1639369, "iso": "2026-08-17T17:16:13Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_meeting-01_1786986967", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786986985.114601, "iso": "2026-08-17T17:16:25Z", "endpoint": "/v1/chat", "tag": "chat_sync:eqr_j_meeting-02_1786986973", "was_billable": false, "ops_charged": 0, "monthly_remaining": 491, "monthly_used": 9}
+{"ts": 1786987244.3638804, "iso": "2026-08-17T17:20:44Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987279.0644805, "iso": "2026-08-17T17:21:19Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:plan-04", "was_billable": true, "ops_charged": 1, "monthly_remaining": 490, "monthly_used": 10}
+{"ts": 1786987281.40131, "iso": "2026-08-17T17:21:21Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987309.0506995, "iso": "2026-08-17T17:21:49Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:meeting-03", "was_billable": true, "ops_charged": 1, "monthly_remaining": 489, "monthly_used": 11}
+{"ts": 1786987312.1347878, "iso": "2026-08-17T17:21:52Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987334.5653734, "iso": "2026-08-17T17:22:14Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:contract-01", "was_billable": true, "ops_charged": 1, "monthly_remaining": 488, "monthly_used": 12}
+{"ts": 1786987337.5931108, "iso": "2026-08-17T17:22:17Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987405.195053, "iso": "2026-08-17T17:23:25Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987438.3395615, "iso": "2026-08-17T17:23:58Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:contract-03", "was_billable": true, "ops_charged": 1, "monthly_remaining": 487, "monthly_used": 13}
+{"ts": 1786987484.2231693, "iso": "2026-08-17T17:24:44Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987518.150207, "iso": "2026-08-17T17:25:18Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:contract-02", "was_billable": true, "ops_charged": 1, "monthly_remaining": 486, "monthly_used": 14}
+{"ts": 1786987784.9477236, "iso": "2026-08-17T17:29:44Z", "endpoint": "", "tag": "", "was_billable": false, "ops_charged": 0, "monthly_remaining": null, "monthly_used": null}
+{"ts": 1786987813.1013985, "iso": "2026-08-17T17:30:13Z", "endpoint": "/v1/chat/async (job result)", "tag": "edit:contract-04", "was_billable": true, "ops_charged": 1, "monthly_remaining": 485, "monthly_used": 15}

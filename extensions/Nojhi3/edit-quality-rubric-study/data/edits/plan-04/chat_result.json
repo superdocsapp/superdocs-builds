@@ -1,0 +1,140 @@
+{
+  "response": "\u2705 Successfully updated all 10 sections. Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+  "session_id": "eqr_plan-04_1786987242",
+  "document_changes": {
+    "updated_html": "<p data-chunk-id=\"56e9cd96-2a9d-4b4c-98c9-58ccf4967b94\">PROJECT ANALYSIS PLAN - BASELINE</p>\n<p data-chunk-id=\"232d8034-2775-410a-b3a2-41522e37538f\">Project Name: Super-Docs Core Platform</p>\n<p data-chunk-id=\"8cd43ddf-97c5-457b-8c8e-2efea79567ac\">Date: 2026-08-01</p>\n<p data-chunk-id=\"6ce10e3e-41bf-4738-bd5a-05b9c9ed4ee8\">Section 1: Executive Summary</p>\n<p data-chunk-id=\"cf59e42a-f57e-4dbb-b45d-7c579454cf7b\">This document defines the main project timeline and assigns the initial tasks for the platform launch.</p>\n<p data-chunk-id=\"2c1110ed-9dc9-4f84-80c6-f5add23f7c82\"><strong>Section 2: Project Timeline</strong></p>\n<li data-chunk-id=\"1485f83d-ee10-4404-8b60-517851a538d4\">Backend Development: August 10</li>\n<li data-chunk-id=\"9ec6d27c-544c-4469-b748-3cfad90d5e7e\">API Integration Completion: August 20</li>\n<li data-chunk-id=\"a1e9f4f0-155c-4766-a222-769747b188a5\">Frontend Project Delivery: September 05</li>\n<p data-chunk-id=\"1f7f1365-cf69-4575-aad1-3f527bbf8120\">Section 3: Project Tasks and Responsible Parties</p>\n<li data-chunk-id=\"3905c4a6-6286-43c7-b49c-5534400bf8e0\">Task: Backend Setup | Assigned to: Alice</li>\n<li data-chunk-id=\"2e5f31d0-71d2-46b9-9557-92bd876b2d86\">Task: API Integration; Owner: Bob</li>\n<li data-chunk-id=\"512150e4-f565-448a-8324-84c291db4b72\">Database migration: Unassigned</li>",
+    "version_id": "e5afc729-fefc-4ee9-8007-0e878a2f4e30",
+    "changes_summary": "10 sections edited, rest untouched",
+    "requires_approval": null,
+    "pending_changes": null,
+    "changes": [
+      {
+        "status": "approved",
+        "chunk_id": "6ce10e3e-41bf-4738-bd5a-05b9c9ed4ee8",
+        "new_html": "<p data-chunk-id=\"6ce10e3e-41bf-4738-bd5a-05b9c9ed4ee8\">Section 1: Executive Summary</p>",
+        "old_html": "<p data-chunk-id=\"6ce10e3e-41bf-4738-bd5a-05b9c9ed4ee8\">Section 1: Summary</p>",
+        "change_id": "4d12936d-32fe-40a2-84e6-6af20059b0ae",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Section 1: Executive Summary"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "cf59e42a-f57e-4dbb-b45d-7c579454cf7b",
+        "new_html": "<p data-chunk-id=\"cf59e42a-f57e-4dbb-b45d-7c579454cf7b\">This document defines the main project timeline and assigns the initial tasks for the platform launch.</p>",
+        "old_html": "<p data-chunk-id=\"cf59e42a-f57e-4dbb-b45d-7c579454cf7b\">This document outlines the core timeline and initial task allocation for the platform launch.</p>",
+        "change_id": "13999c96-e3fc-4d0f-9608-86eb3310f1cd",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "This document defines the main project timeline and assigns the initial tasks for the platform launch."
+      },
+      {
+        "status": "approved",
+        "chunk_id": "2c1110ed-9dc9-4f84-80c6-f5add23f7c82",
+        "new_html": "<p data-chunk-id=\"2c1110ed-9dc9-4f84-80c6-f5add23f7c82\"><strong>Section 2: Project Timeline</strong></p>",
+        "old_html": "<p data-chunk-id=\"2c1110ed-9dc9-4f84-80c6-f5add23f7c82\">Section 2: Timeline</p>",
+        "change_id": "3b68df2a-6cb1-41f7-a318-968eb1755852",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Section 2: Project Timeline"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "1485f83d-ee10-4404-8b60-517851a538d4",
+        "new_html": "<li data-chunk-id=\"1485f83d-ee10-4404-8b60-517851a538d4\">Backend Development: August 10</li>",
+        "old_html": "<li data-chunk-id=\"1485f83d-ee10-4404-8b60-517851a538d4\">Backend Setup: August 10</li>",
+        "change_id": "d9419e85-ff36-4839-93a6-e8ab3feaea2f",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Backend Development: August 10"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "9ec6d27c-544c-4469-b748-3cfad90d5e7e",
+        "new_html": "<li data-chunk-id=\"9ec6d27c-544c-4469-b748-3cfad90d5e7e\">API Integration Completion: August 20</li>",
+        "old_html": "<li data-chunk-id=\"9ec6d27c-544c-4469-b748-3cfad90d5e7e\">API Integration: August 20</li>",
+        "change_id": "dc761180-364e-4a59-bbaf-34aabb80d767",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "API Integration Completion: August 20"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "a1e9f4f0-155c-4766-a222-769747b188a5",
+        "new_html": "<li data-chunk-id=\"a1e9f4f0-155c-4766-a222-769747b188a5\">Frontend Project Delivery: September 05</li>",
+        "old_html": "<li data-chunk-id=\"a1e9f4f0-155c-4766-a222-769747b188a5\">Frontend Delivery: September 05</li>",
+        "change_id": "a89198cf-de2e-4d83-a9bc-2de0ad941cd7",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Frontend Project Delivery: September 05"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "1f7f1365-cf69-4575-aad1-3f527bbf8120",
+        "new_html": "<p data-chunk-id=\"1f7f1365-cf69-4575-aad1-3f527bbf8120\">Section 3: Project Tasks and Responsible Parties</p>",
+        "old_html": "<p data-chunk-id=\"1f7f1365-cf69-4575-aad1-3f527bbf8120\">Section 3: Tasks &amp; Owners</p>",
+        "change_id": "33d3037b-c55e-4929-9cfa-cdaae470f3b2",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Section 3: Project Tasks and Responsible Parties"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "3905c4a6-6286-43c7-b49c-5534400bf8e0",
+        "new_html": "<li data-chunk-id=\"3905c4a6-6286-43c7-b49c-5534400bf8e0\">Task: Backend Setup | Assigned to: Alice</li>",
+        "old_html": "<li data-chunk-id=\"3905c4a6-6286-43c7-b49c-5534400bf8e0\">Backend Setup assigned to Alice</li>",
+        "change_id": "000a4bfe-0179-452c-862f-df2892d72a2a",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Task: Backend Setup | Assigned to: Alice"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "2e5f31d0-71d2-46b9-9557-92bd876b2d86",
+        "new_html": "<li data-chunk-id=\"2e5f31d0-71d2-46b9-9557-92bd876b2d86\">Task: API Integration; Owner: Bob</li>",
+        "old_html": "<li data-chunk-id=\"2e5f31d0-71d2-46b9-9557-92bd876b2d86\">API Integration assigned to Bob</li>",
+        "change_id": "4fa938c7-99ae-49c4-8132-dd1f28277898",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Task: API Integration; Owner: Bob"
+      },
+      {
+        "status": "approved",
+        "chunk_id": "512150e4-f565-448a-8324-84c291db4b72",
+        "new_html": "<li data-chunk-id=\"512150e4-f565-448a-8324-84c291db4b72\">Database migration: Unassigned</li>",
+        "old_html": "<li data-chunk-id=\"512150e4-f565-448a-8324-84c291db4b72\">Database migration owner: unassigned</li>",
+        "change_id": "56eede9e-f643-420a-9fcd-4594797bdc09",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "Parallel edit: Rewrite this chunk to make the project plan clearer and easier to understand\u2026",
+        "new_plain_text": "Database migration: Unassigned"
+      }
+    ],
+    "chunk_diffs": null,
+    "concurrent_merges": null,
+    "focused_document_id": "doc_primary"
+  },
+  "usage": {
+    "monthly_used": 10,
+    "monthly_limit": 500,
+    "monthly_remaining": 490,
+    "was_billable": true,
+    "ops_charged": 1,
+    "quota_exhausted": false,
+    "subscription_tier": "free",
+    "bucket_used": "tier",
+    "redemption_id": null,
+    "promotions": [],
+    "agent_handoff_hint": null
+  },
+  "attachment_id": null
+}

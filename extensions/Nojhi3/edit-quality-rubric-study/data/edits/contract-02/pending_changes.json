@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "2af48bbb-6556-480d-8a48-8ed077d93fa6",
+    "operation": "create",
+    "chunk_id": "new",
+    "document_id": "doc_primary",
+    "old_html": null,
+    "new_html": "<h2>Section 3.4: Data Processing</h2><p>3.4.1 As between the parties, the Client retains all right, title, and interest in the Data. The Provider may process the Data only to provide, maintain, and improve the Services and in accordance with applicable data protection laws, including the GDPR where applicable.</p><p>3.4.2 The Provider shall not engage any sub-processor to process Data containing Personal Data without the Client's prior written approval, except where the sub-processor is reasonably necessary to deliver the Services and has been bound by written obligations no less protective than those set out in this Agreement.</p><p>3.4.3 Upon termination or expiry of this Agreement, the Provider shall delete or irreversibly de-identify the Data containing Personal Data within a reasonable period after the Client's export window ends, unless retention is required by applicable law.</p>",
+    "ai_explanation": "\u2705 I added the Data Processing section after Section 3 with clauses covering data ownership, sub-processor approval, and deletion on termination."
+  }
+]

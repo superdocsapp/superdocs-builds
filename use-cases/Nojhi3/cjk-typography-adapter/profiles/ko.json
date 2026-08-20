@@ -1,0 +1,26 @@
+{
+  "name": "ko",
+  "label": "Korean",
+  "direction": "latin-to-cjk",
+  "lang": "ko",
+  "body_font": "'Batang', 'Nanum Myeongjo', serif",
+  "heading_font": "'Malgun Gothic', 'Nanum Gothic', sans-serif",
+  "latin_font": "'Times New Roman', serif",
+  "body_size_pt": 10,
+  "heading_sizes_pt": {"h1": 15, "h2": 13, "h3": 11, "h4": 10.5, "h5": 10, "h6": 10},
+  "heading_bold": true,
+  "line_spacing": 1.6,
+  "paragraph_spacing_pt": 6,
+  "text_align": "justify",
+  "page": {
+    "width_mm": 210, "height_mm": 297,
+    "margin_top_mm": 25, "margin_bottom_mm": 25,
+    "margin_left_mm": 25, "margin_right_mm": 25
+  },
+  "punctuation_map": {},
+  "quote_map": {"open": "\u201c", "close": "\u201d"},
+  "thin_space": "\u2009",
+  "kinsoku_no_line_start": "\u201d\u300d\u300b\uff09\uff01\uff1f",
+  "kinsoku_no_line_end": "\u201c\u300c\u300a\uff08",
+  "css_extra": "p, li, td, th { line-break: strict; word-break: keep-all; overflow-wrap: normal; }"
+}

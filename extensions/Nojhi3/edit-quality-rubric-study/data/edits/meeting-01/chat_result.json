@@ -1,0 +1,42 @@
+{
+  "response": "\u2705 I updated the attendee list to include Dave.",
+  "session_id": "eqr_meeting-01_1786986285",
+  "document_changes": {
+    "updated_html": "<p data-chunk-id=\"ec9a5032-f7f1-4077-b561-d576c36c80d2\">MEETING NOTES - SPRINT SYNC</p>\n<p data-chunk-id=\"62d34fc2-0a52-44d1-a23c-51da87d984c1\">Date: 2026-08-05</p>\n<p data-chunk-id=\"5087bd0e-3030-4230-974f-b6532f045c7f\">Attendees: Alice, Bob, Charlie, Dave</p>\n<p data-chunk-id=\"ab8b9eeb-8a9f-49f6-9595-b3ef2805d751\">Action Items &amp; Decisions:</p>\n<li data-chunk-id=\"659b69a3-5ac0-444c-8ee7-622f1fcbfe6e\">API Integration deadline moved to August 27 due to third-party vendor delays.</li>\n<li data-chunk-id=\"4bd0ef56-e07b-42e4-b06a-4b0a6b6099ef\">Database migration task has no owner specified currently.</li>\n<li data-chunk-id=\"e1468bf1-d517-4572-aa92-3c5d26085587\">Unmitigated database migration delay risk identified.</li>",
+    "version_id": "20a49de6-b508-45ce-81f3-25f37843b35d",
+    "changes_summary": "1 section edited, rest untouched",
+    "requires_approval": null,
+    "pending_changes": null,
+    "changes": [
+      {
+        "status": "approved",
+        "chunk_id": "5087bd0e-3030-4230-974f-b6532f045c7f",
+        "new_html": "<p data-chunk-id=\"5087bd0e-3030-4230-974f-b6532f045c7f\">Attendees: Alice, Bob, Charlie, Dave</p>",
+        "old_html": "<p data-chunk-id=\"5087bd0e-3030-4230-974f-b6532f045c7f\">Attendees: Alice, Bob, Charlie</p>",
+        "change_id": "8755b1f2-8c3e-411f-a8b8-07ceb8a94948",
+        "operation": "edit",
+        "document_id": "doc_primary",
+        "ai_explanation": "\u2705 I updated the attendee list to include Dave.",
+        "new_plain_text": "Attendees: Alice, Bob, Charlie, Dave",
+        "edit_instruction": "Add Dave to the attendee list by updating the attendees line to include 'Dave' after Charlie. Preserve all other text and formatting exactly."
+      }
+    ],
+    "chunk_diffs": null,
+    "concurrent_merges": null,
+    "focused_document_id": "doc_primary"
+  },
+  "usage": {
+    "monthly_used": 6,
+    "monthly_limit": 500,
+    "monthly_remaining": 494,
+    "was_billable": true,
+    "ops_charged": 1,
+    "quota_exhausted": false,
+    "subscription_tier": "free",
+    "bucket_used": "tier",
+    "redemption_id": null,
+    "promotions": [],
+    "agent_handoff_hint": null
+  },
+  "attachment_id": null
+}

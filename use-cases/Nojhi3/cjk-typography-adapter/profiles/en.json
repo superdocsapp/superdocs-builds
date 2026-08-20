@@ -1,0 +1,31 @@
+{
+  "name": "en",
+  "label": "Western (Latin)",
+  "direction": "cjk-to-latin",
+  "lang": "en",
+  "body_font": "'Calibri', 'Arial', sans-serif",
+  "heading_font": "'Calibri', 'Arial', sans-serif",
+  "latin_font": "'Calibri', 'Arial', sans-serif",
+  "body_size_pt": 11,
+  "heading_sizes_pt": {"h1": 16, "h2": 14, "h3": 12, "h4": 11, "h5": 11, "h6": 11},
+  "heading_bold": true,
+  "line_spacing": 1.15,
+  "paragraph_spacing_pt": 8,
+  "text_align": "left",
+  "page": {
+    "width_mm": 210, "height_mm": 297,
+    "margin_top_mm": 25, "margin_bottom_mm": 25,
+    "margin_left_mm": 25, "margin_right_mm": 25
+  },
+  "punctuation_map": {
+    "\u3001": ",", "\u3002": ".", "\uff01": "!", "\uff1f": "?",
+    "\uff1a": ":", "\uff1b": ";", "\uff08": "(", "\uff09": ")",
+    "\uff0c": ","
+  },
+  "quote_map": {"open": "\"", "close": "\""},
+  "thin_space": "\u2009",
+  "remove_thin_spaces": true,
+  "kinsoku_no_line_start": "",
+  "kinsoku_no_line_end": "",
+  "css_extra": "p, li, td, th { line-break: auto; }"
+}

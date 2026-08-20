@@ -1,0 +1,24 @@
+{
+  "case_id": "plan-01",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The edit accurately assigns Dave as the owner, changing '- Database migration owner: unassigned' to '- Database migration owner: Dave'.",
+    "fact_accuracy": "No factual errors were introduced; Dave is correctly set as the owner per the instruction.",
+    "content_preservation": "All text and sections from the baseline source document were preserved intact.",
+    "structural_integrity": "The section hierarchy and overall structure remain completely coherent and intact.",
+    "formatting_fidelity": "Markdown bulleting and line spacing were added cleanly to improve visual structure without breaking formatting.",
+    "language_quality": "The text is clear, grammatical, and well-formatted."
+  },
+  "difficulty": "easy",
+  "instruction": "Assign the database migration owner to Dave."
+}

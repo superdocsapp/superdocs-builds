@@ -1,0 +1,40 @@
+{
+  "case_id": "meeting-03",
+  "doc_id": "meeting_notes",
+  "difficulty": "hard",
+  "instruction": "Restructure the notes so decisions come first, action items second, and attendees last.",
+  "session_id": "eqr_meeting-03_1786987279",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "export_before_md": {
+      "ok": true,
+      "bytes": 302
+    },
+    "chat": {
+      "job_id": "3cc2d8da-66ee-4533-a481-9c3481aec161",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 1
+    },
+    "chat_result": {
+      "response": "I\u2019m not sure what you want me to do. Please provide the specific request or task, and I\u2019ll help.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36799
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 302
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "plan-01",
+  "doc_id": "project_plan",
+  "difficulty": "easy",
+  "instruction": "Assign the database migration owner to Dave.",
+  "session_id": "eqr_plan-01_1786986182",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "chat": {
+      "job_id": "700adcd8-238b-4bbc-b41a-bd7fb2345afa",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 1
+    },
+    "chat_result": {
+      "response": "\u2705 I've updated the Database migration owner to Dave.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36863
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 447
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

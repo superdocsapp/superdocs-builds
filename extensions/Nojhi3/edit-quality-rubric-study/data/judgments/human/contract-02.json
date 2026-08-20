@@ -1,0 +1,20 @@
+{
+  "case_id": "contract-02",
+  "rater": "human-1",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "",
+    "fact_accuracy": "",
+    "content_preservation": "",
+    "structural_integrity": "",
+    "formatting_fidelity": "",
+    "language_quality": ""
+  }
+}

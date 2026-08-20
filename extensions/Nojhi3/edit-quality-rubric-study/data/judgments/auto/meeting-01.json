@@ -1,0 +1,24 @@
+{
+  "case_id": "meeting-01",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "Dave was added to the attendee list exactly as requested: \"Attendees: Alice, Bob, Charlie, Dave\".",
+    "fact_accuracy": "All facts from the original source are accurately retained without introducing any factual errors.",
+    "content_preservation": "All source content is fully preserved without omissions or unauthorized additions.",
+    "structural_integrity": "The document structure remains coherent and is cleanly formatted into distinct sections and list items.",
+    "formatting_fidelity": "Formatting is clean, well-spaced, and improves readability while maintaining consistency.",
+    "language_quality": "The text is grammatically correct, clear, and professional."
+  },
+  "difficulty": "easy",
+  "instruction": "Change the attendee list to include Dave."
+}

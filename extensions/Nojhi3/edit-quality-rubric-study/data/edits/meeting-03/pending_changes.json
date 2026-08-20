@@ -1,0 +1,11 @@
+[
+  {
+    "change_id": "a87c8185-2b36-4978-aa33-514bf94efe5f",
+    "operation": "move",
+    "chunk_id": "c1c87daf-0a56-4676-99ad-e101424c94e8",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"c1c87daf-0a56-4676-99ad-e101424c94e8\">Attendees: Alice, Bob, Charlie</p>",
+    "new_html": null,
+    "ai_explanation": "\ud83d\udd04 I\u2019ve moved the attendees section to the end. I\u2019m now placing the decisions before the action items."
+  }
+]

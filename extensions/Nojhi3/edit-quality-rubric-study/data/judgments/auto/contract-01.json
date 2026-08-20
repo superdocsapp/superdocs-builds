@@ -1,0 +1,24 @@
+{
+  "case_id": "contract-01",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 1,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The edited document is identical to the source document; the instruction to update the Business plan monthly fee from $49 to $59 was ignored.",
+    "fact_accuracy": "No factual errors were introduced because no edits were made.",
+    "content_preservation": "All source content was preserved without modifications or deletions.",
+    "structural_integrity": "The document structure remains identical to the source.",
+    "formatting_fidelity": "Formatting is completely identical to the source document.",
+    "language_quality": "The language quality is unaffected and remains clean and grammatical."
+  },
+  "difficulty": "easy",
+  "instruction": "Update the pricing table: increase the Business plan monthly fee from $49 to $59."
+}

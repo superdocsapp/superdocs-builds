@@ -1,0 +1,36 @@
+{
+  "case_id": "plan-03",
+  "doc_id": "project_plan",
+  "difficulty": "hard",
+  "instruction": "Rewrite Section 2 (Timeline) to add a 2-day buffer to every date and rename the section to 'Schedule'.",
+  "session_id": "eqr_plan-03_1786986217",
+  "steps": {
+    "upload": {
+      "ok": true
+    },
+    "chat": {
+      "job_id": "50721bb1-611b-4bd9-8292-59b86e4f8f27",
+      "usage": null
+    },
+    "pre_approval_status": "awaiting_approval",
+    "approve": {
+      "ok": true,
+      "decisions": 1
+    },
+    "chat_result": {
+      "response": "\u2705 I updated Section 2 to **Schedule** and added a 2-day buffer to every date: Backend Setup is now August 12, API Integration is now August 22, and Frontend Delivery is now September 07.",
+      "has_updated_html": true
+    },
+    "export_docx": {
+      "ok": true,
+      "bytes": 36866
+    },
+    "export_md": {
+      "ok": true,
+      "bytes": 453
+    }
+  },
+  "status": "completed",
+  "pending_change_count": 1,
+  "final_status": "completed"
+}

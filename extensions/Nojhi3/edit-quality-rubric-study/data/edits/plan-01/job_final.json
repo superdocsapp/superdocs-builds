@@ -1,0 +1,109 @@
+{
+  "job_id": "700adcd8-238b-4bbc-b41a-bd7fb2345afa",
+  "organization_id": null,
+  "user_id": "a2ab81ae-c36f-4674-964e-f4f325bab2da",
+  "session_id": "eqr_plan-01_1786986182",
+  "job_type": "chat",
+  "status": "completed",
+  "created_at": "2026-08-17T17:03:04.055064",
+  "updated_at": "2026-08-17T17:03:16.252359",
+  "progress": 100,
+  "result": {
+    "response": "\u2705 I've updated the Database migration owner to Dave.",
+    "session_id": "eqr_plan-01_1786986182",
+    "document_changes": {
+      "updated_html": "<p data-chunk-id=\"17479355-c084-4573-aaf2-b02a225d5a1c\">PROJECT ANALYSIS PLAN - BASELINE</p>\n<p data-chunk-id=\"dd9a20cb-59de-4d32-8b33-6834aef8eaa2\">Project Name: Super-Docs Core Platform</p>\n<p data-chunk-id=\"e834c21d-b44b-4258-a097-bd0b75547666\">Date: 2026-08-01</p>\n<p data-chunk-id=\"83f934fc-2ac4-41df-8704-1be327554e58\">Section 1: Summary</p>\n<p data-chunk-id=\"b5459047-ec6a-47c7-bf17-d4437be54305\">This document outlines the core timeline and initial task allocation for the platform launch.</p>\n<p data-chunk-id=\"617b8afa-c7b6-4f02-859a-9b9faac37b4e\">Section 2: Timeline</p>\n<li data-chunk-id=\"681108e9-0d3c-453b-a397-29da5e3c8221\">Backend Setup: August 10</li>\n<li data-chunk-id=\"b0a35d75-1b2f-499e-9886-96558ff0e77a\">API Integration: August 20</li>\n<li data-chunk-id=\"255627f6-b169-466c-b7b7-72cde7f648fc\">Frontend Delivery: September 05</li>\n<p data-chunk-id=\"4dfb677d-87bc-4c93-864a-ffae95d469c6\">Section 3: Tasks &amp; Owners</p>\n<li data-chunk-id=\"7bc7e053-26fd-4349-8e21-725b0238cc55\">Backend Setup assigned to Alice</li>\n<li data-chunk-id=\"ffca19be-ec93-4e3e-9b66-5ee110a671b2\">API Integration assigned to Bob</li>\n<li data-chunk-id=\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\">Database migration owner: Dave</li>",
+      "version_id": "545f514e-3111-4b89-94b3-4ce8cc2fa635",
+      "changes_summary": "1 section edited, rest untouched",
+      "requires_approval": null,
+      "pending_changes": null,
+      "changes": [
+        {
+          "status": "approved",
+          "chunk_id": "cf53ae5c-f41b-4bad-b4b7-06a5aa62c789",
+          "new_html": "<li data-chunk-id=\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\">Database migration owner: Dave</li>",
+          "old_html": "<li data-chunk-id=\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\">Database migration owner: unassigned</li>",
+          "change_id": "7489278b-2916-429e-9f17-c69e8414476b",
+          "operation": "edit",
+          "document_id": "doc_primary",
+          "ai_explanation": "\u2705 I've updated the Database migration owner to Dave.",
+          "new_plain_text": "Database migration owner: Dave",
+          "edit_instruction": "Replace 'unassigned' with 'Dave'. Keep all other text, formatting, and structure unchanged."
+        }
+      ],
+      "chunk_diffs": null,
+      "concurrent_merges": null,
+      "focused_document_id": "doc_primary"
+    },
+    "usage": {
+      "monthly_used": 2,
+      "monthly_limit": 500,
+      "monthly_remaining": 498,
+      "was_billable": true,
+      "ops_charged": 1,
+      "quota_exhausted": false,
+      "subscription_tier": "free",
+      "bucket_used": "tier",
+      "redemption_id": null,
+      "promotions": [],
+      "agent_handoff_hint": null
+    },
+    "attachment_id": null
+  },
+  "error": null,
+  "metadata": {
+    "filename": null,
+    "file_size": null,
+    "content_type": null,
+    "message": "Assign the database migration owner to Dave.",
+    "document_html_provided": false,
+    "pending_changes": null,
+    "intermediate_responses": [
+      {
+        "type": "user_facing",
+        "content": "\ud83d\udd0d I\u2019m searching for the database migration owner field so I can update it to Dave.",
+        "context": "supervisor_decision",
+        "sequence": 1,
+        "timestamp": "2026-08-17T17:03:07.999087+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "I've prepared a change for your review.",
+        "context": "supervisor_decision_hitl",
+        "sequence": 2,
+        "timestamp": "2026-08-17T17:03:13.541079+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"7489278b-2916-429e-9f17-c69e8414476b\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"7489278b-2916-429e-9f17-c69e8414476b\", \"operation\": \"edit\", \"chunk_id\": \"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\", \"old_html\": \"<li data-chunk-id=\\\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\\\">Database migration owner: unassigned</li>\", \"new_html\": \"<li data-chunk-id=\\\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\\\">Database migration owner: Dave</li>\", \"ai_explanation\": \"\\u2705 I've updated the Database migration owner to Dave.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 3,
+        "timestamp": "2026-08-17T17:03:14.702375+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"7489278b-2916-429e-9f17-c69e8414476b\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"7489278b-2916-429e-9f17-c69e8414476b\", \"operation\": \"edit\", \"chunk_id\": \"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\", \"old_html\": \"<li data-chunk-id=\\\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\\\">Database migration owner: unassigned</li>\", \"new_html\": \"<li data-chunk-id=\\\"cf53ae5c-f41b-4bad-b4b7-06a5aa62c789\\\">Database migration owner: Dave</li>\", \"ai_explanation\": \"\\u2705 I've updated the Database migration owner to Dave.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 4,
+        "timestamp": "2026-08-17T17:03:15.753496+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "\u2705 Successfully updated all 1 sections.",
+        "context": null,
+        "sequence": 5,
+        "timestamp": "2026-08-17T17:03:15.923765+00:00"
+      }
+    ],
+    "user_id": null,
+    "model_tier": "pro",
+    "session_id": "eqr_plan-01_1786986182",
+    "response_mode": "full",
+    "thinking_depth": "balanced",
+    "request_message": "Assign the database migration owner to Dave.",
+    "cumulative_tokens": 160157,
+    "initial_doc_version": null,
+    "last_real_progress_ts": "2026-08-17T17:03:16.249068+00:00",
+    "user_turn_index_pre_inserted": 0
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "case_id": "contract-02",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 4,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 3,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "Added the requested 'Data Processing' section after Section 3 containing clauses for data ownership ('3.4.1... the Client retains all right, title, and interest'), sub-processor approval ('3.4.2... Provider shall not engage any sub-processor... without the Client's prior written approval'), and deletion on termination ('3.4.3 Upon termination or expiry... Provider shall delete').",
+    "fact_accuracy": "All facts, terms, and GDPR references are accurate and consistent with the document context.",
+    "content_preservation": "All original text outside Section 3.4 is perfectly preserved without unintended omissions or modifications.",
+    "structural_integrity": "The inserted section is titled '## Section 3.4: Data Processing' at top-level header level, creating a numbering scheme inconsistency with Sections 1, 2, 3, 4, 5, and 6.",
+    "formatting_fidelity": "Markdown header hierarchy, table formatting, and bold styling are completely preserved.",
+    "language_quality": "The text is written in clear, standard, and formal legal English."
+  },
+  "difficulty": "medium",
+  "instruction": "Add a 'Data Processing' section after Section 3 with three clauses on GDPR compliance: data ownership, sub-processor approval, and deletion on termination."
+}

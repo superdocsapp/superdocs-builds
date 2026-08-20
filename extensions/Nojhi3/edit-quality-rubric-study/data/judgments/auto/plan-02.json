@@ -1,0 +1,24 @@
+{
+  "case_id": "plan-02",
+  "rater": "auto",
+  "provider": "gemini",
+  "model": "gemini-3.6-flash",
+  "scores": {
+    "faithfulness": 1,
+    "fact_accuracy": 4,
+    "content_preservation": 4,
+    "structural_integrity": 4,
+    "formatting_fidelity": 4,
+    "language_quality": 4
+  },
+  "evidence": {
+    "faithfulness": "The edit completely ignored the instruction and failed to add a Milestones section after Section 3.",
+    "fact_accuracy": "No factual errors were introduced into the text.",
+    "content_preservation": "All original content from the source document was preserved.",
+    "structural_integrity": "The document structure is clear and coherent.",
+    "formatting_fidelity": "Formatting is consistent, introducing neat list bullets.",
+    "language_quality": "The text is clear, grammatical, and free of errors."
+  },
+  "difficulty": "medium",
+  "instruction": "Add a Milestones section after Section 3 listing the three phases (Backend, API, Frontend) with their dates."
+}

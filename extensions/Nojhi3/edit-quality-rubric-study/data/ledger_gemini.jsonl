@@ -1,0 +1,14 @@
+{"ts": 1786987167.6439974, "iso": "2026-08-17T17:19:27Z", "case_id": "plan-01", "model": "gemini-3.6-flash", "prompt_tokens": 628, "completion_tokens": 226, "total_tokens": 1392}
+{"ts": 1786987174.4736955, "iso": "2026-08-17T17:19:34Z", "case_id": "plan-02", "model": "gemini-3.6-flash", "prompt_tokens": 645, "completion_tokens": 158, "total_tokens": 1573}
+{"ts": 1786987182.8296356, "iso": "2026-08-17T17:19:42Z", "case_id": "plan-03", "model": "gemini-3.6-flash", "prompt_tokens": 647, "completion_tokens": 220, "total_tokens": 1610}
+{"ts": 1786987188.9480338, "iso": "2026-08-17T17:19:48Z", "case_id": "plan-04", "model": "gemini-3.6-flash", "prompt_tokens": 627, "completion_tokens": 204, "total_tokens": 1587}
+{"ts": 1786987194.7992637, "iso": "2026-08-17T17:19:54Z", "case_id": "meeting-01", "model": "gemini-3.6-flash", "prompt_tokens": 566, "completion_tokens": 221, "total_tokens": 1111}
+{"ts": 1786987204.193714, "iso": "2026-08-17T17:20:04Z", "case_id": "meeting-02", "model": "gemini-3.6-flash", "prompt_tokens": 636, "completion_tokens": 210, "total_tokens": 1775}
+{"ts": 1786987530.9968572, "iso": "2026-08-17T17:25:30Z", "case_id": "plan-04", "model": "gemini-3.6-flash", "prompt_tokens": 660, "completion_tokens": 230, "total_tokens": 1219}
+{"ts": 1786987568.8106058, "iso": "2026-08-17T17:26:08Z", "case_id": "meeting-03", "model": "gemini-3.6-flash", "prompt_tokens": 582, "completion_tokens": 180, "total_tokens": 1557}
+{"ts": 1786987577.9135795, "iso": "2026-08-17T17:26:17Z", "case_id": "contract-01", "model": "gemini-3.6-flash", "prompt_tokens": 1141, "completion_tokens": 171, "total_tokens": 2394}
+{"ts": 1786987628.3986037, "iso": "2026-08-17T17:27:08Z", "case_id": "contract-02", "model": "gemini-3.6-flash", "prompt_tokens": 1153, "completion_tokens": 232, "total_tokens": 3395}
+{"ts": 1786987646.3248558, "iso": "2026-08-17T17:27:26Z", "case_id": "contract-03", "model": "gemini-3.6-flash", "prompt_tokens": 1149, "completion_tokens": 191, "total_tokens": 1911}
+{"ts": 1786987835.8570616, "iso": "2026-08-17T17:30:35Z", "case_id": "contract-04", "model": "gemini-3.6-flash", "prompt_tokens": 1120, "completion_tokens": 256, "total_tokens": 1962}
+{"ts": 1786989603.4536362, "iso": "2026-08-17T18:00:03Z", "case_id": "contract-04", "model": "gemini-3.6-flash", "prompt_tokens": 1783, "completion_tokens": 291, "total_tokens": 3081}
+{"ts": 1786989620.5694816, "iso": "2026-08-17T18:00:20Z", "case_id": "contract-02", "model": "gemini-3.6-flash", "prompt_tokens": 1743, "completion_tokens": 287, "total_tokens": 3079}
