@@ -109,7 +109,10 @@ class NuclinoWikiAdapter(WikiAdapter):
         if self._mock_handler:
             data = self._mock_handler("patch", {"item_id": doc_id, "payload": payload})
         else:
-            data = self._http_request(f"/items/{doc_id}/content", method="PATCH", data=payload)
+            try:
+                data = self._http_request(f"/items/{doc_id}", method="PUT", data=payload)
+            except Exception:
+                data = self._http_request(f"/items/{doc_id}/content", method="PATCH", data=payload)
 
         item_data = data.get("data", data)
         new_version = str(item_data.get("contentVersion", str(int(patch.expected_version) + 1 if patch.expected_version.isdigit() else f"{patch.expected_version}_v2")))
