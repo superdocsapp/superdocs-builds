@@ -1,0 +1,23 @@
+Northstar Components Ltd — Management Accounts
+Reporting period: January 1, 2026 to March 31, 2026
+
+Revenue for the quarter was USD 120,000. Operating expenses were USD 70,000.
+Net profit was reported as USD 55,000 and the operating margin was reported as
+45%.
+
+Invoice summary:
+| Item | Amount |
+| --- | ---: |
+| Hardware supply | USD 40,000 |
+| Implementation services | USD 20,000 |
+| Support services | USD 10,000 |
+| Subtotal | USD 75,000 |
+| GST 18% | USD 10,000 |
+| Discount | USD 2,000 |
+| Grand Total | USD 84,600 |
+
+The contract effective date is January 1, 2026 and the contract expiry date is
+December 31, 2025. Delivery is due September 15, 2026.
+
+The approved contract value is USD 100,000. The approved contract value in the
+quarterly summary is USD 120,000.
