@@ -1,0 +1,38 @@
+name: client-pipeline
+
+# Regenerates the typed clients from the spec, runs the compatibility gate, and
+# smoke-tests both clients against a Prism mock — on every push and PR.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest   # Docker, make, python, node all preinstalled
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # fetch -> generate -> compat (gate) -> mock -> smoke.
+      # The compat gate exits non-zero if the old->new spec diff is breaking,
+      # failing the build; it also asserts the gate fires on the breaking demo.
+      - name: Run pipeline
+        run: make all
+
+      - name: Upload compatibility report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compat-report
+          path: |
+            reports/compat.md
+            reports/compat.json
+            reports/breaking-demo/compat.md

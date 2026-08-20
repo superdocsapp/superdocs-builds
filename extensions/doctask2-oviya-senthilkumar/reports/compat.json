@@ -1,0 +1,186 @@
+{
+  "generated_at": "2026-08-19T12:25:29+00:00",
+  "base": {
+    "file": "superdocs-old.json",
+    "version": "2.0.0",
+    "title": "Universal Document AI API",
+    "paths": 65
+  },
+  "revision": {
+    "file": "superdocs-new.json",
+    "version": "2.0.0",
+    "title": "Universal Document AI API",
+    "paths": 77
+  },
+  "compatible": true,
+  "counts": {
+    "breaking": 0,
+    "warnings": 0,
+    "safe": 32,
+    "total": 32
+  },
+  "breaking": [],
+  "warnings": [],
+  "safe": [
+    {
+      "id": "api-schema-removed",
+      "endpoint": "",
+      "detail": "removed the schema `RenameDocumentRequest`"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "GET /.well-known/api-catalog",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "GET /.well-known/mcp-server-card",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "GET /.well-known/mcp.json",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "POST /v1/agents/adopt",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "GET /v1/agents/adopt-info",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "GET /v1/agents/challenge",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "POST /v1/agents/handoff",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "POST /v1/agents/request-upgrade",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "POST /v1/agents/signup",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "GET /v1/agents/whoami",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/chat",
+      "detail": "added the new optional request property `deleted_part_chunk_ids`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/chat",
+      "detail": "added the new optional request property `touched_chunk_ids`"
+    },
+    {
+      "id": "response-optional-property-added",
+      "endpoint": "POST /v1/chat",
+      "detail": "added the optional property `hint` to the response with the `200` status"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/chat/async",
+      "detail": "added the new optional request property `deleted_part_chunk_ids`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/chat/async",
+      "detail": "added the new optional request property `touched_chunk_ids`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/documents/export",
+      "detail": "added the new optional request property `options/fidelity`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/documents/export",
+      "detail": "added the new optional request property `source_filename`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/documents/export/email-request",
+      "detail": "added the new optional request property `source_filename`"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "POST /v1/documents/images/upload-base64",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "PATCH /v1/documents/{document_id}",
+      "detail": "added the new optional request property `base_parts`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "PATCH /v1/documents/{document_id}",
+      "detail": "added the new optional request property `parts`"
+    },
+    {
+      "id": "request-property-became-optional",
+      "endpoint": "PATCH /v1/documents/{document_id}",
+      "detail": "the request property `title` became optional"
+    },
+    {
+      "id": "request-property-list-of-types-widened",
+      "endpoint": "PATCH /v1/documents/{document_id}",
+      "detail": "request property `title` list-of-types was widened by adding types `null` to media type `application/json`"
+    },
+    {
+      "id": "request-property-min-length-decreased",
+      "endpoint": "PATCH /v1/documents/{document_id}",
+      "detail": "the `title` request property's minLength was decreased from `1` to `0`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/downloads",
+      "detail": "added the new optional request property `options/fidelity`"
+    },
+    {
+      "id": "endpoint-added",
+      "endpoint": "POST /v1/limits/increase-request",
+      "detail": "endpoint added"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/sessions/{session_id}/documents/{document_id}/save",
+      "detail": "added the new optional request property `deleted_part_chunk_ids`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/sessions/{session_id}/documents/{document_id}/save",
+      "detail": "added the new optional request property `touched_chunk_ids`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/sessions/{session_id}/documents/{document_id}/unarchive",
+      "detail": "added the new optional request property `anyOf[subschema #1: SaveDocumentRequest]/deleted_part_chunk_ids`"
+    },
+    {
+      "id": "new-optional-request-property",
+      "endpoint": "POST /v1/sessions/{session_id}/documents/{document_id}/unarchive",
+      "detail": "added the new optional request property `anyOf[subschema #1: SaveDocumentRequest]/touched_chunk_ids`"
+    },
+    {
+      "id": "response-optional-property-added",
+      "endpoint": "POST /v1/uploads/{upload_id}/process",
+      "detail": "added the optional property `warnings` to the response with the `200` status"
+    }
+  ]
+}
