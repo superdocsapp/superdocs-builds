@@ -1,0 +1,27 @@
+{
+  "intake_id": "limited-real-property",
+  "poa_type": "limited",
+  "jurisdiction": "in-mh",
+  "principal": {
+    "name": "Kavitha Ramanathan",
+    "address": "14 Sarojini Road, Begumpet, Hyderabad 500016, Telangana, India",
+    "identifier": "born 4 March 1958"
+  },
+  "agent": {
+    "name": "Rohan Deshpande",
+    "address": "9 Prabhat Road, Shivajinagar, Pune 411004, Maharashtra, India"
+  },
+  "successor_agent": {
+    "name": "Anjali Ramanathan",
+    "address": "27 Lake View Colony, Jubilee Hills, Hyderabad 500033, Telangana, India"
+  },
+  "granted_powers": [
+    "rp-lease",
+    "rp-management",
+    "rp-registration",
+    "fin-bills"
+  ],
+  "effective_date": "on the date the Principal signs this instrument",
+  "limitation": "the letting, upkeep and registration of the real property described in this instrument, and the payment of outgoings on it",
+  "real_property_description": "Flat 3B, Shivneri Apartments, 9 Prabhat Road, Shivajinagar, Pune 411004, Maharashtra, India"
+}

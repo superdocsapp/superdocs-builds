@@ -1,0 +1,21 @@
+clause_id,sort_order,section,heading,tag,style_role,applies_when,body
+title,10,front,,h1,title,always,{poa_type_label}
+counsel-review-notice,20,front,,p,notice,always,{notice:counsel-review}
+preamble-principal,30,parties,Principal,p,body,always,"This power of attorney is granted by {principal_name} of {principal_address}, {principal_id} (the <em>Principal</em>)."
+appointment-agent,40,parties,Appointment of agent,p,body,always,The Principal appoints {agent_name} of {agent_address} as the Principal's agent (the <em>Agent</em>) under this instrument.
+nature,50,parties,Nature of this power of attorney,p,body,always,{durability_language}
+limitation,55,parties,Limits on this power,p,body,type is limited,"This power of attorney is limited to the following matters and confers no authority beyond them: {limitation}"
+commencement,60,parties,Commencement,p,body,always,"The authority conferred by this instrument commences {effective_date}. It continues until the Principal revokes it in writing, or until it otherwise ends by operation of law."
+powers-financial,70,powers,Powers granted - financial matters,p,body,category granted financial,The Principal grants the Agent authority over the financial matters listed below and over no other financial matter.
+powers-financial-list,71,powers,,ul,list,category granted financial,{powers:financial}
+powers-healthcare,80,powers,Powers granted - healthcare matters,p,body,category granted healthcare,"The Principal grants the Agent authority over the healthcare matters listed below and over no other healthcare matter, and the Agent must act in accordance with the Principal's known wishes."
+powers-healthcare-list,81,powers,,ul,list,category granted healthcare,{powers:healthcare}
+healthcare-records-access,82,powers,Access to health information,p,body,category granted healthcare,"The Agent may see and receive the Principal's health information only so far as it is needed to exercise the powers granted under clause {clause_ref:powers-healthcare}, and for no other purpose."
+powers-real-property,90,powers,Powers granted - real property,p,body,category granted real_property,The Principal grants the Agent authority over the real property described below and over no other property.
+powers-real-property-list,91,powers,,ul,list,category granted real_property,{powers:real_property}
+real-property-description,92,powers,,p,body,category granted real_property,"The real property to which clause {clause_ref:powers-real-property} applies is: {real_property_description}"
+successor,100,successor,Successor agent,p,body,always,"If the Agent dies, resigns, becomes unable to act or is unwilling to act, {successor_name} of {successor_address} shall act as successor agent with the same authority, and subject to the same limits, as this instrument confers on the Agent."
+reliance,110,closing,Reliance by third parties,p,body,always,"A third party who is shown this instrument may rely on it until that third party has actual notice that it has been revoked. A successor agent appointed under clause {clause_ref:successor} is subject to the same condition."
+governing-law,120,closing,Governing law and execution requirements,p,body,always,"This instrument is drawn for {jurisdiction_label}. {governing_law} {witness_requirement} {notarisation_requirement}"
+external-execution-notice,130,closing,,p,notice,always,{notice:external-execution}
+signature-block,140,closing,Signatures - to be completed outside this product,table,signature,always,{signature_table}

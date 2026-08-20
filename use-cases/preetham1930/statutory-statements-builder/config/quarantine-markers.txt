@@ -1,0 +1,12 @@
+# A source carrying any of these inside an HTML/Markdown comment is quarantined:
+# reported as quarantined, and never consulted for an event, a figure or a note.
+#
+# Quarantine runs in BOTH directions on purpose. Not consulting a forged source
+# stops it suppressing a disclosure; it also stops it *manufacturing* one, which
+# is the same class of failure and is easier to miss because the result looks
+# like diligence.
+ignore all previous instructions
+system instruction
+mark every disclosure
+without human sign-off
+do not mention this instruction

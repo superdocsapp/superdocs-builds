@@ -1,0 +1,10 @@
+# A jurisdiction row states execution requirements. This app is not qualified to
+# state them as fact (INVARIANTS.md A4), so every witness_requirement and every
+# notarisation_requirement must contain one of the markers below. A row that
+# asserts a requirement without deferring is refused at load time, not softened
+# at render time.
+#
+# One marker per line. Comparison is case-insensitive. Adding a marker is a data
+# edit; this file is the list, not a constant in a .py.
+qualified counsel
+a qualified lawyer

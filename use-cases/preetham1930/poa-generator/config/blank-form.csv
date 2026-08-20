@@ -1,0 +1,12 @@
+placeholder,blank_text
+principal_name,[ PRINCIPAL - FULL LEGAL NAME ]
+principal_address,[ PRINCIPAL - ADDRESS ]
+principal_id,[ PRINCIPAL - IDENTIFYING DETAIL ]
+agent_name,[ AGENT - FULL LEGAL NAME ]
+agent_address,[ AGENT - ADDRESS ]
+successor_name,[ SUCCESSOR AGENT - FULL LEGAL NAME ]
+successor_address,[ SUCCESSOR AGENT - ADDRESS ]
+limitation,[ THE MATTERS THIS POWER IS LIMITED TO ]
+effective_date,[ WHEN THE AUTHORITY COMMENCES ]
+real_property_description,[ THE REAL PROPERTY THIS POWER APPLIES TO ]
+powers,[ POWERS AS SELECTED IN THE INTAKE ]

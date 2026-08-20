@@ -1,0 +1,28 @@
+{
+  "intake_id": "durable-financial",
+  "poa_type": "durable",
+  "jurisdiction": "in-ts",
+  "principal": {
+    "name": "Kavitha Ramanathan",
+    "address": "14 Sarojini Road, Begumpet, Hyderabad 500016, Telangana, India",
+    "identifier": "born 4 March 1958"
+  },
+  "agent": {
+    "name": "Suresh Ramanathan",
+    "address": "14 Sarojini Road, Begumpet, Hyderabad 500016, Telangana, India"
+  },
+  "successor_agent": {
+    "name": "Anjali Ramanathan",
+    "address": "27 Lake View Colony, Jubilee Hills, Hyderabad 500033, Telangana, India"
+  },
+  "granted_powers": [
+    "fin-banking",
+    "fin-investments",
+    "fin-tax",
+    "fin-bills",
+    "fin-business"
+  ],
+  "effective_date": "on the date the Principal signs this instrument",
+  "limitation": null,
+  "real_property_description": null
+}

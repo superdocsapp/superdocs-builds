@@ -1,0 +1,7 @@
+rule,value,why
+period_reference,during the year,a sentence tied to last year's period is a claim about last year
+period_reference,for the year,the same
+period_reference,as at,the same
+period_reference,at the reporting date,the same
+period_reference,in the current year,the same
+period_reference,during the period,the same

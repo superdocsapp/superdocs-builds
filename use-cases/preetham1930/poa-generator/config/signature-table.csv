@@ -1,0 +1,5 @@
+column_key,column_label,fill
+role,Role,label
+name,Name,placeholder
+signature,Signature,blank
+date,Date,blank

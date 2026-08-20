@@ -1,0 +1,27 @@
+{
+  "intake_id": "healthcare",
+  "poa_type": "durable",
+  "jurisdiction": "in-ts",
+  "principal": {
+    "name": "Kavitha Ramanathan",
+    "address": "14 Sarojini Road, Begumpet, Hyderabad 500016, Telangana, India",
+    "identifier": "born 4 March 1958"
+  },
+  "agent": {
+    "name": "Nandini Ramanathan",
+    "address": "27 Lake View Colony, Jubilee Hills, Hyderabad 500033, Telangana, India"
+  },
+  "successor_agent": {
+    "name": "Suresh Ramanathan",
+    "address": "14 Sarojini Road, Begumpet, Hyderabad 500016, Telangana, India"
+  },
+  "granted_powers": [
+    "health-treatment",
+    "health-records",
+    "health-providers",
+    "health-admission"
+  ],
+  "effective_date": "when a physician treating the Principal records in writing that the Principal is unable to make healthcare decisions",
+  "limitation": null,
+  "real_property_description": null
+}
