@@ -197,7 +197,15 @@ heading and section 3's own paragraph:
 The text is correct. The renumbering is correct: Service levels became 5,
 Governing law became 6. It is anchored to the heading rather than placed after
 the section's last element, so section 3 now has a clause wedged inside it and
-its own paragraph sits under someone else's heading. On screen in a summary this
+its own paragraph sits under someone else's heading.
+
+**And it does not happen every time.** I ran the same script against the same
+document six times: four runs misplaced the section, two got it right. That is
+the most useful part of this whole tutorial. If the failure were reliable you
+would find it on your first run and never ship it. Because it is intermittent,
+you can build the integration, test it twice, see it work twice, and ship a
+document generator that quietly gets it wrong a third of the time. The check is
+not paranoia, it is the only thing standing between you and that. On screen in a summary this
 looks fine. On paper it is a contract with a clause in the wrong clause.
 
 That is the check earning its place: seventeen lines of regex caught something

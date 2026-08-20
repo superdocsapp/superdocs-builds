@@ -40,9 +40,15 @@ The clause text was right and the renumbering was right: Service levels became
 The insertion appears to anchor to the heading chunk rather than to the last
 chunk of the section the heading owns.
 
-**Reproduce:** `python3 part1_first_edit/first_edit.py`. Reproduced on two
-separate sessions. The script's `orphan_headings` check prints
-`PLACEMENT ['3. Charges and payment']`.
+**Reproduce:** `python3 part1_first_edit/first_edit.py`. It is **intermittent**:
+across six runs on 18 and 19 August, with the same prompt and the same document,
+four placed the section wrongly and two placed it correctly. The script's
+`orphan_headings` check prints `PLACEMENT ['3. Charges and payment']` on the bad
+runs.
+
+The intermittency is part of the finding. A single clean run does not prove the
+placement logic is right, and any test suite that asserts on one run will pass
+about a third of the time by luck.
 
 **Worth knowing:** denying the change and returning the feedback "place it after
 the whole of section 3, including its table" fixed it on the next attempt
