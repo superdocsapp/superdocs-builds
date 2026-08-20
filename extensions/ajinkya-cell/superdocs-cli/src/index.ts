@@ -14,7 +14,7 @@ export function createProgram(): Command {
   program
     .name('superdocs')
     .description('Interactive terminal developer assistant for SuperDocs AI in-document intelligence & editing')
-    .version('1.0.0');
+    .version('1.0.1');
 
   program.addCommand(initCommand);
   program.addCommand(uploadCommand);
