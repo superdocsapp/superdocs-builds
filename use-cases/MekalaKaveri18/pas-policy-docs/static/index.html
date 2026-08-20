@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PAS policy documents</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="nav">
+        <div class="brand">Policy admin → SuperDocs</div>
+        <span class="pill">Guidewire / Duck Creek style payload · templates · export</span>
+      </header>
+      <section class="hero">
+        <p class="eyebrow">Insurance PAS forms</p>
+        <h1>Draft the endorsement from <em>the PAS record</em>.</h1>
+        <p class="lede">Paste a fictional policy JSON. Both coverage lines and the endorsement date must land in the clauses.</p>
+      </section>
+      <main class="grid">
+        <section class="panel">
+          <div class="kicker">PAS payload</div>
+          <label>JSON<textarea id="json"></textarea></label>
+          <label class="check"><input type="checkbox" id="review" checked /> Review mode</label>
+          <div class="row">
+            <button id="load">Load sample</button>
+            <button class="primary" id="run">Generate</button>
+          </div>
+          <p class="cite" id="status"></p>
+        </section>
+        <section class="panel">
+          <div class="kicker">Wording</div>
+          <div id="changes"></div>
+          <article class="doc" id="doc"></article>
+          <a id="export" class="btn hidden" href="#">Export</a>
+        </section>
+      </main>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

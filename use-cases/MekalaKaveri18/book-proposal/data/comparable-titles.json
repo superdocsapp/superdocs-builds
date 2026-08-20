@@ -1,0 +1,102 @@
+[
+  {
+    "title": "Atomic Habits",
+    "author": "James Clear",
+    "year": 2018,
+    "publisher": "Avery / Penguin Random House",
+    "isbn": "978-0735211292",
+    "audience": "self-help, productivity, general nonfiction",
+    "positioning": "Mass-market behavior change with a systems frame; huge BookScan and backlist.",
+    "why_comp": "Shows how a practical self-improvement book can hold the list for years."
+  },
+  {
+    "title": "Range",
+    "author": "David Epstein",
+    "year": 2019,
+    "publisher": "Riverhead",
+    "isbn": "978-0735214484",
+    "audience": "career, learning, general nonfiction",
+    "positioning": "Evidence-led argument against early specialization.",
+    "why_comp": "Same reader as a research-backed career/learning proposal."
+  },
+  {
+    "title": "Thinking, Fast and Slow",
+    "author": "Daniel Kahneman",
+    "year": 2011,
+    "publisher": "Farrar, Straus and Giroux",
+    "isbn": "978-0374275631",
+    "audience": "psychology, decision science, general nonfiction",
+    "positioning": "Canonical popular cognitive science; still the shelf neighbor for bias books.",
+    "why_comp": "Signals a serious popular-science buyer, not a generic 'mindfulness' slot."
+  },
+  {
+    "title": "Quiet",
+    "author": "Susan Cain",
+    "year": 2012,
+    "publisher": "Crown",
+    "isbn": "978-0307352149",
+    "audience": "psychology, workplace, general nonfiction",
+    "positioning": "Identity-framed social science with a clear cultural hook.",
+    "why_comp": "A model for a big-idea book that still reads as a personal argument."
+  },
+  {
+    "title": "Deep Work",
+    "author": "Cal Newport",
+    "year": 2016,
+    "publisher": "Grand Central",
+    "isbn": "978-1455586691",
+    "audience": "productivity, knowledge workers",
+    "positioning": "Prescription-heavy professional nonfiction.",
+    "why_comp": "Same buyer as a focus/attention proposal aimed at knowledge workers."
+  },
+  {
+    "title": "Sapiens",
+    "author": "Yuval Noah Harari",
+    "year": 2015,
+    "publisher": "Harper",
+    "isbn": "978-0062316097",
+    "audience": "history, big-idea nonfiction",
+    "positioning": "Sweeping narrative history for airport and serious-reader shelves.",
+    "why_comp": "Use only if the proposal is civilizational/history-scale, not self-help."
+  },
+  {
+    "title": "The Body Keeps the Score",
+    "author": "Bessel van der Kolk",
+    "year": 2014,
+    "publisher": "Viking",
+    "isbn": "978-0670785933",
+    "audience": "psychology, trauma, health",
+    "positioning": "Clinical authority written for a lay reader; long-running backlist.",
+    "why_comp": "Health/psychology proposals that need a serious clinical neighbor."
+  },
+  {
+    "title": "Educated",
+    "author": "Tara Westover",
+    "year": 2018,
+    "publisher": "Random House",
+    "isbn": "978-0399590504",
+    "audience": "memoir, education",
+    "positioning": "Literary memoir with reported texture.",
+    "why_comp": "Only a fair comp for memoir-driven nonfiction, not a how-to."
+  },
+  {
+    "title": "The Lean Startup",
+    "author": "Eric Ries",
+    "year": 2011,
+    "publisher": "Crown Business",
+    "isbn": "978-0307887894",
+    "audience": "business, founders",
+    "positioning": "Method book that became a category label.",
+    "why_comp": "Startup/operating-system proposals, not general psychology."
+  },
+  {
+    "title": "Factfulness",
+    "author": "Hans Rosling",
+    "year": 2018,
+    "publisher": "Flatiron",
+    "isbn": "978-1250107817",
+    "audience": "data, global development, general nonfiction",
+    "positioning": "Chart-led optimism with a teaching voice.",
+    "why_comp": "Data-literacy and 'the world is not as you think' proposals."
+  }
+]
