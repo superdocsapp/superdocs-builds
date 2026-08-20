@@ -1,0 +1,11 @@
+node_modules/
+.npm-cache/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+data/
+artifacts/*
+!artifacts/.gitkeep
+*.log
