@@ -1,0 +1,11 @@
+{
+  "_captured": "2026-08-19, live SuperDocs API",
+  "_why": "Proves chunk ids arrive as data-chunk-id attributes on elements, not as a separate chunks list. lint.py reads them from here.",
+  "html": "<h1 data-chunk-id=\"db1d893f-8709-48da-a654-bd7c28515166\">Configuring The Webhook</h1>\n<p data-chunk-id=\"e6bfe2fc-4a74-4b5d-9bbf-657632caa5ae\">In order to configure the webhook, please click Save. The service utilizes a cache to store events.</p>\n<pre data-chunk-id=\"8edb9574-705d-4a1c-b6e0-bd4101efe720\"><code>client.utilize(please=True)  # do not rewrite this</code></pre>\n<table data-chunk-id=\"81038ebd-88b5-4152-a3e1-3702c3da5de3\"><tbody><tr><th>Setting</th><th>Notes</th></tr><tr><td>retries</td><td>utilize the default</td></tr></tbody></table>\n<p data-chunk-id=\"04df4d9d-85d5-445e-8239-683d1893b8d8\">At this point in time you should terminate the session.</p>",
+  "session_id": "stylefix-live-2026-08-19",
+  "filename": "probe.html",
+  "chunks_count": 5,
+  "version_id": "22196af4-a87c-42a6-aaa5-146e8ab91fe7",
+  "page_setup": null,
+  "persisted": true
+}

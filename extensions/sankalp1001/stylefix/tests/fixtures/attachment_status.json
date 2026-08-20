@@ -1,0 +1,17 @@
+{
+  "_captured": "2026-08-19, live SuperDocs API",
+  "_why": "The readiness shape. Neither a top-level status scalar nor an `attachments` list; readiness is total_ready with total_processing at zero.",
+  "session_id": "stylefix-live-2026-08-19",
+  "ready_attachments": [
+    {"attachment_id": "9f8358c9-bb3e-4a6d-939e-2085bbea88c0", "filename": "house-product-style.md",
+     "file_extension": ".md", "chunks_count": 12, "file_size": 925,
+     "upload_timestamp": "2026-08-19T18:08:26.862409"}
+  ],
+  "processing_jobs": [
+    {"job_id": "dbbeb7cf-5caa-4dd3-88a1-6497772ab0cb", "filename": "house-product-style.md",
+     "status": "completed", "progress": 100, "error": null,
+     "attachment_id": "9f8358c9-bb3e-4a6d-939e-2085bbea88c0"}
+  ],
+  "total_ready": 1,
+  "total_processing": 0
+}

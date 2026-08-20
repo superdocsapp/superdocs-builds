@@ -1,0 +1,50 @@
+{
+  "_captured": "2026-08-19, live SuperDocs API, session stylefix-live-2026-08-19",
+  "_why": "Ground truth for the HITL envelope. Every field name in parsing.py is checked against this file rather than against the OpenAPI schema, because the schema does not describe the shape of a pending change.",
+  "job_id": "fc9d8012-07c2-47e4-bc41-9ab7adbf21b3",
+  "session_id": "stylefix-live-2026-08-19",
+  "job_type": "chat",
+  "status": "awaiting_approval",
+  "progress": 86,
+  "result": null,
+  "error": null,
+  "metadata": {
+    "document_html_provided": false,
+    "pending_changes": [
+      {
+        "change_id": "cc3f6a9a-5441-41f6-a5b0-0e31d7e6cc3c",
+        "operation": "edit",
+        "chunk_id": "db1d893f-8709-48da-a654-bd7c28515166",
+        "document_id": "doc_primary",
+        "old_html": "<h1 data-chunk-id=\"db1d893f-8709-48da-a654-bd7c28515166\">Configuring The Webhook</h1>",
+        "new_html": "<h1 data-chunk-id=\"db1d893f-8709-48da-a654-bd7c28515166\">Configuring the webhook</h1>",
+        "ai_explanation": "Parallel edit: Linting per style guide."
+      },
+      {
+        "change_id": "70f6040c-5ef0-455f-af0e-ff26775dfbfa",
+        "operation": "edit",
+        "chunk_id": "e6bfe2fc-4a74-4b5d-9bbf-657632caa5ae",
+        "document_id": "doc_primary",
+        "old_html": "<p data-chunk-id=\"e6bfe2fc-4a74-4b5d-9bbf-657632caa5ae\">In order to configure the webhook, please click Save. The service utilizes a cache to store events.</p>",
+        "new_html": "<p data-chunk-id=\"e6bfe2fc-4a74-4b5d-9bbf-657632caa5ae\">To configure the webhook, please click Save. The service uses a cache to store events.</p>",
+        "ai_explanation": "Parallel edit: Linting per style guide."
+      },
+      {
+        "change_id": "ea2646be-6bcb-4426-81e0-ebd9596d5728",
+        "operation": "edit",
+        "chunk_id": "04df4d9d-85d5-445e-8239-683d1893b8d8",
+        "document_id": "doc_primary",
+        "old_html": "<p data-chunk-id=\"04df4d9d-85d5-445e-8239-683d1893b8d8\">At this point in time you should terminate the session.</p>",
+        "new_html": "<p data-chunk-id=\"04df4d9d-85d5-445e-8239-683d1893b8d8\">At this point in time you should end the session.</p>",
+        "ai_explanation": "Parallel edit: Linting per style guide."
+      }
+    ],
+    "intermediate_responses": [
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"batch_approval\", \"batch_id\": \"cc3f6a9a-5441-41f6-a5b0-0e31d7e6cc3c\", \"batch_total\": 3, \"changes\": [{\"change_id\": \"cc3f6a9a-5441-41f6-a5b0-0e31d7e6cc3c\", \"chunk_id\": \"db1d893f-8709-48da-a654-bd7c28515166\", \"old_html\": \"<h1>Configuring The Webhook</h1>\", \"new_html\": \"<h1>Configuring the webhook</h1>\"}]}",
+        "sequence": 3
+      }
+    ]
+  }
+}
