@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Standup → customer status</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="nav">
+        <div>Standup desk</div>
+        <span class="pill">Slack-shaped export · SuperDocs memo · CISO-safe</span>
+      </header>
+      <section class="hero">
+        <p class="eyebrow">Customer success · B2B SaaS</p>
+        <h1>What Slack said, <em>what the customer may read</em>.</h1>
+        <p class="lede">Users: CSMs at firms like Harbor & Pine's vendor. Internal "maybe Friday" never ships.</p>
+      </section>
+      <main class="grid">
+        <section class="panel">
+          <div class="kicker">Standup export</div>
+          <pre id="raw"></pre>
+          <div class="row">
+            <button id="run">Write the memo</button>
+          </div>
+          <p class="cite" id="status"></p>
+        </section>
+        <section class="panel">
+          <div class="kicker">Forwardable memo</div>
+          <article class="doc" id="doc"></article>
+          <a id="export" class="btn hidden" href="#">Export</a>
+        </section>
+      </main>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      fetch("/fixture").then((r) => r.json()).then((j) => { $("raw").textContent = JSON.stringify(j, null, 2); });
+      $("run").onclick = async () => {
+        $("status").textContent = "Working…";
+        const r = await fetch("/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        const j = await r.json();
+        $("status").textContent = j.status + (j.offline ? " (offline)" : "");
+        $("doc").innerHTML = j.html || "";
+        if (j.id) { $("export").classList.remove("hidden"); $("export").href = "/jobs/" + j.id + "/export"; }
+      };
+    </script>
+  </body>
+</html>

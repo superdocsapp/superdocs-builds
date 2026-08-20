@@ -1,0 +1,32 @@
+{
+  "name": "cursor-superdocs-selection",
+  "displayName": "SuperDocs selection edit",
+  "description": "Send the current editor selection to SuperDocs for a targeted edit, then replace only that range.",
+  "version": "0.1.0",
+  "publisher": "MekalaKaveri18",
+  "engines": { "vscode": "^1.85.0" },
+  "activationEvents": ["onCommand:superdocs.editSelection"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "superdocs.editSelection",
+        "title": "SuperDocs: Edit selection"
+      }
+    ],
+    "configuration": {
+      "title": "SuperDocs",
+      "properties": {
+        "superdocs.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "sk_ key from SuperDocs settings. Do not commit this."
+        },
+        "superdocs.baseUrl": {
+          "type": "string",
+          "default": "https://api.superdocs.app"
+        }
+      }
+    }
+  }
+}

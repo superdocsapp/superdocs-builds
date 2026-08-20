@@ -1,0 +1,28 @@
+{
+  "title": "Salt on the Northern Quay",
+  "pov": "third person limited, Kell",
+  "characters": [
+    {
+      "name": "Kell Marin",
+      "alive": true,
+      "last_seen": "chapter-12",
+      "notes": "Pilot; cannot swim."
+    },
+    {
+      "name": "Mara Vale",
+      "alive": false,
+      "died_in": "chapter-3",
+      "cause": "ash fever",
+      "notes": "Must not appear after chapter 3 except in memory."
+    }
+  ],
+  "places": [
+    {"name": "Port Kell", "bearing": "north of the strait"},
+    {"name": "Ashmarsh", "bearing": "inland, west"}
+  ],
+  "timeline": [
+    {"chapter": "chapter-3", "fact": "Mara Vale dies of ash fever in Ashmarsh."},
+    {"chapter": "chapter-8", "fact": "Kell reaches Port Kell, which lies north of the strait."},
+    {"chapter": "chapter-12", "fact": "Kell waits on the northern quay; Mara is dead."}
+  ]
+}

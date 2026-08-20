@@ -1,0 +1,21 @@
+{
+  "channel": "#acct-harbor-pine",
+  "exported_at": "2026-08-20T09:12:00Z",
+  "messages": [
+    {
+      "user": "Priya (CSM)",
+      "ts": "09:01",
+      "text": "Harbor & Pine still blocked on SSO. Eng said 'maybe Friday if we get lucky'. Don't tell the customer that."
+    },
+    {
+      "user": "Jonah (Eng)",
+      "ts": "09:03",
+      "text": "IdP metadata was wrong. Fix is in review. No Friday promise. Target: 2026-08-22 if QA is green."
+    },
+    {
+      "user": "Priya (CSM)",
+      "ts": "09:05",
+      "text": "Customer pinged twice. They want a written status they can forward to their CISO."
+    }
+  ]
+}
