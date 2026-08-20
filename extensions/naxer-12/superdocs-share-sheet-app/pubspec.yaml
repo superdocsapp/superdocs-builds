@@ -1,0 +1,32 @@
+name: superdocs_share_sheet_app
+description: "A Flutter mobile app for instant document editing via SuperDocs API and OS Share Sheet."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  flutter_secure_storage: ^9.0.0
+  shared_preferences: ^2.2.2
+  receive_sharing_intent: ^1.8.0
+  workmanager: ^0.10.0
+  flutter_local_notifications: ^17.0.0
+  webview_flutter: ^4.7.0
+  share_plus: ^9.0.0
+  path_provider: ^2.1.2
+  path: ^1.9.0
+  intl: ^0.19.0
+  uuid: ^4.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  mockito: ^5.4.4
+
+flutter:
+  uses-material-design: true
