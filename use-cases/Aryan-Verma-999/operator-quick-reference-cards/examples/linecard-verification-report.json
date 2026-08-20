@@ -1,0 +1,14 @@
+{
+  "manual_sha256": "2a0bf608d483fd156e5657975eb6a19d1381bfff8719cf22208978d6e7ef7570",
+  "card_html_sha256": "1c37778ff90304f637bfa126cd290b141dd5ec103bda698aa88fedb71a475c3d",
+  "pdf_sha256": "d07c87ce815c5eb402e7a7b2c40e5e903cd1128c1fc65241d124ec63209a1b7f",
+  "page_count": 2,
+  "exact_value": "PASS",
+  "safety": "PASS",
+  "procedure_coverage": "3/3 PASS",
+  "restart_coverage": "PASS",
+  "citation": "PASS: PDF p. 3",
+  "hostile_content": "INERT",
+  "result": "PASS",
+  "scope": "synthetic LC-100 M1 fixture"
+}

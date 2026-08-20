@@ -1,0 +1,26 @@
+[project]
+name = "linecard"
+version = "0.2.0"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "httpx>=0.27",
+    "pydantic>=2",
+    "PyMuPDF>=1.24",
+    "python-dotenv>=1.0",
+    "uvicorn>=0.30",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["linecard"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+markers = ["live: requires RUN_LIVE_SUPERDOCS=1 and SUPERDOCS_API_KEY"]

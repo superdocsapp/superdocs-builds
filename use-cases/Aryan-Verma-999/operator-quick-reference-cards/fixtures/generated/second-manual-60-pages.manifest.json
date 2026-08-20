@@ -1,0 +1,10 @@
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+{
+  "path": "fixtures/generated/second-manual-60-pages.pdf",
+  "sha256": "c478630033bc0af4f639c47e452aa75f51f4c1cfe34f760264ba5d59408baccf",
+  "byte_size": 65300,
+  "page_count": 60,
+  "seed": 2002,
+  "generator": "generate_scale_manual.py v1",
+  "variant": "AX-200"
+}

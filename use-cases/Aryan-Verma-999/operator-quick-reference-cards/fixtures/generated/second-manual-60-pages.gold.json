@@ -1,0 +1,16 @@
+{
+  "schema": "linecard-gold-ledger-v1",
+  "manual": "second-manual-60-pages.pdf",
+  "manual_sha256": "c478630033bc0af4f639c47e452aa75f51f4c1cfe34f760264ba5d59408baccf",
+  "tasks": [{
+    "task": "Remove a feed-throat obstruction",
+    "relevant_pages": [12, 13, 28, 45],
+    "required_safety": ["De-energize the drive and verify zero motion before access."],
+    "required_steps": ["Halt the feeder.", "Confirm the stored force is released.", "Remove the obstruction with the designated hook."],
+    "required_specifications": ["18 N·m ± 1 N·m"],
+    "cross_reference_edges": [{"from": 12, "to": 45, "label": "return to operation"}],
+    "expected_conflicts": ["27 N·m ± 2 N·m is for an alternate setup"],
+    "non_applicable": ["image-only page 102"]
+  }],
+  "denominator": {"safety": 1, "procedure": 3, "specification": 1, "citation": 5}
+}

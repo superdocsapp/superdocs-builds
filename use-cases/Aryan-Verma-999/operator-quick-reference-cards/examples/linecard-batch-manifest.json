@@ -1,0 +1,11 @@
+{
+  "schema": "linecard-offline-batch-v1",
+  "scope": "SYNTHETIC / OFFLINE_VERIFIED",
+  "sample_gate": "APPROVED",
+  "aggregate_status": "COMPLETED",
+  "cards": [
+    {"card_id": "lc-offline-01", "task": "Clear infeed jam", "status": "COMPLETED", "attempts": 1, "operation_budget": {"reserved": 1, "consumed": 0}},
+    {"card_id": "lc-offline-02", "task": "Weekly lubrication", "status": "COMPLETED", "attempts": 1, "operation_budget": {"reserved": 1, "consumed": 0}},
+    {"card_id": "lc-offline-03", "task": "Guard replacement / inspection", "status": "COMPLETED", "attempts": 1, "operation_budget": {"reserved": 1, "consumed": 0}}
+  ]
+}

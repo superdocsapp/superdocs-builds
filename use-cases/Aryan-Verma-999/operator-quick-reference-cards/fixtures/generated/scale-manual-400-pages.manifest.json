@@ -1,0 +1,10 @@
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+{
+  "path": "fixtures/generated/scale-manual-400-pages.pdf",
+  "sha256": "d0a2de13ab5a60e1f918dc220410aba9e028f64fcdadb2f819af518b9dcbf30b",
+  "byte_size": 427152,
+  "page_count": 400,
+  "seed": 1001,
+  "generator": "generate_scale_manual.py v1",
+  "variant": "LC-100"
+}

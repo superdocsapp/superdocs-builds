@@ -1,0 +1,21 @@
+{
+  "run_fingerprint": "c3b02d913f19ffc8f7747969c18e64ea724f010f657d9d1e235603dfe0134da8",
+  "request_hash": "92444f90a12fe98e522198b8e63114d07d44a76ff430aa6c6ee0c694951e098d",
+  "skeleton_html_sha256": "1c37778ff90304f637bfa126cd290b141dd5ec103bda698aa88fedb71a475c3d",
+  "manual": {"durable_id": "00000000-0000-4000-8000-000000000001", "pre_version": 4, "pre_html_sha256": "7acb94276a933edddbc439c4f4519edb3d6115249ef8a3ce0cd1dab7fe51a885", "post_version": 4, "post_html_sha256": "7acb94276a933edddbc439c4f4519edb3d6115249ef8a3ce0cd1dab7fe51a885"},
+  "card": {"durable_id": "00000000-0000-4000-8000-000000000002", "base_version": 1, "base_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7"},
+  "proposal_rounds": [
+    {"round": 1, "proposal_count": 12, "all_rejected": true, "base_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7", "prospective_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7"},
+    {"round": 2, "proposal_count": 11, "all_rejected": true, "base_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7", "prospective_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7"},
+    {"round": 3, "proposal_count": 12, "all_rejected": true, "base_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7", "prospective_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7"},
+    {"round": 4, "proposal_count": 1, "all_rejected": true, "base_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7", "prospective_html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7"}
+  ],
+  "authoritative": {"version": 1, "html_sha256": "cc748c28b15020ef4394a121fc2311b38dd37d316ab469cc4ca60e7919f623c7"},
+  "verifier": {"status": "BLOCKED", "failed": [
+    {"check_id": "PROTECTED_STRUCTURE", "evidence_ids": [], "expected": "two explicit card-page containers", "observed": "failed", "affected_block": "card-page-1/card-page-2", "reason": "authoritative HTML did not satisfy protected page structure"},
+    {"check_id": "CITATION_PAGE_POINTERS", "evidence_ids": ["SPEC-001"], "expected": "PDF p. 3", "observed": "wrong or absent specification pointer", "affected_block": "specification", "reason": "SPEC-001 citation was not PDF p. 3"}
+  ], "passed": ["EXACT_SPECIFICATION", "REQUIRED_SAFETY", "REQUIRED_PROCEDURE_COVERAGE", "RESTART_COVERAGE", "UNSUPPORTED_NUMERIC_VALUE", "HOSTILE_CONTENT_INERT"]},
+  "structural_diff": {"changed_blocks": [], "interpretation": "authoritative result matched unchanged base/prospective hash; failure was present before any accepted proposal"},
+  "export_attempted": false,
+  "root_cause_class": "I"
+}
