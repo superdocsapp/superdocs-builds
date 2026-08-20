@@ -16,7 +16,7 @@ export const statusCommand = createCommand('status')
       'SuperDocs Configuration',
       `Base URL:       ${config.baseUrl}\n` +
       `API Key:        ${config.apiKey ? `${chalk.green('Configured')} (${config.apiKey.slice(0, 10)}...)` : chalk.yellow('Not Set (Mock or Unset)')}\n` +
-      `Mock Mode:      ${config.mockMode ? chalk.green('ENABLED (Offline simulation)') : chalk.dim('DISABLED (Live API)')}\n` +
+      `Mock Mode:      ${config.mockMode ? chalk.yellow('ENABLED (Offline simulation)') : chalk.bold.green('DISABLED (Live SuperDocs Cloud Engine)')}\n` +
       `Default Format: ${config.defaultExportFormat}`
     );
 

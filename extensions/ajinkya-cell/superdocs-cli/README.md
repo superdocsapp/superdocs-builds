@@ -26,8 +26,7 @@
    - [`superdocs upload <path>`](#superdocs-upload-path)
    - [`superdocs edit [options]`](#superdocs-edit-options)
    - [`superdocs approve [options]`](#superdocs-approve-options)
-   - [`superdocs export [options]`](#superdocs-export-options)
-   - [`superdocs chat`](#superdocs-chat)
+   - [`superdocs export`](#superdocs-export)
    - [`superdocs status`](#superdocs-status)
 6. [Interactive Terminal REPL Mode](#-interactive-terminal-repl-mode)
 7. [Model Context Protocol (MCP) Integration](#-model-context-protocol-mcp-integration)
@@ -67,7 +66,6 @@ Traditional AI coding and writing workflows suffer from a fundamental disconnect
 - 🎯 **Surgical In-Document Editing**: Instead of rewriting entire files from scratch, the underlying AI performs localized, context-aware mutations while preserving surrounding structures, tables, headings, and formatting.
 - 🌈 **Visual Terminal Diff Engine**: Computes line-by-line Myers unified diffs with high-visibility ANSI terminal coloring and change metrics (`+additions` / `-deletions`).
 - 🛡️ **Interactive Approval Gates**: Changes are held in a staged version sandbox (`PendingVersion`). Developers inspect the diff before committing updates to the document or syncing to disk.
-- 💬 **Interactive Chat REPL (`superdocs chat`)**: Continuous conversational refinement loop with inline slash commands (`/diff`, `/approve`, `/export`, `/status`, `/exit`).
 - 🔌 **Native Model Context Protocol (MCP)**: Exposes SuperDocs primitives as MCP tools for instant integration with Claude Desktop, Cursor, and autonomous agent loops.
 - 🤖 **Zero-Friction Agent Onboarding**: Integrates with `POST /v1/agents/signup` to automatically provision API keys without leaving the terminal.
 - 📦 **Universal Multi-Format Export**: Ingest Markdown, Word, or PDF, edit via streaming AI, and compile directly to clean `.md`, `.pdf`, `.docx`, or `.html`.
@@ -85,7 +83,6 @@ The CLI is engineered as a modular, layered Node.js/TypeScript architecture buil
 flowchart TD
     subgraph UserInterfaces [User & Agent Interfaces]
         CLI[Terminal CLI / Bin<br/><code>superdocs</code>]
-        REPL[Interactive Chat REPL<br/><code>superdocs chat</code>]
         MCP_CLIENTS[Claude Desktop / Cursor / Agents]
     end
 
@@ -424,25 +421,6 @@ superdocs export --format html --out ./dist/architecture-v1.html
 
 ---
 
-### `superdocs chat`
-Launches a dedicated interactive terminal REPL (Read-Eval-Print-Loop) for continuous, iterative document refinement.
-
-```bash
-superdocs chat
-```
-
-Inside the REPL:
-- Submit natural language instructions (e.g. `Format all code blocks to use TypeScript syntax`).
-- The AI streams edits, updates the pending buffer, and provides immediate approval choices.
-- Run inline commands directly from the REPL prompt:
-  - `/diff`: Render the current pending diff.
-  - `/approve`: Immediately commit pending changes.
-  - `/export`: Trigger an export flow without exiting chat mode.
-  - `/status`: Inspect active document statistics and edit history count.
-  - `/exit` or `quit`: Gracefully exit the session.
-
----
-
 ### `superdocs status`
 Prints a comprehensive summary of the current SuperDocs environment, active document ID, source file path, character/word metrics, pending diff status, and applied edit history.
 
@@ -687,7 +665,6 @@ superdocs-cli/
 │   │   └── superdocs.ts       # SuperDocs REST/SSE client & mock engine
 │   ├── commands/
 │   │   ├── approve.ts         # Visual diff review & commit command
-│   │   ├── chat.ts            # Interactive terminal REPL chat engine
 │   │   ├── edit.ts            # Surgical AI streaming edit command
 │   │   ├── export.ts          # Multi-format document exporter
 │   │   ├── init.ts            # Setup, onboarding, and agent signup
@@ -696,6 +673,7 @@ superdocs-cli/
 │   ├── utils/
 │   │   ├── diff.ts            # Myers line-by-line diff computation
 │   │   ├── logger.ts          # Terminal UI box formatting & logging
+│   │   ├── pdf.ts             # ASCII85/Flate PDF parser & Adobe PDF generator
 │   │   └── state.ts           # Conf-backed persistent state manager
 │   ├── index.ts               # Commander program root definition
 │   └── types.ts               # Global TypeScript interfaces & schemas

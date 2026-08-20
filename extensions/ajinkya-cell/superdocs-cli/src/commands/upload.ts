@@ -47,7 +47,7 @@ export const uploadCommand = createCommand('upload')
         `Length:        ${(res.content || '').length} characters (${(res.content || '').split(/\s+/).filter(Boolean).length} words)`
       );
 
-      logger.info(`Next step: Run ${chalk.bold.cyan('superdocs edit --prompt "<instruction>"')} or ${chalk.bold.cyan('superdocs chat')} to modify.`);
+      logger.info(`Next step: Run ${chalk.bold.cyan('superdocs edit --prompt "<instruction>"')} to modify the document.`);
     } catch (err: any) {
       spinner.fail(chalk.red(`Upload failed: ${err.message}`));
       process.exit(1);

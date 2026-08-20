@@ -19,14 +19,16 @@ const DEFAULT_SESSION: DocumentSession = {
   history: []
 };
 
+const projectName = process.env.NODE_ENV === 'test' ? 'superdocs-cli-test' : 'superdocs-cli';
+
 const configStore = new Conf<SuperDocsConfig>({
-  projectName: 'superdocs-cli',
+  projectName,
   configName: 'config',
   defaults: DEFAULT_CONFIG
 });
 
 const sessionStore = new Conf<DocumentSession>({
-  projectName: 'superdocs-cli',
+  projectName,
   configName: 'session',
   defaults: DEFAULT_SESSION
 });
@@ -41,15 +43,30 @@ function cleanUndefined<T extends Record<string, any>>(obj: T): T {
   return result;
 }
 
-// Config Methods
 export function getConfig(): SuperDocsConfig {
   const stored = configStore.store || {};
+  const apiKey = process.env.SUPERDOCS_API_KEY || stored.apiKey;
+  const baseUrl = process.env.SUPERDOCS_API_URL || stored.baseUrl || DEFAULT_CONFIG.baseUrl;
+
+  let mockMode = false;
+  if (process.env.SUPERDOCS_MOCK === 'true') {
+    mockMode = true;
+  } else if (process.env.SUPERDOCS_MOCK === 'false') {
+    mockMode = false;
+  } else if (apiKey && (apiKey.startsWith('sk_') || apiKey.startsWith('sd_live'))) {
+    mockMode = false;
+  } else if (stored.mockMode !== undefined) {
+    mockMode = Boolean(stored.mockMode);
+  } else {
+    mockMode = !apiKey;
+  }
+
   return {
     ...DEFAULT_CONFIG,
     ...stored,
-    apiKey: process.env.SUPERDOCS_API_KEY || stored.apiKey,
-    baseUrl: process.env.SUPERDOCS_API_URL || stored.baseUrl || DEFAULT_CONFIG.baseUrl,
-    mockMode: process.env.SUPERDOCS_MOCK === 'true' || Boolean(stored.mockMode)
+    apiKey,
+    baseUrl,
+    mockMode
   };
 }
 

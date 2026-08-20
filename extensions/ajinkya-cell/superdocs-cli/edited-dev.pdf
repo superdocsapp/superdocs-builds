@@ -1,0 +1,129 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> >> /Contents 6 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+6 0 obj
+<< /Length 1499 >>
+stream
+BT
+/F1 10 Tf
+14 TL
+50 790 Td
+/F2 14 Tf
+18 TL
+(DevDiscuss - Backend Project Documentation) Tj
+/F1 10 Tf
+14 TL
+T*
+() Tj
+T*
+/F2 11 Tf
+15 TL
+(1. Application Overview) Tj
+/F1 10 Tf
+14 TL
+T*
+() Tj
+T*
+(DevDiscuss is a developer-focused discussion platform inspired by StackOverflow and) Tj
+T*
+(GitHub) Tj
+T*
+() Tj
+T*
+/F2 11 Tf
+15 TL
+(2. Core Functionalities) Tj
+/F1 10 Tf
+14 TL
+T*
+() Tj
+T*
+(User Authentication \(Register, Login, JWT-based sessions\)) Tj
+T*
+(Create, Update, Delete Problems) Tj
+T*
+(Post Solutions to Problems) Tj
+T*
+(Upvote Problems and Solutions \(Unique vote per user\)) Tj
+T*
+(Mark Solution as Accepted \(Problem owner only\)) Tj
+T*
+(Follow / Unfollow Users) Tj
+T*
+(Notifications system) Tj
+T*
+(Search, Filter, and Pagination support \(future expansion\)) Tj
+T*
+() Tj
+T*
+/F2 11 Tf
+15 TL
+(3. Full Backend File Structure) Tj
+/F1 10 Tf
+14 TL
+T*
+() Tj
+T*
+(devdiscuss/) Tj
+T*
+() Tj
+T*
+/F2 11 Tf
+15 TL
+(4. Architecture Notes) Tj
+/F1 10 Tf
+14 TL
+T*
+() Tj
+T*
+(- App Router based API architecture. - Drizzle ORM for type-safe SQL queries. -) Tj
+T*
+(PostgreSQL as) Tj
+T*
+() Tj
+T*
+/F2 11 Tf
+15 TL
+(Conclusion & Architecture Summary) Tj
+/F1 10 Tf
+14 TL
+T*
+(DevDiscuss provides a modular, scalable full-stack discussion platform built on) Tj
+T*
+(Next.js, TypeScript, and PostgreSQL. The system integrates robust authentication,) Tj
+T*
+(real-time messaging, and high-performance full-text search, ensuring high) Tj
+T*
+(availability, maintainability, and clean separation of concerns.) Tj
+T*
+() Tj
+ET
+endstream
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000000321 00000 n 
+0000000396 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+1946
+%%EOF

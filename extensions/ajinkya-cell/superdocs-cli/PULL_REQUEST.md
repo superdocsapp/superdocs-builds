@@ -49,7 +49,6 @@ Unlike standard conversational AI chat interfaces that force developers into ted
   2. `superdocs edit --prompt "<instruction>"`: Streaming AI surgical edits with real-time reasoning progress.
   3. `superdocs approve`: Interactive terminal visual diff review with one-click server lock or `--ci` Markdown PR comment output.
   4. `superdocs export --format <pdf|docx|md|html>`: Compile and download finalized documents.
-- 💬 **Interactive Chat REPL** (`superdocs chat`): Continuous conversational refinement loop with inline slash commands (`/diff`, `/approve`, `/export`, `/status`, `/exit`).
 - 🤖 **Automated Agent Onboarding** (`superdocs init --signup`): Integrates with `POST /v1/agents/signup` for instant credential provisioning.
 - 🔌 **Model Context Protocol (MCP)**: Native MCP adapter exposing 6 SuperDocs tools to Claude Desktop, Cursor IDE, and agentic workflows.
 - 🧪 **Offline Simulation / Mock Engine**: Built-in mock mode (`--mock` or `SUPERDOCS_MOCK=true`) for testing without active network credentials.
@@ -82,10 +81,7 @@ superdocs export --format pdf --out ./dist/api.pdf
 superdocs export --format docx --out ./dist/api.docx
 superdocs export --format md --out ./dist/api.md
 
-# 6. Interactive Chat REPL Mode
-superdocs chat
-
-# 7. Check session state, active document, and edit history
+# 6. Check session state, active document, and edit history
 superdocs status
 ```
 
@@ -158,7 +154,6 @@ extensions/superdocs-cli/
 │   │   └── superdocs.ts       # SuperDocs REST/SSE client & mock engine
 │   ├── commands/
 │   │   ├── approve.ts         # Visual diff review & commit command
-│   │   ├── chat.ts            # Interactive terminal REPL chat engine
 │   │   ├── edit.ts            # Surgical AI streaming edit command
 │   │   ├── export.ts          # Multi-format document exporter
 │   │   ├── init.ts            # Setup, onboarding, and agent signup
@@ -167,6 +162,7 @@ extensions/superdocs-cli/
 │   ├── utils/
 │   │   ├── diff.ts            # Myers line-by-line diff computation
 │   │   ├── logger.ts          # Terminal UI box formatting & logging
+│   │   ├── pdf.ts             # ASCII85/Flate PDF parser & Adobe PDF generator
 │   │   └── state.ts           # Conf-backed persistent state manager
 │   ├── index.ts               # Commander program root definition
 │   └── types.ts               # Global TypeScript interfaces & schemas

@@ -1,51 +1,112 @@
 import zlib from 'zlib';
 
 /**
- * Standalone PDF 1.4 Text Extractor and Parser
- * Extracts structured Markdown text from binary PDF streams (including FlateDecode).
+ * Adobe ASCII85 / Base85 Decoder
+ * Conforms to Adobe PostScript & PDF ASCII85Decode specification.
+ */
+export function decodeAscii85(str: string): Buffer {
+  let clean = str.replace(/<~|\s/g, '');
+  if (clean.endsWith('~>')) {
+    clean = clean.slice(0, -2);
+  }
+  const bytes: number[] = [];
+
+  for (let i = 0; i < clean.length; i += 5) {
+    const chunk = clean.slice(i, i + 5);
+    if (chunk === 'z') {
+      bytes.push(0, 0, 0, 0);
+      i -= 4; // 'z' represents 4 zero bytes
+      continue;
+    }
+
+    let value = 0;
+    const pad = 5 - chunk.length;
+    const paddedChunk = chunk + 'u'.repeat(pad);
+
+    for (let j = 0; j < 5; j++) {
+      value = value * 85 + (paddedChunk.charCodeAt(j) - 33);
+    }
+
+    const b0 = (value >>> 24) & 255;
+    const b1 = (value >>> 16) & 255;
+    const b2 = (value >>> 8) & 255;
+    const b3 = value & 255;
+
+    const quad = [b0, b1, b2, b3];
+    for (let k = 0; k < 4 - pad; k++) {
+      bytes.push(quad[k]);
+    }
+  }
+
+  return Buffer.from(bytes);
+}
+
+/**
+ * Standalone Multi-Filter PDF Text Extractor and Parser
+ * Handles /ASCII85Decode, /FlateDecode, chained filter arrays, and uncompressed PDF text operators.
  */
 export function parsePdfToMarkdown(buffer: Buffer, fallbackName = 'Document'): string {
   const str = buffer.toString('latin1');
-  const streamRegex = /<<[^>]*\/Filter\s*\/FlateDecode[^>]*>>\s*stream\r?\n([\s\S]*?)\r?\nendstream/g;
+  const streamBlocks = [...str.matchAll(/<<([\s\S]*?)>>\s*stream\r?\n([\s\S]*?)(?:~>)?endstream/g)];
 
-  let match;
-  const rawItems: string[] = [];
+  const rawLines: string[] = [];
 
-  while ((match = streamRegex.exec(str)) !== null) {
+  for (const block of streamBlocks) {
+    const dict = block[1];
+    const streamData = block[2];
+
+    let decompressed = '';
     try {
-      const rawStream = Buffer.from(match[1], 'latin1');
-      const decompressed = zlib.inflateSync(rawStream).toString('latin1');
-      const btBlocks = decompressed.match(/BT[\s\S]*?ET/g) || [decompressed];
+      let curBuffer: Buffer;
+      if (dict.includes('ASCII85Decode')) {
+        curBuffer = decodeAscii85(streamData);
+      } else {
+        curBuffer = Buffer.from(streamData, 'latin1');
+      }
 
-      for (const block of btBlocks) {
-        const lines = block.split(/\r?\n/);
-        for (const line of lines) {
-          // Tj single string
-          const tjMatch = line.match(/\((.*?)\)\s*Tj/);
-          if (tjMatch) {
-            const cl = cleanPdfText(tjMatch[1]);
-            if (cl) rawItems.push(cl);
-          }
-          // TJ array of strings & spacing numbers
-          const tjArrayMatch = line.match(/\[(.*?)\]\s*TJ/);
-          if (tjArrayMatch) {
-            const inner = tjArrayMatch[1];
-            let combined = '';
-            const tokens = inner.match(/\((?:\\\(|\\\)|[^)])*\)|-?\d+(?:\.\d+)?/g) || [];
-            for (const token of tokens) {
-              if (token.startsWith('(') && token.endsWith(')')) {
-                combined += cleanPdfText(token.slice(1, -1));
-              } else {
-                const num = parseFloat(token);
-                if (num < -50) combined += ' ';
-              }
+      if (dict.includes('FlateDecode')) {
+        curBuffer = zlib.inflateSync(curBuffer);
+      }
+      decompressed = curBuffer.toString('latin1');
+    } catch {
+      try {
+        decompressed = zlib.inflateSync(Buffer.from(streamData, 'latin1')).toString('latin1');
+      } catch {
+        decompressed = streamData;
+      }
+    }
+
+    if (!decompressed) continue;
+
+    const btBlocks = decompressed.match(/BT[\s\S]*?ET/g) || [decompressed];
+
+    for (const bt of btBlocks) {
+      const lines = bt.split(/\r?\n/);
+      for (const line of lines) {
+        // Match ( ... ) Tj
+        const tjMatch = line.match(/\(((?:\\\(|\\\)|[^)])*)\)\s*Tj/);
+        if (tjMatch) {
+          const t = cleanPdfText(tjMatch[1]);
+          if (t) rawLines.push(t);
+        }
+
+        // Match [ ... ] TJ
+        const tjArrayMatch = line.match(/\[(.*?)\]\s*TJ/);
+        if (tjArrayMatch) {
+          const inner = tjArrayMatch[1];
+          let combined = '';
+          const tokens = inner.match(/\((?:\\\(|\\\)|[^)])*\)|-?\d+(?:\.\d+)?/g) || [];
+          for (const token of tokens) {
+            if (token.startsWith('(') && token.endsWith(')')) {
+              combined += cleanPdfText(token.slice(1, -1));
+            } else {
+              const num = parseFloat(token);
+              if (num < -50) combined += ' ';
             }
-            if (combined.trim()) rawItems.push(combined.trim());
           }
+          if (combined.trim()) rawLines.push(combined.trim());
         }
       }
-    } catch {
-      // Ignore non-inflate streams
     }
   }
 
@@ -55,7 +116,7 @@ export function parsePdfToMarkdown(buffer: Buffer, fallbackName = 'Document'): s
         const code = parseInt(oct, 8);
         if (code === 40) return '(';
         if (code === 41) return ')';
-        if (code === 21 || code === 25 || code === 17) return '• ';
+        if (code === 127 || code === 21 || code === 25 || code === 17) return '• ';
         return String.fromCharCode(code);
       })
       .replace(/\\([()\\])/g, '$1')
@@ -63,10 +124,9 @@ export function parsePdfToMarkdown(buffer: Buffer, fallbackName = 'Document'): s
       .trim();
   }
 
-  if (rawItems.length === 0) {
-    // If no flate streams found, try ASCII text search
+  if (rawLines.length === 0) {
     const asciiMatches = str.match(/[A-Za-z0-9 ,.:;@\-_/()'\"]{4,}/g) || [];
-    const validLines = asciiMatches.filter(l => !l.includes('obj') && !l.includes('endobj') && !l.includes('stream'));
+    const validLines = asciiMatches.filter(l => !l.includes('obj') && !l.includes('endobj') && !l.includes('stream') && !l.includes('Font') && !l.includes('MediaBox'));
     if (validLines.length > 5) {
       return validLines.join('\n');
     }
@@ -77,19 +137,24 @@ export function parsePdfToMarkdown(buffer: Buffer, fallbackName = 'Document'): s
   const knownHeaders = [
     'education', 'projects', 'experience', 'skills', 'technical skills',
     'certifications', 'achievements', 'summary', 'about', 'work experience',
-    'contact', 'links', 'publications'
+    'application overview', 'core functionalities', 'file structure',
+    'architecture notes', 'table of contents', 'overview'
   ];
 
-  for (let i = 0; i < rawItems.length; i++) {
-    const item = rawItems[i];
+  for (let i = 0; i < rawLines.length; i++) {
+    const item = rawLines[i];
     if (!item) continue;
+    if (item === '•' || item === 'n' || item === 'nnn') continue;
 
-    if (i === 0 && !item.startsWith('#')) {
-      markdownLines.push(`# ${item}\n`);
-    } else if (knownHeaders.includes(item.toLowerCase())) {
+    // Numbered headings e.g. "1. Overview", "2. Core Functionalities"
+    if (/^\d+\.\s+[A-Za-z]/.test(item)) {
+      markdownLines.push(`\n## ${item}\n`);
+    } else if (knownHeaders.some(h => item.toLowerCase() === h || item.toLowerCase() === `## ${h}`) && item.length < 50) {
       markdownLines.push(`\n## ${item}\n`);
     } else if (item.startsWith('•')) {
       markdownLines.push(`- ${item.replace(/^•\s*/, '')}`);
+    } else if (i === 0 && !item.startsWith('#')) {
+      markdownLines.push(`# ${item}\n`);
     } else {
       markdownLines.push(item);
     }
@@ -100,7 +165,7 @@ export function parsePdfToMarkdown(buffer: Buffer, fallbackName = 'Document'): s
 
 /**
  * Standalone PDF 1.4 Generator conforming to Adobe PDF Specification.
- * Produces valid, renderable multi-page PDF documents without external native dependencies.
+ * Produces valid, renderable multi-page vector PDF documents without external native dependencies.
  */
 export function generateValidPDF(textContent: string): Buffer {
   const escapePdfText = (str: string): string => {

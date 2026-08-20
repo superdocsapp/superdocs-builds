@@ -61,7 +61,11 @@ export const initCommand = createCommand('init')
           message: 'Enter your SuperDocs API Key:',
           default: currentConfig.apiKey || ''
         });
+        if (apiKey && apiKey.trim().length > 0) {
+          mockMode = false;
+        }
       } else if (action === 'signup') {
+        mockMode = false;
         const agentName = await input({
           message: 'Enter your Agent/Client name:',
           default: 'superdocs-developer'
@@ -102,8 +106,8 @@ export const initCommand = createCommand('init')
     logger.box(
       'SuperDocs CLI Configuration Saved',
       `Base URL:      ${updated.baseUrl}\n` +
-      `API Key:       ${updated.apiKey ? `${updated.apiKey.slice(0, 8)}...` : chalk.yellow('None (Mock/Unset)')}\n` +
-      `Mock Mode:     ${updated.mockMode ? chalk.green('ENABLED') : chalk.dim('DISABLED')}\n` +
+      `API Key:       ${updated.apiKey ? `${chalk.green(updated.apiKey.slice(0, 10))}...` : chalk.yellow('None (Mock/Unset)')}\n` +
+      `Mock Mode:     ${updated.mockMode ? chalk.yellow('ENABLED (Offline simulation)') : chalk.green('DISABLED (Live API Mode)')}\n` +
       `Export Format: ${updated.defaultExportFormat}`
     );
 

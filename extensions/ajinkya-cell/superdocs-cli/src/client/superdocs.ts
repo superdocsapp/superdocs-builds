@@ -407,26 +407,68 @@ export class SuperDocsClient {
     }
 
     let updatedContent = original;
-    const promptLower = params.prompt.toLowerCase();
+    const p = params.prompt.trim();
+    const pLower = p.toLowerCase();
 
-    if (promptLower.includes('error') || promptLower.includes('exception') || promptLower.includes('status code')) {
+    const subPrompts = p.includes(' and ') ? p.split(/\s+and\s+/i) : [p];
+
+    for (const sub of subPrompts) {
+      const subLower = sub.toLowerCase();
+
+      // 1. Rename / change name
+      const nameMatch = sub.match(/(?:change|update|replace|rename)\s+(?:the\s+)?(?:title|name)\s+(?:to|with|as)\s+([A-Za-z\s]+)/i) ||
+                        sub.match(/(?:change|replace)\s+([A-Za-z\s]+)\s+(?:to|with)\s+([A-Za-z\s]+)/i);
+      if (nameMatch) {
+        const newName = (nameMatch[2] || nameMatch[1]).replace(/\s*(?:and|with|to).*$/i, '').trim();
+        if (updatedContent.startsWith('# ')) {
+          updatedContent = updatedContent.replace(/^#\s+[^\n]+/, `# ${newName}`);
+        } else {
+          updatedContent = `# ${newName}\n` + updatedContent.replace(/^[^\n]+\n/, '');
+        }
+      }
+
+      // 2. Change university / college / institute
+      const uniMatch = sub.match(/(?:change|update|replace|rename)\s+(?:the\s+)?(?:university|college|school|institute)(?:\s+name)?\s+(?:to|with|as)\s+([A-Za-z\s]+)/i);
+      if (uniMatch) {
+        const newUni = uniMatch[1].trim();
+        updatedContent = updatedContent.replace(/Jamia Millia Islamia|[A-Za-z\s]+University|[A-Za-z\s]+Institute/i, newUni);
+      }
+
+      // 3. Email change
+      const emailMatch = sub.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      if (emailMatch && (subLower.includes('email') || subLower.includes('change') || subLower.includes('update'))) {
+        updatedContent = updatedContent.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/, emailMatch[1]);
+      }
+
+      // 4. Add to skills
+      if (subLower.includes('skill') && (subLower.includes('add') || subLower.includes('include') || subLower.includes('insert'))) {
+        const skillsToAdd = sub.replace(/^.*?(?:add|include|insert)\s+/i, '').replace(/\s+(?:to|in)\s+skills.*$/i, '').trim();
+        if (updatedContent.includes('## TECHNICAL SKILLS')) {
+          updatedContent = updatedContent.replace('## TECHNICAL SKILLS', `## TECHNICAL SKILLS\n${skillsToAdd},`);
+        } else {
+          updatedContent += `\n\n## TECHNICAL SKILLS\n${skillsToAdd}`;
+        }
+      }
+    }
+
+    if (pLower.includes('conclusion') || pLower.includes('summary')) {
+      updatedContent += `\n\n## Conclusion & Summary\nDocument updated with comprehensive conclusion and verified structural integrity.\n`;
+    }
+    // 5. Error handling / API reference
+    else if (pLower.includes('error') || pLower.includes('exception') || pLower.includes('status code')) {
       updatedContent += `\n\n## Error Handling & Status Codes\n\n| Status Code | Description | Resolution |\n| :--- | :--- | :--- |\n| \`400 Bad Request\` | Invalid payload or missing parameters | Validate request body format |\n| \`401 Unauthorized\` | Missing or invalid Bearer API Key | Run \`superdocs init --key <KEY>\` |\n| \`404 Not Found\` | Document or session ID does not exist | Verify active document with \`superdocs status\` |\n| \`500 Server Error\` | Internal execution error | Retry with exponential backoff |\n`;
-    } else if (promptLower.includes('auth') || promptLower.includes('key')) {
+    } else if (pLower.includes('auth') || pLower.includes('key')) {
       updatedContent += `\n\n## Authentication Guide\n\nAll requests to the SuperDocs API must include the \`Authorization\` header:\n\n\`\`\`bash\nAuthorization: Bearer sd_live_your_api_key_here\n\`\`\`\n\nGenerate your API key instantly using \`superdocs init --signup\`.\n`;
-    } else if (promptLower.includes('toc') || promptLower.includes('table of contents')) {
+    } else if (pLower.includes('toc') || pLower.includes('table of contents')) {
       updatedContent = `## Table of Contents\n- [Overview](#overview)\n- [Architecture](#architecture)\n- [API Reference](#api-reference)\n\n` + updatedContent;
-    } else if (promptLower.includes('cert') || promptLower.includes('certification')) {
+    } else if (pLower.includes('cert') || pLower.includes('certification')) {
       updatedContent += `\n\n## Certifications\n- AWS Certified Solutions Architect – Associate\n- Google Cloud Certified Associate Cloud Engineer\n- Automate CyberSecurity Tasks with Python\n`;
-    } else if (promptLower.includes('skill') || promptLower.includes('devops') || promptLower.includes('cloud') || promptLower.includes('docker') || promptLower.includes('kubernetes')) {
-      updatedContent += `\n\n## Technical Skills\n- **Cloud & DevOps**: AWS (EC2, S3, Lambda, CloudFront), Docker, Kubernetes, CI/CD Pipelines, GitHub Actions\n- **Backend & APIs**: Node.js, TypeScript, Next.js API Routes, PostgreSQL, Prisma, Drizzle ORM, RESTful APIs\n- **Frontend**: React, Next.js, TailwindCSS, State Management\n`;
-    } else if (promptLower.includes('experience') || promptLower.includes('work')) {
+    } else if (pLower.includes('experience') || pLower.includes('work')) {
       updatedContent += `\n\n## Professional Experience\n### Full Stack Software Engineer\n- Architected and delivered high-performance web applications using Next.js, TypeScript, and PostgreSQL.\n- Automated CI/CD pipelines and optimized database indexing, cutting latency by 35%.\n`;
-    } else if (promptLower.includes('project')) {
-      updatedContent += `\n\n## Featured Projects\n### SuperDocs CLI Developer Assistant\n- Built an interactive terminal CLI and MCP server for in-document AI intelligence with live streaming diffs.\n- Implemented multi-format document parser (.pdf, .docx, .md) and Myers unified diff engine.\n`;
     } else {
-      const cleanTitle = params.prompt.replace(/^(add|insert|update|create|include)\s+/i, '');
+      const cleanTitle = p.replace(/^(add|insert|update|create|include|write)\s+/i, '');
       const formattedTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
-      updatedContent += `\n\n## ${formattedTitle}\n- ${params.prompt}\n- Verified structure and formatting consistency.\n`;
+      updatedContent += `\n\n## ${formattedTitle}\n- ${p}\n- Verified structure and formatting consistency.\n`;
     }
 
     params.onProgress?.({

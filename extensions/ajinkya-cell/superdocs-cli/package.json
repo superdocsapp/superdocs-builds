@@ -1,6 +1,6 @@
 {
   "name": "@ajinkya-cell/superdocs-cli",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "Interactive terminal developer assistant for SuperDocs AI document intelligence & editing",
   "type": "module",
   "bin": {
