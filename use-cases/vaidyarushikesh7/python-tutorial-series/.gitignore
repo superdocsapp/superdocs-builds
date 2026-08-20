@@ -1,0 +1,6 @@
+out/
+sample/tender-response.docx
+sample/tender-response.html
+__pycache__/
+*.pyc
+.env
