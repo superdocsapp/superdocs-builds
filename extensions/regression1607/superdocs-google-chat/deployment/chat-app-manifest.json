@@ -1,0 +1,27 @@
+{
+  "name": "SuperDocs",
+  "description": "Draft and edit documents in chat, with human approval, powered by SuperDocs.",
+  "logoUrl": "https://use.superdocs.app/favicon.png",
+  "appType": "BOT",
+  "supportFilesMessaging": false,
+  "connectionSettings": {
+    "httpEndpoint": {
+      "url": "https://YOUR_PUBLIC_HOST/",
+      "authAudience": "https://YOUR_PUBLIC_HOST"
+    }
+  },
+  "triggers": {
+    "onMessage": true,
+    "onAddedToSpace": true,
+    "onRemovedFromSpace": false,
+    "onCardClicked": true
+  },
+  "visibility": {
+    "state": "PRIVATE",
+    "individualUsers": ["you@example.com"]
+  },
+  "slashCommands": [
+    { "commandId": 1, "commandName": "/draft", "description": "Draft or edit a document" },
+    { "commandId": 2, "commandName": "/digest", "description": "Show what this space produced" }
+  ]
+}
