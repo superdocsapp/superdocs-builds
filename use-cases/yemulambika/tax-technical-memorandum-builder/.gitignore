@@ -1,0 +1,25 @@
+node_modules/
+dist/
+coverage/
+local-output/
+.e2e-runtime/
+playwright-report/
+test-results/
+downloads/
+browser-profile/
+*.tsbuildinfo
+*.trace
+*.zip
+*.webm
+*.mp4
+.env
+.env.*
+!.env.example
+
+# Generated only by Playwright/live verification; review-workflow.png is curated.
+docs/evidence/offline-duplicate-analysis-proposals.png
+docs/evidence/ui-live/
+docs/evidence/ui-live-superdocs-validation.json
+docs/evidence/client-export-render.png
+docs/evidence/file-export-render.png
+docs/evidence/manual-live/
