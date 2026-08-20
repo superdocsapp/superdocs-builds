@@ -1,0 +1,9 @@
+fastapi>=0.115,<0.142
+uvicorn[standard]>=0.34,<0.53
+sqlmodel>=0.0.22,<0.1
+psycopg2-binary>=2.9.10,<3
+pgserver>=0.1.4,<0.2
+requests>=2.32,<3
+python-dotenv>=1.0,<2
+pydantic>=2.10,<3
+pytest>=8.3,<10

@@ -1,0 +1,36 @@
+# Render Blueprint -- deploys the FastAPI backend in one shot. In the Render
+# dashboard: New -> Blueprint -> point at this repo. Render finds this file
+# automatically at the repo root.
+#
+# DB: Neon, same pattern as the healthcare-privacy-pack build (no
+# equivalent-tier expiry, unlike Render's own free Postgres, which deletes
+# itself 30 days after creation). No `databases:` block here on purpose --
+# paste your Neon connection string into DATABASE_URL in the Render
+# dashboard instead of letting Render provision + host its own.
+#
+# SUPERDOCS_API_KEY, DATABASE_URL, and PUBLIC_BACKEND_BASE are all
+# `sync: false` -- Render will prompt for these in the dashboard instead of
+# reading them from this file, so nothing sensitive is ever committed.
+# PUBLIC_BACKEND_BASE can't be known until after the first deploy assigns
+# you a *.onrender.com URL -- deploy once, copy that URL in, then redeploy
+# (or just set it once you know your custom domain).
+services:
+  - type: web
+    name: ttrpg-campaign-builder-api
+    env: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: SUPERDOCS_API_KEY
+        sync: false
+      - key: SUPERDOCS_API_BASE
+        value: https://api.superdocs.app
+      - key: DATABASE_URL
+        sync: false
+      - key: PUBLIC_BACKEND_BASE
+        sync: false
+      - key: CORS_ORIGIN_REGEX
+        sync: false

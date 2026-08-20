@@ -1,0 +1,100 @@
+{
+  "generated_at": "2026-08-16T12:24:15.709595+00:00",
+  "org": "Cedar Grove Health Partners",
+  "total_edges": 6,
+  "passed": 6,
+  "failed": 0,
+  "overall_status": "PASS",
+  "edges": [
+    {
+      "edge_id": "16c63caf-2c32-4c40-8f92-f1b367f57ecb",
+      "checks": {
+        "heading_present_in_policy_structure": true,
+        "hash_matches": true,
+        "citation_format_valid": true,
+        "citation_text": "Implements: Policy \u00a71 \u2014 Access Control and Authentication"
+      },
+      "passed": true,
+      "errors": [],
+      "procedure_title": "Access Provisioning & Deprovisioning Procedure",
+      "policy_section": "\u00a71 \u2014 Access Control and Authentication",
+      "live_hash": "9b3138a8f67ac1b82964af23bbf9810c3df29779180a96759a461007ef1dd692",
+      "edge_synced_hash": "9b3138a8f67ac1b82964af23bbf9810c3df29779180a96759a461007ef1dd692"
+    },
+    {
+      "edge_id": "96fc82eb-dc27-47be-872a-a3e3caaa30cb",
+      "checks": {
+        "heading_present_in_policy_structure": true,
+        "hash_matches": true,
+        "citation_format_valid": true,
+        "citation_text": "Implements: Policy \u00a72 \u2014 Individual Rights and Patient Access to Records"
+      },
+      "passed": true,
+      "errors": [],
+      "procedure_title": "Patient Access Request Handling Procedure",
+      "policy_section": "\u00a72 \u2014 Individual Rights and Patient Access to Records",
+      "live_hash": "bdfeb4b83e77a74cf0feb6f956150df38c3d5d678d57741544c0ac1b6df8dafb",
+      "edge_synced_hash": "bdfeb4b83e77a74cf0feb6f956150df38c3d5d678d57741544c0ac1b6df8dafb"
+    },
+    {
+      "edge_id": "cd8df60e-b586-44d1-9192-833f7991faf6",
+      "checks": {
+        "heading_present_in_policy_structure": true,
+        "hash_matches": true,
+        "citation_format_valid": true,
+        "citation_text": "Implements: Policy \u00a73 \u2014 Minimum Necessary Use and Disclosure of PHI"
+      },
+      "passed": true,
+      "errors": [],
+      "procedure_title": "Minimum Necessary Disclosure Review Procedure",
+      "policy_section": "\u00a73 \u2014 Minimum Necessary Use and Disclosure of PHI",
+      "live_hash": "16f69f54564b7c7b65e357fda4d6268a3da251088a417b3c47345e375559d7a4",
+      "edge_synced_hash": "16f69f54564b7c7b65e357fda4d6268a3da251088a417b3c47345e375559d7a4"
+    },
+    {
+      "edge_id": "ea4ccb0e-5e1c-4008-8adf-53c14752a9e0",
+      "checks": {
+        "heading_present_in_policy_structure": true,
+        "hash_matches": true,
+        "citation_format_valid": true,
+        "citation_text": "Implements: Policy \u00a74 \u2014 Breach Notification"
+      },
+      "passed": true,
+      "errors": [],
+      "procedure_title": "Breach Notification Response Procedure",
+      "policy_section": "\u00a74 \u2014 Breach Notification",
+      "live_hash": "1598fd8d6e96d09a417639b4288356160aca4c85e414320353536dd75cfdeb43",
+      "edge_synced_hash": "1598fd8d6e96d09a417639b4288356160aca4c85e414320353536dd75cfdeb43"
+    },
+    {
+      "edge_id": "c826213b-f313-474e-b888-d61f3f9489d6",
+      "checks": {
+        "heading_present_in_policy_structure": true,
+        "hash_matches": true,
+        "citation_format_valid": true,
+        "citation_text": "Implements: Policy \u00a76 \u2014 Business Associate Agreements and Vendor Risk Review"
+      },
+      "passed": true,
+      "errors": [],
+      "procedure_title": "Vendor / BAA Risk Review Procedure",
+      "policy_section": "\u00a76 \u2014 Business Associate Agreements and Vendor Risk Review",
+      "live_hash": "e41c347c2f824790c4cbed0c0e707cb519722bf798ede25315655d1dfec153a1",
+      "edge_synced_hash": "e41c347c2f824790c4cbed0c0e707cb519722bf798ede25315655d1dfec153a1"
+    },
+    {
+      "edge_id": "6d903d42-5696-45d1-88bf-f3f3b4c7ef74",
+      "checks": {
+        "heading_present_in_policy_structure": true,
+        "hash_matches": true,
+        "citation_format_valid": true,
+        "citation_text": "Implements: Policy \u00a75 \u2014 Workforce Security and Training"
+      },
+      "passed": true,
+      "errors": [],
+      "procedure_title": "Workforce Onboarding & Training Procedure",
+      "policy_section": "\u00a75 \u2014 Workforce Security and Training",
+      "live_hash": "f63d859d80c70d0b80805da60d574e7cf31677fc629f7515208f0b0db5086d0d",
+      "edge_synced_hash": "f63d859d80c70d0b80805da60d574e7cf31677fc629f7515208f0b0db5086d0d"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+# secrets
+backend/.env
+frontend/.env.local
+
+# python
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+*.pyc
+
+# embedded postgres data (never committed -- lives outside the repo anyway
+# by default, but ignore defensively if PGDATA_DIR is ever pointed here)
+backend/.pgdata/
+
+# locally re-hosted illustration bytes (see main.py's ILLUSTRATIONS_DIR /
+# _save_local_illustration) -- generated at runtime, never committed
+backend/illustration_assets/
+
+# output of scripts/demo_seed_live.py -- regenerate it, don't commit it
+backend/demo_export/
+
+# real secrets written by the sandbox verification run -- never committed
+backend/.env
+
+# node / next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+npm-debug.log*
+
+# OS
+.DS_Store
