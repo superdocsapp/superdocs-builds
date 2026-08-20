@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+local-output/
+.e2e-runtime/
+playwright-report/
+test-results/
+fixtures/
+docs/evidence/*.png

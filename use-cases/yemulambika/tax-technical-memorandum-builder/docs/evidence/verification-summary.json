@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "scope": "sanitized public verification summary",
+  "offline_verification": {
+    "unit_test_files_passed": 2,
+    "unit_tests_passed": 18,
+    "playwright_tests_passed": 4,
+    "playwright_retries": 0,
+    "typescript": "passed",
+    "eslint": "passed",
+    "prettier": "passed",
+    "production_build": "passed",
+    "dependency_vulnerabilities": 0
+  },
+  "observed_manual_live_workflow": {
+    "uploaded_document_count": 4,
+    "terminal_job_status": "awaiting_approval",
+    "quotation_checks": 3,
+    "verified_quotations": 2,
+    "rejected_fabricated_quotations": 1,
+    "traced_monetary_values": 5,
+    "unmatched_negative_controls_before_correction": 1,
+    "unmatched_negative_controls_after_correction": 0,
+    "approved_proposals": 1,
+    "rejected_proposals": 1,
+    "mandatory_pending_after_review": 0,
+    "reviewed_content_submission": "succeeded",
+    "exports": [
+      {
+        "filename": "synthetic-tax-memo-client.html",
+        "format": "html",
+        "bytes": 2378,
+        "sha256": "2c18c7d1b9654ce0cf5dede7b9880d24c82ba8477075a051736026681ab511fe",
+        "rendered_in_chromium": true
+      },
+      {
+        "filename": "synthetic-tax-memo-file.html",
+        "format": "html",
+        "bytes": 3034,
+        "sha256": "f0373c703b9e728c03b679c6d9984f20f8f308647636f0be50f023236eb3058f",
+        "rendered_in_chromium": true
+      }
+    ],
+    "rejected_material_absent": true,
+    "approved_material_and_citations_present": true,
+    "historical_orphan_heading_observed": true
+  },
+  "post_live_renderer_correction": {
+    "verified_offline": true,
+    "approved_heading_and_content_retained": true,
+    "rejected_heading_and_content_absent": true,
+    "orphan_heading_absent": true,
+    "corrected_second_live_run_performed": false
+  },
+  "public_screenshot": {
+    "path": "review-workflow.png",
+    "bytes": 164005,
+    "width": 1280,
+    "height": 2930,
+    "sha256": "1284f553f741897c3110fe27dab30f88e856c5d59fc2a003854b89753e2c63c6",
+    "scope": "offline duplicate-heading review workflow"
+  },
+  "additional_live_requests_during_pr_preparation": 0,
+  "contains_credentials": false,
+  "contains_personal_email": false,
+  "contains_source_document_text": false
+}
