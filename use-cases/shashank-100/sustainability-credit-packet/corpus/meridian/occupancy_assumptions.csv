@@ -1,0 +1,4 @@
+occupant_group,count,days_per_year,wc_uses_male,wc_uses_female,urinal_uses_male,lav_uses,shower_uses,kitchen_minutes
+Full time staff,340,250,1,3,2,3,0.10,0.5
+Outpatient visitors,180,250,0.5,1,0.5,1,0,0
+Research residents,45,300,1,3,2,3,0.35,0.5
