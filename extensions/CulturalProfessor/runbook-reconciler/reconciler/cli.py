@@ -381,6 +381,23 @@ def _cmd_status(_: argparse.Namespace) -> int:
                     f"{batch['changes']} change(s) · opened {batch['opened']}"
                 )
 
+        rules = [r for r in register.decisions_by_rule() if r["approved"] or r["rejected"]]
+        if rules:
+            # A rejection is recorded against one finding, which is right. But a
+            # rule that is wrong in general keeps firing on every other page and
+            # nothing adds it up, so nobody notices the rule is the problem --
+            # they notice the queue is not worth reading. This is the tally.
+            print("\nhow each rule is doing in review:")
+            for rule in rules:
+                flag = "  ← worth a look" if rule["rejection_rate"] >= 0.5 else ""
+                print(
+                    f"  {rule['rule_id']:24} {rule['approved']} approved · "
+                    f"{rule['rejected']} rejected · {rule['undecided']} undecided{flag}"
+                )
+            if any(r["rejection_rate"] >= 0.5 for r in rules):
+                print("  a rule rejected more often than not is either wrong or not wanted here.")
+                print("  `rr mute <finding-id>` writes one claim into config/mappings.yaml.")
+
         runs = register.last_runs(limit=5)
         if runs:
             print("\nrecent runs:")
@@ -391,6 +408,73 @@ def _cmd_status(_: argparse.Namespace) -> int:
                     f"{cost['seconds']:.2f}s · {cost['operations']} operation(s)"
                 )
     return 0
+
+
+def _cmd_mute(args: argparse.Namespace) -> int:
+    """Stop checking one claim, by writing it into config where it is visible.
+
+    The escape hatch that keeps this installable has existed since the first
+    stage and has never had a way to reach it: `ignore_subjects` is read on
+    every sweep and the only way to add to it was to open the YAML. So the
+    honest response to a false positive — "this claim is not worth checking" —
+    was a decision a reviewer could make and not record, and the rule went on
+    firing on every other page.
+
+    Takes a finding id, because that is what `rr review` and `rr status` put in
+    front of somebody, and mutes the *subject* behind it, because that is the
+    thing that will come back. The distinction is worth being explicit about:
+    muting is not rejecting. A rejection says "this sentence should not change";
+    a mute says "stop asking about this claim at all", and it is written into a
+    file somebody can read, review and revert.
+    """
+    from reconciler.config import mute_subject
+
+    config = Config.load()
+    with Register(config.register_path) as register:
+        finding = register.finding(args.finding_id)
+        if finding is None:
+            print(f"no finding with id {args.finding_id!r}. `rr status` lists what is here.")
+            return 2
+        subject = finding.subject
+
+        muted = mute_subject(subject)
+        if muted:
+            # Clearing the queue is half the job and the half that is easy to
+            # forget. Muting only changes what *future* sweeps produce: the rows
+            # already in the register keep their ids, keep `decision IS NULL`,
+            # and sit in the review queue for ever, so the reviewer who just
+            # said "stop asking me this" gets asked it again every time they
+            # open the queue.
+            #
+            # Recorded as rejected rather than deleted. It is true — a human
+            # declined to act on it — and it is what makes the per-rule tally in
+            # `rr status` mean anything: a rule muted across four pages should
+            # show as four rejections, which is exactly the signal that the rule
+            # rather than the pages is the problem.
+            cleared = [
+                f for f in register.review_queue() if f.subject == subject and f.decision is None
+            ]
+            for stale in cleared:
+                register.decide(stale.finding_id, "rejected")
+
+    if muted:
+        print(f"muted {subject!r} in config/mappings.yaml.")
+        print("it will be reported unverifiable from the next sweep, never as correct.")
+        if cleared:
+            where = ", ".join(sorted({f.page_id or "estate" for f in cleared}))
+            print(f"{len(cleared)} open finding(s) cleared from the review queue (page {where}).")
+        print("delete the line to start checking it again.")
+        return 0
+
+    if subject in Config.load().mappings.ignore_subjects:
+        print(f"{subject!r} is already muted in config/mappings.yaml.")
+        return 0
+
+    # The file is not in either shape this knows how to edit. Say what to add
+    # rather than guessing at somebody's YAML.
+    print("could not edit config/mappings.yaml automatically. Add this by hand:")
+    print(f"\nignore_subjects:\n  - {subject!r}")
+    return 1
 
 
 def _close(source: PageSource) -> None:
@@ -431,6 +515,7 @@ COMMANDS: dict[str, tuple[str, Handler]] = {
     "pack": ("build the on-call readiness and DR evidence documents (free)", _cmd_pack),
     "mcp": ("serve analyze/propose/approve/apply to an agent over stdio", _cmd_mcp),
     "status": ("what the register holds, and what is parked (free)", _cmd_status),
+    "mute": ("stop checking the claim behind a finding, by writing it into config", _cmd_mute),
     "measure": ("score the checker against fixtures/expected.yaml", _cmd_measure),
     "version": ("print the version and exit", _cmd_version),
 }
@@ -481,6 +566,12 @@ _OPTIONS: dict[str, list[tuple[tuple[str, ...], dict]]] = {
         ),
     ],
     "review": [_AUTO, _CORPUS],
+    "mute": [
+        (
+            ("finding_id",),
+            {"help": "the finding whose subject should stop being checked"},
+        ),
+    ],
     "pack": [
         _CORPUS,
         (("--out",), {"default": "out", "help": "where to write the documents (default: out/)"}),

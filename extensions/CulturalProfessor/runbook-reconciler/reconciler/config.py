@@ -90,6 +90,49 @@ class Mappings:
         )
 
 
+def mute_subject(subject: str, path: Path | None = None) -> bool:
+    """Add a subject to `ignore_subjects`, editing the text rather than the YAML.
+
+    Round-tripping through `yaml.safe_load`/`yaml.dump` would rewrite the file
+    and throw away every comment in it. `config/mappings.yaml` is mostly
+    comments — it is the file that explains to a platform team what each escape
+    hatch is for — and a tool that silently strips them the first time somebody
+    runs `rr mute` has made the config worse in exchange for saving itself
+    twenty lines.
+
+    So the two shapes the key can be in are handled literally: the empty inline
+    list it ships as, and a block list once there is something in it. Anything
+    else (a key that is not there, a file shaped unexpectedly) returns False and
+    the caller tells the operator to add the line by hand, which is a worse
+    outcome than doing it for them and a much better one than corrupting the
+    file.
+
+    Returns False when the subject is already muted, so the caller can say so
+    rather than writing a duplicate.
+    """
+    path = path or CONFIG_DIR / "mappings.yaml"
+    if not path.is_file():
+        return False
+
+    existing = Mappings.load(path).ignore_subjects
+    if subject in existing:
+        return False
+
+    text = path.read_text(encoding="utf-8")
+    entry = f"  - {subject!r}"
+
+    if "\nignore_subjects: []" in text:
+        updated = text.replace("\nignore_subjects: []", f"\nignore_subjects:\n{entry}", 1)
+    elif "\nignore_subjects:\n" in text:
+        head, _, tail = text.partition("\nignore_subjects:\n")
+        updated = f"{head}\nignore_subjects:\n{entry}\n{tail}"
+    else:
+        return False
+
+    path.write_text(updated, encoding="utf-8")
+    return True
+
+
 @dataclass(frozen=True)
 class Config:
     infra_repo_paths: tuple[Path, ...]
@@ -169,4 +212,12 @@ class Config:
         )
 
 
-__all__ = ["CONFIG_DIR", "DEFAULT_CORPUS", "PROJECT_ROOT", "Config", "Mappings", "display_path"]
+__all__ = [
+    "CONFIG_DIR",
+    "DEFAULT_CORPUS",
+    "PROJECT_ROOT",
+    "Config",
+    "Mappings",
+    "display_path",
+    "mute_subject",
+]

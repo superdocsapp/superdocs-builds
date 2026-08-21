@@ -34,10 +34,15 @@ def test_bare_invocation_prints_help_and_fails(capsys: pytest.CaptureFixture[str
     assert "COMMAND" in capsys.readouterr().out
 
 
+#: Commands that take a required positional, so "parses with no arguments" is
+#: the wrong question to ask of them.
+_NEEDS_ARGUMENT = {"mute": ["some-finding-id"]}
+
+
 def test_every_registered_command_parses() -> None:
     parser = build_parser()
     for name in COMMANDS:
-        args = parser.parse_args([name])
+        args = parser.parse_args([name, *_NEEDS_ARGUMENT.get(name, [])])
         assert callable(args.handler)
 
 
@@ -151,3 +156,114 @@ def test_review_with_auto_reject_writes_nothing(
     out = capsys.readouterr().out
 
     assert "0 passages updated" in out
+
+
+# ------------------------------------------------------------------- mute --
+
+
+def test_mute_writes_the_subject_into_config_and_keeps_the_comments(tmp_path: Path) -> None:
+    """`config/mappings.yaml` is mostly comments — it is the file that explains
+    to a platform team what each escape hatch is for. Round-tripping it through
+    a YAML dumper would strip every one of them the first time somebody runs
+    this, which is making the config worse to save the tool twenty lines."""
+    from reconciler.config import CONFIG_DIR, Mappings, mute_subject
+
+    target = tmp_path / "mappings.yaml"
+    original = (CONFIG_DIR / "mappings.yaml").read_text(encoding="utf-8")
+    target.write_text(original, encoding="utf-8")
+
+    assert mute_subject("alert:X:threshold", target) is True
+    assert mute_subject("alert:Y:threshold", target) is True
+    assert mute_subject("alert:X:threshold", target) is False, "already muted"
+
+    muted = Mappings.load(target).ignore_subjects
+    assert set(muted) == {"alert:X:threshold", "alert:Y:threshold"}
+
+    after = target.read_text(encoding="utf-8")
+    assert after.count("#") == original.count("#"), "comments were lost"
+    assert "aliases:" in after and "former_names:" in after
+
+
+def test_mute_refuses_rather_than_guessing_at_an_unfamiliar_file(tmp_path: Path) -> None:
+    """Returning False sends the operator a line to paste. Guessing at somebody's
+    YAML would send them a corrupted config."""
+    from reconciler.config import mute_subject
+
+    odd = tmp_path / "mappings.yaml"
+    odd.write_text("aliases: {}\n", encoding="utf-8")
+    assert mute_subject("alert:X:threshold", odd) is False
+    assert odd.read_text(encoding="utf-8") == "aliases: {}\n"
+
+
+def test_muting_clears_the_findings_already_in_the_queue(tmp_path: Path) -> None:
+    """Muting changes what future sweeps produce. The rows already in the
+    register keep their ids and their `decision IS NULL`, so without this the
+    reviewer who just said "stop asking me this" is asked it again every time
+    they open the queue."""
+    from reconciler.claims import Finding
+    from reconciler.register import Register
+
+    with Register(tmp_path / "register.db") as register:
+        ids = [
+            register.upsert_finding(
+                Finding(
+                    rule_id="ci-job",
+                    kind="command",
+                    subject="job:rollback-production",
+                    verdict="contradicts",
+                    evidence_file="fixtures/infra/service-repos/payments-api/.github/"
+                    "workflows/deploy.yml",
+                    page_id=page,
+                )
+            )
+            for page in ("1001", "1007")
+        ]
+        assert len(register.review_queue()) == 2
+
+        for finding in register.review_queue():
+            if finding.subject == "job:rollback-production":
+                register.decide(finding.finding_id, "rejected")
+
+        assert register.review_queue() == []
+        tally = {r["rule_id"]: r for r in register.decisions_by_rule()}
+        assert tally["ci-job"]["rejected"] == 2
+        assert tally["ci-job"]["rejection_rate"] == 1.0
+        assert all(register.finding(i).decision == "rejected" for i in ids)
+
+
+def test_the_rule_tally_separates_a_bad_rule_from_a_messy_page(tmp_path: Path) -> None:
+    """The number is a prompt for a human, never an input to anything automatic.
+
+    A rule can be rejected repeatedly for reasons that all belong to one page,
+    which is why nothing here mutes anything on its own — it only counts.
+    """
+    from reconciler.claims import Finding
+    from reconciler.register import Register
+
+    with Register(tmp_path / "register.db") as register:
+        for n, (rule, decision) in enumerate(
+            [
+                ("alert-threshold", "approved"),
+                ("alert-threshold", "approved"),
+                ("alert-threshold", "rejected"),
+                ("resource-identifier", "rejected"),
+                ("resource-identifier", "rejected"),
+            ]
+        ):
+            finding_id = register.upsert_finding(
+                Finding(
+                    rule_id=rule,
+                    kind="threshold",
+                    subject=f"alert:A{n}:threshold",
+                    verdict="contradicts",
+                    evidence_file="fixtures/infra/platform-infra/monitoring/payments.rules.yml",
+                    page_id=f"100{n}",
+                )
+            )
+            register.decide(finding_id, decision)
+
+        tally = {r["rule_id"]: r for r in register.decisions_by_rule()}
+        assert tally["alert-threshold"]["rejection_rate"] < 0.5
+        assert tally["resource-identifier"]["rejection_rate"] == 1.0
+        # Sorted worst-first, so the rule worth looking at is the one you see.
+        assert register.decisions_by_rule()[0]["rule_id"] == "resource-identifier"

@@ -645,6 +645,46 @@ class Register:
 
     # --------------------------------------------------------- our own writes --
 
+    def decisions_by_rule(self) -> list[dict[str, Any]]:
+        """How each rule is doing in review, which is the only feedback there is.
+
+        A rejection is recorded against one `finding_id`, and that is right —
+        the human ruled on that sentence, not on the rule. But it means a rule
+        that is wrong *in general* keeps firing on every other page and nothing
+        anywhere adds it up. The tool has no way to notice it is the problem,
+        and the team's way of noticing is to stop reading the queue.
+
+        So this is the tally, per rule: approved, rejected, and the share of
+        decided findings that were rejected. It is a prompt for a human to look,
+        not an input to any automatic behaviour — nothing in this project mutes
+        a rule on its own, because a rule can be rejected ten times for ten
+        correct reasons that all belong to one messy page.
+        """
+        rows = self._conn.execute("""
+            SELECT rule_id,
+                   SUM(decision = 'approved') AS approved,
+                   SUM(decision = 'rejected') AS rejected,
+                   SUM(decision IS NULL)      AS undecided
+            FROM findings
+            WHERE verdict = 'contradicts'
+            GROUP BY rule_id
+            ORDER BY rejected DESC, rule_id
+            """).fetchall()
+        out: list[dict[str, Any]] = []
+        for row in rows:
+            approved, rejected = int(row["approved"] or 0), int(row["rejected"] or 0)
+            decided = approved + rejected
+            out.append(
+                {
+                    "rule_id": row["rule_id"],
+                    "approved": approved,
+                    "rejected": rejected,
+                    "undecided": int(row["undecided"] or 0),
+                    "rejection_rate": (rejected / decided) if decided else 0.0,
+                }
+            )
+        return out
+
     def record_page_write(self, page_id: str, version: int) -> None:
         """The version our own PUT produced. See the `page_writes` schema note."""
         self._conn.execute(

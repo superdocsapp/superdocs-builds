@@ -107,7 +107,7 @@ naming the page's subject service, and the page-level pass then condemned the en
 as a runbook for a service that no longer exists. A page-level false positive does not cost
 one finding; it costs the page.
 
-Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 290 passing.
+Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 294 passing.
 
 *Demo recording: not yet linked. It rides the submission form rather than this repository,
 and there is no screenshot here rather than a staged one — every output in this README is
@@ -133,6 +133,7 @@ honest claim is that the method is sound, measured in both directions, and small
 ./rr pack                  # the readiness report and the DR evidence document (free)
 ./rr watch                 # sweep when the estate changes, debounced and coalesced
 ./rr status                # what the register holds, and what is parked
+./rr mute <finding-id>     # stop checking one claim, written into config
 ./rr mcp                   # the four tools, over stdio, for an agent
 ```
 
@@ -140,7 +141,7 @@ There are three scripts, and they are for three different things:
 
 | | |
 | --- | --- |
-| `./rr test` | the suite — 290 tests, no key, no network |
+| `./rr test` | the suite — 294 tests, no key, no network |
 | `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
 | `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 
@@ -171,6 +172,25 @@ the estate does not store. See [BUGS.md](BUGS.md) and `edit._sane`.
 
 Stage 11 then reports *nothing to propose* — zero operations on an estate with nothing
 left wrong.
+
+### When the tool is the one that is wrong
+
+A rejection is recorded against one finding, which is right — the human ruled on that
+sentence, not on the rule. But it means a rule that is wrong *in general* keeps firing on
+every other page and nothing adds it up, so nobody concludes the rule is the problem; they
+conclude the queue is not worth reading.
+
+`rr status` tallies approvals and rejections per rule and flags any rule rejected more
+often than not. It is a prompt for a human and never an input to anything automatic: a
+rule can be rejected ten times for ten correct reasons that all belong to one messy page.
+
+`rr mute <finding-id>` is the response — it writes the claim's subject into
+`ignore_subjects` in [`config/mappings.yaml`](config/mappings.yaml), edits the file as text
+so the comments explaining every other escape hatch survive, and clears the findings
+already sitting in the queue. Muted claims are reported **unverifiable** from the next
+sweep, never as correct; deleting the line starts checking them again. That escape hatch
+has been read on every sweep since stage 1 and until now there was no way to reach it
+except by opening the YAML.
 
 ### The claim register is the spine
 
