@@ -386,7 +386,7 @@ both, and a summary that silently failed to write would have shipped.
 **A second chart.** Consumer contacts received against contacts closed, with the backlog
 as the space between the two step lines and the overdue part of that backlog shaded. Both
 charts moved to a validated categorical palette — the trio was run through a colour-vision
-and contrast check rather than picked by eye, and the first attempt (the report's own teal
+and contrast check rather than picked by eye, and the first attempt (the report's own accent
 and green) failed three of six checks including normal-vision separation at delta-E 10.2,
 well under the floor of 15. Aqua sits below the 3:1 contrast floor on white, so every
 series is directly labelled as well as legended: identity is never carried by colour alone.

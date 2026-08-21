@@ -13,7 +13,7 @@ Today someone writes that by hand from six piles of records. It takes weeks.
 
 Built for the SuperDocs Round 2 engineer task.
 
-![The drafted report — Observed in teal, Assessed in amber, every claim carrying the record it came from](docs/screenshot-report.jpg)
+![The drafted report — Observed in blue, Assessed in amber, every claim carrying the record it came from](docs/screenshot-report.jpg)
 
 ![The human gate: every change shown before and after, approved or rejected one at a time](docs/screenshot-review-gate.jpg)
 
@@ -216,7 +216,7 @@ A regulator must tell **evidence** from **judgement** at a glance.
 | **Assessed** | the team's judgement | *…met its restoration objective* `[assessed]` |
 | **Not recorded** | a stated gap | *Counting was interrupted for 3 h 45 m; the records do not support a figure inside it* |
 
-In the report they are colour-coded — teal, amber, grey — so a reader skimming can still tell them apart.
+In the report they are colour-coded — blue, amber, grey — so a reader skimming can still tell them apart.
 
 This is structural, not a request in a prompt:
 
@@ -283,7 +283,7 @@ flood cannot answer to the same number: Storm A runs to 24 hours, Storm B to 12.
 
 **On the colours.** Both charts use one validated categorical trio — checked with a
 colour-vision and contrast script rather than picked by eye. The first attempt used this
-report's own teal and green and **failed three of six checks**, including normal-vision
+report's own accent and a green beside it and **failed three of six checks**, including normal-vision
 separation at ΔE 10.2 against a floor of 15. Aqua sits under the 3:1 contrast floor on
 white, so every series is directly labelled as well as legended: identity is never carried
 by colour alone.
