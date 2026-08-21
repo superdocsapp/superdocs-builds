@@ -1,0 +1,47 @@
+{
+  "doctrine": "Last shot (England and Wales)",
+  "summary": "Where each party sends its own standard terms, the last set sent before performance is treated as a counter-offer, and performance by the other party is treated as acceptance of it.",
+  "authority_note": "Reflects the approach in Butler Machine Tool v Ex-Cell-O (CA 1979). Summarised for triage, not as legal advice.",
+  "rules": [
+    {
+      "id": "LS-1",
+      "conclusion": "supplier",
+      "when": {
+        "last_terms_from": "supplier",
+        "performance_followed_last_terms": true,
+        "objection_before_performance": false
+      },
+      "because": "The supplier's acknowledgement was the last set of terms sent before performance, and the buyer performed (or accepted performance) without objecting to it. On a last-shot analysis that performance reads as acceptance of the supplier's counter-offer."
+    },
+    {
+      "id": "LS-2",
+      "conclusion": "buyer",
+      "when": {
+        "last_terms_from": "buyer",
+        "performance_followed_last_terms": true,
+        "objection_before_performance": false
+      },
+      "because": "The buyer's document was the last set of terms sent before performance, and the supplier performed without objecting to it."
+    },
+    {
+      "id": "LS-3",
+      "conclusion": "buyer",
+      "when": {
+        "last_terms_from": "supplier",
+        "performance_followed_last_terms": true,
+        "objection_before_performance": true
+      },
+      "because": "The buyer objected to the supplier's terms before performance, so performance cannot be read as silent acceptance of them. The buyer's earlier terms are the better candidate, though an objection that is itself a fresh counter-offer may restart the exchange."
+    },
+    {
+      "id": "LS-4",
+      "conclusion": "unresolved",
+      "when": {
+        "terms_were_exchanged": true,
+        "performance_followed_last_terms": false
+      },
+      "because": "Nothing has been performed since the last set of terms was sent. Without performance there is no conduct to read as acceptance, so neither set of terms has yet prevailed and the exchange is still open."
+    }
+  ],
+  "inconclusive_because": "The recorded sequence does not match any rule in this playbook. Rather than guess, the analysis reports what it would need to know."
+}
