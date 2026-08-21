@@ -144,20 +144,30 @@ def apply_approved(
             plan.new_version = source.write(plan.page_id, plan.updated, plan.version)
         except VersionConflict:
             result.conflicts.append(plan.page_id)
-            _rollback(written, source, result)
+            _rollback(written, source, register, result)
             return result
         except Exception:
-            _rollback(written, source, result)
+            _rollback(written, source, register, result)
             raise
+        # Rule 6, recorded the instant the write lands rather than once the
+        # whole batch has. It used to sit in the transaction below, which is
+        # right for the happy path and wrong for every other one: a batch that
+        # failed on its third page had already bumped two page versions, and
+        # rolling them back bumped two more -- four versions this tool produced,
+        # none of them in the ledger, all of them looking to the watcher like
+        # somebody else's edit. It then swept on its own writes, which is the
+        # one thing the ledger exists to prevent.
+        #
+        # The ledger is a record of every version this tool caused, not of the
+        # ones it was happy about. Entries are keyed (page_id, version) and
+        # writing one for a page that is about to be restored is not a lie: we
+        # did write that version.
+        if plan.new_version:
+            register.record_page_write(plan.page_id, plan.new_version)
         written.append(plan)
 
     with register.transaction():
         for plan in written:
-            # Rule 6: the watcher has to be able to tell this version bump was
-            # ours. Recorded in the same transaction as the applied mark so the
-            # two cannot disagree after a crash.
-            if plan.new_version:
-                register.record_page_write(plan.page_id, plan.new_version)
             for finding_id in plan.finding_ids:
                 register.mark_applied(finding_id)
                 result.applied.append(finding_id)
@@ -308,16 +318,34 @@ def _comment(
     result.commented.append(finding.finding_id)
 
 
-def _rollback(written: list[PagePlan], source: PageSource, result: ApplyResult) -> None:
+def _rollback(
+    written: list[PagePlan], source: PageSource, register: Register, result: ApplyResult
+) -> None:
     """Put back what landed before the failure. Compensating, not atomic.
 
     Restoring is itself a write and can itself fail. When it does the run stops
     at that page and records it as stranded, because carrying on would leave a
     batch half restored and nobody able to say which half.
+
+    The version to write against is the one the *server* reported for our own
+    write, which is what `source.write` returns and what `plan.new_version`
+    holds. It used to be `plan.version + 1` — the number we assumed it would
+    become. The two agree today and there is no reason to depend on that: a site
+    that numbers versions differently would turn every rollback into a spurious
+    conflict, and a spurious conflict here is a page left stranded that was
+    perfectly restorable.
+
+    The restoring write is itself a version this tool produced, so it goes in
+    the ledger too. Otherwise the compensation is the thing the watcher sweeps
+    on.
     """
     for plan in reversed(written):
         try:
-            source.write(plan.page_id, plan.original, plan.version + 1)
+            restored = source.write(
+                plan.page_id, plan.original, plan.new_version or plan.version + 1
+            )
+            if restored:
+                register.record_page_write(plan.page_id, restored)
             result.rolled_back.append(plan.page_id)
         except Exception:
             result.stranded.append(plan.page_id)

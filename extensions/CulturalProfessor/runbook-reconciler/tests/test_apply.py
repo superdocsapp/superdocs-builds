@@ -243,6 +243,46 @@ def test_a_batch_that_fails_halfway_rolls_the_earlier_pages_back(
     assert register.approved_unapplied(), "the work must survive for the next run"
 
 
+def test_every_version_a_failed_batch_produced_is_in_the_ledger(
+    workspace: Path, register: Register
+) -> None:
+    """Rule 6 on the path that used to leak it.
+
+    A batch that fails on its second page has already bumped the first page's
+    version, and rolling it back bumps it again. Both are versions this tool
+    caused. The ledger used to be written only in the transaction that closes a
+    fully successful batch, so neither was recorded and the watcher read its own
+    two writes as somebody else's edits — then swept on them, which is the loop
+    the ledger exists to stop.
+    """
+    source = LocalSource(workspace)
+    first = next(f for f in seed(register, source, "1001") if f.subject.endswith(":threshold"))
+    second = next(f for f in seed(register, source, "1007") if f.subject.endswith(":threshold"))
+    approve(register, first, "1.2s")
+    approve(register, second, "1.2s")
+
+    started_at = source.read("1001").version
+    real_write = source.write
+    calls: list[str] = []
+
+    def failing_write(page_id: str, body: str, expected_version: int) -> int:
+        calls.append(page_id)
+        if page_id == "1007":
+            raise VersionConflict("somebody else got there first")
+        return real_write(page_id, body, expected_version)
+
+    source.write = failing_write  # type: ignore[method-assign]
+    result = apply_approved(register, source)
+
+    assert result.rolled_back == ["1001"]
+    landed = source.read("1001").version
+    assert landed > started_at + 1, "the edit and its compensation are two versions"
+    for version in range(started_at + 1, landed + 1):
+        assert register.wrote_version("1001", version), (
+            f"version {version} of page 1001 was written by this tool and is not in the ledger"
+        )
+
+
 def test_a_failed_rollback_is_reported_as_stranded_not_swallowed(
     workspace: Path, register: Register
 ) -> None:
