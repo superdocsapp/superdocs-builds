@@ -30,6 +30,7 @@ same size of mistake and the code should not treat them as if they were.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from functools import cached_property
 from pathlib import Path
 
 from reconciler.config import Config, Mappings
@@ -106,6 +107,34 @@ class Estate:
         )
 
     # ------------------------------------------------------------- lookups --
+
+    @cached_property
+    def terraform_literals(self) -> dict[str, tuple[Block, str]]:
+        """Every resolved literal any Terraform block declares, by its value.
+
+        Built once, because the alternative is what `entity_exists` was doing:
+        walking every block's every attribute for every identifier in every code
+        span on every page. On the bundled estate that is nothing — forty files
+        and a fraction of a second — and it is quadratic in exactly the two
+        dimensions a real customer grows in, so it is the shape of thing that is
+        fine until the day somebody points it at four thousand files.
+
+        Unresolved attributes are excluded here rather than at every call site.
+        `bucket = aws_s3_bucket.x.id` is a reference this tool does not evaluate,
+        and matching a runbook's identifier against the literal text of a
+        reference would be confirming a claim against a string that is not a
+        value.
+
+        First declaration wins, so the answer does not depend on dict ordering
+        the day two resources declare the same literal.
+        """
+        out: dict[str, tuple[Block, str]] = {}
+        for block in self.terraform:
+            for attribute, value in block.attributes.items():
+                if attribute in block.unresolved:
+                    continue
+                out.setdefault(value, (block, attribute))
+        return out
 
     def alert(self, name: str) -> AlertRule | None:
         return next((a for a in self.alerts if a.name == name), None)

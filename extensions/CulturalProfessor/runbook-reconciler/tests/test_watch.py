@@ -67,6 +67,7 @@ def watcher(
     clock: FakeClock,
     quiet: float = 2.0,
     watch_pages: bool = True,
+    page_interval: float = 0.0,
 ) -> Watcher:
     import dataclasses
 
@@ -81,6 +82,10 @@ def watcher(
         sleep=clock.sleep,
         output=lambda _: None,
         watch_pages=watch_pages,
+        # Zero: every poll re-lists. These tests drive `poll()` directly against
+        # a fake clock that does not advance on its own, and the point of most
+        # of them is what happens between two consecutive listings.
+        page_interval=page_interval,
     )
 
 
@@ -349,3 +354,73 @@ def test_a_trigger_describes_itself_without_flooding_the_terminal() -> None:
     assert "40 infra file(s)" in text
     assert "+37 more" in text
     assert len(text) < 200
+
+
+# ------------------------------------------------------- what a tick costs --
+
+
+def test_the_space_is_not_re_listed_on_every_tick(
+    estate: Path, register: Register, runbooks_dir: Path
+) -> None:
+    """Statting local files is free. Listing a Confluence space is not.
+
+    It is a paginated crawl plus one extra call per page, because CQL search is
+    unreachable with a scoped token. At the file interval that is a 400-call
+    round trip every ten seconds against somebody's production wiki, to notice
+    an edit nobody is paged over.
+    """
+    clock = FakeClock()
+    watch = watcher(estate, register, runbooks_dir, clock, page_interval=300.0)
+
+    listings = 0
+    real_pages = watch.source.pages
+
+    def counting_pages():
+        nonlocal listings
+        listings += 1
+        return real_pages()
+
+    watch.source.pages = counting_pages  # type: ignore[method-assign]
+
+    watch.poll()  # the baseline listing
+    assert listings == 1
+
+    for _ in range(20):
+        clock.advance(10.0)
+        watch.poll()
+    assert listings == 1, "200 seconds of ticks must not re-list a 300-second interval"
+
+    clock.advance(120.0)
+    watch.poll()
+    assert listings == 2, "and it must re-list once the interval really has passed"
+
+
+def test_a_page_edit_is_still_noticed_once_the_page_interval_passes(
+    estate: Path, register: Register, tmp_path: Path, runbooks_dir: Path
+) -> None:
+    """Cheaper must not mean blind.
+
+    The skipped ticks leave `state.pages` alone rather than refreshing it, so
+    the next listing that does run compares against the last real one and the
+    edit is still there to be found. Refreshing the snapshot on a tick that did
+    not actually list would lose the edit entirely.
+    """
+    runbooks = tmp_path / "runbooks"
+    runbooks.mkdir()
+    for path in runbooks_dir.iterdir():
+        if path.is_file():
+            (runbooks / path.name).write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+
+    clock = FakeClock()
+    watch = watcher(estate, register, runbooks, clock, page_interval=300.0)
+    watch.poll()
+
+    source = LocalSource(runbooks)
+    document = source.read("1001")
+    source.write("1001", document.body + "<p>theirs</p>", document.version)
+
+    clock.advance(10.0)
+    assert not watch.poll().pages, "not due yet"
+
+    clock.advance(300.0)
+    assert "1001" in watch.poll().pages

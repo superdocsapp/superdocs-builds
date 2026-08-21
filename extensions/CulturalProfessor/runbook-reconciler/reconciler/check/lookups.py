@@ -302,15 +302,15 @@ def _entity_exists(estate: Estate, groups: dict[str, str], args: dict[str, Any])
         return Observation(
             value=name, source=workflow.job(name).source, found=True, note="a CI job"
         )
-    for block in estate.terraform:
-        for attribute, value in block.attributes.items():
-            if value == name and attribute not in block.unresolved:
-                return Observation(
-                    value=name,
-                    source=block.source,
-                    found=True,
-                    note=f"{block.address}.{attribute}",
-                )
+    literal = estate.terraform_literals.get(name)
+    if literal:
+        block, attribute = literal
+        return Observation(
+            value=name,
+            source=block.source,
+            found=True,
+            note=f"{block.address}.{attribute}",
+        )
     component = estate.component(name)
     if component:
         return Observation(value=name, source=component.source, found=True, note="a catalog entry")

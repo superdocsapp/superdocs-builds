@@ -66,6 +66,19 @@ _UNRESOLVED = object()
 DEFAULT_INTERVAL = 10.0
 #: How long everything must hold still before a sweep starts.
 DEFAULT_QUIET = 2.0
+#: How often the runbook space is re-listed, which is a different question from
+#: how often the estate is stat'ed and deserves a different answer.
+#:
+#: Statting a few hundred local files costs nothing. Listing a Confluence space
+#: does not: it is a paginated crawl plus **one extra call per page**, because
+#: CQL search is unreachable with a scoped token (BUGS.md item 2). At the file
+#: interval that is a 400-call round trip every ten seconds against somebody's
+#: production wiki, all to notice an edit that can wait.
+#:
+#: The two are not the same urgency either. An infra change is what makes a
+#: runbook wrong and is worth reacting to promptly; a human editing a runbook is
+#: worth re-checking, but nobody is paged over it arriving five minutes later.
+DEFAULT_PAGE_INTERVAL = 300.0
 
 #: Directories that are never estate config and change constantly.
 IGNORED_DIRECTORIES = frozenset({".git", "__pycache__", ".venv", "node_modules", ".terraform"})
@@ -126,6 +139,7 @@ class Watcher:
         sleep: Callable[[float], None] = time.sleep,
         output: Callable[[str], None] = print,
         watch_pages: bool = True,
+        page_interval: float = DEFAULT_PAGE_INTERVAL,
     ) -> None:
         self.config = config
         self.register = register
@@ -136,8 +150,12 @@ class Watcher:
         self.sleep = sleep
         self.output = output
         self.watch_pages = watch_pages
+        #: Zero means "every poll", which is what the tests want and what a
+        #: local corpus can afford.
+        self.page_interval = page_interval
         self.state = WatchState()
         self._me: Any = _UNRESOLVED
+        self._last_page_scan: float | None = None
 
     # ------------------------------------------------------------ observing --
 
@@ -159,13 +177,30 @@ class Watcher:
             return {}
         return {page.page_id: page for page in self.source.pages()}
 
+    def _pages_due(self) -> bool:
+        """Whether this tick re-lists the space. See `DEFAULT_PAGE_INTERVAL`."""
+        if not self.watch_pages:
+            return False
+        if self.page_interval <= 0 or self._last_page_scan is None:
+            return True
+        return self.clock() - self._last_page_scan >= self.page_interval
+
     def poll(self) -> Trigger:
         """One tick: what moved since last time, our own writes excluded."""
         files = self.scan_files()
         changed_paths = tuple(sorted(_differences(self.state.files, files)))
         self.state.files = files
 
+        if not self._pages_due():
+            # The space was not re-listed this tick, so nothing is known to have
+            # changed on it. Deliberately not "assume unchanged and carry on
+            # comparing": leaving `state.pages` alone means the next scan that
+            # does run compares against the last real listing rather than
+            # against a stale snapshot it has been pretending to refresh.
+            return Trigger(paths=changed_paths)
+
         pages = self.scan_pages()
+        self._last_page_scan = self.clock()
         versions = {page_id: ref.version for page_id, ref in pages.items()}
         before = {page_id: ref.version for page_id, ref in self.state.pages.items()}
         changed_pages = tuple(
@@ -248,9 +283,10 @@ class Watcher:
 
     def loop(self, ticks: int | None = None) -> WatchState:
         """Run until interrupted, or for a fixed number of ticks in tests."""
+        pages = f" · runbook pages every {self.page_interval:g}s" if self.watch_pages else ""
         self.output(
             f"watching {len(self.config.infra_repo_paths)} infra path(s) every "
-            f"{self.interval:g}s · debounce {self.quiet:g}s · ctrl-c to stop"
+            f"{self.interval:g}s{pages} · debounce {self.quiet:g}s · ctrl-c to stop"
         )
         # The first poll establishes the baseline. Without it every file in the
         # estate looks new and the watcher opens by sweeping on nothing.
@@ -301,6 +337,7 @@ def _differences(before: dict[str, float | int], after: dict[str, float | int]) 
 
 __all__ = [
     "DEFAULT_INTERVAL",
+    "DEFAULT_PAGE_INTERVAL",
     "DEFAULT_QUIET",
     "Trigger",
     "WatchState",

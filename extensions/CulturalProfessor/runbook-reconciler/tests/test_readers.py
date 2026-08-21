@@ -330,3 +330,43 @@ def test_the_estate_loads_from_config_defaults() -> None:
     estate = Estate.load(Config.load())
     assert estate.summary()["alerts"] == 7
     assert estate.summary()["workloads"] == 4
+
+
+def test_the_terraform_literal_index_agrees_with_a_linear_scan() -> None:
+    """The index replaced a nested walk run once per identifier per page.
+
+    Fine on forty files, quadratic in the two dimensions a real customer grows
+    in. The behaviour has to be identical, so it is checked against the scan it
+    replaced rather than against a hand-written expectation.
+    """
+    from reconciler.config import Config
+    from reconciler.estate import Estate
+
+    estate = Estate.load(Config.load())
+
+    expected: dict[str, tuple[str, str]] = {}
+    for block in estate.terraform:
+        for attribute, value in block.attributes.items():
+            if attribute not in block.unresolved:
+                expected.setdefault(value, (block.address, attribute))
+
+    actual = {
+        value: (block.address, attribute)
+        for value, (block, attribute) in estate.terraform_literals.items()
+    }
+    assert actual == expected
+    assert "meridian-payments-prod" in actual, "the index is not empty"
+
+
+def test_an_unresolved_terraform_reference_is_not_a_literal() -> None:
+    """`bucket = aws_s3_bucket.x.id` is a reference this tool does not evaluate.
+
+    Matching a runbook's identifier against the text of a reference would be
+    confirming a claim against something that is not a value.
+    """
+    from reconciler.config import Config
+    from reconciler.estate import Estate
+
+    estate = Estate.load(Config.load())
+    for value in estate.terraform_literals:
+        assert not value.startswith("aws_"), f"{value!r} is a reference, not a literal"

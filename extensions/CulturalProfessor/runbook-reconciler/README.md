@@ -107,7 +107,7 @@ naming the page's subject service, and the page-level pass then condemned the en
 as a runbook for a service that no longer exists. A page-level false positive does not cost
 one finding; it costs the page.
 
-Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 286 passing.
+Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 290 passing.
 
 *Demo recording: not yet linked. It rides the submission form rather than this repository,
 and there is no screenshot here rather than a staged one — every output in this README is
@@ -140,7 +140,7 @@ There are three scripts, and they are for three different things:
 
 | | |
 | --- | --- |
-| `./rr test` | the suite — 286 tests, no key, no network |
+| `./rr test` | the suite — 290 tests, no key, no network |
 | `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
 | `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 
@@ -356,6 +356,10 @@ path puts page text into one.
   [`config/mappings.yaml`](config/mappings.yaml).
 - **Label filtering costs one extra call per page** because CQL search is unreachable with
   a scoped token ([BUGS.md](BUGS.md) item 2). On a very large space that dominates a sweep.
+  `rr watch` therefore re-lists the space on its own slower clock — every 300s against the
+  10s file poll — because an infra change is what makes a runbook wrong, and a human
+  editing a runbook is worth re-checking but not worth a 400-call round trip every ten
+  seconds.
 - **The wording layer is not deterministic, and the checker is.** The same batch of five
   passages returned usable replacements for 1/5, then 4/5, then 4/5. `rr propose` retries
   only what still lacks wording, so re-running converges, but any measurement of *that*
