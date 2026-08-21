@@ -39,3 +39,30 @@ def test_policy_file_loads():
     assert policy.tool_policy.is_allowed("chat")
     assert policy.sensitive_policy.enabled is True
     assert policy.quotas["default"] == 100
+
+def test_audit_cost_and_persistence():
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory() as directory:
+        path = Path(directory) / "audit.jsonl"
+
+        logger = AuditLogger(storage_path=path)
+
+        event = logger.record(
+            request_id="test-persistence",
+            team="default",
+            tool="chat",
+            allowed=True,
+            status_code=200,
+            duration_ms=12.34,
+        )
+
+        assert event.cost == 0.01
+        assert path.exists()
+
+        restored = AuditLogger(storage_path=path)
+
+        assert len(restored.events) == 1
+        assert restored.events[0].event_id == event.event_id
+        assert restored.events[0].cost == 0.01
+        assert restored.events[0].event_hash == event.event_hash
