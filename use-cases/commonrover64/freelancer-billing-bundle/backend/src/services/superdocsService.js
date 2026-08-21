@@ -84,20 +84,45 @@ export async function approveChanges({ sessionId, jobId, approved, changes }) {
     return superdocsFetch(`/v1/chat/${sessionId}/approve`, {
         method: "POST",
         body: JSON.stringify({
-            jobId: jobId,
+            job_id: jobId,
             approved,
             changes,
         }),
     });
 }
 
-//  export the sessions current doc. this is the "export" call
+// exports the session's current document, this is the "export" call
+// unlike the other calls, this can return raw file bytes (docx/pdf) instead of JSON
+// so we check content-type first instead of always calling res.json()
 export async function exportDocument({ sessionId, format = "docx" }) {
-    return superdocsFetch("/v1/documents/export", {
+    const res = await fetch(`${BASE_URL}/v1/documents/export`, {
         method: "POST",
-        body: JSON.stringify({
-            session_id: sessionId,
-            format,
-        }),
+        headers: {
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ session_id: sessionId, format }),
     });
+
+    if (!res.ok) {
+        const body = await res.text();
+        throw new Error(`SuperDocs export error ${res.status}: ${body}`);
+    }
+
+    const contentType = res.headers.get("content-type") || "";
+
+    if (contentType.includes("application/json")) {
+        return res.json();
+    }
+
+    // raw file bytes, wrap in a buffer plus metadata for the route to save or stream
+    const buffer = Buffer.from(await res.arrayBuffer());
+    const contentDisposition = res.headers.get("content-disposition") || "";
+
+    return {
+        isBinary: true,
+        buffer,
+        contentType,
+        contentDisposition,
+    };
 }
