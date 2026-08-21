@@ -14,6 +14,9 @@ LIABILITY. That is what the assigned build means by matching by substance rather
 
 from __future__ import annotations
 
+import re
+from functools import lru_cache
+
 from app.domain.clause import ClauseArea
 
 # Phrases that indicate a clause belongs to an area, lowercased. Matching is substring-based on a
@@ -114,10 +117,76 @@ INSTRUCTION_PHRASES: tuple[str, ...] = (
 )
 
 
-def areas_for(text: str) -> set[ClauseArea]:
-    """Which clause areas a piece of text plausibly belongs to."""
+# A clause states its subject early and cross-references other subjects later. "Title and risk in
+# the goods pass to Buyer on delivery" is a title clause that happens to mention delivery; the
+# giveaway is *where* each word sits. Matches inside this many leading characters count double.
+_SUBJECT_WINDOW = 40
+
+
+@lru_cache(maxsize=512)
+def _at_word_start(phrase: str) -> re.Pattern[str]:
+    """Match a phrase only where a word begins.
+
+    Several entries above are deliberately stems — "warrant" is meant to catch "warranty" and
+    "warrants", "deliver" to catch "delivered". So the boundary goes on the front only.
+
+    Without the leading boundary, "ship" matched inside "workmanship" and pulled a warranty clause
+    into the delivery area. Substring matching over legal prose finds words inside other words.
+    """
+    return re.compile(r"\b" + re.escape(phrase))
+
+
+def score_areas(text: str) -> dict[ClauseArea, int]:
+    """How strongly a span belongs to each clause area.
+
+    Two signals, both cheap and inspectable:
+
+      * **how many** distinct phrases for that area appear, and
+      * **where** they appear — a phrase in the opening of the span is the clause's subject,
+        one further in is usually a cross-reference to a different clause.
+    """
     lowered = text.lower()
-    return {area for area, phrases in CLAUSE_PHRASES.items() if any(p in lowered for p in phrases)}
+    scores: dict[ClauseArea, int] = {}
+
+    for area, phrases in CLAUSE_PHRASES.items():
+        score = 0
+        counted: list[tuple[int, int]] = []
+
+        # Longest phrase first, and skip any match that overlaps one already counted. The delivery
+        # list holds both "delivery" and "deliver"; without this the single word "delivery" scored
+        # twice and tied with a warranty clause that mentioned it once in passing.
+        for phrase in sorted(phrases, key=len, reverse=True):
+            found = _at_word_start(phrase).search(lowered)
+            if found is None:
+                continue
+            at, end = found.span()
+            if any(at < seen_end and seen_at < end for seen_at, seen_end in counted):
+                continue
+            counted.append((at, end))
+            score += 2 if at < _SUBJECT_WINDOW else 1
+
+        if score:
+            scores[area] = score
+
+    return scores
+
+
+def areas_for(text: str) -> set[ClauseArea]:
+    """Which clause areas a span belongs to — the best-supported ones, not every one it mentions.
+
+    Returning every area with any keyword hit put warranty and title text inside the delivery
+    position, because both of those clauses end with the words "from delivery" and "on delivery".
+    The memo then quoted warranty wording under a delivery heading, which is worse than useless to
+    a contract manager checking a supplier's position.
+
+    Ties are kept rather than broken arbitrarily: a sentence genuinely about title *and* risk on
+    delivery belongs to both, and guessing between them would trade one wrong answer for another.
+    """
+    scores = score_areas(text)
+    if not scores:
+        return set()
+    best = max(scores.values())
+    return {area for area, score in scores.items() if score == best}
 
 
 def instruction_phrases_in(text: str) -> tuple[str, ...]:

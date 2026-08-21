@@ -1,0 +1,466 @@
+/* Terms Conflict Checker — visual system
+ *
+ * Shares its foundation with the corrective-plan build (one submission, one hand) but its
+ * signature is different, because the subject is different.
+ *
+ * The signature here is FACING PAGES. A battle of the forms is two documents pointed at each
+ * other, so every contested clause is set as two columns of verbatim quotation with the dispute
+ * running down the gutter between them. Silence is the same layout with one page visibly empty —
+ * a void you can see, not a box that renders blank and reads as agreement.
+ */
+
+:root {
+  --paper: #eef1f0;
+  --raised: #ffffff;
+  --sunk: #e4e9e7;
+
+  --ink: #10161a;
+  --ink-soft: #3b4750;
+  --steel: #6c7b82;
+
+  --rule: #d3dbd9;
+  --rule-strong: #b6c2bf;
+
+  --contested: #ad3a10;
+  --contested-wash: #f9e8e0;
+  --silent: #7d6414;
+  --silent-wash: #f5eed7;
+  --agreed: #0b6e4f;
+  --agreed-wash: #e2efe9;
+
+  --display: Archivo, system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* ---------- masthead ---------------------------------------------------- */
+
+.masthead {
+  background: var(--raised);
+  border-bottom: 1px solid var(--rule);
+  padding: 18px 28px;
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.masthead h1 {
+  font-family: var(--display);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.masthead .sub { margin: 0; color: var(--steel); font-size: 13px; }
+
+.docs-pair {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--steel);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.docs-pair .vs { color: var(--contested); font-weight: 600; }
+
+/* ---------- tally ------------------------------------------------------- */
+
+.tally {
+  background: var(--sunk);
+  border-bottom: 1px solid var(--rule);
+  padding: 14px 28px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--rule-strong);
+  background: var(--raised);
+  font-size: 13px;
+}
+
+.count b {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.count--contested { border-color: var(--contested); color: var(--contested); background: var(--contested-wash); }
+.count--silent { border-color: var(--silent); color: var(--silent); background: var(--silent-wash); }
+.count--agreed { border-color: var(--agreed); color: var(--agreed); background: var(--agreed-wash); }
+
+.tally .spacer { margin-left: auto; }
+
+/* ---------- layout ------------------------------------------------------ */
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.controls {
+  background: var(--raised);
+  border-right: 1px solid var(--rule);
+  padding: 22px 22px 40px;
+  min-height: calc(100vh - 122px);
+}
+
+.findings { padding: 24px 28px 64px; }
+
+/* ---------- controls ---------------------------------------------------- */
+
+.field { display: block; margin-bottom: 14px; }
+
+.field > span {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-bottom: 5px;
+}
+
+.field select, .field input {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+
+.block-head {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 24px 0 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+}
+
+/* The sequence is a timeline, because order is exactly what the doctrine turns on. */
+.timeline { list-style: none; margin: 0; padding: 0; }
+
+.moment {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 10px;
+  padding: 8px 0 8px 14px;
+  border-left: 2px solid var(--rule-strong);
+  position: relative;
+}
+
+.moment::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 15px;
+  width: 8px;
+  height: 8px;
+  background: var(--raised);
+  border: 2px solid var(--rule-strong);
+  border-radius: 50%;
+}
+
+.moment--terms::before { border-color: var(--ink); background: var(--ink); }
+.moment--objection::before { border-color: var(--contested); background: var(--contested); }
+.moment--performance::before { border-color: var(--agreed); background: var(--agreed); }
+
+.moment time {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--steel);
+  padding-top: 2px;
+}
+
+.moment .what { font-size: 13px; }
+.moment .who {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+/* ---------- governing verdict ------------------------------------------- */
+
+.governs {
+  border: 1px solid var(--ink);
+  border-left-width: 3px;
+  background: var(--raised);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+
+.governs h2 {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--steel);
+  letter-spacing: 0.02em;
+}
+
+.governs .call {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 0 0 8px;
+}
+
+.governs .rule {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--steel);
+  letter-spacing: 0.05em;
+}
+
+.governs details { margin-top: 10px; }
+.governs summary { cursor: pointer; font-size: 13px; color: var(--ink-soft); }
+.governs pre {
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  background: var(--sunk);
+  padding: 12px;
+  margin: 8px 0 0;
+  border-left: 2px solid var(--rule-strong);
+}
+
+.caveat {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--steel);
+  font-style: italic;
+}
+
+/* ---------- the facing pages — this build's signature -------------------- */
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--steel);
+  margin: 26px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+.dispute {
+  background: var(--raised);
+  border: 1px solid var(--rule);
+  margin-bottom: 14px;
+  animation: rise 300ms cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: none; }
+}
+
+.dispute--contested { border-left: 3px solid var(--contested); }
+.dispute--silence { border-left: 3px solid var(--silent); }
+.dispute--decided { opacity: 0.6; }
+
+.dispute__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
+}
+
+.dispute__head h3 {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.verdict-tag {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border: 1px solid currentColor;
+}
+
+.verdict-tag--conflict { color: var(--contested); background: var(--contested-wash); }
+.verdict-tag--silence { color: var(--silent); background: var(--silent-wash); }
+.verdict-tag--agree { color: var(--agreed); background: var(--agreed-wash); }
+
+.state-tag {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--steel);
+}
+
+.comment {
+  margin: 0;
+  padding: 12px 18px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  background: var(--sunk);
+}
+
+/* Two documents, facing. The gutter between them is the dispute. */
+.pages {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+}
+
+.page { padding: 16px 18px; }
+.gutter { background: var(--rule); }
+
+.page h4 {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--steel);
+  margin: 0 0 9px;
+}
+
+.page blockquote {
+  margin: 0 0 9px;
+  padding-left: 11px;
+  border-left: 2px solid var(--rule-strong);
+  font-size: 14px;
+}
+
+.page--empty { background: repeating-linear-gradient(-45deg, var(--sunk), var(--sunk) 6px, transparent 6px, transparent 12px); }
+
+.page--empty .void {
+  margin: 0;
+  color: var(--silent);
+  font-size: 14px;
+}
+
+.page--empty .void strong { display: block; font-weight: 600; }
+
+.dispute__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 12px 18px;
+  border-top: 1px solid var(--rule);
+}
+
+/* ---------- buttons ----------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn:hover:not(:disabled) { background: #000; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule-strong); }
+.btn--ghost:hover:not(:disabled) { background: var(--sunk); border-color: var(--ink); }
+.btn--raise { background: var(--contested); border-color: var(--contested); color: #fff; }
+.btn--drop { background: transparent; color: var(--steel); border-color: var(--rule-strong); }
+.btn svg { width: 15px; height: 15px; }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* ---------- notices ----------------------------------------------------- */
+
+.notice {
+  border: 1px solid var(--rule-strong);
+  border-left-width: 3px;
+  background: var(--sunk);
+  padding: 12px 15px;
+  margin-bottom: 16px;
+}
+
+.notice h3 {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.notice p { margin: 0; font-size: 13px; color: var(--ink-soft); }
+.notice--alarm { border-color: var(--contested); background: var(--contested-wash); }
+.notice--alarm h3 { color: var(--contested); }
+.notice blockquote {
+  margin: 8px 0 0;
+  padding-left: 11px;
+  border-left: 2px solid var(--contested);
+  font-size: 13px;
+}
+
+.empty {
+  border: 1px dashed var(--rule-strong);
+  background: var(--raised);
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--steel);
+}
+
+.spin { animation: spin 900ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- responsive & motion ----------------------------------------- */
+
+@media (max-width: 940px) {
+  .workspace { grid-template-columns: 1fr; }
+  .controls { border-right: none; border-bottom: 1px solid var(--rule); min-height: 0; }
+  .pages { grid-template-columns: 1fr; }
+  .gutter { height: 1px; }
+  .masthead, .tally, .findings { padding-left: 18px; padding-right: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

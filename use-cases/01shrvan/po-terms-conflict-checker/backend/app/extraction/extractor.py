@@ -23,7 +23,13 @@ from app.extraction.patterns import areas_for, instruction_phrases_in
 # Split on sentence enders and newlines, keeping offsets. Clause text is full of "Cl. 7.2" and
 # "No. 3", so a naive split on "." alone would shred it; requiring whitespace after the stop and a
 # following capital or digit-with-space keeps numbered references intact.
-_BOUNDARY = re.compile(r"(?<=[.;!?])\s+(?=[A-Z0-9])|\n+")
+#
+# A lone newline is NOT a boundary. Contract text is hard-wrapped, so splitting on every line break
+# cut sentences in half: "...until payment has been received in" / "full, notwithstanding delivery
+# and the passing of risk." That second fragment mentions delivery and nothing else, so it filed
+# under Delivery and the memo quoted half a retention-of-title clause under a delivery heading.
+# Only a sentence ending, or a blank line, closes a span.
+_BOUNDARY = re.compile(r"(?<=[.;!?])\s+(?=[A-Z0-9])|\n\s*\n")
 
 
 class Span(NamedTuple):
