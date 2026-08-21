@@ -58,6 +58,14 @@ PYTHONPATH=src uv run python -m spec_doc_sync.cli live plan.json --docs fixtures
 
 Live mode sends only approved intents to `POST /v1/chat/async` with `approval_mode: ask_every_time`, polls the durable job, renders each proposed change, posts explicit per-change decisions to `/v1/chat/{session_id}/approve`, and optionally exports the reviewed session through `/v1/documents/export`. The key is environment-only and is never returned to a browser or written to state.
 
+For a credentialed smoke test without placing the key in shell history or a file, copy the key and pipe the clipboard directly to the verifier:
+
+```bash
+pbpaste | PYTHONPATH=src uv run python scripts/live_verify.py --output reviewed-reference.docx
+```
+
+**Live verification (22 August 2026):** SuperDocs completed the async review job, surfaced one change, accepted one explicit approval, renamed `customer_id` to `account_id`, and exported a 36,683-byte DOCX. The rendered export was visually clean and contained no remaining `customer_id` token.
+
 ## What is measured
 
 - **Exhaustive rename:** every exact token occurrence of a confidently renamed field is counted before editing; applying a stale plan fails rather than partially updating.
