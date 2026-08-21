@@ -15,11 +15,11 @@ August Monsoon Depression
 
 ### Observed
 
-The August Monsoon Depression began affecting the Barakar Valley Power Distribution Limited network at 14:05 on 11 August 2026, when the first outages were recorded on feeder 11 kV JMR-07 [EL-0004]. Consumers without supply peaked at 33,400, which is 9.8 per cent of the 342,000 consumers served, at 17:00 on 11 August [EL-0008]. Full restoration took 36 hours 35 minutes from the first recorded outage to the final consumer restored at 02:40 on 13 August [EL-0004, EL-0019].
+August Monsoon Depression began affecting the Barakar Valley Power Distribution Limited network at 14:05 on 11 August 2026, when the first outages were recorded on feeder 11 kV JMR-07 [EL-0004]. Consumers without supply peaked at 33,400, which is 9.8 per cent of the 342,000 consumers served, at 17:00 on 11 August [EL-0008]. Full restoration took 36 hours 35 minutes from the first recorded outage to the final consumer restored at 02:40 on 13 August [EL-0004, EL-0019].
 
 ### Assessed
 
-The response is judged to have met its restoration objective, with no service interruption extending beyond the operating standard [assessed]
+The response is judged to have met its restoration objective, with no service interruption extending beyond the operating standard [assessed].
 
 ## 2. Timeline of Events
 
@@ -43,29 +43,27 @@ The response is judged to have met its restoration objective, with no service in
 
 ### Observed
 
-##### Observed
-
-8 crews totalling 44 field personnel were mobilised for the event [EL-0002, EL-0007]. 1 mutual-aid crew totalling 10 personnel was requested from Durgapur Circle [EL-0011, EL-0013]. Crews worked approximately 1,050 personnel-hours on the event, covering 7 of 8 crews while the remaining 1 has incomplete records and is excluded [EL-0002, EL-0007].
+8 crews totalling 44 field personnel were mobilised for the event [EL-0002, EL-0007]. 1 mutual-aid crew totalling 10 personnel was requested from Durgapur Circle [EL-0011, EL-0013]. Crews worked approximately 1,050 personnel-hours on the event [EL-0002, EL-0007]. This figure covers 7 of 8 crews; the remaining 1 has incomplete records and is excluded [EL-0002, EL-0007].
 
 ### Assessed
-
-##### Assessed
 
 Mutual aid was requested at an appropriate point in the event, and earlier escalation would not have materially shortened the restoration [assessed].
 
 ### What the records do not show
 
-##### What the records do not show
-
-Crew CR-B08 (10 personnel from Durgapur Circle) has no mobilisation time in the records, so its hours cannot be computed and are excluded from the personnel-hours total [no record].
+Crew CR-B08 (10 personnel from Durgapur Circle) has no mobilisation time in the records, so its hours cannot be computed and are excluded from the personnel-hours total. [no record]
 
 ## 4. Restoration Performance
+
+### Observed
 
 ### Observed
 
 * 50 per cent of affected consumers were restored within 13 hours of peak outage, by 06:00 on 12 August when 10,200 consumers remained without supply [EL-0008, EL-0014]
 * 90 per cent of affected consumers were restored within 25 hours of peak outage, by 18:00 on 12 August when 1,340 consumers remained without supply [EL-0008, EL-0018]
 * 9 consumer counts were recorded across the event, from 14:05 on 11 August to 02:40 on 13 August [EL-0004, EL-0019]
+
+### Assessed
 
 ### Assessed
 
@@ -79,11 +77,11 @@ The first consumer notification was issued at 14:43 on 11 August, 38 minutes aft
 
 ### Assessed
 
-Message cadence was appropriate to the restoration profile, and consumers received revised estimates at the points where the estimates materially changed [assessed]
+Message cadence was appropriate to the restoration profile, and consumers received revised estimates at the points where the estimates materially changed [assessed].
 
 ## 6. Restoration Curve
 
-![Restoration curve for August Monsoon Depression](https://storage.googleapis.com/superdocs-document-images/img/cd71f053d92e427ebfa34e9ba1a67b3c.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260819%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260819T165000Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=bb5ea2b5b01d2546146c7a1a7bcb33043dbbffa706d7d6e2f7e753803d19c7fb51a522a07ea1a71ce0ed0cab797268cafeca28a6f4d32f480cdfeb353babf7b741d01ce669644b6864759216951d5c31d20481f47f2f221d3b3ac5d878d303615c22dc9ec12563207c4d08e87424451a09e99ec9f806a265ec89fb5e50452c752ca97ac78ce4650673e81e09816e6c70358f1a1285d80adbf6898dbe8bfb1f7d129e054b2d08e69d5a4b42c047becf979775545885f53fb8e67ba464415f0cc84a6a99fa521017dc4aa503d292b68b1484a5a429045e10aaf6ea1c39f3eeabb6591d5ea3930ae876cd736e9a3d54146a9d895dfac5766bb2d6b108d57d4a6cc4)
+![Restoration curve for August Monsoon Depression](https://storage.googleapis.com/superdocs-document-images/img/bc0c87da555e437cb8f1935a954d4eaa.png?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260820%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260820T154501Z&X-Goog-Expires=86400&X-Goog-SignedHeaders=host&X-Goog-Signature=38a525b8d4a56f72b30004019d1e311c909a1c87349b163e2f58ab89ef17d200b6f23fdc4c5c7ebadbbd3514d6e6d685a2a4438e444c98ab1da57310809d3d955233d4d145faa6f8b3b488edd99fe6f4a5784e37d73e6b5b734ae1077f9c1b3be256439f7cde98bd130e453a316d02fc3ca6ca69bdbe2a60c2a9f5667f53247ff14a3a7dd1e54a81d7b077596af469a5a172e67d6ddea03b0990c1cdd7670bd1a27bed5d95d3ba714c1eab10954680a9cab6fc0b225782d43c88bdf4476bbdd7c100bd7ab8791f78bb739c687f4da7d4baa86cfb36b794e86fa8d0993f02eab5f0733f1f5b5d294e0366663fa3506cc7f2fca5233ce3d7adc38abf1bb80b7114)
 
 *Consumers without supply over the course of August Monsoon Depression, peaking at 33,400 at 17:00 on 11 August 2026 [EL-0008].*
 

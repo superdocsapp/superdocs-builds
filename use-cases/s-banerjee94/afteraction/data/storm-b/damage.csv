@@ -1,0 +1,6 @@
+entry_id,reported_at,asset_type,count,status,reported_by,feeder,location,note,source_ref,confirmed_at,repaired_at
+DMG-0001,2026-08-11T11:20:00,conductor_span,3,confirmed,telemetry,11 kV BRK-03,Nunia canal corridor,"Three spans down after a branch brought the conductor together in the canal corridor.",TEL-0001,2026-08-11T11:20:00,2026-08-11T14:20:00
+DMG-0002,2026-08-11T11:55:00,pole,2,confirmed,customer,11 kV KLT-02,Kulti Road near pole 19,"Two poles tilted in saturated ground.",COM-0004,2026-08-11T12:15:00,2026-08-11T18:30:00
+DMG-0003,2026-08-11T12:45:00,transformer,1,confirmed,telemetry,11 kV MHS-07,Mohishila DTR-09,"Distribution transformer failed on overcurrent.",TEL-0003,2026-08-11T13:30:00,2026-08-11T16:10:00
+DMG-0004,2026-08-11T14:10:00,insulator,3,confirmed,crew,11 kV KLT-02,Kulti section poles 17 to 19,"Three insulators cracked, found while replacing the tilted poles.",FLD-0004,2026-08-11T14:10:00,2026-08-11T18:30:00
+DMG-0005,2026-08-11T15:30:00,cross_arm,2,confirmed,customer,11 kV MHS-07,Mohishila Colony,"Two cross-arms broken. Reported by a consumer at 15:30 and confirmed by the gang within the hour.",COM-0009,2026-08-11T16:05:00,2026-08-11T18:55:00

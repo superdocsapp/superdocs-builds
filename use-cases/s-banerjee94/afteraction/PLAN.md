@@ -71,21 +71,27 @@ exists to avoid.
 ## Shape
 
 ```
-event log + crew records + customer comms      (synthetic, committed)
+six record sets, split by where the record came from    (synthetic, committed)
+  weather · telemetry · damage · crew · comms · field reports
                     │
                     ▼
-        parse ──► facts, each keyed to a log entry
+        parse ──► merged chronological spine + facts, each keyed to a record
                     │
-                    ├──► restoration curve ──► PNG ──► uploaded as an image
+                    ├──► restoration curve   ──► PNG ──► uploaded as an image
+                    ├──► consumer contacts   ──► PNG ──► uploaded as an image
                     │
                     ├──► templates/report.html ──► the styled skeleton that is uploaded
                     │
                     ▼
-        one instruction per section, carrying only that section's log lines
+        Python groups the timeline into time windows (1h or 2h, from the
+        event's own length) and hands each window's raw records over
                     │
                     ▼
    SuperDocs:  upload ──► chat ──► approve ──► export
-                    │
+                    │       │
+                    │       └── one turn per section, one turn for ALL windows,
+                    │           and a last turn that summarises the finished
+                    │           document into the Executive Summary
                     ▼
         lessons-learned store ──► carried into the next event
 ```
@@ -247,3 +253,170 @@ One warning was also clear. The largest submission was an agentic pipeline with 
 its own state store and its own review dashboard. It is impressive work, and it reads as a version
 *of* SuperDocs rather than a build *on* it. The temptation to reshape a Task 1 system into this
 slot is real and is being deliberately declined: here, SuperDocs does the document work.
+
+---
+
+## Correction, 21 August: one log file was the wrong shape
+
+Everything above was built against a single `event_log.csv` per event. Three problems
+surfaced when the data was looked at properly, and all three were structural rather than
+cosmetic.
+
+### 1. The timeline was the log, reprinted
+
+The old `_timeline` wrote one bullet per record. Thirty-two records gave eighteen
+bullets, which reads well and hid the defect: a real substation running a multi-day
+restoration logs **thousands** of lines, and one bullet each would make the report the
+log. A commission wants roughly twenty milestones whether the log holds thirty lines or
+thirty thousand — the output length is fixed by what a person will read, so the funnel
+has to absorb the growth.
+
+**Decision.** Group the timeline into fixed time windows and write one bullet per
+window, with the window size taken from the event's own length:
+
+| Event duration | Bullet window |
+| --- | --- |
+| <= 16 hours | 1 hour |
+| > 16 hours | 2 hours |
+
+Sixteen hours is where a storm stops being a shift and becomes a multi-day restoration:
+crews stand down overnight, water has to recede, mutual aid travels. Past that an
+hour-by-hour account is mostly empty hours. Windows are clock-aligned, so a reader sees
+`18:00-20:00` and not `17:43-19:43`, and empty windows produce no bullet at all.
+
+Storm A is 45 hours, so 2-hour windows: **45 records become 17 bullets**, one window
+absorbing 15 records on its own. Storm B is 12 hours, so 1-hour windows. The pair
+deliberately covers both branches of the rule.
+
+**Python picks the window and which records fall in it; SuperDocs writes the sentence.**
+That split is the whole point. A model choosing which twenty of two thousand records
+matter produces a selection nobody can state and nobody can defend to a regulator — so
+selection stays in code, and compression is what the model is asked for.
+
+**The cost this avoided.** Seventeen windows could have been seventeen chat turns, which
+is seventeen billable operations for a section that costs one. The API allows up to 25
+targeted edits in a single operation, so every window goes out in **one** request. There
+is a test for it, because it is a budget property rather than a style one.
+
+### 2. Evidence and hearsay looked identical
+
+The damage figures — "34 poles, 52 spans, 9 transformers" — lived as **prose inside a
+note**. Every other number in the report is computed in Python and handed to the model;
+those three rode along inside a quoted string where nothing could check them. And the log
+could not distinguish a consumer saying a pole looks broken from a transformer reporting
+itself faulted from a crew confirming it on site. Three grades of evidence, one
+indistinguishable line each.
+
+**Decision.** Split the single log into six sets by **where the record came from**, and
+merge them back into one chronological spine at load time:
+
+| File | Prefix | What it is |
+| --- | --- | --- |
+| `weather.csv` | `WEA` | an external feed: the met office, a monitoring mast |
+| `telemetry.csv` | `TEL` | the network reporting on itself: trips, faults, counts |
+| `damage.csv` | `DMG` | an asset recorded as damaged, with its own provenance |
+| `crew.csv` | `CRW` | gang mobilisation and release |
+| `comms.csv` | `COM` | messages in **both** directions |
+| `field_reports.csv` | `FLD` | a human on site: safety, access, standing water |
+
+The id prefix carries the grade of evidence into the finished document, so a reader
+seeing `[TEL-0032]` knows it is machine data and `[COM-0014]` knows it is a phone call,
+without coming back to the source. Damage counts are now structured (`asset_type`,
+`count`, `status`, `reported_by`, `source_ref`) and summed in Python like every other
+figure. `DamageStatus.REPORTED` and `CONFIRMED` are **never added together** — counting
+one consumer's word alongside a crew's inspection asserts more broken poles than were
+ever broken.
+
+There is no `event_log.csv` any more. A seventh file restating the other six is a file
+that drifts out of step with them, so `Corpus.log` is derived by merging.
+
+The chain this unlocks, and the reason it was worth the rework:
+
+```
+COM-0002  in   call centre  "Tree on line, Mohishila Colony"
+   -> DMG-0002  3 poles  reported_by=customer  source_ref=COM-0002
+   -> CRW-0002  line gang mobilised to 11 kV MHS-07
+   -> DMG-0002  repaired 16:40 the following day
+```
+
+A consumer's call traced through to a repair, every step citable.
+
+**Two consequences worth writing down.**
+
+*A citation resolves to a record, not to a position on a timeline.* A crew with no
+mobilisation time has no place in a chronological merge — but the record exists, and
+LL-A1 is a lessons-learned item about exactly that missing time. So `entry_ids` spans all
+six sets while `log` stays the timeline.
+
+*A gap that names a record is citing it.* "Crew CRW-0005 has no release time" reads as an
+unsourced foreign citation unless the gap declares `CRW-0005` as a source. `Gap` gained a
+`sources` field for this, and the need for it was found by the traceability pass flagging
+this build's own report.
+
+### 3. Inbound messages were missing entirely
+
+`customer_comms.csv` held eight rows, all outbound. The event log's `communication`
+entries recorded the same eight facts a second time — the duplication that made the whole
+structure feel wrong. Nothing recorded consumers contacting the utility, which in a real
+storm is the largest stream of all and the first thing a commission asks about: *how many
+consumers called, and how long did they wait?*
+
+`comms.csv` now carries `direction` (in/out), the inbound channels a consumer actually
+uses (call centre, SMS, WhatsApp, email), and `resolved_at`. Storm A ends with 46 contacts
+still open and one batch closed past its target; Storm B closes every one inside twelve
+hours. That contrast is the improvement story the two reports tell together.
+
+`complaint_target_hours` is a field on the event rather than a constant: a four-hour
+squall and a four-day flood cannot answer to the same number, and the utility already
+knows which it is operating under.
+
+### 4. Two things the new shape supports
+
+**An executive summary, written last.** Ten sentences at the top of the document. It is
+the only instruction that asks the model to read *the document* rather than a list of
+facts — SuperDocs is already holding it, so handing over a second copy of the facts would
+only give the summary and the body a chance to disagree. It runs after the retries,
+because a summary written before the sections is a summary of what they were going to say.
+
+It is a real `<h2>`, not a styled table cell. That is functional rather than visual: the
+export becomes `## Executive Summary`, which is what the per-section fingerprint splits on
+and what the placeholder check searches under. As a table it would have been invisible to
+both, and a summary that silently failed to write would have shipped.
+
+**A second chart.** Consumer contacts received against contacts closed, with the backlog
+as the space between the two step lines and the overdue part of that backlog shaded. Both
+charts moved to a validated categorical palette — the trio was run through a colour-vision
+and contrast check rather than picked by eye, and the first attempt (the report's own teal
+and green) failed three of six checks including normal-vision separation at delta-E 10.2,
+well under the floor of 15. Aqua sits below the 3:1 contrast floor on white, so every
+series is directly labelled as well as legended: identity is never carried by colour alone.
+
+### 5. Scale: one substation, not a district
+
+The old data covered a whole distribution division, 342,000 consumers. Real reporting runs
+substation by substation — each substation writes its own after-action report and the
+parent circle combines them for the public. Both storms were rebuilt at **Neamatpur 33/11
+kV**, 28,400 consumers, five feeders. Smaller area, tighter numbers, and a rollup to a
+circle-level report becomes the obvious next feature rather than a rewrite.
+
+### 6. The prompt is now on screen
+
+SuperDocs is an AI editor, so what this tool actually controls is the brief. Until now the
+CLI printed what came *back* and never what was asked, which meant a reviewer at the
+interactive gate was reviewing the answer without the question. Every turn now announces
+its instruction first: `--prompts` on `build` and `demo`, on by default under
+`--gate interactive`. It is printed whole, for the same reason the gate refuses to
+truncate proposed text.
+
+### What this cost
+
+The two live reports in `docs/`, both report screenshots and the verified 28/28 and 23/23
+figures were all produced against the old data and are stale. They need a live re-run.
+Offline the suite is green at 158 tests and both storms build clean end to end.
+
+### Not built, deliberately
+
+A report re-issued at 24 hours and again at 48 as the logs grow. It needs no feature: the
+pipeline is a pure function of the data folder, so re-running after the records grow
+produces the updated report. The property is worth *keeping* — it is the reason nothing
+here caches parsed state between runs — but there is nothing to write.

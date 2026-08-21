@@ -19,7 +19,7 @@ from typing import Any, Callable, Protocol
 from . import sections as S
 from .client import Approver, approve_all
 from .corpus import load_corpus, load_lessons_opened, load_resolutions
-from .curve import render_curve
+from .curve import render_complaints, render_curve
 from .facts import SECTION_TITLES, FactSet, build_facts
 from .lessons import apply_event, inherited, load_store, raised_here, save_store, summarise
 from .models import Lesson
@@ -86,17 +86,21 @@ def _watch(approver: Approver) -> tuple[Approver, list[str]]:
     return gate, rejected
 
 
-def expected_headings(carried: list[Lesson]) -> list[str]:
+def expected_headings(carried: list[Lesson], facts: FactSet | None = None) -> list[str]:
     """Every heading the skeleton put in the document, and no others.
 
     The skeleton decides the document's shape, so this list is derivable from it. A
     heading in the export that is not here was written by the model.
     """
-    titles = ["Storm Restoration After-Action Report"]
+    titles = ["Storm Restoration After-Action Report", "Executive Summary"]
     for n, title in enumerate(SECTION_TITLES.values(), start=1):
         titles.append(f"{n}. {title}")
-    titles.append(f"{len(SECTION_TITLES) + 1}. Restoration Curve")
-    titles.append(f"{len(SECTION_TITLES) + 2}. Lessons Learned")
+    titles.append(S.heading_for("curve"))
+    # The contacts chart only exists when consumers actually contacted the utility, so
+    # its heading is only expected when the records carry one.
+    if facts is not None and facts.complaints:
+        titles.append(S.heading_for("complaints"))
+    titles.append(S.heading_for("lessons", facts))
     titles += ["Observed", "Assessed", "What the records do not show", "Raised by this event"]
     if carried:
         titles.append("Carried forward from previous events")
@@ -144,7 +148,7 @@ def run_event(
 
     corpus = load_corpus(event_id, data_root)
     facts = build_facts(corpus)
-    note("parse", f"{len(corpus.log)} log entries, {len(facts.claims)} claims, {len(facts.gaps)} gaps")
+    note("parse", f"{len(corpus.log)} records, {len(facts.claims)} claims, {len(facts.gaps)} gaps")
 
     # --- carry-forward, before drafting: this event's report opens with what it inherits
     store = load_store(store_path)
@@ -189,6 +193,10 @@ def run_event(
 
     def turn(instruction: str, aimed_at: str, gate: Approver | None = None) -> None:
         nonlocal current
+        # The instruction goes out before the change comes back, so it is announced
+        # first. SuperDocs writes the prose; what this tool controls is the brief, and a
+        # reviewer who sees only the diff is reviewing the answer without the question.
+        note("prompt", instruction)
         backend.chat(
             session_id,
             instruction,
@@ -213,7 +221,7 @@ def run_event(
         instruction = S.instruction_for(facts, key)
         if not instruction:
             continue
-        note("draft", f"{SECTION_TITLES[key]} ({len(facts.sources_for(key))} log lines supplied)")
+        note("draft", f"{SECTION_TITLES[key]} ({len(facts.sources_for(key))} records supplied)")
         gate, rejected = _watch(approver)
         turn(instruction, numbered[key], gate)
         if rejected:
@@ -223,8 +231,8 @@ def run_event(
     if skipped:
         note("budget", f"stopped at {edits} edits; {len(skipped)} sections left undrafted")
 
-    # --- the curve, rendered here and placed by SuperDocs
-    curve_title = f"{len(SECTION_TITLES) + 1}. Restoration Curve"
+    # --- the charts, rendered here and placed by SuperDocs
+    curve_title = S.heading_for("curve")
     if sections_limit is None or edits < sections_limit:
         curve_path = render_curve(facts, out_dir / "restoration-curve.png")
         url = backend.upload_image(session_id, f"{event_id}-restoration-curve.png", curve_path)
@@ -232,8 +240,20 @@ def run_event(
         turn(S.curve_instruction(url, facts), curve_title)
         edits += 1
 
+    # The contacts chart exists only when consumers contacted the utility. An event
+    # nobody called about gets no chart rather than an empty pair of axes.
+    complaints_title = S.heading_for("complaints")
+    if facts.complaints and (sections_limit is None or edits < sections_limit):
+        chart = render_complaints(facts, out_dir / "consumer-contacts.png")
+        instruction = S.complaints_instruction("", facts)
+        if chart and instruction:
+            url = backend.upload_image(session_id, f"{event_id}-consumer-contacts.png", chart)
+            note("chart", f"contacts chart rendered and uploaded: {url[:60]}")
+            turn(S.complaints_instruction(url, facts), complaints_title)
+            edits += 1
+
     # --- lessons raised by this event
-    lessons_title = f"{len(SECTION_TITLES) + 2}. Lessons Learned"
+    lessons_title = S.heading_for("lessons", facts)
     lessons_instruction = S.lessons_instruction(facts, mine, carried)
     # An event that raised nothing needs no turn: the skeleton already states the absence,
     # so the section is complete on upload rather than waiting for an edit.
@@ -278,6 +298,33 @@ def run_event(
     else:
         stalled_lessons = False
 
+    # --- the executive summary, written last from the finished document
+    #
+    # Last because a summary written before the sections would be a summary of what the
+    # sections were going to say. By this point every section is drafted and every
+    # stalled one has been re-issued, so SuperDocs is summarising the report a reader
+    # will actually get. It is the one instruction that asks the model to read the
+    # document rather than a list of facts — the document is already there, so handing
+    # over a second copy of the facts would only give the two a chance to disagree.
+    summary_title = "Executive Summary"
+    summary_done = False
+    if sections_limit is None or edits < sections_limit:
+        note("summary", f"summarising the finished report in {S.SUMMARY_SENTENCES} sentences")
+        turn(S.summary_instruction(facts), summary_title)
+        summary_done = True
+        edits += 1
+
+        # The same one-pass retry the sections get. A summary that quietly failed to
+        # land leaves the word "Placeholder" at the top of the document, which is the
+        # first thing a reader sees.
+        check = backend.export(session_id, scratch, "markdown")
+        empty_summary = unfilled(check.read_text(encoding="utf-8"), [summary_title])
+        check.unlink(missing_ok=True)
+        if empty_summary and (sections_limit is None or edits < sections_limit):
+            note("retry", "the executive summary still holds its placeholder; re-issuing")
+            turn(S.summary_instruction(facts), summary_title)
+            edits += 1
+
     # --- export (free) then verify what was actually produced
     exports = {
         "markdown": backend.export(session_id, out_dir / f"{event_id}-after-action.md", "markdown"),
@@ -306,7 +353,9 @@ def run_event(
     # whose content can be legitimately absent — an event may raise nothing — and that is
     # exactly why a placeholder surviving there once shipped unnoticed.
     checked_sections = [numbered[k] for k in drafted] + ([lessons_title] if lessons_done else [])
-    drift = structural_drift(markdown, expected_headings(carried), checked_sections)
+    if summary_done:
+        checked_sections.append(summary_title)
+    drift = structural_drift(markdown, expected_headings(carried, facts), checked_sections)
     for problem in drift:
         note("drift", problem)
 

@@ -26,7 +26,7 @@ def _apply(event_id: str, store: list | None = None) -> list:
 
 def test_storm_a_opens_its_lessons():
     store = _apply("storm-a")
-    assert len(store) == 3
+    assert len(store) == 4
     assert all(x.status is LessonStatus.OPEN for x in store)
     assert all(x.opened_in_event == "storm-a" for x in store)
 
@@ -35,19 +35,23 @@ def test_storm_b_inherits_storm_a_and_closes_one():
     store = _apply("storm-b", _apply("storm-a"))
     carried = {x.lesson_id: x for x in inherited(store, "storm-b")}
 
-    assert set(carried) == {"LL-A1", "LL-A2", "LL-A3"}
+    assert set(carried) == {"LL-A1", "LL-A2", "LL-A3", "LL-A4"}
     assert carried["LL-A2"].status is LessonStatus.CLOSED
     assert carried["LL-A2"].closed_in_event == "storm-b"
     assert carried["LL-A1"].status is LessonStatus.OPEN
     assert carried["LL-A3"].status is LessonStatus.OPEN
+    # LL-A4 was raised by a consumer report nobody inspected during storm-a, and
+    # storm-b closed it by sending a gang to look.
+    assert carried["LL-A4"].status is LessonStatus.CLOSED
+    assert carried["LL-A4"].closed_sources == ["FLD-0005"]
 
 
 def test_a_closed_item_cites_the_evidence_that_closed_it():
     """Not the evidence that raised it. Those live in different events' logs."""
     store = _apply("storm-b", _apply("storm-a"))
     closed = next(x for x in store if x.lesson_id == "LL-A2")
-    assert closed.closed_sources == ["EL-0004", "EL-0005"]  # storm-b's log
-    assert closed.sources == ["EL-0004", "EL-0007"]  # storm-a's, untouched
+    assert closed.closed_sources == ["TEL-0001", "COM-0002"]  # storm-b's records
+    assert closed.sources == ["TEL-0001", "COM-0003"]  # storm-a's, untouched
     assert closed.closed_in_event == "storm-b"
 
 
@@ -58,7 +62,7 @@ def test_an_item_still_open_records_why_it_is_still_open():
     still_open = next(x for x in store if x.lesson_id == "LL-A1")
     assert still_open.last_reviewed_event == "storm-b"
     assert still_open.carry_note
-    assert still_open.carry_sources == ["EL-0011", "EL-0013"]
+    assert still_open.carry_sources == ["CRW-0006"]
 
 
 def test_storm_b_raises_its_own_item_without_inheriting_it():
@@ -66,9 +70,9 @@ def test_storm_b_raises_its_own_item_without_inheriting_it():
     mine = raised_here(store, "storm-b")
     assert [x.lesson_id for x in mine] == ["LL-B1"]
     assert summarise(store, "storm-b") == {
-        "inherited": 3,
+        "inherited": 4,
         "inherited_open": 2,
-        "inherited_closed": 1,
+        "inherited_closed": 2,
         "raised_here": 1,
     }
 

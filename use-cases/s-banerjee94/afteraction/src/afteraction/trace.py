@@ -29,7 +29,11 @@ from enum import StrEnum
 from .facts import FactSet
 from .models import Corpus
 
-CITATION = re.compile(r"\bEL-\d{4}\b")
+# A citation names one record in one of the six sets, and the prefix carries the grade
+# of evidence with it — TEL is a device, COM is a person on a phone, FLD is a crew on
+# site. Matching all six here rather than a generic \w{3} keeps a mistyped prefix a
+# failure rather than a citation that resolves against nothing.
+CITATION = re.compile(r"\b(?:WEA|TEL|DMG|CRW|COM|FLD)-\d{4}\b")
 ASSESSED_MARK = re.compile(r"\[assessed\]", re.IGNORECASE)
 
 # A statement about what the records do NOT contain. It is not an unsourced assertion

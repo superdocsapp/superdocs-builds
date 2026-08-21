@@ -1,0 +1,11 @@
+entry_id,at,category,device,feeder,consumers_out,note,flag
+TEL-0001,2026-08-11T11:05:00,outage,RTU-NMT-01,11 kV BRK-03,1780,"BRK-03 tripped on earth fault after tree contact in the Nunia canal corridor.",
+TEL-0002,2026-08-11T11:48:00,outage,RTU-NMT-02,11 kV KLT-02,5240,"KLT-02 tripped on overcurrent. Kulti trunk out.",
+TEL-0003,2026-08-11T12:30:00,outage,RTU-NMT-01,11 kV MHS-07,9200,"MHS-07 out after a distribution transformer failed at Mohishila.",
+TEL-0004,2026-08-11T13:10:00,outage,OMS-NMT,,9200,"Peak consumers without supply confirmed at 9,200 across three feeders.",
+TEL-0005,2026-08-11T14:35:00,restoration,RTU-NMT-01,11 kV BRK-03,7420,"BRK-03 re-energised after the Nunia corridor spans were restrung.",
+TEL-0006,2026-08-11T16:20:00,restoration,RTU-NMT-01,11 kV MHS-07,3460,"MHS-07 restored after transformer replacement at Mohishila.",
+TEL-0007,2026-08-11T18:45:00,restoration,RTU-NMT-02,11 kV KLT-02,1140,"KLT-02 restored to the Kulti trunk. Laterals remain out.",
+TEL-0008,2026-08-11T20:10:00,restoration,OMS-NMT,,380,"Remaining outages are individual service connections on the Kulti laterals.",
+TEL-0009,2026-08-11T21:15:00,restoration,OMS-NMT,,0,"Final consumer restored. Event closed.",
+TEL-0010,2026-08-11T21:20:00,assessment,OMS-NMT,,,"Outage management system link remained available for the whole event and consumer counts were recorded continuously.",

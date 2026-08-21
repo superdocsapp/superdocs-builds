@@ -1,0 +1,9 @@
+entry_id,crew_type,home_base,headcount,assigned_to,mobilized_at,released_at,mutual_aid,note,sources
+CRW-0001,line gang,Neamatpur,6,11 kV BRK-03,2026-04-24T18:40:00,2026-04-25T10:00:00,false,"Held at the level crossing until the section was confirmed dead.",TEL-0001;FLD-0001
+CRW-0002,line gang,Neamatpur,6,11 kV MHS-07,2026-04-24T18:55:00,2026-04-25T17:20:00,false,"",TEL-0002
+CRW-0003,line gang,Kulti,5,11 kV KLT-02,2026-04-24T19:30:00,2026-04-25T20:40:00,false,"",TEL-0003
+CRW-0004,tree-cutting gang,Neamatpur,4,11 kV MHS-07,2026-04-24T20:10:00,2026-04-25T14:00:00,false,"Clearing the fallen tree along the Mohishila route before line work could start.",FLD-0004
+CRW-0005,line gang,Sitarampur,5,11 kV STP-05,2026-04-24T20:45:00,,false,"Release not recorded.",TEL-0004
+CRW-0006,line gang,Durgapur,6,11 kV KLT-02,,2026-04-26T11:30:00,true,"Mutual aid from the Durgapur circle. Mobilisation time not recorded.",FLD-0005
+CRW-0007,transformer gang,Asansol,4,11 kV STP-05,2026-04-25T07:00:00,2026-04-26T10:30:00,false,"Transformer replacement at Sitarampur.",DMG-0004
+CRW-0008,line gang,Durgapur,6,11 kV STP-05,,2026-04-26T13:40:00,true,"Second mutual-aid gang, held overnight for flooding at Ward 6. Mobilisation time not recorded.",FLD-0008

@@ -72,3 +72,44 @@ def test_rejecting_returns_the_reason_for_the_model(capsys):
 )
 def test_html_is_rendered_as_readable_prose(html, expected):
     assert _readable(html).strip() == expected
+
+
+# ------------------------------------------------------------------ the prompt
+
+
+def test_the_prompt_is_shown_in_full(capsys):
+    """SuperDocs writes the prose; what this tool controls is the brief.
+
+    A reviewer who sees only the proposed diff is reviewing the answer without the
+    question, so the instruction is printed whole — for the same reason the gate refuses
+    to truncate proposed text.
+    """
+    from afteraction.cli import _echo_prompt
+
+    instruction = "\n".join(f"line {n} of the brief" for n in range(40))
+    _echo_prompt(instruction)
+    printed = capsys.readouterr().out
+
+    assert "prompt sent to SuperDocs (40 lines)" in printed
+    for n in range(40):
+        assert f"line {n} of the brief" in printed
+
+
+def test_prompts_are_off_by_default_and_on_for_the_interactive_gate(capsys):
+    """A timeline instruction runs to a couple of hundred lines: useful when reviewing
+    what was asked, noise when watching a build finish. Someone approving each change by
+    hand is exactly the person who needs the question as well as the answer."""
+    from afteraction.cli import _reporter
+
+    _reporter(False)("prompt", "a long instruction")
+    assert "a long instruction" not in capsys.readouterr().out
+
+    _reporter(True)("prompt", "a long instruction")
+    assert "a long instruction" in capsys.readouterr().out
+
+
+def test_other_stages_still_report_when_prompts_are_off(capsys):
+    from afteraction.cli import _reporter
+
+    _reporter(False)("verify", "37/37 claims traced")
+    assert "37/37 claims traced" in capsys.readouterr().out

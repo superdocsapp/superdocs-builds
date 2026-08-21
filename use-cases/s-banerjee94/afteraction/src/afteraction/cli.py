@@ -49,6 +49,28 @@ def _echo(stage: str, detail: str) -> None:
     typer.echo(f"  {typer.style(f'{stage:<8}', fg=typer.colors.CYAN)} {detail}")
 
 
+def _echo_prompt(instruction: str) -> None:
+    """The instruction, in full, before the change it produces.
+
+    Shown whole rather than summarised, for the same reason the gate shows the whole
+    proposed text: SuperDocs is an AI editor, so what this tool actually controls is the
+    brief. A reviewer who sees only the diff is reviewing the answer without the
+    question, and an instruction hiding past a cut-off is the one worth reading.
+    """
+    width = max(60, min(shutil.get_terminal_size((100, 24)).columns - 6, 110))
+    lines = instruction.splitlines()
+    typer.echo()
+    typer.echo(
+        typer.style(f"  ┌─ prompt sent to SuperDocs ({len(lines)} lines) ", fg=typer.colors.MAGENTA)
+        + typer.style("─" * max(0, width - 44), fg=typer.colors.MAGENTA)
+    )
+    for raw in lines:
+        for line in textwrap.wrap(raw, width=width - 4) or [""]:
+            typer.echo(typer.style(f"  │ {line}", fg=typer.colors.BRIGHT_BLACK))
+    typer.echo(typer.style("  └" + "─" * (width - 3), fg=typer.colors.MAGENTA))
+    typer.echo()
+
+
 def _load_key() -> str:
     """Read the key from the environment, falling back to a local .env.
 
@@ -162,6 +184,26 @@ def _report(result) -> None:
         typer.echo(f"  exported {kind}: {path}")
 
 
+def _reporter(show_prompts: bool):
+    """The on_event callback for one run.
+
+    Prompts are opt-in because a timeline instruction runs to a couple of hundred
+    lines — useful when you are reviewing what was asked, noise when you are
+    watching a build finish. The interactive gate turns them on by itself: someone
+    approving each change by hand is exactly the person who needs the question in
+    front of them as well as the answer.
+    """
+
+    def report(stage: str, detail: str) -> None:
+        if stage == "prompt":
+            if show_prompts:
+                _echo_prompt(detail)
+            return
+        _echo(stage, detail)
+
+    return report
+
+
 @app.command()
 def build(
     event: str = typer.Argument(..., help="event id, e.g. storm-a"),
@@ -171,6 +213,12 @@ def build(
     model_tier: str = typer.Option("core", help="core | turbo | pro | max"),
     store: Path = typer.Option(DEFAULT_STORE, help="carry-forward store"),
     out: Path | None = typer.Option(None, help="output directory"),
+    prompts: bool | None = typer.Option(
+        None,
+        "--prompts/--no-prompts",
+        help="print each instruction before the change it produces "
+             "(on by default with --gate interactive)",
+    ),
 ) -> None:
     """Draft one event's after-action report inside a SuperDocs document."""
     backend = SuperDocsClient(_load_key()) if live else MockSuperDocs()
@@ -185,7 +233,7 @@ def build(
             approver=_gate_for(gate),
             sections_limit=limit,
             model_tier=model_tier,
-            on_event=_echo,
+            on_event=_reporter(gate == "interactive" if prompts is None else prompts),
         )
     finally:
         backend.close()
@@ -197,6 +245,9 @@ def build(
 def demo(
     live: bool = typer.Option(False, "--live", help="use the real SuperDocs API (costs operations)"),
     store: Path = typer.Option(Path("out") / "demo-lessons.json", help="carry-forward store"),
+    prompts: bool = typer.Option(
+        False, "--prompts", help="print each instruction before the change it produces"
+    ),
 ) -> None:
     """Run every event on disk in order, so the carry-forward can be seen working.
 
@@ -228,7 +279,7 @@ def demo(
                 backend,
                 store_path=store,
                 out_dir=Path("out") / event,
-                on_event=_echo,
+                on_event=_reporter(prompts),
             )
         finally:
             backend.close()

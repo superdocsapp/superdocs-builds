@@ -1,0 +1,7 @@
+entry_id,at,category,location,feeder,note,reported_by
+FLD-0001,2026-08-11T11:20:00,damage,Nunia canal corridor,11 kV BRK-03,"Branch contact brought the conductor together. Three spans down in the canal corridor.",Gang 1 supervisor
+FLD-0002,2026-08-11T11:40:00,access,Nunia canal corridor,11 kV BRK-03,"Canal corridor heavily overgrown. Tree-cutting gang required before restringing can start. Corridor last cleared in 2023.",Section engineer
+FLD-0003,2026-08-11T12:15:00,safety,Kulti Road near pole 19,11 kV KLT-02,"Conductor down at low height beside the road. Area cordoned and the section isolated.",Gang 3 supervisor
+FLD-0004,2026-08-11T14:10:00,damage,Kulti section poles 17 to 19,11 kV KLT-02,"Three insulators found cracked while replacing the tilted poles.",Gang 3 supervisor
+FLD-0005,2026-08-11T15:45:00,assessment,Mohishila Bazaar,11 kV MHS-07,"Pole reported by a consumer during the April event inspected. The tree trunk has been removed and the pole is sound with no remedial work required.",Section engineer
+FLD-0006,2026-08-11T20:30:00,safety,All sections,,"All conductor-down sites cleared and released for normal operation.",Safety officer

@@ -52,19 +52,45 @@ def test_counts_agree_with_their_nouns(facts):
         assert not bad, f"{claim.claim_id}: {bad} in {claim.text!r}"
 
 
-def test_log_notes_are_quoted_without_being_re_cased(facts):
-    """The note is the record. A timeline entry quotes it as written."""
-    for claim in facts.for_section(TIMELINE):
-        quoted = claim.text.split(": ", 1)[1]
-        entry = facts.corpus.entry(claim.sources[0])
-        assert entry.note.startswith(quoted[:40])
+def test_record_notes_reach_the_model_exactly_as_written(facts):
+    """The note is the record, so it is handed over unedited.
+
+    The timeline's prose is now written by SuperDocs from a window's raw records, which
+    makes the instruction the place where this property lives. Every note in every
+    window must appear in it verbatim — trimming, re-casing or paraphrasing a note
+    before sending it would alter the record and call the result a quotation.
+    """
+    from afteraction.sections import timeline_instruction
+
+    instruction = timeline_instruction(facts)
+    assert instruction
+    for window in facts.windows:
+        for entry in window.entries:
+            assert entry.note in instruction, f"{entry.entry_id} was altered before being sent"
+
+
+def test_every_window_record_is_offered_with_its_own_id(facts):
+    """A window's records are listed against their ids, so the bullet that comes back
+    can carry every one of them and traceability has something to resolve."""
+    from afteraction.sections import timeline_instruction
+
+    instruction = timeline_instruction(facts)
+    for window in facts.windows:
+        for entry in window.entries:
+            assert f"  {entry.entry_id}  " in instruction
 
 
 def test_proper_nouns_survive_into_the_timeline(facts):
-    """'Durgapur Circle' must never appear as 'durgapur Circle'."""
-    for claim in facts.for_section(TIMELINE):
-        assert "durgapur" not in claim.text
-        assert "burnpur" not in claim.text
+    """'Durgapur circle' must never appear as 'durgapur circle'.
+
+    Grafting a note onto a lead-in by downcasing its first letter is how proper nouns
+    get mangled, and these notes are the record.
+    """
+    from afteraction.sections import timeline_instruction
+
+    instruction = timeline_instruction(facts)
+    assert "durgapur" not in instruction
+    assert "neamatpur" not in instruction
 
 
 def test_large_numbers_are_grouped(facts):

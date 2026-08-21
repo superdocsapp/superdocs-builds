@@ -25,7 +25,7 @@
 
 <!-- block:document -->
 <div style="border-bottom:3px solid #14505f;padding-bottom:0.4rem;margin-bottom:0.9rem;">
-  <p style="margin:0 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;letter-spacing:0.12em;text-transform:uppercase;color:#5b6672;">{{utility}}</p>
+  <p style="margin:0 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;letter-spacing:0.12em;text-transform:uppercase;color:#5b6672;">{{utility}} &middot; {{substation}}</p>
   <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:18pt;font-weight:normal;color:#14505f;">Storm Restoration After-Action Report</h1>
   <p style="margin:0.25rem 0 0;font-family:Georgia,'Times New Roman',serif;font-size:12pt;color:#1b2430;">{{event_name}}</p>
 </div>
@@ -40,6 +40,10 @@
       <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Consumers served</td>
       <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{consumers}}</td>
     </tr>
+    <tr>
+      <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Records reviewed</td>
+      <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{records}}</td>
+    </tr>
   </tbody>
 </table>
 
@@ -48,15 +52,34 @@
     <tr>
       <td style="background-color:#f2f6f8;border-left:3px solid #14505f;padding:9px 12px;font-family:Calibri,'Segoe UI',sans-serif;font-size:9.5pt;color:#3c4753;">
         This report keeps two kinds of statement apart.
-        <b style="color:#14505f;">Observed</b> statements are traceable to a numbered event-log entry and carry that entry in square brackets.
-        <b style="color:#8a5a1e;">Assessed</b> statements are the response team's judgement and carry no log entry because none supports them.
+        <b style="color:#14505f;">Observed</b> statements are traceable to a numbered record and carry that record in square brackets.
+        <b style="color:#8a5a1e;">Assessed</b> statements are the response team's judgement and carry no record because none supports them.
         Where the records cannot answer a question, the report says so rather than estimating.
+        A citation's prefix names the record set it came from: <b>TEL</b> network telemetry, <b>DMG</b> a damage record, <b>CRW</b> a crew record, <b>COM</b> a consumer contact, <b>FLD</b> a crew's report from site, <b>WEA</b> a weather reading.
       </td>
     </tr>
   </tbody>
 </table>
 {{body_html}}
 <!-- /block:document -->
+
+<!--
+  The summary is a real <h2>, not a styled table cell, and that is a functional choice
+  rather than a visual one. The exported markdown becomes "## Executive Summary", which
+  is what the per-section fingerprint in surgical.py splits on and what the placeholder
+  check in trace.py searches under. As a table it would have been invisible to both, and
+  a summary that silently failed to write would have shipped.
+-->
+<!-- block:summary -->
+<h2 style="margin:0 0 0.5rem;padding-bottom:0.25rem;border-bottom:1px solid #c9d4da;font-family:Georgia,'Times New Roman',serif;font-size:12.5pt;font-weight:normal;color:#14505f;">Executive Summary</h2>
+<table style="border-collapse:collapse;width:100%;margin:0 0 1.1rem;">
+  <tbody>
+    <tr>
+      <td style="background-color:#f7fafb;border-left:3px solid #14505f;padding:11px 12px;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.45;color:#1b2430;">Placeholder for the executive summary.</td>
+    </tr>
+  </tbody>
+</table>
+<!-- /block:summary -->
 
 <!-- block:section -->
 <h2 style="margin:1.1rem 0 0.5rem;padding-bottom:0.25rem;border-bottom:1px solid #c9d4da;font-family:Georgia,'Times New Roman',serif;font-size:12.5pt;font-weight:normal;color:#14505f;">{{number}}. {{title}}</h2>
@@ -81,6 +104,10 @@
 <!-- block:curve -->
 <p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for the restoration curve.</p>
 <!-- /block:curve -->
+
+<!-- block:complaints -->
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for the consumer contacts chart.</p>
+<!-- /block:complaints -->
 
 <!-- block:carried_heading -->
 <h3 style="margin:0.7rem 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#14505f;">Carried forward from previous events</h3>

@@ -7,6 +7,8 @@ bad draft instead of exporting it.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from afteraction.mock import MockSuperDocs
@@ -54,15 +56,16 @@ def test_observed_and_assessed_stay_apart_in_the_document(store, tmp_path):
     # a judgement never carries a citation, wherever it ends up
     for line in markdown.splitlines():
         if "[assessed]" in line:
-            assert "EL-" not in line.split("[assessed]")[0][-90:]
+            assert not re.search(r"(WEA|TEL|DMG|CRW|COM|FLD)-\d{4}", line.split("[assessed]")[0][-90:])
 
 
 def test_gaps_reach_the_document_rather_than_being_dropped(store, tmp_path):
     result = _run("storm-a", store, tmp_path)
     markdown = result.exports["markdown"].read_text(encoding="utf-8")
     assert "What the records do not show" in markdown
-    assert "CR-A11" in markdown
-    assert "CC-A06" in markdown
+    assert "CRW-0005" in markdown   # a crew whose release was never logged
+    assert "COM-0005" in markdown   # a consumer contact nobody answered
+    assert "DMG-0006" in markdown   # a pole reported and never inspected
     assert "[no record]" in markdown
 
 
@@ -111,8 +114,8 @@ def test_carry_forward_citations_name_the_event_whose_log_they_mean(store, tmp_p
     markdown = result.exports["markdown"].read_text(encoding="utf-8")
     table = markdown.split("Carried forward", 1)[1].split("Raised by", 1)[0]
 
-    assert "storm-b/EL-0004" in table  # the notification that closed LL-A2
-    assert "storm-b/EL-0005" in table
+    assert "storm-b/TEL-0001" in table  # the outage that started LL-A2's clock
+    assert "storm-b/COM-0002" in table  # the notification that closed it
     for line in table.splitlines():
         if "LL-A" in line:
             assert "storm-" in line.split("[")[-1], f"unqualified citation in: {line}"
@@ -129,7 +132,7 @@ def test_a_bad_draft_fails_the_run(store, tmp_path, mode):
 def test_an_invented_citation_is_named_in_the_report(store, tmp_path):
     result = _run("storm-a", store, tmp_path, backend=MockSuperDocs(misbehave="phantom"))
     assert result.trace.phantoms
-    assert "EL-9999" in result.trace.phantoms[0].offending
+    assert "TEL-9999" in result.trace.phantoms[0].offending
 
 
 def test_rejecting_a_change_leaves_the_placeholder_and_keeps_the_reason(store, tmp_path):
@@ -157,7 +160,7 @@ def test_rejecting_one_change_does_not_discard_the_others(store, tmp_path):
     assert len(seen) > 3
     assert len(backend.rejections) == 1
     assert "Placeholder" in markdown  # the rejected one stayed
-    assert "EL-" in markdown  # the approved ones landed
+    assert re.search(r"(TEL|DMG|CRW|COM|FLD)-\d{4}", markdown)  # the approved ones landed
 
 
 def test_storm_b_opens_storm_as_lessons_because_it_read_them(store, tmp_path):
@@ -166,9 +169,9 @@ def test_storm_b_opens_storm_as_lessons_because_it_read_them(store, tmp_path):
     result = _run("storm-b", store, tmp_path)
 
     assert result.carry == {
-        "inherited": 3,
+        "inherited": 4,
         "inherited_open": 2,
-        "inherited_closed": 1,
+        "inherited_closed": 2,
         "raised_here": 1,
     }
     markdown = result.exports["markdown"].read_text(encoding="utf-8")
@@ -192,7 +195,7 @@ def test_running_the_pair_twice_gives_the_same_register(store, tmp_path):
     _run("storm-a", store, tmp_path)
     second_result = _run("storm-b", store, tmp_path)
     assert store.read_text(encoding="utf-8") == first
-    assert second_result.carry["inherited"] == 3
+    assert second_result.carry["inherited"] == 4
 
 
 def test_small_sample_mode_caps_billable_turns(store, tmp_path):

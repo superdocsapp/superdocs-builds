@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .client import Approver, ProposedChange, Usage, approve_all
+from .sections import SUMMARY_PLACEHOLDER
 
 BULLET = re.compile(r"^-\s+(.*)$")
 SECTION_NAME = re.compile(r"section\s+[“\"]([^”\"]+)[”\"]")
@@ -34,6 +35,10 @@ IMG_TAG = re.compile(r"<img[^>]+>")
 # extracted from prose. An earlier version matched a quoted run of text, which also
 # matched the `"` closing alt="..." and swallowed the instruction into the document.
 CAPTION = re.compile(r"<p><em>(.*?)</em></p>", re.S)
+# One time window in a timeline instruction: "WINDOW 3 - 24 April, 20:00-22:00",
+# followed by its records indented two spaces as "  TEL-0006  note text".
+WINDOW = re.compile(r"^WINDOW\s+\d+\s+\S\s+(?P<label>.+)$", re.M)
+RECORD = re.compile(r"^  (?P<rid>(?:WEA|TEL|DMG|CRW|COM|FLD)-\d{4})  (?P<note>.+)$")
 
 
 class MockSuperDocs:
@@ -162,16 +167,31 @@ class MockSuperDocs:
             # look for the caption only after the tag, never inside its attributes
             caption = CAPTION.search(message, image.end())
             body = image.group(0) + (f"<p><em>{caption.group(1)}</em></p>" if caption else "")
+            named = SECTION_NAME.search(message)
+            section = named.group(1) if named else ""
+            # Two charts now, two placeholders. Picking by section name rather than
+            # assuming the curve keeps the contacts chart from overwriting it.
+            which = "contacts" if "Consumer Contacts" in section else "curve"
+            target = {
+                "curve": "Placeholder for the restoration curve.",
+                "contacts": "Placeholder for the consumer contacts chart.",
+            }[which]
             return [
                 ProposedChange(
-                    change_id="mock-curve",
+                    change_id=f"mock-{which}",
                     operation="edit",
-                    chunk_id=f"{SECTION_NAME.search(message).group(1) if SECTION_NAME.search(message) else ''}|curve",
-                    old_html="Placeholder for the restoration curve.",
+                    chunk_id=f"{section}|{which}",
+                    old_html=target,
                     new_html=body,
-                    explanation="Inserted the restoration curve and its caption.",
+                    explanation=f"Inserted the {which} chart and its caption.",
                 )
             ]
+
+        if SUMMARY_PLACEHOLDER in message:
+            return [self._summary(message)]
+
+        if WINDOW.search(message):
+            return self._timeline(message)
 
         named = SECTION_NAME.search(message)
         section = named.group(1) if named else ""
@@ -209,16 +229,92 @@ class MockSuperDocs:
             )
         return changes
 
+    def _timeline(self, message: str) -> list[ProposedChange]:
+        """One bullet per time window, the way a cooperative model would write them.
+
+        The instruction hands over every record in every window and asks for two
+        sentences and all the citations. The mock does exactly that — it compresses by
+        taking the window's first two notes — so the offline document has the same shape
+        as the live one and the traceability pass reads the same citations on both paths.
+
+        Gaps travel with the timeline instruction but land under a different sub-heading,
+        so they are a second change against a second placeholder rather than more list
+        items appended to the first.
+        """
+        named = SECTION_NAME.search(message)
+        section = named.group(1) if named else ""
+
+        bullets: list[str] = []
+        for label, records in _windows(message):
+            # "AT MOST TWO SENTENCES" is a rule the instruction states, so the mock obeys
+            # it — one sentence from each of the first two records, not both records
+            # whole. A mock that ignored the limit would write four sentences behind one
+            # trailing citation, and the traceability pass would correctly report the
+            # first two as unsourced. That is the check working, not a false alarm.
+            notes = [_first_sentence(note) for _, note in records][:2]
+            ids = ", ".join(rid for rid, _ in records)
+            bullets.append(f"<li><strong>{label}</strong> — {' '.join(notes)} [{ids}]</li>")
+
+        changes = [
+            ProposedChange(
+                change_id="mock-timeline",
+                operation="edit",
+                chunk_id=f"{section}|observed",
+                old_html=f"Placeholder for observed statements in {section}.",
+                new_html="<ul>" + "".join(bullets) + "</ul>",
+                explanation=f"Drafted {len(bullets)} timeline windows.",
+            )
+        ]
+
+        gaps = _buckets(message)["gaps"]
+        if gaps:
+            written = [self._sentence(g, "gaps") for g in gaps]
+            changes.append(
+                ProposedChange(
+                    change_id="mock-timeline-gaps",
+                    operation="edit",
+                    chunk_id=f"{section}|gaps",
+                    old_html=f"Placeholder for gaps in {section}.",
+                    new_html=f"<p>{' '.join(written)}</p>",
+                    explanation=f"Drafted {len(gaps)} declared gap(s).",
+                )
+            )
+        return changes
+
+    def _summary(self, message: str) -> ProposedChange:
+        """The executive summary, written from the document rather than from facts.
+
+        A mock cannot summarise a document it only pretends to hold, so it writes the
+        one honest thing it can: a short paragraph naming the event. What matters for the
+        offline path is that the placeholder is replaced and no citation is invented —
+        the summary is the one part of the report that deliberately carries none.
+        """
+        named = re.search(r"The event is [“\"]([^”\"]+)[”\"]", message)
+        event = named.group(1) if named else "the event"
+        body = (
+            f"<p>This report covers {event} and the restoration that followed it. "
+            "It sets out what the records show, what the response team concluded, and "
+            "where the records do not answer the question.</p>"
+        )
+        return ProposedChange(
+            change_id="mock-summary",
+            operation="edit",
+            chunk_id="Executive Summary|summary",
+            old_html=SUMMARY_PLACEHOLDER,
+            new_html=body,
+            explanation="Drafted the executive summary.",
+        )
+
     def _sentence(self, statement: str, bucket: str) -> str:
         """One drafted sentence, with the citation kept where the instruction put it."""
         text = statement.strip()
         if bucket == "observed" and self.misbehave:
             if self.misbehave == "phantom":
-                text = re.sub(r"\[EL-\d{4}[^\]]*\]", "[EL-9999]", text, count=1)
+                text = re.sub(r"\[(?:WEA|TEL|DMG|CRW|COM|FLD)-\d{4}[^\]]*\]", "[TEL-9999]", text, count=1)
             elif self.misbehave == "foreign":
-                text = re.sub(r"\[EL-\d{4}[^\]]*\]", "[EL-0019]", text, count=1)
+                text = re.sub(r"\[(?:WEA|TEL|DMG|CRW|COM|FLD)-\d{4}[^\]]*\]", "[FLD-0001]", text, count=1)
             elif self.misbehave == "unsourced":
-                text = re.sub(r"\s*\[EL-\d{4}[^\]]*\]", "", text)
+                text = re.sub(r"\s*\[(?:WEA|TEL|DMG|CRW|COM|FLD)-\d{4}[^\]]*\]", "", text)
         if not text.endswith((".", "!", "?")):
             text += "."
         return text[0].upper() + text[1:]
@@ -247,13 +343,17 @@ def _apply(html: str, change: ProposedChange) -> str:
     start, end = _section_bounds(html, section)
     head, body, tail = html[:start], html[start:end], html[end:]
 
-    para = re.compile(r"<p\b([^>]*)>\s*" + re.escape(target) + r"\s*</p>")
+    # A placeholder may live in a paragraph or, for the executive summary, in a shaded
+    # table cell. Either keeps its own tag and styling through the edit, the same way the
+    # live service edits a chunk without restyling it.
+    para = re.compile(r"<(p|td)\b([^>]*)>\s*" + re.escape(target) + r"\s*</\1>")
 
     def swap(match: re.Match[str]) -> str:
+        tag, attrs = match.group(1), match.group(2)
         new = change.new_html or ""
         inner = re.fullmatch(r"<p\b[^>]*>(.*)</p>", new, re.S)
-        # prose keeps the paragraph; a block replacement, such as the curve, takes over
-        return f"<p{match.group(1)}>{inner.group(1)}</p>" if inner else new
+        # prose keeps its own tag; a block replacement, such as a chart, takes over
+        return f"<{tag}{attrs}>{inner.group(1)}</{tag}>" if inner else new
 
     return head + para.sub(swap, body, count=1) + tail
 
@@ -271,11 +371,15 @@ def _section_bounds(html: str, title: str) -> tuple[int, int]:
 
 # The line that opens each bucket in an instruction, upper-cased for matching. One
 # definition, so the splitter and the shape detector below cannot drift apart.
+# Deliberately *not* the words used as headings in the document. When the label and the
+# heading were the same string — "WHAT THE RECORDS DO NOT SHOW" was the heading, verbatim —
+# the model copied the label into the document underneath the heading it already had. A
+# label that shares no wording with a heading gives it nothing to copy.
 _HEADERS = {
-    "observed": "OBSERVED STATEMENTS",
-    "assessed": "ASSESSED STATEMENTS",
-    "gaps": "WHAT THE RECORDS DO NOT SHOW",
-    "raised": "ITEMS RAISED BY",
+    "observed": "STATEMENTS WITH A RECORD",
+    "assessed": "TEAM JUDGEMENTS",
+    "gaps": "DECLARED GAPS",
+    "raised": "NEW ITEMS FROM",
 }
 
 
@@ -296,6 +400,31 @@ def _shapes(message: str) -> dict[str, str]:
             shapes[bucket] = "list" if "bulleted list" in low else "prose"
     return shapes
 
+
+
+def _first_sentence(note: str) -> str:
+    """The first sentence of a record's note, ending in a full stop."""
+    head = re.split(r"(?<=[.!?])\s+", note.strip(), maxsplit=1)[0].strip()
+    return head if head.endswith((".", "!", "?")) else head + "."
+
+
+def _windows(message: str) -> list[tuple[str, list[tuple[str, str]]]]:
+    """Read the time windows back out of a timeline instruction.
+
+    Returns `[(label, [(record_id, note), ...]), ...]` in the order the instruction
+    listed them. Parsing the instruction rather than reaching into `FactSet` keeps the
+    mock honest: it sees exactly what the live service sees, and nothing else.
+    """
+    found: list[tuple[str, list[tuple[str, str]]]] = []
+    for line in message.splitlines():
+        header = WINDOW.match(line)
+        if header:
+            found.append((header.group("label").strip(), []))
+            continue
+        record = RECORD.match(line)
+        if record and found:
+            found[-1][1].append((record.group("rid"), record.group("note").strip()))
+    return [(label, records) for label, records in found if records]
 
 
 def _buckets(message: str) -> dict[str, list[str]]:
