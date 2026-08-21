@@ -224,3 +224,35 @@ def test_committed_measurement_matches_a_fresh_run(swept: SweepResult) -> None:
     assert payload["score"]["precision"] == pytest.approx(fresh.precision)
     assert payload["score"]["recall"] == pytest.approx(fresh.recall)
     assert payload["score"]["expected"] == fresh.expected
+
+
+def test_an_alert_whose_name_is_a_prefix_of_another_is_not_reported_documented() -> None:
+    """`PaymentsApiHighLatency` is a prefix of `PaymentsApiHighLatencyWarning`.
+
+    A plain `in` test reported the warning as documented by the page that only
+    ever names the critical alert, and turned an `orphan-alert` into an
+    `unlinked-runbook` — a finding telling the team to annotate their rule with
+    a page that does not describe it. Nearly-right is the worst shape for this
+    one, because it reads as almost done and is not.
+    """
+    from reconciler.check.coverage import _page_mentioning
+
+    text = {"1001": "PaymentsApiHighLatency fires when p99 latency stays above 800ms."}
+
+    assert _page_mentioning("PaymentsApiHighLatency", text) == "1001"
+    assert _page_mentioning("PaymentsApiHighLatencyWarning", text) is None
+
+
+def test_a_bounded_match_still_finds_a_name_next_to_punctuation() -> None:
+    """The boundary must not cost the ordinary case: a name in a heading, in a
+    sentence ending in a full stop, or inside a code span is still the alert
+    being documented."""
+    from reconciler.check.coverage import _page_mentioning
+
+    for wording in (
+        "Runbook: ManifestWorkerStalled",
+        "When ManifestWorkerStalled fires, drain the queue.",
+        "See `ManifestWorkerStalled`.",
+        "ManifestWorkerStalled",
+    ):
+        assert _page_mentioning("ManifestWorkerStalled", {"1008": wording}) == "1008"

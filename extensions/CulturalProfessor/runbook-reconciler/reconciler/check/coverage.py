@@ -25,6 +25,7 @@ decision.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 
 from reconciler.claims import Finding
@@ -175,9 +176,19 @@ def _page_mentioning(alert_name: str, page_text: dict[str, str]) -> str | None:
     documenting it; a page that merely discusses the same service is not, and
     telling a team "you already have a runbook for this" when they do not is the
     kind of wrong that gets a tool switched off.
+
+    Which is why this is bounded rather than `alert_name in text`. Alert names
+    nest: an estate with `PaymentsApiHighLatency` and
+    `PaymentsApiHighLatencyWarning` has the first as a prefix of the second, and
+    a plain substring test reports the warning as documented by the page that
+    only ever mentions the critical one. The finding then tells the team to add
+    a `runbook_url` annotation pointing at a page that does not describe their
+    alert — worse than the `orphan-alert` it displaced, because it reads as
+    nearly done.
     """
+    bounded = re.compile(rf"\b{re.escape(alert_name)}\b")
     for page_id, text in sorted(page_text.items()):
-        if alert_name in text:
+        if bounded.search(text):
             return page_id
     return None
 
