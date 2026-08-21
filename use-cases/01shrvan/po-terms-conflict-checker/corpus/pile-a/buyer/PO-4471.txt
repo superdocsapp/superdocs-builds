@@ -1,0 +1,28 @@
+NORTHWIND INDUSTRIAL LTD
+PURCHASE ORDER PO-4471
+
+To:     Kessler Components GmbH
+Date:   9 February 2026
+Goods:  Precision machined housings, drawing NW-2231 rev C, quantity 400.
+
+This order is placed on Northwind's standard conditions of purchase, which apply to the
+exclusion of any other terms.
+
+12. LIABILITY
+Supplier's aggregate liability under this order shall be unlimited for any breach.
+
+13. DELIVERY
+Delivery shall be DDP Buyer's premises, Sheffield, time being of the essence.
+
+14. PAYMENT
+Payment terms are net 30 days from receipt of a valid invoice.
+
+15. WARRANTY
+Goods shall be free from defects in materials and workmanship for 24 months from delivery
+and shall conform to specification NW-2231 rev C.
+
+16. GOVERNING LAW
+This order is governed by the laws of England and Wales.
+
+17. TITLE AND RISK
+Title and risk in the goods pass to Buyer on delivery to the address stated above.
