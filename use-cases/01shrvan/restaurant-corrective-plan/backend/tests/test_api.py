@@ -106,3 +106,52 @@ def test_export_rejects_md_with_cause_and_fix() -> None:
         == "export failed: format 'md' is not valid. Use 'doc', 'docx', 'html', 'markdown', 'pdf', 'txt'."
     )
 
+
+def test_docx_is_refused_rather_than_silently_returning_html() -> None:
+    """A format SuperDocs accepts is not automatically one this endpoint produces.
+
+    This endpoint renders the plan locally, so it can only make HTML. Returning HTML bytes to a
+    caller that asked for docx would be a capability that is present and broken — the caller would
+    save a .docx that Word cannot open. Refusing, and naming where docx *is* available, is the
+    honest behaviour.
+    """
+    draft = client().post("/api/draft", json=sample_payload()).json()
+    decisions = {item["code"]: "approved" for item in draft["plan"]["items"]}
+
+    response = client().post(
+        "/api/export",
+        json={
+            "plan": draft["plan"],
+            "violations": sample_payload()["violations"],
+            "decisions": decisions,
+            "format": "docx",
+        },
+    )
+
+    assert response.status_code == 501
+    detail = response.json()["detail"]
+    assert "'docx' is not available here" in detail
+    assert "SUPERDOCS_API_KEY" in detail, "the error names the fix, not only the cause"
+    assert response.headers["content-type"].startswith("application/json")
+
+
+def test_html_export_still_succeeds_and_is_html() -> None:
+    draft = client().post("/api/draft", json=sample_payload()).json()
+    decisions = {item["code"]: "approved" for item in draft["plan"]["items"]}
+
+    response = client().post(
+        "/api/export",
+        json={
+            "plan": draft["plan"],
+            "violations": sample_payload()["violations"],
+            "decisions": decisions,
+            "format": "html",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/html")
+    body = response.text
+    for code in (item["code"] for item in draft["plan"]["items"]):
+        assert code in body, f"{code} is missing from the document sent to the department"
+

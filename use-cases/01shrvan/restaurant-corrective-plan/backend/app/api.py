@@ -16,6 +16,15 @@ from .template import build_plan_template_html
 from .verifier import verify_coverage
 
 
+# What this endpoint can actually render without a SuperDocs session. Deliberately narrower than
+# VALID_EXPORT_FORMATS, which is what the SuperDocs API accepts.
+OFFLINE_EXPORT_FORMATS = frozenset({"html"})
+
+
+def _named(formats: frozenset[str] | set[str]) -> str:
+    return ", ".join(f"'{value}'" for value in sorted(formats))
+
+
 class DraftRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
 
@@ -73,6 +82,21 @@ def create_app() -> FastAPI:
             raise HTTPException(
                 status_code=400,
                 detail=f"export failed: format '{request.format}' is not valid. Use {valid}.",
+            )
+        # A format SuperDocs supports is not automatically a format *this endpoint* produces.
+        # Rendering happens locally here, so only HTML is genuinely available on the offline path.
+        # Accepting 'docx' and returning HTML bytes would be a capability that is present and
+        # broken, which is worse than one that is honestly absent.
+        if request.format not in OFFLINE_EXPORT_FORMATS:
+            raise HTTPException(
+                status_code=501,
+                detail=(
+                    f"export failed: this endpoint renders the plan locally and produces "
+                    f"{_named(OFFLINE_EXPORT_FORMATS)} only, so '{request.format}' is not "
+                    f"available here. SuperDocs produces {_named(VALID_EXPORT_FORMATS)} from an "
+                    f"approved session — set SUPERDOCS_API_KEY and export through the live "
+                    f"drafting path for that."
+                ),
             )
         review_items = tuple(
             ReviewItem(item=item, decision=request.decisions.get(item.code, "pending"))

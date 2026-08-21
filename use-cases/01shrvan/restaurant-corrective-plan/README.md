@@ -47,12 +47,22 @@ The sample restaurant, inspection report, and health department are fictional. T
 
 ## Screenshot
 
-Screenshot placeholder: capture the review screen after the final demo pass.
+![The review screen: three cited codes, three separate responses, three owners](docs/review-screen.png)
+
+The strip under the title is the **coverage ledger** — every cited code with whether it has been
+answered individually. It is the first thing on screen because it is the one thing that decides
+whether this document can be sent at all.
+
+Each response leads with its **code plate**, which carries the code and its state (`AWAITING`,
+`CLEARED`, `REJECTED`). Approving or rejecting one response leaves the others exactly as they were.
 
 ## Limitations
 
 - Offline drafting is deterministic and intentionally conservative; it is a fallback, not a claim that no model is needed.
-- Offline export currently returns HTML. DOCX/PDF export is available through the live SuperDocs smoke path.
+- **`/api/export` produces HTML only.** Asking it for `docx` returns `501` naming where DOCX is
+  available, rather than handing back HTML bytes under a `.docx` name — a capability may be honestly
+  absent from a path, but should never be present and broken. DOCX and PDF come from SuperDocs
+  itself, through the live drafting path.
 - The verifier rejects copied actions, copied owners, invented codes, empty reports, and boilerplate actions, but very short vague actions such as "Will be addressed" are a documented limitation to tighten next.
 - This is not an 8D root-cause investigation and does not claim a health department will accept the plan without human review.
 
