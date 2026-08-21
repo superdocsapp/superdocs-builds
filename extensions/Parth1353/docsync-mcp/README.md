@@ -196,8 +196,10 @@ spends operations.
   `approved` always present because omitting it is a bare 422.
 - **Multipart upload with `open_mode=new_focused`**, never `upload-base64`.
 - **Session document roster with `include_html=true`** to read each document's
-  own body back for verification. Free, and it avoids the export path, which has
-  no `document_id` and returns whichever document is focused.
+  own body back for verification. Free, and it avoids the export path — which as
+  of 21 August *accepts* a `document_id`, returns `200`, and then ignores it,
+  handing back whichever document is focused. Verified with a two-document
+  session: asked for the non-focused one, got the focused one.
 - **Markdown export** to write the edited document back into the repository.
 
 ---
@@ -219,6 +221,18 @@ The one that shaped the design. Against the example ADR:
 A bypassed job replies *"✅ I've completed the requested change"*, returns a
 populated `document_changes.updated_html`, and **persists nothing**. The
 document is untouched and no change was ever offered for review.
+
+**Re-measured on 21 August, after SuperDocs' August fix sprint.** The bypass is
+**fixed** — nine multi-item instructions, nine correct pauses. But the milder
+half of the same problem is still there: **one of four two-item instructions
+proposed a change for only one of the two items** (three-item turns were
+complete, 2 of 2).
+
+So the design below stands, on new evidence rather than old. It was originally
+forced by the bypass; it is now justified by the drop rate. I have deliberately
+*not* relaxed it on the strength of a fix verified in a single afternoon — an
+edit that silently goes missing is exactly what this tool exists to catch, and
+one in four is not a rate worth designing around.
 
 So docsync sends **one changed fact per document per round**. A document with
 three changed facts takes three rounds against the same session; `docsync apply`
