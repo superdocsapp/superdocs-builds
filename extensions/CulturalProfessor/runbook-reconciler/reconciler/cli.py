@@ -148,8 +148,18 @@ def _cmd_propose(args: argparse.Namespace) -> int:
             spent = propose_all(register, client, model_tier=args.tier)
         print(
             f"\n{spent['operations']} operation(s) spent across {spent['pages']} page(s). "
-            f"`rr review` is the next step; nothing has been written to any document yet."
+            f"{spent['worded']} of {spent['requested']} finding(s) came back with usable wording."
         )
+        # The wording layer is the one non-deterministic thing here, and saying
+        # so at the moment it under-delivers beats a limitations section nobody
+        # reads. Re-running retries only what still lacks wording.
+        if spent["worded"] < spent["requested"]:
+            missing = spent["requested"] - spent["worded"]
+            print(
+                f"{missing} still have none — either the wording was refused as unsafe or "
+                f"the service declined it. Re-running `rr propose --yes` retries only those."
+            )
+        print("`rr review` is the next step; nothing has been written to any document yet.")
     return 0
 
 

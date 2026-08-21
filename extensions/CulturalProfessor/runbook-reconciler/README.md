@@ -77,7 +77,7 @@ against whatever the implementation happened to find.
 | Claims it could not check | 8 — counted separately, never folded into "verified" |
 | Paid operations for all of the above | **0** |
 
-Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 279 passing.
+Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 281 passing.
 
 *Demo recording: not yet linked. It rides the submission form rather than this repository,
 and there is no screenshot here rather than a staged one — every output in this README is
@@ -109,7 +109,7 @@ There are three scripts, and they are for three different things:
 
 | | |
 | --- | --- |
-| `./rr test` | the suite — 279 tests, no key, no network |
+| `./rr test` | the suite — 281 tests, no key, no network |
 | `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
 | `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 

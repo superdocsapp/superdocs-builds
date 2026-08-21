@@ -23,12 +23,13 @@ from reconciler.edit import (
     build_instruction,
     build_passage_document,
     deny,
+    propose_all,
     propose_for_page,
     read_back_passages,
 )
 from reconciler.register import Register
 from reconciler.superdocs import SuperDocs
-from tests.stub_superdocs import Stub
+from tests.stub_superdocs import Stub, default_edit
 
 
 @pytest.fixture
@@ -462,3 +463,60 @@ def test_a_parked_batch_survives_a_restart(tmp_path: Path, client: SuperDocs) ->
 
         reopened.settle_batch(proposal.job_id)
         assert reopened.open_batches() == []
+
+
+# ------------------------------------------------------ what a run reports --
+
+
+def _seed_for_proposal(register, pairs) -> None:
+    for finding, claim in pairs:
+        register.upsert_claim(claim)
+        register.upsert_finding(finding)
+
+
+def test_propose_all_reports_what_came_back_not_what_was_asked(
+    client: SuperDocs, stub: Stub, tmp_path: Path
+) -> None:
+    """The wording layer is the one non-deterministic thing here.
+
+    `propose_all` used to return the length of its own work list under the name
+    `proposals`, so a run where the service worded one finding of two reported
+    two — and reported it most confidently on exactly the runs where the layer
+    had done worst. `requested` and `worded` are separate numbers because they
+    are separate facts, and the gap between them is the measurement.
+    """
+    stub.edit_fn = lambda doc, msg: [c for c in default_edit(doc, msg) if "300" in c["old_html"]]
+
+    with Register(tmp_path / "register.db") as register:
+        _seed_for_proposal(register, [LATENCY, QUEUE])
+        spent = propose_all(register, client)
+
+    assert spent["requested"] == 2
+    assert spent["worded"] == 1, "only the queue-depth passage came back"
+    assert spent["operations"] == 2, "two pages, one operation each"
+
+
+def test_propose_all_counts_only_findings_it_actually_sent(
+    client: SuperDocs, tmp_path: Path
+) -> None:
+    """A comment-only finding is never sent, so it is not in `requested`.
+
+    Otherwise the ratio a re-run is judged on can never reach one, and a number
+    that cannot reach its own success value teaches people to ignore it.
+    """
+    macro = pair(
+        "alert:LabelPrinterQueueDepth:threshold",
+        "300",
+        "500",
+        "queue holds more than 300 jobs",
+        editable=False,
+        page_id="1004",
+    )
+
+    with Register(tmp_path / "register.db") as register:
+        _seed_for_proposal(register, [LATENCY, macro])
+        spent = propose_all(register, client)
+
+    assert spent["requested"] == 1
+    assert spent["worded"] == 1
+    assert spent["operations"] == 1, "the comment-only page never opened a session"

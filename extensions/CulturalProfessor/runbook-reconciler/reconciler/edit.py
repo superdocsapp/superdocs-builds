@@ -271,6 +271,21 @@ def propose_all(register: Any, client: SuperDocs, model_tier: str | None = None)
     Findings that already carry a proposal are skipped, which is what makes this
     safe to re-run after a crash: the register is the record of what has been
     paid for.
+
+    ## The two counts, and why they are two
+
+    `requested` is how many findings were sent for wording; `worded` is how many
+    came back with a replacement that survived `_sane`. They are not the same
+    number and the gap between them is the honest measurement of the one
+    non-deterministic layer in this project — the same batch of five has
+    returned 1, then 4, then 4.
+
+    This used to report `len(queue)` under the name `proposals`, which is the
+    size of the work list rather than of the result: it read as "five proposals
+    made" on a run that produced one, and it read that way *most loudly* on the
+    runs where the wording layer had done worst. Re-running retries only what
+    still lacks wording, so a caller that can see both numbers can see the
+    convergence; a caller shown only the queue length cannot see anything.
     """
     queue = [f for f in register.review_queue() if not f.proposed and f.page_id]
     by_page: dict[str, list[tuple[Finding, Claim]]] = {}
@@ -282,11 +297,14 @@ def propose_all(register: Any, client: SuperDocs, model_tier: str | None = None)
 
     spent = 0
     pages = 0
+    requested = 0
+    worded = 0
     for page_id, items in sorted(by_page.items()):
         proposal = propose_for_page(client, page_id, items, model_tier=model_tier)
         spent += proposal.operations
         if proposal.operations:
             pages += 1
+        requested += len(items) - len(proposal.skipped)
         for item in proposal.proposals:
             register.record_proposal(
                 finding_id=item.finding_id,
@@ -299,7 +317,13 @@ def propose_all(register: Any, client: SuperDocs, model_tier: str | None = None)
                 proposed=item.proposed,
                 explanation=item.explanation,
             )
-    return {"operations": spent, "pages": pages, "proposals": len(queue)}
+            worded += 1
+    return {
+        "operations": spent,
+        "pages": pages,
+        "requested": requested,
+        "worded": worded,
+    }
 
 
 def _map_changes(

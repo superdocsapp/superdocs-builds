@@ -236,7 +236,13 @@ class Server:
             return {
                 "operations_spent": spent["operations"],
                 "pages": spent["pages"],
-                "detail": "worded, not written. approve then apply.",
+                "findings_sent": spent["requested"],
+                "findings_worded": spent["worded"],
+                "detail": (
+                    "worded, not written. approve then apply. A finding sent that came "
+                    "back unworded has no replacement text and cannot be applied; "
+                    "calling propose again retries only those."
+                ),
             }
 
     def _approve(self, arguments: dict[str, Any]) -> dict[str, Any]:
