@@ -132,6 +132,57 @@ def test_the_retry_is_bounded_to_one_pass(store, tmp_path):
     assert any("Consumer Communications" in d for d in result.drift)
 
 
+def test_a_chart_that_did_not_land_is_retried_and_lands(store, tmp_path):
+    """The live failure: the curve edit strayed into the neighbouring section, section 7
+    kept its placeholder, and the run failed on surgical while nothing mentioned the
+    missing chart. The chart sections were outside both the placeholder sweep and the
+    retry because they are not in SECTION_TITLES."""
+    backend = MockSuperDocs(stall="7. Restoration Curve")
+    result = _run("storm-a", store, tmp_path, backend=backend)
+
+    assert result.retried == ["Restoration Curve"]
+    assert result.ok
+    assert "Placeholder for the restoration curve" not in result.exports["markdown"].read_text(
+        encoding="utf-8"
+    )
+
+
+def test_a_contacts_chart_that_did_not_land_is_retried_and_lands(store, tmp_path):
+    """Both chart sections, not just the first one."""
+    backend = MockSuperDocs(stall="8. Consumer Contacts")
+    result = _run("storm-a", store, tmp_path, backend=backend)
+
+    assert result.retried == ["Consumer Contacts"]
+    assert result.ok
+
+
+def test_a_chart_placeholder_surviving_the_retry_is_reported(store, tmp_path):
+    """Bounded at one pass here too: a chart that fails twice fails the run rather than
+    exporting a report with a placeholder where the reader expects a picture."""
+
+    class CurveNeverLands(MockSuperDocs):
+        def chat(self, session_id, message, **kwargs):
+            # the curve's alt text, which no other instruction carries — matching on
+            # "restoration curve" also caught the timeline and lessons briefs
+            if "Restoration curve for " in message:
+                return {"response": "no change"}
+            return super().chat(session_id, message, **kwargs)
+
+    result = _run("storm-a", store, tmp_path, backend=CurveNeverLands())
+
+    assert result.retried == ["Restoration Curve"]
+    assert not result.ok
+    assert any("Restoration Curve" in d for d in result.drift)
+
+
+def test_a_chart_that_lands_first_time_is_not_retried(store, tmp_path):
+    """The sweep must not re-issue a section that is already written — a second chart
+    turn is a second billable operation for a picture that is already in the document."""
+    result = _run("storm-a", store, tmp_path)
+
+    assert result.retried == []
+    assert result.ok
+
 # ------------------------------------------------------------------ surgical precision
 
 

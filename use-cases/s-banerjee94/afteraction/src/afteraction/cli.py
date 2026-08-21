@@ -64,9 +64,13 @@ def _echo_prompt(instruction: str) -> None:
         typer.style(f"  ┌─ prompt sent to SuperDocs ({len(lines)} lines) ", fg=typer.colors.MAGENTA)
         + typer.style("─" * max(0, width - 44), fg=typer.colors.MAGENTA)
     )
+    # The brief is the thing being read here, so it wears a readable colour. It was
+    # BRIGHT_BLACK, which is dark grey and close to invisible on a black terminal — the
+    # frame is chrome and can stay quiet, but the text inside it is the point.
+    rail = typer.style("  │ ", fg=typer.colors.MAGENTA)
     for raw in lines:
         for line in textwrap.wrap(raw, width=width - 4) or [""]:
-            typer.echo(typer.style(f"  │ {line}", fg=typer.colors.BRIGHT_BLACK))
+            typer.echo(rail + typer.style(line, fg=typer.colors.WHITE))
     typer.echo(typer.style("  └" + "─" * (width - 3), fg=typer.colors.MAGENTA))
     typer.echo()
 
@@ -142,10 +146,15 @@ def _gate_for(name: str):
 
 
 def _report(result) -> None:
+    """One line per check, each carrying its own verdict, then the run's.
+
+    The run verdict used to be printed against the traceability line, so a run that
+    failed the surgical check read as "FAIL 37/37 claims traced (100%), 0 flagged" —
+    a failure marker beside a perfect result, pointing at the wrong check.
+    """
     trace = result.trace
-    verdict = OK if result.ok else BAD
     typer.echo()
-    typer.echo(f"  {verdict}  {trace.summary()}")
+    typer.echo(f"  {OK if trace.clean else BAD}  {trace.summary()}")
     for flagged in trace.flagged[:8]:
         typer.echo(
             typer.style(f"    [{flagged.verdict}] ", fg=typer.colors.RED)
@@ -182,6 +191,20 @@ def _report(result) -> None:
     typer.echo(f"  {result.edits} edit turns, {result.seconds:.1f}s, {cost}")
     for kind, path in result.exports.items():
         typer.echo(f"  exported {kind}: {path}")
+
+    failed = [
+        name
+        for name, bad in (
+            ("traceability", not trace.clean),
+            ("shape", bool(result.drift)),
+            ("surgical", result.surgical is not None and not result.surgical.clean),
+        )
+        if bad
+    ]
+    typer.echo(
+        f"  {OK if result.ok else BAD}  "
+        + ("run passed" if result.ok else f"run failed on: {', '.join(failed)}")
+    )
 
 
 def _reporter(show_prompts: bool):

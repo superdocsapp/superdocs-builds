@@ -232,12 +232,23 @@ def run_event(
         note("budget", f"stopped at {edits} edits; {len(skipped)} sections left undrafted")
 
     # --- the charts, rendered here and placed by SuperDocs
+    #
+    # A chart turn is an edit like any other, and one that is approved but does not land
+    # leaves the placeholder sitting where the chart should be. These two sections are
+    # not in SECTION_TITLES, so they were outside the placeholder check and outside the
+    # retry — a live run put the curve edit into the neighbouring section and exported a
+    # report with "Placeholder for the restoration curve" still in it. They are tracked
+    # here so they are checked and re-issued alongside everything else.
+    image_turns: list[tuple[str, str]] = []
+
     curve_title = S.heading_for("curve")
     if sections_limit is None or edits < sections_limit:
         curve_path = render_curve(facts, out_dir / "restoration-curve.png")
         url = backend.upload_image(session_id, f"{event_id}-restoration-curve.png", curve_path)
         note("curve", f"rendered and uploaded: {url[:60]}")
-        turn(S.curve_instruction(url, facts), curve_title)
+        curve_brief = S.curve_instruction(url, facts)
+        turn(curve_brief, curve_title)
+        image_turns.append((curve_title, curve_brief))
         edits += 1
 
     # The contacts chart exists only when consumers contacted the utility. An event
@@ -249,7 +260,9 @@ def run_event(
         if chart and instruction:
             url = backend.upload_image(session_id, f"{event_id}-consumer-contacts.png", chart)
             note("chart", f"contacts chart rendered and uploaded: {url[:60]}")
-            turn(S.complaints_instruction(url, facts), complaints_title)
+            chart_brief = S.complaints_instruction(url, facts)
+            turn(chart_brief, complaints_title)
+            image_turns.append((complaints_title, chart_brief))
             edits += 1
 
     # --- lessons raised by this event
@@ -270,18 +283,36 @@ def run_event(
     check = backend.export(session_id, scratch, "markdown")
     still_empty = unfilled(
         check.read_text(encoding="utf-8"),
-        [numbered[k] for k in drafted] + ([lessons_title] if lessons_done else []),
+        [numbered[k] for k in drafted]
+        + [title for title, _ in image_turns]
+        + ([lessons_title] if lessons_done else []),
     )
     check.unlink(missing_ok=True)
     # A section whose change a person rejected is empty *because they said so*. Re-issuing
     # it would quietly overturn the decision the gate exists to record, so a refusal ends
     # the matter and only an unexplained empty section is retried.
     stalled = [k for k in drafted if numbered[k] in still_empty and k not in refused]
+    retried_sections: list[str] = []
     for key in stalled:
         if sections_limit is not None and edits >= sections_limit:
             break
         note("retry", f"{SECTION_TITLES[key]} still holds its placeholder; re-issuing")
         turn(S.instruction_for(facts, key), numbered[key])
+        retried_sections.append(SECTION_TITLES[key])
+        edits += 1
+
+    # A chart carries no citations to reject, so there is no refusal to respect here —
+    # an empty chart section only ever means the image did not land.
+    for title, brief in image_turns:
+        if title not in still_empty:
+            continue
+        if sections_limit is not None and edits >= sections_limit:
+            break
+        note("retry", f"{title} still holds its placeholder; re-issuing")
+        turn(brief, title)
+        # reported without its number, so the retry list reads the same way for every
+        # section whether it came from SECTION_TITLES or from a chart
+        retried_sections.append(title.split(". ", 1)[-1])
         edits += 1
 
     # The lessons section gets the same treatment. It was left out of the first version of
@@ -352,7 +383,11 @@ def run_event(
     # The lessons section is checked alongside the numbered ones. It is the only section
     # whose content can be legitimately absent — an event may raise nothing — and that is
     # exactly why a placeholder surviving there once shipped unnoticed.
-    checked_sections = [numbered[k] for k in drafted] + ([lessons_title] if lessons_done else [])
+    checked_sections = (
+        [numbered[k] for k in drafted]
+        + [title for title, _ in image_turns]
+        + ([lessons_title] if lessons_done else [])
+    )
     if summary_done:
         checked_sections.append(summary_title)
     drift = structural_drift(markdown, expected_headings(carried, facts), checked_sections)
@@ -372,7 +407,7 @@ def run_event(
         drift=drift,
         carry=counts,
         skipped=skipped,
-        retried=[SECTION_TITLES[k] for k in stalled] + (["Lessons Learned"] if stalled_lessons else []),
+        retried=retried_sections + (["Lessons Learned"] if stalled_lessons else []),
         surgical=surgical,
         seconds=time.monotonic() - started,
         operations=(
