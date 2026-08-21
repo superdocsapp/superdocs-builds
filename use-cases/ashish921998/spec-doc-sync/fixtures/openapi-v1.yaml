@@ -1,0 +1,20 @@
+openapi: 3.1.0
+info: {title: Nimbus Billing API, version: 1.4.0}
+paths:
+  /invoices:
+    post:
+      operationId: createInvoice
+      summary: Create an invoice
+      description: Creates a draft invoice for a customer.
+components:
+  schemas:
+    Invoice:
+      type: object
+      properties:
+        customer_id:
+          type: string
+          description: Stable account identifier.
+        memo:
+          type: string
+          description: Free-form invoice note.
+

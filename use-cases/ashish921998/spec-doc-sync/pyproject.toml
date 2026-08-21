@@ -1,0 +1,24 @@
+[project]
+name = "spec-doc-sync"
+version = "0.1.0"
+description = "Keep human-written API reference docs aligned with OpenAPI changes through SuperDocs review"
+requires-python = ">=3.11"
+dependencies = ["httpx>=0.28,<1", "pyyaml>=6,<7"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.4,<9"]
+
+[project.scripts]
+spec-doc-sync = "spec_doc_sync.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/spec_doc_sync"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["src"]

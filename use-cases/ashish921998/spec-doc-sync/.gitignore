@@ -1,0 +1,7 @@
+.venv/
+.pytest_cache/
+__pycache__/
+.spec-doc-sync-state.json
+plan.json
+.env
+

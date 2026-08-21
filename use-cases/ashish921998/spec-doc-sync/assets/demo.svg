@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Spec Doc Sync verified demo</title>
+  <desc id="desc">Terminal-style output showing four specification changes, two exhaustive rename updates, one byte-identical untouched page, and the stopping rule.</desc>
+  <rect width="1200" height="630" fill="#f1f2eb"/>
+  <rect x="64" y="56" width="1072" height="518" rx="16" fill="#17201b"/>
+  <circle cx="106" cy="96" r="8" fill="#f27059"/><circle cx="134" cy="96" r="8" fill="#f7c851"/><circle cx="162" cy="96" r="8" fill="#75c98b"/>
+  <text x="96" y="162" fill="#d7ff43" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="24">$ make demo</text>
+  <text x="96" y="230" fill="#f8faf6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">No-spend preview</text>
+  <text x="405" y="230" fill="#aeb8b0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">4 spec changes → 5 proposals</text>
+  <text x="96" y="296" fill="#f8faf6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">Rename search proof</text>
+  <text x="405" y="296" fill="#75c98b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">all 2 occurrences updated</text>
+  <text x="96" y="362" fill="#f8faf6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">Untouched page</text>
+  <text x="405" y="362" fill="#75c98b" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">authentication.md · byte-identical</text>
+  <text x="96" y="428" fill="#f8faf6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">Second invocation</text>
+  <text x="405" y="428" fill="#f7c851" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="27">stopped · no retrigger</text>
+  <line x1="96" y1="476" x2="1104" y2="476" stroke="#455049"/>
+  <text x="96" y="524" fill="#aeb8b0" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="19">SuperDocs review mode: async → poll → item decisions → export</text>
+</svg>
