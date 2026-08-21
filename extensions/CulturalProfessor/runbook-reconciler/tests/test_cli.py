@@ -267,3 +267,43 @@ def test_the_rule_tally_separates_a_bad_rule_from_a_messy_page(tmp_path: Path) -
         assert tally["resource-identifier"]["rejection_rate"] == 1.0
         # Sorted worst-first, so the rule worth looking at is the one you see.
         assert register.decisions_by_rule()[0]["rule_id"] == "resource-identifier"
+
+
+def test_blame_names_the_commit_behind_a_finding(
+    scratch_register: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The question a reader asks after "is this wrong" is "since when"."""
+    assert main(["check", "--blame"]) == 1
+    out = capsys.readouterr().out
+
+    assert "drifted :" in out
+    assert out.count("evidence:") >= out.count("drifted :")
+
+
+def test_check_without_blame_runs_no_git_at_all(
+    scratch_register: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """One subprocess per finding is imperceptible on thirteen and is not on a
+    first sweep finding four hundred. The free layer's claim is that it costs
+    nothing, so attribution is asked for rather than assumed."""
+    import subprocess
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError(f"rr check ran a subprocess: {args!r}")
+
+    monkeypatch.setattr(subprocess, "run", forbidden)
+    assert main(["check"]) == 1
+
+
+def test_a_finding_whose_evidence_is_a_page_is_not_blamed(
+    scratch_register: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """`confluence:page:1005` is not a path and has no history here. It prints
+    without attribution rather than with a guess."""
+    from reconciler.cli import _drifted_in
+
+    class Fake:
+        evidence_file = "confluence:page:1005"
+        evidence_line = 1
+
+    assert _drifted_in(Fake()) is None

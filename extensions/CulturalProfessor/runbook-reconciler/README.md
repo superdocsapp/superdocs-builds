@@ -107,7 +107,7 @@ naming the page's subject service, and the page-level pass then condemned the en
 as a runbook for a service that no longer exists. A page-level false positive does not cost
 one finding; it costs the page.
 
-Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 294 passing.
+Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 306 passing.
 
 *Demo recording: not yet linked. It rides the submission form rather than this repository,
 and there is no screenshot here rather than a staged one — every output in this README is
@@ -127,6 +127,7 @@ honest claim is that the method is sound, measured in both directions, and small
 
 ```bash
 ./rr check                 # free: no model, no network unless Confluence is configured
+./rr check --blame         # ...and name the commit each drift arrived in
 ./rr propose               # prices the work in operations — spends nothing
 ./rr propose --yes         # the only command in this project that can be charged for
 ./rr review                # decide finding by finding; writes only what you approved
@@ -141,7 +142,7 @@ There are three scripts, and they are for three different things:
 
 | | |
 | --- | --- |
-| `./rr test` | the suite — 294 tests, no key, no network |
+| `./rr test` | the suite — 306 tests, no key, no network |
 | `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
 | `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 
@@ -191,6 +192,30 @@ already sitting in the queue. Muted claims are reported **unverifiable** from th
 sweep, never as correct; deleting the line starts checking them again. That escape hatch
 has been read on every sweep since stage 1 and until now there was no way to reach it
 except by opening the YAML.
+
+### Since when, not just what
+
+Every finding names the file and the line that proves it, which answers what the estate
+says. The next question a reader asks is **when did this stop being true**, because a
+rename from two years ago and a typo from last week are the same finding and completely
+different work.
+
+`INFRA_REPO_PATHS` are git checkouts, so the change feed is already on disk. `rr check
+--blame` runs `git blame` on each evidence line:
+
+```
+  [page 1001] job:rollback-production
+      observed: no CI job named 'rollback-production'; the declared jobs are …
+      evidence: fixtures/infra/service-repos/payments-api/.github/workflows/deploy.yml:36
+      drifted : 6f11c8d · CulturalProfessor · 2026-08-15 · fixtures: synthetic estate…
+```
+
+Opt-in, because it is one subprocess per finding: imperceptible on thirteen, not on a
+first sweep over a real estate finding four hundred, and the free layer's claim is that it
+costs nothing. Everything about it fails soft — a path outside a repository, a line nobody
+has committed, a machine with no `git` — and the finding prints exactly as it did before.
+A checker that refused to report drift because it could not work out whose fault it was
+would have its priorities backwards.
 
 ### The claim register is the spine
 
@@ -396,6 +421,7 @@ path puts page text into one.
 ```
 reconciler/
   register.py      the claim register — the spine both halves read
+  history.py       which commit each drift arrived in, from git blame
   claims.py        claim identity, derived from text and heading path, never position
   readers/         ground truth: alerts, k8s, ci, terraform, catalog, escalation, dashboards
   estate.py        entity resolution — exact matches only, no fuzzy fallback

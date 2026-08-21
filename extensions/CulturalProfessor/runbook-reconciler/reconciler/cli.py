@@ -45,14 +45,14 @@ def _cmd_check(args: argparse.Namespace) -> int:
     print(f"reading {describe_source(source)}\n")
     with Register(config.register_path) as register:
         result = Sweep(config, register, source=source).run(mode="check")
-        _report(result, verbose=args.verbose)
+        _report(result, verbose=args.verbose, blame=args.blame)
     _close(source)
     # Non-zero when there is drift, so CI can gate on it. `--exit-zero` is for
     # the pre-commit nudge, which must never block a commit.
     return 0 if args.exit_zero or not result.contradictions else 1
 
 
-def _report(result: SweepResult, verbose: bool = False) -> None:
+def _report(result: SweepResult, verbose: bool = False, blame: bool = False) -> None:
     if result.coverage_skipped:
         print("coverage: not computed — this sweep was narrowed to specific pages, and a")
         print("          coverage number over part of a space is a wrong coverage number")
@@ -69,6 +69,13 @@ def _report(result: SweepResult, verbose: bool = False) -> None:
             print(f"      says {_short(finding.detail)}")
             print(f"      observed: {finding.observed}")
             print(f"      evidence: {finding.evidence_file}:{finding.evidence_line or 1}")
+            if blame:
+                # The question a reader asks after "is this wrong" is "since
+                # when", because a rename from two years ago and a typo from
+                # last week are the same finding and completely different work.
+                commit = _drifted_in(finding)
+                if commit:
+                    print(f"      drifted : {commit.describe()}")
             if "comment-only" in finding.tags:
                 print("      not editable by this tool: it will post a comment for a human")
 
@@ -82,6 +89,23 @@ def _report(result: SweepResult, verbose: bool = False) -> None:
     stages = " · ".join(f"{name} {seconds:.2f}s" for name, seconds in result.stages.items())
     print(f"stages: {stages}")
     print(f"operations spent: {result.operations}")
+
+
+def _drifted_in(finding):
+    """The commit behind a finding's evidence line, where there is one.
+
+    Estate-level findings and the ones whose evidence is the page itself cite
+    `confluence:page:NNNN`, which is not a path and has no history here. They
+    print without attribution rather than with a guess.
+    """
+    from reconciler.history import blame
+
+    if not finding.evidence_file or ":" in finding.evidence_file.split("/")[0]:
+        return None
+    path = Path(finding.evidence_file)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    return blame(path, finding.evidence_line or 1)
 
 
 def _short(text: str, limit: int = 110) -> str:
@@ -252,7 +276,7 @@ def _cmd_sweep(args: argparse.Namespace) -> int:
             result = Sweep(config, register, source=source).run(
                 mode="sweep", page_ids=args.pages or None
             )
-            _report(result, verbose=args.verbose)
+            _report(result, verbose=args.verbose, blame=args.blame)
 
             if not args.review:
                 pages = _pages_awaiting_proposal(register)
@@ -531,6 +555,13 @@ _AUTO = (
         "help": "decide every finding the same way, without a terminal (for CI)",
     },
 )
+_BLAME = (
+    ("--blame",),
+    {
+        "action": "store_true",
+        "help": "name the commit that introduced each drift (one git blame per finding)",
+    },
+)
 _CORPUS = (
     ("--corpus",),
     {
@@ -543,6 +574,7 @@ _OPTIONS: dict[str, list[tuple[tuple[str, ...], dict]]] = {
     "check": [
         _VERBOSE,
         _CORPUS,
+        _BLAME,
         (
             ("--exit-zero",),
             {"action": "store_true", "help": "always exit 0, for a non-blocking pre-commit hook"},
@@ -551,6 +583,7 @@ _OPTIONS: dict[str, list[tuple[tuple[str, ...], dict]]] = {
     "sweep": [
         _VERBOSE,
         _CORPUS,
+        _BLAME,
         _AUTO,
         (
             ("--pages",),
