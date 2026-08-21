@@ -168,12 +168,21 @@ curl -X POST http://localhost:8001/run -H "Content-Type: application/json" \
   one that contains it. If no embedding provider is configured, the literal
   half still works and the UI says why the other half is missing.
 - **Documents** (`/documents`) — upload files (creates a new run, or appends to the
-  selected one), delete documents, and open a document in-app to read its
-  current text and its **edit history**: every applied fix with before/after
+  selected one), select existing documents and **Analyze selected** to start a
+  fresh run over them without re-uploading anything, delete documents, and open
+  a document in-app to read its current text and its **edit history**: every applied fix with before/after
   content, the reviewer's note, and any approved fix that was blocked or failed.
   Calls the Ingestor API (`POST /upload`, `GET /documents`, `GET /documents/{id}`,
   `GET /documents/{id}/history`, `GET /documents/{id}/content`,
-  `POST /documents/{id}/reingest`, `DELETE /documents/{id}`).
+  `POST /runs/from-documents`, `POST /documents/{id}/reingest`,
+  `DELETE /documents/{id}`).
+
+  **Re-running costs no upload and no embeddings.** `POST /runs/from-documents`
+  copies the selected documents and their chunks — vectors included — into a
+  new run, reusing the same `superdocs_doc_id`, so nothing is re-uploaded to
+  SuperDocs and nothing is re-embedded. Documents are copied rather than shared
+  because `documents.run_id` is a single foreign key and retrieval is scoped by
+  it; a run has to own its documents to search them.
 
   **One SuperDocs session per document.** A session holds a single active
   document, so uploading into a shared session *replaces* whatever it already
@@ -195,18 +204,25 @@ curl -X POST http://localhost:8001/run -H "Content-Type: application/json" \
 - **Notifications** — a top-right toast stack (`notifications/NotificationContext.tsx`,
   `components/ToastStack.tsx`) surfaces upload, delete, approve, and reject
   outcomes without blocking the page.
+- **Activity panel** (bottom-right) — shows anything in flight, not only
+  analysis runs. Runs are discovered by polling, but a one-off operation
+  (upload, re-ingest, delete, apply, starting a run) is known only to the tab
+  that began it, so those register as tasks via `withTask(...)` in
+  `runs/RunActivityContext.tsx`. Without them the panel went quiet during
+  exactly the operations that take longest, and the UI looked frozen while the
+  backend was busy.
 
 ## Test Suite
 
 | Layer | Tests | Count | Requires |
 |-------|-------|-------|----------|
 | `backend/tests/core/` | Shared foundation (models, mocks, text projection, migrations) | 78 | nothing |
-| `backend/tests/ingestor/` | File Ingestor (watcher, session-per-document, chunk order) | 30 | nothing |
+| `backend/tests/ingestor/` | File Ingestor (watcher, session-per-document, chunk order, re-run) | 39 | nothing |
 | `backend/tests/analyzer/` | Analysis Core (parser, finder, verifier, search) | 86 | nothing |
 | `backend/tests/editor/` | Edit Engine (byte Judge, apply write-back, history, missing docs) | 52 | nothing |
 | `frontend/` | Frontend (tsc --noEmit + vite build) | build check | node |
 
-**All 246 Python tests pass with `MockLLMProvider` — no live API keys needed.**
+**All 255 Python tests pass with `MockLLMProvider` — no live API keys needed.**
 
 Run from `backend/`:
 ```bash

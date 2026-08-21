@@ -5,6 +5,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form, Response
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from html import escape
 from uuid import UUID, uuid4
 from typing import Optional
@@ -100,6 +101,112 @@ async def run_once(files: list[str] | None = None):
         job_id = await Dispatcher.dispatch_ingestion(run_id, document_ids)
         return {"run_id": str(run_id), "document_ids": [str(d) for d in document_ids], "job_id": str(job_id)}
     return {"run_id": str(run_id), "document_ids": [], "message": "no documents ingested"}
+
+
+class RerunRequest(BaseModel):
+    document_ids: list[str]
+
+
+@app.post("/runs/from-documents")
+async def run_existing_documents(body: RerunRequest):
+    """Start a new analysis run over documents that are already ingested.
+
+    Re-uploading a file only to analyse it again is wasted work: SuperDocs
+    already holds the document, and we already hold its chunks and their
+    embeddings. This creates a run that reuses both.
+
+    Documents are *copied* into the new run rather than shared, because
+    `documents.run_id` is a single foreign key and retrieval is scoped by it —
+    a run has to own its documents to be able to search them. The copy carries
+    the existing embeddings across, so a re-run costs no embedding calls, and
+    the same `superdocs_doc_id`, so a fix approved in the new run edits the
+    same real document.
+    """
+    if not body.document_ids:
+        raise HTTPException(400, "Select at least one document to analyse")
+
+    # Named parameters per id rather than an array literal: asyncpg binds a
+    # Postgres array from a Python list, not from a "{a,b}" string, and
+    # building the string by hand would also be an injection seam.
+    try:
+        ids = {f"id{i}": str(UUID(v)) for i, v in enumerate(body.document_ids)}
+    except (ValueError, AttributeError):
+        raise HTTPException(400, "document_ids must be UUIDs")
+
+    sources = await exec(
+        f"""
+        SELECT id, filename, file_hash, session_id, superdocs_doc_id
+          FROM documents
+         WHERE id IN ({", ".join(":" + k for k in ids)})
+         ORDER BY filename
+        """,
+        ids,
+    )
+    if not sources:
+        raise HTTPException(404, "None of those documents exist")
+
+    # documents is UNIQUE (run_id, file_hash): the same file ingested under two
+    # earlier runs would collide when copied into one new run. Keep the first.
+    unique: dict[str, dict] = {}
+    for row in sources:
+        unique.setdefault(row["file_hash"], row)
+    skipped = len(sources) - len(unique)
+
+    run_id = uuid4()
+    await insert(
+        "runs",
+        {
+            "id": str(run_id),
+            "trigger": "rerun",
+            "corpus_ref": ", ".join(sorted(r["filename"] for r in unique.values()))[:200],
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc),
+        },
+    )
+
+    new_ids: list[UUID] = []
+    for row in unique.values():
+        new_doc_id = uuid4()
+        await insert(
+            "documents",
+            {
+                "id": str(new_doc_id),
+                "run_id": str(run_id),
+                # Same SuperDocs document and session: this is the same real
+                # document, not a new one. Nothing is re-uploaded.
+                "superdocs_doc_id": row["superdocs_doc_id"],
+                "session_id": row["session_id"],
+                "filename": row["filename"],
+                "file_hash": row["file_hash"],
+                "created_at": datetime.now(timezone.utc),
+            },
+        )
+        # Copied in SQL so the embedding vectors never round-trip through
+        # Python — and so the new run starts with a warm cache instead of
+        # re-embedding text that has not changed.
+        await exec(
+            """
+            INSERT INTO chunks
+                   (id, document_id, chunk_id, ordinal, html, text_content,
+                    content_hash, embedding)
+            SELECT gen_random_uuid(), :new_did, chunk_id, ordinal, html,
+                   text_content, content_hash, embedding
+              FROM chunks
+             WHERE document_id = :old_did
+            """,
+            {"new_did": str(new_doc_id), "old_did": str(row["id"])},
+        )
+        new_ids.append(new_doc_id)
+
+    job_id = await Dispatcher.dispatch_ingestion(run_id, new_ids)
+
+    return {
+        "run_id": str(run_id),
+        "document_ids": [str(d) for d in new_ids],
+        "documents": len(new_ids),
+        "skipped_duplicates": skipped,
+        "job_id": str(job_id),
+    }
 
 
 @app.post("/upload")

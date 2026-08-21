@@ -1666,3 +1666,43 @@ a {
   margin: 0;
   color: var(--color-text-muted);
 }
+
+/* ---------- Document selection + bulk analyse ---------- */
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  flex-wrap: wrap;
+}
+
+.table-toolbar-count {
+  font-size: 12px;
+}
+
+.select-cell {
+  width: 34px;
+  padding-right: 0;
+}
+
+.select-cell input {
+  cursor: pointer;
+  margin: 0;
+}
+
+.data-table tr.is-selected {
+  background: var(--color-surface-muted, #f4f3f0);
+}
+
+/* A non-run operation in the activity panel: no link, it has no log page. */
+.active-runs-item-static {
+  cursor: default;
+}
+
+.spinner-sm {
+  width: 11px;
+  height: 11px;
+  border-width: 2px;
+}

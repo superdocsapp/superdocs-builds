@@ -4,6 +4,7 @@ import {
   documentContentUrl,
   listDocuments,
   reingestDocument,
+  runExistingDocuments,
   uploadDocuments,
   type DocumentSummary,
 } from "../api";
@@ -103,19 +104,34 @@ function DocumentTable({
   onView,
   onReingest,
   reingesting,
+  selected,
+  onToggle,
+  onToggleAll,
 }: {
   documents: DocumentSummary[];
   onDelete: (id: string) => void;
   onView: (doc: DocumentSummary) => void;
   onReingest: (doc: DocumentSummary) => void;
   reingesting: string | null;
+  selected: Set<string>;
+  onToggle: (id: string) => void;
+  onToggleAll: () => void;
 }) {
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const allSelected = documents.length > 0 && documents.every((d) => selected.has(d.id));
 
   return (
     <table className="data-table">
       <thead>
         <tr>
+          <th className="select-cell">
+            <input
+              type="checkbox"
+              checked={allSelected}
+              onChange={onToggleAll}
+              aria-label="Select all documents"
+            />
+          </th>
           <th>Filename</th>
           <th>Sections</th>
           <th>Hash</th>
@@ -125,7 +141,15 @@ function DocumentTable({
       </thead>
       <tbody>
         {documents.map((doc) => (
-          <tr key={doc.id}>
+          <tr key={doc.id} className={selected.has(doc.id) ? "is-selected" : ""}>
+            <td className="select-cell">
+              <input
+                type="checkbox"
+                checked={selected.has(doc.id)}
+                onChange={() => onToggle(doc.id)}
+                aria-label={`Select ${doc.filename}`}
+              />
+            </td>
             <td className="doc-filename-cell">
               <Icon name="documents" size={14} />
               <span>{doc.filename}</span>
@@ -206,13 +230,16 @@ function DocumentTable({
 }
 
 export function DocumentsPage() {
-  const { selectedRunId } = useRuns();
+  const { selectedRunId, setSelectedRunId, refresh } = useRuns();
   const { notify } = useNotifications();
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [viewing, setViewing] = useState<DocumentSummary | null>(null);
   const [reingesting, setReingesting] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [analyzing, setAnalyzing] = useState(false);
+  const { trackRun, withTask } = useRunActivity();
 
   const load = () => {
     setLoading(true);
@@ -230,11 +257,61 @@ export function DocumentsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRunId]);
 
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    setSelected((prev) =>
+      prev.size === documents.length ? new Set() : new Set(documents.map((d) => d.id))
+    );
+  }
+
+  async function handleAnalyzeSelected() {
+    const ids = documents.filter((d) => selected.has(d.id)).map((d) => d.id);
+    if (ids.length === 0) return;
+    const names = documents.filter((d) => selected.has(d.id)).map((d) => d.filename);
+
+    setAnalyzing(true);
+    try {
+      const res = await withTask("Starting analysis", `${ids.length} document(s)`, () =>
+        runExistingDocuments(ids)
+      );
+      notify(
+        "Analysis started",
+        `${res.documents} document${res.documents === 1 ? "" : "s"} · run ${res.run_id.slice(0, 8)}` +
+          (res.skipped_duplicates
+            ? ` · ${res.skipped_duplicates} duplicate file${res.skipped_duplicates === 1 ? "" : "s"} skipped`
+            : ""),
+        "info"
+      );
+      trackRun(res.run_id, names.join(", "));
+      setSelectedRunId(res.run_id);
+      setSelected(new Set());
+      refresh();
+    } catch (err) {
+      const message = errorMessage(err);
+      setError(message);
+      notify("Could not start analysis", message, "error");
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
   async function handleDelete(id: string) {
     const doc = documents.find((d) => d.id === id);
     try {
-      await deleteDocument(id);
+      await withTask("Deleting document", doc?.filename, () => deleteDocument(id));
       setDocuments((docs) => docs.filter((d) => d.id !== id));
+      setSelected((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
       notify("Document deleted", doc?.filename, "success");
     } catch (err) {
       const message = errorMessage(err);
@@ -246,7 +323,9 @@ export function DocumentsPage() {
   async function handleReingest(doc: DocumentSummary) {
     setReingesting(doc.id);
     try {
-      const res = await reingestDocument(doc.id);
+      const res = await withTask("Re-ingesting document", doc.filename, () =>
+        reingestDocument(doc.id)
+      );
       notify(
         "Document re-ingested",
         `${res.filename} is linked to SuperDocs again (${res.chunks} sections). ` +
@@ -287,13 +366,36 @@ export function DocumentsPage() {
         </div>
       )}
       {documents.length > 0 && (
-        <DocumentTable
-          documents={documents}
-          onDelete={handleDelete}
-          onView={setViewing}
-          onReingest={handleReingest}
-          reingesting={reingesting}
-        />
+        <>
+          <div className="table-toolbar">
+            <span className="text-muted table-toolbar-count">
+              {selected.size > 0
+                ? `${selected.size} selected`
+                : `${documents.length} document${documents.length === 1 ? "" : "s"}`}
+            </span>
+            {/* Analysing what is already ingested needs no upload: SuperDocs
+                still holds the documents and we still hold their chunks. */}
+            <button
+              className="btn btn-primary"
+              onClick={handleAnalyzeSelected}
+              disabled={selected.size === 0 || analyzing}
+              title="Start a new analysis run over the selected documents — nothing is re-uploaded"
+            >
+              <Icon name="review" size={14} />{" "}
+              {analyzing ? "Starting…" : "Analyze selected"}
+            </button>
+          </div>
+          <DocumentTable
+            documents={documents}
+            onDelete={handleDelete}
+            onView={setViewing}
+            onReingest={handleReingest}
+            reingesting={reingesting}
+            selected={selected}
+            onToggle={toggle}
+            onToggleAll={toggleAll}
+          />
+        </>
       )}
 
       {viewing && (

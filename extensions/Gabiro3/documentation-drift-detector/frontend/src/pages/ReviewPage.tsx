@@ -17,6 +17,7 @@ import { MetricsPanel } from "../components/MetricsPanel";
 import { Icon } from "../components/Icon";
 import { RunPicker } from "../components/RunPicker";
 import { useRuns } from "../runs/RunContext";
+import { useRunActivity } from "../runs/RunActivityContext";
 import { useNotifications } from "../notifications/NotificationContext";
 
 function errorMessage(err: unknown): string {
@@ -26,6 +27,7 @@ function errorMessage(err: unknown): string {
 export function ReviewPage() {
   const { selectedRunId } = useRuns();
   const { notify } = useNotifications();
+  const { withTask } = useRunActivity();
   const [findings, setFindings] = useState<Finding[]>([]);
   const [cost, setCost] = useState<CostStage[]>([]);
   const [totalOps, setTotalOps] = useState(0);
@@ -68,7 +70,9 @@ export function ReviewPage() {
 
   const handleApprove = async (id: string, feedback?: string) => {
     try {
-      const res = await approveFinding(id, feedback);
+      const res = await withTask("Approving finding", undefined, () =>
+        approveFinding(id, feedback)
+      );
       // Approving now schedules the edit. The toast reports what was actually
       // set in motion rather than promising an apply that used to never come.
       notify(
@@ -96,7 +100,11 @@ export function ReviewPage() {
 
   const handleReingest = async (finding: Finding) => {
     try {
-      const res = await reingestDocument(finding.document_id);
+      const res = await withTask(
+        "Re-ingesting document",
+        finding.filename || undefined,
+        () => reingestDocument(finding.document_id)
+      );
       notify(
         "Document re-ingested",
         `${res.filename} is linked to SuperDocs again (${res.chunks} sections). ` +
@@ -113,7 +121,9 @@ export function ReviewPage() {
     if (!selectedRunId) return;
     setApplying(true);
     try {
-      const res = await applyApproved(selectedRunId);
+      const res = await withTask("Applying approved fixes", undefined, () =>
+        applyApproved(selectedRunId)
+      );
       const applied = res.counts["APPLIED"] ?? 0;
       const blocked =
         (res.counts["NEEDS_ESCALATION"] ?? 0) + (res.counts["ALARM"] ?? 0);

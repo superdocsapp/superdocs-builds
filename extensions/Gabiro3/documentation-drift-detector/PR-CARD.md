@@ -95,7 +95,15 @@ findings.
 **7. Its cost is counted.**
 Every SuperDocs operation and token is written to an append-only trace and
 aggregated per stage in a cost panel. "Cheap" is a number here, not an
-adjective.
+adjective. Re-analysing an existing corpus spends neither an upload nor an
+embedding call, because the run reuses the document and its vectors.
+
+**8. It never looks idle while it is working.**
+The activity panel reports anything in flight, not just analysis runs. Runs are
+discovered by polling, but a one-off operation — upload, re-ingest, delete,
+approve, apply — is known only to the tab that started it, so those register
+explicitly. Otherwise the UI falls silent during precisely the operations that
+take longest.
 
 ---
 
@@ -121,6 +129,14 @@ deviation in the build.
 Ingest of a whole corpus: upload, hash-diff so an update costs like an update,
 per-document durable identity, and a documents view with per-document content,
 edit history and re-ingest.
+
+Documents already ingested can be **re-analysed without re-uploading**: select
+them and start a run. `POST /runs/from-documents` copies the selected documents
+and their chunks — embedding vectors included — into a new run, reusing the
+same `superdocs_doc_id`. Nothing is sent to SuperDocs and nothing is
+re-embedded. They are copied rather than shared because `documents.run_id` is a
+single foreign key and retrieval is scoped by it: a run has to own its
+documents to search them.
 
 Uses `POST /v1/documents/upload-base64`,
 `GET /v1/sessions/{id}/documents`, `POST /v1/sessions/{id}/documents/open`,
@@ -154,7 +170,7 @@ Postgres `jobs` table rather than a message queue:
 
 | Service | Port | Owns |
 |---|---|---|
-| Ingestor | 8001 | watch, upload, documents, history, re-ingest |
+| Ingestor | 8001 | watch, upload, documents, history, re-ingest, re-run |
 | Analyzer | 8002 | findings, search, metrics, cost, run logs, stop/resume |
 | Editor / Review | 8003 | review, approve/reject, apply, export |
 

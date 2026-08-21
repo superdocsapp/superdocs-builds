@@ -13,9 +13,21 @@ function elapsedSince(iso: string): string {
 }
 
 export function ActiveRunsPanel() {
-  const { activeRuns, panelCollapsed, togglePanel } = useRunActivity();
+  const { activeRuns, tasks, panelCollapsed, togglePanel } = useRunActivity();
 
-  if (activeRuns.length === 0) return null;
+  const total = activeRuns.length + tasks.length;
+  if (total === 0) return null;
+
+  // Analysis is the headline when a run is going; otherwise name the work
+  // actually happening, so "Working" never appears with nothing to explain it.
+  const heading =
+    activeRuns.length > 0
+      ? tasks.length > 0
+        ? "Working"
+        : "Analyzing"
+      : tasks.length === 1
+        ? tasks[0].label
+        : "Working";
 
   return (
     <aside
@@ -24,14 +36,31 @@ export function ActiveRunsPanel() {
       <button type="button" className="active-runs-header" onClick={togglePanel}>
         <span className="active-runs-header-left">
           <span className="spinner" aria-hidden="true" />
-          Analyzing
-          <span className="badge badge-neutral active-runs-count">{activeRuns.length}</span>
+          {heading}
+          <span className="badge badge-neutral active-runs-count">{total}</span>
         </span>
         <Icon name={panelCollapsed ? "chevron-up" : "chevron-down"} size={15} />
       </button>
 
       {!panelCollapsed && (
         <ul className="active-runs-list">
+          {/* One-off operations first: they are the ones the user just
+              triggered and is waiting on. */}
+          {tasks.map((task) => (
+            <li key={task.id}>
+              <div className="active-runs-item active-runs-item-static">
+                <span className="spinner spinner-sm" aria-hidden="true" />
+                <div className="active-runs-item-body">
+                  <p className="active-runs-item-title">{task.label}</p>
+                  <p className="active-runs-item-meta text-muted">
+                    {task.detail ? `${task.detail} · ` : ""}
+                    {elapsedSince(task.startedAt)}
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))}
+
           {activeRuns.map((run) => (
             <li key={run.id}>
               <Link

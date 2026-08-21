@@ -175,6 +175,28 @@ export async function getDocumentHistory(documentId: string): Promise<DocumentHi
   return fetchJson<DocumentHistory>(`${INGESTOR_BASE}/documents/${documentId}/history`);
 }
 
+export interface RerunResult {
+  run_id: string;
+  document_ids: string[];
+  documents: number;
+  skipped_duplicates: number;
+  job_id: string;
+}
+
+/** Start a new analysis run over documents that are already ingested. */
+export async function runExistingDocuments(documentIds: string[]): Promise<RerunResult> {
+  const r = await fetch(`${INGESTOR_BASE}/runs/from-documents`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ document_ids: documentIds }),
+  });
+  if (!r.ok) {
+    const body = await r.text();
+    throw new Error(`${r.status}: ${body.slice(0, 300)}`);
+  }
+  return r.json();
+}
+
 export interface ReingestResult {
   document_id: string;
   filename: string;
