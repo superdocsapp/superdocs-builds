@@ -1,0 +1,95 @@
+<h1>Installation Scope of Work</h1>
+<p><em>What will be built, how it is designed, and who does what.</em></p>
+<p class="pack-mark"><strong>INTERNAL — NOT FOR CUSTOMER RELEASE</strong></p>
+<p>Service order SO-40188 &middot; circuit
+NS-ETH-40188-DUB &middot; Acme Manufacturing Holdings Ltd</p>
+<hr/>
+
+<h2>1. As-designed configuration</h2>
+<p>The diagram below is generated from the order record. It shows
+1 Gbps Ethernet Private Line between Acme Northbank Works and
+Acme Docklands Data Hall with None — single path.</p>
+
+<pre class="mermaid">
+flowchart LR
+  %% design:bandwidth=1 Gbps
+  %% design:diversity=single
+  %% design:circuit=NS-ETH-40188-DUB
+  subgraph A["Acme Northbank Works"]
+    ACE["Customer equipment<br/>1000BASE-LX single-mode LC"]
+    ACPE["Nokia 7210 SAS-Sx<br/>A-end NTU"]
+  end
+  subgraph B["Acme Docklands Data Hall"]
+    BCPE["Nokia 7210 SAS-Sx<br/>B-end NTU"]
+    BCE["Customer equipment<br/>1000BASE-LX single-mode LC"]
+  end
+  ACE ---|"1000BASE-LX single-mode LC"| ACPE
+  BCPE ---|"1000BASE-LX single-mode LC"| BCE
+  subgraph CORE["Supplier core"]
+    R1["Route A<br/>single path — no protection"]
+  end
+  ACPE ==>|"1 Gbps"| R1
+  R1 ==>|"1 Gbps"| BCPE
+  classDef risk stroke:#c0392b,stroke-width:2px;
+  class R1 risk;
+  CORE -.- CID["Circuit NS-ETH-40188-DUB"]
+</pre>
+<p><em>As-designed: 1 Gbps Ethernet Private Line between Acme Northbank Works and Acme Docklands Data Hall, single path — an outage on Route A is a service outage.</em></p>
+
+<h2>2. Design summary</h2>
+<table>
+<tr><th>Circuit ID</th><td>NS-ETH-40188-DUB</td></tr>
+<tr><th>Bandwidth</th><td>1 Gbps</td></tr>
+<tr><th>Committed information rate</th><td>1 Gbps</td></tr>
+<tr><th>Handoff</th><td>1000BASE-LX single-mode LC</td></tr>
+<tr><th>MTU</th><td>9000</td></tr>
+<tr><th>VLAN mode</th><td>802.1Q tagged, transparent</td></tr>
+<tr><th>Route diversity</th><td>None — single path</td></tr>
+<tr><th>Protection</th><td>None — single path</td></tr>
+<tr><th>CPE</th><td>2 × Nokia 7210 SAS-Sx</td></tr>
+<tr><th>CPE managed by supplier</th><td>Yes</td></tr>
+</table>
+
+<h2>3. Supplier scope</h2>
+<ul>
+<li>Provide and install 2 × Nokia 7210 SAS-Sx at the
+locations identified in the site survey.</li>
+<li>Terminate the access fibre and present 1000BASE-LX single-mode LC at each end.</li>
+<li>Configure the circuit to 1 Gbps with MTU 9000.</li>
+<li>Implement None — single path and None — single path.</li>
+<li>Complete the acceptance test plan and produce the results pack.</li>
+<li>Hand over to service on 16 February 2026.</li>
+</ul>
+
+<h2>4. Customer scope</h2>
+<ul>
+<li>Provide access to Acme Northbank Works and Acme Docklands Data Hall within the agreed
+access hours.</li>
+<li>Provide rack space and power as recorded in the readiness checklist.</li>
+<li>Nominate a technical contact for cutover: Dervla Ó Ríordáin
+(infrastructure@acme-manufacturing.example).</li>
+<li>Confirm acceptance within 5 days of the results pack.</li>
+</ul>
+
+<h2>5. Programme</h2>
+<table>
+<tr><th>Site survey</th><td>08 December 2025</td></tr>
+<tr><th>Installation</th><td>02 February 2026</td></tr>
+<tr><th>Cutover window</th><td>22:00–04:00, any weeknight, 5 working days notice</td></tr>
+<tr><th>Ready for service</th><td>16 February 2026</td></tr>
+</table>
+
+
+<h2>6. Internal build notes</h2>
+<p>Single fibre entry at Northbank confirmed by desktop survey. Duct from the footway chamber is congested; if the survey finds no spare subduct this becomes a 6-week civils job and the RFS date will move.</p>
+<p><strong>Risk to the committed date:</strong> Medium. The committed date assumes no civils at the A-end. Dublin City Council road-opening licences are running at 5 weeks.</p>
+<p>Wholesale circuit WSL-DUB-88213 at
+USD 2,079.00 per month
+(50.5% margin at the ordered price).</p>
+<p>Escalation: Delivery desk, delivery@northstar-connectivity.example then Head of Service Delivery, +353 1 555 0111.</p>
+
+
+<hr/>
+<p><small>Generated from order record SO-40188
+(fingerprint 5074e01701af5232) for the internal pack. Every value in this
+document comes from that one record; nothing here was typed twice.</small></p>

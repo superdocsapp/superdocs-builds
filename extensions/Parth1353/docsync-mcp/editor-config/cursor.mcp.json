@@ -1,0 +1,15 @@
+{
+  "_comment": [
+    "Copy to .cursor/mcp.json in your repository (project scope), or to ~/.cursor/mcp.json",
+    "for every project. Cursor uses the same 'mcpServers' key as Claude Code.",
+    "",
+    "docsync reads SUPERDOCS_API_KEY from the .env beside your docsync.yaml, so no key",
+    "belongs in this file."
+  ],
+  "mcpServers": {
+    "docsync": {
+      "command": "docsync",
+      "args": ["serve", "--registry", ".", "--max-operations", "20"]
+    }
+  }
+}
