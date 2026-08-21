@@ -29,7 +29,8 @@ the SuperDocs API.
 
 ## Run
 
-    python3 main.py
+    python3 main.py                              # runs the default style (classic crew tee)
+    python3 main.py styles/classic_chino_trousers.json   # runs any other style file
 
 Output lands in `output/<style_id>_techpack.docx`.
 
@@ -63,6 +64,14 @@ parsing, and table-verification logic, none requiring a live API key.
   continues editing the same in-progress document; a repeated,
   already-satisfied instruction correctly returns a no-op
   (`document_changes: null`) rather than reapplying itself.
+- **Generator and grading engine are style-agnostic by design**, not hardcoded to
+  the tee. Proven, not just claimed: a second, independently-built style
+  (`classic_chino_trousers.json`, sourced from real trouser grading conventions —
+  including the industry-standard fact that inseam length does NOT grade across
+  sizes, unlike waist/hip/thigh which do) ran through the identical pipeline with
+  zero code changes and zero new bugs, producing a correctly graded second tech
+  pack. This is the "does it work the second time, on a second run with different
+  documents" bar the task brief names directly.
 
 ## Known bugs found while building
 

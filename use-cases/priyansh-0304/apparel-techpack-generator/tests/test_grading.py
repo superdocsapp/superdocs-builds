@@ -70,3 +70,17 @@ def test_different_base_size_still_grades_correctly():
     # Now M is one step above the S base
     assert table["Chest Width"]["S"] == 20.0
     assert table["Chest Width"]["M"] == 21.0
+
+def test_trouser_inseam_does_not_grade_real_style_data():
+    # Regression test using the actual submitted trouser style, not
+    # synthetic data -- locks in the real "inseam doesn't grade" claim
+    # made in the README and demoed in the submission.
+    import json
+    with open("styles/classic_chino_trousers.json") as f:
+        style = json.load(f)
+
+    table = build_graded_spec(style)
+    inseam_values = table["Inseam Length"]
+
+    assert len(set(inseam_values.values())) == 1, "Inseam should be identical across every size"
+    assert inseam_values["M"] == 32.0

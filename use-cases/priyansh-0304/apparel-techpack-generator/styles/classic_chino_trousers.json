@@ -1,0 +1,33 @@
+{
+  "style_id": "TROUSER-001",
+  "style_name": "Classic Straight Chino Trousers",
+  "base_size": "M",
+  "size_range": ["XS", "S", "M", "L", "XL", "XXL"],
+  "unit": "inches",
+  "measurement_points": [
+    {"point_name": "Waist Width", "measured_at": "flat, at waistband", "base_value": 17.0, "grade_rule": 0.75, "tolerance": 0.5},
+    {"point_name": "Hip Width", "measured_at": "flat, 7 in below waist", "base_value": 21.0, "grade_rule": 0.75, "tolerance": 0.5},
+    {"point_name": "Thigh Width", "measured_at": "flat, 1 in below crotch", "base_value": 12.5, "grade_rule": 0.5, "tolerance": 0.25},
+    {"point_name": "Front Rise", "measured_at": "crotch seam to waistband top, front", "base_value": 11.5, "grade_rule": 0.5, "tolerance": 0.25},
+    {"point_name": "Back Rise", "measured_at": "crotch seam to waistband top, back", "base_value": 16.0, "grade_rule": 0.5, "tolerance": 0.25},
+    {"point_name": "Knee Width", "measured_at": "flat, at knee point", "base_value": 9.0, "grade_rule": 0.25, "tolerance": 0.25},
+    {"point_name": "Leg Opening", "measured_at": "flat, hemmed edge", "base_value": 7.5, "grade_rule": 0.25, "tolerance": 0.125},
+    {"point_name": "Inseam Length", "measured_at": "crotch seam to hem, inner leg", "base_value": 32.0, "grade_rule": 0.0, "tolerance": 0.5}
+  ],
+  "materials": [
+    {"component": "Main fabric", "spec": "97% cotton / 3% elastane twill, 260 GSM", "placement": "Body panels"},
+    {"component": "Waistband interfacing", "spec": "Fusible woven interfacing, mid-weight", "placement": "Waistband"},
+    {"component": "Pocket bagging", "spec": "65/35 poly-cotton, 120 GSM", "placement": "Front and back pocket bags"},
+    {"component": "Zipper", "spec": "YKK #3 metal zip, antique brass", "placement": "Fly"},
+    {"component": "Button", "spec": "Metal shank button, antique brass", "placement": "Waistband closure"},
+    {"component": "Thread", "spec": "Polyester core-spun, tex 40, color-matched", "placement": "All construction seams"}
+  ],
+  "construction_notes": [
+    "Inseam and outseam: safety-stitched (5-thread), 1cm seam allowance",
+    "Waistband: curved, cut-on, interfaced, with 7 belt loops",
+    "Fly: zip fly with button closure, bar-tacked at fly base and pocket corners",
+    "Pockets: slant front pockets, welt back pockets with button closure",
+    "Hem: single-needle topstitch, 2cm width",
+    "Note: inseam length does not grade across sizes -- industry-standard convention for trousers, unlike waist/hip/thigh which scale per size"
+  ]
+}

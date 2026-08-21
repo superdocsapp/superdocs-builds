@@ -1,4 +1,5 @@
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -9,7 +10,7 @@ from techpack.verification import verify_measurement_table
 
 load_dotenv()
 
-STYLE_PATH = Path("styles/classic_crew_tee.json")
+DEFAULT_STYLE_PATH = Path("styles/classic_crew_tee.json")
 OUTPUT_DIR = Path("output")
 
 
@@ -30,7 +31,11 @@ def get_updated_html(result: dict, fallback_html: str) -> str:
 
 
 def main():
-    style = load_style(STYLE_PATH)
+    # Style file is now a CLI argument, not hardcoded -- this is what
+    # actually proves the pipeline generalizes across garment types,
+    # not just runs correctly on the one style it was built against.
+    style_path = Path(sys.argv[1]) if len(sys.argv) > 1 else DEFAULT_STYLE_PATH
+    style = load_style(style_path)
     session_id = f"techpack-{style['style_id']}-{int(time.time())}"
 
     html = generate_tech_pack_html(style)
@@ -50,9 +55,9 @@ def main():
     result = send_edit(
         session_id=session_id,
         message=(
-            "Generate a front-view and back-view black and white technical flat "
-            "sketch of a classic crew neck t-shirt and insert them at the top of "
-            "the document, above the measurement table."
+            f"Generate front-view and back-view black and white technical flat "
+            f"sketches of a {style['style_name'].lower()} and insert them at the "
+            f"top of the document, above the measurement table."
         ),
     )
     print("Chat response:", result.get("response"))
