@@ -77,18 +77,49 @@ against whatever the implementation happened to find.
 | Claims it could not check | 8 — counted separately, never folded into "verified" |
 | Paid operations for all of the above | **0** |
 
-Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 281 passing.
+### The other corpus: pages with nothing wrong with them
+
+Precision on planted drift measures whether the checker finds what is there. It says
+nothing about what it **invents** on prose that has nothing wrong with it, and that is the
+number that decides whether a team leaves the tool switched on.
+
+So `fixtures/negative/` holds runbooks that are **true** about the same estate, written in
+the ways the extractor was not tuned for: correct values in other units (`1200ms` against
+a rule storing `1.2` seconds), templated commands in four placeholder dialects, a DR table,
+and CamelCase prose that is not an alert name. There is no key to write, because the
+expected output is zero. The same `./rr measure` scores it.
+
+| | |
+| --- | --- |
+| Correct pages | 4 |
+| Claims made on them | 27 |
+| False positives | **0** |
+| Of those claims, settled against ground truth | 18 |
+| Reported unverifiable | 9 |
+
+The second-to-last row is why the zero means something: a checker that shrugged at
+everything would also score zero false positives, so there is a test asserting that most
+of these claims come back **confirmed** rather than unchecked.
+
+Writing this corpus immediately paid for itself. It found a bug where one templated
+command — `kubectl rollout restart deploy/SERVICE_HERE` — made `SERVICE_HERE` the claim
+naming the page's subject service, and the page-level pass then condemned the entire page
+as a runbook for a service that no longer exists. A page-level false positive does not cost
+one finding; it costs the page.
+
+Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 286 passing.
 
 *Demo recording: not yet linked. It rides the submission form rather than this repository,
 and there is no screenshot here rather than a staged one — every output in this README is
 copied from a real run you can reproduce with the command above it.*
 
-**What this number is and is not.** It is a real score against a key written in advance,
-on a corpus of 8 runbooks and ~40 config files. It is not evidence of how the checker
-behaves on somebody's real 400-page space, where the interesting failure is false
-positives from prose the extractor was never designed for. The honest claim is that the
-method is sound and measured; the sample is small and synthetic, and was built by the
-same person who wrote the checker.
+**What these numbers are and are not.** They are real scores: one against a key written in
+advance, one against a corpus whose expected output is zero by construction. Both are on 12
+runbooks and ~40 config files. Neither is evidence of how the checker behaves on somebody's
+real 400-page space. The negative corpus narrows that gap — it is the first evidence here
+about the failure mode that actually matters — but it was written by the same person who
+wrote the checker, and prose nobody has thought of is exactly what it cannot contain. The
+honest claim is that the method is sound, measured in both directions, and small.
 
 ---
 
@@ -109,7 +140,7 @@ There are three scripts, and they are for three different things:
 
 | | |
 | --- | --- |
-| `./rr test` | the suite — 281 tests, no key, no network |
+| `./rr test` | the suite — 286 tests, no key, no network |
 | `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
 | `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 
@@ -317,9 +348,12 @@ path puts page text into one.
 - **Value decays after the first sweep.** The first run finds years of accumulated drift;
   the tenth finds last week's. That is the correct shape for the product and a bad shape
   for a demo, and it is worth saying which one you are looking at.
-- **Placeholders are a convention, not magic.** `<your-namespace>` is treated as
-  unverifiable. A team writing placeholders another way will see false positives until
-  they say so in config.
+- **Placeholders are a convention, not magic.** Four dialects are recognised without
+  configuration — `<your-namespace>`, `{{ namespace }}`, `$NAMESPACE`, `SERVICE_HERE` —
+  and a bare capitalised `NAMESPACE` deliberately is not, because that could be a real
+  resource and a convention that swallows real names reports every estate as clean. A team
+  spelling them another way adds theirs to `placeholder_patterns` in
+  [`config/mappings.yaml`](config/mappings.yaml).
 - **Label filtering costs one extra call per page** because CQL search is unreachable with
   a scoped token ([BUGS.md](BUGS.md) item 2). On a very large space that dominates a sweep.
 - **The wording layer is not deterministic, and the checker is.** The same batch of five
@@ -351,6 +385,7 @@ reconciler/
   watch.py         the trigger
   mcp_server.py    the machine interface
 fixtures/          synthetic estate, runbooks, and expected.yaml (the measurement key)
+  negative/        runbooks that are TRUE, where any finding is a false positive
 docs/              measurement raw data
 ```
 

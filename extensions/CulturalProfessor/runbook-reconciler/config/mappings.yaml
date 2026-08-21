@@ -27,3 +27,21 @@ former_names:
 # a team that decides one claim is not worth verifying says so here instead of
 # turning the checker off.
 ignore_subjects: []
+
+# Extra spellings of "put your own value here", added to the built-in
+# conventions rather than replacing them.
+#
+# Recognised without configuration: `<your-namespace>`, `{{ namespace }}`,
+# `$NAMESPACE` / `${NAMESPACE}`, and `YOUR_THING` / `THING_HERE`. Deliberately
+# NOT recognised: a bare capitalised word like `NAMESPACE`, because that could
+# be a real resource, and a placeholder convention that swallows real names is a
+# checker that reports every estate as drift-free.
+#
+# So this list is for house styles the built-ins do not cover. An entry is a
+# regular expression; one that does not compile is ignored rather than taking
+# the checker down with it.
+#
+#   placeholder_patterns:
+#     - 'PLACEHOLDER_\w+'
+#     - '«[^»]+»'
+placeholder_patterns: []

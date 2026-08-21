@@ -278,9 +278,9 @@ def test_every_version_a_failed_batch_produced_is_in_the_ledger(
     landed = source.read("1001").version
     assert landed > started_at + 1, "the edit and its compensation are two versions"
     for version in range(started_at + 1, landed + 1):
-        assert register.wrote_version("1001", version), (
-            f"version {version} of page 1001 was written by this tool and is not in the ledger"
-        )
+        assert register.wrote_version(
+            "1001", version
+        ), f"version {version} of page 1001 was written by this tool and is not in the ledger"
 
 
 def test_a_failed_rollback_is_reported_as_stranded_not_swallowed(
@@ -432,9 +432,7 @@ def test_a_character_diff_can_split_one_logical_edit() -> None:
     assert len(ranges) > 1
 
 
-def test_both_copies_of_a_repeated_value_are_corrected(
-    workspace: Path, register: Register
-) -> None:
+def test_both_copies_of_a_repeated_value_are_corrected(workspace: Path, register: Register) -> None:
     """Two identical wrong values in one paragraph are two edits, not one twice.
 
     `str.find` used to answer both anchors with the first occurrence, so the

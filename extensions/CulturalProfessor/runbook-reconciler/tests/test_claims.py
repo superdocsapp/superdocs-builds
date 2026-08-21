@@ -306,9 +306,7 @@ def test_the_same_value_twice_in_one_passage_is_two_claims() -> None:
         "800ms. The mirrored rule in the failover region also pages above 800ms.</p>"
     )
     document = parse(body, page_id="x")
-    thresholds = [
-        c for c in extract_claims(document) if c.subject.endswith(":threshold")
-    ]
+    thresholds = [c for c in extract_claims(document) if c.subject.endswith(":threshold")]
 
     assert len(thresholds) == 2
     assert [c.anchor.value_occurrence for c in thresholds] == [0, 1]

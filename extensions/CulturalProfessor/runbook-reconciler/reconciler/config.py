@@ -68,6 +68,11 @@ class Mappings:
     aliases: dict[str, str] = field(default_factory=dict)
     former_names: dict[str, str] = field(default_factory=dict)
     ignore_subjects: tuple[str, ...] = ()
+    #: Extra spellings of "put your own value here", added to the built-in
+    #: conventions rather than replacing them. The README has always said a team
+    #: writing placeholders another way should "say so in config"; this is where
+    #: they say it.
+    placeholder_patterns: tuple[str, ...] = ()
 
     @classmethod
     def load(cls, path: Path | None = None) -> Mappings:
@@ -81,6 +86,7 @@ class Mappings:
                 str(k).lower(): str(v) for k, v in (raw.get("former_names") or {}).items()
             },
             ignore_subjects=tuple(raw.get("ignore_subjects") or ()),
+            placeholder_patterns=tuple(str(p) for p in (raw.get("placeholder_patterns") or ())),
         )
 
 

@@ -90,10 +90,51 @@ _CDATA_OPEN = "<![CDATA["
 _CDATA_CLOSE = "]]>"
 _COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 
-#: Angle-bracketed placeholders: `<your-namespace>`, `<cluster>`. Runbooks are
-#: written with them deliberately, and treating one as a value that does not
-#: exist is the false positive that eats this product (risk 3 in the brief).
-PLACEHOLDER = re.compile(r"<[a-z][a-z0-9 _-]*>", re.IGNORECASE)
+#: The four ways a runbook says "put your own value here", as spellings rather
+#: than as guesses. Runbooks are written with them deliberately, and treating one
+#: as a value that does not exist is the false positive that eats this product
+#: (risk 3 in the brief).
+#:
+#: Only angle brackets used to be recognised, and a negative corpus written to
+#: provoke exactly this found the rest in one run: `kubectl -n $NAMESPACE
+#: rollout restart deploy/SERVICE_HERE` produced a claim that `SERVICE_HERE` is
+#: a deployment, and because it is the claim that names the page's subject
+#: service, the page-level pass then condemned the whole page as a runbook for a
+#: service that no longer exists.
+#:
+#: What is *not* here matters as much. A bare `NAMESPACE` or `SERVICE` in caps
+#: is not included: it could be a real resource, and a placeholder convention
+#: that swallows real names is a checker that reports drift-free estates. Every
+#: pattern below carries a marker that prose does not — brackets, a `$`, or an
+#: explicit `YOUR_`/`_HERE` affix. A team spelling them another way adds theirs
+#: to `placeholder_patterns` in `config/mappings.yaml`, which is what the README
+#: has always promised and what previously had nowhere to go.
+DEFAULT_PLACEHOLDER_PATTERNS: tuple[str, ...] = (
+    r"<[a-z][a-z0-9 _-]*>",  # <your-namespace>, <cluster>
+    r"\{\{[^}]{1,64}\}\}",  # {{ namespace }}, {{service}}
+    r"\$\{?[A-Z][A-Z0-9_]*\}?",  # $NAMESPACE, ${SERVICE}
+    r"\b(?:YOUR|MY)_[A-Z0-9_]+\b|\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*_HERE\b",  # SERVICE_HERE
+)
+
+PLACEHOLDER = re.compile("|".join(DEFAULT_PLACEHOLDER_PATTERNS), re.IGNORECASE)
+
+
+def placeholder_matcher(extra: tuple[str, ...] = ()) -> re.Pattern[str]:
+    """The convention, plus whatever this estate spells differently.
+
+    A bad pattern in a config file must not take the checker down with it, so an
+    entry that does not compile is dropped rather than raised — the cost is that
+    one convention going unrecognised, which is a false positive somebody can
+    see, against a tool that will not start, which is not.
+    """
+    patterns = list(DEFAULT_PLACEHOLDER_PATTERNS)
+    for pattern in extra:
+        try:
+            re.compile(pattern)
+        except re.error:
+            continue
+        patterns.append(pattern)
+    return re.compile("|".join(patterns), re.IGNORECASE)
 
 
 @dataclass(frozen=True)

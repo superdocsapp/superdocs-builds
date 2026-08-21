@@ -162,7 +162,79 @@ def _rule_four(
     return violations
 
 
-def write_raw(score_result: Score, findings: list[Finding], path: Path | None = None) -> Path:
+@dataclass
+class NegativeScore:
+    """The corpus where every reported contradiction is wrong by construction.
+
+    `fixtures/negative/` holds runbooks that are **true** about the same estate
+    and written in the ways the extractor was not tuned for: correct values in
+    other units, templated commands, tables, and CamelCase prose that is not an
+    alert name. There is no key to write, because the expected output is zero.
+
+    This is the number the positive corpus cannot produce. Precision on a set of
+    planted positives says how well the checker finds drift that is there;
+    it says nothing about what it invents on prose that has none, and the second
+    is what decides whether a team keeps the tool switched on. The two are
+    reported separately and never averaged.
+    """
+
+    pages: int = 0
+    claims: int = 0
+    agrees: int = 0
+    unverifiable: int = 0
+    false_positives: list[dict[str, str]] = field(default_factory=list)
+
+    @property
+    def false_positive_rate(self) -> float:
+        return len(self.false_positives) / self.claims if self.claims else 0.0
+
+    def lines(self) -> list[str]:
+        return [
+            f"negative corpus: {self.pages} correct pages · {self.claims} claims · "
+            f"{len(self.false_positives)} false positive(s)",
+            f"false-positive rate {self.false_positive_rate:.3f} · "
+            f"{self.agrees} confirmed correct · {self.unverifiable} unverifiable",
+            *[
+                f"  FALSE POS page {f['page']}: {f['subject']} — {f['observed']}"
+                for f in self.false_positives
+            ],
+        ]
+
+
+def score_negative(findings_by_page: dict[str, list[Finding]]) -> NegativeScore:
+    """Every contradiction here is a false positive. That is the whole method.
+
+    No matching, no key, no judgement call: the pages were written to be true,
+    so anything reported as a contradiction is the checker inventing drift.
+    `unverifiable` is not counted against it — declining to check something is
+    the honest answer this project is built around, and penalising it would
+    reward guessing.
+    """
+    result = NegativeScore(pages=len(findings_by_page))
+    for page_id, findings in sorted(findings_by_page.items()):
+        for finding in findings:
+            result.claims += 1
+            if finding.verdict == "agrees":
+                result.agrees += 1
+            elif finding.verdict == "unverifiable":
+                result.unverifiable += 1
+            else:
+                result.false_positives.append(
+                    {
+                        "page": page_id,
+                        "subject": finding.subject,
+                        "observed": (finding.observed or finding.detail)[:120],
+                    }
+                )
+    return result
+
+
+def write_raw(
+    score_result: Score,
+    findings: list[Finding],
+    path: Path | None = None,
+    negative: NegativeScore | None = None,
+) -> Path:
     """Commit the raw data, not just the summary.
 
     The brief asks for measurement with the method stated and the raw data
@@ -176,7 +248,18 @@ def write_raw(score_result: Score, findings: list[Finding], path: Path | None = 
             "expected.yaml was written before the checker existed. A produced finding "
             "matches an expected one when the page, the kind and the asserted string all "
             "agree; subjects are not scored, being an internal naming choice made after "
-            "the key was written."
+            "the key was written. The negative corpus is scored the other way round and "
+            "needs no key: fixtures/negative/ holds runbooks that are true about the same "
+            "estate, so every contradiction reported there is a false positive by "
+            "construction. The two are never averaged."
+        ),
+        "negative_corpus": (
+            {
+                **asdict(negative),
+                "false_positive_rate": round(negative.false_positive_rate, 4),
+            }
+            if negative is not None
+            else None
         ),
         "score": {
             **asdict(score_result),
@@ -202,4 +285,4 @@ def write_raw(score_result: Score, findings: list[Finding], path: Path | None = 
     return path
 
 
-__all__ = ["Score", "load_key", "score", "write_raw"]
+__all__ = ["NegativeScore", "Score", "load_key", "score", "score_negative", "write_raw"]

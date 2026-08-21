@@ -256,3 +256,52 @@ def test_a_bounded_match_still_finds_a_name_next_to_punctuation() -> None:
         "ManifestWorkerStalled",
     ):
         assert _page_mentioning("ManifestWorkerStalled", {"1008": wording}) == "1008"
+
+
+def test_a_placeholder_in_a_command_does_not_condemn_the_whole_page() -> None:
+    """The most expensive false positive this tool can produce.
+
+    `kubectl rollout restart deploy/SERVICE_HERE` made `SERVICE_HERE` the claim
+    that names the page's subject service. The page-level pass runs *before* the
+    per-claim placeholder check ever sees it, so nothing in the estate resolved
+    it and the whole page was reported as a runbook for a service that no longer
+    exists — every other claim on it marked unverifiable as a consequence. One
+    templated command, one condemned page.
+    """
+    from reconciler.check.vertical import check_page
+    from reconciler.config import Config
+    from reconciler.estate import Estate
+    from reconciler.extract.patterns import extract_claims
+    from reconciler.extract.storage import parse
+
+    body = (
+        "<h2>Triage</h2>\n<p>The deployment is <code>payments-api</code> in namespace "
+        "<code>payments</code>.</p>\n<p>Then run <code>kubectl rollout restart "
+        "deploy/SERVICE_HERE</code> against your own service.</p>"
+    )
+    document = parse(body, page_id="9200")
+    findings = check_page("9200", extract_claims(document), Estate.load(Config.load()))
+
+    assert not [f for f in findings if f.rule_id == "orphan-runbook"]
+    assert [f for f in findings if f.verdict == "agrees"], "the real claims still get checked"
+
+
+def test_the_placeholder_conventions_cover_the_four_common_spellings() -> None:
+    """And deliberately not bare capitals, which could be a real resource."""
+    from reconciler.extract.storage import placeholder_matcher
+
+    matcher = placeholder_matcher()
+    for spelling in ("<your-namespace>", "{{ namespace }}", "$NAMESPACE", "SERVICE_HERE"):
+        assert matcher.search(spelling), spelling
+    for real in ("payments-api", "payments", "manual-rollback"):
+        assert not matcher.search(real), real
+
+
+def test_an_estate_can_add_its_own_placeholder_spelling() -> None:
+    """The README's promise that a team "says so in config" had nowhere to go."""
+    from reconciler.extract.storage import placeholder_matcher
+
+    assert not placeholder_matcher().search("PLACEHOLDER_ns")
+    assert placeholder_matcher((r"PLACEHOLDER_\w+",)).search("PLACEHOLDER_ns")
+    # A broken pattern is dropped rather than taking the checker down with it.
+    assert placeholder_matcher((r"[unclosed",)).search("<your-namespace>")

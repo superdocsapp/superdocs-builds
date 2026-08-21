@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -44,10 +45,25 @@ from reconciler.check import lookups
 from reconciler.claims import Claim, Finding
 from reconciler.config import CONFIG_DIR, display_path
 from reconciler.estate import Estate
-from reconciler.extract.storage import PLACEHOLDER
+from reconciler.extract.storage import placeholder_matcher
 
 #: Where a page's subject service comes from: the claim that names a workload.
 _SUBJECT_CLAIM = re.compile(r"^workload:(?P<name>[^:]+):name$")
+
+
+@lru_cache(maxsize=8)
+def _cached_matcher(extra: tuple[str, ...]) -> re.Pattern[str]:
+    return placeholder_matcher(extra)
+
+
+def _matcher(estate: Estate) -> re.Pattern[str]:
+    """The placeholder convention for this estate, built once per spelling set.
+
+    Compiled behind a cache because it is consulted for every claim on every
+    page and the answer depends only on config, which does not change during a
+    sweep.
+    """
+    return _cached_matcher(tuple(estate.mappings.placeholder_patterns))
 
 
 @dataclass(frozen=True)
@@ -133,7 +149,7 @@ def check_claim(claim: Claim, estate: Estate, checks: list[Check]) -> Finding:
     if claim.subject in estate.mappings.ignore_subjects:
         return _unverifiable(claim, "muted in config/mappings.yaml by the team that owns it")
 
-    if PLACEHOLDER.search(claim.asserted):
+    if _matcher(estate).search(claim.asserted):
         return _unverifiable(
             claim,
             "the value is a deliberate placeholder, not a resource that is missing",
@@ -224,16 +240,34 @@ def _is_subject_claim(claim: Claim) -> bool:
 
 
 def _orphan_finding(page_id: str, claims: list[Claim], estate: Estate) -> Finding | None:
-    """One finding for a page about a service that no longer exists."""
+    """One finding for a page about a service that no longer exists.
+
+    Placeholders are excluded here and not only in `check_claim`, and the
+    difference is the whole reason this is a separate filter. The per-claim
+    check runs *after* this pass, so a placeholder that happens to be the claim
+    naming the page's subject service never reached it: a command block reading
+    `kubectl rollout restart deploy/SERVICE_HERE` made `SERVICE_HERE` the
+    page's subject, nothing in the estate resolved it, and the page-level
+    verdict then marked every other claim on the page unverifiable — one
+    templated command condemning a page that was entirely correct.
+
+    A page-level verdict is the most expensive false positive this tool can
+    produce, because it does not cost one finding, it costs the page.
+    """
+    placeholder = _matcher(estate)
     named = [
         _SUBJECT_CLAIM.match(claim.subject).group("name")  # type: ignore[union-attr]
         for claim in claims
-        if _is_subject_claim(claim)
+        if _is_subject_claim(claim) and not placeholder.search(claim.asserted)
     ]
     if not named or any(estate.resolve(name).resolved for name in named):
         return None
 
-    subject_claim = next(claim for claim in claims if _is_subject_claim(claim))
+    subject_claim = next(
+        claim
+        for claim in claims
+        if _is_subject_claim(claim) and not placeholder.search(claim.asserted)
+    )
     service = named[0]
     return Finding(
         rule_id="orphan-runbook",

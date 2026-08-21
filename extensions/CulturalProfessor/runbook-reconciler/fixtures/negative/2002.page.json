@@ -1,0 +1,9 @@
+{
+  "id": "2002",
+  "status": "current",
+  "title": "Runbook: tracking-ingest restarts (templated commands)",
+  "spaceKey": "RUN",
+  "version": { "number": 1, "createdAt": "2026-06-01T07:45:00.000Z", "authorId": "557058:4d7e" },
+  "labels": ["runbook", "tracking"],
+  "_links": { "webui": "/spaces/RUN/pages/2002" }
+}

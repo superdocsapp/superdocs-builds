@@ -226,10 +226,12 @@ def _prepare(
             result.escalated.append(
                 (
                     finding.finding_id,
-                    f"{claim.asserted!r} is no longer in that passage"
-                    if not nth
-                    else f"that passage no longer holds {nth + 1} occurrences of "
-                    f"{claim.asserted!r}",
+                    (
+                        f"{claim.asserted!r} is no longer in that passage"
+                        if not nth
+                        else f"that passage no longer holds {nth + 1} occurrences of "
+                        f"{claim.asserted!r}"
+                    ),
                 )
             )
             continue

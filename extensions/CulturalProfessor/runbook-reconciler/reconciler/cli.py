@@ -19,7 +19,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from reconciler import __version__
-from reconciler.config import Config
+from reconciler.config import PROJECT_ROOT, Config
 from reconciler.confluence import PageSource, describe_source, page_source
 from reconciler.register import Register
 from reconciler.sweep import Sweep, SweepResult
@@ -106,9 +106,50 @@ def _cmd_measure(args: argparse.Namespace) -> int:
     scored = score(result.findings, result.claims)
     for line in scored.lines():
         print(line)
-    path = write_raw(scored, result.findings)
+
+    # Scored second and printed separately, never folded in. Precision on
+    # planted drift says how well the checker finds what is there; the negative
+    # corpus says what it invents on prose that has nothing wrong with it, and
+    # only the second predicts whether a team leaves it switched on.
+    negative = _measure_negative(config)
+    if negative is not None:
+        print()
+        for line in negative.lines():
+            print(line)
+
+    path = write_raw(scored, result.findings, negative=negative)
     print(f"\nraw data: {path}")
-    return 0 if not (scored.misses or scored.false_positives) else 1
+    failed = bool(scored.misses or scored.false_positives)
+    failed = failed or bool(negative and negative.false_positives)
+    return 0 if not failed else 1
+
+
+def _measure_negative(config: Config):
+    """Sweep `fixtures/negative/` — runbooks that are true — into a score.
+
+    Deliberately not routed through `Sweep`: this must not touch the register.
+    A corpus swept for measurement would put its claims and findings in the same
+    store the review queue reads, and a reviewer would be shown findings about
+    pages that exist only to prove the checker stays quiet.
+    """
+    from reconciler.check.vertical import check_page, load_checks
+    from reconciler.confluence.local import LocalSource
+    from reconciler.estate import Estate
+    from reconciler.extract.patterns import extract_claims
+    from reconciler.measure import score_negative
+
+    directory = PROJECT_ROOT / "fixtures" / "negative"
+    if not directory.is_dir():
+        return None
+
+    estate = Estate.load(config)
+    checks = load_checks(config.checks_path)
+    source = LocalSource(directory)
+    by_page = {}
+    for ref in source.pages():
+        document = source.read(ref.page_id)
+        by_page[ref.page_id] = check_page(ref.page_id, extract_claims(document), estate, checks)
+    return score_negative(by_page)
 
 
 def _cmd_propose(args: argparse.Namespace) -> int:

@@ -158,3 +158,56 @@ def test_infra_fixtures_parse(infra_dir: Path) -> None:
         yaml.safe_load(path.read_text(encoding="utf-8"))
     for path in infra_dir.rglob("*.json"):
         json.loads(path.read_text(encoding="utf-8"))
+
+
+# ------------------------------------------------------- the negative corpus --
+
+
+def _negative_findings() -> dict[str, list]:
+    from reconciler.check.vertical import check_page
+    from reconciler.config import PROJECT_ROOT, Config
+    from reconciler.confluence.local import LocalSource
+    from reconciler.estate import Estate
+    from reconciler.extract.patterns import extract_claims
+
+    estate = Estate.load(Config.load())
+    source = LocalSource(PROJECT_ROOT / "fixtures" / "negative")
+    return {
+        ref.page_id: check_page(ref.page_id, extract_claims(source.read(ref.page_id)), estate)
+        for ref in source.pages()
+    }
+
+
+def test_the_negative_corpus_produces_no_contradictions() -> None:
+    """Every page in `fixtures/negative/` is true about the estate.
+
+    So every contradiction reported there is the checker inventing drift, and
+    there is no key to argue with: the expected output is zero. This is the
+    number `fixtures/expected.yaml` cannot produce — precision on planted
+    positives measures finding what is there, and says nothing about what gets
+    invented on prose that has nothing wrong with it.
+    """
+    from reconciler.measure import score_negative
+
+    scored = score_negative(_negative_findings())
+
+    assert scored.pages >= 4, "the negative corpus must not quietly shrink to nothing"
+    assert scored.claims >= 20, "pages that assert nothing prove nothing"
+    assert scored.false_positives == [], "\n".join(scored.lines())
+
+
+def test_the_negative_corpus_is_actually_checked_and_not_just_shrugged_at() -> None:
+    """A corpus that returns `unverifiable` for everything would also score zero.
+
+    Which would make the number above meaningless: declining to check anything
+    is trivially free of false positives. Most of these claims have to come back
+    confirmed against real ground truth for the zero to mean anything.
+    """
+    from reconciler.measure import score_negative
+
+    scored = score_negative(_negative_findings())
+
+    assert scored.agrees > scored.unverifiable, (
+        f"only {scored.agrees} of {scored.claims} negative-corpus claims were actually "
+        f"settled against the estate; the false-positive rate is not evidence yet"
+    )

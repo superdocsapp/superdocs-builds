@@ -1,5 +1,13 @@
 {
-  "method": "expected.yaml was written before the checker existed. A produced finding matches an expected one when the page, the kind and the asserted string all agree; subjects are not scored, being an internal naming choice made after the key was written.",
+  "method": "expected.yaml was written before the checker existed. A produced finding matches an expected one when the page, the kind and the asserted string all agree; subjects are not scored, being an internal naming choice made after the key was written. The negative corpus is scored the other way round and needs no key: fixtures/negative/ holds runbooks that are true about the same estate, so every contradiction reported there is a false positive by construction. The two are never averaged.",
+  "negative_corpus": {
+    "pages": 4,
+    "claims": 27,
+    "agrees": 18,
+    "unverifiable": 9,
+    "false_positives": [],
+    "false_positive_rate": 0.0
+  },
   "score": {
     "expected": 13,
     "reported": 13,

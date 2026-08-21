@@ -1,0 +1,10 @@
+<h2>When this fires</h2>
+<p>The <strong>LabelPrinterQueueDepth</strong> alert fires when the queue holds more than 500 jobs for 10 minutes.</p>
+<h2>Background</h2>
+<p>The label printers are a ThermalTransferPrinter fleet behind a QueueDepthCollector sidecar. Neither of those is an alert; they are the names of things in the vendor's own documentation, and a checker that reads every CamelCase word as an alert name will have opinions about both.</p>
+<p>Historically we ran 3 printers per depot and the queue drained in under 4 minutes. Those two numbers describe the world, not any threshold, and there is nothing in the estate for them to disagree with.</p>
+<h2>Triage</h2>
+<p>The deployment is <code>label-printer</code> in namespace <code>fulfilment</code> and runs 3 replicas.</p>
+<p>Escalation for this service sits with the <strong>Fulfilment</strong> rota, and the head of operations picks it up after 20 minutes.</p>
+<h2>Mitigation</h2>
+<p>Run the <code>deploy-production</code> job once the backlog is drained.</p>
