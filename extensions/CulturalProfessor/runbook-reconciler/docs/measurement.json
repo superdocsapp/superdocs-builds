@@ -8,7 +8,7 @@
     "false_positives": [],
     "rule_four_violations": [],
     "unverifiable": 8,
-    "agrees": 49,
+    "agrees": 50,
     "precision": 1.0,
     "recall": 1.0,
     "cried_wolf": 0.0
@@ -52,6 +52,16 @@
       "verdict": "agrees",
       "observed": "Payments Core",
       "evidence": "fixtures/infra/platform-infra/pagerduty/escalation.yaml:5",
+      "tags": []
+    },
+    {
+      "rule_id": "namespace-exists",
+      "page_id": "1001",
+      "kind": "command",
+      "subject": "namespace:payments",
+      "verdict": "agrees",
+      "observed": "payments",
+      "evidence": "fixtures/infra/platform-infra/kubernetes/payments/deployment.yaml:4",
       "tags": []
     },
     {

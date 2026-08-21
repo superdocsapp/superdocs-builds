@@ -98,6 +98,43 @@ def test_rule_2_an_edit_leaves_every_other_byte_alone(runbooks_dir: Path) -> Non
     assert_single_change(document.body, edited, start, end)
 
 
+def test_rule_2_the_splice_lands_on_the_anchored_value_not_an_earlier_substring(
+    runbooks_dir: Path,
+) -> None:
+    """Page 1001 says `payments-api in namespace payments`, and `payments` is in both.
+
+    The apply path used to re-find the value with `str.find`, which on this
+    passage answers with the `payments` inside `payments-api` — 39 bytes before
+    the namespace the claim is actually anchored to. An approved namespace fix
+    would have rewritten part of the deployment name and left the namespace
+    wrong, and `assert_single_change` would have passed it, because that
+    assertion validates the range apply computed rather than the range the claim
+    anchored.
+
+    So the check is anchor against anchor: whatever the apply path re-resolves
+    has to be the bytes the extractor chose, not the first thing that looks like
+    them.
+    """
+    from reconciler.apply import _occurrence_at
+
+    document = LocalSource(runbooks_dir).read("1001")
+    claim = next(
+        c
+        for c in extract_claims(document)
+        if c.subject == "workload:payments-api:namespace" and c.page_id == "1001"
+    )
+    block = document.find_block(claim.anchor.heading_path, claim.anchor.content_hash)
+    assert block is not None
+
+    naive = block.text.find(claim.asserted)
+    at = _occurrence_at(block.text, claim.asserted, claim.anchor.value_occurrence)
+    assert at != naive  # the passage really does contain the trap
+
+    start, end = block.body_range(at, at + len(claim.asserted))
+    assert (start, end) == (claim.anchor.char_start, claim.anchor.char_end)
+    assert document.body[start:end] == claim.asserted
+
+
 def test_rule_2_a_write_touching_two_places_is_refused(runbooks_dir: Path) -> None:
     document = LocalSource(runbooks_dir).read("1001")
     tampered = document.body.replace("Payments Core", "Payments Platform").replace("800ms", "1.2s")

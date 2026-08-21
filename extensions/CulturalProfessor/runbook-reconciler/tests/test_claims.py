@@ -14,6 +14,7 @@ is validated: every emit names a group its own pattern actually captures.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
@@ -287,3 +288,50 @@ def test_claims_on_a_macro_passage_inherit_its_refusal(
     )
     assert not threshold.anchor.editable
     assert "status" in (threshold.anchor.refusal or "")
+
+
+def test_the_same_value_twice_in_one_passage_is_two_claims() -> None:
+    """A paragraph that says the wrong thing twice needs fixing twice.
+
+    Both matches sit in one block, under one heading, with one subject and one
+    content hash, so before `value_occurrence` existed they hashed to a single
+    `claim_id` and the extractor's dedupe kept the first. The reviewer saw one
+    finding, the splice corrected one `800ms`, and the second stayed wrong on a
+    page the tool had just reported as fixed.
+    """
+    from reconciler.extract.storage import parse
+
+    body = (
+        "<h2>Latency</h2>\n<p>PaymentsApiHighLatency fires when p99 latency stays above "
+        "800ms. The mirrored rule in the failover region also pages above 800ms.</p>"
+    )
+    document = parse(body, page_id="x")
+    thresholds = [
+        c for c in extract_claims(document) if c.subject.endswith(":threshold")
+    ]
+
+    assert len(thresholds) == 2
+    assert [c.anchor.value_occurrence for c in thresholds] == [0, 1]
+    assert len({c.claim_id for c in thresholds}) == 2
+    # Distinct anchors, and the second one is genuinely the later `800ms`.
+    assert thresholds[0].anchor.char_end <= thresholds[1].anchor.char_start
+
+
+def test_the_first_value_in_a_passage_keeps_the_id_it_always_had() -> None:
+    """`value_occurrence` is appended to the hash only when it is non-zero.
+
+    `finding_id` derives from `claim_id`, so churning ids would throw away every
+    decision a human has already recorded. Adding the field must be invisible to
+    every claim that existed before it.
+    """
+    from reconciler.claims import Anchor
+
+    anchor = Anchor(
+        heading_path=("Latency",),
+        node_index=3,
+        content_hash="abc123",
+        char_start=10,
+        char_end=15,
+    )
+    assert anchor.anchor_hash == replace(anchor, value_occurrence=0).anchor_hash
+    assert anchor.anchor_hash != replace(anchor, value_occurrence=1).anchor_hash

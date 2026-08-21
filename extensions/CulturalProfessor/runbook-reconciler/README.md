@@ -44,7 +44,7 @@ cd extensions/CulturalProfessor/runbook-reconciler
 7 alerts · 4 have runbooks · 1 dead links · 1 runbooks referencing resources that no
 longer exist · 2 alerts with no runbook
 
-13 findings across 7 runbooks · 49 claims verified · 8 could not be checked · 0 paid operations
+13 findings across 7 runbooks · 50 claims verified · 8 could not be checked · 0 paid operations
 
   [page 1001] alert:PaymentsApiHighLatency:threshold
       says the threshold in the alerting rule that actually pages someone
@@ -73,11 +73,11 @@ against whatever the implementation happened to find.
 | Precision | **1.000** |
 | Recall | **1.000** |
 | Cried-wolf rate | **0.000** |
-| Claims verified | 49 |
+| Claims verified | 50 |
 | Claims it could not check | 8 — counted separately, never folded into "verified" |
 | Paid operations for all of the above | **0** |
 
-Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 272 passing.
+Raw data: [`docs/measurement.json`](docs/measurement.json). Test suite: 276 passing.
 
 *Demo recording: not yet linked. It rides the submission form rather than this repository,
 and there is no screenshot here rather than a staged one — every output in this README is
@@ -109,7 +109,7 @@ There are three scripts, and they are for three different things:
 
 | | |
 | --- | --- |
-| `./rr test` | the suite — 272 tests, no key, no network |
+| `./rr test` | the suite — 276 tests, no key, no network |
 | `./selftest` | unattended pass/fail proof, cheapest first, live stages opt-in |
 | `./demo` | a **paced, narrated walkthrough**, one stage at a time, run for real |
 

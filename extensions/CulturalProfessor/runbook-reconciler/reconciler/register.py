@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS claims (
     heading_path TEXT NOT NULL,
     node_index   INTEGER NOT NULL,
     occurrence   INTEGER NOT NULL DEFAULT 0,
+    value_occurrence INTEGER NOT NULL DEFAULT 0,
     content_hash TEXT NOT NULL,
     char_start   INTEGER NOT NULL,
     char_end     INTEGER NOT NULL,
@@ -232,11 +233,35 @@ class Register:
             self._conn.execute("PRAGMA journal_mode=WAL")
             self._conn.execute("PRAGMA foreign_keys=ON")
             self._conn.executescript(SCHEMA)
+            self._migrate()
         self._conn.execute(
             "INSERT INTO meta(key, value) VALUES('schema_version', ?) "
             "ON CONFLICT(key) DO NOTHING",
             (str(SCHEMA_VERSION),),
         )
+
+    def _migrate(self) -> None:
+        """Columns added after somebody already had a register on disk.
+
+        `CREATE TABLE IF NOT EXISTS` does nothing to a table that exists, so a
+        column added to `SCHEMA` never reaches an older file and every read of
+        it raises `no such column` — the register somebody has been recording
+        decisions in for a month is the one that breaks.
+
+        Additive only, and deliberately so: a column with a default can be added
+        to a live table without touching a row, and anything that is not that
+        (a dropped column, a changed type, a backfill) is a real migration that
+        should be written down and versioned rather than run implicitly at
+        every open.
+        """
+        additions = {"claims": {"value_occurrence": "INTEGER NOT NULL DEFAULT 0"}}
+        for table, columns in additions.items():
+            present = {
+                row["name"] for row in self._conn.execute(f"PRAGMA table_info({table})").fetchall()
+            }
+            for name, declaration in columns.items():
+                if name not in present:
+                    self._conn.execute(f"ALTER TABLE {table} ADD COLUMN {name} {declaration}")
 
     # ------------------------------------------------------------ plumbing --
 
@@ -273,9 +298,10 @@ class Register:
         self._conn.execute(
             """
             INSERT INTO claims (claim_id, page_id, page_version, kind, subject, asserted,
-                                excerpt, heading_path, node_index, occurrence, content_hash,
+                                excerpt, heading_path, node_index, occurrence,
+                                value_occurrence, content_hash,
                                 char_start, char_end, editable, refusal, first_seen, last_seen)
-            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
             ON CONFLICT(claim_id) DO UPDATE SET
                 page_version = excluded.page_version,
                 node_index   = excluded.node_index,
@@ -296,6 +322,7 @@ class Register:
                 json.dumps(list(claim.anchor.heading_path)),
                 anchor.node_index,
                 anchor.occurrence,
+                anchor.value_occurrence,
                 anchor.content_hash,
                 anchor.char_start,
                 anchor.char_end,
@@ -714,6 +741,7 @@ def _claim_from_row(row: sqlite3.Row) -> Claim:
             editable=bool(row["editable"]),
             refusal=row["refusal"],
             occurrence=row["occurrence"],
+            value_occurrence=row["value_occurrence"],
         ),
     )
 

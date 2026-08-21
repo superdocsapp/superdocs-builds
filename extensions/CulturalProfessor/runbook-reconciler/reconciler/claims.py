@@ -28,6 +28,16 @@ The occurrence index exists because two identical sentences under one heading
 are two passages that each need fixing. Without it they collide onto one
 `claim_id` and the second one is silently never repaired.
 
+`value_occurrence` is the same argument one level down, and the level it was
+missing at. A paragraph reading "latency stays above 800ms … the secondary page
+also uses 800ms" makes the claim twice, in one block, under one heading — same
+subject, same text hash, same occurrence, therefore one `claim_id`. The
+extractor deduplicated them, the reviewer saw one finding, the splice took
+`str.find` and corrected the first, and the second stayed wrong on a page the
+tool had just reported as fixed. Counting how many times the value already
+appeared in the block separates them, and the apply path seeks that same
+ordinal rather than the first match.
+
 ## Verdicts
 
 `agrees | contradicts | unverifiable`, and the third is not a polite way of
@@ -102,11 +112,24 @@ class Anchor:
     editable: bool = True
     refusal: str | None = None
     occurrence: int = 0
+    #: How many times the asserted value already appeared in this block before
+    #: this one. `occurrence` distinguishes two identical *passages*; this
+    #: distinguishes two identical *values inside one passage*, which is a
+    #: different collision and was silently losing the second one.
+    value_occurrence: int = 0
 
     @property
     def anchor_hash(self) -> str:
         # node_index is deliberately absent. See the module docstring.
-        return _digest(" > ".join(self.heading_path), self.content_hash, str(self.occurrence))
+        parts = [" > ".join(self.heading_path), self.content_hash, str(self.occurrence)]
+        # Appended only when non-zero, so every claim that existed before this
+        # field did keeps its id. That is not cosmetic: `finding_id` derives
+        # from `claim_id`, and churning them would throw away every decision a
+        # human has already recorded. The first value in a passage is what every
+        # stored claim is, and it hashes as it always did.
+        if self.value_occurrence:
+            parts.append(f"v{self.value_occurrence}")
+        return _digest(*parts)
 
 
 @dataclass(frozen=True)

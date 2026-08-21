@@ -390,3 +390,45 @@ def test_a_character_diff_can_split_one_logical_edit() -> None:
         "<p>run the rollback-production job</p>", "<p>run the manual-rollback job</p>"
     )
     assert len(ranges) > 1
+
+
+def test_both_copies_of_a_repeated_value_are_corrected(
+    workspace: Path, register: Register
+) -> None:
+    """Two identical wrong values in one paragraph are two edits, not one twice.
+
+    `str.find` used to answer both anchors with the first occurrence, so the
+    page came back with one value corrected, one still wrong, and two findings
+    marked applied. The ordinal is carried on the claim and sought here, and the
+    end-of-page assertion proves the two splices landed in different places.
+    """
+    page = workspace / "9100.storage.xhtml"
+    page.write_text(
+        "<h2>Latency</h2>\n<p>PaymentsApiHighLatency fires when p99 latency stays above "
+        "800ms. The mirrored rule in the failover region also pages above 800ms.</p>",
+        encoding="utf-8",
+    )
+    (workspace / "9100.page.json").write_text(
+        '{"id": "9100", "title": "Mirrored latency", "version": {"number": 1}}\n',
+        encoding="utf-8",
+    )
+
+    source = LocalSource(workspace)
+    before = source.read("9100").body
+    findings = [
+        f
+        for f in seed(register, source, "9100")
+        if f.subject == "alert:PaymentsApiHighLatency:threshold"
+    ]
+    assert len(findings) == 2
+
+    for finding in findings:
+        approve(register, finding, "1.2s")
+
+    result = apply_approved(register, source)
+
+    assert sorted(result.applied) == sorted(f.finding_id for f in findings)
+    after = source.read("9100").body
+    assert "800ms" not in after
+    assert after.count("1.2s") == 2
+    assert len(changed_ranges(before, after)) == 2

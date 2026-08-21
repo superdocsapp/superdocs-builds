@@ -210,10 +210,17 @@ def _prepare(
             )
             continue
 
-        at = block.text.find(claim.asserted)
+        at = _occurrence_at(block.text, claim.asserted, claim.anchor.value_occurrence)
         if at == -1:
+            nth = claim.anchor.value_occurrence
             result.escalated.append(
-                (finding.finding_id, f"{claim.asserted!r} is no longer in that passage")
+                (
+                    finding.finding_id,
+                    f"{claim.asserted!r} is no longer in that passage"
+                    if not nth
+                    else f"that passage no longer holds {nth + 1} occurrences of "
+                    f"{claim.asserted!r}",
+                )
             )
             continue
 
@@ -235,6 +242,27 @@ def _prepare(
         # is the coordinate system this check needs.
         assert_only_these_ranges_changed(plan.original, plan.updated, plan.edits)
     return plan
+
+
+def _occurrence_at(text: str, value: str, nth: int) -> int:
+    """Where the `nth` occurrence of `value` starts, or -1.
+
+    `str.find` was here, and for a passage saying the same wrong thing twice it
+    corrected the first one under both anchors — one splice landing twice,
+    reported as two fixes. The ordinal comes from the claim, which counted it
+    off the same string at extraction, so the two cannot disagree about which
+    `800ms` this finding is about.
+
+    Returning -1 when the passage no longer holds that many occurrences is the
+    right answer rather than a fallback to the first: fewer of them than there
+    were means the passage changed, and a changed passage escalates.
+    """
+    at = -1
+    for _ in range(nth + 1):
+        at = text.find(value, at + 1)
+        if at == -1:
+            return -1
+    return at
 
 
 def _already_applied(document: Document, claim: Claim, finding: Finding) -> bool:

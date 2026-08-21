@@ -267,20 +267,35 @@ def _emit(
         except KeyError:
             continue
         start, end = block.body_range(span[0], span[1])
+        asserted = emit.value.format(**bindings) if emit.value else captured
         out.append(
             _claim(
                 document=document,
                 block=block,
                 kind=emit.kind or pattern.kind,
                 subject=subject,
-                asserted=emit.value.format(**bindings) if emit.value else captured,
+                asserted=asserted,
                 char_start=start,
                 char_end=end,
                 rule=pattern.id,
                 spans_markup=block.crosses_markup(span[0], span[1]),
+                value_occurrence=_value_occurrence(block.text, asserted, span[0]),
             )
         )
     return out
+
+
+def _value_occurrence(text: str, asserted: str, at: int) -> int:
+    """How many times this value already appeared in the block before this match.
+
+    Counted on the same string and with the same value the apply path searches,
+    so the two agree by construction rather than by both being written
+    carefully. A synthesized `asserted` — one an `emits` entry supplied rather
+    than captured — does not appear in the text at all and counts zero, which is
+    exactly what it did before this existed.
+    """
+    value = asserted.strip()
+    return text.count(value, 0, at) if value else 0
 
 
 def _claim(
@@ -294,6 +309,7 @@ def _claim(
     rule: str,
     excerpt: str | None = None,
     spans_markup: bool = False,
+    value_occurrence: int = 0,
 ) -> Claim:
     editable, refusal = block.editable, block.refusal
     if spans_markup and editable:
@@ -319,6 +335,7 @@ def _claim(
             editable=editable,
             refusal=refusal,
             occurrence=occurrence_of(document.blocks, block),
+            value_occurrence=value_occurrence,
         ),
     )
 
