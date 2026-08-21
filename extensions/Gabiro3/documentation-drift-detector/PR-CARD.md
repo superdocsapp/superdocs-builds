@@ -103,16 +103,18 @@ adjective.
 
 ### Search
 
-Global search across every document in every run, from the sidebar or
-`Ctrl`/`Cmd`+`K`. Chunks containing the typed phrase rank first with the match
-highlighted; chunks related only by meaning appear below, labelled as such.
-Selecting a result opens the document viewer scrolled to that exact chunk.
+**In-document** semantic search across every document in every run, from the
+sidebar or `Ctrl`/`Cmd`+`K`. Chunks containing the typed phrase rank first with
+the match highlighted; chunks related only by meaning appear below, labelled as
+such. Selecting a result opens the document viewer scrolled to that exact chunk.
 
 `GET /search?q=&limit=&run_id=&semantic=` → ranked hits carrying document,
 filename, run, chunk id, snippet offsets and match type.
 
-**This is built on our own embeddings — SuperDocs has no search endpoint.**
-See caveat 1; this is the single largest deviation in the build.
+**This is in-document search, built on our own embeddings.** SuperDocs' own
+semantic retrieval covers *attachments*, not the editable working document, and
+is not exposed as a query endpoint. See caveat 1 — this is the single largest
+deviation in the build.
 
 ### Multi-document
 
@@ -134,6 +136,12 @@ and a side-by-side diff panel. Per-item approve/reject with feedback, persisted
 across reloads. Approving schedules the apply in the background — the Review
 page polls and each card reports the true outcome, including `Blocked —
 document unchanged` when the byte Judge refused the edit.
+
+Recovery is offered where the problem surfaces: a finding whose document is
+missing from SuperDocs carries **Re-ingest document** and a view button
+directly on the card, so neither repairing nor inspecting costs a page switch.
+Re-ingest states its cost before confirming — new chunk ids mean the finding
+cannot survive it.
 
 Uses `POST /v1/chat/async` (`approval_mode=ask_every_time`, `model_tier=max`),
 `GET /v1/jobs/{id}`, `POST /v1/chat/{id}/approve` (including *denials*),
@@ -166,18 +174,29 @@ are also downloadable as HTML or plain text.
 
 Full detail in [`README.md`](./README.md#caveats-and-honest-limits).
 
-**1. Search is not SuperDocs-native.** The live OpenAPI document has no search
-path and no mention of semantic search, vector search or similarity across 77
-endpoints. Search here runs on the pgvector index this project already
-maintains, over a plain-text projection of chunk HTML (matching raw markup
-would make `class` or `href` hit every chunk). Literal and semantic hits are
-scored in **disjoint bands**, so no similarity score can outrank a chunk that
-actually contains the query, and a similarity floor keeps a nonsense query from
-returning a confident-looking page of noise. Driving search through
-`chat_async` was considered and rejected: an LLM job per query, seconds of
-latency, billed as operations, and blind to documents not open in the session.
-*If SuperDocs ships native search, the right move is to delete our module and
-call it — the `GET /search` interface would not need to change.*
+**1. In-document semantic search is ours; SuperDocs' own retrieval is
+attachment-only.** SuperDocs *does* do semantic retrieval: a file uploaded to
+`/v1/attachments/upload-base64` is chunked, indexed and made "AI-searchable",
+and `GET /v1/attachments/status/{session_id}` reports its chunk count once
+queryable. But that index covers **attachments** — which the API defines as
+"read-only context for the AI to reference, **not the editable working
+document**" — and it is reachable only from inside a chat turn: the attachment
+routes are upload, status and delete, so a client cannot ask for ranked hits
+and get addressable chunks back to render or link to.
+
+Searching the documents *being edited* therefore had to be built here, on the
+pgvector index this project already maintains, over a plain-text projection of
+chunk HTML (matching raw markup would make `class` or `href` hit every chunk).
+Literal and semantic hits are scored in **disjoint bands**, so no similarity
+score can outrank a chunk that actually contains the query, and a similarity
+floor keeps a nonsense query from returning a confident-looking page of noise.
+Driving search through `chat_async` was considered and rejected for the same
+reason as attachment retrieval, plus cost: an LLM job per query, seconds of
+latency, billed as operations, and no addressable hits.
+
+*If SuperDocs extends that index to working documents and exposes a query
+endpoint, the right move is to delete our module and call it — the
+`GET /search` interface would not need to change.*
 
 **2. One document = one session, even though users see a single workspace.**
 Verified against the live API: uploading into a session that already holds a

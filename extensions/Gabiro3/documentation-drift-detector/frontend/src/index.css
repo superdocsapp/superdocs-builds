@@ -1638,3 +1638,31 @@ a {
   gap: var(--space-3);
   flex-wrap: wrap;
 }
+
+/* ---------- Recovery actions on a finding whose document is gone ---------- */
+
+.recovery-actions {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.recovery-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.recovery-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.recovery-confirm-text {
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+  color: var(--color-text-muted);
+}

@@ -2,6 +2,8 @@
 
 Built on SuperDocs by **Gabiro Arnaud**.
 
+SuperDocs-backed multi-agent pipeline that detects, proves, and fixes documentation drift against a change feed.
+
 ## What it does
 
 Documentation goes stale silently. A port default changes, a command is
@@ -15,9 +17,9 @@ allowed to claim drift at all. It proposes a scoped fix, a human approves or
 rejects item by item, and the approved edit is applied **through SuperDocs** to
 that one chunk — with a proof that no other chunk changed by a single byte.
 
-Where it cannot verify something, it says `UNKNOWN` rather than guessing.
-Every step is written to an append-only trace, so a run can be audited after
-the fact rather than taken on faith.
+Where it cannot verify something, it says `UNKNOWN` rather than guessing. Every
+step is written to an append-only trace, so a run can be audited after the fact
+rather than taken on faith.
 
 ## What SuperDocs features it uses
 
@@ -30,9 +32,9 @@ the fact rather than taken on faith.
 | **Document read-back** | `GET /v1/documents/{id}?include_html=true` | The byte-identity proof. Chunk hashes before and after an edit are compared to show nothing outside the target chunk moved. |
 | **Export** | `POST /v1/downloads` | Signed download URL for the corrected document after an apply. |
 
-Two things are deliberately **not** done through SuperDocs, and the reasons are
-in [Caveats](#caveats-and-honest-limits): semantic search, and the
-one-session-per-document ingestion model.
+Two things are deliberately **not** done through SuperDocs — in-document search
+and the one-session-per-document ingestion model. Both are explained in
+[Caveats](#caveats-and-honest-limits).
 
 ## Repository Layout
 
@@ -148,15 +150,23 @@ curl -X POST http://localhost:8001/run -H "Content-Type: application/json" \
   as such. Selecting a result opens the document viewer scrolled to that exact
   section. Calls the Analyzer API (`GET /search`).
 
-  Search is **not** a SuperDocs feature — its API has no search endpoint.
-  Embedding storage and retrieval are this system's job, so search runs on the
-  pgvector index (`chunks.embedding`) already built
-  for drift detection, over the `chunks.text_content` projection so queries
-  match document text rather than HTML tag names. Literal and semantic hits are
-  scored in disjoint bands, so a similarity score can never rank a chunk that
-  lacks the word above one that contains it. If no embedding provider is
-  configured, the literal half still works and the UI says why the other half
-  is missing.
+  **This is in-document semantic search, which SuperDocs does not natively
+  provide.** SuperDocs *does* have semantic retrieval, but only over
+  **attachments**: files uploaded via `/v1/attachments/upload-base64` are
+  chunked, indexed and made "AI-searchable" so the model can reference them
+  during a chat turn. That is deliberately distinct from the editable working
+  document — the API describes attachments as "read-only context for the AI to
+  reference, not the editable working document" — and it is not exposed as a
+  query endpoint: the attachment routes are upload, status and delete only, so
+  a client cannot ask for ranked hits and get back addressable chunks.
+
+  Searching the documents themselves therefore had to be built here, on the
+  pgvector index (`chunks.embedding`) already maintained for drift detection,
+  over the `chunks.text_content` projection so queries match document text
+  rather than HTML tag names. Literal and semantic hits are scored in disjoint
+  bands, so a similarity score can never rank a chunk that lacks the word above
+  one that contains it. If no embedding provider is configured, the literal
+  half still works and the UI says why the other half is missing.
 - **Documents** (`/documents`) — upload files (creates a new run, or appends to the
   selected one), delete documents, and open a document in-app to read its
   current text and its **edit history**: every applied fix with before/after
@@ -205,16 +215,26 @@ Run from `backend/`:
 
 ## Caveats and honest limits
 
-### 1. Semantic search is ours, not SuperDocs'
+### 1. In-document semantic search is ours; SuperDocs' is attachment-only
 
-The SuperDocs API has **no search endpoint**. I checked the live OpenAPI
-document before building: 77 paths covering sessions, documents, chat, jobs,
-approvals, downloads, templates and attachments, with zero occurrences of
-`semantic search`, `vector search`, `similarity`, or a `search` field. The only
-match for "semantic" is the word *semantics* in prose about opening documents.
+SuperDocs **does** have semantic retrieval — but it is scoped to
+**attachments**. A file uploaded to `/v1/attachments/upload-base64` is
+processed asynchronously, chunked, indexed and made "AI-searchable" so the
+model can reference it during a chat turn ("rewrite section 3 to match the
+style guide PDF I attached"). `GET /v1/attachments/status/{session_id}` even
+reports the chunk count once it is queryable.
 
-So global search is built on the pgvector index this project already maintains
-for drift detection:
+Two things it is not:
+
+- **Not the working document.** The API draws the line explicitly: attachments
+  are "read-only context for the AI to reference, **not the editable working
+  document**". There is no equivalent index over the documents being edited.
+- **Not a query endpoint.** The attachment routes are upload, status and
+  delete. Retrieval happens *inside* a chat turn, so a client cannot ask for
+  ranked hits and get back addressable chunks to render or link to.
+
+So **in-document semantic search had to be built here**, on the pgvector index
+this project already maintains for drift detection:
 
 - **Text, not markup.** Chunks are stored as SuperDocs HTML. Matching the
   markup would make `class`, `href` or `p` hit every chunk that has a tag,
@@ -228,20 +248,21 @@ for drift detection:
 - **It degrades rather than breaks.** With no embedding provider configured the
   literal half still works and the UI says why the other half is absent.
 
-The alternative — asking `chat_async` to find text — was rejected: an LLM job
-per query, polled for seconds, billed as operations, and blind to documents not
-open in the session.
+Driving search through `chat_async` instead was rejected: an LLM job per query,
+polled for seconds, billed as operations, and — like attachment retrieval —
+unable to hand back addressable chunk hits.
 
-**If SuperDocs adds native search**, the honest move is to delete
-`agents/analyzer/search.py` and call it. The interface it presents
-(`GET /search` returning ranked chunk hits) would not have to change.
+**If SuperDocs extends its index to working documents and exposes a query
+endpoint**, the honest move is to delete `agents/analyzer/search.py` and call
+it. The interface it presents (`GET /search` returning ranked chunk hits) would
+not have to change.
 
 ### 2. One document = one session, even though users see one workspace
 
 A SuperDocs session holds a **single active document**. Uploading a second file
 into a session that already has one does not add a tab — it *replaces* the
-existing document. I verified this against the live API: the upload created no
-new document and instead bumped `updated_at` on the session's existing durable
+existing document. Verified against the live API: the upload created no new
+document and instead bumped `updated_at` on the session's existing durable
 document, overwriting its content.
 
 This build originally used one sticky session for the whole corpus, and every
@@ -263,11 +284,13 @@ upload silently destroyed the document uploaded before it. The fix:
 documents, but underneath there is one SuperDocs session per document. Users
 never see a session id. The cost is that a document ingested under the old
 shared-session model holds an id that names nothing, which is why
-**`POST /documents/{id}/reingest`** exists — it rebuilds a document from its
-original file into a fresh session. It rebuilds from the source file rather
-than from stored chunks because SuperDocs mints **new random chunk ids on every
-upload**, so a re-ingest necessarily invalidates existing findings for that
-document; they are cleared, while applied-edit history is kept.
+**`POST /documents/{id}/reingest`** exists — reachable from both the Documents
+page and directly from a stalled finding on the Review page. It rebuilds a
+document from its original file into a fresh session, rather than from stored
+chunks, because SuperDocs mints **new random chunk ids on every upload**. That
+also means a re-ingest necessarily invalidates existing findings for that
+document; they are cleared (the UI says so before you confirm), while
+applied-edit history is kept.
 
 If SuperDocs later supports several co-resident documents per session, the
 per-document session id becomes a single field change in `SuperDocsClient`.
@@ -290,6 +313,9 @@ per-document session id becomes a single field change in `SuperDocsClient`.
   chunk content, not about the exported file's binary equality.
 - **Export is session-scoped.** `POST /v1/downloads` exports the session, so
   with one document per session an export is per document by construction.
+- **Scale is untested beyond a small corpus.** The literal half of search does a
+  sequential scan over `text_content`; correct, but no trigram or full-text
+  index is warranted at this size yet.
 
 ## Key Design Decisions
 

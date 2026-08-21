@@ -291,6 +291,8 @@ export interface ApplyResult {
   phase?: string;
   target_chunk_changed?: boolean;
   chunks_verified?: number;
+  /** Set when the document itself is gone: re-ingest, do not retry. */
+  document_missing?: boolean;
 }
 
 export async function applyApproved(

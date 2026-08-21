@@ -7,7 +7,9 @@ import {
   getCost,
   getMetrics,
   applyApproved,
+  reingestDocument,
 } from "../api";
+import { DocumentViewer } from "../components/DocumentViewer";
 import { FindingCard } from "../components/FindingCard";
 import { UnknownPanel } from "../components/UnknownPanel";
 import { CostPanel } from "../components/CostPanel";
@@ -31,6 +33,9 @@ export function ReviewPage() {
   const [loaded, setLoaded] = useState(false);
   const [metrics, setMetrics] = useState<RunMetrics | null>(null);
   const [applying, setApplying] = useState(false);
+  // Viewing a document from Review, so a reviewer never has to leave the page
+  // to see what a finding is talking about.
+  const [viewing, setViewing] = useState<Finding | null>(null);
 
   const poll = () => {
     if (!selectedRunId) return;
@@ -89,6 +94,21 @@ export function ReviewPage() {
     }
   };
 
+  const handleReingest = async (finding: Finding) => {
+    try {
+      const res = await reingestDocument(finding.document_id);
+      notify(
+        "Document re-ingested",
+        `${res.filename} is linked to SuperDocs again (${res.chunks} sections). ` +
+          `Its findings were cleared because the section ids changed — re-run analysis to detect the drift again.`,
+        "success"
+      );
+      poll();
+    } catch (err) {
+      notify("Re-ingest failed", errorMessage(err), "error");
+    }
+  };
+
   async function handleApplyAll() {
     if (!selectedRunId) return;
     setApplying(true);
@@ -97,7 +117,19 @@ export function ReviewPage() {
       const applied = res.counts["APPLIED"] ?? 0;
       const blocked =
         (res.counts["NEEDS_ESCALATION"] ?? 0) + (res.counts["ALARM"] ?? 0);
-      if (blocked > 0) {
+      const missing = res.items.filter((i) => i.document_missing).length;
+
+      if (missing > 0) {
+        // Retrying is exactly what does not help here, so the toast names the
+        // action that does and the cards below carry the button for it.
+        notify(
+          `${missing} document${missing === 1 ? " is" : "s are"} missing from SuperDocs`,
+          `${applied > 0 ? `${applied} applied. ` : ""}Re-ingest ${
+            missing === 1 ? "it" : "them"
+          } from the finding below — retrying cannot succeed.`,
+          "error"
+        );
+      } else if (blocked > 0) {
         // A blocked commit is the byte Judge doing its job — surface it loudly.
         notify(
           `${applied} applied, ${blocked} blocked`,
@@ -164,6 +196,8 @@ export function ReviewPage() {
             finding={f}
             onApprove={(fb?: string) => handleApprove(f.id, fb)}
             onReject={(fb: string) => handleReject(f.id, fb)}
+            onReingest={() => handleReingest(f)}
+            onViewDocument={() => setViewing(f)}
           />
         ))}
       </section>
@@ -179,6 +213,16 @@ export function ReviewPage() {
       <section className="panel">
         <CostPanel stages={cost} totalOps={totalOps} />
       </section>
+
+      {viewing && (
+        <DocumentViewer
+          documentId={viewing.document_id}
+          filename={viewing.filename || viewing.document_id}
+          // Land on the chunk the finding is about, not the top of the file.
+          targetChunkId={viewing.evidence_chunk_id || viewing.chunk_id}
+          onClose={() => setViewing(null)}
+        />
+      )}
     </div>
   );
 }
