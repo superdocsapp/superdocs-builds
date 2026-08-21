@@ -1,0 +1,24 @@
+Kestrel Mutual Insurance Company - Loss Run Report
+"Insured: Meridian Cold Chain Logistics, Inc."
+FEIN: 88-0143927
+Policy Period: 2021-04-01 to 2022-04-01
+Valuation Date: 2024-01-15
+Report Type: Original
+
+Claim Number,Policy Number,Policy Year,Coverage,Date of Loss,Date Reported,Status,Claimant,Paid,Reserve,Incurred,Description
+KM-2021-0225,KM-CA-2021-88417,2021,Workers Compensation,2021-04-13,2021-04-13,Closed,Employee,"15,001.60",0.00,"15,001.60","Repetitive strain, order picking"
+KM-2021-0258,KM-CA-2021-88417,2021,General Liability,2021-05-27,2021-05-28,Closed,Third party,"19,941.90",0.00,"19,941.90",Damage to customer dock leveller
+KM-2021-0232,KM-CA-2021-88417,2021,Workers Compensation,2021-06-07,2021-06-08,Open,Employee,"6,185.43","9,757.81","15,943.24","Repetitive strain, order picking"
+KM-2021-0219,KM-CA-2021-88417,2021,Auto Physical Damage,2021-08-03,2021-08-04,Closed,First party,"27,450.00",0.00,"27,450.00","Reefer trailer sidewall damage, low bridge strike, Route 6."
+KM-2021-0224,KM-CA-2021-88417,2021,Auto Physical Damage,2021-08-03,2021-08-11,Closed,First party,"27,450.00",0.00,"27,450.00",Trailer damage from bridge strike on Route 6 - unit 4471.
+KM-2021-0218,KM-CA-2021-88417,2021,Auto Physical Damage,2021-11-01,2021-11-02,Closed,First party,"3,316.72",0.00,"3,316.72","Tyre blowout, wheel arch damage"
+KM-2021-0235,KM-CA-2021-88417,2021,Auto Liability,2021-11-09,2021-11-15,Closed,Third party,"4,841.71",0.00,"4,841.71",Backing incident at customer dock
+KM-2021-0252,KM-CA-2021-88417,2021,Property,2021-11-22,2021-11-28,Open,First party,37.13,587.27,624.40,"Freezer motor burnout, electrical surge"
+KM-2021-0333,KM-CA-2021-88417,2021,General Liability,2021-12-02,2021-12-15,Open,Third party,0.00,"96,000.00","96,000.00","Alleged product contamination, retailer recall costs claimed."
+KM-2021-0201,KM-CA-2021-88417,2021,General Liability,2022-01-27,2022-01-28,Closed,Third party,"2,965.48",0.00,"2,965.48",Damage to customer dock leveller
+KM-2021-0209,KM-CA-2021-88417,2021,General Liability,2022-02-20,2022-02-26,Closed,Third party,"19,921.04",0.00,"19,921.04",Minor property damage at delivery site
+KM-2021-0243,KM-CA-2021-88417,2021,Auto Liability,2022-03-06,2022-03-09,Closed,Third party,"3,824.26",0.00,"3,824.26","Sideswipe during lane change, property damage only"
+
+,,,,,,,TOTAL INCURRED,,,"237,280.35",
+,,,,,,,CLAIM COUNT,,,12,
+,,,,,,,EARNED PREMIUM,,,"412,000.00",

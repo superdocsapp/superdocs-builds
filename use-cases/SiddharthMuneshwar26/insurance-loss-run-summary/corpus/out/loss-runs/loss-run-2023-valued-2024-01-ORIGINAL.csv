@@ -1,0 +1,21 @@
+Kestrel Mutual Insurance Company - Loss Run Report
+"Insured: Meridian Cold Chain Logistics, Inc."
+FEIN: 88-0143927
+Policy Period: 2023-04-01 to 2024-04-01
+Valuation Date: 2024-01-15
+Report Type: Original
+
+Claim Number,Policy Number,Policy Year,Coverage,Date of Loss,Date Reported,Status,Claimant,Paid,Reserve,Incurred,Description
+KM-2023-0221,KM-CA-2023-88417,2023,Workers Compensation,2023-04-18,2023-04-24,Closed,Employee,"3,370.06",0.00,"3,370.06","Repetitive strain, order picking"
+KM-2023-0217,KM-CA-2023-88417,2023,General Liability,2023-06-15,2023-06-22,Closed,Third party,"53,536.94",0.00,"53,536.94",Minor property damage at delivery site
+KM-2023-0204,KM-CA-2023-88417,2023,Auto Liability,2023-07-20,2023-07-24,Open,Third party,"2,909.95","5,026.84","7,936.79",Backing incident at customer dock
+KM-2023-0250,KM-CA-2023-88417,2023,Auto Liability,2023-09-21,2023-09-28,Closed,Third party,"61,283.59",0.00,"61,283.59","Sideswipe during lane change, property damage only"
+KM-2023-0417,KM-CA-2023-88417,2023,Auto Liability,2023-11-08,2023-11-09,Open,Third party,"8,150.00","36,850.00","45,000.00","Tractor-trailer jackknife on I-80, two vehicles involved, bodily injury alleged by both occupants of the second vehicle."
+KM-2023-0209,KM-CA-2023-88417,2023,General Liability,2023-11-12,2023-11-19,Open,Third party,754.74,"3,941.25","4,695.99",Damage to customer dock leveller
+KM-2023-0245,KM-CA-2023-88417,2023,Auto Physical Damage,2023-12-06,2023-12-07,Open,First party,"6,651.70","37,366.31","44,018.01","Windshield replacement, road debris"
+KM-2023-0237,KM-CA-2023-88417,2023,Workers Compensation,2024-01-22,2024-01-28,Open,Employee,257.11,"1,905.54","2,162.65","Hand laceration, box cutter"
+KM-2023-0230,KM-CA-2023-88417,2023,Workers Compensation,2024-02-17,2024-02-22,Open,Employee,"11,619.63","52,468.78","64,088.41","Hand laceration, box cutter"
+
+,,,,,,,TOTAL INCURRED,,,"287,592.44",
+,,,,,,,CLAIM COUNT,,,9,
+,,,,,,,EARNED PREMIUM,,,"501,200.00",

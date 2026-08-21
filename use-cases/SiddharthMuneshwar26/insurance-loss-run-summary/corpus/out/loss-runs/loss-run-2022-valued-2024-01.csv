@@ -1,0 +1,24 @@
+Kestrel Mutual Insurance Company - Loss Run Report
+"Insured: Meridian Cold Chain Logistics, Inc."
+FEIN: 88-0143927
+Policy Period: 2022-04-01 to 2023-04-01
+Valuation Date: 2024-01-15
+Report Type: Original
+
+Claim Number,Policy Number,Policy Year,Coverage,Date of Loss,Date Reported,Status,Claimant,Paid,Reserve,Incurred,Description
+KM-2022-0246,KM-CA-2022-88417,2022,General Liability,2022-04-22,2022-04-24,Closed,Third party,"3,758.58",0.00,"3,758.58",Minor property damage at delivery site
+KM-2022-0267,KM-CA-2022-88417,2022,Auto Physical Damage,2022-06-19,2022-06-22,Closed,First party,"17,714.07",0.00,"17,714.07","Tractor door damage, parking lot"
+KM-2022-0232,KM-CA-2022-88417,2022,Auto Physical Damage,2022-08-01,2022-08-09,Closed,First party,"3,307.82",0.00,"3,307.82","Tractor door damage, parking lot"
+KM-2022-0214,KM-CA-2022-88417,2022,Workers Compensation,2022-08-02,2022-08-06,Closed,Employee,"17,289.63",0.00,"17,289.63","Repetitive strain, order picking"
+KM-2022-0237,KM-CA-2022-88417,2022,Auto Physical Damage,2022-08-17,2022-08-25,Open,First party,"8,535.28","15,191.06","23,726.34","Tyre blowout, wheel arch damage"
+KM-2022-0311,KM-CA-2022-88417,2022,Workers Compensation,2022-09-19,2022-09-19,Closed,Employee,"41,280.00",0.00,"41,280.00","Warehouse associate lumbar strain, pallet jack incident."
+KM-2022-0258,KM-CA-2022-88417,2022,Auto Physical Damage,2023-01-19,2023-01-26,Open,First party,666.02,"1,913.46","2,579.48","Tractor door damage, parking lot"
+KM-2022-0252,KM-CA-2022-88417,2022,Property,2023-02-05,2023-02-10,Open,First party,749.80,"2,476.00","3,225.80","Roof leak, Bakersfield warehouse"
+KM-2022-0203,KM-CA-2022-88417,2022,Auto Physical Damage,2023-02-15,2023-02-22,Closed,First party,"14,349.16",0.00,"14,349.16","Tractor door damage, parking lot"
+KM-2022-0209,KM-CA-2022-88417,2022,Auto Liability,2023-02-15,2023-02-15,Closed,Third party,"34,851.06",0.00,"34,851.06","Sideswipe during lane change, property damage only"
+KM-2022-0224,KM-CA-2022-88417,2022,Workers Compensation,2023-02-20,2023-02-25,Closed,Employee,"3,712.44",0.00,"3,712.44","Slip on wet dock plate, contusion"
+KM-2022-0402,KM-CA-2022-88417,2022,General Liability,2023-04-11,2023-04-19,Closed,Third party,"18,900.00",0.00,"18,900.00","Slip and fall, visitor at the Fresno cross-dock."
+
+,,,,,,,TOTAL INCURRED,,,"184,694.38",
+,,,,,,,CLAIM COUNT,,,12,
+,,,,,,,EARNED PREMIUM,,,"448,500.00",

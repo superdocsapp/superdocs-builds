@@ -1,0 +1,19 @@
+Kestrel Mutual Insurance Company - Loss Run Report
+"Insured: Meridian Cold Chain Logistics, Inc."
+FEIN: 88-0143927
+Policy Period: 2024-04-01 to 2025-04-01
+Valuation Date: 2026-01-09
+Report Type: REISSUE - supersedes prior
+
+Claim Number,Policy Number,Policy Year,Coverage,Date of Loss,Date Reported,Status,Claimant,Paid,Reserve,Incurred,Description
+KM-2024-0231,KM-CA-2024-88417,2024,Auto Liability,2024-06-19,2024-06-28,Closed,Third party,526.85,0.00,526.85,"Minor collision in yard, no injuries"
+KM-2024-0106,KM-CA-2024-88417,2024,Auto Liability,2024-06-22,2024-06-23,Open,Third party,"31,000.00","118,000.00","149,000.00","Rear-end collision, company tractor, claimant hospitalised."
+KM-2024-0202,KM-CA-2024-88417,2024,Auto Liability,2024-10-06,2024-10-11,Closed,Third party,"2,415.83",0.00,"2,415.83","Minor collision in yard, no injuries"
+KM-2024-0223,KM-CA-2024-88417,2024,Auto Physical Damage,2024-10-12,2024-10-18,Closed,First party,"16,697.56",0.00,"16,697.56","Tyre blowout, wheel arch damage"
+KM-2024-0238,KM-CA-2024-88417,2024,Auto Physical Damage,2024-11-22,2024-11-28,Closed,First party,"2,094.59",0.00,"2,094.59","Windshield replacement, road debris"
+KM-2024-0208,KM-CA-2024-88417,2024,Auto Physical Damage,2025-02-28,2025-02-28,Closed,First party,"3,364.47",0.00,"3,364.47","Tractor door damage, parking lot"
+KM-2024-0218,KM-CA-2024-88417,2024,Property,2025-03-05,2025-03-14,Open,First party,"3,537.94","11,194.31","14,732.25","Freezer motor burnout, electrical surge"
+
+,,,,,,,TOTAL INCURRED,,,"188,831.55",
+,,,,,,,CLAIM COUNT,,,7,
+,,,,,,,EARNED PREMIUM,,,"566,900.00",
