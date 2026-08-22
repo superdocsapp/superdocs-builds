@@ -1,0 +1,42 @@
+FORM GST ASMT-10
+[See rule 99(1)]
+
+Reference No: ZD270826001234X          DIN: 20260827XYZ00019
+Date: 27-Jul-2026
+
+To,
+M/s Meridian Ornaments LLP
+GSTIN: 27AABCK5678G1Z3
+Shop 14, Zaveri Lane, Mumbai - 400002
+
+Tax period: April 2026 - June 2026 (FY 2026-27, Q1)
+
+Subject: Notice for intimating discrepancies in the return after scrutiny
+
+Sir/Madam,
+
+This is to inform that during scrutiny of the returns furnished by you for
+the aforesaid tax period, the following discrepancies have been noticed:
+
+Discrepancy 1: Outward taxable supplies declared in FORM GSTR-1 amount to
+Rs. 48,20,000 whereas outward taxable supplies declared in FORM GSTR-3B for
+the same period amount to Rs. 45,10,000. The difference of Rs. 3,10,000
+results in an apparent short payment of tax of Rs. 9,300 (CGST Rs. 4,650 +
+SGST Rs. 4,650) at the applicable rate of 3%.
+
+Discrepancy 2: Input tax credit availed in FORM GSTR-3B (Table 4A) amounts
+to Rs. 2,80,000 whereas credit available as per FORM GSTR-2B for the said
+period amounts to Rs. 2,35,000. Excess availment of Rs. 45,000 appears to
+contravene section 16(2)(aa) of the CGST Act, 2017.
+
+Discrepancy 3: Interest under section 50 on the delayed payment of tax for
+the month of May 2026 (return filed on 28-Jun-2026 against due date of
+20-Jun-2026) does not appear to have been discharged.
+
+You are hereby directed to furnish explanation for the above discrepancies
+within THIRTY (30) days from the date of service of this notice. In case no
+satisfactory explanation is furnished, proceedings under section 73 or
+section 74 of the Act may be initiated.
+
+State Tax Officer
+Ghatak 27, Mumbai Nodal Division

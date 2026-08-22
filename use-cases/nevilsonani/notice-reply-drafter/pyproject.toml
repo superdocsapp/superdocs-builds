@@ -1,0 +1,21 @@
+[project]
+name = "notice-reply-drafter"
+version = "0.1.0"
+description = "GST notice reply drafter for CA firms - built ON SuperDocs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "httpx>=0.27",
+    "typer>=0.12",
+    "pyyaml>=6.0",
+]
+
+[project.scripts]
+nrd = "nrd.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nrd"]
