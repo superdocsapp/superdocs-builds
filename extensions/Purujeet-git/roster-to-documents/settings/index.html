@@ -2,47 +2,262 @@
 <html>
 <head>
   <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body{font-family:Arial,sans-serif;margin:20px;color:#202124}
-    label{display:block;font-size:13px;font-weight:600;margin:16px 0 6px}
-    input{box-sizing:border-box;width:100%;padding:9px;border:1px solid #dadce0;border-radius:4px;font-size:13px}
-    .muted{color:#5f6368;font-size:12px;line-height:1.4}
-    .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
-    button{padding:9px 14px;border:0;border-radius:5px;background:#1a73e8;color:white;cursor:pointer}
-    button.secondary{background:#f1f3f4;color:#202124}
-    button:disabled{opacity:.55;cursor:default}
-    #message{margin-top:12px;font-size:12px}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: #f7f6f2;
+      color: #1a202c;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    
+    .modal-container {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    
+    .modal-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .modal-icon {
+      width: 56px;
+      height: 56px;
+      background: #ee735f;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 28px;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .modal-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 8px;
+    }
+    
+    .modal-header p {
+      font-size: 13px;
+      color: #718096;
+      line-height: 1.5;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    input[type="password"]:focus {
+      outline: none;
+      border-color: #171717;
+      box-shadow: 3px 3px 0 #ee735f;
+    }
+    
+    input[type="password"]::placeholder {
+      color: #cbd5e0;
+    }
+    
+    .helper-text {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #718096;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    
+    .helper-text::before {
+      content: "ℹ";
+      color: #171717;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+    
+    #message {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.5;
+      min-height: 20px;
+    }
+    
+    #message.loading {
+      background: #e6fffa;
+      color: #234e52;
+    }
+    
+    #message.success {
+      background: #c6f6d5;
+      color: #22543d;
+      border: 1px solid #9ae6b4;
+    }
+    
+    #message.error {
+      background: #fed7d7;
+      color: #742a2a;
+      border: 1px solid #fc8181;
+    }
+    
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    button#save {
+      background: #ee735f;
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    button#save:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    button.secondary {
+      background: #f7fafc;
+      color: #1a202c;
+      border: 1.5px solid #e2e8f0;
+    }
+    
+    button.secondary:hover {
+      background: #edf2f7;
+      border-color: #cbd5e0;
+    }
+    
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  </style>
+  <style>
+    /* Match the document workspace with solid SuperDocs-inspired colors. */
+    :root { --ink:#171717; --muted:#6b6b6b; --line:#dedbd6; --paper:#fff; --canvas:#f7f6f2; --coral:#ee735f; --coral-dark:#c95142; --soft-coral:#fff0ed; }
+    body { background:var(--canvas); color:var(--ink); padding:18px; }
+    .modal-container { background:var(--paper); border:1px solid var(--line); border-radius:0; box-shadow:none; padding:20px; }
+    .modal-header { display:flex; align-items:flex-start; gap:12px; text-align:left; padding-bottom:16px; border-bottom:1px solid var(--line); }
+    .modal-icon { width:34px; height:34px; flex:0 0 34px; margin:0; background:var(--coral); border:2px solid var(--ink); border-radius:0; box-shadow:none; font-size:17px; }
+    .modal-header h2 { font-size:19px; color:var(--ink); letter-spacing:-.4px; }
+    .modal-header p { color:var(--muted); font-size:11px; }
+    label { color:var(--muted); font-size:10px; }
+    input[type="password"] { border:1px solid var(--line); border-radius:0; }
+    input[type="password"]:focus { border-color:var(--ink); box-shadow:3px 3px 0 var(--coral); }
+    .helper-text { color:var(--muted); font-size:11px; }
+    .helper-text::before { content:"i"; color:var(--ink); background:var(--coral); border:1px solid var(--ink); width:15px; height:15px; display:inline-flex; align-items:center; justify-content:center; }
+    #message { border-radius:0; }
+    #message.loading { background:#f4f1e9; color:#59554e; }
+    #message.success { background:#edf6ef; border-color:#9fc7a8; }
+    #message.error { background:var(--soft-coral); border-color:#e3a196; }
+    .actions { border-top:1px solid var(--line); }
+    button { border-radius:0; border:1px solid var(--ink); }
+    button#save { background:var(--coral); color:var(--ink); box-shadow:none; }
+    button#save:hover:not(:disabled) { background:var(--coral-dark); color:#fff; transform:none; box-shadow:none; }
+    button.secondary { background:var(--paper); color:var(--ink); border-color:var(--line); }
+    button.secondary:hover { background:#f0eee9; border-color:var(--ink); }
   </style>
 </head>
 <body>
-  <h3>SuperDocs settings</h3>
-  <div class="muted">The API key is stored securely in Apps Script Script Properties and is never shown after saving.</div>
-  <label for="apiKey">SuperDocs API key</label>
-  <input id="apiKey" type="password" autocomplete="off" placeholder="Paste your API key">
-  <div id="message" class="muted">Loading…</div>
-  <div class="actions">
-    <button class="secondary" onclick="google.script.host.close()">Cancel</button>
-    <button id="save" onclick="save()">Save key</button>
+  <div class="modal-container">
+    <div class="modal-header">
+      <div class="modal-icon">🔑</div>
+      <h2>Connect SuperDocs</h2>
+      <p>Unlock AI-powered document refinement and export capabilities</p>
+    </div>
+    
+    <div class="form-group">
+      <label for="apiKey">API Key</label>
+      <input id="apiKey" type="password" autocomplete="off" placeholder="sk_live_...">
+      <div class="helper-text">Get your API key from <strong>SuperDocs Dashboard → Settings → API Keys</strong></div>
+    </div>
+    
+    <div id="message" class="loading">Loading configuration…</div>
+    
+    <div class="actions">
+      <button class="secondary" onclick="google.script.host.close()">Cancel</button>
+      <button id="save" onclick="save()">Save & Connect</button>
+    </div>
   </div>
   <script>
     const message = document.getElementById('message');
     const saveButton = document.getElementById('save');
+    
     google.script.run.withSuccessHandler(function(state){
-      message.textContent = state.superDocsConfigured ? 'A key is currently configured.' : 'No key is configured yet.';
+      if(state.superDocsConfigured){
+        message.textContent = '✅ API key is currently configured and active.';
+        message.className = 'success';
+      } else {
+        message.textContent = '⚠️ No API key configured yet. Add yours to enable document refinement.';
+        message.className = 'error';
+      }
     }).withFailureHandler(function(error){
-      message.textContent = 'Could not load settings: ' + error.message;
+      message.textContent = '❌ Could not load settings: ' + error.message;
+      message.className = 'error';
     }).getSettingsState();
+    
     function save(){
       const key = document.getElementById('apiKey').value.trim();
-      if(!key){message.textContent='Enter a SuperDocs API key.';return;}
+      if(!key){
+        message.textContent='❌ Enter a SuperDocs API key.';
+        message.className='error';
+        return;
+      }
       saveButton.disabled=true;
-      message.textContent='Saving…';
+      message.textContent='⏳ Saving and verifying...';
+      message.className='loading';
       google.script.run.withSuccessHandler(function(){
-        message.textContent='Saved. You can close this window and generate documents.';
+        message.textContent='✅ Saved successfully! You can now generate documents.';
+        message.className='success';
         document.getElementById('apiKey').value='';
         saveButton.disabled=false;
       }).withFailureHandler(function(error){
-        message.textContent='Save failed: ' + error.message;
+        message.textContent='❌ Save failed: ' + error.message;
+        message.className='error';
         saveButton.disabled=false;
       }).saveSuperDocsApiKey(key);
     }

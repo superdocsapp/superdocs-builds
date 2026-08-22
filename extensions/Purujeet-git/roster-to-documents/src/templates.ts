@@ -1,15 +1,42 @@
+// Template cache to avoid redundant Drive calls during batch processing
+var TEMPLATE_CACHE: Record<string, string> = {};
+
+function clearTemplateCache(): void {
+  TEMPLATE_CACHE = {};
+}
+
 function getTemplateBody(templateId: string): string {
+  // Check in-memory cache first
+  if (TEMPLATE_CACHE[templateId]) {
+    return TEMPLATE_CACHE[templateId];
+  }
+  
   var folderId = getScriptProperty(CONFIG.TEMPLATE_FOLDER_PROPERTY);
+  var template: string = "";
+  
+  // Try to get dynamic template from Drive
   if (folderId) {
     var files = DriveApp.getFolderById(folderId).getFilesByName(templateId + ".html");
-    if (files.hasNext()) return files.next().getBlob().getDataAsString();
+    if (files.hasNext()) {
+      template = files.next().getBlob().getDataAsString();
+    }
   }
-  if (templateId.indexOf("dynamic-") === 0) {
+  
+  // If not found and it's a dynamic template, error out
+  if (!template && templateId.indexOf("dynamic-") === 0) {
     throw new Error("Dynamic template file not found: " + templateId + ". Run preview again to regenerate templates.");
   }
-  var allowed = getTemplateDefinitions().some(function (template) { return template.id === templateId; });
-  var selected = allowed ? templateId : "general";
-  return HtmlService.createTemplateFromFile("templates/" + selected).getRawContent();
+  
+  // Fall back to built-in templates if not found in Drive
+  if (!template) {
+    var allowed = getTemplateDefinitions().some(function (definition) { return definition.id === templateId; });
+    var selected = allowed ? templateId : "general";
+    template = HtmlService.createTemplateFromFile("templates/" + selected).getRawContent();
+  }
+  
+  // Cache the template for future calls
+  TEMPLATE_CACHE[templateId] = template;
+  return template;
 }
 
 function getDynamicTemplateMap(): Record<string, DynamicTemplateRecord> {

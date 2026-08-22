@@ -21,6 +21,7 @@ function loadJob(jobId: string): JobState {
 function createJob(sheet: any): JobState {
   var lastRow = sheet.getLastRow();
   if (lastRow < 2) throw new Error("No roster rows found.");
+  clearTemplateCache(); // Clear cache at start of new job
   var jobId = Utilities.getUuid();
   var outputColumn = ensureHeader(sheet, CONFIG.DEFAULT_OUTPUT_HEADER);
   var job: JobState = {

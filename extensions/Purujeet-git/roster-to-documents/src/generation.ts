@@ -17,7 +17,7 @@ function buildRowIdempotencyKey(spreadsheetId: string, sheetName: string, rowNum
 
 function generateRowDocument(row: RosterRow, jobId: string, emailEnabled: boolean, idempotencyKey: string): GenerationResult {
   var route = routeRow(row);
-  var baseTemplate = getTemplateBody(route.templateId);
+  var baseTemplate = getTemplateBody(route.templateId); // Uses cache automatically
   var rendered = renderTemplate(baseTemplate, row.values);
   var name = String(row.values["Name"] || "Document");
   var fileName = safeFileName(name + "_" + route.templateName);
