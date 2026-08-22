@@ -16,7 +16,7 @@ runMigrations();
 
 app.use("/clients", clientsRouter);
 app.use("/engagements", engagementsRouter);
-app.use("timesheet-entries", timesheetEntriesRouter);
+app.use("/timesheet-entries", timesheetEntriesRouter);
 app.use("/invoices", invoicesRoute);
 app.use("/documents", documentsRouter)
 
