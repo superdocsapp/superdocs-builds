@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { exampleInput, makeKitHtml, type KitInput } from "./lib/kit";
+import { exampleInput, filterStrings, kitTemplates, makeKitHtml, type KitInput } from "./lib/kit";
 import { exportKit, startReview, submitDecisions, type ReviewJob } from "./lib/superdocs";
 import { validateTranslations } from "./lib/validation";
 import "./styles.css";
@@ -14,8 +14,23 @@ export default function App() {
   const [approvedHtml, setApprovedHtml] = useState<string | null>(null);
   const [status, setStatus] = useState("Ready. The SuperDocs key stays on the local server.");
   const [activeSession, setActiveSession] = useState("");
+  const [search, setSearch] = useState("");
   const violations = useMemo(() => validateTranslations(kit.strings, targetText, kit.targetLanguage, kit.doNotTranslate), [kit, targetText, kit.targetLanguage]);
+  const visibleStrings = useMemo(() => filterStrings(kit.strings, search), [kit.strings, search]);
   const errorsFor = (id: string) => violations.filter(item => item.id === id);
+
+  function applyTemplate(templateId: string) {
+    const template = kitTemplates.find(item => item.id === templateId);
+    if (!template) return;
+    setKit(template.input);
+    setTargetText({});
+    setReview(null);
+    setDecisions({});
+    setApprovedHtml(null);
+    setActiveSession("");
+    setSearch("");
+    setStatus(`${template.label} loaded. Add returned translations, then request review.`);
+  }
 
   async function sendToSuperDocs() {
     const nextSession = sessionId();
@@ -52,6 +67,7 @@ export default function App() {
   return <main>
     <header><p className="eyebrow">Localization production desk</p><h1>Kitline</h1><p>Build a handoff a translator can trust, then run a human-reviewed SuperDocs pass before export.</p></header>
     <section className="setup">
+      <label>Kit template <select aria-label="Kit template" defaultValue="ashfall" onChange={event => applyTemplate(event.target.value)}>{kitTemplates.map(template => <option value={template.id} key={template.id}>{template.label}</option>)}</select></label>
       <label>Target language <input value={kit.targetLanguage} onChange={event => setKit({ ...kit, targetLanguage: event.target.value })} /></label>
       <button onClick={sendToSuperDocs}>Create and review kit</button>
       <button className="quiet" disabled={!activeSession} onClick={download}>Export DOCX</button>
@@ -60,7 +76,8 @@ export default function App() {
 
     <section className="context"><div><p className="eyebrow">Translator context</p><h2>{kit.game}</h2><textarea value={kit.world} onChange={event => setKit({ ...kit, world: event.target.value })} /></div><div><p className="eyebrow">Voice direction</p><textarea value={kit.tone} onChange={event => setKit({ ...kit, tone: event.target.value })} /></div></section>
     <section><div className="section-head"><div><p className="eyebrow">String table</p><h2>Source and returned text</h2></div><strong className={violations.length ? "bad" : "good"}>{violations.length ? `${violations.length} issue(s)` : "All clear"}</strong></div>
-      <div className="table-wrap"><table><thead><tr><th>ID / source</th><th>Limit</th><th>Speaker and scene</th><th>Returned translation</th></tr></thead><tbody>{kit.strings.map(item => <tr key={item.id}><td><code>{item.id}</code><p>{item.source}</p></td><td>{item.characterLimit} display units</td><td><strong>{item.speaker}</strong><br /><small>{item.scene}</small></td><td><textarea aria-label={`${item.id} translation`} value={targetText[item.id] ?? ""} onChange={event => setTargetText({ ...targetText, [item.id]: event.target.value })} placeholder={`Paste ${kit.targetLanguage} translation`} />{errorsFor(item.id).map(error => <small className="violation" key={error.message}>{error.message}</small>)}</td></tr>)}</tbody></table></div>
+      <div className="string-search"><input aria-label="Find strings" value={search} onChange={event => setSearch(event.target.value)} placeholder="Find by ID, source, speaker or scene" /><small>{visibleStrings.length} of {kit.strings.length} string(s) shown</small></div>
+      <div className="table-wrap"><table><thead><tr><th>ID / source</th><th>Limit</th><th>Speaker and scene</th><th>Returned translation</th></tr></thead><tbody>{visibleStrings.map(item => <tr key={item.id}><td><code>{item.id}</code><p>{item.source}</p></td><td>{item.characterLimit} display units</td><td><strong>{item.speaker}</strong><br /><small>{item.scene}</small></td><td><textarea aria-label={`${item.id} translation`} value={targetText[item.id] ?? ""} onChange={event => setTargetText({ ...targetText, [item.id]: event.target.value })} placeholder={`Paste ${kit.targetLanguage} translation`} />{errorsFor(item.id).map(error => <small className="violation" key={error.message}>{error.message}</small>)}</td></tr>)}</tbody></table></div>
     </section>
 
     <section className="side-by-side"><div><p className="eyebrow">Protected content</p><h2>Do not translate</h2><textarea value={kit.doNotTranslate.join("\n")} onChange={event => setKit({ ...kit, doNotTranslate: event.target.value.split("\n").filter(Boolean) })} /></div><div><p className="eyebrow">Consistency</p><h2>Style sheet</h2><textarea value={kit.styleRules.join("\n")} onChange={event => setKit({ ...kit, styleRules: event.target.value.split("\n").filter(Boolean) })} /></div></section>

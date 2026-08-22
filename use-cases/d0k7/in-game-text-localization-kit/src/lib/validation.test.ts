@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { exampleInput, makeKitHtml } from "./kit";
+import { exampleInput, filterStrings, makeKitHtml } from "./kit";
 import { parsePendingChanges } from "./superdocs";
 import { displayWidth, validateTranslations } from "./validation";
 
@@ -39,5 +39,10 @@ describe("localization validation", () => {
     const html = makeKitHtml(exampleInput);
     expect(html).toContain('data-chunk-id="00000000-0000-4000-8000-000000000001"');
     expect(html).toContain('data-chunk-id="00000000-0000-4000-8000-000000000008"');
+  });
+
+  it("filters a large string table by workflow-relevant context", () => {
+    expect(filterStrings(exampleInput.strings, "breach").map(item => item.id)).toEqual(["DIA.ROOK.ENTRY"]);
+    expect(filterStrings(exampleInput.strings, "HUD").map(item => item.id)).toEqual(["HUD.REACTOR.OVERLOAD"]);
   });
 });

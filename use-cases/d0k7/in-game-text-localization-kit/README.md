@@ -2,7 +2,7 @@
 
 Built by Dheeraj Mishra for the SuperDocs task.
 
-Kitline is a localization-producer workbench for the moment before a game string table goes to a translation vendor. It produces a real translator handoff: world and tone context, per-string character limits, speaker and scene notes, protected tokens and proper nouns, and a style sheet. When translations return, it flags token loss, token invention, and target-script display-width breaches on the exact row.
+Kitline is a localization-producer workbench for the moment before a game string table goes to a translation vendor. It provides reusable handoff templates, finds individual strings by ID or context, and produces a real translator handoff: world and tone context, per-string character limits, speaker and scene notes, protected tokens and proper nouns, and a style sheet. When translations return, it flags token loss, token invention, and target-script display-width breaches on the exact row.
 
 The sample is synthetic. It is deliberately game-like, with a combat HUD warning, a named speaker, an objective tag, variables and markup. A translator who has not played the game gets enough context to translate intent instead of guessing from isolated strings.
 
@@ -35,7 +35,7 @@ The server calls:
 3. `POST /v1/chat/{session_id}/approve` with explicit per-change decisions
 4. `POST /v1/documents/export`
 
-Run the deterministic checks with `npm test` and produce a deployable build with `npm run build`. The five tests cover protected formatting tokens, repeated protected content, proper nouns, target-script width and resilient parsing of normal or double-encoded proposed-change payloads.
+Run the deterministic checks with `npm test` and produce a deployable build with `npm run build`. The six tests cover protected formatting tokens, repeated protected content, proper nouns, target-script width, string-table search and resilient parsing of normal or double-encoded proposed-change payloads.
 
 ## Verification
 
