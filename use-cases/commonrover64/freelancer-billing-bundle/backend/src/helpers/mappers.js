@@ -4,14 +4,14 @@ export function mapRateRow(row) {
     return {
         hourlyRate: Number(row.hourly_rate),
         currency: row.currency,
-        effectiveFrom: row.effective_from.toISOString().slice(0, 10),
+        effectiveFrom: row.effective_from,
     };
 }
 
 //  maps a DB timesheet_entries row to what splitInvoiceByRate expects
 export function mapTimesheetRow(row) {
     return {
-        date: row.entry_date.toISOString().slice(1, 10),
+        date: row.entry_date,
         hours: Number(row.hours),
         description: row.description,
     };
