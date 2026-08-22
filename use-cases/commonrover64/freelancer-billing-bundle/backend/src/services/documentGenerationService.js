@@ -5,9 +5,9 @@ import {
     approveChanges,
     exportDocument,
 } from "./superdocsService.js";
+import { isBluffedChange } from "./bluffDetector.js";
+import { validateCompletion } from "./completionValidator.js";
 
-// step 1: upload the skeleton, ask AI to fill it in, and stop as soon as there are proposed changes. Does NOT approve anything.
-// a human reviews job.metadata.pending_changes before calling resumeAfterReview.
 export async function startDocumentGeneration({
     sessionId,
     filename,
@@ -24,31 +24,36 @@ export async function startDocumentGeneration({
         throw new Error(`SuperDocs job failed: ${job.error}`);
     }
 
+    const pendingChanges =
+        job.status === "awaiting_approval" ? job.metadata.pending_changes : [];
+
+    const flaggedChanges = pendingChanges.map((change) => ({
+        ...change,
+        isSuspectedBluff: isBluffedChange(change),
+    }));
+
     return {
         jobId,
         sessionId,
         status: job.status,
-        pendingChanges:
-            job.status === "awaiting_approval"
-                ? job.metadata.pending_changes
-                : [],
+        pendingChanges: flaggedChanges,
     };
 }
 
-// step 2: takes the human's decisions (one approved: true/false per change_id),
-// submits them, waits for the job to finish applying, then exports.
+// expectedValues: array of strings/numbers that must appear in the final
+// exported document. Caller passes these from the real data used to build
+// the instruction, so we verify against ground truth, not the AI's own claim.
 export async function resumeAfterReview({
     sessionId,
     jobId,
     decisions,
+    expectedValues = [],
     exportFormat = "docx",
 }) {
-    // decisions: array of { change_id, approved }
-
     await approveChanges({
         sessionId,
         jobId,
-        approved: true, // required top-level default; each entry below carries its own real decision
+        approved: true,
         changes: decisions,
     });
 
@@ -58,19 +63,47 @@ export async function resumeAfterReview({
         throw new Error(`SuperDocs job failed after review: ${job.error}`);
     }
 
-    // if denying a change caused the AI to propose a revision, there will be
-    // a new round of pending_changes. Surface that instead of exporting early.
     if (job.status === "awaiting_approval") {
+        const nextChanges = job.metadata.pending_changes;
+        const anyBluffed = nextChanges.some(isBluffedChange);
+
+        if (anyBluffed) {
+            return {
+                status: "failed_needs_manual_retry",
+                reason: "SuperDocs proposed a placeholder or degraded value after a review round. Session may have lost context. Start a fresh generation instead of continuing this session.",
+                pendingChanges: nextChanges,
+            };
+        }
+
         return {
             status: "awaiting_approval",
-            pendingChanges: job.metadata.pending_changes,
+            pendingChanges: nextChanges.map((change) => ({
+                ...change,
+                isSuspectedBluff: false,
+            })),
         };
     }
 
+    // Job says completed. Verify before trusting it.
     const exportResult = await exportDocument({
         sessionId,
         format: exportFormat,
     });
+
+    if (exportResult.isBinary && expectedValues.length > 0) {
+        const validation = await validateCompletion(
+            exportResult.buffer,
+            expectedValues,
+        );
+
+        if (!validation.isComplete) {
+            return {
+                status: "completed_but_incomplete",
+                reason: `Job reported completed, but the exported document is missing: ${validation.missing.join(", ")}`,
+                exportResult,
+            };
+        }
+    }
 
     return {
         status: "completed",
