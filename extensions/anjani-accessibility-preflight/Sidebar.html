@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 16px;
+      margin: 0;
+      color: #202124;
+      background: #ffffff;
+    }
+
+    h2 {
+      margin: 0 0 6px 0;
+      font-size: 20px;
+    }
+
+    .subtitle {
+      color: #5f6368;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 6px;
+      padding: 11px;
+      margin-bottom: 12px;
+      background: #1a73e8;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1557b0;
+    }
+
+    button:disabled {
+      background: #9aa0a6;
+      cursor: wait;
+    }
+
+    .fix-button {
+      background: #188038;
+      margin-top: 10px;
+    }
+
+    .fix-button:hover {
+      background: #137333;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #5f6368;
+    }
+
+    .document-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 10px 5px;
+      text-align: center;
+    }
+
+    .summary-number {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      color: #5f6368;
+      margin-top: 3px;
+    }
+
+    .issue-card {
+      border-left: 4px solid #d93025;
+      background: #fce8e6;
+      padding: 11px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+
+    .warning-card {
+      border-left: 4px solid #f9ab00;
+      background: #fef7e0;
+      padding: 11px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+
+    .passed-card {
+      border-left: 4px solid #188038;
+      background: #e6f4ea;
+      padding: 11px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+
+    .card-title {
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 5px;
+      text-transform: capitalize;
+    }
+
+    .card-message {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: bold;
+      margin: 20px 0 10px;
+    }
+
+    .stats {
+      border: 1px solid #dadce0;
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 15px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 12px;
+    }
+
+    .stat-value {
+      font-weight: bold;
+    }
+
+    .success-message {
+      background: #e6f4ea;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+      color: #137333;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .error-message {
+      background: #fce8e6;
+      border-radius: 8px;
+      padding: 14px;
+      color: #c5221f;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .empty {
+      color: #5f6368;
+      font-size: 12px;
+      padding: 8px 0;
+    }
+
+    .location {
+      color: #5f6368;
+      font-size: 11px;
+      margin-top: 5px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <h2>Accessibility Preflight</h2>
+
+  <div class="subtitle">
+    Scan this Google Doc for common accessibility issues before export.
+  </div>
+
+  <button id="scanButton" onclick="runScan()">
+    Run Accessibility Check
+  </button>
+
+  <div id="result">
+
+    <div class="empty">
+      Click "Run Accessibility Check" to scan this document.
+    </div>
+
+  </div>
+
+
+  <script>
+
+    // ==========================================
+    // RUN ACCESSIBILITY SCAN
+    // ==========================================
+
+    function runScan() {
+
+      const button = document.getElementById('scanButton');
+      const result = document.getElementById('result');
+
+      button.disabled = true;
+      button.innerText = 'Scanning...';
+
+      result.innerHTML = `
+        <div class="loading">
+          Checking document...
+        </div>
+      `;
+
+      google.script.run
+
+        .withSuccessHandler(function(report) {
+
+          button.disabled = false;
+          button.innerText = 'Run Accessibility Check';
+
+          displayReport(report);
+
+        })
+
+        .withFailureHandler(function(error) {
+
+          button.disabled = false;
+          button.innerText = 'Run Accessibility Check';
+
+          result.innerHTML = `
+            <div class="error-message">
+              <strong>Scanner Error</strong><br><br>
+              ${escapeHtml(error.message)}
+            </div>
+          `;
+
+        })
+
+        .getAccessibilityReport();
+    }
+
+
+    // ==========================================
+    // DISPLAY REPORT
+    // ==========================================
+
+    function displayReport(report) {
+
+      const result = document.getElementById('result');
+
+      let html = '';
+
+      html += `
+        <div class="document-title">
+          Document: ${escapeHtml(report.title || 'Current document')}
+        </div>
+      `;
+
+
+      // ------------------------------------------
+      // COUNTS
+      // ------------------------------------------
+
+      const issues = report.issues || [];
+
+      const headingIssues = issues.filter(function(issue) {
+        return issue.type === 'heading';
+      });
+
+      const tableIssues = issues.filter(function(issue) {
+        return issue.type === 'table';
+      });
+
+      const imageIssues = issues.filter(function(issue) {
+        return issue.type === 'image';
+      });
+
+
+      // ------------------------------------------
+      // SUCCESS MESSAGE
+      // ------------------------------------------
+
+      if (issues.length === 0) {
+
+        html += `
+          <div class="success-message">
+            ✓ No accessibility issues found
+          </div>
+        `;
+
+      } else {
+
+        html += `
+          <div class="warning-card">
+            <strong>Accessibility checks completed</strong>
+            <div class="card-message">
+              ${issues.length} item(s) need attention or review.
+            </div>
+          </div>
+        `;
+
+      }
+
+
+      // ------------------------------------------
+      // SUMMARY
+      // ------------------------------------------
+
+      html += `
+        <div class="summary">
+
+          <div class="summary-card">
+            <div class="summary-number">
+              ${headingIssues.length}
+            </div>
+            <div class="summary-label">
+              Headings
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-number">
+              ${tableIssues.length}
+            </div>
+            <div class="summary-label">
+              Tables
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-number">
+              ${imageIssues.length}
+            </div>
+            <div class="summary-label">
+              Images
+            </div>
+          </div>
+
+        </div>
+      `;
+
+
+      // ------------------------------------------
+      // ISSUES
+      // ------------------------------------------
+
+      if (issues.length > 0) {
+
+        html += `
+          <div class="section-title">
+            ⚠️ Findings
+          </div>
+        `;
+
+
+        issues.forEach(function(issue) {
+
+          html += `
+            <div class="warning-card">
+
+              <div class="card-title">
+                ${escapeHtml(issue.type || 'Check')}
+              </div>
+
+              <div class="card-message">
+                ${escapeHtml(issue.message || '')}
+              </div>
+          `;
+
+
+          if (issue.text) {
+
+            html += `
+              <div class="card-message">
+                <strong>Text:</strong>
+                ${escapeHtml(issue.text)}
+              </div>
+            `;
+
+          }
+
+
+          // HEADING FIX BUTTON
+
+          if (issue.type === 'heading') {
+
+            html += `
+              <button
+                class="fix-button"
+                onclick="fixIssue('heading')">
+                Fix Headings
+              </button>
+            `;
+
+          }
+
+
+          // TABLE MESSAGE
+
+          if (issue.type === 'table') {
+
+            html += `
+              <div class="location">
+                Table detected. Review the first row as the header row.
+              </div>
+            `;
+
+          }
+
+
+          // IMAGE MESSAGE
+
+          if (issue.type === 'image') {
+
+            html += `
+              <div class="location">
+                Check the image's alternative text.
+              </div>
+            `;
+
+          }
+
+
+          html += `
+            </div>
+          `;
+
+        });
+
+      }
+
+
+      // ------------------------------------------
+      // STATISTICS
+      // ------------------------------------------
+
+      if (report.counts) {
+
+        html += `
+          <div class="section-title">
+            Document Statistics
+          </div>
+
+          <div class="stats">
+
+            <div class="stat-row">
+              <span>Headings</span>
+              <span class="stat-value">
+                ${report.counts.headings || 0}
+              </span>
+            </div>
+
+            <div class="stat-row">
+              <span>Images</span>
+              <span class="stat-value">
+                ${report.counts.images || 0}
+              </span>
+            </div>
+
+            <div class="stat-row">
+              <span>Tables</span>
+              <span class="stat-value">
+                ${report.counts.tables || 0}
+              </span>
+            </div>
+
+          </div>
+        `;
+
+      }
+
+
+      result.innerHTML = html;
+    }
+
+
+    // ==========================================
+    // FIX ACTIONS
+    // ==========================================
+
+    function fixIssue(type) {
+
+      if (type === 'heading') {
+
+        const buttons = document.querySelectorAll('.fix-button');
+
+        buttons.forEach(function(button) {
+          button.disabled = true;
+          button.innerText = 'Fixing...';
+        });
+
+
+        google.script.run
+
+          .withSuccessHandler(function(count) {
+
+            alert(count + ' heading(s) fixed.');
+
+            runScan();
+
+          })
+
+          .withFailureHandler(function(error) {
+
+            alert('Could not fix headings: ' + error.message);
+
+            runScan();
+
+          })
+
+          .fixHeadings();
+
+      }
+
+    }
+
+
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHtml(value) {
+
+      if (value === null || value === undefined) {
+        return '';
+      }
+
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+
+    }
+
+  </script>
+
+</body>
+
+</html>
