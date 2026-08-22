@@ -8,7 +8,7 @@ export async function createTimesheetEntry({
     description,
 }) {
     const result = await pool.query(
-        `INSERT INTO timesheet_entries (engagement_id, entry_dates, hours, description) VALUES ($1, $2, $3, $4)
+        `INSERT INTO timesheet_entries (engagement_id, entry_date, hours, description) VALUES ($1, $2, $3, $4)
         RETURNING *`,
         [engagementId, entryDate, hours, description],
     );
