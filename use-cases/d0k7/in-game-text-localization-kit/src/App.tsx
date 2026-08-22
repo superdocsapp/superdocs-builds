@@ -11,9 +11,10 @@ export default function App() {
   const [targetText, setTargetText] = useState<Record<string, string>>({});
   const [review, setReview] = useState<ReviewJob | null>(null);
   const [decisions, setDecisions] = useState<Record<string, boolean>>({});
+  const [approvedHtml, setApprovedHtml] = useState<string | null>(null);
   const [status, setStatus] = useState("Ready. The SuperDocs key stays on the local server.");
   const [activeSession, setActiveSession] = useState("");
-  const violations = useMemo(() => validateTranslations(kit.strings, targetText, kit.targetLanguage), [kit, targetText, kit.targetLanguage]);
+  const violations = useMemo(() => validateTranslations(kit.strings, targetText, kit.targetLanguage, kit.doNotTranslate), [kit, targetText, kit.targetLanguage]);
   const errorsFor = (id: string) => violations.filter(item => item.id === id);
 
   async function sendToSuperDocs() {
@@ -21,10 +22,12 @@ export default function App() {
     try {
       setStatus("Sending the generated kit to SuperDocs...");
       setActiveSession(nextSession);
+      setApprovedHtml(null);
       setStatus("Asking SuperDocs for a translator-readiness review. This can take a minute.");
-      const result = await startReview(nextSession, makeKitHtml(kit));
+      const result = await startReview(nextSession, makeKitHtml(kit, targetText));
       setReview(result);
       setDecisions(Object.fromEntries(result.changes.map(change => [change.change_id, true])));
+      setApprovedHtml(result.updatedHtml);
       setStatus(result.changes.length ? `${result.changes.length} proposed change(s) ready for your review.` : "Review completed with no proposed changes.");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "The SuperDocs request failed.");
@@ -34,8 +37,9 @@ export default function App() {
   async function applyReview() {
     if (!review) return;
     try {
-      await submitDecisions(review, decisions);
-      setStatus("Your per-change decisions were sent. Export is now available from SuperDocs.");
+      const updated = await submitDecisions(review, decisions);
+      setApprovedHtml(updated);
+      setStatus(updated ? "Your per-change decisions were applied. The approved document is shown below and ready to export." : "Your decisions were sent. SuperDocs completed the review, but did not return updated HTML in the polling payload. Export remains available.");
     } catch (error) { setStatus(error instanceof Error ? error.message : "Could not submit review decisions."); }
   }
 
@@ -62,5 +66,6 @@ export default function App() {
     <section className="side-by-side"><div><p className="eyebrow">Protected content</p><h2>Do not translate</h2><textarea value={kit.doNotTranslate.join("\n")} onChange={event => setKit({ ...kit, doNotTranslate: event.target.value.split("\n").filter(Boolean) })} /></div><div><p className="eyebrow">Consistency</p><h2>Style sheet</h2><textarea value={kit.styleRules.join("\n")} onChange={event => setKit({ ...kit, styleRules: event.target.value.split("\n").filter(Boolean) })} /></div></section>
 
     {review && <section className="review"><p className="eyebrow">SuperDocs review</p><h2>Approve each proposed context edit</h2>{review.changes.length === 0 ? <p>No changes proposed.</p> : review.changes.map(change => <article key={change.change_id}><p>{change.ai_explanation}</p><div className="diff"><del dangerouslySetInnerHTML={{ __html: change.old_html ?? "" }} /><ins dangerouslySetInnerHTML={{ __html: change.new_html ?? "" }} /></div><label><input type="checkbox" checked={decisions[change.change_id] ?? false} onChange={event => setDecisions({ ...decisions, [change.change_id]: event.target.checked })} /> Approve this change</label></article>)}<button disabled={!review.changes.length} onClick={applyReview}>Send decisions</button></section>}
+    {approvedHtml && <section className="approved-document"><p className="eyebrow">Approved document</p><h2>Returned SuperDocs HTML</h2><iframe title="Approved localization kit" sandbox="" srcDoc={approvedHtml} /></section>}
   </main>;
 }

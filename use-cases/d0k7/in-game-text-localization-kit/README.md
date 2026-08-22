@@ -6,11 +6,13 @@ Kitline is a localization-producer workbench for the moment before a game string
 
 The sample is synthetic. It is deliberately game-like, with a combat HUD warning, a named speaker, an objective tag, variables and markup. A translator who has not played the game gets enough context to translate intent instead of guessing from isolated strings.
 
+![Kitline review desk with source context, returned translations and row-level validation](assets/kitline-review-desk.png)
+
 ## Why this shape
 
 Game localization is not a generic document rewrite. The source string is kept immutable beside the returned translation and the validator runs locally, deterministically. It protects `{playerName}`, `[ITEM_VANTA_CORE]`, markup, printf-style variables and literal newlines without spending an operation. Width is measured in display units, with CJK characters taking two units and Arabic/Hebrew given a 1.35 multiplier. This is a conservative preflight, not a font-rendering engine, so the kit reports a violation for a producer to decide instead of claiming final platform fit.
 
-SuperDocs owns the document workflow: the app sends generated HTML, including stable `data-chunk-id` attributes, for a narrow translator-readiness pass in `ask_every_time` review mode, exposes every proposed change for per-change approval, then exports the approved DOCX. The instruction explicitly forbids changes to string IDs, source strings, limits, context columns, protected content and glossary entries. The API key stays in the local server environment and is never sent to the browser, committed, logged or persisted.
+SuperDocs owns the document workflow: the app sends generated HTML, including stable `data-chunk-id` attributes, for a narrow translator-readiness pass in `ask_every_time` review mode, exposes every proposed change for per-change approval, renders the approved returned HTML when the API supplies it, then exports the approved DOCX. The instruction explicitly forbids changes to string IDs, source strings, limits, context columns, protected content and glossary entries. The API key stays in the local server environment and is never sent to the browser, committed, logged or persisted.
 
 ## Run it
 
@@ -33,7 +35,7 @@ The server calls:
 3. `POST /v1/chat/{session_id}/approve` with explicit per-change decisions
 4. `POST /v1/documents/export`
 
-Run the deterministic checks with `npm test` and produce a deployable build with `npm run build`.
+Run the deterministic checks with `npm test` and produce a deployable build with `npm run build`. The five tests cover protected formatting tokens, repeated protected content, proper nouns, target-script width and resilient parsing of normal or double-encoded proposed-change payloads.
 
 ## Verification
 
