@@ -21,7 +21,37 @@ router.post("/generate", async (req, res) => {
 router.post("/review", async (req, res) => {
     try {
         const result = await resumeAfterReview(req.body);
-        res.json(result);
+
+        // If a fresh round of changes came back (denial triggered a revision),
+        // there's nothing to export yet, just return the JSON as-is.
+        if (result.status === "awaiting_approval") {
+            return res.json(result);
+        }
+
+        const { exportResult } = result;
+        // Export came back as raw file bytes, send it as an actual downloadable file
+        // instead of dumping the buffer into a JSON response.
+        if (exportResult?.isBinary) {
+            res.setHeader(
+                "Content-Type",
+                exportResult.contentType || "application/octet-stream",
+            );
+            if (exportResult.contentDisposition) {
+                res.setHeader(
+                    "Content-Disposition",
+                    exportResult.contentDisposition,
+                );
+            } else {
+                res.setHeader(
+                    "Content-Disposition",
+                    'attachment; filename = "document.docx"',
+                );
+            }
+            return res.send(exportResult.buffer);
+        }
+
+        // Export came back as JSON (e.g. a download URL), return it normally.
+        res.json(result)
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
