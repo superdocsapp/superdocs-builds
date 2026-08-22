@@ -1,0 +1,4 @@
+beautifulsoup4>=4.12
+requests>=2.31
+pytest>=8.3
+python-dotenv>=1.0

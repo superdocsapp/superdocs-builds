@@ -1,0 +1,18 @@
+{
+  "name": "docsync-agent",
+  "displayName": "DocSync — Code-to-Docs Sync (SuperDocs)",
+  "description": "Proposes targeted, cited README/doc updates when your code's public functions change. Built on SuperDocs.",
+  "version": "0.1.0",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:docsync.check"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "docsync.check",
+        "title": "DocSync: Check for stale documentation"
+      }
+    ]
+  }
+}
