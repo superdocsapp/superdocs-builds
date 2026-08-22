@@ -1,0 +1,45 @@
+ANNUAL ESG ATTESTATION RETURN 2026
+
+SUPPLIER PROFILE:
+Company: Acme Precision Components GmbH
+Supplier Code: SUP-ACME-01
+Tier: Tier 1 Strategic Material Partner
+Jurisdiction: European Union (Germany)
+
+---
+
+SECTION 1: ENVIRONMENTAL PERFORMANCE & DECARBONIZATION
+1.1 Greenhouse Gas Emissions:
+- Scope 1 Direct Emissions: 4,850 MT CO2e (certified by TÜV SÜD audit 2025).
+- Scope 2 Emissions: We currently do not track Scope 2 indirect emissions from electricity consumption.
+- Scope 3 Supply Chain: Screening initiated for category 1 raw steel purchases.
+1.2 Renewable Energy & Energy Efficiency:
+- 38% of facility electricity is contracted from certified North Sea offshore wind farms.
+1.3 Environmental Management System:
+- ISO 14001 certification has not yet been audited for the current fiscal year. Target completion Q4 2026.
+1.4 Hazardous Waste & Effluent:
+- Zero chemical effluent discharge to municipal drains. 100% closed-loop solvent recovery.
+
+---
+
+SECTION 2: LABOR STANDARDS & HUMAN RIGHTS DUE DILIGENCE
+2.1 Prohibition of Forced & Child Labor:
+- Zero tolerance policy. Mandatory age verification (>18 years old for all factory floor workers).
+2.2 Working Hours & Rest:
+- Standard working hours: 38.5 hours/week. Maximum recorded peak overtime is 6.5 hours/week, voluntary with 50% wage bonus.
+2.3 Grievance Mechanisms:
+- Works council representation with confidential digital grievance logging.
+
+---
+
+SECTION 3: ETHICS & GOVERNANCE
+3.1 Anti-Corruption & Business Integrity:
+- Formal corporate anti-bribery charter signed by all executives. Annual compliance testing mandated for sales and procurement personnel.
+3.2 Whistleblower Protection:
+- Anonymous hotline hosted by external compliance legal counsel.
+
+---
+
+AUTHORIZED OFFICER SIGN-OFF:
+Dr. Klaus Weber, VP Sustainable Procurement
+Acme Precision Components GmbH

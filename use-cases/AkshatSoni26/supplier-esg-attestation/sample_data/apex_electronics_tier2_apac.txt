@@ -1,0 +1,42 @@
+ANNUAL ESG ATTESTATION RETURN 2026
+
+SUPPLIER PROFILE:
+Company: Apex Electronics Manufacturing Ltd.
+Supplier Code: SUP-APEX-02
+Tier: Tier 2 Direct Manufacturing
+Jurisdiction: APAC (Taiwan)
+
+---
+
+SECTION 1: ENVIRONMENTAL & ENERGY
+1. Energy Tracking:
+- Scope 1 Emissions: 1,420 MT CO2e.
+- Scope 2 Emissions: 3,100 MT CO2e.
+- Clean Solar Electricity: 25% clean solar mix installed on factory rooftop.
+- ISO 14001: Certified until 2028.
+2. Waste:
+- 100% industrial solder slag recycled by licensed chemical processors.
+
+---
+
+SECTION 2: LABOR & FAIR WORKING CONDITIONS
+1. Working Hours & Overtime Disclosures:
+- During peak production seasons, workers operate up to 72 hours per week to meet quota deadlines.
+2. Recruitment Agency Fees:
+- Recruitment agency fees are deducted across the first 6 months of employment.
+3. Health & Safety:
+- Semi-annual fire safety drills conducted. Fire exits cleared and illuminated.
+
+---
+
+SECTION 3: GOVERNANCE & ETHICS
+1. Anti-Corruption:
+- Anti-bribery policy: Formal anti-corruption training is currently informal and not documented.
+2. Whistleblower System:
+- Active anonymous email inbox monitored by HR manager.
+
+---
+
+AUTHORIZED SIGN-OFF:
+Chen Wei-Ming, Factory General Manager
+Apex Electronics Manufacturing Ltd.

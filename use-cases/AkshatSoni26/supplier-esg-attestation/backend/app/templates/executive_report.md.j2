@@ -1,0 +1,21 @@
+# EXECUTIVE SUPPLIER ESG PROGRAMME AUDIT REPORT ({{ cycle_year }})
+
+## 1. Executive Summary
+During the {{ cycle_year }} Supplier Attestation Cycle, **{{ total_invited }} suppliers** across 3 tiers and 3 global operating jurisdictions were invited to complete the mandatory ESG & Ethical Conduct Attestation.
+
+- **Programme Completion Rate:** **{{ attestation_rate }}%** ({{ submitted_count }}/{{ total_invited }} suppliers)
+- **Overall Programme Risk Rating:** **{{ prog_risk }}**
+- **Average ESG Compliance:** Environmental **{{ pillar_averages.environmental_avg }}%**, Social **{{ pillar_averages.social_avg }}%**, Governance **{{ pillar_averages.governance_avg }}%**.
+
+## 2. Key Systemic Risk Vectors
+{% if top_shortfalls %}
+{% for item in top_shortfalls %}
+{{ loop.index }}. **{{ item.standard_clause }} [{{ item.severity }}]:** Identified across {{ item.occurrence_count }} supplier audit(s) within the {{ item.pillar }} governance domain.
+{% endfor %}
+{% else %}
+1. **Zero Systemic Shortfalls:** All audited suppliers achieved 100% compliance across all required governance pillars.
+{% endif %}
+
+## 3. Recommended Remediation Strategy
+1. Enforce 30-day corrective action plans for all suppliers with accepted critical findings.
+2. Schedule targeted follow-up audits for suppliers in Tier 2 manufacturing regions showing elevated overtime and wastewater risks.

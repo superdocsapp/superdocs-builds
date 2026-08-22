@@ -1,0 +1,47 @@
+ANNUAL ESG ATTESTATION RETURN 2026
+
+SUPPLIER PROFILE:
+Company: Nordic CleanTech Solutions AB
+Supplier Code: SUP-NORDIC-04
+Tier: Tier 1 Strategic Material Partner
+Jurisdiction: European Union (Sweden)
+
+---
+
+SECTION 1: ENVIRONMENTAL EXCELLENCE & NET-ZERO
+1. GHG Accounting:
+- Scope 1 Emissions: 210 MT CO2e (biogas heating).
+- Scope 2 Emissions: 45 MT CO2e certified by third-party audit.
+- Scope 3 Upstream: 100% mapped across Category 1 purchased steel and polymers.
+2. Renewable Power:
+- 100% certified wind and hydro power backed by European Guarantees of Origin (GoOs).
+3. Management Systems:
+- ISO 14001: Certified EMS with annual surveillance audits (Certificate #SE-88291).
+- Waste Diversion: 94.2% circular material recycling rate.
+
+---
+
+SECTION 2: LABOR & HUMAN RIGHTS
+1. Labor Protections:
+- Forced labor prohibition: Strict zero tolerance policy.
+- Child labor prohibition: Strict zero tolerance policy.
+- Standard weekly working hours: 40 hours per week, with max 8 hours voluntary overtime.
+- Living Wage: 100% workers earn above collective bargaining living wage.
+2. Worker Welfare:
+- Worker grievance mechanism: Independent anonymous ombudsman hotline.
+- Occupational Health: ISO 45001 certified.
+
+---
+
+SECTION 3: GOVERNANCE & SUPPLY CHAIN DUE DILIGENCE
+1. Business Integrity:
+- Anti-bribery policy: Formal code of ethics with mandatory annual certified testing.
+- Whistleblower protection: Encrypted anonymous reporting portal.
+2. Chain of Custody:
+- 100% sub-tier supplier provenance tracked under EU CSDDD and EUDR mandates.
+
+---
+
+AUTHORIZED SIGN-OFF:
+Astrid Lindholm, Chief Sustainability Officer
+Nordic CleanTech Solutions AB
