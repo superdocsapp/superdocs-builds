@@ -2,55 +2,62 @@
 
 Built by Dheeraj Mishra for the SuperDocs task.
 
-Kitline is a localization-producer workbench for the moment before a game string table goes to a translation vendor. It provides reusable handoff templates, finds individual strings by ID or context, and produces a real translator handoff: world and tone context, per-string character limits, speaker and scene notes, protected tokens and proper nouns, and a style sheet. When translations return, it flags token loss, token invention, and target-script display-width breaches on the exact row.
+I built Kitline around a small but annoying game-localization problem: a translator often receives isolated strings in a spreadsheet and has to guess what they mean, who is speaking, where the text appears, and how much space is available.
 
-The sample is synthetic. It is deliberately game-like, with a combat HUD warning, a named speaker, an objective tag, variables and markup. A translator who has not played the game gets enough context to translate intent instead of guessing from isolated strings.
+Kitline turns that string table into a handoff document. It keeps the English source beside the returned translation, adds world and scene context, records character limits, and keeps protected game terms visible. Before the handoff is exported, it checks each row for missing tokens, changed tags and obvious width risk.
+
+The sample data is fictional. I used a combat warning, a named character and an objective tag because they show the kinds of strings that can break when localization is treated as simple text replacement.
 
 ![Kitline review desk with source context, returned translations and row-level validation](assets/kitline-review-desk.png)
 
-## User flow
+## How I expect someone to use it
 
-1. Choose a kit template and set the target language.
-2. Add the game context and voice guidance the vendor needs.
-3. Paste returned translations row by row. Kitline flags lost protected content and display-width risk locally.
-4. Maintain the do-not-translate list and style sheet.
-5. Send the generated handoff to SuperDocs, inspect every proposed context or style edit, then export the approved DOCX.
+1. Pick one of the sample handoff templates and set the target language.
+2. Add the game context and voice notes that a translator needs.
+3. Paste the translations returned by the vendor into the matching rows.
+4. Fix or consciously accept any warnings about tokens, protected terms or display width.
+5. Send the handoff document to SuperDocs for a review of the context and style notes.
+6. Approve or reject each proposed edit, then export the reviewed document as DOCX.
 
-The page keeps these steps visible beside the relevant controls so a producer does not need to learn the workflow from a separate manual.
+The app does not translate the strings itself and it does not auto-approve edits. Those are producer decisions.
 
-## Why this shape
+## Why the local checks exist
 
-Game localization is not a generic document rewrite. The source string is kept immutable beside the returned translation and the validator runs locally, deterministically. It protects `{playerName}`, `[ITEM_VANTA_CORE]`, markup, printf-style variables and literal newlines without spending an operation. Width is measured in display units, with CJK characters taking two units and Arabic/Hebrew given a 1.35 multiplier. This is a conservative preflight, not a font-rendering engine, so the kit reports a violation for a producer to decide instead of claiming final platform fit.
+I did not want an editing model to silently change a game variable such as `{playerName}`, an inventory tag such as `[ITEM_VANTA_CORE]`, or markup such as `<c=warning>`. Kitline compares the source and returned text locally first. It also uses a simple display-width estimate so a producer can see strings that are likely to be too wide for a UI.
 
-SuperDocs owns the document workflow: the app sends generated HTML, including stable `data-chunk-id` attributes, for a narrow translator-readiness pass in `ask_every_time` review mode, exposes every proposed change for per-change approval, renders the approved returned HTML when the API supplies it, then exports the approved DOCX. The instruction explicitly forbids changes to string IDs, source strings, limits, context columns, protected content and glossary entries. The API key stays in the local server environment and is never sent to the browser, committed, logged or persisted.
+The width check is only a warning. It cannot replace testing a real game font on a real screen.
 
-## Run it
+## Where SuperDocs fits
+
+Kitline generates HTML with stable `data-chunk-id` values and sends it to SuperDocs through a small local Express server. The server starts an async review using `ask_every_time`, polls for the result, shows each proposed change in the UI, submits the decisions, and exports the final DOCX.
+
+I use SuperDocs only for a narrow review of the translator context and style guidance. The review instruction tells it to preserve string IDs, English source text, limits, speaker and scene fields, protected tokens and the do-not-translate list. The API key stays on the server and never reaches the browser.
+
+## Run it locally
 
 ```bash
 npm install
+```
+
+Copy `.env.example` to `.env` and put your `SUPERDOCS_API_KEY` there. Then run:
+
+```bash
 npm run dev
 ```
 
-Copy `.env.example` to a local `.env`, then set `SUPERDOCS_API_KEY` before starting. The app calls the local server at `/api/superdocs/*`; only that server sends authenticated requests to SuperDocs. The browser never receives the key. For a production-style local run:
+Open the address printed in the terminal. For a production build:
 
 ```bash
 npm run build
 npm run serve
 ```
 
-The server calls:
+## Checks I ran
 
-1. `POST /v1/chat/async` with `document_html` and `approval_mode: "ask_every_time"`
-2. `GET /v1/jobs/{job_id}` until review is ready
-3. `POST /v1/chat/{session_id}/approve` with explicit per-change decisions
-4. `POST /v1/documents/export`
+`npm test` covers protected formatting tokens, repeated protected terms, proper nouns, target-script width, string-table search and parsing both normal and double-encoded proposed-change payloads.
 
-Run the deterministic checks with `npm test` and produce a deployable build with `npm run build`. The six tests cover protected formatting tokens, repeated protected content, proper nouns, target-script width, string-table search and resilient parsing of normal or double-encoded proposed-change payloads.
+I also ran a synthetic kit through the live SuperDocs flow: async review, an explicit approval and a DOCX export all returned successfully. No API key or source document is committed to this repository.
 
-## Verification
+## What I would build next
 
-On 13 August 2026, a synthetic chunked localization kit completed the live SuperDocs workflow: async review, an explicit per-change approval, and a DOCX export returned HTTP 200. A second check through Kitline's own local proxy confirmed generated `data-chunk-id` HTML reaches SuperDocs and the proxy returns a DOCX export. No key or source document was committed.
-
-## Honest limits
-
-This is an editable demo, not a translation-management system. It accepts the configured JSON-like string model in the UI rather than parsing every vendor format, and character width is a conservative proxy for rendered pixel width. It does not translate strings or auto-approve SuperDocs changes. Those decisions remain with the localization producer.
+For a real team, I would add CSV, XLIFF and Google Sheets imports, per-locale terminology rules and a real rendering check using the target game font. This version is intentionally a focused working slice, not a complete translation-management system.
