@@ -28,9 +28,25 @@ function ClientEngagementSelector({ onSelect }) {
 
     useEffect(() => {
         if (selectedEngagementId) {
-            onSelect(selectedEngagementId);
+            const engagement = engagements.find(
+                (e) => String(e.id) === String(selectedEngagementId),
+            );
+            const client = clients.find(
+                (c) => String(c.id) === String(selectedClientId),
+            );
+            onSelect({
+                engagementId: selectedEngagementId,
+                engagementTitle: engagement?.title,
+                clientName: client?.name,
+            });
         }
-    }, [selectedEngagementId, onSelect]);
+    }, [
+        selectedEngagementId,
+        engagements,
+        clients,
+        selectedClientId,
+        onSelect,
+    ]);
 
     if (error) {
         return <p style={{ color: "red" }}>Error: {error}</p>;

@@ -1,0 +1,85 @@
+:root {
+    --cream: #f5efe2;
+    --ink: #17140d;
+    --coral: #ff5b57;
+    --teal: #12b3a4;
+    --mustard: #ffc531;
+    --violet: #6b5be6;
+    --sky: #3aa0ff;
+}
+
+body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    margin: 0;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* Base card look, thick black outline plus hard offset shadow, no blur, no gradients. */
+.card {
+    background: white;
+    border: 3px solid var(--ink);
+    border-radius: 12px;
+    box-shadow: 6px 6px 0 var(--ink);
+    padding: 1.5rem;
+}
+
+/* Base pill button look, shared by all buttons regardless of color. */
+.btn {
+    display: inline-block;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 0.6rem 1.4rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--ink);
+    transition:
+        transform 0.1s,
+        box-shadow 0.1s;
+    background: white;
+    color: var(--ink);
+}
+
+.btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 var(--ink);
+}
+
+.btn-coral {
+    background: var(--coral);
+    color: white;
+}
+
+.btn-teal {
+    background: var(--teal);
+    color: white;
+}
+
+select {
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-weight: 600;
+    background: white;
+}
+
+.step-label {
+    display: inline-block;
+    background: var(--mustard);
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    padding: 0.3rem 1rem;
+    font-weight: 800;
+    font-size: 0.85rem;
+    margin: 1.5rem 0 0.75rem 0;
+    box-shadow: 3px 3px 0 var(--ink);
+}
