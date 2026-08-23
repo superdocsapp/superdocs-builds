@@ -1,73 +1,92 @@
 # Material-Change Analysis Between Versions
 
+Built for the SuperDocs task.
+
 ## Use Case
+**Legal & Procurement** — Automated detection of substantive contractual changes between two versions of an agreement.
 
-**Legal & Procurement** — Automated detection of substantive contractual
-changes between two versions of an agreement.
+## Overview
+Reviewing redlines across lengthy contracts is time-consuming and error-prone. This application automates legal risk and obligation comparisons across two contract versions:
 
-## What it does
+- **Distinguishes Material Changes from Formatting**: Filters out styling, typographical, or cosmetic edits to focus exclusively on substantive legal clauses (e.g., liability caps, indemnification, payment terms, intellectual property, termination rights).
+- **Determines Party Advantage**: Identifies which party benefits from each material change and details the specific risk shift.
+- **Generates Pushback Points**: Formulates concrete negotiation talking points and redline counter-proposals for the disadvantaged party.
+- **Dual Pipeline Integration**: Provides full implementations via both the **SuperDocs MCP Server** (`main_mcp.py`) and the **SuperDocs REST API** (`main.py`).
 
-This tool helps **legal and procurement teams** quickly understand what
-actually changed between two versions of a contract, without manually
-redlining every clause. Given two versions of an agreement, it:
+---
 
-- Uploads both versions to SuperDocs
-- Asks the AI to **separate substantive/material changes from pure
-  formatting or stylistic edits**
-- Identifies **which party each material change favors**, and why
-  (liability shifts, indemnification scope, payment terms, etc.)
-- Produces a list of concrete **pushback points** a reviewer on the
-  disadvantaged side could raise during negotiation
-- Exports the final analysis as a shareable document
+## The 4-Step Pipeline
 
-The goal is to cut down the time a reviewer spends hunting for the clauses
-that actually matter in a long redline.
+| Step | MCP Tool / REST Endpoint | Purpose |
+| :--- | :--- | :--- |
+| **1. Upload** | `upload` / `POST /documents/upload` | Ingests baseline (`contract_v1.txt`) and revised (`contract_v2.txt`) agreements. |
+| **2. Chat** | `chat` / `POST /chat` | Dispatches instructions to compare versions, isolate legal risk shifts, and structure findings. |
+| **3. Approve** | `approve` / `POST /approve` | Programmatically confirms and commits the proposed findings. |
+| **4. Export** | `export` / `POST /export` | Generates the final structured legal brief (`final_material_change_brief.md`). |
 
-## How it works
+---
 
-The script (`main.py`) makes exactly four calls to the SuperDocs API, in order:
+## Handling Founder Traps & Edge Cases
 
-1. **Upload** — sends both contract versions as documents
-2. **Chat** — instructs the AI to run the material-change comparison
-3. **Approve** — programmatically approves the returned findings
-4. **Export** — exports the final analysis document
+1. **The JSON Double-Parse Trap**:
+   SuperDocs API/MCP responses may contain nested JSON-encoded strings within dictionary or list fields. Both pipelines use `deep_parse()` to recursively unwrap stringified JSON objects at any arbitrary depth, preventing unexpected `KeyError` or type errors.
 
-## Setup
+2. **The Timeout Trap**:
+   Deep document analysis can take anywhere from 30 seconds to several minutes on large agreements. The clients avoid aggressive HTTP read timeouts, employing patient status polling (`poll_until_ready`) with a generous 10-minute ceiling.
 
+3. **Budget Guard & Loop Control**:
+   `SMALL_SAMPLE_MODE` and `MAX_TOOL_CALLS` / `MAX_OPERATIONS` enforce a strict upper limit on API operations during development and testing to prevent burning token budgets.
+
+---
+
+## Setup & Installation
+
+### 1. Install Dependencies
 ```bash
 pip install -r requirements.txt
-cp .env.example .env
-# then fill in SUPERDOCS_API_KEY in .env
 ```
 
-Drop two **synthetic or public** contract versions (never real, confidential
-paperwork) into `sample_data/` as `contract_v1.txt` and `contract_v2.txt`,
-then run:
+### 2. Configure Environment Variables
+Copy the environment template and insert your `SUPERDOCS_API_KEY`:
+```bash
+cp .env.example .env
+```
 
+`.env` configuration options:
+```ini
+SUPERDOCS_API_KEY=your_actual_api_key_here
+SUPERDOCS_MCP_URL=https://api.superdocs.app/mcp/sse
+SUPERDOCS_BASE_URL=https://docs.superdocs.app/api
+SMALL_SAMPLE_MODE=true
+MAX_TOOL_CALLS=5
+MAX_OPERATIONS=5
+```
+
+### 3. Provide Sample Contracts
+Sample synthetic contracts are provided in `sample_data/`:
+- `sample_data/contract_v1.txt`: Baseline MSA (Net 30, 1x liability cap, standard gross negligence indemnity).
+- `sample_data/contract_v2.txt`: Revised MSA (Net 60, 3x liability cap, strict indemnity).
+
+---
+
+## Execution
+
+### Run via Model Context Protocol (MCP) [Recommended]
+```bash
+python main_mcp.py
+```
+
+### Run via REST API
 ```bash
 python main.py
 ```
 
-`SMALL_SAMPLE_MODE` and `MAX_OPERATIONS` in `.env` cap how many API calls the
-script will make in a single run, so you don't burn through your API budget
-while debugging.
+The final analysis deliverable will be generated and saved to `final_material_change_brief.md`.
 
-## Known API quirks handled here
+---
 
-- **JSON-in-JSON:** the findings/changes payload sometimes comes back as a
-  JSON-encoded string nested inside the response, so the script runs a
-  second `json.loads()` pass on it.
-- **Long processing times:** deep comparisons on large documents can take
-  30 seconds to several minutes with no visible progress. The script polls
-  patiently instead of timing out early.
-- **Budget control:** `SMALL_SAMPLE_MODE` + `MAX_OPERATIONS` act as a hard
-  cap on API calls during development to prevent runaway usage.
-
-## SuperDocs API Steps
-
-| Step | Endpoint | Purpose |
-|------|----------|---------|
-| 1 | `POST /documents/upload` | Upload both contract versions |
-| 2 | `POST /chat` | Send comparison instruction |
-| 3 | `POST /approve` | Approve the AI findings |
-| 4 | `POST /export` | Export the final analysis |
+## Submitter Information
+- **Submitter**: Saket Bhadada
+- **Use Case**: Material-change analysis between versions (Legal & Procurement)
+- **Folder**: `use-cases/saket-bhadada-material-change/`
+- Built for the SuperDocs task.
