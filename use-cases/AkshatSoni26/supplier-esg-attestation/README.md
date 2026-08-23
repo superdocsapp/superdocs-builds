@@ -1,8 +1,5 @@
 # SupplyGuard — Supplier ESG Attestation & Responsible-Sourcing Compliance Engine
 
-> **Author:** Akshat Soni | Full-Stack AI Engineer  
-> **Build Assignment:** Assigned Build S2 (Responsible-Sourcing & Supplier Attestation)  
-> **Documentation:** [System Architecture & Lifecycle State Machine](docs/ARCHITECTURE.md)  
 > *Built for the SuperDocs Full-Stack AI Engineer Task (Assigned Build S2: Responsible-Sourcing & Supplier Attestation)*
 
 An automated, audit-ready compliance intelligence platform built on the **SuperDocs API & MCP surface**. The system manages the complete annual supplier ESG attestation lifecycle: issuing localized tier-specific questionnaires and codes of conduct, normalizing multi-format responses into a standardized schema, enforcing human-in-the-loop review gates, automatically drafting evidence-quoted deficiency notices, and reconciling aggregate risk profile charts.
@@ -39,9 +36,10 @@ An automated, audit-ready compliance intelligence platform built on the **SuperD
 
 ---
 
-## 📸 System Architecture & Pipeline Flow
+## 📸 System Architecture & Mermaid Diagrams
 
-> Full architectural blueprints and database ERDs are maintained in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+<details open>
+<summary><b>📊 End-to-End System Pipeline (Click to Expand / Collapse)</b></summary>
 
 ```mermaid
 flowchart TD
@@ -89,9 +87,10 @@ flowchart TD
     SD_Client <--> SD_Platform
 ```
 
----
+</details>
 
-## 🔄 Attestation Lifecycle State Machine
+<details>
+<summary><b>🔄 4-Stage Attestation Lifecycle State Machine (Click to Expand)</b></summary>
 
 ```mermaid
 stateDiagram-v2
@@ -116,6 +115,82 @@ stateDiagram-v2
     
     APPROVED --> [*]: Executive Programme Report PDF Generated
 ```
+
+</details>
+
+<details>
+<summary><b>🗄️ Database Entity Relationship Diagram ERD (Click to Expand)</b></summary>
+
+```mermaid
+erDiagram
+    SUPPLIER ||--o{ ATTESTATION_CYCLE : participates_in
+    ATTESTATION_CYCLE ||--o| ASSESSMENT : evaluated_by
+    ASSESSMENT ||--o{ FINDING : contains
+    ATTESTATION_CYCLE ||--o| FOLLOW_UP_LETTER : generates
+
+    SUPPLIER {
+        string id PK
+        string name
+        string code UK
+        string tier "TIER_1_STRATEGIC | TIER_2_MANUFACTURING | TIER_3_COMMODITY"
+        string region "EU | APAC | NORTH_AMERICA"
+        string country
+        string primary_contact_email
+        timestamp created_at
+    }
+
+    ATTESTATION_CYCLE {
+        string id PK
+        string supplier_id FK
+        int cycle_year
+        string status "NOT_ISSUED | ISSUED | SUBMITTED | NORMALIZED | UNDER_REVIEW | APPROVED | FOLLOW_UP_REQUIRED"
+        string issued_document_id
+        string response_document_id
+        string response_format "PDF | DOCX | TXT"
+        timestamp submitted_at
+        timestamp normalized_at
+    }
+
+    ASSESSMENT {
+        string id PK
+        string attestation_id FK
+        float overall_risk_score "0.0 - 100.0"
+        string risk_tier "LOW | MEDIUM | HIGH | CRITICAL"
+        float environmental_score
+        float social_score
+        float governance_score
+        text summary_markdown
+        boolean is_approved
+        string approved_by
+        timestamp approved_at
+    }
+
+    FINDING {
+        string id PK
+        string assessment_id FK
+        string pillar "ENVIRONMENTAL | SOCIAL | GOVERNANCE"
+        string severity "LOW | MEDIUM | HIGH | CRITICAL"
+        string standard_clause
+        text shortfall_summary
+        text supplier_exact_quote
+        string source_location
+        text recommended_action
+        string review_decision "PENDING | ACCEPTED | REJECTED"
+    }
+
+    FOLLOW_UP_LETTER {
+        string id PK
+        string attestation_id FK
+        text letter_markdown
+        string recipient_email
+        timestamp generated_at
+        timestamp sent_at
+    }
+```
+
+</details>
+
+*Raw diagram source files are also preserved in [`mermaid/`](mermaid/).*
 
 ---
 

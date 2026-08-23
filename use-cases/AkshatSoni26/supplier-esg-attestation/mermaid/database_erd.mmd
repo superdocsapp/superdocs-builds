@@ -1,0 +1,64 @@
+erDiagram
+    SUPPLIER ||--o{ ATTESTATION_CYCLE : participates_in
+    ATTESTATION_CYCLE ||--o| ASSESSMENT : evaluated_by
+    ASSESSMENT ||--o{ FINDING : contains
+    ATTESTATION_CYCLE ||--o| FOLLOW_UP_LETTER : generates
+
+    SUPPLIER {
+        string id PK
+        string name
+        string code UK
+        string tier "TIER_1_STRATEGIC | TIER_2_MANUFACTURING | TIER_3_COMMODITY"
+        string region "EU | APAC | NORTH_AMERICA"
+        string country
+        string primary_contact_email
+        timestamp created_at
+    }
+
+    ATTESTATION_CYCLE {
+        string id PK
+        string supplier_id FK
+        int cycle_year
+        string status "NOT_ISSUED | ISSUED | SUBMITTED | NORMALIZED | UNDER_REVIEW | APPROVED | FOLLOW_UP_REQUIRED"
+        string issued_document_id
+        string response_document_id
+        string response_format "PDF | DOCX | TXT"
+        timestamp submitted_at
+        timestamp normalized_at
+    }
+
+    ASSESSMENT {
+        string id PK
+        string attestation_id FK
+        float overall_risk_score "0.0 - 100.0"
+        string risk_tier "LOW | MEDIUM | HIGH | CRITICAL"
+        float environmental_score
+        float social_score
+        float governance_score
+        text summary_markdown
+        boolean is_approved
+        string approved_by
+        timestamp approved_at
+    }
+
+    FINDING {
+        string id PK
+        string assessment_id FK
+        string pillar "ENVIRONMENTAL | SOCIAL | GOVERNANCE"
+        string severity "LOW | MEDIUM | HIGH | CRITICAL"
+        string standard_clause
+        text shortfall_summary
+        text supplier_exact_quote
+        string source_location
+        text recommended_action
+        string review_decision "PENDING | ACCEPTED | REJECTED"
+    }
+
+    FOLLOW_UP_LETTER {
+        string id PK
+        string attestation_id FK
+        text letter_markdown
+        string recipient_email
+        timestamp generated_at
+        timestamp sent_at
+    }
