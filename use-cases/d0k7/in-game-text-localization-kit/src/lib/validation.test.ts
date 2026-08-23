@@ -14,6 +14,7 @@ describe("localization validation", () => {
   });
 
   it("uses target-script display width rather than character count", () => {
+    expect(displayWidth("[ITEM_VANTA_CORE]", "Japanese")).toBe(17);
     expect(displayWidth("警告", "Japanese")).toBe(4);
     expect(validateTranslations([{ id: "A", source: "Warning", characterLimit: 3, speaker: "", scene: "" }], { A: "警告" }, "Japanese").some(result => result.kind === "limit")).toBe(true);
   });
@@ -27,6 +28,15 @@ describe("localization validation", () => {
     );
     expect(results.some(result => result.kind === "missing_token")).toBe(true);
     expect(results.some(result => result.kind === "missing_protected_term")).toBe(true);
+  });
+
+  it("does not double-count ASCII protected tokens in a CJK locale", () => {
+    const results = validateTranslations(
+      [{ id: "A", source: "Recover [ITEM_VANTA_CORE]", characterLimit: 30, speaker: "", scene: "" }],
+      { A: "[ITEM_VANTA_CORE]\u3092\u56de\u53ce" },
+      "Japanese",
+    );
+    expect(results.some(result => result.kind === "limit")).toBe(false);
   });
 
   it("parses both array and double-encoded SuperDocs change payloads", () => {

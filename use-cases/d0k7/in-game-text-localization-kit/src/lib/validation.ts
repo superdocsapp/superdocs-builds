@@ -8,7 +8,7 @@ export function protectedTokens(value: string): string[] {
 }
 
 export function displayWidth(value: string, language: string): number {
-  const multiplier = /japanese|chinese|korean/i.test(language) ? 2 : /arabic|hebrew/i.test(language) ? 1.35 : 1;
+  const multiplier = /arabic|hebrew/i.test(language) ? 1.35 : 1;
   return [...value].reduce((total, char) => {
     if (/\p{Mark}/u.test(char)) return total;
     const wide = /[\u1100-\u115F\u2E80-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE10-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6]/u.test(char);
