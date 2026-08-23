@@ -114,7 +114,8 @@ def deep_parse(data: Any) -> Any:
 # ------------------------------ HELPERS ------------------------------------
 
 def _require_api_key() -> None:
-    if not API_KEY or API_KEY == "your_api_key_here":
+    key = os.environ.get("SUPERDOCS_API_KEY") or API_KEY
+    if not key or key == "your_api_key_here":
         sys.exit(
             "[ERROR] Missing SUPERDOCS_API_KEY. Copy .env.example to .env and fill "
             "in your key before running this script."
@@ -150,7 +151,7 @@ def upload_document(file_path: str, label: str) -> str:
     doc_id = data.get("document_id") or data.get("id")
     if not doc_id:
         raise RuntimeError(f"Upload response missing document id: {data}")
-    print(f"  ✓ Uploaded {label} -> document_id={doc_id}")
+    print("  [OK] Uploaded " + label + " -> document_id=" + str(doc_id))
     return doc_id
 
 
@@ -167,7 +168,7 @@ def request_comparison(doc_id_a: str, doc_id_b: str) -> str:
     if not job_id:
         # If the endpoint executed synchronously and directly returned findings
         return data
-    print(f"  ✓ Comparison requested -> job_id={job_id}")
+    print("  [OK] Comparison requested -> job_id=" + str(job_id))
     return job_id
 
 
@@ -213,7 +214,7 @@ def approve_findings(job_id_or_data: Any, findings: dict) -> dict:
     job_id = job_id_or_data if isinstance(job_id_or_data, str) else "job_latest"
     payload = {"job_id": job_id, "approved": True}
     data = _post("/approve", payload, "approve:findings")
-    print("  ✓ Findings approved.")
+    print("  [OK] Findings approved.")
     return data
 
 
@@ -224,7 +225,7 @@ def export_analysis(job_id_or_data: Any, export_format: str = "markdown") -> str
     payload = {"job_id": job_id, "format": export_format}
     data = _post("/export", payload, "export:analysis")
     export_url = data.get("export_url") or data.get("url") or data.get("content")
-    print(f"  ✓ Export completed.")
+    print("  [OK] Export completed.")
     return export_url or "Analysis export successful."
 
 
@@ -247,19 +248,19 @@ def main():
     print("  SuperDocs REST Material-Change Analysis Pipeline")
     print("=" * 65)
 
-    print("\n▶ Step 1: Uploading baseline and revised contracts...")
+    print("\n--> Step 1: Uploading baseline and revised contracts...")
     doc_id_a = upload_document(version_a_path, "version_a")
     doc_id_b = upload_document(version_b_path, "version_b")
 
-    print("\n▶ Step 2: Requesting comparison & material analysis...")
+    print("\n--> Step 2: Requesting comparison & material analysis...")
     job_ref = request_comparison(doc_id_a, doc_id_b)
     job_result = poll_until_ready(job_ref)
     findings = extract_findings(job_result)
 
-    print("\n▶ Step 3: Approving findings...")
+    print("\n--> Step 3: Approving findings...")
     approve_findings(job_ref, findings)
 
-    print("\n▶ Step 4: Exporting analysis deliverable...")
+    print("\n--> Step 4: Exporting analysis deliverable...")
     export_res = export_analysis(job_ref)
 
     # Persist deliverable to output file
@@ -269,7 +270,7 @@ def main():
         else json.dumps(findings, indent=2)
     )
     out_file.write_text(out_content, encoding="utf-8")
-    print(f"\n✓ Analysis deliverable saved to: {out_file.resolve()}")
+    print(f"\n[OK] Analysis deliverable saved to: {out_file.resolve()}")
     print("\n" + "=" * 65 + "\n")
 
 

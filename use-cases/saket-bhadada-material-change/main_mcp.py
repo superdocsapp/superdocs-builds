@@ -130,7 +130,8 @@ def extract_tool_result(result: Any) -> Any:
 # ===========================================================================
 
 def _require_api_key() -> None:
-    if not API_KEY or API_KEY == "your_api_key_here":
+    key = os.environ.get("SUPERDOCS_API_KEY") or API_KEY
+    if not key or key == "your_api_key_here":
         sys.exit(
             "[ERROR] Missing SUPERDOCS_API_KEY.\n"
             "Please configure your key in .env before running this script."
@@ -169,7 +170,7 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
     async with sse_client(url=MCP_URL, headers=headers) as (read_stream, write_stream):
         async with ClientSession(read_stream, write_stream) as session:
             await session.initialize()
-            print("✓ MCP Session initialized and handshake completed.")
+            print("[OK] MCP Session initialized and handshake completed.")
 
             # Discover registered tools
             tools_list = await session.list_tools()
@@ -184,7 +185,7 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
             # ---------------------------------------------------------------
             # STEP 1: UPLOAD
             # ---------------------------------------------------------------
-            print("▶ Step 1: Ingesting contract documents...")
+            print("--> Step 1: Ingesting contract documents...")
             v1_content = v1_path.read_text(encoding="utf-8")
             v2_content = v2_path.read_text(encoding="utf-8")
 
@@ -198,7 +199,7 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
                 parsed_v1.get("document_id") or parsed_v1.get("id") or "doc_v1_id"
                 if isinstance(parsed_v1, dict) else "doc_v1_id"
             )
-            print(f"  ✓ Uploaded Baseline ({v1_path.name}) -> ID: {doc_id_v1}")
+            print(f"  [OK] Uploaded Baseline ({v1_path.name}) -> ID: {doc_id_v1}")
 
             budget.spend(f"{upload_tool}:contract_v2")
             res_v2 = await session.call_tool(
@@ -210,12 +211,12 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
                 parsed_v2.get("document_id") or parsed_v2.get("id") or "doc_v2_id"
                 if isinstance(parsed_v2, dict) else "doc_v2_id"
             )
-            print(f"  ✓ Uploaded Revised ({v2_path.name}) -> ID: {doc_id_v2}\n")
+            print(f"  [OK] Uploaded Revised ({v2_path.name}) -> ID: {doc_id_v2}\n")
 
             # ---------------------------------------------------------------
             # STEP 2: CHAT (Analysis Instruction)
             # ---------------------------------------------------------------
-            print("▶ Step 2: Executing Material-Change Analysis via Chat...")
+            print("--> Step 2: Executing Material-Change Analysis via Chat...")
             budget.spend(f"{chat_tool}:analysis")
             chat_args = {
                 "document_ids": [doc_id_v1, doc_id_v2],
@@ -247,12 +248,12 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
                     elif status in ("error", "failed"):
                         raise RuntimeError(f"Analysis job failed: {status_data}")
 
-            print("  ✓ Material-change analysis completed successfully.\n")
+            print("  [OK] Material-change analysis completed successfully.\n")
 
             # ---------------------------------------------------------------
             # STEP 3: APPROVE
             # ---------------------------------------------------------------
-            print("▶ Step 3: Programmatically approving AI findings...")
+            print("--> Step 3: Programmatically approving AI findings...")
             budget.spend(f"{approve_tool}")
             approve_args = {
                 "document_id": doc_id_v2,
@@ -262,12 +263,12 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
             }
             approve_res = await session.call_tool(approve_tool, arguments=approve_args)
             approve_data = extract_tool_result(approve_res)
-            print("  ✓ Approval confirmed.\n")
+            print("  [OK] Approval confirmed.\n")
 
             # ---------------------------------------------------------------
             # STEP 4: EXPORT
             # ---------------------------------------------------------------
-            print("▶ Step 4: Exporting final legal deliverable...")
+            print("--> Step 4: Exporting final legal deliverable...")
             budget.spend(f"{export_tool}")
             export_args = {
                 "document_id": doc_id_v2,
@@ -295,7 +296,7 @@ async def run_mcp_pipeline(v1_path: Path, v2_path: Path) -> None:
 
             out_path = Path(OUTPUT_FILE)
             out_path.write_text(final_content, encoding="utf-8")
-            print(f"  ✓ Deliverable exported and saved to: {out_path.resolve()}\n")
+            print(f"  [OK] Deliverable exported and saved to: {out_path.resolve()}\n")
 
     print("=" * 65)
     print("  Pipeline Execution Complete!")
