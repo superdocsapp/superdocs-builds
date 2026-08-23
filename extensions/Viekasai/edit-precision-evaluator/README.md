@@ -4,6 +4,8 @@ This extension measures whether a document edit changed everything it should—a
 
 The checked-in dashboard uses clearly marked demonstration data. Benchmark conclusions must come from a live run after the labels receive independent second review.
 
+The API integration has completed a capped live small-sample run. Its verified metrics and failure evidence are published in [results/SMALL_RUN.md](results/SMALL_RUN.md). This is integration evidence, not a substitute for the independently reviewed full-corpus benchmark.
+
 ## What it evaluates
 
 The corpus contains 13 synthetic HR-policy cases across all required instruction types:

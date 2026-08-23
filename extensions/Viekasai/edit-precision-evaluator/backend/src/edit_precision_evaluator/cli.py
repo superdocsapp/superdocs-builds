@@ -55,6 +55,7 @@ async def _run_live_async(args: argparse.Namespace) -> int:
                 operation_cap=args.max_operations,
                 mode=args.mode,
                 export_root=args.output.parent / "exports",
+                checkpoint_path=args.output.parent / "checkpoint.json",
             )
     except BudgetExceeded as exc:
         print(f"BUDGET STOP: {exc}")

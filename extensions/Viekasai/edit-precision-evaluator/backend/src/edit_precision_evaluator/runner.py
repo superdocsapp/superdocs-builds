@@ -8,7 +8,6 @@ from pathlib import Path
 from .alignment import align_chunk_ids, remap_case
 from .approaches import direct_prompt, parse_search_chunk_ids, scoped_edit_prompt, search_prompt
 from .budget import BudgetExceeded, OperationBudget, estimated_operations
-from .html_units import changed_unit_ids
 from .models import Approach, CorpusCase, InstructionType, RunResult
 from .report import build_report
 from .scorer import score_edit
@@ -101,21 +100,30 @@ async def run_case(
             session_id=session_id,
         )
     else:
+        search_session_id = f"{session_id}-retrieval"
+        search_uploaded = await client.upload_document(
+            filename=case.document,
+            content=document_html.encode(),
+            session_id=search_session_id,
+        )
         budget.reserve(1)
         search_outcome = await client.analyze(
             document_html=None,
             message=search_prompt(case.instruction),
-            session_id=session_id,
+            session_id=search_session_id,
         )
         budget.reconcile(1, _actual_operations(search_outcome))
-        if search_outcome.updated_html:
-            search_changes, _ = changed_unit_ids(uploaded.html, search_outcome.updated_html)
-            if search_changes:
-                raise ValueError(
-                    "Search-scoped analysis unexpectedly edited the document; "
-                    "the contaminated run was stopped before scoring"
-                )
         search_chunk_ids = parse_search_chunk_ids(search_outcome.response_text)
+        if search_chunk_ids:
+            try:
+                retrieval_map = align_chunk_ids(
+                    search_uploaded.html,
+                    uploaded.html,
+                    set(search_chunk_ids),
+                )
+                search_chunk_ids = [retrieval_map[item] for item in search_chunk_ids]
+            except ValueError:
+                search_chunk_ids = []
         outcome = await _run_edit_call(
             client=client,
             budget=budget,
@@ -161,6 +169,7 @@ async def run_evaluation(
     operation_cap: int,
     mode: str,
     export_root: Path | None = None,
+    checkpoint_path: Path | None = None,
 ) -> dict:
     selected = select_cases(cases, mode)
     preflight_budget(selected, approaches, operation_cap)
@@ -181,6 +190,11 @@ async def run_evaluation(
                     export_root=export_root,
                 )
             )
+            if checkpoint_path is not None:
+                write_report(
+                    build_report(results, operation_cap=operation_cap, mode=f"{mode}-partial"),
+                    checkpoint_path,
+                )
     return build_report(results, operation_cap=operation_cap, mode=mode)
 
 
