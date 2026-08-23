@@ -8,6 +8,16 @@ The sample is synthetic. It is deliberately game-like, with a combat HUD warning
 
 ![Kitline review desk with source context, returned translations and row-level validation](assets/kitline-review-desk.png)
 
+## User flow
+
+1. Choose a kit template and set the target language.
+2. Add the game context and voice guidance the vendor needs.
+3. Paste returned translations row by row. Kitline flags lost protected content and display-width risk locally.
+4. Maintain the do-not-translate list and style sheet.
+5. Send the generated handoff to SuperDocs, inspect every proposed context or style edit, then export the approved DOCX.
+
+The page keeps these steps visible beside the relevant controls so a producer does not need to learn the workflow from a separate manual.
+
 ## Why this shape
 
 Game localization is not a generic document rewrite. The source string is kept immutable beside the returned translation and the validator runs locally, deterministically. It protects `{playerName}`, `[ITEM_VANTA_CORE]`, markup, printf-style variables and literal newlines without spending an operation. Width is measured in display units, with CJK characters taking two units and Arabic/Hebrew given a 1.35 multiplier. This is a conservative preflight, not a font-rendering engine, so the kit reports a violation for a producer to decide instead of claiming final platform fit.
