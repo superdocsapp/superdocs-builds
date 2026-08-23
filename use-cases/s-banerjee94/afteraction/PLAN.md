@@ -412,7 +412,7 @@ truncate proposed text.
 
 The two live reports in `docs/`, both report screenshots and the verified 28/28 and 23/23
 figures were all produced against the old data and are stale. They need a live re-run.
-Offline the suite is green at 158 tests and both storms build clean end to end.
+Offline the suite is green at 162 tests and both storms build clean end to end.
 
 ### Not built, deliberately
 
@@ -420,3 +420,42 @@ A report re-issued at 24 hours and again at 48 as the logs grow. It needs no fea
 pipeline is a pure function of the data folder, so re-running after the records grow
 produces the updated report. The property is worth *keeping* — it is the reason nothing
 here caches parsed state between runs — but there is nothing to write.
+
+---
+
+## Correction, 22 August: the two chart sections were outside the safety net
+
+A live run failed the surgical check: the turn aimed at `7. Restoration Curve` also
+changed `6. Consumer Communications`. That much worked as designed. What did not is that
+section 7 kept its placeholder, the run exported a `.docx` with "Placeholder for the
+restoration curve" sitting where the chart belongs, and **nothing in the output mentioned
+it**. The failure that got reported was the collateral edit; the missing chart went
+unremarked.
+
+The cause is a gap in a list. `unfilled()` only inspects sections passed to it, and the
+pipeline passes `drafted` — which is built from `SECTION_TITLES`. The curve and contacts
+sections are not in `SECTION_TITLES`; they are placed by their own turns after the loop.
+So both sat outside the placeholder sweep **and** outside the one-pass retry, which is
+the exact mechanism built earlier for exactly this failure. The retry was written after a
+live run left the lessons section holding its placeholder, and the same blind spot was
+left in place two sections further down.
+
+**Decision.** Track the chart turns as they run, as `(title, instruction)` pairs, and feed
+them into the mid-run sweep, the retry, and the final shape check — the pattern the
+lessons section already uses. A chart carries no citations to reject, so there is no
+refusal to respect: an empty chart section only ever means the image did not land.
+
+Two smaller things the same run exposed, both the terminal saying something untrue:
+
+- The first summary line took its marker from the **run** verdict, so a surgical failure
+  printed `FAIL` beside a clean `37/37 claims traced (100%)`. A reader would blame
+  traceability for another check's failure. Each check now carries its own verdict, and
+  the run verdict is its own last line naming what failed.
+- `retried` listed every section that *qualified* for a retry, including ones the
+  `--limit` budget stopped before reaching. It now records what was actually re-issued.
+
+**The general lesson, worth stating because it will recur.** Every check here takes a list
+of what to check, and every list is built from `SECTION_TITLES`. Any section that arrives
+by another route is invisible to all of them by default, and invisible in the quiet
+direction — the run passes. A new section type needs adding to those lists, not just to
+the pipeline.
