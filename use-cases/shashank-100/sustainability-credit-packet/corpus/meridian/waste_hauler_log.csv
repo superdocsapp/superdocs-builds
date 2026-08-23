@@ -1,0 +1,15 @@
+month,material_stream,tons,destination_facility,facility_type
+2025-09,Concrete and masonry,412.50,Ridgeline Aggregate Recovery,recycling
+2025-09,Metals,38.20,Corbin Scrap Processing,recycling
+2025-09,Mixed landfill,64.10,County Transfer Station,landfill
+2025-10,Concrete and masonry,388.70,Ridgeline Aggregate Recovery,recycling
+2025-10,Wood,96.40,Timberline Biomass,recycling
+2025-10,Metals,44.90,Corbin Scrap Processing,recycling
+2025-10,Mixed landfill,71.30,County Transfer Station,landfill
+2025-11,Gypsum board,52.80,National Gypsum Reclaim,recycling
+2025-11,Wood,88.10,Timberline Biomass,recycling
+2025-11,Metals,29.60,Corbin Scrap Processing,recycling
+2025-11,Mixed landfill,58.40,County Transfer Station,landfill
+2025-12,Concrete and masonry,201.30,Ridgeline Aggregate Recovery,recycling
+2025-12,Cardboard,18.90,Corbin Scrap Processing,recycling
+2025-12,Mixed landfill,49.70,County Transfer Station,landfill

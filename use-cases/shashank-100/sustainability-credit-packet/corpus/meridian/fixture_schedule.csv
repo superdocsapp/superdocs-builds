@@ -1,0 +1,7 @@
+fixture_type,manufacturer,model,rated_flow,flow_unit,watersense,quantity
+Water closet,Sloan,ST-2459 Hybrid,1.10,gpf,yes,64
+Urinal,Sloan,SU-7019 Waterfree,0.00,gpf,yes,18
+Public lavatory faucet,Chicago Faucets,EQ-A11A,0.35,gpm,yes,52
+Private lavatory faucet,Kohler,K-7404 Purist,1.20,gpm,yes,12
+Kitchen faucet,Elkay,LKGT2091,1.50,gpm,no,6
+Showerhead,Delta,H2Okinetic 75152,1.75,gpm,yes,14

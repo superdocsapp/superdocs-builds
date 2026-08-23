@@ -1,0 +1,68 @@
+# The credit register. Adding a credit is an entry here, never a code change.
+#
+# status is derived, never authored: a credit is "documented" only when every
+# required evidence item is present in the bundle. See registry.resolve_status.
+
+project:
+  name: Meridian Health Sciences Building
+  owner: Meridian University Health System
+  architect: Halloran Sterne Architects
+  location: Ashfield, Vermont
+  floor_area_sf: 214000
+  rating_system: LEED v4.1 BD+C New Construction
+  target_level: Gold
+  corpus: corpus/meridian
+
+credits:
+  - id: WEc1
+    name: Indoor Water Use Reduction
+    category: Water Efficiency
+    points_targeted: 4
+    requirement_file: corpus/leed/WEc1_indoor_water.md
+    calculation:
+      function: indoor_water_reduction
+      args:
+        fixture_csv: fixture_schedule.csv
+        occupancy_csv: occupancy_assumptions.csv
+    evidence:
+      - description: Fixture and fitting schedule with rated flow rates
+        file: fixture_schedule.csv
+      - description: Occupancy assumptions used in the calculation
+        file: occupancy_assumptions.csv
+      - description: WaterSense certificates for each labeled fixture
+        file: watersense_certificates.txt
+
+  - id: EAc2
+    name: Optimize Energy Performance
+    category: Energy and Atmosphere
+    points_targeted: 9
+    requirement_file: corpus/leed/EAc2_optimize_energy.md
+    calculation:
+      function: energy_improvement
+      args:
+        baseline_cost: 1284600
+        proposed_cost: 894800
+    evidence:
+      - description: Whole building energy simulation report
+        file: energy_model_summary.md
+      - description: Simulation model input summary
+        file: energy_model_summary.md
+      - description: Energy modeler credentials statement
+        file: energy_model_summary.md
+
+  - id: MRc2
+    name: Construction and Demolition Waste Management
+    category: Materials and Resources
+    points_targeted: 2
+    requirement_file: corpus/leed/MRc2_construction_waste.md
+    calculation:
+      function: waste_diversion
+      args:
+        hauler_csv: waste_hauler_log.csv
+    evidence:
+      - description: Monthly waste hauler reports by material stream
+        file: waste_hauler_log.csv
+      - description: Construction waste management plan
+        file: waste_management_plan.txt
+      - description: Receiving facility legitimacy documentation
+        file: facility_certifications.txt
