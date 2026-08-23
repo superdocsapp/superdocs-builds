@@ -6,6 +6,12 @@ An automated, audit-ready compliance intelligence platform built on the **SuperD
 
 ---
 
+## 🎬 Live Product Walkthrough Demo
+
+▶️ **Watch the Video Demo on Loom:** [SuperDocs Supplier ESG Attestation Engine Demo](https://www.loom.com/share/4ee46470abbf47a1a28bf1d77eeb285a)
+
+---
+
 ## 📸 System Architecture & Pipeline Flow
 
 ```mermaid
