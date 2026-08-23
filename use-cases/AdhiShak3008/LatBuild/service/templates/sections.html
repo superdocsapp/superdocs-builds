@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Sections — LatBuild</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="back-link">← Back</a>
+      <h1>Select Sections to Edit</h1>
+      <p class="subtitle">{{ pdf_filename }}</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="alert alert-info">
+      Select one or more sections. Each section will be sent independently to SuperDocs with your instruction. Everything else in the PDF stays untouched.
+    </div>
+
+    <section class="card">
+      <div class="section-controls">
+        <button class="btn btn-secondary btn-sm" id="select-all-btn">Select All</button>
+        <button class="btn btn-secondary btn-sm" id="deselect-all-btn">Deselect All</button>
+      </div>
+
+      <div class="section-list" id="section-list">
+        {% for section in sections %}
+        <label class="section-item{% if section.level == 2 %} section-item-sub{% endif %}" data-name="{{ section.title }}">
+          <input type="checkbox" class="section-checkbox" value="{{ section.title }}">
+          <div class="section-info">
+            <span class="section-name">{% if section.level == 2 %}&nbsp;&nbsp;&nbsp;&nbsp;{% endif %}{{ section.title }}</span>
+            <span class="section-meta">
+              {% if section.pages | length == 1 %}
+                Page {{ section.pages[0] }}
+              {% else %}
+                Pages {{ section.pages[0] }}–{{ section.pages[-1] }}
+              {% endif %}
+              &nbsp;·&nbsp;
+              ~{{ section.word_count }} words
+            </span>
+            {% if section.full_text %}
+            <p class="section-preview">{{ section.full_text[:250] }}{% if section.full_text | length > 250 %}…{% endif %}</p>
+            {% if section.full_text | length > 250 %}
+            <details class="section-full-text">
+              <summary>View full text ({{ section.word_count }} words)</summary>
+              <div class="section-full-text-content">{{ section.full_text }}</div>
+            </details>
+            {% endif %}
+            {% elif section.word_count == 0 %}
+            <p class="section-preview muted">(content in subsections below)</p>
+            {% endif %}
+          </div>
+        </label>
+        {% else %}
+        <p class="muted">No editable sections detected in this PDF.</p>
+        {% endfor %}
+      </div>
+
+      <div class="action-row">
+        <span id="selection-count" class="muted">0 sections selected</span>
+        <button class="btn btn-primary" id="continue-btn" disabled>Continue →</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>initSectionsPage();</script>
+</body>
+</html>

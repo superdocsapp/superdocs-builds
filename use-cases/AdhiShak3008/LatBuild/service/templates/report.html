@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fidelity Report — LatBuild</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/" class="back-link">← Start over</a>
+      <h1>Fidelity Report</h1>
+      <p class="subtitle">{{ pdf_filename }}</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- Overall result -->
+    <section class="card">
+      <h2>Overall Result</h2>
+      {% if report.pass == true %}
+      <div class="alert alert-success fidelity-pass">
+        <strong>✓ PASS</strong> — Edit was applied. Layout fidelity confirmed.
+      </div>
+      {% elif report.pass == false %}
+      <div class="alert alert-warning fidelity-fail">
+        <strong>⚠ ISSUES DETECTED</strong> — Edit was applied but some fidelity checks failed. Review the details below.
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <strong>Fidelity check could not complete.</strong> The edit was applied — download and verify manually.
+      </div>
+      {% endif %}
+    </section>
+
+    <!-- Fidelity table -->
+    <section class="card">
+      <h2>Fidelity Details</h2>
+      <table class="report-table">
+        <tbody>
+          <tr>
+            <td>Selected sections</td>
+            <td>{{ report.selected_sections | join(', ') }}</td>
+          </tr>
+          <tr>
+            <td>Pages modified</td>
+            <td>{{ report.pages_modified | length }} of {{ report.pages_total }}</td>
+          </tr>
+          <tr class="{{ 'row-fail' if report.non_target_pages_changed else 'row-pass' }}">
+            <td>Non-target pages changed</td>
+            <td>
+              {% if report.non_target_pages_changed %}
+                ⚠ {{ report.non_target_pages_changed | length }} (pages: {{ report.non_target_pages_changed | join(', ') }})
+              {% else %}
+                ✓ 0
+              {% endif %}
+            </td>
+          </tr>
+          <tr class="{{ 'row-fail' if report.figures_original != report.figures_modified else 'row-pass' }}">
+            <td>Figures preserved</td>
+            <td>{{ report.figures_modified }} / {{ report.figures_original }}</td>
+          </tr>
+          <tr class="{{ 'row-fail' if report.tables_original != report.tables_modified else 'row-pass' }}">
+            <td>Tables preserved</td>
+            <td>{{ report.tables_modified }} / {{ report.tables_original }}</td>
+          </tr>
+          <tr class="{{ 'row-fail' if report.overflow_detected else 'row-pass' }}">
+            <td>Text overflow</td>
+            <td>{{ '⚠ Detected' if report.overflow_detected else '✓ None' }}</td>
+          </tr>
+          <tr class="{{ 'row-fail' if report.page_count_changed else 'row-pass' }}">
+            <td>Page count changed</td>
+            <td>{{ '⚠ Yes' if report.page_count_changed else '✓ No' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Export -->
+    <section class="card">
+      <h2>Download</h2>
+      {% if can_download %}
+      <p>Your modified PDF is ready. The original layout has been preserved — only the selected sections were changed.</p>
+      <a href="/api/download" class="btn btn-primary btn-large">
+        ↓ Download Modified PDF
+      </a>
+      {% else %}
+      <p class="muted">Modified PDF not available.</p>
+      {% endif %}
+
+      <p class="muted" style="margin-top: 16px;">
+        To edit different sections or upload a new PDF,
+        <a href="/">start over</a>.
+      </p>
+    </section>
+
+    <!-- Raw summary -->
+    <section class="card">
+      <h2>Summary</h2>
+      <pre class="summary-pre">{{ report.summary }}</pre>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

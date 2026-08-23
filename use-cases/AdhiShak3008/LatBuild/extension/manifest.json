@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "LatBuild — SuperDocs PDF Companion",
+  "version": "1.0.0",
+  "description": "Surgical PDF editing with layout preservation, powered by SuperDocs.",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "LatBuild"
+  },
+  "permissions": ["storage"],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png"
+  }
+}

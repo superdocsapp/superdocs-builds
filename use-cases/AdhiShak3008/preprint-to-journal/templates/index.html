@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preprint to Journal Converter</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <h1>Preprint → Journal Submission Converter</h1>
+    <p class="subtitle">Transform your manuscript to meet a target journal's requirements using SuperDocs.</p>
+  </header>
+
+  <main>
+    {% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+    {% endif %}
+
+    <!-- Step 1: Upload -->
+    <section class="card" id="upload-section">
+      <h2>Step 1: Upload Manuscript</h2>
+      <p>Upload your preprint as a <strong>.docx</strong> file. The original will be preserved — every journal conversion starts from this original.</p>
+
+      {% if has_manuscript %}
+      <div class="alert alert-success">
+        ✓ Manuscript loaded: <strong>{{ original_filename }}</strong>
+        <button class="btn btn-sm btn-secondary" id="replace-btn">Replace</button>
+      </div>
+      <div id="upload-form" style="display:none;">
+      {% else %}
+      <div id="upload-form">
+      {% endif %}
+        <form id="upload-form-el">
+          <input type="file" id="file-input" accept=".docx" required>
+          <button type="submit" class="btn btn-primary">Upload Manuscript</button>
+        </form>
+        <div id="upload-status" class="status-msg"></div>
+      </div>
+    </section>
+
+    <!-- Step 2: Select Journal -->
+    <section class="card {% if not has_manuscript %}disabled{% endif %}" id="journal-section">
+      <h2>Step 2: Select Target Journal</h2>
+
+      {% if journals %}
+      <div class="journal-grid">
+        {% for j in journals %}
+        <div class="journal-card" data-journal-id="{{ j.id }}">
+          <h3>{{ j.name }}</h3>
+          <button class="btn btn-primary select-journal-btn" data-journal-id="{{ j.id }}"
+            {% if not has_manuscript %}disabled{% endif %}>
+            Select & Transform
+          </button>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted">No journal profiles found.</p>
+      {% endif %}
+
+      <!-- Optional: author info for blinding -->
+      <details class="author-info-panel">
+        <summary>Optional: Provide author information for blinding</summary>
+        <p class="muted">If the target journal requires blinded review, providing author names and affiliations improves blinding accuracy.</p>
+        <label>Author names (one per line):
+          <textarea id="author-names" rows="3" placeholder="Jane Smith&#10;John Doe"></textarea>
+        </label>
+        <label>Affiliations (one per line):
+          <textarea id="author-affiliations" rows="3" placeholder="University of Example&#10;Example Institute"></textarea>
+        </label>
+      </details>
+    </section>
+
+    <!-- Step 3: Transform progress (shown after journal selected) -->
+    <section class="card hidden" id="progress-section">
+      <h2>Step 3: Transformation in Progress</h2>
+      <div id="progress-bar-wrap">
+        <div id="progress-bar"></div>
+      </div>
+      <p id="progress-msg">Starting transformation…</p>
+      <p class="muted">Large manuscripts may take several minutes. Do not close this page.</p>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    // Pass server-side state to JS
+    window.APP_STATE = {
+      hasManuscript: {{ 'true' if has_manuscript else 'false' }},
+    };
+  </script>
+</body>
+</html>

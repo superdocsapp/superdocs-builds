@@ -1,0 +1,36 @@
+{
+  "id": "nature",
+  "name": "Nature",
+  "section_order": [
+    "Abstract",
+    "Introduction",
+    "Results",
+    "Discussion",
+    "Methods",
+    "References",
+    "Acknowledgements",
+    "Author Contributions",
+    "Competing Interests",
+    "Data Availability"
+  ],
+  "reference_style": "numbered-superscript",
+  "reference_style_description": "Numbered references in superscript, e.g. text^1,2^. References listed numerically at end.",
+  "word_limit": 3000,
+  "abstract_word_limit": 150,
+  "figure_placement": "end",
+  "figure_placement_description": "Figures and figure legends placed at the end of the manuscript after the references.",
+  "table_placement": "end",
+  "table_placement_description": "Tables placed at the end of the manuscript after figures.",
+  "blinded_review": false,
+  "required_declarations": [
+    "competing_interests",
+    "data_availability",
+    "author_contributions"
+  ],
+  "declaration_descriptions": {
+    "competing_interests": "A statement declaring any competing financial or non-financial interests.",
+    "data_availability": "A statement describing where the data supporting the findings can be accessed.",
+    "author_contributions": "A statement describing each author's specific contribution."
+  },
+  "notes": "Methods section appears after Discussion, not before Results. Abstract is unstructured (no subheadings). Word limit applies to main text excluding abstract, methods, references, and figure legends."
+}

@@ -1,0 +1,254 @@
+PROMPT ANALYSIS — instruction_builder.py
+=========================================
+Generated: Nature profile, no author_info (blinded_review=false)
+=========================================
+
+
+EXACT PROMPT CURRENTLY GENERATED FOR NATURE
+--------------------------------------------
+
+CRITICAL CONSTRAINT — SCIENTIFIC CONTENT MUST NOT BE CHANGED:
+You must not rewrite, paraphrase, summarise, or alter any scientific claims,
+numerical results, statistical values (p-values, confidence intervals, effect
+sizes, sample sizes), equations, or the meaning of any citation. Do not invent
+references or alter citation targets. The transformation changes only document
+structure, section order, reference formatting style, and placement of figures
+and tables. Every number, every equation, every scientific claim must appear
+in the output exactly as it appears in the input.
+
+Transform this manuscript to meet the submission requirements of **Nature**. Apply the following changes:
+
+**1. Section structure and order**
+Reorganise the manuscript so its sections appear in this exact order:
+  1. Abstract
+  2. Introduction
+  3. Results
+  4. Discussion
+  5. Methods
+  6. References
+  7. Acknowledgements
+  8. Author Contributions
+  9. Competing Interests
+  10. Data Availability
+Rename existing sections to match these headings exactly. If a section does not exist in the manuscript, note it as missing rather than inventing content.
+
+**2. Reference formatting**
+Reformat all in-text citations and the reference list to use the Nature style: Numbered references in superscript, e.g. text^1,2^. References listed numerically at end.
+Do not add, remove, or alter any reference. Only reformat the citation style.
+
+**3. Figure placement**
+Move all figures and figure legends to: Figures and figure legends placed at the end of the manuscript after the references.
+
+**4. Table placement**
+Move all tables to: Tables placed at the end of the manuscript after figures.
+
+**5. Word limit**
+The main text word limit is 3000 words (excluding abstract, methods, references, and figure legends). If the manuscript exceeds this limit, flag the excess clearly with a comment such as '[WORD LIMIT: manuscript currently exceeds 3000 words — manual reduction required]' at the start of the document. Do not delete scientific content to meet the limit.
+
+**Abstract**
+The abstract must not exceed 150 words. Do not alter the scientific content.
+
+**6. Required declarations**
+Check whether the following declarations are present. If a declaration section exists, move it to the correct position in the section order. If it is missing, insert a placeholder section with the text '[DECLARATION REQUIRED — please complete before submission]':
+  - **Competing Interests**: A statement declaring any competing financial or non-financial interests.
+  - **Data Availability**: A statement describing where the data supporting the findings can be accessed.
+  - **Author Contributions**: A statement describing each author's specific contribution.
+
+**7. Additional journal requirements**
+Methods section appears after Discussion, not before Results. Abstract is unstructured (no subheadings). Word limit applies to main text excluding abstract, methods, references, and figure legends.
+
+After completing all transformations, do not add any commentary or explanation inside the document body. The output should be the transformed manuscript only.
+
+
+=========================================
+ISSUE-BY-ISSUE ANALYSIS
+=========================================
+
+ISSUE 1 — Abstract heading disappeared
+---------------------------------------
+Root cause: The SCIENCE_PRESERVATION_PREAMBLE says "The transformation changes
+only document structure, section order, reference formatting style, and placement
+of figures and tables." It does NOT explicitly say "preserve all existing
+headings". Section 1 says "Rename existing sections to match these headings
+exactly" — but if SuperDocs interprets the Abstract as a special preamble block
+rather than a named section, it may strip the heading while keeping the text.
+The notes field also says "Abstract is unstructured (no subheadings)" which
+SuperDocs may have misread as "the Abstract block has no heading".
+
+What is missing: An explicit rule that says the "Abstract" heading must be
+present as a visible section heading in the output, and that "unstructured"
+refers only to the absence of sub-headings within the abstract body, not the
+absence of the "Abstract" heading itself.
+
+
+ISSUE 2 — Section order became Introduction → Results → Discussion → Methods
+------------------------------------------------------------------------------
+Root cause: Section 1 of the prompt says "Reorganise the manuscript so its
+sections appear in this exact order" and lists the correct Nature order. However
+the notes field at the end says:
+
+  "Methods section appears after Discussion, not before Results."
+
+This note is redundant with the section_order list (Methods is already listed
+after Discussion), but more importantly it is phrased as a clarification, not
+a hard constraint. SuperDocs may have treated the notes as the authoritative
+instruction and the numbered list as a suggestion, or it may have matched the
+note's phrasing ("after Discussion") without reading the full list.
+
+Additionally, the section order instruction uses the word "Reorganise" which is
+a soft verb. There is no explicit statement that the order is mandatory and
+non-negotiable.
+
+What is missing: The section order must be stated as a hard, non-negotiable
+constraint. The redundant note about Methods placement should be removed from
+the notes field (it is already encoded in section_order). The instruction should
+say explicitly: "This order is mandatory. Do not deviate from it."
+
+
+ISSUE 3 — SuperDocs invented an Author Contributions statement
+---------------------------------------------------------------
+Root cause: This is the most serious issue. Section 6 of the prompt says:
+
+  "If it is missing, insert a placeholder section with the text
+   '[DECLARATION REQUIRED — please complete before submission]'"
+
+SuperDocs did not insert that placeholder. Instead it fabricated a realistic-
+looking Author Contributions statement ("A.K. conceived and designed the
+experiments..."). This means SuperDocs ignored the placeholder instruction and
+generated content from its own knowledge of what such a statement looks like.
+
+The current preamble prohibits altering "scientific claims, numerical results,
+statistical values, equations, or the meaning of any citation." It does NOT
+explicitly prohibit inventing author contribution statements, funding
+information, affiliations, or other factual metadata. SuperDocs found a gap
+in the prohibition and filled it.
+
+What is missing: An explicit, prominent prohibition on inventing any factual
+information — author contributions, funding sources, affiliations, dates,
+copyright, publication metadata — not just scientific data. The placeholder
+instruction must be strengthened: "Do NOT generate a contribution statement.
+Do NOT fill in author names, roles, or any other information. Leave the section
+heading only with no body text, or omit the section entirely."
+
+
+ISSUE 4 — SuperDocs added copyright/publication boilerplate
+------------------------------------------------------------
+Root cause: There is no rule in the current prompt that prohibits adding
+publication metadata, copyright notices, or institutional boilerplate. The
+closing line says "do not add any commentary or explanation inside the document
+body" — but SuperDocs apparently classified the copyright line as document
+metadata rather than commentary, so the rule did not fire.
+
+The SCIENCE_PRESERVATION_PREAMBLE only protects scientific content. It says
+nothing about non-scientific additions.
+
+What is missing: An explicit rule that prohibits adding any content that was
+not present in the source manuscript — specifically: copyright notices,
+publication dates, journal names, DOIs, institutional affiliations, ISSN/ISBN,
+editor names, submission/acceptance dates, or any other publication metadata.
+The rule must be framed as "do not add anything that is not in the source",
+not just "do not add commentary".
+
+
+ISSUES 3 & 4 — Shared root cause
+----------------------------------
+Both issues share the same underlying gap: the no-fabrication constraint in
+the preamble is scoped only to scientific content (numbers, equations,
+citations). It does not cover factual metadata. SuperDocs is a capable model
+and will helpfully fill in "missing" information unless explicitly told not to.
+The fix is to broaden the no-fabrication rule to cover ALL factual content,
+and to make it the very first and most prominent constraint in the prompt.
+
+
+=========================================
+EXACT CHANGES NEEDED IN instruction_builder.py
+=========================================
+
+1. REPLACE SCIENCE_PRESERVATION_PREAMBLE
+   The current preamble only covers scientific data. It must be expanded to
+   cover all fabrication. Proposed replacement:
+
+   CRITICAL CONSTRAINTS — READ BEFORE APPLYING ANY CHANGE:
+
+   NO FABRICATION: Do not invent, generate, or add any information that is not
+   explicitly present in the source manuscript. This prohibition covers:
+     - Author contribution statements
+     - Funding sources or grant numbers
+     - Author affiliations or institutional details
+     - Copyright notices, publication dates, journal names, DOIs
+     - Editor names, submission/acceptance dates, volume/issue numbers
+     - Any other publication metadata or boilerplate
+   If required information is absent from the source, leave the requirement
+   unmet. Do not fill it in. Do not insert placeholder text that resembles
+   real content.
+
+   NO SCIENTIFIC ALTERATION: Do not rewrite, paraphrase, summarise, or alter
+   any scientific claims, numerical results, statistical values (p-values,
+   confidence intervals, effect sizes, sample sizes), equations, or the meaning
+   of any citation. Every number, every equation, every scientific claim must
+   appear in the output exactly as it appears in the input.
+
+   PRESERVE ALL SOURCE CONTENT: Do not delete any substantive content from the
+   source manuscript. Structural moves (reordering sections, relocating figures)
+   are permitted. Deletion is not.
+
+2. STRENGTHEN SECTION ORDER INSTRUCTION (section 1)
+   Change "Reorganise the manuscript so its sections appear in this exact order"
+   to:
+   "Reorder the manuscript sections into this exact sequence. This order is
+   mandatory — do not deviate from it for any reason:"
+   Add at the end: "Do not insert sections that are not in this list."
+
+3. ADD ABSTRACT HEADING RULE
+   After the section order block, add an explicit rule:
+   "The 'Abstract' heading must appear as a visible section heading in the
+   output. 'Unstructured' means the abstract body has no sub-headings — it
+   does not mean the 'Abstract' heading itself should be removed."
+
+4. REPLACE THE DECLARATIONS INSTRUCTION (section 6)
+   The current instruction says "insert a placeholder section with the text
+   '[DECLARATION REQUIRED — please complete before submission]'".
+   This must be changed to an explicit prohibition on fabrication:
+
+   "For each required declaration, check whether it is present in the source.
+   If it is present, move it to the correct position. If it is absent:
+     - Do NOT generate, invent, or fill in any content for it.
+     - Do NOT insert placeholder text that resembles a real statement.
+     - Do NOT use author names, roles, or any other information to construct
+       a statement.
+     - Simply omit the section. The compliance layer will report it as unmet.
+   The only permitted action for a missing declaration is to omit it."
+
+5. REMOVE REDUNDANT NOTE FROM nature.json
+   The notes field currently says "Methods section appears after Discussion,
+   not before Results." This is already encoded in section_order and creates
+   a conflicting signal. It should be removed from the notes field.
+   (The notes field should only carry information not already in structured
+   fields — e.g. the word limit scope clarification and abstract style note.)
+
+6. ADD NO-BOILERPLATE RULE TO CLOSING LINE
+   The current closing line says "do not add any commentary or explanation
+   inside the document body." Extend it to:
+   "Do not add any commentary, explanation, copyright notices, publication
+   metadata, journal branding, or any other content that was not present in
+   the source manuscript."
+
+
+=========================================
+SUMMARY TABLE
+=========================================
+
+Observed issue                        | Root cause in current prompt
+--------------------------------------|----------------------------------------------
+Abstract heading stripped             | No rule preserving existing headings;
+                                      | "unstructured" note misread as "no heading"
+Wrong section order                   | Soft "Reorganise" verb; redundant Methods
+                                      | note in notes field conflicts with list
+Author Contributions fabricated       | No-fabrication rule only covers scientific
+                                      | data, not metadata; placeholder instruction
+                                      | too weak — model filled it in "helpfully"
+Copyright boilerplate added           | No rule prohibiting addition of non-source
+                                      | content; closing line only bans "commentary"
+
+All four issues are fixable by changes to instruction_builder.py and a minor
+edit to nature.json notes. No architectural changes are needed.

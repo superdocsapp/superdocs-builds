@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Instruction — LatBuild</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/sections" class="back-link">← Back to sections</a>
+      <h1>Enter Editing Instruction</h1>
+      <p class="subtitle">{{ selected_sections | length }} section(s) selected</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Selected Sections</h2>
+      <div class="selected-section-list">
+        {% for section in selected_sections %}
+        <div class="selected-section-tag">
+          {{ section.title }}
+          <span class="muted">(~{{ section.word_count }} words)</span>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Instructions per Section</h2>
+      <p>Enter a specific instruction for each selected section. SuperDocs will process each independently.</p>
+
+      <form id="edit-form">
+        {% for section in selected_sections %}
+        <div class="section-instruction-group">
+          <label class="section-instruction-label">
+            <span class="section-name">{{ section.title }}</span>
+            <span class="muted">(~{{ section.word_count }} words, p{{ section.start_page }}{% if section.start_page != section.end_page %}–{{ section.end_page }}{% endif %})</span>
+          </label>
+          <textarea
+            class="section-instruction-input"
+            data-section="{{ section.title }}"
+            rows="2"
+            placeholder="e.g. Make this more concise and emphasize the experimental contribution."
+            required
+          ></textarea>
+        </div>
+        {% endfor %}
+
+        <details class="apply-all-group">
+          <summary>Apply one instruction to all sections</summary>
+          <div class="apply-all-inner">
+            <textarea id="bulk-instruction" rows="2" placeholder="Type here and click Apply to All"></textarea>
+            <button type="button" class="btn btn-secondary btn-sm" id="apply-all-btn">Apply to All</button>
+          </div>
+        </details>
+
+        <div id="transform-status" class="status-msg"></div>
+
+        <div class="action-row">
+          <button type="submit" class="btn btn-primary btn-large" id="start-btn">
+            Send to SuperDocs →
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    window.EDIT_STATE = {
+      selectedSections: {{ selected_sections | map(attribute='title') | list | tojson }},
+    };
+    initEditPage();
+  </script>
+</body>
+</html>

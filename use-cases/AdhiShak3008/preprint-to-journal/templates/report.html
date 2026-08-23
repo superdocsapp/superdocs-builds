@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compliance Report — {{ journal.name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="back-link">← Convert another journal</a>
+    <h1>Compliance Report</h1>
+    <p class="subtitle">Journal: <strong>{{ journal.name }}</strong></p>
+  </header>
+
+  <main>
+
+    <!-- Overall summary -->
+    <section class="card">
+      <h2>Overall Assessment</h2>
+      <p class="summary-text {{ 'text-success' if summary.counts.unmet == 0 else 'text-warning' }}">
+        {{ summary.overall }}
+      </p>
+      <div class="status-counts">
+        <span class="badge badge-met">✓ Met: {{ summary.counts.met }}</span>
+        <span class="badge badge-sent">~ Instructed: {{ summary.counts.instruction_sent }}</span>
+        <span class="badge badge-partial">⚠ Partial: {{ summary.counts.partial }}</span>
+        <span class="badge badge-unmet">✗ Unmet: {{ summary.counts.unmet }}</span>
+        <span class="badge badge-unverifiable">? Unverifiable: {{ summary.counts.unverifiable }}</span>
+      </div>
+    </section>
+
+    <!-- Requirement-by-requirement report -->
+    <section class="card">
+      <h2>Journal Requirements</h2>
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Requirement</th>
+            <th>Status</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in compliance %}
+          <tr class="status-row-{{ item.status }}">
+            <td><strong>{{ item.requirement }}</strong></td>
+            <td>
+              <span class="badge badge-{{ item.status }}">
+                {% if item.status == 'met' %}✓ Met
+                {% elif item.status == 'unmet' %}✗ Unmet
+                {% elif item.status == 'partial' %}⚠ Partial
+                {% elif item.status == 'instruction_sent' %}~ Instructed
+                {% elif item.status == 'unverifiable' %}? Unverifiable
+                {% else %}{{ item.status }}
+                {% endif %}
+              </span>
+            </td>
+            <td>{{ item.detail }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Scientific content preservation -->
+    <section class="card">
+      <h2>Scientific Content Preservation Check</h2>
+      <div class="alert {{ 'alert-warning' if preservation.has_concerns else 'alert-success' }}">
+        {{ preservation.summary }}
+      </div>
+      <p class="limitation-notice">
+        <strong>Limitation:</strong> {{ preservation.limitation_notice }}
+      </p>
+
+      {% if preservation.numbers_missing %}
+      <details>
+        <summary>Missing numerical values ({{ preservation.numbers_missing | length }})</summary>
+        <ul>{% for n in preservation.numbers_missing %}<li><code>{{ n }}</code></li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+
+      {% if preservation.stats_missing %}
+      <details>
+        <summary>Missing statistical markers ({{ preservation.stats_missing | length }})</summary>
+        <ul>{% for s in preservation.stats_missing %}<li><code>{{ s }}</code></li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+
+      {% if preservation.equations_missing %}
+      <details>
+        <summary>Missing equations ({{ preservation.equations_missing | length }})</summary>
+        <ul>{% for e in preservation.equations_missing %}<li><code>{{ e }}</code></li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+
+      {% if preservation.sentences_potentially_changed %}
+      <details>
+        <summary>Sentence fingerprints not found in transformed manuscript ({{ preservation.sentences_potentially_changed | length }}) — may be due to restructuring</summary>
+        <ul>{% for s in preservation.sentences_potentially_changed %}<li><code>{{ s }}…</code></li>{% endfor %}</ul>
+      </details>
+      {% endif %}
+    </section>
+
+    <!-- Blinding report (only shown when applicable) -->
+    {% if blinding_result %}
+    <section class="card">
+      <h2>Blinding Review</h2>
+      <div class="alert alert-warning">
+        <strong>{{ blinding_result.limitation_notice }}</strong>
+      </div>
+
+      {% if blinding_result.items_removed %}
+      <h3>Items removed / replaced</h3>
+      <ul>
+        {% for item in blinding_result.items_removed %}
+        <li>✓ {{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {% if blinding_result.potential_remaining %}
+      <h3 class="text-warning">Potential remaining identifiers — review required</h3>
+      <ul>
+        {% for item in blinding_result.potential_remaining %}
+        <li>⚠ {{ item }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-success">No obvious remaining identifiers detected by automated check. Manual review is still required.</p>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <!-- Export -->
+    <section class="card">
+      <h2>Export</h2>
+      {% if can_export %}
+      <p>Download the transformed manuscript as a Word document (.docx).</p>
+      <form method="POST" action="/api/export" id="export-form">
+        <button type="submit" class="btn btn-primary btn-large">
+          Download {{ journal.name }} Manuscript (.docx)
+        </button>
+      </form>
+      <p class="muted">
+        To convert to a different journal, <a href="/">return to the upload page</a>
+        and select another journal. The transformation will restart from your
+        original manuscript.
+      </p>
+      {% else %}
+      <p class="muted">Export is not available — transformation did not complete successfully.</p>
+      {% endif %}
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    // Handle export form as fetch to get file download
+    document.getElementById('export-form')?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = e.target.querySelector('button');
+      btn.disabled = true;
+      btn.textContent = 'Preparing download…';
+      try {
+        const resp = await fetch('/api/export', { method: 'POST' });
+        if (!resp.ok) {
+          const err = await resp.json();
+          alert('Export failed: ' + (err.error || 'Unknown error'));
+          btn.disabled = false;
+          btn.textContent = 'Download Manuscript (.docx)';
+          return;
+        }
+        const blob = await resp.blob();
+        const cd = resp.headers.get('Content-Disposition') || '';
+        const nameMatch = cd.match(/filename="?([^"]+)"?/);
+        const filename = nameMatch ? nameMatch[1] : 'manuscript.docx';
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert('Export failed: ' + err.message);
+      }
+      btn.disabled = false;
+      btn.textContent = 'Download Manuscript (.docx)';
+    });
+  </script>
+</body>
+</html>

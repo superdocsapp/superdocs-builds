@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Changes — LatBuild</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a href="/edit" class="back-link">← Back</a>
+      <h1>Review Proposed Changes</h1>
+      <p class="subtitle">{{ selected_sections | length }} section(s) — approve or reject each</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="alert alert-info" id="global-status">
+      <span class="spinner"></span> Waiting for SuperDocs to complete...
+    </div>
+
+    <!-- Per-section review panels -->
+    {% for section_name, job in jobs.items() %}
+    <section class="card section-review-card" data-section="{{ section_name }}" data-job-id="{{ job.job_id }}" data-session-id="{{ job.session_id }}">
+      <div class="section-review-header">
+        <h2>{{ section_name }}</h2>
+        <div class="section-status-badge">
+          <span class="spinner"></span> Processing…
+        </div>
+      </div>
+
+      <div class="diff-grid hidden">
+        <div class="diff-panel diff-before">
+          <div class="diff-label">Original</div>
+          <div class="diff-content original-content">{{ job.original_text }}</div>
+        </div>
+        <div class="diff-panel diff-after">
+          <div class="diff-label">Proposed</div>
+          <div class="diff-content proposed-content"></div>
+        </div>
+      </div>
+
+      <div class="section-actions hidden">
+        <button type="button" class="btn btn-success approve-section-btn">
+          ✓ Approve this section
+        </button>
+        <button type="button" class="btn btn-danger reject-section-btn">
+          ✗ Reject — keep original
+        </button>
+      </div>
+
+      <div class="section-decision hidden"></div>
+
+      {% if job.status == 'failed' %}
+      <div class="alert alert-error">SuperDocs job failed: {{ job.error }}</div>
+      {% endif %}
+    </section>
+    {% endfor %}
+
+    <!-- Batch controls -->
+    <div class="card batch-controls hidden" id="batch-controls">
+      <div class="batch-inner">
+        <button class="btn btn-success" id="approve-all-btn">Approve All</button>
+        <button class="btn btn-danger" id="reject-all-btn">Reject All</button>
+        <button class="btn btn-primary btn-large" id="apply-btn" disabled>
+          Apply Approved Changes to PDF →
+        </button>
+      </div>
+      <div id="apply-status" class="status-msg"></div>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    window.REVIEW_STATE = {
+      jobs: {{ jobs | tojson }},
+      sectionNames: {{ selected_sections | tojson }},
+    };
+    initReviewPage();
+  </script>
+</body>
+</html>

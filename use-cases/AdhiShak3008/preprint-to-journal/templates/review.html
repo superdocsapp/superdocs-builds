@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Changes — {{ journal.name }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="back-link">← Back to upload</a>
+    <h1>Review Proposed Changes</h1>
+    <p class="subtitle">Journal: <strong>{{ journal.name }}</strong></p>
+  </header>
+
+  <main>
+    <div class="alert alert-info">
+      <strong>Review each proposed change below.</strong>
+      Approve changes you accept. Deny changes you want to reject.
+      Approved changes are applied to the document; denied changes are discarded.
+      You can provide feedback when denying a change.
+    </div>
+
+    <!-- Status / polling area -->
+    <div id="poll-status">
+      {% if conv.status == 'in_progress' or conv.status == 'pending' %}
+      <div class="alert alert-info" id="polling-msg">
+        <span class="spinner"></span> Transformation in progress — checking for proposed changes…
+      </div>
+      {% elif conv.status == 'awaiting_approval' %}
+      <div class="alert alert-warning" id="polling-msg">
+        Proposed changes are ready for review.
+      </div>
+      {% elif conv.status == 'completed' %}
+      <div class="alert alert-success" id="polling-msg">
+        ✓ All changes processed. <a href="/report">View compliance report →</a>
+      </div>
+      {% elif conv.status == 'failed' %}
+      <div class="alert alert-error" id="polling-msg">
+        Transformation failed. <a href="/">Try again</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Batch controls -->
+    <div id="batch-controls" class="batch-bar hidden">
+      <span id="change-count-label"></span>
+      <button class="btn btn-success" id="approve-all-btn">Approve All</button>
+      <button class="btn btn-danger" id="deny-all-btn">Deny All</button>
+      <button class="btn btn-primary" id="submit-decisions-btn">Submit Decisions</button>
+    </div>
+
+    <!-- Change cards -->
+    <div id="changes-container"></div>
+
+    <!-- Completed state -->
+    <div id="completed-panel" class="hidden">
+      <div class="alert alert-success">
+        ✓ All changes have been processed.
+      </div>
+      <a href="/report" class="btn btn-primary">View Compliance Report & Export →</a>
+    </div>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    window.REVIEW_STATE = {
+      jobId: {{ job_id | tojson }},
+      sessionId: {{ session_id | tojson }},
+      initialStatus: {{ conv.status | tojson }},
+    };
+    initReviewPage();
+  </script>
+</body>
+</html>

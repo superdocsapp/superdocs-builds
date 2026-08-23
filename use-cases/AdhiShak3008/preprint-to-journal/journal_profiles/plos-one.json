@@ -1,0 +1,39 @@
+{
+  "id": "plos-one",
+  "name": "PLOS ONE",
+  "section_order": [
+    "Abstract",
+    "Introduction",
+    "Materials and Methods",
+    "Results",
+    "Discussion",
+    "Conclusions",
+    "Acknowledgments",
+    "References",
+    "Figure Legends",
+    "Tables"
+  ],
+  "reference_style": "author-year",
+  "reference_style_description": "Author-year citations in parentheses, e.g. (Smith et al., 2020). Reference list in alphabetical order by first author surname.",
+  "word_limit": null,
+  "abstract_word_limit": 300,
+  "abstract_structure": ["Background", "Methodology/Principal Findings", "Conclusions/Significance"],
+  "figure_placement": "end",
+  "figure_placement_description": "Figures uploaded separately; figure legends placed at end of manuscript after references.",
+  "table_placement": "end",
+  "table_placement_description": "Tables placed at end of manuscript after figure legends.",
+  "blinded_review": true,
+  "required_declarations": [
+    "competing_interests",
+    "data_availability",
+    "funding",
+    "author_contributions"
+  ],
+  "declaration_descriptions": {
+    "competing_interests": "A statement that the authors have declared no competing interests, or a description of any competing interests.",
+    "data_availability": "A statement that all data are fully available without restriction, or describing access conditions.",
+    "funding": "A statement listing all funding sources and the role of funders in study design, data collection, analysis, and reporting.",
+    "author_contributions": "A statement using CRediT taxonomy describing each author's contribution."
+  },
+  "notes": "PLOS ONE uses double-blind peer review. All identifying information must be removed from the manuscript. Section titled 'Materials and Methods' not 'Methods'. 'Acknowledgments' (US spelling, no 'e'). Abstract must be structured with the three subheadings listed."
+}

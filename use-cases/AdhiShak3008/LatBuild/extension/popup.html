@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LatBuild</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 280px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      color: #1e293b;
+      background: #fff;
+    }
+    .header {
+      background: #0f172a;
+      color: #fff;
+      padding: 14px 16px;
+    }
+    .header h1 { font-size: 1.1rem; font-weight: 800; }
+    .header p  { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
+    .body { padding: 16px; }
+    .status {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-bottom: 12px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+    .status.running { color: #1d4ed8; background: #eff6ff; border-color: #93c5fd; }
+    .status.error   { color: #b91c1c; background: #fef2f2; border-color: #fca5a5; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      margin-bottom: 8px;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #1d4ed8; color: #fff; }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .divider { border: none; border-top: 1px solid #f1f5f9; margin: 10px 0; }
+    .note { font-size: 0.76rem; color: #94a3b8; text-align: center; margin-top: 8px; }
+    #port-input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    label { font-size: 0.82rem; color: #475569; display: block; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>LatBuild</h1>
+    <p>SuperDocs PDF Companion</p>
+  </div>
+  <div class="body">
+    <div class="status" id="status-msg">
+      Service not started. Run <code>python app.py</code> in the LatBuild/service folder.
+    </div>
+
+    <a href="#" class="btn btn-primary" id="open-btn">Open LatBuild</a>
+    <button class="btn btn-secondary" id="check-btn">Check Service</button>
+
+    <hr class="divider">
+
+    <label for="port-input">Service port</label>
+    <input type="number" id="port-input" value="5001" min="1000" max="65535">
+
+    <p class="note">LatBuild runs locally. Your PDF never leaves your machine except for the text sent to SuperDocs.</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

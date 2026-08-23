@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LatBuild — SuperDocs PDF Companion</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>LatBuild</h1>
+      <p class="subtitle">SuperDocs-powered surgical PDF editing with layout preservation</p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Upload Your PDF</h2>
+      <p>Upload a digitally-generated PDF (IEEE paper, academic article, report). LatBuild will detect its sections and let you edit any of them through SuperDocs — without reconstructing the whole document.</p>
+
+      {% if has_pdf %}
+      <div class="alert alert-success">
+        ✓ Loaded: <strong>{{ pdf_filename }}</strong>
+        <button class="btn btn-sm btn-secondary" id="replace-btn">Replace</button>
+      </div>
+      <div id="upload-form" style="display:none;">
+      {% else %}
+      <div id="upload-form">
+      {% endif %}
+        <form id="upload-form-el">
+          <div class="file-drop-zone" id="drop-zone">
+            <p>Drop a PDF here or</p>
+            <input type="file" id="file-input" accept=".pdf" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="upload-btn">Analyze PDF</button>
+        </form>
+        <div id="upload-status" class="status-msg"></div>
+      </div>
+
+      {% if has_pdf %}
+      <div class="action-row">
+        <a href="/sections" class="btn btn-primary">Select Sections to Edit →</a>
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="card how-it-works">
+      <h2>How it works</h2>
+      <ol>
+        <li><strong>Upload</strong> your PDF — LatBuild maps its sections and layout.</li>
+        <li><strong>Select</strong> any section(s) you want to edit.</li>
+        <li><strong>Give SuperDocs an instruction</strong> — "make this more concise", "improve academic clarity", etc.</li>
+        <li><strong>Review</strong> the proposed rewrites side-by-side.</li>
+        <li><strong>Approve</strong> — LatBuild surgically patches only the selected sections into the original PDF.</li>
+        <li><strong>Download</strong> your document — same layout, updated content.</li>
+      </ol>
+      <p class="muted">SuperDocs sees only the section text. Your PDF structure is never sent to any AI model.</p>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+  <script>
+    window.APP_STATE = { hasPdf: {{ 'true' if has_pdf else 'false' }} };
+    initUploadPage();
+  </script>
+</body>
+</html>
