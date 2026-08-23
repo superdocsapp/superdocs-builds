@@ -16,6 +16,13 @@ into that.
 
 **Live:** https://live-deliverable-zoom-app-production.up.railway.app
 
+Open that in any browser and you get the real panel, running against the real
+backend, with a document you can drive — see the one command below. What you
+will **not** get there is live audio capture: that needs the Zoom side panel
+on a Mac, and the Zoom app is still in beta review, so only its author can
+install it. The panel says so itself rather than pretending otherwise, and
+nothing else about the system depends on it.
+
 ---
 
 ## What it looks like

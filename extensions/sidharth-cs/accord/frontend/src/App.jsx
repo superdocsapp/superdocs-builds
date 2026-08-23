@@ -205,6 +205,11 @@ export default function App() {
   // a missing helper surfaces the restrained error on click), Stop shows
   // whenever a START/STOP is in flight or ACKed-listening.
   const canListen = state.key === 'ready' || state.key === 'helper-off'
+  // Outside Zoom there is no meeting audio to capture and no Mac helper, so
+  // Listen cannot do anything. It was still the most prominent control on
+  // the page — the first thing a visitor clicks, and a dead end. The notice
+  // above explains the situation; the button has to stop contradicting it.
+  const outsideZoom = status === 'demo'
   const isListening =
     state.key === 'connecting' || state.key === 'listening' || state.key === 'stopping'
 
@@ -285,11 +290,16 @@ export default function App() {
           <span className="capture-dot" aria-hidden="true" />
           <span className="capture-label">{state.label}</span>
           <span className="capture-action">
-            {canListen && (
+            {canListen && !outsideZoom && (
               <button className="btn primary" disabled={session.helperBusy}
                       onClick={() => session.helperStart().catch(() => {})}>
                 Listen
               </button>
+            )}
+            {canListen && outsideZoom && (
+              <span className="capture-hint">
+                Live capture needs the Zoom panel on a Mac — use <code>demo.py</code>
+              </span>
             )}
             {isListening && (
               <button className="btn ghost" disabled={session.helperBusy}
@@ -347,6 +357,7 @@ export default function App() {
       <main className="doc-area">
         {session.draftVersion === 0 ? (
           <EmptyState state={state} canListen={canListen} isListening={isListening}
+                      outsideZoom={outsideZoom}
                       templateKey={session.active_template_key} onSetTemplate={session.setTemplate}
                       onUploadTemplate={session.uploadTemplate}
                       customTemplateName={session.customTemplateName}
@@ -556,7 +567,7 @@ export default function App() {
 /*  Empty state — the first thing a participant sees                 */
 /* ------------------------------------------------------------------ */
 
-function EmptyState({ state, canListen, isListening, templateKey, onSetTemplate,
+function EmptyState({ state, canListen, isListening, outsideZoom, templateKey, onSetTemplate,
                      onUploadTemplate, customTemplateName, uploadingTemplate,
                      onListen, onStop }) {
   const ready = state.key === 'ready'
@@ -604,11 +615,20 @@ function EmptyState({ state, canListen, isListening, templateKey, onSetTemplate,
         <span className={`capture-dot ${state.key}`} aria-hidden="true" />
         <span>{state.label}</span>
       </div>
-      {ready && canListen && (
-        <button className="btn primary empty-listen" onClick={onListen}>Listen</button>
-      )}
-      {canListen && state.key === 'helper-off' && (
-        <button className="btn primary empty-listen" onClick={onListen}>Listen</button>
+      {canListen && outsideZoom ? (
+        <p className="empty-hint">
+          Live capture needs the Zoom panel on a Mac. To watch this document
+          build, run <code>python3 demo.py</code> against this session.
+        </p>
+      ) : (
+        <>
+          {ready && canListen && (
+            <button className="btn primary empty-listen" onClick={onListen}>Listen</button>
+          )}
+          {canListen && state.key === 'helper-off' && (
+            <button className="btn primary empty-listen" onClick={onListen}>Listen</button>
+          )}
+        </>
       )}
       {isListening && (
         <button className="btn ghost empty-listen" onClick={onStop}>Stop</button>

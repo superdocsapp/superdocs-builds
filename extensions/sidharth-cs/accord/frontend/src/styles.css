@@ -784,3 +784,24 @@ button { font: inherit; color: inherit; }
 }
 .correction-bar input::placeholder { color: var(--faint); }
 .correction-bar .btn { flex-shrink: 0; }
+
+/* Shown where the Listen button would be when the panel is running outside
+   Zoom, so the most prominent control is not one that cannot work. */
+.capture-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: right;
+}
+.capture-hint code,
+.empty-hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95em;
+}
+.empty-hint {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 32ch;
+  margin: 4px auto 0;
+  text-align: center;
+}

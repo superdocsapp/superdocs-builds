@@ -1256,6 +1256,19 @@ class MeetingSession:
         # section as a clean success.
         self._batch_partial_error = None
 
+        # Table-cell fills first, prose second. A details-table fill writes one
+        # cell, cannot drop another section's content, and is already treated
+        # as non-fatal when it fails. Prose operations are the risky ones —
+        # and when one fails and the platform refuses the revert, the batch
+        # has to stop, taking every operation after it with it.
+        #
+        # Live, a batch routed to ['Scope of Work', 'Timeline & Milestones',
+        # 'Budget / Commercial Terms', 'Client', 'Project'] stopped on a
+        # 409'd revert, and the finished document had every prose section
+        # filled and no client name at all. Ordering costs nothing and gets
+        # the cheap, safe writes done before anything can wedge.
+        ops = sorted(ops, key=lambda o: o.table_field is None)
+
         for op in ops:
             op_turn = self._turn_count
             op_html = current_html
