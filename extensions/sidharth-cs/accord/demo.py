@@ -29,6 +29,49 @@ import urllib.request
 DEPLOYED = "https://live-deliverable-zoom-app-production.up.railway.app"
 
 
+def _via_curl(url: str, data, method: str | None):
+    """Same request through curl, which carries its own CA bundle.
+
+    Returns (status, parsed_body) or None if curl cannot be used at all.
+    Certificate verification stays enabled: no -k, no --insecure. If curl
+    cannot verify the certificate either, the request genuinely should fail.
+
+    The body goes to a file and only the status and content type come back on
+    stdout, because /export returns a binary .docx — reading the two together
+    as text died on the first non-UTF-8 byte, at the very last step of an
+    otherwise complete run.
+    """
+    import subprocess, tempfile, os
+    fd, tmp = tempfile.mkstemp()
+    os.close(fd)
+    cmd = ["curl", "-sS", "-o", tmp, "-w", "%{http_code} %{content_type}",
+           "-X", method or ("POST" if data is not None else "GET"), url]
+    if data is not None:
+        cmd += ["-H", "Content-Type: application/json", "--data-binary", data.decode()]
+    try:
+        out = subprocess.run(cmd, capture_output=True, timeout=120)
+        if out.returncode != 0:
+            return None
+        head = out.stdout.decode(errors="replace").split()
+        if not head or not head[0].isdigit():
+            return None
+        status, ctype = int(head[0]), (head[1] if len(head) > 1 else "")
+        body = open(tmp, "rb").read()
+    except (FileNotFoundError, subprocess.SubprocessError, OSError):
+        return None
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+    if "json" in ctype:
+        try:
+            return status, json.loads(body)
+        except json.JSONDecodeError:
+            return status, body.decode(errors="replace")
+    return status, body
+
+
 def _ssl_context() -> ssl.SSLContext:
     """A python.org or Homebrew Python on macOS ships no CA bundle of its own
     and cannot verify any HTTPS certificate until someone runs
@@ -79,8 +122,14 @@ LATE_CORRECTION = "Sorry, correction — the total budget is $55,000, not $45,00
 
 def call(url: str, path: str, payload=None, method=None):
     data = json.dumps(payload).encode() if payload is not None else None
+    # Built once and reused by BOTH transports below. Passing the bare base
+    # URL to the curl fallback sent every request to "/" instead, where a
+    # POST answers 405 and the /health check passes against the panel's own
+    # HTML — a fallback that silently talks to the wrong endpoint is worse
+    # than no fallback.
+    target = url + path
     req = urllib.request.Request(
-        url + path,
+        target,
         data=data,
         method=method or ("POST" if data is not None else "GET"),
         headers={"Content-Type": "application/json"},
@@ -94,10 +143,24 @@ def call(url: str, path: str, payload=None, method=None):
         return e.code, e.read().decode(errors="replace")
     except urllib.error.URLError as e:
         if isinstance(e.reason, ssl.SSLCertVerificationError):
+            # A Homebrew or python.org Python on macOS ships no CA bundle of
+            # its own, so urllib cannot verify ANY certificate until someone
+            # installs certifi or runs Install Certificates.command. That is
+            # a fair thing to ask of a contributor and an unfair thing to ask
+            # of someone who just wants to see whether this works.
+            #
+            # curl carries its own trust store and is present on every macOS
+            # and effectively every Linux, so borrow it rather than telling a
+            # reviewer to go and fix their Python first. Verification is
+            # still ON — this is a different verifier, never a disabled one.
+            got = _via_curl(target, data, method)
+            if got is not None:
+                return got
             sys.exit(
                 "\nHTTPS certificate verification failed: this Python has no CA "
-                "bundle.\n\nThe cause is the Python install, not this project or "
-                "the server. Fix it with either:\n"
+                "bundle, and curl is not available to fall back on.\n\nThe cause "
+                "is the Python install, not this project or the server. Fix it "
+                "with either:\n"
                 "  pip3 install certifi\n"
                 '  open "/Applications/Python 3.x/Install Certificates.command"\n'
                 "\nOr run against a local backend instead:  "

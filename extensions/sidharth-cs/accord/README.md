@@ -51,7 +51,10 @@ python3 demo.py --correction        # a repair spoken mid-sentence
 python3 demo.py --late-correction   # correct a value already written
 ```
 
-Standard library only, nothing to install. It feeds the same transcript
+Standard library only, nothing to install — verified on a stock Homebrew
+Python with no `certifi` and no virtualenv. (A Python without a CA bundle
+cannot verify HTTPS at all; the script borrows `curl`'s trust store rather
+than asking you to fix your Python first. Verification stays on.) It feeds the same transcript
 endpoint the live capture feeds, so it exercises the identical pipeline —
 batching, classification, section routing, the validation gate, SuperDocs
 edits, approval and export. It prints a `?meeting=<id>` URL: open that in a
@@ -199,6 +202,13 @@ Settings first.
   output. The cause is upstream, not in this pipeline — documented with
   reproductions in [SUPERDOCS_BUGS.md](SUPERDOCS_BUGS.md), which also covers
   review mode being bypassed and a gate denial that landed anyway.
+  Concretely, and worth knowing before you run `demo.py`: a run can end with
+  `batch failed: ... edit did not settle after approval`. That is SuperDocs
+  accepting an approval whose job never reaches a terminal state for us; the
+  session refuses further edits rather than guessing at remote state. **Run
+  it again** — the second run is usually clean. The script says which
+  happened instead of pretending, which is the behaviour the gate exists
+  for.
 - **Latency.** One session allows one live document, and concurrent
   `chat_async` returns 409, so every edit is strictly sequential. This is the
   largest contributor to end-to-end latency.
