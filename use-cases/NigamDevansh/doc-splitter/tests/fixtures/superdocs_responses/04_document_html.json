@@ -1,0 +1,105 @@
+{
+  "status": 200,
+  "body": {
+    "document_id": "d089a41b-4407-4132-a35d-4e79e1679554",
+    "title": "01_msa",
+    "source": "ai_created",
+    "version": 7,
+    "created_at": "2026-08-10T09:29:32.949550",
+    "updated_at": "2026-08-10T15:21:39.785235",
+    "archived": false,
+    "sessions": [
+      {
+        "scoped_session_id": "user:46c41140-1660-4b37-807f-da1540930945:probe-doctask-001",
+        "session_id": "probe-doctask-001",
+        "opened_at": "2026-08-10T09:29:33.032648",
+        "updated_at": "2026-08-10T15:21:39.955456",
+        "label": "In the section that states the payment terms, replace the exact text 'Net 30' with '[REDACTED]'. \u2026"
+      }
+    ],
+    "structure": {
+      "headings": [
+        {
+          "level": 2,
+          "text": "1. Parties and Agreement",
+          "position": 0
+        },
+        {
+          "level": 2,
+          "text": "2. Term",
+          "position": 2
+        },
+        {
+          "level": 2,
+          "text": "3. Renewal",
+          "position": 4
+        },
+        {
+          "level": 2,
+          "text": "4. Termination",
+          "position": 6
+        },
+        {
+          "level": 2,
+          "text": "5. Services",
+          "position": 8
+        },
+        {
+          "level": 2,
+          "text": "6. Fees and Payment",
+          "position": 10
+        },
+        {
+          "level": 2,
+          "text": "7. Limitation of Liability",
+          "position": 12
+        },
+        {
+          "level": 2,
+          "text": "8. Indemnification",
+          "position": 14
+        },
+        {
+          "level": 2,
+          "text": "9. Warranties",
+          "position": 16
+        },
+        {
+          "level": 2,
+          "text": "10. Insurance",
+          "position": 18
+        },
+        {
+          "level": 2,
+          "text": "11. Confidentiality",
+          "position": 20
+        },
+        {
+          "level": 2,
+          "text": "12. Governing Law and Jurisdiction",
+          "position": 22
+        }
+      ],
+      "section_count": 12,
+      "block_count": 24,
+      "media": {
+        "images": 0,
+        "diagrams": 0
+      }
+    },
+    "html": "<h2 data-chunk-id=\"af774ada-6f16-4cf6-984d-57a76a81ea9b\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">1. Parties and Agreement</h2>\n<p data-chunk-id=\"0091ad1e-f72c-4277-b18f-01caf73a7ea8\">This Master Services Agreement is entered into between Acme Corporation (\"Customer\") and Beta Logistics LLC (\"Supplier\"). Customer is a Delaware corporation with its principal place of business at 100 Industrial Way, Newark, Delaware. Supplier is a New York limited liability company with its principal place of business at 200 Freight Lane, Albany, New York. This Agreement governs the provision of freight management and logistics coordination services by Supplier to Customer.</p>\n<h2 data-chunk-id=\"0b1f0ae8-dc45-44b3-a5dc-532a924f908a\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">2. Term</h2>\n<p data-chunk-id=\"4f90953f-91a7-4ede-bcd1-2ec4807ab092\">This agreement is effective as of 1 January 2025. The initial term of this Agreement shall be for a period of thirty-six (36) months. This Agreement shall expire on 31 December 2027.</p>\n<h2 data-chunk-id=\"bdd4ec2f-586e-4a28-b6d9-47f3336bf4ba\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">3. Renewal</h2>\n<p data-chunk-id=\"6dc81ef9-263d-45a2-98bb-b4bcdb545dad\">This Agreement shall automatically renew for successive one-year periods. Either party may provide written notice of non-renewal at least ninety (90) days prior to the expiration of the then-current term.</p>\n<h2 data-chunk-id=\"728f07eb-5948-4022-b1a0-d80e8a9ad8c5\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">4. Termination</h2>\n<p data-chunk-id=\"d1fb26aa-86c5-4888-a36d-be92b161bb21\">Beta Logistics LLC may terminate this Agreement for convenience upon sixty (60) days written notice. Acme Corporation may not terminate this Agreement for convenience. Either party may terminate this Agreement immediately for uncured material breach.</p>\n<h2 data-chunk-id=\"7c8d166a-af7f-4a5d-862a-ecf2000d189b\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">5. Services</h2>\n<p data-chunk-id=\"7137ec09-94fd-4ec3-ab5a-9d788e813495\">Supplier shall provide freight management, route optimization, warehousing coordination, and inventory tracking services as described in Exhibit A. Supplier shall perform the services in a professional manner and in accordance with applicable industry standards and regulations. Customer shall provide accurate shipping data and timely instructions necessary for Supplier to perform the services.</p>\n<h2 data-chunk-id=\"af4235bf-8470-4ac4-8093-15bceda43952\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">6. Fees and Payment</h2>\n<p data-chunk-id=\"10c1a9e4-707c-4ac0-b737-58a1f624c1cc\">Customer shall pay all fees as set forth in applicable Statements of Work. All fees are due Net 30. Late payments are subject to a service charge not to exceed the maximum rate permitted by applicable law. Customer shall not withhold payment pending resolution of good-faith disputes.</p>\n<h2 data-chunk-id=\"95f9427d-37c3-44fb-a956-a2bbb97b2294\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">7. Limitation of Liability</h2>\n<p data-chunk-id=\"f6bd346d-1431-43cb-bb69-9ff7d9ccdf0a\">Beta Logistics LLC's total liability shall not exceed USD 120,000. The liability cap is a fixed amount and shall not vary based on fees paid or any other metric. This limitation applies to all claims regardless of theory of liability, including contract, tort, or strict liability, and regardless of whether the remedy arises at law or in equity.</p>\n<h2 data-chunk-id=\"fbaeb358-961d-4423-99dc-c7773e2713e0\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">8. Indemnification</h2>\n<p data-chunk-id=\"0a0ac951-06cc-4eac-a5fc-3eb9f423a346\">Beta Logistics LLC shall indemnify Acme Corporation against third-party claims arising from the negligence or willful misconduct of Supplier in the performance of services under this Agreement. Customer shall promptly notify Supplier of any indemnifiable claim and cooperate in the defense at Supplier's expense.</p>\n<h2 data-chunk-id=\"01559a7a-2bf0-4954-a265-d204d02ea9bc\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">9. Warranties</h2>\n<p data-chunk-id=\"574f39a5-5a6c-43da-81c1-1a8af6ddcf34\">Beta Logistics LLC warrants that the services shall conform to the specifications for a warranty period of twelve (12) months. Supplier does not warrant that services will be uninterrupted or error-free but shall use commercially reasonable efforts to correct material defects within a reasonable time.</p>\n<h2 data-chunk-id=\"a6fbd09a-c704-4d07-b152-468a740d157c\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">10. Insurance</h2>\n<p data-chunk-id=\"5b18a27d-50ae-4776-82e2-a827d109eb12\">Beta Logistics LLC shall maintain commercial general liability insurance of USD 1,000,000 throughout the term of this Agreement. Supplier shall provide certificates of insurance to Customer upon request and shall notify Customer of any material change in coverage.</p>\n<h2 data-chunk-id=\"b2a7a46a-0a00-4b5c-9d8a-0a5011fb795b\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">11. Confidentiality</h2>\n<p data-chunk-id=\"a94e8d28-ffe6-416d-a361-aa7d49c5a4c9\">Each party agrees to hold the other party's confidential information in strict confidence and to use such information solely for the purpose of exercising rights and performing obligations under this Agreement. The confidentiality obligations shall survive for a period of twenty-four (24) months following termination. Confidential information does not include information that is or becomes publicly available through no breach of this Agreement.</p>\n<h2 data-chunk-id=\"e2542357-704c-4594-9b67-7bdfd7ee8585\" style=\"font-size:13pt;font-weight:bold;color:#4F81BD;margin-top:10pt;margin-bottom:0pt;page-break-after:avoid\">12. Governing Law and Jurisdiction</h2>\n<p data-chunk-id=\"bae9ca9d-3e77-4e50-8d4f-038aa57bb749\">This Agreement shall be governed by the laws of the State of New York. The parties consent to the exclusive jurisdiction of the state and federal courts located in New York County, New York.</p>",
+    "page_setup": {
+      "source": "docx",
+      "width_in": 8.5,
+      "height_in": 11.0,
+      "margin_in": {
+        "top": 1.0,
+        "left": 1.25,
+        "right": 1.25,
+        "bottom": 1.0
+      },
+      "orientation": "portrait"
+    },
+    "version_id": "30df845a-6c21-45dc-853f-26bd0adfb624"
+  }
+}

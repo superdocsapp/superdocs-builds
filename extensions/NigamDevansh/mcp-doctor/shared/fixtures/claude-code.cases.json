@@ -1,0 +1,688 @@
+{
+  "$schema": "../schema/fixture-cases.schema.json",
+  "client": "claude-code",
+  "cases_version": 3,
+  "_readme": [
+    "The specification, expressed as examples. No implementation existed when these were written,",
+    "so they define what both must do rather than describing what one happens to do.",
+    "",
+    "Inputs are exact bytes and repair expectations are exact bytes, because the promise being",
+    "proven is a MINIMAL SPAN EDIT: only the target span changes and every other byte survives.",
+    "A field-level assertion would let TypeScript and Python reformat differently and both pass.",
+    "",
+    "Every credential-shaped value carries a `fixture` marker; the validator rejects any that",
+    "does not, so no live key can enter the corpus."
+  ],
+  "cases": [
+    {
+      "name": "healthy",
+      "description": "A correct remote-HTTP entry. Nothing to report but the connection itself.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_healthy_00000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": []
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      }
+    },
+    {
+      "name": "no-entry",
+      "description": "Client configured, but no SuperDocs server. Not using SuperDocs is not a failure.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"postgres\": {\n      \"command\": \"npx\",\n      \"args\": [\"-y\", \"pg-mcp\"]\n    }\n  }\n}\n"
+      },
+      "env": {
+        "SUPERDOCS_API_KEY": null
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.no-entry",
+              "severity": "info",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.key-absent",
+              "severity": "error"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "--fix may add a missing entry, but never invents a credential. With no key resolvable it exits 1 naming the variable and writes nothing."
+    },
+    {
+      "name": "scheme-insecure",
+      "description": "http:// on the canonical host. Repairable: same host, wrong scheme.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"http://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_scheme_00000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.scheme-insecure",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.scheme-insecure",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_scheme_00000000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      },
+      "_why": "Exactly four bytes differ. Indentation, key order and the trailing newline are identical, which is what a span edit guarantees and a reserialise would not."
+    },
+    {
+      "name": "path-wrong",
+      "description": "Right host, wrong path. Repairable.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/v1/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_path_0000000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.path-wrong",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.path-wrong",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_path_0000000000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      }
+    },
+    {
+      "name": "auth-header-no-bearer",
+      "description": "The key is present but the Bearer scheme is missing.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"sk_fixture_nobearer_000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.auth-header-no-bearer",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.auth-header-no-bearer",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_nobearer_000000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      },
+      "_why": "The fix inserts 'Bearer ' and touches nothing else — in particular it does not rewrite, re-encode or normalise the key itself."
+    },
+    {
+      "name": "auth-header-doubled-bearer",
+      "description": "A classic copy-paste: Bearer written twice.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer Bearer sk_fixture_double_0000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.auth-header-doubled-bearer",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.auth-header-doubled-bearer",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_double_0000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      }
+    },
+    {
+      "name": "auth-header-missing",
+      "description": "A URL with no credential at all. The key comes from the environment, never from thin air.",
+      "env": {
+        "SUPERDOCS_API_KEY": "sk_fixture_fromenv_00000000"
+      },
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\"\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.auth-header-missing",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.auth-header-missing",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_fromenv_00000000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      },
+      "_why": "An insertion rather than a replacement: a comma is appended to the url line and a headers block added at the entry's indentation. Everything above and below is untouched."
+    },
+    {
+      "name": "accept-header-incompatible",
+      "description": "An explicit Accept override SuperDocs answers with 406. A wildcard is not enough.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_accept_00000000\",\n        \"Accept\": \"*/*\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.accept-header-incompatible",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.accept-header-incompatible",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_accept_00000000\",\n        \"Accept\": \"application/json\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      }
+    },
+    {
+      "name": "transport-not-http",
+      "description": "A URL entry left on the stdio transport shape.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"stdio\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_transport_0000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.transport-not-http",
+              "severity": "error",
+              "auto_fixable": true
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.transport-not-http",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_transport_0000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      }
+    },
+    {
+      "name": "crlf-preserved",
+      "description": "Windows line endings survive a repair untouched.",
+      "raw_files": {
+        ".mcp.json": "{\r\n  \"mcpServers\": {\r\n    \"superdocs\": {\r\n      \"type\": \"http\",\r\n      \"url\": \"http://api.superdocs.app/mcp\",\r\n      \"headers\": {\r\n        \"Authorization\": \"Bearer sk_fixture_crlf_0000000000\"\r\n      }\r\n    }\r\n  }\r\n}\r\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.scheme-insecure",
+              "severity": "error"
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.scheme-insecure",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "{\r\n  \"mcpServers\": {\r\n    \"superdocs\": {\r\n      \"type\": \"http\",\r\n      \"url\": \"https://api.superdocs.app/mcp\",\r\n      \"headers\": {\r\n        \"Authorization\": \"Bearer sk_fixture_crlf_0000000000\"\r\n      }\r\n    }\r\n  }\r\n}\r\n"
+          }
+        }
+      },
+      "_why": "A naive parse-and-reserialise silently converts CRLF to LF, rewriting every line of a Windows developer's file and burying the real change in a whole-file diff."
+    },
+    {
+      "name": "bom-preserved",
+      "description": "A UTF-8 BOM survives a repair, and does not break parsing.",
+      "raw_files": {
+        ".mcp.json": "﻿{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"http://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_bom_00000000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.scheme-insecure",
+              "severity": "error"
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.scheme-insecure",
+              "fixed": true
+            }
+          ],
+          "backup_expected": true,
+          "files": {
+            ".mcp.json": "﻿{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_bom_00000000000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      },
+      "_why": "Editors on Windows add a BOM. A strict JSON parser rejects it and a careless writer strips it; either way the developer's file is damaged by a tool that claimed to help."
+    },
+    {
+      "name": "env-placeholder-unresolved",
+      "description": "Placeholder syntax the client supports, but the variable is not set.",
+      "env": {
+        "SUPERDOCS_API_KEY": null
+      },
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer ${SUPERDOCS_API_KEY}\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.env-placeholder-unresolved",
+              "severity": "error",
+              "auto_fixable": false
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.env-placeholder-unresolved"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      }
+    },
+    {
+      "name": "key-shape-unexpected",
+      "description": "Neither of the two known prefixes. A warning, not an error.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer abc123notakey\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.key-shape-unexpected",
+              "severity": "warn"
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.key-shape-unexpected"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "We do not know every key format forever, so an unfamiliar shape warns and is never 'corrected'."
+    },
+    {
+      "name": "duplicate-key-shadows-a-value",
+      "description": "The same key twice. JSON keeps the last silently, so a wrong value above a right one looks like a working config that does not work.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"http://api.superdocs.app/wrong\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_dupkey_000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.duplicate-keys",
+              "severity": "warn",
+              "auto_fixable": false
+            }
+          ],
+          "must_not_contain_findings": [
+            "config.path-wrong",
+            "config.scheme-insecure"
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "config.duplicate-keys"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "The surviving value is correct, so no URL defect fires — but the shadowed one is still reported, because a reader of this file cannot tell which one the client uses. Never auto-fixed: deleting one of a developer's two lines is a guess about intent."
+    },
+    {
+      "name": "duplicate-entries",
+      "description": "Two SuperDocs entries. Never guess which to keep.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": { \"Authorization\": \"Bearer sk_fixture_dupa_000000000\" }\n    },\n    \"superdocs-old\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": { \"Authorization\": \"Bearer sk_fixture_dupb_000000000\" }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.duplicate-entries",
+              "severity": "error",
+              "auto_fixable": false
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.duplicate-entries"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      }
+    },
+    {
+      "name": "invalid-syntax",
+      "description": "A broken file is never auto-rewritten.",
+      "raw_files": {
+        ".mcp.json": "{ \"mcpServers\": { \"superdocs\": { \"url\": } } }\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.invalid-syntax",
+              "severity": "error",
+              "auto_fixable": false
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [
+            {
+              "id": "config.invalid-syntax"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "Repairing a file we could not parse would mean guessing at its structure. No backup is written either, because nothing is attempted."
+    },
+    {
+      "name": "stdio-server",
+      "description": "A local-process SuperDocs server. Out of scope, named rather than ignored.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"command\": \"superdocs-mcp\",\n      \"args\": [\"--stdio\"]\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.stdio-server",
+              "severity": "info"
+            }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.stdio-server"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      }
+    },
+    {
+      "name": "host-rule-policy-gateway",
+      "description": "THE HOST RULE. An entry named superdocs pointing at an organisation's policy gateway. --fix must leave it byte-identical: rewriting it to the vendor endpoint would silently disable that gateway's allowlist, content scan, quota and audit.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"http://localhost:8080/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer gw_fixture_team_token_00000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host",
+              "severity": "info",
+              "auto_fixable": false
+            }
+          ],
+          "must_not_contain_findings": [
+            "config.scheme-insecure",
+            "config.path-wrong",
+            "config.key-shape-unexpected"
+          ],
+          "no_network_to": [
+            "localhost",
+            "127.0.0.1"
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false,
+          "no_network_to": [
+            "localhost",
+            "127.0.0.1"
+          ]
+        }
+      },
+      "_why": "http:// and a non-standard key prefix would each be a defect on the canonical host. Off it they are none of our business — the host rule short-circuits every URL and credential check, and no probe is sent to the address either."
+    },
+    {
+      "name": "host-rule-staging",
+      "description": "A private relay or staging endpoint. Same rule, different address.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://superdocs.staging.internal.example/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_staging_000000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host",
+              "severity": "info"
+            }
+          ],
+          "no_network_to": [
+            "superdocs.staging.internal.example"
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      }
+    },
+    {
+      "name": "host-rule-lookalike-host",
+      "description": "A near-miss host that is NOT SuperDocs. Out of scope, never 'corrected' onto the canonical host — and no key may be sent to it.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app.evil.example/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_lookalike_0000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host",
+              "severity": "info"
+            }
+          ],
+          "no_network_to": [
+            "api.superdocs.app.evil.example"
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false,
+          "no_network_to": [
+            "api.superdocs.app.evil.example"
+          ]
+        }
+      },
+      "_why": "Host matching must compare the full host EXACTLY. A suffix or substring check would read this as canonical and send a live key to an attacker."
+    },
+    {
+      "name": "host-rule-userinfo-not-printed",
+      "description": "An out-of-scope URL carrying a credential in its userinfo. The finding must name the host only — never the URL — or the secret lands in the terminal, in --json, and in the Markdown a developer pastes into a support thread.",
+      "raw_files": {
+        ".mcp.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://sk_fixture_inurl_secret_00@internal-gateway.example/mcp\",\n      \"headers\": {}\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host",
+              "severity": "info"
+            }
+          ],
+          "no_network_to": [
+            "internal-gateway.example"
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [
+            {
+              "id": "scope.non-canonical-host"
+            }
+          ],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "The host rule prevents SENDING the key here. Only the placeholder policy prevents PRINTING it. The redaction property test asserts sk_fixture_inurl_secret_00 appears in no rendered output."
+    }
+  ]
+}

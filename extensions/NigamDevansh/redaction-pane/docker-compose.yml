@@ -1,0 +1,45 @@
+# One service. No database, no worker, no analyst — that is the point.
+#
+#   npx office-addin-dev-certs install     # once, on the HOST
+#   cp .env.example .env                   # add the keys you have
+#   docker compose up
+#
+# Then sideload manifest.xml into Word. See README.md.
+
+services:
+  redaction:
+    build:
+      context: .
+      args:
+        # Selects which tier-3 provider SDK the image installs. Default openai;
+        # set LLM_PROVIDER in .env and `make up` to bake in gemini or anthropic.
+        LLM_PROVIDER: ${LLM_PROVIDER:-openai}
+    ports:
+      - "8443:8443"
+    volumes:
+      # Generated and trusted on the host by office-addin-dev-certs. Read-only:
+      # this container has no business modifying a keychain-trusted certificate.
+      - ~/.office-addin-dev-certs:/certs:ro
+      # The SQLite database and the audit log survive a restart.
+      - ./data:/app/data
+    environment:
+      # Everything else has a default in service/settings.py. These are the ones
+      # that are secret or deployment-specific, so they come from the shell or
+      # from .env — never from a file in the repository.
+      - SUPERDOCS_API_KEY
+      - LLM_PROVIDER
+      - OPENAI_API_KEY
+      - GEMINI_API_KEY
+      - ANTHROPIC_API_KEY
+      - GLINER_ENABLED
+    env_file:
+      - path: .env
+        required: false
+    healthcheck:
+      # `--insecure`: the certificate is trusted by the host keychain, not by
+      # the container's CA bundle, and the healthcheck is asking whether the
+      # process is up rather than whether TLS is trustworthy from in here.
+      test: ["CMD-SHELL", "python -c \"import urllib.request,ssl; urllib.request.urlopen('https://127.0.0.1:8443/health', context=ssl._create_unverified_context())\""]
+      interval: 10s
+      timeout: 5s
+      retries: 6

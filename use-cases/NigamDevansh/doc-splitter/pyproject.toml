@@ -1,0 +1,45 @@
+[project]
+name = "doc-splitter"
+version = "0.1.0"
+description = "Split a master document into separate clean .docx parts. Standalone."
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+# **`doctask-core` is deliberately absent.** This app is a pull request into
+# somebody else's repository. It imports `service._portable`, which is a *copy*
+# — see `portable.toml` — so a `cp -r` of this folder is a complete project with
+# no link back here.
+#
+# **One copied file.** SuperDocs parses the document on upload and returns HTML
+# with a chunk id per block, so the splitter needs no local text extraction, no
+# PII detection and no model stack — six dependencies, all of them used.
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9", # the upload is a file POST; FastAPI does not
+                               # pull this in and raises at IMPORT time without it
+    "pydantic-settings>=2.3",
+    "httpx>=0.27",             # _portable/superdocs_client.py
+]
+
+[dependency-groups]
+dev = ["pytest>=8.2", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["service"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# A COPY, kept byte-identical so `sync_portable.py --check` can prove it.
+extend-exclude = ["service/_portable"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

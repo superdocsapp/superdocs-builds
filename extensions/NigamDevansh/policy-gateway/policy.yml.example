@@ -1,0 +1,71 @@
+# Copy to policy.yml and edit. Without a policy.yml the gateway runs as a
+# transparent passthrough — useful for confirming nothing breaks before you
+# switch enforcement on.
+#
+# Generate each token_hash with:
+#
+#     gateway hash-token 'gw_the_token_you_will_give_the_team'
+#
+# The plaintext token goes to the team; only the hash belongs in this file.
+# A token that appears here in plaintext is a token you have published.
+
+version: 1
+
+upstream:
+  url: https://api.superdocs.app/mcp
+  # Read from the environment at startup, never inlined. The gateway holds the
+  # real sk_ key; teams only ever hold a gateway token.
+  key_env: SUPERDOCS_API_KEY
+
+defaults:
+  # These two return a pre-signed GCS URL that the agent then uses DIRECTLY,
+  # bypassing this gateway completely — no scan, no quota, no audit entry. A
+  # gateway advertising a pre-send scan while leaving them open is lying.
+  # Denying them forces content through upload_document_base64, where the
+  # proxy can actually read it. Cost: inline uploads are reliable to ~20MB.
+  deny_tools: [request_upload_url, request_download_url]
+
+  arguments:
+    # Otherwise the model may carry context, or search, across other chats and
+    # documents in the same account — a tenant-bleed risk between teams.
+    cross_session_memory: { force: false }
+    cross_session_search: { force: false }
+    # `force` overrides the "document is open in another session" guard.
+    "archive_document.force": { deny: true }
+
+  scan:
+    rules: [pii_email, pii_ssn, secret_api_key, injection_markers]
+    # block | mask | warn. Note that `mask` degrades to `block` for binary
+    # uploads: rewriting text inside a .docx means rebuilding the ZIP, which
+    # v1 does not attempt, and passing it through unmasked would be dishonest.
+    on_match: mask
+    # Scanning of RESPONSES, off by default. Ingress protects the vendor
+    # boundary; egress protects the agent's own context window from document
+    # content coming back through get_session_history / get_job / return_html.
+    egress: false
+
+teams:
+  legal:
+    token_hash: "sha256:REPLACE_ME_RUN_gateway_hash-token"
+    # An explicit allowlist: anything not named here is refused, and is also
+    # filtered out of tools/list so the agent never learns it exists.
+    allow_tools:
+      - chat_async
+      - get_job
+      - upload_document_base64
+      - export_document
+      - approve_change
+    arguments:
+      "chat_async.approval_mode": { force: ask_every_time }
+      "chat_async.model_tier": { max: pro }
+    quota: { monthly_edits: 200 }
+    # Stricter than the default: legal blocks rather than masks.
+    scan: { on_match: block }
+
+  marketing:
+    token_hash: "sha256:REPLACE_ME_RUN_gateway_hash-token"
+    # "*" allows every tool EXCEPT deny_tools — deny always wins over allow,
+    # including the defaults above.
+    allow_tools: ["*"]
+    deny_tools: [archive_document]
+    quota: { monthly_edits: 50 }

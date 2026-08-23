@@ -1,0 +1,42 @@
+# One service. No database, no worker, no model stack — that is the point.
+#
+#   cp .env.example .env               # add your SuperDocs key
+#   cp policy.yml.example policy.yml   # add your teams' token hashes
+#   docker compose up                  # → http://localhost:8080/mcp
+#
+# Then point each agent client at http://localhost:8080/mcp with its own
+# gateway token. See README.md.
+services:
+  gateway:
+    build: .
+    ports:
+      # Host port is overridable because 8080 is a popular address — set
+      # GATEWAY_HOST_PORT in .env if something already owns it. The container
+      # side stays 8080; only the outside changes.
+      - "${GATEWAY_HOST_PORT:-8080}:8080"
+    volumes:
+      # Read-only: the gateway reads policy at startup and has no business
+      # rewriting the file that governs it.
+      - ./policy.yml:/app/policy.yml:ro
+      # The audit log survives a restart, and the chain continues across one.
+      # Without this volume every restart starts a new chain and the old
+      # entries are gone — which defeats the entire point of the service.
+      - ./data:/app/data
+    environment:
+      # The one secret. Never in the image, never in policy.yml — the gateway
+      # holds the real sk_ key so that no agent ever has to.
+      - SUPERDOCS_API_KEY
+      - GATEWAY_UPSTREAM_URL
+      - GATEWAY_POLICY_PATH
+      - GATEWAY_AUDIT_LOG_PATH
+    env_file:
+      - path: .env
+        required: false
+    healthcheck:
+      # /health is served by the gateway itself and does not call SuperDocs —
+      # this asks whether the proxy is up, not whether the vendor is.
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+    restart: unless-stopped

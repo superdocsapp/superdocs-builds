@@ -1,0 +1,143 @@
+{
+  "$schema": "../schema/client-registry.schema.json",
+  "id": "vscode",
+  "name": "Visual Studio Code",
+  "entry_version": 1,
+  "evidence": {
+    "_readme": "Added at delivery step 1 so JSONC has a home in the fixture corpus \u2014 VS Code's mcp.json is JSONC, and source-preserving JSONC editing is the hardest problem in the build (PLAN \u00a78). Every claim here is 'documented': lower confidence than Claude Code, and never write-capable until captured.",
+    "paths": {
+      "darwin": {
+        "status": "documented",
+        "date": "2026-08-22",
+        "how": "The containing directory (~/Library/Application Support/Code/User) was confirmed present on this machine, but no mcp.json existed to capture. Directory evidence is not file evidence."
+      },
+      "linux": {
+        "status": "unverified",
+        "how": "No Linux installation available. Resolves via XDG_CONFIG_HOME, see path-bases.json."
+      },
+      "win32": {
+        "status": "unverified",
+        "how": "No Windows installation available. Resolves via APPDATA, see path-bases.json."
+      }
+    },
+    "schema": {
+      "status": "documented",
+      "date": "2026-08-22",
+      "how": "Remote-HTTP server shape from VS Code's published MCP documentation. Note the top-level key is `servers`, NOT `mcpServers` \u2014 the single most common cross-client mistake, and the reason the container key is data rather than a constant.",
+      "capture_todo": "Configure a real remote HTTP MCP server in VS Code, read back .vscode/mcp.json, and promote before enabling repairs."
+    },
+    "repairs": {
+      "status": "unverified",
+      "how": "No repair round-tripped. JSONC repairs additionally require the source-preserving editor to be proven (PLAN \u00a78)."
+    }
+  },
+  "write_capable": {
+    "_note": "All false. JSONC write capability additionally depends on a proven span-preserving editor; until then JSONC is read-only rather than reformatted.",
+    "darwin": false,
+    "linux": false,
+    "win32": false
+  },
+  "locations": [
+    {
+      "scope": "workspace",
+      "precedence": 1,
+      "format": "jsonc",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "base": "project_root",
+      "path": ".vscode/mcp.json",
+      "note": "Workspace-scoped and usually committed.",
+      "containers": [
+        {
+          "json_path": "$.servers",
+          "scope_hint": "workspace"
+        }
+      ]
+    },
+    {
+      "scope": "user",
+      "precedence": 2,
+      "format": "jsonc",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "base": "app_config",
+      "path": "Code/User/mcp.json",
+      "note": "User-level. The app_config base is where the three platforms genuinely diverge; path-bases.json defines it once so neither implementation invents it.",
+      "containers": [
+        {
+          "json_path": "$.servers",
+          "scope_hint": "user"
+        }
+      ]
+    }
+  ],
+  "server_map": {
+    "container_key": "servers",
+    "shape": "object",
+    "_shape_note": "`servers`, not `mcpServers`. Getting this wrong produces a config the client silently ignores \u2014 a leading cause of 'server failed to connect'."
+  },
+  "http_server_schema": {
+    "transport": {
+      "field": "type",
+      "http_values": [
+        "http",
+        "sse"
+      ],
+      "preferred": "http",
+      "stdio_indicator_fields": [
+        "command",
+        "args"
+      ],
+      "detected_by": "type-field"
+    },
+    "url": {
+      "field": "url"
+    },
+    "headers": {
+      "supported": true,
+      "field": "headers",
+      "shape": "object",
+      "case_insensitive_names": true,
+      "authorization_header": "Authorization",
+      "accept_header": "Accept",
+      "client_sends_own_accept": true
+    },
+    "env_interpolation": {
+      "supported": true,
+      "syntax": "${env:VAR}"
+    }
+  },
+  "identification": {
+    "rules": [
+      {
+        "by": "url_host",
+        "equals": "api.superdocs.app",
+        "confidence": "certain"
+      },
+      {
+        "by": "name",
+        "matches": "^superdocs",
+        "confidence": "likely",
+        "flags": "i"
+      }
+    ],
+    "_host_rule": "Exact host comparison only. Never suffix or substring."
+  },
+  "repairs": {
+    "allowed": [],
+    "planned": [
+      "url-scheme",
+      "url-path",
+      "transport-field",
+      "auth-header",
+      "accept-header"
+    ],
+    "_allowed_empty_note": "Empty until both the schema is captured AND the JSONC span editor is proven."
+  }
+}

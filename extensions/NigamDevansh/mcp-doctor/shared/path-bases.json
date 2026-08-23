@@ -1,0 +1,127 @@
+{
+  "$schema": "schema/path-bases.schema.json",
+  "bases_version": 1,
+  "_readme": [
+    "Where a config path is anchored, defined once, in data.",
+    "",
+    "Without this, each implementation invents platform behaviour: one expands '~', the other",
+    "reads %USERPROFILE%, a third falls back to os.homedir() \u2014 and the two tools disagree about",
+    "which file they are even looking at. That is precisely the drift the conformance suite is",
+    "meant to catch, so the fix belongs in the contract rather than in two codebases.",
+    "",
+    "A registry entry names a `base` and a relative `path`. It never embeds '~' or '%VAR%'.",
+    "Resolution is: take the first env var in `from_env` that is set and non-empty; if none is,",
+    "use `fallback`. Segments join with the platform separator; the stored path always uses '/'."
+  ],
+  "bases": {
+    "home": {
+      "description": "The user's home directory.",
+      "darwin": {
+        "from_env": [
+          "HOME"
+        ],
+        "fallback": "~"
+      },
+      "linux": {
+        "from_env": [
+          "HOME"
+        ],
+        "fallback": "~"
+      },
+      "win32": {
+        "from_env": [
+          "USERPROFILE"
+        ],
+        "fallback": null
+      }
+    },
+    "project_root": {
+      "description": "The directory the scan was started from, or the nearest ancestor containing a project marker.",
+      "darwin": {
+        "from_env": [],
+        "fallback": "<scan root>"
+      },
+      "linux": {
+        "from_env": [],
+        "fallback": "<scan root>"
+      },
+      "win32": {
+        "from_env": [],
+        "fallback": "<scan root>"
+      },
+      "markers": [
+        ".git",
+        "package.json",
+        "pyproject.toml",
+        ".mcp.json"
+      ],
+      "ascend": true,
+      "_note": "Ascends from the working directory to the first ancestor holding a marker, stopping at the home directory. If none is found, the working directory is used and no ancestor is searched."
+    },
+    "app_config": {
+      "description": "Per-user application configuration. The one that genuinely differs per platform.",
+      "darwin": {
+        "from_env": [],
+        "fallback": "$HOME/Library/Application Support"
+      },
+      "linux": {
+        "from_env": [
+          "XDG_CONFIG_HOME"
+        ],
+        "fallback": "$HOME/.config"
+      },
+      "win32": {
+        "from_env": [
+          "APPDATA"
+        ],
+        "fallback": null
+      }
+    },
+    "app_data": {
+      "description": "Per-user application state, distinct from configuration on Windows and Linux.",
+      "darwin": {
+        "from_env": [],
+        "fallback": "$HOME/Library/Application Support"
+      },
+      "linux": {
+        "from_env": [
+          "XDG_DATA_HOME"
+        ],
+        "fallback": "$HOME/.local/share"
+      },
+      "win32": {
+        "from_env": [
+          "LOCALAPPDATA"
+        ],
+        "fallback": null
+      }
+    },
+    "codex_home": {
+      "description": "Codex's home directory. Overridable, and the override is real: CODEX_HOME appears in the live config on the machine this was captured from.",
+      "darwin": {
+        "from_env": [
+          "CODEX_HOME"
+        ],
+        "fallback": "$HOME/.codex"
+      },
+      "linux": {
+        "from_env": [
+          "CODEX_HOME"
+        ],
+        "fallback": "$HOME/.codex"
+      },
+      "win32": {
+        "from_env": [
+          "CODEX_HOME"
+        ],
+        "fallback": null
+      }
+    }
+  },
+  "rules": {
+    "no_tilde_in_registry": true,
+    "no_env_syntax_in_registry": true,
+    "path_separator_in_data": "/",
+    "_note": "Registry entries store portable segments. A base whose env var is unset and whose fallback is null makes that location UNRESOLVABLE on that platform \u2014 reported as such, never guessed at."
+  }
+}

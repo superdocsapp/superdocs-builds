@@ -1,0 +1,374 @@
+{
+  "$schema": "../schema/mcp-exchanges.schema.json",
+  "exchanges_version": 1,
+  "endpoint": "https://api.superdocs.app/mcp",
+
+  "_readme": [
+    "Recorded HTTP exchanges, so the fake server in delivery step 2 replays REAL behaviour",
+    "instead of behaviour inferred from prose. PLAN §13 step 1 asks for the endpoint profile",
+    "'as fixtures'; profile/superdocs.json holds the derived rules, this file holds the evidence.",
+    "",
+    "Every exchange carries `source`:",
+    "  captured    — observed against the live endpoint on `date`. Byte-faithful except for the",
+    "                sanitisation noted in `sanitised`.",
+    "  constructed — NOT observed. Written to a documented shape so the fake server can produce",
+    "                the case. Treated as lower confidence and labelled wherever it matters.",
+    "",
+    "No request here carries a real Authorization value. Where a credential was sent, it is",
+    "replaced by a marker."
+  ],
+
+  "exchanges": [
+    {
+      "name": "unauth-initialize-401",
+      "source": "captured",
+      "date": "2026-08-22",
+      "sanitised": ["none — no credential was sent"],
+      "purpose": "The credential-free control. Proves the endpoint is reachable and auth-gated without spending a key.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": { "content-type": "application/json", "accept": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": {
+            "protocolVersion": "2025-11-25",
+            "capabilities": {},
+            "clientInfo": { "name": "mcp-doctor", "version": "0.1.0" }
+          }
+        }
+      },
+      "response": {
+        "status": 401,
+        "headers": {
+          "content-type": "application/json",
+          "www-authenticate": "Bearer realm=\"OAuth\", resource_metadata=\"https://api.superdocs.app/mcp/.well-known/oauth-protected-resource\", error=\"invalid_token\", error_description=\"Missing or invalid access token\""
+        },
+        "body": {
+          "detail": "Authentication required. Provide an sk_ or lce_ API key as Bearer token."
+        }
+      }
+    },
+
+    {
+      "name": "unauth-tools-list-401",
+      "source": "captured",
+      "date": "2026-08-22",
+      "purpose": "Every MCP method is auth-gated, not just initialize.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": { "content-type": "application/json", "accept": "application/json" },
+        "body": { "jsonrpc": "2.0", "id": 1, "method": "tools/list" }
+      },
+      "response": {
+        "status": 401,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "detail": "Authentication required. Provide an sk_ or lce_ API key as Bearer token."
+        }
+      }
+    },
+
+    {
+      "name": "interceptor-401-without-fingerprint",
+      "source": "constructed",
+      "purpose": "A corporate proxy or captive portal answering 401 INSTEAD of the endpoint. Drives network.interceptor. Constructed because we cannot conjure a real interceptor — but the discriminator it exercises (an absent www-authenticate) is captured above.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": { "content-type": "application/json", "accept": "application/json" },
+        "body": { "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {} }
+      },
+      "response": {
+        "status": 401,
+        "headers": { "content-type": "text/html" },
+        "body_text": "<html><head><title>Authentication Required</title></head><body>Sign in to the network</body></html>"
+      }
+    },
+
+    {
+      "name": "discovery-protected-resource",
+      "source": "captured",
+      "date": "2026-08-22",
+      "purpose": "Credential-free liveness probe, and the authoritative 'where to get a key' URL.",
+      "request": {
+        "method": "GET",
+        "path": "/mcp/.well-known/oauth-protected-resource",
+        "headers": {}
+      },
+      "response": {
+        "status": 200,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "resource": "https://api.superdocs.app/mcp",
+          "bearer_methods_supported": ["header"],
+          "resource_documentation": "https://docs.superdocs.app/account/api-keys",
+          "resource_name": "SuperDocs MCP Server",
+          "signup_endpoint": "https://api.superdocs.app/v1/agents/signup"
+        }
+      }
+    },
+
+    {
+      "name": "accept-wildcard-406",
+      "source": "captured",
+      "date": "2026-08-22",
+      "purpose": "A wildcard Accept is NOT sufficient. This is the defect config.accept-header-incompatible exists for.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "*/*",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": { "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {} }
+      },
+      "response": {
+        "status": 406,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "server-error",
+          "error": {
+            "code": -32600,
+            "message": "Not Acceptable: Client must accept application/json"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "accept-absent-406",
+      "source": "captured",
+      "date": "2026-08-22",
+      "purpose": "No Accept header at all behaves identically to a wildcard.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": { "jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {} }
+      },
+      "response": {
+        "status": 406,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": "server-error",
+          "error": {
+            "code": -32600,
+            "message": "Not Acceptable: Client must accept application/json"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "authenticated-initialize",
+      "source": "captured",
+      "date": "2026-08-22",
+      "sanitised": [
+        "request authorization replaced with a marker",
+        "response result.instructions truncated — it is long prose and the doctor never reads it"
+      ],
+      "purpose": "The healthy handshake. serverInfo and protocolVersion are what the doctor reports.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": {
+            "protocolVersion": "2025-11-25",
+            "capabilities": {},
+            "clientInfo": { "name": "mcp-doctor", "version": "0.1.0" }
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "result": {
+            "protocolVersion": "2025-11-25",
+            "capabilities": {
+              "experimental": {},
+              "logging": {},
+              "prompts": { "listChanged": true },
+              "resources": { "subscribe": false, "listChanged": true },
+              "tools": { "listChanged": true },
+              "extensions": { "io.modelcontextprotocol/ui": {} }
+            },
+            "serverInfo": { "name": "SuperDocs", "version": "3.4.0" },
+            "instructions": "SuperDocs is a structured document editor available via 38 MCP tools. […truncated in fixture…]"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "protocol-negotiation-downgrade",
+      "source": "captured",
+      "date": "2026-08-22",
+      "purpose": "THE correction. A newer version is negotiated, never rejected — proposing 2026-07-28 returns 200 answering 2025-11-25. A doctor that called this a fault would send developers to change a working config.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": { "protocolVersion": "2026-07-28", "capabilities": {}, "clientInfo": { "name": "d", "version": "1" } }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "result": {
+            "protocolVersion": "2025-11-25",
+            "capabilities": { "tools": { "listChanged": true } },
+            "serverInfo": { "name": "SuperDocs", "version": "3.4.0" }
+          }
+        }
+      }
+    },
+
+    {
+      "name": "protocol-negotiation-echo",
+      "source": "captured",
+      "date": "2026-08-22",
+      "purpose": "An older version is echoed back rather than upgraded. Both directions negotiate.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "initialize",
+          "params": { "protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": { "name": "d", "version": "1" } }
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "result": {
+            "protocolVersion": "2024-11-05",
+            "capabilities": { "tools": { "listChanged": true } },
+            "serverInfo": { "name": "SuperDocs", "version": "3.4.0" }
+          }
+        }
+      }
+    },
+
+    {
+      "name": "tools-list",
+      "source": "captured",
+      "date": "2026-08-22",
+      "sanitised": [
+        "3 of 38 tool objects retained; descriptions truncated",
+        "the doctor only counts tools and never reads their schemas"
+      ],
+      "truncated": true,
+      "expected_totals": { "tools": 38 },
+      "purpose": "Inventory for the connected line and for drift.inventory.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": { "jsonrpc": "2.0", "id": 2, "method": "tools/list" }
+      },
+      "response": {
+        "status": 200,
+        "headers": { "content-type": "application/json" },
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 2,
+          "result": {
+            "tools": [
+              { "name": "chat", "description": "Synchronous AI chat that can rewrite specific paragraphs […truncated…]" },
+              { "name": "list_sessions", "description": "[…truncated…]" },
+              { "name": "get_document_detail", "description": "[…truncated…]" }
+            ]
+          }
+        }
+      },
+      "replay_note": "A fake server replaying this must pad `tools` to expected_totals.tools so inventory assertions are meaningful."
+    },
+
+    {
+      "name": "authenticated-forbidden-403",
+      "source": "constructed",
+      "purpose": "A valid key without access. Drives auth.forbidden. NOT observed — we have no key in that state, and provoking one would mean tampering with a real account.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": { "jsonrpc": "2.0", "id": 1, "method": "tools/list" }
+      },
+      "response": {
+        "status": 403,
+        "headers": { "content-type": "application/json" },
+        "body": { "detail": "Forbidden" }
+      }
+    },
+
+    {
+      "name": "rate-limited-429",
+      "source": "constructed",
+      "purpose": "Drives a retry hint. NOT observed — deliberately provoking a rate limit against the live service would be rude and would spend quota.",
+      "request": {
+        "method": "POST",
+        "path": "/mcp",
+        "headers": {
+          "content-type": "application/json",
+          "accept": "application/json",
+          "authorization": "Bearer <redacted-fixture-key>"
+        },
+        "body": { "jsonrpc": "2.0", "id": 1, "method": "tools/list" }
+      },
+      "response": {
+        "status": 429,
+        "headers": { "content-type": "application/json", "retry-after": "30" },
+        "body": { "detail": "Rate limit exceeded" }
+      }
+    }
+  ]
+}

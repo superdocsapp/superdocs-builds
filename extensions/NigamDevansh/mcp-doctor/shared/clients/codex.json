@@ -1,0 +1,122 @@
+{
+  "$schema": "../schema/client-registry.schema.json",
+  "id": "codex",
+  "name": "OpenAI Codex",
+  "entry_version": 1,
+  "evidence": {
+    "_readme": "The only TOML client in the registry, which is why it was added: the contract declared TOML as a supported format with no client and no fixtures behind it. Paths and the container shape are CAPTURED from a real installation; the remote-HTTP fields are not, because every server configured on that machine was stdio.",
+    "paths": {
+      "darwin": {
+        "status": "captured",
+        "date": "2026-08-22",
+        "how": "~/.codex/config.toml read on a real installation (5.2KB) containing live [mcp_servers.*] tables. CODEX_HOME was also observed set in that file's own environment block, which is why codex_home is a base rather than a hardcoded path."
+      },
+      "linux": {
+        "status": "unverified",
+        "how": "Same layout expected via CODEX_HOME or $HOME/.codex; no Linux installation available."
+      },
+      "win32": {
+        "status": "unverified",
+        "how": "No Windows installation available; codex_home has no fallback there, so the location is reported unresolvable rather than guessed."
+      }
+    },
+    "schema": {
+      "status": "documented",
+      "date": "2026-08-22",
+      "how": "CAPTURED: the container is a TOML table per server, `[mcp_servers.<name>]`, with `command`, `args`, `env`, `cwd`, `enabled` and `startup_timeout_sec` \u2014 two real stdio servers were read. DOCUMENTED, NOT observed: the remote-HTTP fields (`url`, headers). No remote server was configured on that machine, so the HTTP shape has not been seen and must be captured before any repair runs.",
+      "capture_todo": "Add a real remote HTTP MCP server to ~/.codex/config.toml, read back the written table, and confirm the url and header field names before promoting."
+    },
+    "repairs": {
+      "status": "unverified",
+      "how": "No repair round-tripped. TOML repairs additionally need the span-preserving writer proven, exactly as JSONC does."
+    }
+  },
+  "write_capable": {
+    "_note": "All false. The HTTP field names are unconfirmed, so a repair would be guessing at key names in a real developer's file.",
+    "darwin": false,
+    "linux": false,
+    "win32": false
+  },
+  "locations": [
+    {
+      "scope": "user",
+      "precedence": 1,
+      "format": "toml",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "base": "codex_home",
+      "path": "config.toml",
+      "note": "One file holds everything \u2014 model settings, plugins, project trust levels and MCP servers. A repair here sits beside unrelated configuration, which is the strongest possible argument for minimal span edits over reserialising.",
+      "containers": [
+        {
+          "json_path": "$.mcp_servers",
+          "scope_hint": "user"
+        }
+      ]
+    }
+  ],
+  "server_map": {
+    "container_key": "mcp_servers",
+    "shape": "object",
+    "_shape_note": "TOML tables: [mcp_servers.superdocs]. Note the underscore \u2014 not mcpServers, not servers. Three clients, three spellings of the same idea."
+  },
+  "http_server_schema": {
+    "transport": {
+      "detected_by": "url-field-presence",
+      "field": null,
+      "http_values": [],
+      "preferred": null,
+      "stdio_indicator_fields": [
+        "command",
+        "args"
+      ],
+      "_note": "CAPTURED: entries carrying `command` are stdio \u2014 both live servers were of that shape. A remote entry is identified by carrying a URL instead."
+    },
+    "url": {
+      "field": "url"
+    },
+    "headers": {
+      "supported": true,
+      "field": "http_headers",
+      "shape": "object",
+      "case_insensitive_names": true,
+      "authorization_header": "Authorization",
+      "accept_header": "Accept",
+      "client_sends_own_accept": true,
+      "_accept_note": "Field names here are DOCUMENTED, not captured \u2014 see evidence.schema. They must be confirmed against a real remote entry before --fix touches this client."
+    },
+    "env_interpolation": {
+      "supported": false
+    }
+  },
+  "identification": {
+    "rules": [
+      {
+        "by": "url_host",
+        "equals": "api.superdocs.app",
+        "confidence": "certain"
+      },
+      {
+        "by": "name",
+        "matches": "^superdocs",
+        "confidence": "likely",
+        "flags": "i"
+      }
+    ],
+    "_host_rule": "Exact host comparison only. Never suffix or substring."
+  },
+  "repairs": {
+    "_readme": "Empty until the HTTP field names are captured AND a TOML span writer is proven.",
+    "allowed": [],
+    "planned": [
+      "url-scheme",
+      "url-path",
+      "auth-header",
+      "accept-header"
+    ],
+    "_allowed_empty_note": "`transport-field` is absent from the plan on purpose: this client has no transport field to repair \u2014 remoteness is inferred from the URL."
+  }
+}

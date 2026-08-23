@@ -1,0 +1,131 @@
+{
+  "$schema": "../schema/fixture-cases.schema.json",
+  "client": "antigravity",
+  "cases_version": 1,
+
+  "_readme": [
+    "The client that cannot hold a SuperDocs key.",
+    "",
+    "Antigravity's shipped mcp_config.json documentation defines `command`/`args`/`env` for stdio",
+    "and `serverUrl` for SSE. There is no headers field for either. SuperDocs authenticates with",
+    "`Authorization: Bearer`, so a working SuperDocs entry cannot be expressed here at all.",
+    "",
+    "Every case therefore ends in `files_unchanged`. That is not a limitation being hidden — it is",
+    "the diagnosis, and reporting it plainly is more useful than emitting repair advice that could",
+    "not work if followed."
+  ],
+
+  "cases": [
+    {
+      "name": "empty-config-file",
+      "description": "A freshly installed client. Both mcp_config.json files on the machine this was captured from were 0 bytes.",
+      "raw_files": { ".gemini/config/mcp_config.json": "" },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.file-empty", "severity": "info" }],
+          "must_not_contain_findings": ["config.invalid-syntax"]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.file-empty" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "An empty file is not a corrupt one. Reporting 'invalid JSON at line 1, column 1' would be technically true and completely unhelpful — and it would send someone hunting for damage that is not there."
+    },
+
+    {
+      "name": "server-url-field-is-found",
+      "description": "A SuperDocs entry using serverUrl. It must be FOUND — a doctor hunting for `url` would report 'no entry' while one sits in front of it.",
+      "raw_files": {
+        ".gemini/config/mcp_config.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"serverUrl\": \"https://api.superdocs.app/mcp\"\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.client-cannot-authenticate", "severity": "info" }],
+          "must_not_contain_findings": ["config.no-entry"]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.client-cannot-authenticate" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "The whole reason the URL field name is registry data rather than the constant 'url'. Three clients so far: url, url, serverUrl."
+    },
+
+    {
+      "name": "cannot-authenticate-even-when-otherwise-correct",
+      "description": "A canonical URL, correct in every way the client permits — and still unusable, because there is nowhere to put the key.",
+      "raw_files": {
+        ".gemini/config/mcp_config.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"serverUrl\": \"https://api.superdocs.app/mcp\"\n    },\n    \"sqlite-helper\": {\n      \"command\": \"sqlite-mcp-server\",\n      \"args\": [\"/path/to/database.db\"]\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.client-cannot-authenticate", "severity": "info" }],
+          "must_not_contain_findings": ["config.auth-header-missing", "config.key-absent"]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.client-cannot-authenticate" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "config.auth-header-missing would be the WRONG finding: it implies adding a header would help, and `--fix` would then be expected to add one to a schema with no such field. The distinction between 'you forgot the header' and 'this client has no headers' is the entire value of the diagnosis."
+    },
+
+    {
+      "name": "stdio-server",
+      "description": "A local-process entry, the shape the shipped documentation leads with.",
+      "raw_files": {
+        ".gemini/config/mcp_config.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"command\": \"superdocs-mcp\",\n      \"args\": [\"--stdio\"],\n      \"env\": {\n        \"SUPERDOCS_API_KEY\": \"sk_fixture_agy_stdio_00000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.stdio-server", "severity": "info" }]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.stdio-server" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "stdio is checked BEFORE the cannot-authenticate rule: a stdio server passes its key through env, so the header limitation does not apply to it."
+    },
+
+    {
+      "name": "host-rule-gateway",
+      "description": "The host rule still applies here, and takes precedence over the authentication limitation.",
+      "raw_files": {
+        ".gemini/config/mcp_config.json": "{\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"serverUrl\": \"http://localhost:8080/mcp\"\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.non-canonical-host", "severity": "info" }],
+          "must_not_contain_findings": [
+            "config.scheme-insecure",
+            "scope.client-cannot-authenticate"
+          ],
+          "no_network_to": ["localhost", "127.0.0.1"]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.non-canonical-host" }],
+          "files_unchanged": true,
+          "backup_expected": false,
+          "no_network_to": ["localhost", "127.0.0.1"]
+        }
+      },
+      "_why": "Ordering matters. Off the canonical host we have no opinion at all — including no opinion about whether the client could authenticate against whatever lives there, which may not need a Bearer key."
+    }
+  ]
+}

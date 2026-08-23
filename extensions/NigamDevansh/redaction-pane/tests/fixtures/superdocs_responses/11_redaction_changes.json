@@ -1,0 +1,65 @@
+[
+  {
+    "change_id": "d23e7c0f-5be0-4820-8cdc-6da148089e55",
+    "operation": "edit",
+    "chunk_id": "6016ac46-d27d-4d2a-babe-e11bdefe752c",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"6016ac46-d27d-4d2a-babe-e11bdefe752c\" style=\"margin-bottom:0pt\">Jonathan Michael Whitfield</p>",
+    "new_html": "<p data-chunk-id=\"6016ac46-d27d-4d2a-babe-e11bdefe752c\" style=\"margin-bottom:0pt\">[REDACTED]</p>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  },
+  {
+    "change_id": "5e29e92f-8f8c-482d-8ac1-8deb9033d64c",
+    "operation": "edit",
+    "chunk_id": "f7e80827-f756-4a16-8774-4d2b8dcbe3fc",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"f7e80827-f756-4a16-8774-4d2b8dcbe3fc\" style=\"margin-bottom:0pt\">482 Rosewood Terrace, Suite 1200</p>",
+    "new_html": "<p data-chunk-id=\"f7e80827-f756-4a16-8774-4d2b8dcbe3fc\" style=\"margin-bottom:0pt\">[REDACTED]</p>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  },
+  {
+    "change_id": "4acca558-3ff9-4852-bc5c-0a5628952c42",
+    "operation": "edit",
+    "chunk_id": "d232c81c-3dd3-402d-a99b-f96bfe9f2b78",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"d232c81c-3dd3-402d-a99b-f96bfe9f2b78\" style=\"margin-bottom:0pt\">Springfield, Illinois 62704</p>",
+    "new_html": "<p data-chunk-id=\"d232c81c-3dd3-402d-a99b-f96bfe9f2b78\" style=\"margin-bottom:0pt\">[REDACTED]</p>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  },
+  {
+    "change_id": "3021917b-e6b4-43cc-a6e0-b730c6a3db29",
+    "operation": "edit",
+    "chunk_id": "c40060c7-b887-4600-848d-9339ec31595b",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"c40060c7-b887-4600-848d-9339ec31595b\">Billing contact: Sarah Chen<br/>77 Harbour Road, Boston MA 02110</p>",
+    "new_html": "<p data-chunk-id=\"c40060c7-b887-4600-848d-9339ec31595b\">Billing contact: [REDACTED]<br/>[REDACTED]</p>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  },
+  {
+    "change_id": "8e521599-2cef-4580-a089-080dddf93af9",
+    "operation": "edit",
+    "chunk_id": "68976948-7089-439a-b026-93c0c96ad100",
+    "document_id": "doc_primary",
+    "old_html": "<p data-chunk-id=\"68976948-7089-439a-b026-93c0c96ad100\">Fees are due Net 30. Card on file 4111 1111 1111 1111.</p>",
+    "new_html": "<p data-chunk-id=\"68976948-7089-439a-b026-93c0c96ad100\">Fees are due Net 30. Card on file [REDACTED].</p>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  },
+  {
+    "change_id": "3aaf9060-51b1-4fac-a358-2148c6bdd22e",
+    "operation": "edit",
+    "chunk_id": "19bbdda9-b1a9-46a9-b24e-138f91c1e42a",
+    "document_id": "doc_primary",
+    "old_html": "<header data-chunk-id=\"19bbdda9-b1a9-46a9-b24e-138f91c1e42a\" data-part-section=\"s0\" data-part-type=\"header\" data-part-variant=\"default\" role=\"doc-pageheader\"><p style=\"margin-bottom:0pt;line-height:1.0\">CONFIDENTIAL \u2014 prepared for Jonathan Michael Whitfield</p></header>",
+    "new_html": "<header data-chunk-id=\"19bbdda9-b1a9-46a9-b24e-138f91c1e42a\" data-part-section=\"s0\" data-part-type=\"header\" data-part-variant=\"default\" role=\"doc-pageheader\"><p style=\"margin-bottom:0pt;line-height:1.0\">CONFIDENTIAL \u2014 prepared for [REDACTED]</p></header>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  },
+  {
+    "change_id": "30cf1292-a723-4399-8729-935035b1a625",
+    "operation": "edit",
+    "chunk_id": "17159c4c-fe97-4907-87c1-8873a7e2f041",
+    "document_id": "doc_primary",
+    "old_html": "<footer data-chunk-id=\"17159c4c-fe97-4907-87c1-8873a7e2f041\" data-part-section=\"s0\" data-part-type=\"footer\" data-part-variant=\"default\" role=\"doc-pagefooter\"><p style=\"margin-bottom:0pt;line-height:1.0\">Contact: jwhitfield@acme-example.com | 555-0142</p></footer>",
+    "new_html": "<footer data-chunk-id=\"17159c4c-fe97-4907-87c1-8873a7e2f041\" data-part-section=\"s0\" data-part-type=\"footer\" data-part-variant=\"default\" role=\"doc-pagefooter\"><p style=\"margin-bottom:0pt;line-height:1.0\">Contact: [REDACTED] | [REDACTED]</p></footer>",
+    "ai_explanation": "Parallel edit: Strictly redact the personal data found in this chunk by replacing the exact\u2026"
+  }
+]

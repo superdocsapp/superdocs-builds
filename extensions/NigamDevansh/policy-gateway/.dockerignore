@@ -1,0 +1,23 @@
+# The audit log is host state, not image content. Copying it in would also
+# start every container from a chain it cannot continue.
+data/
+*.jsonl
+
+# The secret stays in the environment.
+.env
+
+# Not needed at runtime; excluded so a source edit does not bust the
+# dependency layer.
+tests/
+bench/
+.venv/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.egg-info/
+uv.lock
+PLAN.md
+README.md
+Dockerfile
+docker-compose.yml
+policy.yml.example

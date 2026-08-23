@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://superdocs.app/mcp-doctor/schema/endpoint-profile.json",
+  "title": "SuperDocs endpoint profile",
+  "description": "A DATED record of measured endpoint behaviour. Everything here is an observation, not an assumption: a difference at runtime is reported as profile drift, never as a user fault.",
+  "type": "object",
+  "required": [
+    "profile_version", "measured_on", "canonical", "credential",
+    "unauthenticated", "discovery", "accept_header", "protocol", "session", "handshake", "inventory"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "profile_version": { "type": "integer", "minimum": 1 },
+    "measured_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "measured_by": { "type": "string" },
+
+    "canonical": {
+      "type": "object",
+      "description": "THE HIGHEST-SEVERITY OBJECT IN THE CONTRACT. Both implementations read this to decide where an authenticated request — carrying the user's real key — is sent. Every field is therefore pinned to a literal, not merely typed: a one-line edit here must not be able to redirect anybody's credential. validate_contract.py additionally parses the URL and rejects userinfo, a port, a query or a fragment.",
+      "required": ["url", "host", "path", "scheme", "follow_redirects"],
+      "properties": {
+        "url": {
+          "const": "https://api.superdocs.app/mcp",
+          "description": "Pinned literal. Changing it is a deliberate, reviewable act, not a typo."
+        },
+        "host": { "const": "api.superdocs.app" },
+        "path": { "const": "/mcp" },
+        "scheme": { "const": "https" },
+        "follow_redirects": {
+          "const": false,
+          "description": "An authenticated request must never follow a redirect: a 30x could otherwise carry the Authorization header to another origin."
+        },
+        "path_aliases": {
+          "type": "array",
+          "items": { "enum": ["/mcp", "/mcp/"] },
+          "description": "Closed set. An alias is a path on the SAME origin, never another address."
+        },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "credential": {
+      "type": "object",
+      "required": ["transport", "header_name", "header_scheme", "key_prefixes"],
+      "properties": {
+        "transport": { "const": "header" },
+        "header_name": { "type": "string" },
+        "header_scheme": { "type": "string" },
+        "key_prefixes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "$comment": "Both sk_ and lce_ are valid. A check accepting only sk_ rejects real keys."
+        },
+        "evidence": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "unauthenticated": {
+      "type": "object",
+      "required": ["initialize_status", "fingerprint"],
+      "properties": {
+        "initialize_status": { "type": "integer" },
+        "tools_list_status": { "type": "integer" },
+        "body_contains": { "type": "string" },
+        "note": { "type": "string" },
+        "fingerprint": {
+          "type": "object",
+          "required": ["header", "must_contain"],
+          "properties": {
+            "header": { "type": "string" },
+            "must_contain": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+            "observed": { "type": "string" },
+            "purpose": { "type": "string" }
+          },
+          "additionalProperties": false,
+          "$comment": "The discriminator between a genuine endpoint 401 and an interceptor's 401."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "discovery": {
+      "type": "object",
+      "description": "Derived from the canonical origin, never specified independently. validate_contract.py asserts protected_resource_url == canonical.url + the suffix below, so this cannot become a second, unpinned address.",
+      "required": ["protected_resource_url", "path_suffix", "requires_credential", "status"],
+      "properties": {
+        "protected_resource_url": { "const": "https://api.superdocs.app/mcp/.well-known/oauth-protected-resource" },
+        "path_suffix": { "const": "/.well-known/oauth-protected-resource" },
+        "requires_credential": { "const": false },
+        "status": { "type": "integer" },
+        "observed_fields": { "type": "object" },
+        "purpose": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "accept_header": {
+      "type": "object",
+      "required": ["required", "must_include", "rejected_status"],
+      "properties": {
+        "required": { "type": "boolean" },
+        "must_include": { "type": "string" },
+        "rejected_status": { "type": "integer" },
+        "rejected_body_contains": { "type": "string" },
+        "accepted_values": { "type": "array", "items": { "type": "string" } },
+        "rejected_values": { "type": "array", "items": { "type": "string" } },
+        "absent_header_status": { "type": "integer" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "protocol": {
+      "type": "object",
+      "required": ["negotiated", "rejects_unknown_versions", "server_preferred", "doctor_rule"],
+      "properties": {
+        "negotiated": { "const": true },
+        "rejects_unknown_versions": {
+          "const": false,
+          "$comment": "Measured. The server negotiates; it does not reject. Diagnosing a version as a fault would send a developer to change a working config."
+        },
+        "server_preferred": { "type": "string" },
+        "observed_negotiations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["proposed", "status", "answered"],
+            "properties": {
+              "proposed": { "type": "string" },
+              "status": { "type": "integer" },
+              "answered": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "request_header_also_accepted": { "type": "string" },
+        "doctor_rule": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "session": {
+      "type": "object",
+      "required": ["returns_mcp_session_id"],
+      "properties": {
+        "returns_mcp_session_id": { "type": "boolean" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "handshake": {
+      "type": "object",
+      "required": ["sequence"],
+      "properties": {
+        "sequence": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "inventory": {
+      "type": "object",
+      "required": ["tools", "prompts", "resources", "drift_policy"],
+      "properties": {
+        "tools": { "type": "integer", "minimum": 0 },
+        "prompts": { "type": "integer", "minimum": 0 },
+        "resources": { "type": "integer", "minimum": 0 },
+        "drift_policy": { "const": "warn", "$comment": "Never 'error': a changed surface must not fail a working connection." },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

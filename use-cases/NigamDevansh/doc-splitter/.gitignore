@@ -1,0 +1,14 @@
+# Nothing here belongs in a `cp -r` handoff to someone else's repository.
+.DS_Store
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+.env
+# The whole data directory: the SQLite log, the exported parts, and every
+# exported log. A part file is a slice of somebody's contract, verbatim.
+data/
+ui/node_modules/
+ui/dist/
+ui/tsconfig.tsbuildinfo

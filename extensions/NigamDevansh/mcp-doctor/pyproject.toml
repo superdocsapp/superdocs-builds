@@ -1,0 +1,30 @@
+# Tooling for the SHARED CONTRACT only — not the Python implementation.
+#
+# The shipped Python distribution lands in `python/` at delivery step 4 with its
+# own pyproject. This one exists so `shared/` can be validated and tested from
+# day one, before either implementation exists.
+
+[project]
+name = "mcp-doctor-contract"
+version = "0.1.0"
+description = "Validation tooling for the mcp-doctor shared contract"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "jsonschema>=4.22",
+    "pytest>=8.2",
+    "ruff>=0.6",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "conformance"]

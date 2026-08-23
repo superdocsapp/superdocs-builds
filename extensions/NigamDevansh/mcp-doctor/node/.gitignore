@@ -1,0 +1,4 @@
+node_modules/
+dist/
+# Bundled at build time from ../shared — the source of truth is one level up.
+shared/

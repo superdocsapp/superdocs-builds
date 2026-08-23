@@ -1,0 +1,62 @@
+# The development overlay. **Not what a reviewer runs.**
+#
+#     make dev          # this file, on top of docker-compose.yml
+#     docker compose up # README.md's path — the real image, unchanged
+#
+# It is a separate file on purpose. `docker-compose.yml` builds the image and
+# runs what is baked into it, and that is the documented command; if the mounts
+# below lived there, a reviewer typing `docker compose up` would silently get
+# somebody's working tree instead of the artefact. So the honest default stays
+# the default, and this is opt-in.
+#
+# What it changes:
+#
+#   * `service/` and `ui/dist` are mounted from the host, so a Python edit is a
+#     reload and a pane edit is a refresh — neither is an image rebuild.
+#   * a second container runs `vite build --watch`, so the host still needs no
+#     Node installed to work on the pane.
+#
+# What it does NOT change: `.env` is read when a container STARTS, in dev
+# exactly as in production. Editing it is `make restart`, never a file save.
+
+services:
+  redaction:
+    volumes:
+      # Read-only: the reloader needs to watch these, not write them.
+      - ./service:/app/service:ro
+      - ./ui/dist:/app/ui/dist:ro
+    command:
+      - uvicorn
+      - service.app:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8443"
+      - --ssl-keyfile
+      - /certs/localhost.key
+      - --ssl-certfile
+      - /certs/localhost.crt
+      - --reload
+      # Scoped to the source. Without it the reloader also watches /app/data and
+      # restarts the service every time SQLite touches its own journal — which
+      # looks exactly like a crash loop and is not one.
+      - --reload-dir
+      - /app/service
+
+  # Rebuilds ui/dist on every save. Its own container so that working on this
+  # add-in needs Docker and nothing else — the same promise the main compose
+  # file makes, kept in dev too.
+  pane-watch:
+    image: node:24-slim
+    working_dir: /ui
+    init: true
+    volumes:
+      - ./ui:/ui
+      # A named volume, so the container's Linux node_modules never overwrites
+      # a host install (or get overwritten by one). The two are different
+      # binaries and sharing the directory breaks whichever ran second.
+      - pane-node-modules:/ui/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npm run watch"
+
+volumes:
+  pane-node-modules:

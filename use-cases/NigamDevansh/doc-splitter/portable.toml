@@ -1,0 +1,12 @@
+# What this app copies from packages/core/src/doctask_core/portable/.
+# Refresh with:  uv run python scripts/sync_portable.py
+#
+# **One file.** The splitter talks to SuperDocs and nothing else: the document
+# is parsed by SuperDocs on upload and comes back as HTML with a chunk id on
+# every block, so there is nothing left for a local text extractor to do.
+#
+# `document_text.py` was here until 2026-08-16 and was never imported — and it
+# carried `python-docx` and `pdfplumber` into the dependency list with it.
+files = [
+    "superdocs_client.py",
+]

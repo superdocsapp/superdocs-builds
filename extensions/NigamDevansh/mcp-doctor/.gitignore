@@ -1,0 +1,18 @@
+# Real MCP client configs are never fixtures — they carry live keys. If one is
+# ever copied here for debugging, it must not be committed.
+*.local.json
+*.bak
+*.mcp-doctor-*.bak
+
+.env
+
+.venv/
+node_modules/
+dist/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.egg-info/
+
+# macOS Finder metadata.
+.DS_Store

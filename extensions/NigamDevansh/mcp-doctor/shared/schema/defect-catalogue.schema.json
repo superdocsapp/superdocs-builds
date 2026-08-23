@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://superdocs.app/mcp-doctor/schema/defect-catalogue.json",
+  "title": "mcp-doctor defect catalogue",
+  "description": "Every finding either implementation can emit. Ids are part of the --json contract; changing one is a breaking change.",
+  "type": "object",
+  "required": ["catalogue_version", "placeholder_policy", "defects"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "_readme": { "type": "array", "items": { "type": "string" } },
+    "catalogue_version": { "type": "integer", "minimum": 1 },
+    "placeholder_policy": {
+      "type": "object",
+      "description": "Names a message template may NOT interpolate, because they can carry a credential into the terminal, --json and the shareable --report at once.",
+      "required": ["forbidden"],
+      "properties": {
+        "_why": { "type": "array", "items": { "type": "string" } },
+        "forbidden": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "safe_examples": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "defects": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/defect" }
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "defect": {
+      "type": "object",
+      "required": ["id", "class", "severity", "title", "message", "auto_fixable"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(ok|config|scope|network|auth|drift)\\.[a-z0-9]+(-[a-z0-9]+)*$",
+          "description": "Stable, greppable, dotted-kebab. The prefix must equal `class`."
+        },
+        "class": {
+          "enum": ["ok", "config", "scope", "network", "auth", "drift"],
+          "description": "config/network/auth/drift are the four result classes; `scope` marks out-of-scope observations; `ok` is success."
+        },
+        "severity": { "enum": ["error", "warn", "info"] },
+        "title": { "type": "string", "minLength": 1 },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Template. {placeholders} are filled from the finding's `data`. Both languages must render identically."
+        },
+        "remediation": { "type": ["string", "null"] },
+        "auto_fixable": { "type": "boolean" },
+        "fix_kind": { "$ref": "#/$defs/fix_kind" },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "description": "A fixable defect must name the kind of fix it implies.",
+          "if": { "properties": { "auto_fixable": { "const": true } }, "required": ["auto_fixable"] },
+          "then": { "required": ["fix_kind"] },
+          "else": { "not": { "required": ["fix_kind"] } }
+        },
+        {
+          "description": "Nothing in the `scope` class may ever be auto-fixed — that is the host rule.",
+          "if": { "properties": { "class": { "const": "scope" } }, "required": ["class"] },
+          "then": { "properties": { "auto_fixable": { "const": false } } }
+        }
+      ]
+    },
+
+    "fix_kind": {
+      "enum": [
+        "url-scheme",
+        "url-path",
+        "transport-field",
+        "auth-header",
+        "accept-header",
+        "add-entry"
+      ],
+      "description": "Closed set. Note there is deliberately NO url-host: --fix never changes a host (§6 host rule)."
+    }
+  }
+}

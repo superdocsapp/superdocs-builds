@@ -1,0 +1,153 @@
+{
+  "$schema": "../schema/client-registry.schema.json",
+  "id": "claude-code",
+  "name": "Claude Code",
+  "entry_version": 2,
+  "evidence": {
+    "_readme": "Decision D3: write access is earned, never asserted. Path evidence is PER OS, because verifying a path on macOS says nothing about Windows \u2014 a single global 'captured' would over-claim for two platforms we have never seen.",
+    "paths": {
+      "darwin": {
+        "status": "captured",
+        "date": "2026-08-22",
+        "how": "~/.claude.json confirmed present on a real installation while running inside Claude Code."
+      },
+      "linux": {
+        "status": "unverified",
+        "how": "Same path is expected, but no Linux installation was available to confirm it."
+      },
+      "win32": {
+        "status": "unverified",
+        "how": "No Windows installation was available. The home base resolves via USERPROFILE (see path-bases.json)."
+      }
+    },
+    "schema": {
+      "status": "documented",
+      "date": "2026-08-22",
+      "how": "Remote-HTTP server shape taken from Claude Code's published MCP documentation. NOT captured from a live entry \u2014 no MCP server was configured on this machine to read back.",
+      "capture_todo": "Configure a real remote HTTP MCP server in Claude Code, read the written entry, compare against http_server_schema, then promote to 'captured' before enabling any repair."
+    },
+    "repairs": {
+      "status": "unverified",
+      "how": "No repair has been round-tripped against a real file."
+    }
+  },
+  "write_capable": {
+    "_note": "Derived, not decided. validate_contract.py fails the build if any of these is true while that OS's path evidence or the shared schema evidence is not 'captured'. Per OS, because a repair is only as trustworthy as the path knowledge underneath it.",
+    "darwin": false,
+    "linux": false,
+    "win32": false
+  },
+  "locations": [
+    {
+      "scope": "project",
+      "precedence": 1,
+      "format": "json",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "base": "project_root",
+      "path": ".mcp.json",
+      "note": "Checked into the repository and shared with the team. Highest precedence, and the most likely place a bad entry gets committed.",
+      "containers": [
+        {
+          "json_path": "$.mcpServers",
+          "scope_hint": "project"
+        }
+      ]
+    },
+    {
+      "scope": "user",
+      "precedence": 2,
+      "format": "json",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "base": "home",
+      "path": ".claude.json",
+      "note": "Large multi-purpose file. MCP servers live under the top-level mcpServers key, and per-project under projects.<path>.mcpServers.",
+      "containers": [
+        {
+          "json_path": "$.mcpServers",
+          "scope_hint": "user"
+        },
+        {
+          "json_path": "$.projects[*].mcpServers",
+          "scope_hint": "project-local"
+        }
+      ]
+    }
+  ],
+  "server_map": {
+    "container_key": "mcpServers",
+    "shape": "object",
+    "_shape_note": "An object keyed by server name; the key is the name, the value is the definition."
+  },
+  "http_server_schema": {
+    "transport": {
+      "field": "type",
+      "http_values": [
+        "http",
+        "sse"
+      ],
+      "preferred": "http",
+      "stdio_indicator_fields": [
+        "command",
+        "args"
+      ],
+      "_note": "An entry carrying 'command' is a stdio server \u2192 scope.stdio-server, out of scope.",
+      "detected_by": "type-field"
+    },
+    "url": {
+      "field": "url"
+    },
+    "headers": {
+      "supported": true,
+      "field": "headers",
+      "shape": "object",
+      "case_insensitive_names": true,
+      "authorization_header": "Authorization",
+      "accept_header": "Accept",
+      "client_sends_own_accept": true,
+      "_accept_note": "Claude Code sends its own Accept header, so an explicit override in the config is the only way to break it \u2014 which is what config.accept-header-incompatible detects."
+    },
+    "env_interpolation": {
+      "supported": true,
+      "syntax": "${VAR}",
+      "with_default": "${VAR:-default}"
+    }
+  },
+  "identification": {
+    "_readme": "How a SuperDocs entry is recognised even when the user named it something else. First rule that matches wins.",
+    "rules": [
+      {
+        "by": "url_host",
+        "equals": "api.superdocs.app",
+        "confidence": "certain"
+      },
+      {
+        "by": "name",
+        "matches": "^superdocs",
+        "confidence": "likely",
+        "flags": "i"
+      }
+    ],
+    "_host_rule": "An entry matched by NAME whose URL host is not api.superdocs.app yields scope.non-canonical-host and is never repaired. Host comparison is EXACT \u2014 never a suffix or substring match, or api.superdocs.app.evil.example would pass."
+  },
+  "repairs": {
+    "_readme": "The exhaustive set of fix kinds permitted for this client. A defect marked auto_fixable still does nothing unless its fix_kind appears in `allowed` AND write_capable is true for the running OS.",
+    "allowed": [],
+    "planned": [
+      "url-scheme",
+      "url-path",
+      "transport-field",
+      "auth-header",
+      "accept-header",
+      "add-entry"
+    ],
+    "_allowed_empty_note": "Empty on purpose at delivery step 1: no repair may run until schema evidence is 'captured' and repair fixtures round-trip (step 3)."
+  }
+}
