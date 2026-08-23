@@ -1,0 +1,485 @@
+<!doctype html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      background: #f7f6f2;
+      color: #1a202c;
+      padding: 0;
+      min-height: 100vh;
+    }
+    
+    .container {
+      padding: 24px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    
+    .logo-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: #ee735f;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      margin-right: 10px;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #171717;
+      margin: 0;
+    }
+    
+    .header p {
+      font-size: 13px;
+      color: #718096;
+      margin-top: 4px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+      padding: 20px;
+      margin-bottom: 16px;
+      transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-item {
+      background: #faf9f6;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #171717;
+      margin-bottom: 4px;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: #718096;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .section-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: #718096;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #ee735f;
+    }
+    
+    .toggle label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #1a202c;
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .progress-container {
+      margin: 16px 0;
+    }
+    
+    .progress-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .progress {
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: #ee735f;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 4px;
+    }
+    
+    .progress-bar.active {
+      background: #171717;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { background-position: 0% 0%; }
+      50% { background-position: 100% 0%; }
+    }
+    
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .button {
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      text-decoration: none;
+    }
+    
+    .button.primary {
+      background: #ee735f;
+      color: white;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .button.primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    }
+    
+    .button.secondary {
+      background: #f7fafc;
+      color: #1a202c;
+      border: 1.5px solid #e2e8f0;
+    }
+    
+    .button.secondary:hover:not(:disabled) {
+      background: #edf2f7;
+      border-color: #cbd5e0;
+    }
+    
+    .button.danger {
+      background: #fed7d7;
+      color: #c53030;
+      border: none;
+    }
+    
+    .button.danger:hover:not(:disabled) {
+      background: #fc8181;
+    }
+    
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .status-box {
+      background: #fbfaf8;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #2d3748;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Monaco', 'Courier New', monospace;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .status-icon {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 8px;
+      margin-bottom: 2px;
+    }
+    
+    .status-icon.success {
+      background: #48bb78;
+    }
+    
+    .status-icon.warning {
+      background: #ed8936;
+    }
+    
+    .status-icon.error {
+      background: #f56565;
+    }
+    
+    .muted {
+      color: #718096;
+      font-size: 12px;
+    }
+    
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #4a5568;
+    }
+    
+    .feature-item::before {
+      content: "✓";
+      color: #48bb78;
+      font-weight: bold;
+      font-size: 14px;
+    }
+  </style>
+  <style>
+    /* SuperDocs-inspired document workspace: solid colors, paper panels, and clear borders. */
+    :root { --ink:#171717; --muted:#6b6b6b; --line:#dedbd6; --paper:#fff; --canvas:#f7f6f2; --coral:#ee735f; --coral-dark:#c95142; }
+    body { background:var(--canvas); color:var(--ink); }
+    .container { max-width:500px; padding:18px; }
+    .header { display:flex; align-items:center; justify-content:space-between; text-align:left; padding:4px 0 18px; border-bottom:1px solid var(--line); margin-bottom:14px; }
+    .logo-section { justify-content:flex-start; margin-bottom:0; gap:10px; }
+    .logo-icon { width:30px; height:30px; margin-right:0; background:var(--coral); border:2px solid var(--ink); border-radius:0; color:var(--ink); }
+    .header h1 { font-size:18px; letter-spacing:-.5px; background:none; -webkit-text-fill-color:initial; color:var(--ink); }
+    .header p { font-size:11px; color:var(--muted); text-align:right; max-width:145px; line-height:1.35; }
+    .card { background:var(--paper); border:1px solid var(--line); border-radius:0; box-shadow:none; padding:15px; margin-bottom:12px; }
+    .card:hover { box-shadow:none; border-color:#bdb8b0; }
+    .stats { gap:8px; margin-bottom:15px; }
+    .stat-item { background:#faf9f6; border:1px solid var(--line); border-radius:0; padding:10px 6px; }
+    .stat-value { color:var(--ink); font-size:17px; }
+    .stat-label, .section-title { color:var(--muted); }
+    .toggle input[type="checkbox"] { accent-color:var(--coral); }
+    .toggle label { font-size:12px; color:var(--ink); }
+    .progress { height:7px; background:#ece9e3; border:1px solid var(--line); border-radius:0; box-shadow:none; }
+    .progress-bar { background:var(--coral); border-radius:0; }
+    .progress-bar.active { background:var(--ink); }
+    .button-grid { gap:8px; margin-bottom:8px; }
+    .button { border:1px solid var(--ink); border-radius:0; font-size:12px; transition:background .2s ease,color .2s ease; }
+    .button.primary { background:var(--coral); color:var(--ink); box-shadow:none; }
+    .button.primary:hover:not(:disabled) { background:var(--coral-dark); color:#fff; transform:none; box-shadow:none; }
+    .button.secondary { background:var(--paper); color:var(--ink); border-color:var(--line); }
+    .button.secondary:hover:not(:disabled) { background:#f0eee9; border-color:var(--ink); }
+    .button.danger { background:var(--ink); color:#fff; border-color:var(--ink); }
+    .button.danger:hover:not(:disabled) { background:#444; }
+    .status-box { background:#fbfaf8; border:1px solid var(--line); border-radius:0; padding:12px; font-size:11px; line-height:1.55; color:#333; font-family:Arial,Helvetica,sans-serif; box-shadow:none; }
+    .muted { color:var(--muted); font-size:11px; }
+    .feature-list { gap:7px; margin:10px 0 0; }
+    .feature-item { font-size:11px; color:#444; }
+    .feature-item::before { color:var(--coral-dark); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-section">
+        <div class="logo-icon">📄</div>
+        <h1>Roster to Docs</h1>
+      </div>
+      <p>Generate role-specific documents at scale</p>
+    </div>
+    
+    <div class="card">
+      <div id="state" class="muted">Loading…</div>
+    </div>
+    
+    <div class="card">
+      <div class="stats" id="statsContainer">
+        <div class="stat-item">
+          <div class="stat-value">10</div>
+          <div class="stat-label">Templates</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">3</div>
+          <div class="stat-label">Preview</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">500</div>
+          <div class="stat-label">Max/Run</div>
+        </div>
+      </div>
+      
+      <div class="feature-list">
+        <div class="feature-item">Deterministic template routing</div>
+        <div class="feature-item">SuperDocs AI refinement</div>
+        <div class="feature-item">Resumable batch processing</div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="toggle">
+        <input id="emailToggle" type="checkbox">
+        <label for="emailToggle">Send documents via email</label>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-label">
+          <span>Generation Progress</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="progress">
+          <div id="progressBar" class="progress-bar"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="button-grid">
+      <button id="previewButton" class="button secondary" onclick="preview()">Preview</button>
+      <button id="generateButton" class="button primary" onclick="generate()">Generate</button>
+    </div>
+    
+    <div class="button-grid" style="display: none;" id="controlsContainer">
+      <button id="resumeButton" class="button secondary" onclick="resume()" style="display:none">Resume Job</button>
+      <button id="cancelButton" class="button danger" onclick="cancelJob()" style="display:none">Cancel</button>
+    </div>
+    
+    <div class="card">
+      <div class="section-title">Status</div>
+      <div id="status" class="status-box">Ready to generate documents.</div>
+    </div>
+  </div>
+  <script>
+    let previewJobId = null;
+    let activeJobId = null;
+    let pollTimer = null;
+    const statusEl = document.getElementById('status');
+    
+    function show(value){statusEl.textContent=value;}
+    function setBusy(value){document.getElementById('previewButton').disabled=value;document.getElementById('generateButton').disabled=value;}
+    function showCancel(value){document.getElementById('cancelButton').style.display=value?'inline-block':'none';}
+    function showResume(value){document.getElementById('resumeButton').style.display=value?'inline-block':'none';}
+    
+    function describe(job){
+      if(!job){return 'No saved job for this sheet.';}
+      const percent=job.totalRows ? Math.round(job.completedRows*100/job.totalRows) : 0;
+      const progressBar=document.getElementById('progressBar');
+      progressBar.style.width=Math.min(100,percent)+'%';
+      progressBar.className='progress-bar'+(job.status==='running'?' active':'');
+      document.getElementById('progressPercent').textContent = percent + '%';
+      const failed=(job.results||[]).filter(function(r){return r.status==='failed';}).length;
+      const emailed=(job.results||[]).filter(function(r){return r.emailed;}).length;
+      let lines = [];
+      lines.push('Job: '+job.jobId.substring(0,8)+'...');
+      lines.push('Status: '+job.status);
+      if(job.currentAction) lines.push('Action: '+job.currentAction);
+      lines.push('Progress: '+job.completedRows+'/'+job.totalRows+' ('+percent+'%)');
+      lines.push('Emails sent: '+emailed+(job.emailEnabled?'':' (disabled)'));
+      if(failed>0) lines.push('Failed: '+failed+' row(s)');
+      lines.push('Next row: '+(job.nextRow<=job.endRow?job.nextRow:'Done'));
+      return lines.join('\n');
+    }
+    function poll(){
+      if(!activeJobId)return;
+      if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
+      google.script.run.withSuccessHandler(function(job){
+        activeJobId=job.jobId;
+        show(describe(job));
+        showResume(job.status==='completed'?false:true);
+        showCancel(job.status==='running'||job.status==='preview');
+        if(job.status==='completed'||job.status==='failed'||job.status==='cancelled'){setBusy(false);showCancel(false);return;}
+        pollTimer=setTimeout(poll,1500);
+      }).withFailureHandler(function(error){
+        show('Processing is still in progress. Retrying… ' + (error && error.message ? error.message : ''));
+        pollTimer=setTimeout(poll,5000);
+      }).advanceGeneration(activeJobId);
+    }
+    function startPolling(){if(pollTimer)clearTimeout(pollTimer);pollTimer=null;poll();}
+    google.script.run.withSuccessHandler(function(s){
+      document.getElementById('state').textContent = s.sheetName+' · '+s.totalRows+' roster rows · SuperDocs '+(s.superDocsConfigured?'configured':'not configured');
+      document.getElementById('emailToggle').checked=!!s.defaultEmailEnabled;
+      if(!s.superDocsConfigured)show('Open Extensions → Roster to Documents → Settings to add your SuperDocs API key.');
+      if(s.activeJob){
+        activeJobId=s.activeJob.jobId;
+        previewJobId=s.activeJob.status==='preview'?s.activeJob.jobId:null;
+        show(describe(s.activeJob));
+        showResume(s.activeJob.status==='completed'?false:true);
+        showCancel(s.activeJob.status==='running'||s.activeJob.status==='preview');
+        if(s.activeJob.status==='running')startPolling();
+      }
+    }).withFailureHandler(function(e){show('Initialization error: '+e.message);}).getInitialState();
+    function preview(){
+      setBusy(true);show('Running preview on the first 3 rows…');
+      google.script.run.withSuccessHandler(function(p){
+        setBusy(false);previewJobId=p.jobId;activeJobId=p.jobId;showCancel(true);
+        show(p.results.map(function(r){return 'Row '+r.rowNumber+' → '+r.templateId+'\n'+(r.error||'OK');}).join('\n\n')+'\n\nPreview only. Review it, then generate.');
+      }).withFailureHandler(function(e){setBusy(false);show('Preview failed: '+e.message);}).runPreview();
+    }
+    function generate(){
+      if(!previewJobId){preview();return;}
+      setBusy(true);show('Starting saved job…');
+      google.script.run.withSuccessHandler(function(job){activeJobId=job.jobId;showCancel(true);show(describe(job));startPolling();}).withFailureHandler(function(e){setBusy(false);show('Generation failed to start: '+e.message);}).startGeneration(previewJobId,document.getElementById('emailToggle').checked);
+    }
+    function resume(){
+      if(!activeJobId){show('There is no saved job to continue.');return;}
+      setBusy(true);show('Resuming from the saved row…');
+      google.script.run.withSuccessHandler(function(job){activeJobId=job.jobId;show(describe(job));startPolling();}).withFailureHandler(function(e){setBusy(false);show('Resume failed: '+e.message);}).resumeGeneration(activeJobId);
+    }
+    function cancelJob(){
+      if(!activeJobId)return;
+      if(!window.confirm('Cancel this job? Completed rows will remain, and unprocessed rows will not be generated.'))return;
+      setBusy(true);show('Cancelling the active job and removing its continuation trigger...');
+      google.script.run.withSuccessHandler(function(job){
+        if(pollTimer){clearTimeout(pollTimer);pollTimer=null;}
+        activeJobId=null;previewJobId=null;showCancel(false);showResume(false);setBusy(false);show(describe(job));
+      }).withFailureHandler(function(e){setBusy(false);show('Cancellation failed: '+e.message);}).cancelGeneration(activeJobId);
+    }
+  </script>
+</body>
+</html>
