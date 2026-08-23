@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SuperDocs TaxOrganizer — Client Tax Organizer & Year-End Letter Batch</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Print isolation target: the Export & Print modal copies document text
+         here (a direct child of <body>, sibling of #root) so print CSS can show
+         only this and hide the whole app, avoiding duplicated-page output. -->
+    <div id="print-portal"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

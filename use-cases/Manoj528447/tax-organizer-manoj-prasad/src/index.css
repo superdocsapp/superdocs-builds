@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Print styles for the Export & Print modal.
+
+   Problem this fixes:
+   - Clicking "Print Page" ran window.print(), which printed the ENTIRE page:
+     the letter content behind the modal AND the modal's own copy of it (so the
+     document appeared twice), plus the modal chrome.
+   - A visibility:hidden approach still left hidden elements occupying layout
+     space; with the target lifted to position:absolute over that reserved
+     space, some browsers paginated both, repeating the letter on a 2nd sheet.
+
+   Fix:
+   - When printing, the modal copies the document into a dedicated print
+     container (#print-portal) rendered as a direct child of <body>, and we add
+     a `printing` class to <html>. The CSS then display:none's the entire app
+     root (#root) and shows ONLY #print-portal. Because #print-portal is a
+     sibling of #root (not nested inside it) and #root is fully removed from
+     layout, the printout is the document exactly once, no chrome, no phantom
+     second page -- and it's independent of how deeply the modal was nested.
+--------------------------------------------------------------------------- */
+@media print {
+  /* Hide the live app entirely (removed from layout, not just invisible). */
+  html.printing #root {
+    display: none !important;
+  }
+
+  /* Show only the isolated print portal. */
+  html.printing #print-portal {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff;
+    color: #000000;
+    padding: 24px;
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+  }
+}
+
+/* The print portal is empty and inert except during printing. */
+#print-portal {
+  display: none;
+}

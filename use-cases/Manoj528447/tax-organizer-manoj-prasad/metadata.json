@@ -1,0 +1,6 @@
+{
+  "name": "TaxOrganizer AI",
+  "description": "Client tax organizer pre-filler, personalized year-end tax law update letter batch generator, SuperDocs diff review gate, fillable & print organizers, and missing items follow-up engine.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
