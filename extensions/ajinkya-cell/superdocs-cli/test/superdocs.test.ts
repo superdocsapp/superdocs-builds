@@ -40,6 +40,42 @@ describe('SuperDocs CLI Test Suite', () => {
     });
   });
 
+  describe('Web Diff & Large PDF Threshold', () => {
+    test('detects large documents exceeding word and line threshold', async () => {
+      const { isTooLargeForTerminal, countWords } = await import('../src/utils/web-diff.js');
+      const longText = Array.from({ length: 400 }, (_, i) => `word${i}`).join(' ');
+      const shortText = 'Short document content';
+
+      assert.equal(countWords(longText), 400);
+      assert.equal(countWords(shortText), 3);
+
+      const checkLarge = isTooLargeForTerminal(shortText, longText, 350, 50);
+      assert.equal(checkLarge.tooLarge, true);
+      assert.match(checkLarge.reason || '', /exceeds terminal limit/);
+
+      const checkSmall = isTooLargeForTerminal('Hello', 'Hello world', 350, 50);
+      assert.equal(checkSmall.tooLarge, false);
+    });
+
+    test('generates valid HTML diff report with styling and diff rows', async () => {
+      const { generateHtmlDiffReport } = await import('../src/utils/web-diff.js');
+      const oldDoc = '# Overview\n\nOld line content.';
+      const newDoc = '# Overview\n\nNew line content.\nAdded line.';
+
+      const html = generateHtmlDiffReport(oldDoc, newDoc, {
+        documentName: 'large-report.pdf',
+        prompt: 'Update line content'
+      });
+
+      assert.match(html, /<!DOCTYPE html>/);
+      assert.match(html, /large-report\.pdf/);
+      assert.match(html, /Update line content/);
+      assert.match(html, /diff-table/);
+      assert.match(html, /line-added/);
+      assert.match(html, /line-deleted/);
+    });
+  });
+
   describe('Persistent State & Session', () => {
     test('persists and updates configuration correctly', () => {
       saveConfig({
@@ -110,6 +146,20 @@ describe('SuperDocs CLI Test Suite', () => {
       assert.ok(progressChunks.length > 0);
       assert.ok(progressChunks.some(c => c.type === 'reasoning'));
       assert.ok(progressChunks.some(c => c.type === 'complete'));
+    });
+
+    test('surgically removes skills from list without appending dummy headers', async () => {
+      const initialResume = '# Dev\n\n## TECHNICAL SKILLS\nJava, JavaScript, TypeScript, Rust, Docker\n';
+
+      const pending = await superdocsClient.streamEdit({
+        documentId: 'doc_mock_123',
+        prompt: 'in the skills remove rust',
+        currentContent: initialResume
+      });
+
+      assert.doesNotMatch(pending.content, /## In the skills remove rust/);
+      assert.doesNotMatch(pending.content, /\bRust\b/);
+      assert.match(pending.content, /Java, JavaScript, TypeScript, Docker/);
     });
 
     test('approves and commits proposed versions', async () => {

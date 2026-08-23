@@ -6,11 +6,14 @@ import ora from 'ora';
 import { superdocsClient } from '../client/superdocs.js';
 import { getSession, saveSession } from '../utils/state.js';
 import { createDiff, formatDiffStats } from '../utils/diff.js';
+import { isTooLargeForTerminal, openWebDiff } from '../utils/web-diff.js';
 import { logger } from '../utils/logger.js';
 
 export const approveCommand = createCommand('approve')
   .description('Review visual diff and approve/reject proposed document edits')
   .option('--ci', 'Output diff in GitHub PR-compatible Markdown format (non-interactive)')
+  .option('--web', 'Force opening the HTML visual diff inspection in your default browser')
+  .option('--no-web', 'Disable automatic browser launch for large documents and force terminal diff')
   .option('--write-file', 'Automatically sync approved content back to original source file on disk')
   .action(async (options) => {
     const session = getSession();
@@ -33,12 +36,43 @@ export const approveCommand = createCommand('approve')
       return;
     }
 
-    // Terminal Visual Diff Display
-    console.log('\n' + chalk.bold.underline('SuperDocs Proposed Diff Inspection:'));
-    console.log(formatDiffStats(diffResult));
-    console.log('─'.repeat(70));
-    console.log(diffResult.unifiedView);
-    console.log('─'.repeat(70) + '\n');
+    // Check if document / diff exceeds terminal viewport threshold
+    const largeCheck = isTooLargeForTerminal(
+      session.currentContent,
+      session.pendingVersion.content
+    );
+
+    const shouldOpenWeb = (options.web || (largeCheck.tooLarge && options.web !== false));
+
+    if (shouldOpenWeb) {
+      const tempPath = openWebDiff(
+        session.currentContent,
+        session.pendingVersion.content,
+        {
+          documentName: session.documentName,
+          documentId: session.activeDocumentId,
+          prompt: session.pendingVersion.prompt,
+          additions: diffResult.additions,
+          deletions: diffResult.deletions
+        }
+      );
+
+      console.log('\n' + chalk.bold.underline('SuperDocs Proposed Diff Inspection:'));
+      console.log(formatDiffStats(diffResult));
+      console.log('─'.repeat(70));
+      if (largeCheck.tooLarge && !options.web) {
+        logger.info(chalk.yellow(`Large document detected: ${largeCheck.reason}.`));
+      }
+      logger.success(`HTML Visual Diff launched in browser: ${chalk.cyan(tempPath)}`);
+      console.log('─'.repeat(70) + '\n');
+    } else {
+      // Terminal Visual Diff Display for smaller documents
+      console.log('\n' + chalk.bold.underline('SuperDocs Proposed Diff Inspection:'));
+      console.log(formatDiffStats(diffResult));
+      console.log('─'.repeat(70));
+      console.log(diffResult.unifiedView);
+      console.log('─'.repeat(70) + '\n');
+    }
 
     const shouldApprove = await confirm({
       message: chalk.bold('Approve and lock these edits on SuperDocs server?'),

@@ -13,6 +13,10 @@ import {
   EditStreamChunk
 } from '../types.js';
 
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export class SuperDocsClient {
   private getAxiosInstance(responseType: 'json' | 'arraybuffer' | 'stream' | 'text' = 'json'): AxiosInstance {
     const config = getConfig();
@@ -385,7 +389,7 @@ export class SuperDocsClient {
   }
 
   /**
-   * High-Fidelity Mock AI Streaming Simulation
+   * High-Fidelity Surgical In-Document Simulation
    */
   private async simulateMockEdit(
     params: StreamEditParams,
@@ -395,80 +399,143 @@ export class SuperDocsClient {
     const original = params.currentContent || `# ${params.documentName || 'Document'}\n\nDefault content.`;
     
     const reasoningSteps = [
-      `Analyzing document structure and intent for prompt: "${params.prompt}"...`,
-      'Evaluating context-aware insertion points and formatting preservation...',
-      'Synthesizing surgical edits and code sample formatting...',
-      'Validating syntax and document coherence...'
+      `SuperDocs AI analyzing document structure and intent for prompt: "${params.prompt}"...`,
+      'Evaluating context-aware insertion/removal points and formatting preservation...',
+      'Synthesizing surgical mutations with document layout coherence...',
+      'Validating syntax and consistency...'
     ];
 
     for (const step of reasoningSteps) {
       params.onProgress?.({ type: 'reasoning', reasoning: step });
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 120));
     }
 
     let updatedContent = original;
     const p = params.prompt.trim();
-    const pLower = p.toLowerCase();
-
     const subPrompts = p.includes(' and ') ? p.split(/\s+and\s+/i) : [p];
 
     for (const sub of subPrompts) {
-      const subLower = sub.toLowerCase();
+      const subLower = sub.trim().toLowerCase();
 
-      // 1. Rename / change name
-      const nameMatch = sub.match(/(?:change|update|replace|rename)\s+(?:the\s+)?(?:title|name)\s+(?:to|with|as)\s+([A-Za-z\s]+)/i) ||
-                        sub.match(/(?:change|replace)\s+([A-Za-z\s]+)\s+(?:to|with)\s+([A-Za-z\s]+)/i);
-      if (nameMatch) {
-        const newName = (nameMatch[2] || nameMatch[1]).replace(/\s*(?:and|with|to).*$/i, '').trim();
-        if (updatedContent.startsWith('# ')) {
-          updatedContent = updatedContent.replace(/^#\s+[^\n]+/, `# ${newName}`);
-        } else {
-          updatedContent = `# ${newName}\n` + updatedContent.replace(/^[^\n]+\n/, '');
+      // 1. Skill / word / item removal (e.g. "in the skills remove rust", "remove rust from skills", "remove rust", "delete Docker")
+      const removeMatch = sub.match(/(?:in\s+(?:the\s+)?(?:technical\s+)?skills\s+)?(?:remove|delete|drop|omit|exclude|erase)\s+([a-zA-Z0-9#+.\s,-]+?)(?:\s+(?:from|in)\s+(?:the\s+)?(?:skills|technical skills|document|section))?$/i) ||
+                          sub.match(/(?:in\s+(?:the\s+)?(?:technical\s+)?skills\s+)?(?:remove|delete|drop)\s+([a-zA-Z0-9#+.\s,-]+)/i);
+
+      if (removeMatch && (subLower.includes('remove') || subLower.includes('delete') || subLower.includes('drop') || subLower.includes('omit') || subLower.includes('exclude'))) {
+        const rawTargets = removeMatch[1].replace(/^(?:from|in)\s+(?:the\s+)?(?:skills|technical skills)/i, '').trim();
+        const targets = rawTargets.split(/[,/]|(?:\s+and\s+)/i).map(t => t.trim()).filter(Boolean);
+
+        for (const target of targets) {
+          if (!target) continue;
+          const targetRegex = new RegExp(`\\b${escapeRegExp(target)}\\b`, 'i');
+
+          // Find skills section if mentioned or present
+          const lines = updatedContent.split('\n');
+          let skillLineIdx = -1;
+
+          for (let i = 0; i < lines.length; i++) {
+            if (/##\s+(?:technical\s+)?skills/i.test(lines[i])) {
+              for (let j = i + 1; j < Math.min(lines.length, i + 5); j++) {
+                if (lines[j].trim() && !lines[j].startsWith('#')) {
+                  skillLineIdx = j;
+                  break;
+                }
+              }
+              break;
+            }
+          }
+
+          if (skillLineIdx !== -1 && (subLower.includes('skill') || targetRegex.test(lines[skillLineIdx]))) {
+            const currentSkills = lines[skillLineIdx]
+              .split(',')
+              .map(s => s.trim())
+              .filter(s => s.length > 0 && s.toLowerCase() !== target.toLowerCase());
+            lines[skillLineIdx] = currentSkills.join(', ');
+            updatedContent = lines.join('\n');
+          } else {
+            // Remove target word or matching bullet line from anywhere in document
+            updatedContent = lines.map(line => {
+              if (targetRegex.test(line)) {
+                if (line.includes(',')) {
+                  return line.split(',').map(s => s.trim()).filter(s => s.toLowerCase() !== target.toLowerCase()).join(', ');
+                } else if (line.trim().startsWith('-') || line.trim().startsWith('•')) {
+                  return '';
+                } else {
+                  return line.replace(targetRegex, '').replace(/\s{2,}/g, ' ').trim();
+                }
+              }
+              return line;
+            }).filter(l => l !== '').join('\n');
+          }
+        }
+        continue;
+      }
+
+      // 2. Skill / item addition (e.g. "in the skills add Rust, Go", "add Python to skills")
+      const addMatch = sub.match(/(?:in\s+(?:the\s+)?(?:technical\s+)?skills\s+)?(?:add|insert|include|append)\s+([a-zA-Z0-9#+.\s,-]+?)(?:\s+(?:to|in)\s+(?:the\s+)?(?:skills|technical skills))?$/i);
+      if (addMatch && (subLower.includes('skill') || subLower.includes('to skills'))) {
+        const skillsToAdd = addMatch[1].replace(/\s+(?:to|in)\s+skills.*$/i, '').trim();
+        const lines = updatedContent.split('\n');
+        let inserted = false;
+        for (let i = 0; i < lines.length; i++) {
+          if (/##\s+(?:technical\s+)?skills/i.test(lines[i])) {
+            for (let j = i + 1; j < Math.min(lines.length, i + 5); j++) {
+              if (lines[j].trim() && !lines[j].startsWith('#')) {
+                const existing = lines[j].trim();
+                if (!existing.toLowerCase().includes(skillsToAdd.toLowerCase())) {
+                  lines[j] = `${existing}, ${skillsToAdd}`;
+                }
+                inserted = true;
+                break;
+              }
+            }
+            break;
+          }
+        }
+        if (inserted) {
+          updatedContent = lines.join('\n');
+          continue;
         }
       }
 
-      // 2. Change university / college / institute
-      const uniMatch = sub.match(/(?:change|update|replace|rename)\s+(?:the\s+)?(?:university|college|school|institute)(?:\s+name)?\s+(?:to|with|as)\s+([A-Za-z\s]+)/i);
-      if (uniMatch) {
-        const newUni = uniMatch[1].trim();
-        updatedContent = updatedContent.replace(/Jamia Millia Islamia|[A-Za-z\s]+University|[A-Za-z\s]+Institute/i, newUni);
+      // 3. Replacement: "change X to Y", "replace X with Y", "update X to Y"
+      const replaceMatch = sub.match(/(?:change|replace|update|rename)\s+(.+?)\s+(?:to|with|as)\s+(.+)/i);
+      if (replaceMatch) {
+        const fromText = replaceMatch[1].trim();
+        const toText = replaceMatch[2].trim();
+        const cleanFrom = fromText.replace(/^(?:the\s+)?(?:name|title|university|college|email|phone|skills)\s+/i, '').trim();
+        const fromRegex = new RegExp(escapeRegExp(cleanFrom), 'i');
+        if (fromRegex.test(updatedContent)) {
+          updatedContent = updatedContent.replace(fromRegex, toText);
+          continue;
+        }
       }
 
-      // 3. Email change
+      // 4. Contact Info: Email, Phone
       const emailMatch = sub.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
       if (emailMatch && (subLower.includes('email') || subLower.includes('change') || subLower.includes('update'))) {
         updatedContent = updatedContent.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/, emailMatch[1]);
+        continue;
       }
 
-      // 4. Add to skills
-      if (subLower.includes('skill') && (subLower.includes('add') || subLower.includes('include') || subLower.includes('insert'))) {
-        const skillsToAdd = sub.replace(/^.*?(?:add|include|insert)\s+/i, '').replace(/\s+(?:to|in)\s+skills.*$/i, '').trim();
-        if (updatedContent.includes('## TECHNICAL SKILLS')) {
-          updatedContent = updatedContent.replace('## TECHNICAL SKILLS', `## TECHNICAL SKILLS\n${skillsToAdd},`);
-        } else {
-          updatedContent += `\n\n## TECHNICAL SKILLS\n${skillsToAdd}`;
-        }
+      const phoneMatch = sub.match(/(\+?\d[\d\s-]{8,}\d)/);
+      if (phoneMatch && (subLower.includes('phone') || subLower.includes('mobile') || subLower.includes('contact'))) {
+        updatedContent = updatedContent.replace(/\+?\d[\d\s-]{8,}\d/, phoneMatch[1]);
+        continue;
       }
-    }
 
-    if (pLower.includes('conclusion') || pLower.includes('summary')) {
-      updatedContent += `\n\n## Conclusion & Summary\nDocument updated with comprehensive conclusion and verified structural integrity.\n`;
-    }
-    // 5. Error handling / API reference
-    else if (pLower.includes('error') || pLower.includes('exception') || pLower.includes('status code')) {
-      updatedContent += `\n\n## Error Handling & Status Codes\n\n| Status Code | Description | Resolution |\n| :--- | :--- | :--- |\n| \`400 Bad Request\` | Invalid payload or missing parameters | Validate request body format |\n| \`401 Unauthorized\` | Missing or invalid Bearer API Key | Run \`superdocs init --key <KEY>\` |\n| \`404 Not Found\` | Document or session ID does not exist | Verify active document with \`superdocs status\` |\n| \`500 Server Error\` | Internal execution error | Retry with exponential backoff |\n`;
-    } else if (pLower.includes('auth') || pLower.includes('key')) {
-      updatedContent += `\n\n## Authentication Guide\n\nAll requests to the SuperDocs API must include the \`Authorization\` header:\n\n\`\`\`bash\nAuthorization: Bearer sd_live_your_api_key_here\n\`\`\`\n\nGenerate your API key instantly using \`superdocs init --signup\`.\n`;
-    } else if (pLower.includes('toc') || pLower.includes('table of contents')) {
-      updatedContent = `## Table of Contents\n- [Overview](#overview)\n- [Architecture](#architecture)\n- [API Reference](#api-reference)\n\n` + updatedContent;
-    } else if (pLower.includes('cert') || pLower.includes('certification')) {
-      updatedContent += `\n\n## Certifications\n- AWS Certified Solutions Architect – Associate\n- Google Cloud Certified Associate Cloud Engineer\n- Automate CyberSecurity Tasks with Python\n`;
-    } else if (pLower.includes('experience') || pLower.includes('work')) {
-      updatedContent += `\n\n## Professional Experience\n### Full Stack Software Engineer\n- Architected and delivered high-performance web applications using Next.js, TypeScript, and PostgreSQL.\n- Automated CI/CD pipelines and optimized database indexing, cutting latency by 35%.\n`;
-    } else {
-      const cleanTitle = p.replace(/^(add|insert|update|create|include|write)\s+/i, '');
-      const formattedTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
-      updatedContent += `\n\n## ${formattedTitle}\n- ${p}\n- Verified structure and formatting consistency.\n`;
+      // 5. Explicit section additions
+      if (subLower.startsWith('add section') || subLower.startsWith('create section') || subLower.startsWith('insert section')) {
+        const sectionName = sub.replace(/^(?:add|create|insert)\s+section\s+/i, '').trim();
+        const formattedName = sectionName.charAt(0).toUpperCase() + sectionName.slice(1);
+        updatedContent += `\n\n## ${formattedName}\n- Updated with ${sectionName}.\n`;
+      } else if (subLower.includes('error') || subLower.includes('status code')) {
+        updatedContent += `\n\n## Error Handling & Status Codes\n\n| Status Code | Description | Resolution |\n| :--- | :--- | :--- |\n| \`400 Bad Request\` | Invalid payload or missing parameters | Validate request body format |\n| \`401 Unauthorized\` | Missing or invalid Bearer API Key | Run \`superdocs init --key <KEY>\` |\n| \`404 Not Found\` | Document or session ID does not exist | Verify active document with \`superdocs status\` |\n| \`500 Server Error\` | Internal execution error | Retry with exponential backoff |\n`;
+      } else if (subLower.includes('auth') || subLower.includes('api key')) {
+        updatedContent += `\n\n## Authentication Guide\n\nAll requests to the SuperDocs API must include the \`Authorization\` header:\n\n\`\`\`bash\nAuthorization: Bearer sd_live_your_api_key_here\n\`\`\`\n\nGenerate your API key instantly using \`superdocs init --signup\`.\n`;
+      } else if (subLower.includes('table of contents') || subLower.includes('toc')) {
+        updatedContent = `## Table of Contents\n- [Overview](#overview)\n- [Architecture](#architecture)\n- [API Reference](#api-reference)\n\n` + updatedContent;
+      }
     }
 
     params.onProgress?.({
@@ -480,7 +547,7 @@ export class SuperDocsClient {
     return {
       id: versionId,
       content: updatedContent,
-      reasoning: `Surgically updated document: ${params.prompt}`,
+      reasoning: `Surgically updated document for: "${params.prompt}"`,
       prompt: params.prompt,
       timestamp
     };

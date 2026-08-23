@@ -5,7 +5,8 @@ import { DiffResult } from '../types.js';
 export function createDiff(
   oldStr: string,
   newStr: string,
-  fileName = 'document.md'
+  fileName = 'document.md',
+  options: { compactContext?: boolean } = { compactContext: true }
 ): DiffResult {
   const lineDiffs = diff.diffLines(oldStr || '', newStr || '');
   
@@ -22,9 +23,9 @@ export function createDiff(
   markdownLines.push(`--- a/${fileName}`);
   markdownLines.push(`+++ b/${fileName}`);
 
-  for (const part of lineDiffs) {
+  for (let i = 0; i < lineDiffs.length; i++) {
+    const part = lineDiffs[i];
     const lines = part.value.split('\n');
-    // Remove the trailing empty element if string ends in newline
     if (lines.length > 0 && lines[lines.length - 1] === '') {
       lines.pop();
     }
@@ -43,10 +44,27 @@ export function createDiff(
       }
     } else {
       unchanged += lines.length;
-      // Show up to 3 context lines for compact readability if long
-      for (const line of lines) {
-        terminalLines.push(chalk.dim(`  ${line}`));
-        markdownLines.push(`  ${line}`);
+      // Context folding for unchanged text blocks if compactContext is enabled
+      if (options.compactContext && lines.length > 6) {
+        const lead = lines.slice(0, 3);
+        const tail = lines.slice(-3);
+        const omitted = lines.length - 6;
+
+        for (const line of lead) {
+          terminalLines.push(chalk.dim(`  ${line}`));
+          markdownLines.push(`  ${line}`);
+        }
+        terminalLines.push(chalk.yellow(`  ... (${omitted} lines unchanged) ...`));
+        markdownLines.push(`  ... (${omitted} lines unchanged) ...`);
+        for (const line of tail) {
+          terminalLines.push(chalk.dim(`  ${line}`));
+          markdownLines.push(`  ${line}`);
+        }
+      } else {
+        for (const line of lines) {
+          terminalLines.push(chalk.dim(`  ${line}`));
+          markdownLines.push(`  ${line}`);
+        }
       }
     }
   }
@@ -55,7 +73,7 @@ export function createDiff(
 
   const markdownDiff = [
     '```diff',
-    `# SuperDocs Proposed Diff: +${additions} / -${deletions}`,
+    `# SuperDocs Proposed Diff: +${additions} / -${deletions} (unchanged: ${unchanged})`,
     ...markdownLines,
     '```'
   ].join('\n');

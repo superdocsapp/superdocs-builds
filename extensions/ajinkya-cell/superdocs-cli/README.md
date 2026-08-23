@@ -363,11 +363,17 @@ superdocs edit -p "Add a troubleshooting section covering 401 Unauthorized and 4
 ---
 
 ### `superdocs approve [options]`
-Inspects the staged `pendingVersion` diff, displays a high-visibility terminal comparison, and prompts the user to commit or reject the changes.
+Inspects the staged `pendingVersion` diff. For short documents, displays a high-visibility terminal comparison with context folding; for large documents or multi-page PDFs (>350 words / >50 lines), automatically launches a high-fidelity **HTML Visual Diff** in your default browser.
 
 ```bash
-# Interactive Terminal Diff Review
+# Interactive Diff Review (Auto-detects document size and launches Web Diff for large files)
 superdocs approve
+
+# Force opening the HTML visual diff in your default browser
+superdocs approve --web
+
+# Disable automatic browser launch for large documents and force terminal diff
+superdocs approve --no-web
 
 # Write approved changes directly back to the original source file on disk
 superdocs approve --write-file
@@ -375,6 +381,14 @@ superdocs approve --write-file
 # Output GitHub PR-compatible Markdown diff (Non-interactive CI mode)
 superdocs approve --ci
 ```
+
+#### Flags & Options:
+| Flag | Long Flag | Description | Default |
+| :--- | :--- | :--- | :--- |
+| | `--web` | Force opening the HTML visual diff in default browser | `false` |
+| | `--no-web` | Force terminal diff view even for large multi-page documents | `false` |
+| | `--write-file`| Automatically sync approved content to local source file on disk | `false` |
+| | `--ci` | Output diff in GitHub PR-compatible Markdown format | `false` |
 
 #### Terminal Diff Output Preview:
 ```diff
