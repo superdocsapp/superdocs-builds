@@ -1,5 +1,7 @@
-requests>=2.31
-flask>=3.0
+# Production deployment additions on top of the root requirements.txt
+# (which covers Flask + everything else the webapp needs to run and be
+# tested). Kept as `-r` rather than duplicating entries so these two
+# files can't silently drift out of sync with each other again.
+-r ../requirements.txt
 gunicorn>=22.0
-flask-wtf>=1.2
-flask-limiter>=3.7
+psycopg2-binary>=2.9

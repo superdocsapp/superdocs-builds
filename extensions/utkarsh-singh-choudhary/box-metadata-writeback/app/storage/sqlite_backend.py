@@ -30,6 +30,7 @@ from typing import Any, Optional
 
 from app.models import MetadataChange, PendingReview
 from app.workflow.checkpoint import Checkpoint
+from app.workflow.hash_chain import GENESIS_HASH, compute_entry_hash, verify_chain
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS idempotency (
@@ -45,7 +46,8 @@ CREATE TABLE IF NOT EXISTS reviews (
     confidence REAL NOT NULL,
     status TEXT NOT NULL,
     created_at REAL NOT NULL,
-    decided_at REAL
+    decided_at REAL,
+    source_session_id TEXT
 );
 CREATE TABLE IF NOT EXISTS history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,7 +57,10 @@ CREATE TABLE IF NOT EXISTS history (
     new_value TEXT,
     version_sha1 TEXT NOT NULL,
     timestamp REAL NOT NULL,
-    reason TEXT NOT NULL
+    reason TEXT NOT NULL,
+    source_session_id TEXT,
+    prev_hash TEXT,
+    entry_hash TEXT
 );
 CREATE TABLE IF NOT EXISTS last_values (
     file_id TEXT NOT NULL,
@@ -77,6 +82,24 @@ CREATE TABLE IF NOT EXISTS checkpoint_stages (
 def _connect(db_path: str) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.executescript(_SCHEMA)
+    # Lightweight migration: a db file created before source_session_id
+    # existed won't get it from CREATE TABLE IF NOT EXISTS (that only
+    # applies to brand-new tables). ALTER TABLE ADD COLUMN is safe to
+    # attempt unconditionally here -- SQLite errors if the column
+    # already exists, which we simply swallow.
+    try:
+        conn.execute("ALTER TABLE history ADD COLUMN source_session_id TEXT")
+    except sqlite3.OperationalError:
+        pass
+    for col in ("prev_hash", "entry_hash"):
+        try:
+            conn.execute(f"ALTER TABLE history ADD COLUMN {col} TEXT")
+        except sqlite3.OperationalError:
+            pass
+    try:
+        conn.execute("ALTER TABLE reviews ADD COLUMN source_session_id TEXT")
+    except sqlite3.OperationalError:
+        pass
     conn.commit()
     return conn
 
@@ -129,13 +152,28 @@ class SqliteReviewQueue:
     is still there, still pending, after the process restarts and
     re-opens the same db file."""
 
-    def __init__(self, db_path: str, threshold: float = 0.7) -> None:
+    def __init__(
+        self, db_path: str, threshold: float = 0.7, field_thresholds: Optional[dict] = None
+    ) -> None:
         self.threshold = threshold
+        self.field_thresholds = dict(field_thresholds or {})
         self._conn = _connect(db_path)
         self._lock = threading.Lock()
 
+    def threshold_for(self, field_name: str) -> float:
+        return self.field_thresholds.get(field_name, self.threshold)
+
+    def requires_review(self, field_name: str, confidence: float) -> bool:
+        return confidence < self.threshold_for(field_name)
+
     def stage(
-        self, file_id: str, version_sha1: str, field_name: str, value: str, confidence: float
+        self,
+        file_id: str,
+        version_sha1: str,
+        field_name: str,
+        value: str,
+        confidence: float,
+        source_session_id: Optional[str] = None,
     ) -> PendingReview:
         review = PendingReview(
             review_id=f"rev-{uuid.uuid4().hex[:8]}",
@@ -145,12 +183,13 @@ class SqliteReviewQueue:
             proposed_value=value,
             confidence=confidence,
             created_at=time.time(),
+            source_session_id=source_session_id,
         )
         with self._lock:
             self._conn.execute(
                 "INSERT INTO reviews (review_id, file_id, version_sha1, field_name, "
-                "proposed_value, confidence, status, created_at, decided_at) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "proposed_value, confidence, status, created_at, decided_at, source_session_id) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     review.review_id,
                     review.file_id,
@@ -161,6 +200,7 @@ class SqliteReviewQueue:
                     review.status,
                     review.created_at,
                     review.decided_at,
+                    review.source_session_id,
                 ),
             )
             self._conn.commit()
@@ -177,6 +217,7 @@ class SqliteReviewQueue:
             status=row[6],
             created_at=row[7],
             decided_at=row[8],
+            source_session_id=row[9] if len(row) > 9 else None,
         )
 
     def list_pending(self, file_id: Optional[str] = None) -> list[PendingReview]:
@@ -231,8 +272,14 @@ class SqliteHistoryStore:
         self._lock = threading.Lock()
 
     def record_diff(
-        self, file_id: str, version_sha1: str, new_fields: dict[str, Any], reason: str
+        self,
+        file_id: str,
+        version_sha1: str,
+        new_fields: dict[str, Any],
+        reason: str,
+        session_ids: Optional[dict[str, str]] = None,
     ) -> list[MetadataChange]:
+        session_ids = session_ids or {}
         with self._lock:
             rows = self._conn.execute(
                 "SELECT field_name, value FROM last_values WHERE file_id = ?", (file_id,)
@@ -241,12 +288,20 @@ class SqliteHistoryStore:
             all_keys = set(previous) | set(new_fields)
             entries: list[MetadataChange] = []
             now = time.time()
+            last_hash_row = self._conn.execute(
+                "SELECT entry_hash FROM history WHERE file_id = ? ORDER BY id DESC LIMIT 1", (file_id,)
+            ).fetchone()
+            prev_hash = last_hash_row[0] if last_hash_row and last_hash_row[0] else GENESIS_HASH
             for key in sorted(all_keys):
                 old_val = previous.get(key)
                 new_val = new_fields.get(key)
                 new_val_str = None if new_val is None else str(new_val)
                 if old_val == new_val_str:
                     continue
+                source_session_id = session_ids.get(key)
+                entry_hash = compute_entry_hash(
+                    prev_hash, file_id, key, old_val, new_val_str, version_sha1, now, reason, source_session_id
+                )
                 entry = MetadataChange(
                     file_id=file_id,
                     field_name=key,
@@ -255,18 +310,26 @@ class SqliteHistoryStore:
                     version_sha1=version_sha1,
                     timestamp=now,
                     reason=reason,
+                    source_session_id=source_session_id,
+                    prev_hash=prev_hash,
+                    entry_hash=entry_hash,
                 )
                 entries.append(entry)
                 self._conn.execute(
                     "INSERT INTO history (file_id, field_name, old_value, new_value, "
-                    "version_sha1, timestamp, reason) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    (file_id, key, old_val, new_val_str, version_sha1, now, reason),
+                    "version_sha1, timestamp, reason, source_session_id, prev_hash, entry_hash) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        file_id, key, old_val, new_val_str, version_sha1, now, reason,
+                        source_session_id, prev_hash, entry_hash,
+                    ),
                 )
                 self._conn.execute(
                     "INSERT INTO last_values (file_id, field_name, value) VALUES (?, ?, ?) "
                     "ON CONFLICT(file_id, field_name) DO UPDATE SET value = excluded.value",
                     (file_id, key, new_val_str),
                 )
+                prev_hash = entry_hash
             self._conn.commit()
             return entries
 
@@ -274,7 +337,8 @@ class SqliteHistoryStore:
         with self._lock:
             rows = self._conn.execute(
                 "SELECT file_id, field_name, old_value, new_value, version_sha1, "
-                "timestamp, reason FROM history WHERE file_id = ? ORDER BY id",
+                "timestamp, reason, source_session_id, prev_hash, entry_hash "
+                "FROM history WHERE file_id = ? ORDER BY id",
                 (file_id,),
             ).fetchall()
         return [
@@ -286,9 +350,16 @@ class SqliteHistoryStore:
                 version_sha1=r[4],
                 timestamp=r[5],
                 reason=r[6],
+                source_session_id=r[7],
+                prev_hash=r[8],
+                entry_hash=r[9],
             )
             for r in rows
         ]
+
+    def verify_history(self, file_id: str):
+        """Same convenience wrapper as MetadataHistoryStore.verify_history."""
+        return verify_chain(self.get_history(file_id))
 
 
 class SqliteCheckpointStore:

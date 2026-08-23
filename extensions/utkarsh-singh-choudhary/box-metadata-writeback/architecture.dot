@@ -1,0 +1,128 @@
+digraph architecture {
+    rankdir=TB;
+    fontname="Helvetica";
+    fontsize=16;
+    label="Box workflow app with metadata write-back — architecture";
+    labelloc=t;
+    labeljust=c;
+    node [fontname="Helvetica", fontsize=11, shape=box, style="rounded,filled"];
+    edge [fontname="Helvetica", fontsize=10];
+
+    subgraph cluster_trigger {
+        label="Trigger";
+        style=rounded;
+        webhook_evt [label="Box\nFILE.UPLOADED /\nFILE.METADATA_UPDATED", fillcolor="#dbe9fb"];
+    }
+
+    subgraph cluster_mcp {
+        label="Machine interface";
+        style=rounded;
+        mcp [label="MCP server\n(process_file, list_reviews,\napprove/reject tools)\nOAuth: PKCE + state + rotating refresh", fillcolor="#e6e0f8"];
+    }
+
+    subgraph cluster_api {
+        label="API layer (FastAPI)";
+        style=rounded;
+        api_process [label="POST /process/{file_id}\nPOST /process/batch\n(manual trigger, MCP, tests)", fillcolor="#e6e0f8"];
+        webhook [label="POST /webhook/box\nHMAC signature verified\n(primary + secondary key)", fillcolor="#dbe9fb"];
+        tenant [label="Tenant resolution + trace_id\n(bearer token / ?tenant=)\nrate limiting, structured JSON logs", fillcolor="#e6e0f8"];
+    }
+
+    mcp -> api_process [label="drives pipeline\nwithout a human UI"];
+    webhook_evt -> webhook;
+    api_process -> tenant;
+    webhook -> tenant;
+
+    subgraph cluster_pipeline {
+        label="BoxMetadataWritebackPipeline (per file, per version)";
+        style=rounded;
+
+        idem [label="1. Idempotency +\nconcurrency claim\n(file_id, content sha1)", fillcolor="#fde3c0"];
+        gov [label="2. Governance check\n(legal hold / retention lock)\nfail fast, before any call", fillcolor="#fde3c0"];
+        dup [label="3. Near-duplicate check\n(shingled Jaccard vs. other\nfile_ids — flags, never blocks)", fillcolor="#fde3c0"];
+        checkpoint [label="4. Resume from checkpoint\n(skip stages already done)", fillcolor="#fde3c0"];
+        classify [label="5. Classify\n(retryable + circuit breaker)", fillcolor="#d6f0e3"];
+        extract [label="6. Extract key terms\naccuracy layer: type/format\nvalidation, cross-field\nconsistency, source grounding\n+ optional calibration\n(dual-run or N-way ensemble)", fillcolor="#d6f0e3"];
+        companion [label="7. Generate companion .docx\n(contract / amendment only)", fillcolor="#d6f0e3"];
+        normalize [label="8. Normalize to retention\ntemplate; retention_category\nheld back if doc_class\nconfidence too low", fillcolor="#d6f0e3"];
+        versionguard [label="9. Version guard\n(re-check file unchanged)", fillcolor="#fde3c0"];
+        write [label="10. Write metadata\n(only fields SuperDocs returned;\nmissing left empty, never guessed)", fillcolor="#fde3c0"];
+
+        idem -> gov [label="not already processed"];
+        gov -> dup [label="no hold / lock"];
+        dup -> checkpoint;
+        checkpoint -> classify;
+        classify -> extract;
+        extract -> companion;
+        companion -> normalize;
+        normalize -> versionguard;
+        versionguard -> write [label="version unchanged"];
+    }
+
+    subgraph cluster_gate {
+        label="Human gate";
+        style=rounded;
+        review [label="Review queue\n(low-confidence / failed-validation\nfields held back)", fillcolor="#f9d6d6"];
+        decide [label="POST /reviews/{id}/approve|reject\nsurgical single-field patch", fillcolor="#f9d6d6"];
+        review -> decide [style=dashed];
+    }
+    extract -> review [label="conf < threshold OR\naccuracy check failed", style=dashed];
+    decide -> write [label="approved field only", style=dashed];
+
+    subgraph cluster_reliability {
+        label="Reliability layer";
+        style=rounded;
+        breaker [label="Circuit breaker\n(fails fast after N consecutive\nSuperDocs failures)", fillcolor="#fde3c0"];
+        dlq [label="Dead-letter queue\nGET /dead-letters\n(real ops worklist)", fillcolor="#fde3c0"];
+        breaker -> dlq [style=dashed, label="exhausted / open"];
+    }
+    classify -> breaker [style=dotted];
+    extract -> breaker [style=dotted];
+    companion -> breaker [style=dotted];
+    normalize -> breaker [style=dotted];
+
+    subgraph cluster_external {
+        label="External systems (real or fake, env-selected)";
+        style=rounded;
+        superdocs [label="SuperDocs API\nupload / chat / approve / export", fillcolor="#dcecd4"];
+        box_api [label="Box API\nmetadata template write-back", fillcolor="#dbe9fb"];
+    }
+    classify -> superdocs [label="chat()"];
+    extract -> superdocs;
+    companion -> superdocs [label="upload companion doc"];
+    normalize -> superdocs;
+    write -> box_api [label="update_metadata()\nnever overrides\ngovernance labels"];
+
+    subgraph cluster_persistence {
+        label="Persistence (SQLite; multi-tenant isolated)";
+        style=rounded;
+        history [label="Metadata history\n(hash-chained audit trail —\nGET /files/{id}/history/verify)", fillcolor="#e8e8e8"];
+        reviewstore [label="Review queue store\n(source_session_id provenance)", fillcolor="#e8e8e8"];
+        checkpointstore [label="Checkpoint store", fillcolor="#e8e8e8"];
+        idemstore [label="Idempotency store", fillcolor="#e8e8e8"];
+    }
+    write -> history;
+    decide -> history;
+    idem -> idemstore [style=dotted];
+    checkpoint -> checkpointstore [style=dotted];
+    review -> reviewstore [style=dotted];
+
+    subgraph cluster_observability {
+        label="Observability & accuracy reporting";
+        style=rounded;
+        cost [label="Cost tracker\nGET /cost-report\n(ops/latency per calibration mode)", fillcolor="#f0e6fa"];
+        caltrack [label="Calibration tracker\nGET /calibration-report\n+ /suggest-thresholds\n(real approve/reject vs. confidence)", fillcolor="#f0e6fa"];
+        golden [label="Golden-document\nregression suite\n(pins pipeline OUTPUT,\nnot just mechanism)", fillcolor="#f0e6fa"];
+    }
+    write -> cost [style=dotted];
+    decide -> caltrack [style=dotted];
+
+    subgraph cluster_downstream {
+        label="Governance simulator + downstream Box rules";
+        style=rounded;
+        box_rules [label="Box's own retention,\nsearch, workflow rules\n(driven by written metadata)", fillcolor="#dbe9fb"];
+        gov_sim [label="Governance simulator\nGET /files/{id}/governance-outcome\npredicts retention/disposition", fillcolor="#f9d6d6"];
+    }
+    box_api -> box_rules;
+    box_api -> gov_sim [style=dashed, label="read model"];
+}

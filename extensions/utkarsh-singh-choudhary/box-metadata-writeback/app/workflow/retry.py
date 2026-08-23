@@ -18,6 +18,7 @@ approximation.
 """
 from __future__ import annotations
 
+import threading
 import time
 from dataclasses import dataclass
 from typing import Callable, TypeVar
@@ -77,3 +78,92 @@ def call_with_retry(
             sleep_fn(base_delay * (2 ** (attempt - 1)))
     # unreachable, but keeps type-checkers happy
     raise last_error  # type: ignore[misc]
+
+
+class CircuitOpenError(Exception):
+    """Raised instead of calling SuperDocs at all while the breaker is
+    open. Distinct from SuperDocsAPIError so callers (and tests) can
+    tell "we tried and it failed" apart from "we didn't even try
+    because the last N calls all failed"."""
+
+
+@dataclass
+class _CircuitState:
+    failures: int = 0
+    opened_at: float = 0.0
+    is_open: bool = False
+
+
+class CircuitBreaker:
+    """Per-tenant breaker shared across every stage's SuperDocs call.
+
+    Per-file retry (call_with_retry above) handles one file hitting one
+    transient blip. It does not help when SuperDocs itself is down: every
+    file arriving during an outage still burns its own full retry budget
+    against a service that isn't coming back in the next few hundred ms,
+    which just multiplies load on an already-struggling dependency and
+    slows every concurrent run down together.
+
+    This breaker trips after `failure_threshold` consecutive retryable
+    failures (tracked across calls, not within one call's own retries)
+    and then fails fast -- raising CircuitOpenError without attempting a
+    network call at all -- for `reset_after_seconds`, after which it
+    allows exactly one trial call through (half-open); success closes
+    the breaker and resets the failure count, another failure re-opens
+    it and restarts the timer. A single successful call at any time
+    resets the failure count to zero.
+
+    Thread-safe: shared across concurrent stage calls within a tenant.
+    """
+
+    def __init__(
+        self,
+        failure_threshold: int = 5,
+        reset_after_seconds: float = 30.0,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        self.failure_threshold = failure_threshold
+        self.reset_after_seconds = reset_after_seconds
+        self._clock = clock
+        self._lock = threading.Lock()
+        self._state = _CircuitState()
+
+    def _half_open_allowed(self) -> bool:
+        return (self._clock() - self._state.opened_at) >= self.reset_after_seconds
+
+    def before_call(self) -> None:
+        with self._lock:
+            if self._state.is_open and not self._half_open_allowed():
+                raise CircuitOpenError(
+                    f"circuit open after {self._state.failures} consecutive "
+                    f"failures; retrying in "
+                    f"{self.reset_after_seconds - (self._clock() - self._state.opened_at):.1f}s"
+                )
+
+    def record_success(self) -> None:
+        with self._lock:
+            self._state = _CircuitState()
+
+    def record_failure(self) -> None:
+        with self._lock:
+            self._state.failures += 1
+            if self._state.failures >= self.failure_threshold:
+                self._state.is_open = True
+                self._state.opened_at = self._clock()
+
+    @property
+    def is_open(self) -> bool:
+        with self._lock:
+            return self._state.is_open and not self._half_open_allowed()
+
+    def call(self, fn: Callable[[], T]) -> T:
+        """Convenience wrapper: check-call-record in one place."""
+        self.before_call()
+        try:
+            value = fn()
+        except Exception:
+            self.record_failure()
+            raise
+        else:
+            self.record_success()
+            return value

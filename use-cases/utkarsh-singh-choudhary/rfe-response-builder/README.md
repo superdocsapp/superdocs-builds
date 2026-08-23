@@ -231,39 +231,61 @@ a `<case-id>-exhibit-manifest.json` alongside it.
 
 ## Testing
 
+**Verify this yourself before trusting any test-count claim in this repo
+or its changelog.** Two install paths are supported and both are
+verified (in a genuinely fresh virtualenv, not just the dev sandbox) to
+produce the same result:
+
 ```bash
-make test-offline   # 74 tests, zero network, zero SuperDocs operations spent
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt      # installs everything needed for the FULL suite, webapp included
+PYTHONPATH=. pytest tests/ -q
+# -> 253 passed
+```
+
+or equivalently:
+
+```bash
+pip install -e ".[dev]"              # what `make install` runs
+PYTHONPATH=. pytest tests/ -q
+# -> 253 passed
+```
+
+`make test-offline` runs the same command. Zero network access and zero
+SuperDocs operations are used anywhere in the suite — every SuperDocs API
+call is mocked via `requests_mock`.
+
+```bash
+make test-offline
 make lint           # ruff
 ```
 
-- `tests/test_rfe.py` — pure domain logic: notice parsing (numbered
-  list splitting, no-marker fallback, empty-input handling), top-N
-  keyword matching against the prior petition, new-evidence-catalog
-  matching, exhibit numbering/deduplication, instruction construction,
-  checklist correctness and response-section mapping, case-id filename
-  sanitization, the `is_substantive_reply` answer-quality gate, evidence
-  status classification, multi-document paragraph extraction, and
-  stemmed fuzzy-match suggestions.
-- `tests/test_generate_integration.py` — the full non-interactive
-  pipeline (notice → match → evidence identification → exhibit assembly
-  → per-item drafting turns → checklist → export) against a mocked
-  SuperDocs API via `requests_mock`, including tests that a persistent
-  per-item failure and a non-substantive reply are both honestly
-  reported as `NOT ANSWERED`, a one-off transient failure is absorbed by
-  the client's retry logic, and an end-to-end run of the `--review` CLI
-  flag with mocked terminal input.
-- `tests/test_review.py` — the human-review-gated flow: pending items
-  are only counted as answered when explicitly approved, an omitted
-  decision is treated as rejected, and a synchronously-completed turn
-  (no pending change to approve) still has to pass the substantive-reply
-  check.
-- `tests/test_review_store.py` — the SQLite-backed review session store:
-  round-trip, cross-instance visibility (standing in for separate
-  gunicorn workers sharing one file), deletion, and TTL pruning.
-- `tests/test_webapp.py` — the Flask layer: upload validation
-  (extension, encoding, multi-document `supporting_docs`), CSRF, rate
-  limiting, error handling, the dry-run path, and the real-run →
-  review page → approve → export flow against a mocked SuperDocs API.
+Test files, one per module in `rfe_response_builder/` and `webapp/`:
+
+- `tests/test_rfe.py` — notice parsing, keyword/fuzzy/semantic matching
+  tiers, exhibit numbering, instruction construction, coverage
+  checklist, `is_substantive_reply`.
+- `tests/test_classify.py` — RFE-type classification and response
+  deadline extraction.
+- `tests/test_grounding.py` — the fact-grounding (hallucination) heuristic.
+- `tests/test_consistency.py` — cross-item consistency checking.
+- `tests/test_injection_guard.py` — prompt-injection risk scanning.
+- `tests/test_embeddings.py` — the pluggable TF-IDF/API embedding providers.
+- `tests/test_judge.py` — the LLM-as-judge quality gate.
+- `tests/test_firm_templates.py` — firm-level tone/phrasing customization.
+- `tests/test_schemas.py` — petition/evidence JSON schema validation
+  (both the `jsonschema`-backed path and the dependency-light fallback).
+- `tests/test_versioning.py` — draft version history and redraft-with-feedback.
+- `tests/test_audit.py` — the approve/reject audit trail.
+- `tests/test_superdocs_client.py` — retry/backoff and idempotency headers.
+- `tests/test_generate_integration.py` — the full non-interactive CLI
+  pipeline against a mocked SuperDocs API, including resumable drafting,
+  the quality gate, and injection/consistency warnings.
+- `tests/test_review.py` — the human-review-gated flow.
+- `tests/test_review_store.py`, `tests/test_jobs.py` — the SQLAlchemy-backed
+  (SQLite or Postgres) review-session store and background job queue.
+- `tests/test_webapp.py` — the Flask layer end-to-end, including the
+  session-cookie ownership checks and the redraft flow.
 
 ## Architecture
 

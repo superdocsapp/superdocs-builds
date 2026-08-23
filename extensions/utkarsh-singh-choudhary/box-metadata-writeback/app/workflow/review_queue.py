@@ -21,13 +21,41 @@ DEFAULT_CONFIDENCE_THRESHOLD = 0.7
 
 
 class ReviewQueue:
-    def __init__(self, threshold: float = DEFAULT_CONFIDENCE_THRESHOLD) -> None:
+    """
+    threshold: the global default gate.
+    field_thresholds: optional per-field override, e.g.
+        {"contract_value": 0.85, "counterparty_name": 0.6}
+    A field not listed falls back to `threshold`. This lets a tenant
+    set a tighter bar on fields where being wrong is expensive
+    (money, legal terms) and a looser one where it isn't -- previously
+    a single global constant, per the round-2 writeup's own "not yet
+    built" list.
+    """
+
+    def __init__(
+        self,
+        threshold: float = DEFAULT_CONFIDENCE_THRESHOLD,
+        field_thresholds: Optional[dict[str, float]] = None,
+    ) -> None:
         self.threshold = threshold
+        self.field_thresholds = dict(field_thresholds or {})
         self._lock = threading.Lock()
         self._reviews: dict[str, PendingReview] = {}
 
+    def threshold_for(self, field_name: str) -> float:
+        return self.field_thresholds.get(field_name, self.threshold)
+
+    def requires_review(self, field_name: str, confidence: float) -> bool:
+        return confidence < self.threshold_for(field_name)
+
     def stage(
-        self, file_id: str, version_sha1: str, field_name: str, value: str, confidence: float
+        self,
+        file_id: str,
+        version_sha1: str,
+        field_name: str,
+        value: str,
+        confidence: float,
+        source_session_id: Optional[str] = None,
     ) -> PendingReview:
         review = PendingReview(
             review_id=f"rev-{uuid.uuid4().hex[:8]}",
@@ -37,6 +65,7 @@ class ReviewQueue:
             proposed_value=value,
             confidence=confidence,
             created_at=time.time(),
+            source_session_id=source_session_id,
         )
         with self._lock:
             self._reviews[review.review_id] = review

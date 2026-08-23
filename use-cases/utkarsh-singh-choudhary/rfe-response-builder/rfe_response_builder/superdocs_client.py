@@ -56,26 +56,34 @@ class SuperDocsClient:
         # takes down request capacity for every other user, not just this job.
         self.timeout_s = timeout_s
 
-    def _headers(self) -> dict[str, str]:
-        return {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+    def _headers(self, idempotency_key: str | None = None) -> dict[str, str]:
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
+        if idempotency_key:
+            # Passed through as a standard Idempotency-Key header so a
+            # retried call (either ours, after a timeout where we can't
+            # tell if the original request landed, or a client resuming a
+            # crashed run -- see generate.py's resumable drafting) can't
+            # double-draft or double-spend a SuperDocs operation if the
+            # API honors idempotency keys server-side. Harmless no-op if
+            # the API ignores unknown headers.
+            headers["Idempotency-Key"] = idempotency_key
+        return headers
 
-    # -- 1. draft / edit -----------------------------------------------------
-    def chat(self, session_id: str, message: str, document_html: str | None = None) -> ChatResult:
-        """Synchronous chat turn. Use for short single-turn drafting like
-        this build's letters. For long/HITL work, use chat_async instead.
-
-        Transient failures (429/5xx) are retried with exponential backoff
-        up to `max_retries` times before raising -- a single rate limit
-        blip or momentary 500 shouldn't be enough to mark an RFE item
-        NOT ANSWERED. Non-retryable errors (4xx other than 429) raise
-        immediately."""
-        payload: dict[str, Any] = {"session_id": session_id, "message": message}
-        if document_html is not None:
-            payload["document_html"] = document_html
-
+    def _request_with_retry(self, method: str, url: str, *, json_body: dict[str, Any] | None = None,
+                             idempotency_key: str | None = None) -> requests.Response:
+        """Single retry/backoff implementation shared by every endpoint on
+        this client. Previously only `chat()` retried transient (429/5xx)
+        failures -- `chat_async`, `get_job`, `approve_change`, and
+        `export` all made a single unretried request, so a momentary
+        blip on any of those endpoints surfaced as a hard failure instead
+        of the same graceful backoff `chat()` got. Non-retryable errors
+        (4xx other than 429) always raise immediately, same as before.
+        """
         attempt = 0
         while True:
-            resp = self.http.post(f"{self.base_url}/v1/chat", headers=self._headers(), json=payload, timeout=self.timeout_s)
+            resp = self.http.request(
+                method, url, headers=self._headers(idempotency_key), json=json_body, timeout=self.timeout_s,
+            )
             try:
                 self._raise_for_status(resp)
             except SuperDocsError as e:
@@ -84,37 +92,63 @@ class SuperDocsClient:
                     raise
                 delay = self.retry_backoff_s * (2 ** attempt)
                 logger.warning(
-                    "SuperDocs chat call failed (status=%s, attempt=%d/%d); retrying in %.1fs",
-                    e.status_code, attempt + 1, self.max_retries, delay,
+                    "SuperDocs %s %s failed (status=%s, attempt=%d/%d); retrying in %.1fs",
+                    method, url, e.status_code, attempt + 1, self.max_retries, delay,
                 )
                 time.sleep(delay)
                 attempt += 1
                 continue
+            return resp
 
-            data = resp.json()
-            changes = data.get("document_changes") or {}
-            return ChatResult(
-                session_id=session_id,
-                reply_text=data.get("response", data.get("message", "")),
-                updated_html=changes.get("updated_html"),
-                raw=data,
-            )
+    # -- 1. draft / edit -----------------------------------------------------
+    def chat(self, session_id: str, message: str, document_html: str | None = None,
+              idempotency_key: str | None = None) -> ChatResult:
+        """Synchronous chat turn. Use for short single-turn drafting like
+        this build's letters. For long/HITL work, use chat_async instead.
+
+        Transient failures (429/5xx) are retried with exponential backoff
+        up to `max_retries` times before raising -- a single rate limit
+        blip or momentary 500 shouldn't be enough to mark an RFE item
+        NOT ANSWERED. Non-retryable errors (4xx other than 429) raise
+        immediately.
+
+        `idempotency_key`, if passed, is forwarded as an `Idempotency-Key`
+        header -- pass a stable value derived from (session_id, request_id)
+        when resuming a previously-interrupted drafting run so a retried
+        turn can't double-draft the same section (see generate.py's
+        resumable `build_response_packet`).
+        """
+        payload: dict[str, Any] = {"session_id": session_id, "message": message}
+        if document_html is not None:
+            payload["document_html"] = document_html
+
+        resp = self._request_with_retry(
+            "POST", f"{self.base_url}/v1/chat", json_body=payload, idempotency_key=idempotency_key,
+        )
+        data = resp.json()
+        changes = data.get("document_changes") or {}
+        return ChatResult(
+            session_id=session_id,
+            reply_text=data.get("response", data.get("message", "")),
+            updated_html=changes.get("updated_html"),
+            raw=data,
+        )
 
     def chat_async(self, session_id: str, message: str, approval_mode: str | None = None,
-                    document_html: str | None = None) -> str:
+                    document_html: str | None = None, idempotency_key: str | None = None) -> str:
         """Start a long-running / HITL job. Returns job_id."""
         payload: dict[str, Any] = {"session_id": session_id, "message": message}
         if approval_mode:
             payload["approval_mode"] = approval_mode
         if document_html is not None:
             payload["document_html"] = document_html
-        resp = self.http.post(f"{self.base_url}/v1/chat/async", headers=self._headers(), json=payload, timeout=self.timeout_s)
-        self._raise_for_status(resp)
+        resp = self._request_with_retry(
+            "POST", f"{self.base_url}/v1/chat/async", json_body=payload, idempotency_key=idempotency_key,
+        )
         return resp.json()["job_id"]
 
     def get_job(self, job_id: str) -> dict[str, Any]:
-        resp = self.http.get(f"{self.base_url}/v1/jobs/{job_id}", headers=self._headers(), timeout=self.timeout_s)
-        self._raise_for_status(resp)
+        resp = self._request_with_retry("GET", f"{self.base_url}/v1/jobs/{job_id}")
         return resp.json()
 
     def wait_for_job(self, job_id: str, terminal_statuses=("completed", "failed", "cancelled", "awaiting_approval"),
@@ -139,11 +173,7 @@ class SuperDocsClient:
             payload["approved"] = approved
             if feedback:
                 payload["feedback"] = feedback
-        resp = self.http.post(
-            f"{self.base_url}/v1/chat/{session_id}/approve", headers=self._headers(),
-            json=payload, timeout=self.timeout_s,
-        )
-        self._raise_for_status(resp)
+        resp = self._request_with_retry("POST", f"{self.base_url}/v1/chat/{session_id}/approve", json_body=payload)
         return resp.json()
 
     # -- 3. export ------------------------------------------------------------
@@ -151,11 +181,7 @@ class SuperDocsClient:
         payload: dict[str, Any] = {"session_id": session_id, "format": fmt}
         if filename:
             payload["options"] = {"filename": filename}
-        resp = self.http.post(
-            f"{self.base_url}/v1/documents/export", headers=self._headers(),
-            json=payload, timeout=self.timeout_s,
-        )
-        self._raise_for_status(resp)
+        resp = self._request_with_retry("POST", f"{self.base_url}/v1/documents/export", json_body=payload)
         return resp.content
 
     # -- helpers --------------------------------------------------------------

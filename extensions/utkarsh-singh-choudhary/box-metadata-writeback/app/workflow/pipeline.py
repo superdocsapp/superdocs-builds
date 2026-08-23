@@ -26,10 +26,21 @@ from app.clients.box_client import BoxAPIError, BoxClient
 from app.clients.superdocs_client import SuperDocsAPIError, SuperDocsClient
 from app.models import DocClass, ExtractedFields, StageCost
 from app.workflow.checkpoint import CheckpointStore
+from app.workflow.calibration_tracker import CalibrationTracker
+from app.workflow.companion_doc import render_companion_docx
+from app.workflow.cost_tracker import CostTracker
+from app.workflow.near_duplicate import NearDuplicateDetector
 from app.workflow.history_store import MetadataHistoryStore
 from app.workflow.idempotency import IdempotencyStore
-from app.workflow.retry import DEFAULT_BASE_DELAY_SECONDS, DEFAULT_MAX_ATTEMPTS, call_with_retry
+from app.workflow.retry import (
+    DEFAULT_BASE_DELAY_SECONDS,
+    DEFAULT_MAX_ATTEMPTS,
+    CircuitBreaker,
+    CircuitOpenError,
+    call_with_retry,
+)
 from app.workflow.review_queue import ReviewQueue
+from app.workflow.dead_letter import DeadLetterQueue
 
 logger = logging.getLogger("box_metadata_writeback")
 
@@ -63,6 +74,9 @@ class RunReport:
     skipped_reason: Optional[str] = None
     history_entries: list[Any] = field(default_factory=list)
     queued_for_review: list[str] = field(default_factory=list)
+    calibration_mode: str = "none"  # "none" | "pairwise" | "ensemble" -- which mode produced this run
+    near_duplicate_of: Optional[str] = None  # file_id of the closest near-duplicate, if any
+    near_duplicate_similarity: Optional[float] = None
 
     @property
     def total_operations(self) -> int:
@@ -86,6 +100,10 @@ class BoxMetadataWritebackPipeline:
         max_retry_attempts: int = DEFAULT_MAX_ATTEMPTS,
         retry_base_delay: float = DEFAULT_BASE_DELAY_SECONDS,
         retry_sleep_fn=time.sleep,
+        circuit_breaker: Optional[CircuitBreaker] = None,
+        dead_letter: Optional[DeadLetterQueue] = None,
+        enable_calibration: bool = False,
+        ensemble_runs: int = 0,
     ) -> None:
         self.box = box
         self.superdocs = superdocs
@@ -97,6 +115,34 @@ class BoxMetadataWritebackPipeline:
         self.max_retry_attempts = max_retry_attempts
         self.retry_base_delay = retry_base_delay
         self.retry_sleep_fn = retry_sleep_fn
+        # One breaker per pipeline instance (== per tenant, since each
+        # tenant gets its own pipeline): a sustained SuperDocs outage
+        # trips it once and every subsequent file fails fast instead of
+        # each burning its own full per-file retry budget against a
+        # dependency that isn't coming back in the next few hundred ms.
+        self.circuit_breaker = circuit_breaker or CircuitBreaker()
+        self.dead_letter = dead_letter or DeadLetterQueue()
+        # Opt-in: doubles extract-stage SuperDocs operations per file in
+        # exchange for a calibrated (not just self-reported) confidence
+        # signal. See app/workflow/calibration.py's module docstring for
+        # the trade-off this makes explicit rather than forced.
+        self.enable_calibration = enable_calibration
+        # N-way extension of enable_calibration: instead of exactly one
+        # second opinion, runs `ensemble_runs` additional independent
+        # extraction passes and uses agreement FRACTION (not just
+        # binary match) as the confidence signal -- more precise, but
+        # scales SuperDocs operations linearly with this number.
+        # Mutually exclusive with enable_calibration (ensemble_runs > 0
+        # takes precedence if both are set, since it's a strict
+        # superset of what pairwise calibration does).
+        self.ensemble_runs = ensemble_runs
+        # Accumulates real approve/reject outcomes against original
+        # confidence, closing the loop calibration.py's one-shot
+        # dual-extraction signal can't -- see
+        # app/workflow/calibration_tracker.py's module docstring.
+        self.calibration_tracker = CalibrationTracker()
+        self.cost_tracker = CostTracker()
+        self.near_duplicate_detector = NearDuplicateDetector()
 
     def _chat(self, doc_id: str, instruction: str):
         """Every stage's SuperDocs chat() call goes through here so retry
@@ -105,18 +151,64 @@ class BoxMetadataWritebackPipeline:
         `.attempts` attribute set so the caller can report the real
         number of operations spent, including the failed attempts --
         a retried-then-failed stage costs more than 1 operation and the
-        cost report should say so, not hide it."""
-        retry_result = call_with_retry(
-            lambda: self.superdocs.chat(doc_id, instruction),
-            max_attempts=self.max_retry_attempts,
-            base_delay=self.retry_base_delay,
-            sleep_fn=self.retry_sleep_fn,
-        )
+        cost report should say so, not hide it.
+
+        The circuit breaker wraps the whole retry-with-backoff call, not
+        each individual attempt: a full per-file retry exhaustion counts
+        as one breaker failure, and a single success (even one that took
+        several attempts) resets it. If the breaker is already open,
+        CircuitOpenError is raised immediately -- no network call is
+        attempted at all."""
+        self.circuit_breaker.before_call()
+        try:
+            retry_result = call_with_retry(
+                lambda: self.superdocs.chat(doc_id, instruction),
+                max_attempts=self.max_retry_attempts,
+                base_delay=self.retry_base_delay,
+                sleep_fn=self.retry_sleep_fn,
+            )
+        except Exception:
+            self.circuit_breaker.record_failure()
+            raise
+        else:
+            self.circuit_breaker.record_success()
         return retry_result.value, retry_result.attempts
 
+    def _log_dead_letters(self, file_id: str, version_sha1: str, report: "RunReport") -> None:
+        """Any stage that ended 'failed' this run (retries exhausted, or
+        the circuit was open) gets a dead-letter entry -- called both on
+        early-return paths (classify/extract failures abort the run via
+        _commit_partial) and at the terminal success path, since a
+        companion/normalize failure doesn't abort the run but still
+        deserves an ops worklist entry."""
+        for s in report.stages:
+            if s.status == "failed":
+                self.dead_letter.add(
+                    file_id=file_id,
+                    version_sha1=version_sha1,
+                    stage=s.name,
+                    reason=s.detail,
+                    attempts=s.operations,
+                )
+
     def process(self, file_id: str) -> RunReport:
+        """Thin wrapper around _process_inner(): guarantees cost is
+        recorded exactly once per call, regardless of which of
+        _process_inner's several return points was hit (idempotent
+        no-op, partial failure, or full success) -- a run that failed
+        partway still spent real SuperDocs operations and its cost
+        should count toward the tenant's cost report."""
+        report = self._process_inner(file_id)
+        self.cost_tracker.record_run(report.calibration_mode, report.total_operations, report.total_latency_ms)
+        return report
+
+    def _process_inner(self, file_id: str) -> RunReport:
         version = self.box.get_file_version(file_id)
         report = RunReport(file_id=file_id, version_sha1=version.sha1)
+        report.calibration_mode = (
+            "ensemble" if self.ensemble_runs > 0 else ("pairwise" if self.enable_calibration else "none")
+        )
+        logger.info("run started file_id=%s version_sha1=%s", file_id, version.sha1)
 
         # --- idempotency: same bytes already processed -> honest no-op ---
         if self.idempotency.already_processed(file_id, version.sha1):
@@ -162,6 +254,25 @@ class BoxMetadataWritebackPipeline:
                 extracted = ExtractedFields()
 
             content = self.box.download_file(file_id)
+
+            # Near-duplicate check: informational only, never blocks
+            # processing (see near_duplicate.py's module docstring for
+            # why auto-skip would be the wrong call). Runs once per
+            # process() call, on the actual content bytes -- decoded
+            # best-effort the same way the accuracy layer's source
+            # grounding does.
+            source_text_for_dedup = content.decode("utf-8", errors="ignore") if content else ""
+            dup_match = self.near_duplicate_detector.check_and_register(file_id, source_text_for_dedup)
+            if dup_match:
+                report.near_duplicate_of = dup_match.file_id
+                report.near_duplicate_similarity = dup_match.similarity
+                logger.info(
+                    "near-duplicate detected file_id=%s similar_to=%s similarity=%.3f",
+                    file_id,
+                    dup_match.file_id,
+                    dup_match.similarity,
+                )
+
             # Only re-upload to SuperDocs if we're about to run at least
             # one live stage against it; a fully-resumed run (every stage
             # already checkpointed -- possible if the process died right
@@ -179,17 +290,21 @@ class BoxMetadataWritebackPipeline:
                 if report.stages[-1].status == "failed":
                     self._commit_partial(file_id, version.sha1, extracted, report)
                     self.checkpoint.clear(file_id, version.sha1)
+                    self._log_dead_letters(file_id, version.sha1, report)
                     return report
 
             # Stage: extract key terms
             if "extract" in resumed_stage_names:
                 self._replay_stage(existing_checkpoint, "extract", report)
             else:
-                extracted = self._run_stage_extract(doc_id, extracted, report, file_id, version.sha1)
+                extracted = self._run_stage_extract(
+                    doc_id, extracted, report, file_id, version.sha1, source_content=content
+                )
                 self._checkpoint_stage_if_done(file_id, version.sha1, "extract", report, extracted)
                 if report.stages[-1].status == "failed":
                     self._commit_partial(file_id, version.sha1, extracted, report)
                     self.checkpoint.clear(file_id, version.sha1)
+                    self._log_dead_letters(file_id, version.sha1, report)
                     return report
 
             # Stage: generate companion document (only meaningful for
@@ -232,6 +347,23 @@ class BoxMetadataWritebackPipeline:
             # version done. A partial/failed run (see the early returns
             # above) never reaches this line, so it stays retryable.
             self.idempotency.mark_completed(file_id, version.sha1)
+            # A run can reach here and still have one or more individual
+            # stages that exhausted retries or hit an open circuit --
+            # graceful degradation means the run still commits its
+            # honest partial state rather than crashing. But "committed
+            # with honest gaps" and "worth an operator's attention" are
+            # different things: log every such run to the dead-letter
+            # queue so it shows up on a real worklist instead of only
+            # being visible by reading extraction_notes on each file by
+            # hand.
+            self._log_dead_letters(file_id, version.sha1, report)
+            logger.info(
+                "run finished file_id=%s version_sha1=%s operations=%s failed_stages=%s",
+                file_id,
+                version.sha1,
+                report.total_operations,
+                [s.name for s in report.stages if s.status == "failed"],
+            )
             return report
         finally:
             self.idempotency.release(file_id)
@@ -299,6 +431,7 @@ class BoxMetadataWritebackPipeline:
             except ValueError:
                 extracted.doc_class = DocClass.UNKNOWN
             extracted.doc_class_confidence = float(change.get("confidence", 0.0))
+            extracted.field_session_ids["doc_class"] = result.session_id
             report.stages.append(
                 StageResult(
                     name="classify",
@@ -311,7 +444,7 @@ class BoxMetadataWritebackPipeline:
                     operations=attempts,
                 )
             )
-        except SuperDocsAPIError as e:
+        except (SuperDocsAPIError, CircuitOpenError) as e:
             # Graceful degradation: classification failure doesn't crash
             # the run, it honestly records doc_class as unknown and lets
             # a human see exactly why in the review stage.
@@ -337,15 +470,70 @@ class BoxMetadataWritebackPipeline:
         file_id: str,
         version_sha1: str,
         threshold: Optional[float] = None,
+        source_content: bytes = b"",
     ) -> ExtractedFields:
         t0 = time.monotonic()
-        threshold = self.review_queue.threshold if threshold is None else threshold
+        # `threshold` (if passed) is a caller override applied uniformly;
+        # otherwise each field is gated by the review queue's own
+        # per-field threshold (falls back to its global default), so a
+        # tenant can require a tighter bar on e.g. contract_value than
+        # counterparty_name without a policy engine.
         try:
             result, attempts = self._chat(doc_id, "Extract key terms from this document.")
             self.superdocs.approve(doc_id, result.session_id)
             change = result.proposed_change or {}
             fields = change.get("fields", {})
             confidences = change.get("field_confidence", {})
+
+            # Calibration (opt-in, see __init__): either a single second,
+            # independently phrased extraction pass (enable_calibration),
+            # or an N-way ensemble (ensemble_runs > 0) using agreement
+            # FRACTION across all runs as a more precise signal than a
+            # single binary match/mismatch. Either way, only the FIRST
+            # run's values are ever written anywhere; additional runs are
+            # validation signal only.
+            calibration_attempts = 0
+            if self.ensemble_runs > 0:
+                from app.workflow.calibration import calibrate_fields_ensemble
+
+                additional_runs_fields = []
+                for i in range(self.ensemble_runs):
+                    run_result, run_attempts = self._chat(
+                        doc_id,
+                        f"Extract key terms from this document again, independently re-checking your "
+                        f"work (ensemble pass {i + 1}).",
+                    )
+                    self.superdocs.approve(doc_id, run_result.session_id)
+                    calibration_attempts += run_attempts
+                    run_change = run_result.proposed_change or {}
+                    additional_runs_fields.append(run_change.get("fields", {}))
+                ensemble_calibrated = calibrate_fields_ensemble(fields, confidences, additional_runs_fields)
+                for field_name, c in ensemble_calibrated.items():
+                    confidences[field_name] = c.calibrated_confidence
+                    if c.agreement_fraction <= 0.5:
+                        extracted.extraction_notes += (
+                            f"ensemble calibration disagreement on {field_name}: only "
+                            f"{c.agreement_fraction:.0%} of {c.run_count} independent runs agreed "
+                            f"with the primary value {c.canonical_value!r}. "
+                        )
+            elif self.enable_calibration:
+                from app.workflow.calibration import calibrate_fields
+
+                second_result, calibration_attempts = self._chat(
+                    doc_id, "Extract key terms from this document again, independently re-checking your work."
+                )
+                self.superdocs.approve(doc_id, second_result.session_id)
+                second_change = second_result.proposed_change or {}
+                second_fields = second_change.get("fields", {})
+                calibrated = calibrate_fields(fields, confidences, second_fields)
+                for field_name, c in calibrated.items():
+                    confidences[field_name] = c.calibrated_confidence
+                    if not c.agreed:
+                        extracted.extraction_notes += (
+                            f"calibration disagreement on {field_name}: "
+                            f"first run={c.first_value!r} second run={c.second_value!r}. "
+                        )
+
             extracted.field_confidence.update(confidences)
 
             # Honesty over fabrication: only set what SuperDocs actually
@@ -353,11 +541,55 @@ class BoxMetadataWritebackPipeline:
             # metadata write step later renders as an explicit empty
             # field rather than a guessed one.
             #
+            # Accuracy layer: type/format validation, cross-field
+            # consistency, and source-grounding are applied on top of
+            # (never instead of) the model's self-reported confidence --
+            # see app/workflow/accuracy.py. A field that fails any of
+            # these is capped to VALIDATION_FAILURE_CEILING, guaranteeing
+            # it queues for review under any sane threshold, regardless
+            # of what confidence SuperDocs claimed.
+            from app.workflow.accuracy import (
+                check_cross_field_consistency,
+                check_source_grounding,
+                downgrade_confidence,
+                validate_field_types,
+            )
+
+            source_text = source_content.decode("utf-8", errors="ignore") if source_content else ""
+            type_results = validate_field_types(
+                fields.get("counterparty_name"),
+                fields.get("effective_date"),
+                fields.get("expiration_date"),
+                fields.get("contract_value"),
+            )
+            consistency = check_cross_field_consistency(
+                fields.get("effective_date"), fields.get("expiration_date")
+            )
+            accuracy_notes: list[str] = []
+            for key in ("counterparty_name", "effective_date", "expiration_date", "contract_value"):
+                if key not in fields or not fields[key]:
+                    continue
+                grounded = check_source_grounding(fields[key], source_text) if source_text else True
+                new_conf, notes = downgrade_confidence(
+                    key, confidences.get(key, 1.0), type_valid=type_results[key].valid, grounded=grounded
+                )
+                confidences[key] = new_conf
+                accuracy_notes.extend(notes)
+            if not consistency.valid:
+                # A logical contradiction between fields caps BOTH
+                # implicated fields, not just one -- the pair is what's
+                # wrong, not either field in isolation.
+                for key in ("effective_date", "expiration_date"):
+                    if key in confidences:
+                        confidences[key] = min(confidences[key], 0.3)
+                accuracy_notes.extend(consistency.reasons)
+
             # Fields returned WITH a value are further split by
-            # confidence: at/above threshold, they're set directly on
-            # extracted (same as before); below threshold, the value is
-            # held back and staged in the review queue instead -- it
-            # never reaches Box metadata until a human approves it.
+            # confidence (now accuracy-adjusted): at/above threshold,
+            # they're set directly on extracted (same as before); below
+            # threshold, the value is held back and staged in the review
+            # queue instead -- it never reaches Box metadata until a
+            # human approves it.
             populated, queued = [], []
             for key in (
                 "counterparty_name",
@@ -369,18 +601,23 @@ class BoxMetadataWritebackPipeline:
                     continue
                 value = fields[key]
                 conf = confidences.get(key, 1.0)
-                if conf >= threshold:
+                gate = threshold if threshold is not None else self.review_queue.threshold_for(key)
+                if conf >= gate:
                     setattr(extracted, key, value)
+                    extracted.field_session_ids[key] = result.session_id
                     populated.append(key)
                 else:
-                    review = self.review_queue.stage(file_id, version_sha1, key, value, conf)
+                    review = self.review_queue.stage(
+                        file_id, version_sha1, key, value, conf, source_session_id=result.session_id
+                    )
                     extracted.pending_review_ids.append(review.review_id)
+                    extracted.field_session_ids[key] = result.session_id
                     queued.append(f"{key} (conf={conf})")
 
             missing = {"counterparty_name", "effective_date", "expiration_date", "contract_value"} - set(
                 populated
             ) - {k.split(" ")[0] for k in queued}
-            notes = []
+            notes = list(accuracy_notes)
             if missing:
                 notes.append(f"source did not support: {', '.join(sorted(missing))}")
             if queued:
@@ -397,12 +634,13 @@ class BoxMetadataWritebackPipeline:
                     detail=(
                         f"populated={populated or 'none'} queued_for_review={queued or 'none'}"
                         + (f" (succeeded after {attempts} attempts)" if attempts > 1 else "")
+                        + (f" (calibrated, +{calibration_attempts} ops)" if calibration_attempts else "")
                     ),
                     latency_ms=(time.monotonic() - t0) * 1000,
-                    operations=attempts,
+                    operations=attempts + calibration_attempts,
                 )
             )
-        except SuperDocsAPIError as e:
+        except (SuperDocsAPIError, CircuitOpenError) as e:
             attempts = getattr(e, "attempts", 1)
             extracted.extraction_notes += f"extraction unavailable after {attempts} attempt(s): {e}. "
             report.stages.append(
@@ -425,7 +663,12 @@ class BoxMetadataWritebackPipeline:
             self.superdocs.approve(doc_id, result.session_id)
             change = result.proposed_change or {}
             companion_text = change.get("companion_text", "")
-            companion_bytes = companion_text.encode()
+            companion_bytes = render_companion_docx(
+                extracted,
+                companion_text,
+                source_filename=version.name,
+                generated_at_iso=time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            )
             # Deterministic, content-addressed filename: (file_id, sha1)
             # uniquely identifies "the companion for this exact source
             # version". Combined with upload_companion_document()'s
@@ -434,13 +677,14 @@ class BoxMetadataWritebackPipeline:
             # second companion on retry -- the retry finds the same
             # named file already there and reuses it instead of
             # creating companion-9002 alongside companion-9001.
-            companion_filename = f"{version.file_id}.{version.sha1}.companion.txt"
+            companion_filename = f"{version.file_id}.{version.sha1}.companion.docx"
             companion_file_id = self.box.upload_companion_document(
                 self.companion_folder_id,
                 companion_filename,
                 companion_bytes,
             )
             extracted.companion_document_id = companion_file_id
+            extracted.field_session_ids["companion_document_id"] = result.session_id
             report.stages.append(
                 StageResult(
                     name="generate_companion",
@@ -453,7 +697,7 @@ class BoxMetadataWritebackPipeline:
                     operations=attempts,
                 )
             )
-        except SuperDocsAPIError as e:
+        except (SuperDocsAPIError, CircuitOpenError) as e:
             attempts = getattr(e, "attempts", 1)
             extracted.extraction_notes += f"companion generation unavailable after {attempts} attempt(s): {e}. "
             report.stages.append(
@@ -476,7 +720,21 @@ class BoxMetadataWritebackPipeline:
             self.superdocs.approve(doc_id, result.session_id)
             self.superdocs.export(doc_id)  # exports don't cost operations; safe to always run
             extracted.normalized = True
-            extracted.retention_category = _retention_category_for(extracted.doc_class)
+            extracted.retention_category = retention_category_for_extraction(
+                extracted.doc_class, extracted.doc_class_confidence
+            )
+            if (
+                extracted.retention_category == "uncategorized-review"
+                and extracted.doc_class != DocClass.UNKNOWN
+                and extracted.doc_class_confidence < DOC_CLASS_CONFIDENCE_FLOOR
+            ):
+                extracted.extraction_notes += (
+                    f"classification confidence ({extracted.doc_class_confidence}) below "
+                    f"{DOC_CLASS_CONFIDENCE_FLOOR}; retention_category held to review fallback "
+                    f"rather than trusting doc_class={extracted.doc_class.value}. "
+                )
+            extracted.field_session_ids["normalized"] = result.session_id
+            extracted.field_session_ids["retention_category"] = result.session_id
             report.stages.append(
                 StageResult(
                     name="normalize",
@@ -489,7 +747,7 @@ class BoxMetadataWritebackPipeline:
                     operations=attempts,  # export itself is free per the docs; chat call(s) cost 1 each
                 )
             )
-        except SuperDocsAPIError as e:
+        except (SuperDocsAPIError, CircuitOpenError) as e:
             attempts = getattr(e, "attempts", 1)
             extracted.normalized = False
             extracted.extraction_notes += f"normalization unavailable after {attempts} attempt(s): {e}. "
@@ -547,7 +805,8 @@ class BoxMetadataWritebackPipeline:
         report.metadata_written = written
         report.extracted = extracted
         report.history_entries = self.history.record_diff(
-            file_id, sha1, written, reason="processed (partial: a stage failed)"
+            file_id, sha1, written, reason="processed (partial: a stage failed)",
+            session_ids=extracted.field_session_ids,
         )
 
     def _commit_final(
@@ -579,7 +838,7 @@ class BoxMetadataWritebackPipeline:
         report.metadata_written = written
         report.extracted = extracted
         report.history_entries = self.history.record_diff(
-            file_id, sha1, written, reason="processed"
+            file_id, sha1, written, reason="processed", session_ids=extracted.field_session_ids
         )
 
     def apply_review_decision(self, review_id: str, approve: bool) -> dict[str, Any]:
@@ -590,6 +849,10 @@ class BoxMetadataWritebackPipeline:
         written -- the value is simply discarded, and the metadata
         continues to honestly omit that field."""
         review = self.review_queue.decide(review_id, approve)
+        # Real outcome vs. original confidence -- recorded regardless of
+        # approve/reject, since a rejection is just as much calibration
+        # evidence as an approval.
+        self.calibration_tracker.record_outcome(review.field_name, review.confidence, approved=approve)
         if not approve:
             return {"review_id": review_id, "status": "rejected", "metadata_written": {}}
 
@@ -598,7 +861,11 @@ class BoxMetadataWritebackPipeline:
         written = self.box.update_metadata(review.file_id, METADATA_TEMPLATE_KEY, patch)
         merged = {**current, **patch}
         self.history.record_diff(
-            review.file_id, review.version_sha1, merged, reason="review approved"
+            review.file_id,
+            review.version_sha1,
+            merged,
+            reason="review approved",
+            session_ids={review.field_name: review.source_session_id},
         )
         return {"review_id": review_id, "status": "approved", "metadata_written": written}
 
@@ -613,3 +880,24 @@ def _retention_category_for(doc_class: DocClass) -> str:
         DocClass.UNKNOWN: "uncategorized-review",
     }
     return mapping.get(doc_class, "uncategorized-review")
+
+
+# A doc_class this uncertain shouldn't be trusted to pick a specific
+# retention schedule -- a shaky classification silently producing a
+# confident-looking "contracts-7yr" label is a worse outcome than
+# honestly falling back to a review category. Threshold intentionally
+# distinct from (and, for now, equal to) ReviewQueue's own default --
+# this governs retention_category specifically, not the field-level
+# review gate.
+DOC_CLASS_CONFIDENCE_FLOOR = 0.7
+
+
+def retention_category_for_extraction(doc_class: DocClass, doc_class_confidence: float) -> str:
+    """Confidence-weighted retention derivation: below the floor, the
+    classification itself is too uncertain to drive a specific
+    retention schedule, so this returns the same honest fallback used
+    for a genuinely unknown doc_class, regardless of what the
+    (low-confidence) classification actually said."""
+    if doc_class_confidence < DOC_CLASS_CONFIDENCE_FLOOR:
+        return "uncategorized-review"
+    return _retention_category_for(doc_class)

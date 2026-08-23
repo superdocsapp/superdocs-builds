@@ -95,6 +95,20 @@ def test_build_response_instruction_includes_new_evidence_note():
     assert "joint lease agreement" in instruction
 
 
+def test_build_response_instruction_includes_legal_framework_note_when_given():
+    req = RFERequest("1", "x")
+    instruction = build_response_instruction(req, None, legal_framework_note="8 CFR 214.2(h)(4)(iii)(A) applies.")
+    assert "8 CFR 214.2(h)(4)(iii)(A) applies." in instruction
+    # Must be framed as background context, not an instruction to quote it verbatim.
+    assert "do not quote this verbatim" in instruction.lower()
+
+
+def test_build_response_instruction_omits_framework_block_when_not_given():
+    req = RFERequest("1", "x")
+    instruction = build_response_instruction(req, None)
+    assert "Background context on the likely filing type" not in instruction
+
+
 def test_coverage_checklist_flags_unanswered_items():
     reqs = [RFERequest("1", "a"), RFERequest("2", "b"), RFERequest("3", "c")]
     matches = {"1": None, "2": None, "3": None}
@@ -359,4 +373,97 @@ def test_plan_response_only_computes_fuzzy_suggestions_when_strict_match_empty()
     ])
     _, petition_matches, _, _, fuzzy = plan_response(notice, petition, NewEvidenceCatalog())
     assert petition_matches["1"] == []
-    assert len(fuzzy["1"]) == 1
+    tier, matches = fuzzy["1"]
+    assert tier == "fuzzy"
+    assert len(matches) == 1
+
+
+def test_semantic_matches_catches_short_shared_tokens_below_keyword_floor():
+    pytest.importorskip("sklearn")
+    petition = PriorPetition(arguments=[
+        PetitionArgument(
+            "t1", "Corporate law corporate law tax law practice for a decade.",
+            "Petition Letter, p. 2",
+        ),
+    ])
+    # Both texts share the token "law" (3 chars) -- below this module's
+    # 4-char keyword floor, so it's invisible to both best_matches (exact)
+    # and fuzzy_matches (stemmed), but sklearn's default tokenizer keeps
+    # it, so TF-IDF cosine similarity picks it up. This is the realistic
+    # case semantic_matches helps with -- see its docstring for what it
+    # does and doesn't catch (it is NOT a true-synonym/embeddings match).
+    req = RFERequest("1", "The petitioner needs evidence the applicant has sufficient law background in tax law.")
+    assert petition.best_matches(req) == []
+    assert petition.fuzzy_matches(req) == []
+    sem = petition.semantic_matches(req)
+    assert len(sem) == 1
+    assert sem[0][0].source_ref == "Petition Letter, p. 2"
+    assert 0 < sem[0][1] <= 1
+
+
+def test_semantic_matches_accepts_injected_embedding_provider():
+    """A caller can inject any EmbeddingProvider (e.g. a real
+    APIEmbeddingProvider) instead of relying on the TF-IDF default --
+    proven here with a fake provider that reports perfect similarity
+    regardless of text, confirming semantic_matches actually calls
+    through to whatever provider it's given rather than hardcoding TF-IDF."""
+    from rfe_response_builder.embeddings import EmbeddingProvider
+
+    class _AlwaysSimilarProvider(EmbeddingProvider):
+        def similarities(self, query, candidates):
+            return [0.99] * len(candidates)
+
+    petition = PriorPetition(arguments=[
+        PetitionArgument("t1", "Completely unrelated text about baking bread.", "p. 9"),
+    ])
+    req = RFERequest("1", "The beneficiary's expertise in aeronautics.")
+    # TF-IDF default would find nothing here (zero shared vocabulary).
+    assert petition.semantic_matches(req) == []
+    # The injected provider reports high similarity regardless of content.
+    sem = petition.semantic_matches(req, provider=_AlwaysSimilarProvider())
+    assert len(sem) == 1
+    assert sem[0][1] == 0.99
+
+
+def test_semantic_matches_returns_empty_for_unrelated_text():
+    pytest.importorskip("sklearn")
+    petition = PriorPetition(arguments=[
+        PetitionArgument("t1", "A recipe for baking sourdough bread at home.", "p. 9"),
+    ])
+    req = RFERequest("1", "The beneficiary's specialized technical expertise in aerospace engineering.")
+    assert petition.semantic_matches(req) == []
+
+
+def test_unverified_suggestions_prefers_fuzzy_over_semantic():
+    petition = PriorPetition(arguments=[
+        PetitionArgument("t1", "Extensive specialized professional experience in this technical field.", "p. 1"),
+    ])
+    req = RFERequest("1", "The record does not show applicant is specializing in the occupation.")
+    tier, matches = petition.unverified_suggestions(req)
+    assert tier == "fuzzy"
+    assert len(matches) == 1
+
+
+def test_unverified_suggestions_falls_through_to_semantic_when_fuzzy_empty():
+    pytest.importorskip("sklearn")
+    petition = PriorPetition(arguments=[
+        PetitionArgument(
+            "t1", "Corporate law corporate law tax law practice for a decade.", "p. 2",
+        ),
+    ])
+    req = RFERequest("1", "The petitioner needs evidence the applicant has sufficient law background in tax law.")
+    assert petition.best_matches(req) == []
+    assert petition.fuzzy_matches(req) == []
+    tier, matches = petition.unverified_suggestions(req, top_n=2)
+    assert tier == "semantic"
+    assert len(matches) == 1
+
+
+def test_unverified_suggestions_returns_none_tier_when_nothing_found():
+    petition = PriorPetition(arguments=[
+        PetitionArgument("t1", "A recipe for baking sourdough bread at home.", "p. 9"),
+    ])
+    req = RFERequest("1", "The beneficiary's specialized technical expertise in aerospace engineering.")
+    tier, matches = petition.unverified_suggestions(req)
+    assert tier == "none"
+    assert matches == []

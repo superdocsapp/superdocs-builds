@@ -59,6 +59,96 @@ def test_start_review_returns_pending_items(client, petition, evidence_catalog):
     assert session.items[0].response_section == "Response to Item 1"
 
 
+def test_start_review_flags_ungrounded_facts_in_drafted_reply(client, petition, evidence_catalog):
+    """A reply containing a specific dollar figure and year that appear
+    nowhere in the notice, the matched petition argument, or the matched
+    evidence catalog should be flagged via DraftItem.ungrounded_facts --
+    this is the heuristic check for the drafting model inventing details
+    despite being told not to."""
+    fabricated_reply = (
+        "The beneficiary earned a bonus of $87,250 in 2011 for exceptional performance, "
+        "as demonstrated in the attached record."
+    )
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m, proposed_text=fabricated_reply)
+        session = start_review(client, "sess-2", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+    assert any(item.ungrounded_facts for item in session.items)
+    flagged = next(item for item in session.items if item.ungrounded_facts)
+    assert "$87,250" in flagged.ungrounded_facts
+    assert "2011" in flagged.ungrounded_facts
+
+
+def test_start_review_does_not_flag_grounded_reply(client, petition, evidence_catalog):
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m, proposed_text="A direct, well-supported response addressing the officer's concern.")
+        session = start_review(client, "sess-3", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+    assert all(item.ungrounded_facts == [] for item in session.items)
+
+
+def test_start_review_quality_gate_disabled_by_default(client, petition, evidence_catalog):
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        session = start_review(client, "sess-4", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+    # QUALITY_GATE_ENABLED is unset -- verdict stays "unknown" and no
+    # extra grading calls are made (only the header + 3 item turns, no
+    # grading turns -- see call count below).
+    assert all(item.quality_verdict == "unknown" for item in session.items)
+
+
+def test_start_review_quality_gate_flags_weak_draft_when_enabled(client, petition, evidence_catalog, monkeypatch):
+    monkeypatch.setenv("QUALITY_GATE_ENABLED", "1")
+
+    def chat_callback(request, context):
+        body = request.json()
+        if "-grading-" in body["session_id"]:
+            return {"response": '{"addresses_concern": false, "reasoning": "Restates the petition instead."}',
+                     "document_changes": {}}
+        return {"response": "ok", "document_changes": {}}
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json=chat_callback)
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-1"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-1",
+            json={"status": "awaiting_approval",
+                  "pending_changes": [{"chunk_id": "chunk-1",
+                                        "proposed_text": "Drafted response section addressing the concern."}]},
+        )
+        session = start_review(client, "sess-5", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+    assert all(item.quality_verdict == "weak" for item in session.items)
+    assert all(item.quality_reasoning == "Restates the petition instead." for item in session.items)
+
+
+def test_start_review_quality_gate_uses_separate_grading_session_per_item(client, petition, evidence_catalog, monkeypatch):
+    monkeypatch.setenv("QUALITY_GATE_ENABLED", "1")
+    seen_grading_sessions = []
+
+    def chat_callback(request, context):
+        body = request.json()
+        if "-grading-" in body["session_id"]:
+            seen_grading_sessions.append(body["session_id"])
+            return {"response": '{"addresses_concern": true, "reasoning": "Fine."}', "document_changes": {}}
+        return {"response": "ok", "document_changes": {}}
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json=chat_callback)
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-1"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-1",
+            json={"status": "awaiting_approval",
+                  "pending_changes": [{"chunk_id": "chunk-1", "proposed_text": "A drafted response."}]},
+        )
+        start_review(client, "sess-6", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+    # One distinct grading session per RFE item (3 items), none equal to
+    # the drafting session_id itself.
+    assert len(set(seen_grading_sessions)) == 3
+    assert all(s != "sess-6" for s in seen_grading_sessions)
+
+
 def test_finalize_review_approves_only_selected_items(client, petition, evidence_catalog, tmp_path):
     with requests_mock.Mocker() as m:
         _mock_pending_review(m)

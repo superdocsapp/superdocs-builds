@@ -13,3 +13,8 @@ requests>=2.31,<3.0
 # check to even run, so it belongs in the base requirements, not a
 # separate optional file a fresh clone might skip.
 boxsdk>=3.9,<4.0
+
+# Companion document rendering as real .docx (app/workflow/companion_doc.py)
+# instead of plain text, so what a reviewer downloads from Box actually
+# looks like a retention-approved document, not a .txt file.
+python-docx>=1.1,<2.0

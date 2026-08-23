@@ -48,6 +48,15 @@ class ExtractedFields(BaseModel):
     # entirely -- it's queued for a human, not discarded.
     field_confidence: dict[str, float] = Field(default_factory=dict)
 
+    # Provenance: which SuperDocs chat session produced each field's
+    # value, e.g. {"counterparty_name": "sess-a1b2c3d4"}. This is what
+    # lets the audit trail answer "prove where this number came from"
+    # with an actual traceable API call rather than just a timestamp --
+    # a regulated-industry reviewer's natural next question after "what
+    # changed" is "because of what," and a bare version_sha1 only
+    # answers "which document," not "which specific model response."
+    field_session_ids: dict[str, str] = Field(default_factory=dict)
+
     # Fields extracted with confidence below the review threshold are
     # removed from the fields above and staged here instead, keyed the
     # same way, so the metadata write only ever contains fields a human
@@ -71,6 +80,7 @@ class PendingReview(BaseModel):
     status: str = "pending"  # pending | approved | rejected
     created_at: float = 0.0
     decided_at: Optional[float] = None
+    source_session_id: Optional[str] = None  # SuperDocs chat session that produced proposed_value
 
 
 class MetadataChange(BaseModel):
@@ -88,6 +98,20 @@ class MetadataChange(BaseModel):
     version_sha1: str
     timestamp: float
     reason: str  # e.g. "initial extraction", "reprocessed: new version", "review approved"
+    source_session_id: Optional[str] = None  # SuperDocs chat session that produced new_value, if known
+
+    # Tamper-evidence: entry_hash = sha256(prev_hash + every other field
+    # on this entry). prev_hash is the entry_hash of the previous entry
+    # in this file's chain (or a fixed genesis value for the first
+    # entry). Recomputing entry_hash from the stored fields and
+    # comparing it against what's stored, entry by entry, proves
+    # whether anything in the chain was altered after the fact -- see
+    # app/workflow/hash_chain.py for the compute/verify functions. Both
+    # are None only for entries written before this feature existed
+    # (pre-migration rows); verify_chain treats those as an
+    # unverifiable prefix rather than a break.
+    entry_hash: Optional[str] = None
+    prev_hash: Optional[str] = None
 
 
 class StageCost(BaseModel):

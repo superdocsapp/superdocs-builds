@@ -11,8 +11,13 @@ All case data is synthetic. No real filings.
 """
 from __future__ import annotations
 
+import logging
 import re
 from dataclasses import dataclass, field
+
+from .embeddings import EmbeddingProvider, get_default_provider  # noqa: F401 (EmbeddingProvider used in type hints)
+
+logger = logging.getLogger(__name__)
 
 # --- 1. Parsing the officer's notice into discrete requests -----------------
 #
@@ -210,6 +215,84 @@ class PriorPetition:
         scored.sort(key=lambda pair: pair[0], reverse=True)
         return [(arg, round(conf, 2)) for conf, arg in scored[:top_n]]
 
+    def semantic_matches(self, request: RFERequest, top_n: int = 2,
+                          min_similarity: float = 0.12,
+                          provider: "EmbeddingProvider | None" = None) -> list[tuple[PetitionArgument, float]]:
+        """Third-tier fallback, tried ONLY when both `best_matches` (exact
+        keyword overlap) and `fuzzy_matches` (stemmed keyword overlap) find
+        nothing for this request.
+
+        `provider` (see `embeddings.py`) determines what "semantic" means
+        here. Defaults to `embeddings.get_default_provider()`, which is
+        the zero-cost, zero-network `TfidfEmbeddingProvider` UNLESS
+        `EMBEDDINGS_API_KEY` is set in the environment, in which case it's
+        a real embeddings-API provider instead.
+
+        Important honesty note that still applies to the DEFAULT
+        (TF-IDF) provider: it requires literal shared tokens between the
+        two texts to produce a nonzero score, so it does NOT connect true
+        zero-overlap synonyms like "expertise" and "experience" if
+        nothing else in the two texts overlaps either. What it DOES
+        catch, that `best_matches`/`fuzzy_matches` miss: (a) short but
+        meaningful shared tokens below this module's 4-character keyword
+        floor (e.g. "law", "R&D", "PhD"), and (b) documents that share a
+        handful of significant terms diluted across a lot of other text.
+        For genuine synonym-level connection with a real embeddings
+        model, configure `EMBEDDINGS_API_KEY` -- see `embeddings.py`'s
+        module docstring. Either way, if the provider itself fails
+        (missing scikit-learn, an embeddings-API outage), this degrades
+        to returning [] rather than raising, so the rest of the pipeline
+        (which has never depended on it) is unaffected.
+
+        Exactly like `fuzzy_matches`, results here are NEVER used as a
+        citation and NEVER fed into `build_response_instruction` -- they
+        surface only as an explicit "possible related argument, UNVERIFIED,
+        semantic-similarity-only" suggestion in the dry-run output and the
+        review UI, gated on a human confirming before it's ever cited.
+        Confidence is a similarity score (0-1), not a calibrated
+        probability, and is deliberately treated as noisier than
+        `fuzzy_matches`' Jaccard score -- a weaker, "worth a human's
+        eyes" signal, not a stronger one, regardless of which provider
+        produced it.
+        """
+        if not self.arguments:
+            return []
+        provider = provider or get_default_provider()
+        candidate_texts = [a.text for a in self.arguments]
+        sims = provider.similarities(request.text, candidate_texts)
+        if not sims:
+            return []
+
+        scored = [
+            (float(sim), arg)
+            for sim, arg in zip(sims, self.arguments)
+            if sim >= min_similarity
+        ]
+        scored.sort(key=lambda pair: pair[0], reverse=True)
+        return [(arg, round(sim, 2)) for sim, arg in scored[:top_n]]
+
+    def unverified_suggestions(self, request: RFERequest, top_n: int = 2,
+                                provider: "EmbeddingProvider | None" = None,
+                                ) -> tuple[str, list[tuple[PetitionArgument, float]]]:
+        """Single entry point for 'we found nothing exact, but here's an
+        unverified lead' -- tries `fuzzy_matches` (stemmed, higher trust)
+        first, and only falls through to `semantic_matches` (embeddings-
+        based, lower trust, catches true synonyms if a real provider is
+        configured) if fuzzy also found nothing. Returns (tier_name,
+        matches) where tier_name is one of "fuzzy", "semantic", or "none"
+        -- callers (dry-run output, review UI) use tier_name to label the
+        suggestion's trust level to the human reviewing it. Only called
+        by callers after `best_matches` already returned []; never itself
+        feeds a citation.
+        """
+        fuzzy = self.fuzzy_matches(request, top_n=top_n)
+        if fuzzy:
+            return "fuzzy", fuzzy
+        semantic = self.semantic_matches(request, top_n=top_n, provider=provider)
+        if semantic:
+            return "semantic", semantic
+        return "none", []
+
 
 # --- 3. New evidence needed --------------------------------------------------
 
@@ -245,12 +328,22 @@ class NewEvidenceCatalog:
 # --- 4. Response drafting instruction ----------------------------------------
 
 def build_response_instruction(request: RFERequest, prior_argument: PetitionArgument | None,
-                                new_evidence_note: str | None = None) -> str:
+                                new_evidence_note: str | None = None,
+                                legal_framework_note: str | None = None) -> str:
     """Builds the natural-language instruction sent to SuperDocs for ONE
     RFE request. Deliberately instructs the AI to engage the officer's
     specific concern rather than restate the petition -- the brief's own
     'what strong looks like' bar -- and to flag (never invent) new
-    evidence needed."""
+    evidence needed.
+
+    `legal_framework_note`, if given (see classify.py), is a short,
+    conservative regulatory-anchor note for the notice's classified
+    petition type (e.g. the 8 CFR provision an H-1B specialty-occupation
+    RFE would typically be analyzed under). It's framed to the drafting
+    model as background context to inform tone/structure, explicitly NOT
+    as a citation to insert verbatim -- the drafted text should still
+    only cite what's in the record, consistent with the "do not invent
+    citations" instruction below."""
     if prior_argument:
         prior_block = (
             f"The original petition already argued this point (see {prior_argument.source_ref}): "
@@ -266,12 +359,18 @@ def build_response_instruction(request: RFERequest, prior_argument: PetitionArgu
         )
 
     evidence_block = f" New evidence to reference: {new_evidence_note}." if new_evidence_note else ""
+    framework_block = (
+        f"\n\nBackground context on the likely filing type (for tone/structure only -- do not "
+        f"quote this verbatim or treat it as a citation to insert; only cite what's actually "
+        f"in the record): {legal_framework_note}"
+        if legal_framework_note else ""
+    )
 
     return (
         f"Draft a response section titled \"{response_section_heading(request.request_id)}\" "
         f"addressing this RFE request from the officer (item {request.request_id}): "
         f"\"{request.text}\"\n\n"
-        f"{prior_block}{evidence_block}\n\n"
+        f"{prior_block}{evidence_block}{framework_block}\n\n"
         f"Write it as a direct, specific response to the officer's stated concern -- "
         f"not a restatement of the original petition. Do not invent facts, evidence, "
         f"or citations that were not given to you above."

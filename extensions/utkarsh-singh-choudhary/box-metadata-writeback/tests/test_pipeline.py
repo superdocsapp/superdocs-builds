@@ -50,8 +50,17 @@ def test_happy_path_populates_metadata_and_generates_companion():
     assert "contract_value" not in md
     assert md["normalized"] is True
     assert "companion_document_id" in md
-    # companion doc genuinely exists in Box now
-    assert box.download_file(md["companion_document_id"]).startswith(b"COMPANION SUMMARY")
+    # companion doc genuinely exists in Box now, as a real .docx (not
+    # plain text) -- verify it opens and carries the generated content.
+    companion_bytes = box.download_file(md["companion_document_id"])
+    assert companion_bytes.startswith(b"PK")  # docx = a zip archive
+    import io as _io
+
+    from docx import Document as _Document
+
+    companion_doc = _Document(_io.BytesIO(companion_bytes))
+    full_text = "\n".join(p.text for p in companion_doc.paragraphs)
+    assert "COMPANION SUMMARY" in full_text
 
 
 def test_fields_the_document_does_not_state_are_left_empty_not_guessed():

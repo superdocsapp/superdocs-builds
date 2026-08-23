@@ -139,6 +139,8 @@ def _classify(content: str) -> tuple[str, float]:
         return "policy", 0.75
     if _has_word("agreement", lowered) or _has_word("contract", lowered):
         return "contract", 0.9
+    if _has_word("letter", lowered) or _has_word("memo", lowered) or "dear " in lowered or "regards," in lowered:
+        return "correspondence", 0.7
     return "unknown", 0.2
 
 

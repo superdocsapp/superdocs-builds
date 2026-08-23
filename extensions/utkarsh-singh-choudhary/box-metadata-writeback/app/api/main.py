@@ -25,7 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 
-from app.clients.box_client import verify_box_webhook_signature
+from app.clients.box_client import BoxAPIError, verify_box_webhook_signature
 from app.clients.fake_box_client import FakeBoxClient
 from app.tenancy import TenantContext, TenantRegistry
 from app.workflow.governance_simulator import compute_governance_outcome
@@ -66,6 +66,15 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 logger = logging.getLogger("box_workflow")
+
+# Structured JSON logging with a per-run trace_id, so every log line for
+# one file's processing (webhook receipt through final commit) can be
+# pulled together with one query. LOG_JSON=0 keeps the plain-text format
+# above for local dev if preferred.
+from app.logctx import configure_logging, set_trace_id  # noqa: E402
+
+if os.environ.get("LOG_JSON", "1") != "0":
+    configure_logging(level=os.environ.get("LOG_LEVEL", "INFO"), json_output=True)
 
 _ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
 
@@ -182,6 +191,9 @@ def _report_to_dict(report) -> dict[str, Any]:
         "queued_for_review": report.queued_for_review,
         "total_operations": report.total_operations,
         "total_latency_ms": round(report.total_latency_ms, 2),
+        "calibration_mode": report.calibration_mode,
+        "near_duplicate_of": report.near_duplicate_of,
+        "near_duplicate_similarity": report.near_duplicate_similarity,
     }
 
 
@@ -248,7 +260,15 @@ async def box_webhook(request: Request, tenant: str = "default") -> dict[str, An
         raise HTTPException(status_code=400, detail="missing source.id in webhook payload")
 
     ctx = _tenants.context_for(tenant)
-    report = ctx.pipeline.process(file_id)
+    set_trace_id()
+    try:
+        report = ctx.pipeline.process(file_id)
+    except BoxAPIError as e:
+        # Box sent us a webhook pointing at a file_id we can't actually
+        # reach (deleted between the event firing and us processing it,
+        # a permissions change, etc.) -- a clean 404 rather than a crash,
+        # so Box's own retry/backoff logic sees a real HTTP response.
+        raise HTTPException(status_code=404, detail=f"Box file not accessible: {e}")
     _record_run(ctx, file_id, report)
     return _report_to_dict(report)
 
@@ -268,23 +288,33 @@ def process_batch(req: BatchRequest, ctx: TenantContext = Depends(get_tenant_con
     results: dict[str, Any] = {}
 
     def run_one(file_id: str) -> tuple[str, Any]:
-        report = ctx.pipeline.process(file_id)
+        set_trace_id()  # each thread pool worker gets its own trace_id
+        try:
+            report = ctx.pipeline.process(file_id)
+        except BoxAPIError as e:
+            # One bad file_id in a batch of many must not crash the
+            # whole concurrent request -- every other file's future
+            # still completes normally; this one is reported as a
+            # per-file failure in the results dict instead.
+            return file_id, {"status": "failed", "error": f"Box file not accessible: {e}"}
         _record_run(ctx, file_id, report)
-        return file_id, report
+        return file_id, _report_to_dict(report)
 
     with ThreadPoolExecutor(max_workers=req.max_workers) as pool:
         futures = [pool.submit(run_one, fid) for fid in req.file_ids]
         for future in as_completed(futures):
-            file_id, report = future.result()
-            results[file_id] = _report_to_dict(report)
+            file_id, result = future.result()
+            results[file_id] = result
 
     processed = sum(1 for r in results.values() if r["status"] == "processed")
     skipped = sum(1 for r in results.values() if r["status"] == "skipped")
-    total_operations = sum(r["total_operations"] for r in results.values())
+    failed = sum(1 for r in results.values() if r["status"] == "failed")
+    total_operations = sum(r.get("total_operations", 0) for r in results.values())
     return {
         "batch_size": len(req.file_ids),
         "processed": processed,
         "skipped": skipped,
+        "failed": failed,
         "total_operations": total_operations,
         "results": results,
     }
@@ -295,7 +325,15 @@ def process_file(file_id: str, ctx: TenantContext = Depends(get_tenant_context))
     """Manual trigger, bypassing the webhook signature check -- used by
     the MCP tool and by demo/test scripts that don't have a live Box
     tenant sending real webhooks."""
-    report = ctx.pipeline.process(file_id)
+    set_trace_id()
+    try:
+        report = ctx.pipeline.process(file_id)
+    except BoxAPIError as e:
+        # Most common real cause: file_id doesn't exist in this tenant's
+        # Box account (or was deleted/moved out of reach). A clean 404
+        # beats an uncaught 500 -- the caller gave us a bad identifier,
+        # not something the server did wrong.
+        raise HTTPException(status_code=404, detail=f"Box file not accessible: {e}")
     _record_run(ctx, file_id, report)
     return _report_to_dict(report)
 
@@ -330,6 +368,94 @@ def reject_review(review_id: str, ctx: TenantContext = Depends(get_tenant_contex
         raise HTTPException(status_code=409, detail=str(e))
 
 
+@app.get("/dead-letters")
+def list_dead_letters(
+    file_id: str | None = None, ctx: TenantContext = Depends(get_tenant_context)
+) -> dict[str, Any]:
+    """Runs where at least one stage exhausted retries or hit an open
+    circuit -- the real ops worklist, versus reading extraction_notes on
+    each file by hand. Also reports whether SuperDocs currently looks
+    healthy for this tenant, since a wave of new entries usually means
+    the breaker just tripped."""
+    items = ctx.dead_letter.list_unresolved(file_id)
+    return {
+        "circuit_open": ctx.circuit_breaker.is_open,
+        "unresolved": [
+            {
+                "entry_id": e.entry_id,
+                "file_id": e.file_id,
+                "version_sha1": e.version_sha1,
+                "stage": e.stage,
+                "reason": e.reason,
+                "attempts": e.attempts,
+                "created_at": e.created_at,
+            }
+            for e in items
+        ],
+    }
+
+
+@app.post("/dead-letters/{entry_id}/resolve")
+def resolve_dead_letter(
+    entry_id: str, ctx: TenantContext = Depends(get_tenant_context)
+) -> dict[str, Any]:
+    """Marks an entry resolved -- e.g. after a manual reprocess trigger
+    or after confirming the underlying document just doesn't have the
+    field. Does not itself retrigger processing; call
+    POST /process/{file_id} for that."""
+    try:
+        entry = ctx.dead_letter.resolve(entry_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="unknown dead-letter entry_id")
+    return {"entry_id": entry.entry_id, "resolved": entry.resolved, "resolved_at": entry.resolved_at}
+
+
+@app.get("/calibration-report")
+def calibration_report(
+    field_name: str | None = None, ctx: TenantContext = Depends(get_tenant_context)
+) -> dict[str, Any]:
+    """Real calibration: for each (field, confidence-bucket), how often
+    a human actually approved the value unchanged, versus what the
+    bucket's own confidence midpoint would predict. A large negative
+    calibration_gap means this tenant's pipeline is systematically
+    over-confident for that field/bucket -- worth tightening
+    review_threshold or field_thresholds for it. Needs accumulated
+    review decisions to say anything meaningful; empty on a fresh
+    tenant."""
+    tracker = ctx.pipeline.calibration_tracker
+    return {
+        "buckets": tracker.bucket_report(field_name),
+        "worst_calibrated": tracker.worst_calibrated_fields() if field_name is None else None,
+    }
+
+
+@app.get("/calibration-report/suggest-thresholds")
+def suggest_thresholds(
+    target_approval_rate: float = 0.9, ctx: TenantContext = Depends(get_tenant_context)
+) -> dict[str, Any]:
+    """Suggests (never applies) a per-field confidence threshold based
+    on this tenant's accumulated real review decisions -- the lowest
+    confidence bucket whose real approval rate still meets
+    target_approval_rate. Applying it is a manual edit to this
+    tenant's field_thresholds in tenants config; this endpoint only
+    gives the evidence, since the risk/review-burden trade-off a
+    threshold represents is this tenant's policy call, not this
+    pipeline's to make."""
+    return ctx.pipeline.calibration_tracker.suggest_thresholds(target_approval_rate=target_approval_rate)
+
+
+@app.get("/cost-report")
+def cost_report(ctx: TenantContext = Depends(get_tenant_context)) -> dict[str, Any]:
+    """Real SuperDocs operations/latency spent per run, bucketed by
+    which calibration mode (none / pairwise / enable_calibration /
+    ensemble) produced the run, plus the REALIZED operations multiplier
+    of each calibrated mode versus this tenant's own 'none' baseline --
+    not the docstring's rough estimate. Answers 'is the accuracy
+    trade-off from turning on calibration actually worth it for our
+    document mix' with this tenant's own numbers."""
+    return ctx.pipeline.cost_tracker.report()
+
+
 @app.get("/files/{file_id}/history")
 def file_history(file_id: str, ctx: TenantContext = Depends(get_tenant_context)) -> dict[str, Any]:
     """The audit trail: every field that has ever changed value for this
@@ -338,6 +464,25 @@ def file_history(file_id: str, ctx: TenantContext = Depends(get_tenant_context))
     where you promise untouched' rather than just asserting it."""
     entries = ctx.history.get_history(file_id)
     return {"file_id": file_id, "changes": [e.model_dump() for e in entries]}
+
+
+@app.get("/files/{file_id}/history/verify")
+def verify_file_history(file_id: str, ctx: TenantContext = Depends(get_tenant_context)) -> dict[str, Any]:
+    """Recomputes the hash chain over this file's audit trail and reports
+    whether it's intact -- i.e. whether any entry was altered, deleted,
+    or reordered after being written. Not a substitute for real WORM
+    storage at scale (see README), but gives a regulator or auditor a
+    concrete, checkable answer to "has this been tampered with" rather
+    than just trusting the table."""
+    result = ctx.history.verify_history(file_id)
+    return {
+        "file_id": file_id,
+        "valid": result.valid,
+        "checked_count": result.checked_count,
+        "unverifiable_prefix_count": result.unverifiable_prefix_count,
+        "first_break_index": result.first_break_index,
+        "detail": result.detail,
+    }
 
 
 @app.get("/runs/{file_id}/cost")

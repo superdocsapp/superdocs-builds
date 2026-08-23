@@ -38,9 +38,11 @@ from app.storage.sqlite_backend import (
     SqliteReviewQueue,
 )
 from app.workflow.checkpoint import CheckpointStore
+from app.workflow.dead_letter import DeadLetterQueue
 from app.workflow.history_store import MetadataHistoryStore
 from app.workflow.idempotency import IdempotencyStore
 from app.workflow.pipeline import BoxMetadataWritebackPipeline
+from app.workflow.retry import CircuitBreaker
 from app.workflow.review_queue import ReviewQueue
 
 logger = logging.getLogger("box_workflow.tenancy")
@@ -64,6 +66,12 @@ class TenantConfig:
     box_enterprise_id: Optional[str] = None
     box_jwt_private_key: Optional[str] = None
     superdocs_api_key: Optional[str] = None
+    review_threshold: float = 0.7
+    # Per-field override, e.g. {"contract_value": 0.85}. A field not
+    # listed here falls back to review_threshold. Lets a tenant demand
+    # a tighter bar on fields where being wrong is expensive (money,
+    # legal terms) without a policy engine.
+    field_thresholds: dict = field(default_factory=dict)
 
     def __post_init__(self):
         if not _TENANT_ID_RE.match(self.tenant_id):
@@ -89,6 +97,8 @@ class TenantContext:
     pipeline: BoxMetadataWritebackPipeline
     review_queue: Any
     history: Any
+    dead_letter: DeadLetterQueue = field(default_factory=DeadLetterQueue)
+    circuit_breaker: CircuitBreaker = field(default_factory=CircuitBreaker)
     runs: dict = field(default_factory=dict)
     runs_lock: threading.Lock = field(default_factory=threading.Lock)
     metrics_lock: threading.Lock = field(default_factory=threading.Lock)
@@ -128,7 +138,12 @@ def _build_superdocs_client(cfg: TenantConfig) -> SuperDocsClient:
     return RealSuperDocsClient.from_env() or FakeSuperDocsClient()
 
 
-def _build_stores(tenant_id: str, db_dir: Optional[str]):
+def _build_stores(
+    tenant_id: str,
+    db_dir: Optional[str],
+    review_threshold: float = 0.7,
+    field_thresholds: Optional[dict] = None,
+):
     """Each tenant gets its own SQLite file (tenant-{id}.db under
     db_dir), not shared tables in one file -- a query bug that forgets a
     WHERE tenant_id = ? clause can leak across tables in a shared-schema
@@ -138,12 +153,17 @@ def _build_stores(tenant_id: str, db_dir: Optional[str]):
     and still fully isolated per tenant, just not durable -- same
     tradeoff as the pre-multi-tenancy single-tenant path."""
     if not db_dir:
-        return IdempotencyStore(), ReviewQueue(), MetadataHistoryStore(), CheckpointStore()
+        return (
+            IdempotencyStore(),
+            ReviewQueue(threshold=review_threshold, field_thresholds=field_thresholds),
+            MetadataHistoryStore(),
+            CheckpointStore(),
+        )
     os.makedirs(db_dir, exist_ok=True)
     db_path = os.path.join(db_dir, f"tenant-{tenant_id}.db")
     return (
         SqliteIdempotencyStore(db_path),
-        SqliteReviewQueue(db_path),
+        SqliteReviewQueue(db_path, threshold=review_threshold, field_thresholds=field_thresholds),
         SqliteHistoryStore(db_path),
         SqliteCheckpointStore(db_path),
     )
@@ -152,9 +172,23 @@ def _build_stores(tenant_id: str, db_dir: Optional[str]):
 def build_tenant_context(cfg: TenantConfig, db_dir: Optional[str]) -> TenantContext:
     box = _build_box_client(cfg)
     superdocs = _build_superdocs_client(cfg)
-    idempotency, review_queue, history, checkpoint = _build_stores(cfg.tenant_id, db_dir)
+    idempotency, review_queue, history, checkpoint = _build_stores(
+        cfg.tenant_id, db_dir, cfg.review_threshold, cfg.field_thresholds
+    )
+    dead_letter = DeadLetterQueue()
+    circuit_breaker = CircuitBreaker(
+        failure_threshold=int(os.environ.get("WORKFLOW_CIRCUIT_FAILURE_THRESHOLD", "5")),
+        reset_after_seconds=float(os.environ.get("WORKFLOW_CIRCUIT_RESET_SECONDS", "30")),
+    )
     pipeline = BoxMetadataWritebackPipeline(
-        box, superdocs, idempotency, review_queue=review_queue, history=history, checkpoint=checkpoint
+        box,
+        superdocs,
+        idempotency,
+        review_queue=review_queue,
+        history=history,
+        checkpoint=checkpoint,
+        circuit_breaker=circuit_breaker,
+        dead_letter=dead_letter,
     )
     return TenantContext(
         tenant_id=cfg.tenant_id,
@@ -163,6 +197,8 @@ def build_tenant_context(cfg: TenantConfig, db_dir: Optional[str]) -> TenantCont
         pipeline=pipeline,
         review_queue=review_queue,
         history=history,
+        dead_letter=dead_letter,
+        circuit_breaker=circuit_breaker,
     )
 
 

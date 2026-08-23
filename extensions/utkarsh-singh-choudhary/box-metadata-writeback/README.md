@@ -42,7 +42,7 @@ field-by-field audit trail (`empty → value`) for the same run.
 ```bash
 make bootstrap   # venv + deps + offline tests + starts the demo server
 # or, if you already have a venv active:
-make test        # 111/111 offline tests, no live key needed
+make test        # 290/290 offline tests, no live key needed
 make demo        # runs the pipeline directly against 3 seeded scenarios
 make mcp         # live MCP client <-> server probe over real stdio
 ```
@@ -227,16 +227,27 @@ Verified offline against the real API's published OpenAPI schema
 (`tests/test_real_superdocs_client.py`, 10 tests: upload payload shape,
 completed-without-approval flow, failed-job handling, the approve
 no-op-vs-real-call branch, export, the operations budget, and HTTP error
-surfacing) — 111/111 tests passing total. A true live end-to-end run
-against `api.superdocs.app` was not exercised from this sandbox: its
-network egress allowlist blocks that host (only npm/pypi/github-adjacent
-infra domains are reachable here), so `upload()` returns `403 Host not
-in allowlist` in this environment specifically. The client code, request
-bodies, and response parsing are built directly from SuperDocs'
-`/openapi.json` and docs — this is a real, complete implementation, just
-not live-run from this sandbox. Deployed anywhere with normal internet
-access and `SUPERDOCS_API_KEY` set, it talks to the real API with no
-further code change.
+surfacing). A true live end-to-end run against `api.superdocs.app` was
+not exercised from this sandbox: its network egress allowlist blocks
+that host (only npm/pypi/github-adjacent infra domains are reachable
+here), so `upload()` returns `403 Host not in allowlist` in this
+environment specifically. The client code, request bodies, and
+response parsing are built directly from SuperDocs' `/openapi.json`
+and docs — this is a real, complete implementation, just not live-run
+from this sandbox. Deployed anywhere with normal internet access and
+`SUPERDOCS_API_KEY` set, it talks to the real API with no further code
+change.
+
+**`live_integration_check.py`** (repo root) is a ready-to-run local
+harness for exactly this: run `export SUPERDOCS_API_KEY=sk_...` then
+`python live_integration_check.py` on a machine with real network
+access, and it exercises upload → classify → extract → generate
+companion → normalize against the real API (using an in-memory Box
+file by default, or a real Box file with `BOX_*` env vars set and
+`--file-id`), printing a stage-by-stage pass/fail table, extracted
+field values with confidence, dead-letter entries, and circuit-breaker
+state. It never reads its key from anywhere but the environment and
+has a hard-coded check refusing to print any string containing it.
 
 ## What it does
 
@@ -435,7 +446,7 @@ through round 2, this build only ever got as far as "metadata was
 written." Nothing showed it *doing* anything downstream, which means the
 card's central claim was asserted in a README sentence, not demonstrated.
 
-18. **`app/workflow/governance_simulator.py` + `GET
+20. **`app/workflow/governance_simulator.py` + `GET
     /files/{id}/governance-outcome`.** Reads exactly the metadata fields
     Box's own retention policies, search facets, and Relay workflows
     would read, and computes the same three classes of outcome Box
@@ -461,7 +472,7 @@ card's central claim was asserted in a README sentence, not demonstrated.
     `workflow_reasoning` are lists of plain-English citations, not just a
     verdict, because a reviewer should be able to check the logic, not
     just trust it. 8 dedicated tests, all passing.
-19. **`demo_scenario/` + `scripts/demo_scenario.py`.** One coherent
+21. **`demo_scenario/` + `scripts/demo_scenario.py`.** One coherent
     narrative instead of scattered per-test fixtures: Meridian Cold Chain
     Logistics, a synthetic mid-size regulated freight brokerage, with 5
     realistic documents — a master services agreement, an amendment to
@@ -477,7 +488,121 @@ card's central claim was asserted in a README sentence, not demonstrated.
     follows — `make demo-scenario` to run it.
     **This narrative caught a real bug**, documented below.
 
+## Round 3 additions (post-submission hardening pass)
+
+22. **Circuit breaker + dead-letter queue.** `app/workflow/retry.py`'s
+    `CircuitBreaker` trips after consecutive SuperDocs failures across
+    files (not just within one file's own retries) and fails fast —
+    no network call attempted — until a cooldown window passes, so a
+    real outage doesn't make every concurrent file burn its own full
+    retry budget against a dependency that isn't coming back in the
+    next few hundred ms. Any run left with a permanently-failed stage
+    lands in `app/workflow/dead_letter.py`'s queue — a real ops
+    worklist via `GET /dead-letters`, instead of only being visible by
+    reading `extraction_notes` file by file.
+23. **Structured JSON logging with a per-run trace ID.**
+    `app/logctx.py` threads one `trace_id` through every log line for
+    a run — webhook receipt through final commit — via a contextvar,
+    so concurrent runs' logs don't interleave into an unreadable mess
+    and one `jq` query pulls a single run's complete story.
+24. **Companion document as a real formatted `.docx`.**
+    `app/workflow/companion_doc.py` — title, an extracted-terms table
+    with confidence scores, extraction notes, generated content, and a
+    governance footer, superseding the earlier plain-text version (see
+    "What I cut" above).
+25. **OAuth hardening: PKCE, CSRF state, rotating refresh tokens.**
+    `app/mcp/oauth.py` adds RFC 7636 (S256) PKCE, a caller-supplied
+    `state` round-tripped through authorize→exchange for CSRF
+    detection, and single-use refresh tokens with theft detection
+    (reusing an already-rotated refresh token revokes every token for
+    that client, matching how a real IdP treats refresh-token reuse).
+26. **Confidence calibration: pairwise and N-way ensemble.**
+    `app/workflow/calibration.py` — `enable_calibration=True` runs
+    extraction twice with independently-phrased prompts and uses
+    agreement to correct the self-reported confidence before it gates
+    review; `ensemble_runs=N` extends this to N-way majority voting,
+    using agreement *fraction* (not just binary match) as a more
+    precise signal. Both opt-in, since either doubles-or-more the
+    extract stage's SuperDocs operations per file — a cost the tenant
+    should choose, not one imposed by default.
+27. **Accuracy layer: validation, consistency, and source grounding.**
+    `app/workflow/accuracy.py` applies three checks *on top of* (never
+    instead of) the model's self-reported confidence: type/format
+    validation (a `contract_value` that isn't parseable currency, a
+    date that isn't a real calendar date), cross-field consistency
+    (an `expiration_date` before `effective_date`), and source
+    grounding (does the extracted value's text actually appear in the
+    source document — the strongest available signal against
+    hallucination). Any failure force-caps confidence low enough to
+    guarantee human review, regardless of what the model claimed.
+    Proven with injection tests that fake a hallucinated value at 0.98
+    self-reported confidence and confirm it still gets blocked.
+28. **Golden-document regression suite.**
+    `tests/test_golden_documents.py` — a fixed set of hand-verified
+    documents run through the real pipeline end to end, diffed field
+    by field against known-correct expected output. Every other test
+    in this build proves a *mechanism* works; this is the one that
+    proves the pipeline's actual *output* stays correct as the code
+    evolves. It already caught one real gap (the fake client had no
+    code path producing `correspondence` classification) and the fix
+    went into the fake client itself, not just the test.
+29. **Real calibration tracking + threshold suggestions.**
+    `app/workflow/calibration_tracker.py` closes the loop the one-shot
+    dual-extraction signal (#26) can't: it buckets real approve/reject
+    outcomes by original confidence and computes an actual calibration
+    gap per field (`GET /calibration-report`) — "of everything we
+    scored 0.7–0.8, what fraction did a human actually approve
+    unchanged." `suggest_thresholds()` (`GET
+    /calibration-report/suggest-thresholds`) walks that evidence and
+    suggests, but never applies, a corrected per-field threshold — the
+    risk/review-burden trade-off stays the tenant's call.
+30. **Cost/latency dashboard per calibration mode.**
+    `app/workflow/cost_tracker.py` + `GET /cost-report` — real
+    SuperDocs operations and latency per run, bucketed by which
+    calibration mode produced it, with the *realized* operations
+    multiplier of each calibrated mode against this tenant's own
+    baseline (not a docstring estimate).
+31. **Near-duplicate detection across distinct files.**
+    `app/workflow/near_duplicate.py` uses shingled Jaccard similarity
+    to flag when a newly-processed document (under a *different*
+    file_id than idempotency already dedupes) is a near-duplicate of
+    one already processed — a re-upload under a new Box file ID, or a
+    trivial edit. Flags only, never blocks: an automatic skip would be
+    exactly the kind of guessing the governance principle in this
+    build argues against.
+32. **Tamper-evident, hash-chained audit trail.**
+    `app/workflow/hash_chain.py` — every `MetadataChange` entry's hash
+    covers every other field on the entry plus the previous entry's
+    hash, so altering, deleting, or reordering any past entry is
+    detectable via `GET /files/{id}/history/verify`, not just
+    theoretically preventable. Not a substitute for real WORM storage
+    at production scale, but makes tampering *detectable* with nothing
+    beyond what this build can run offline — tested against a
+    simulated direct-database-row edit, the actual threat model this
+    exists for.
+33. **Field-level provenance.** Every `MetadataChange` and
+    `PendingReview` now records `source_session_id` — the specific
+    SuperDocs chat session that produced that field's value — so "what
+    changed" also answers "because of what," survives review approval,
+    and persists across a SQLite restart.
+34. **Fixed an uncaught `BoxAPIError`.** `POST /process/{file_id}` (and
+    the webhook handler) with an unknown/inaccessible file_id
+    previously 500'd uncaught; now returns a clean 404. More
+    importantly, `POST /process/batch` previously let *one* bad
+    file_id crash the entire concurrent batch request via
+    `future.result()` re-raising — every other file's already-succeeded
+    result was lost with it. Fixed to catch per-file and report a
+    `"failed"` status for just that entry while the rest of the batch
+    completes normally.
+
 ## Architecture
+
+![Architecture diagram](architecture.png)
+
+*(Regenerate with `dot -Tpng architecture.dot -o architecture.png` after
+any pipeline-stage change — `architecture.dot` is the Graphviz source,
+kept in sync with the ASCII diagram below and the actual stage order in
+`app/workflow/pipeline.py`.)*
 
 ```
 Box webhook (or manual/MCP trigger, MCP now gated behind OAuth token)
@@ -541,51 +666,18 @@ so every call site downstream just gets a dict.
   constructs them, but there's no ngrok tunnel or registered Box app in
   this submission — that's infrastructure, not logic, and doesn't change
   what's actually being graded here.
-- **Companion document is a text file, not a formatted Word/PDF doc.**
-  The task card's "strong" bar is about metadata accuracy and governance
-  safety, not document formatting; a formatted companion doc is a
-  presentation-layer improvement, not a correctness one, so it was cut in
-  favor of finishing the governance/idempotency/concurrency guarantees
-  properly.
-- **No React review UI.** The human gate exists — every low-confidence
-  field genuinely stops at `ReviewQueue` and never reaches Box until a
-  human calls `POST /reviews/{id}/approve` or `.../reject` — but there is
-  no page to click through, only the API endpoint itself. The card's
-  "surfaces it touches" list names Review alongside API, search,
-  templates, export, but the brief separately states everything beyond
-  the four-call minimum contract is optional depth. A UI would be pure
-  presentation on top of a gate that already, provably, holds; that time
-  went into proving the gate holds under a compromised-model adversarial
-  case instead (see "Prompt-injection resistance").
-- **The OAuth flow is deliberately small.** No PKCE, no persistent token
-  storage, a single hardcoded demo client, no refresh tokens. The task
-  doc names this as an extra-credit surface SuperDocs hasn't built
-  themselves; the goal here was to demonstrate the actual mechanics
-  (code issuance → code-for-token exchange → expiry → enforcement at the
-  tool boundary) correctly and provably, not to ship a production
-  identity provider on top of an already-large task.
-- **Review-queue confidence threshold (0.7) is a single global constant,**
-  not configurable per field type or per enterprise policy. A real
-  deployment would likely want, say, a lower bar for `counterparty_name`
-  and a higher one for `contract_value` given what's actually at stake if
-  each is wrong; that's a policy question for the product, not an
-  engineering one, so a single well-reasoned default was chosen and left
-  easy to override (`ReviewQueue(threshold=...)`) rather than building
-  a policy engine nobody asked for.
-- **Confidence is self-reported by the model, not independently
-  calibrated.** In `real_superdocs_client.py`, the prompt asks the model
-  to include `"field_confidence": {...}` alongside its extraction — that
-  is a language model's own stated confidence, not a measured error rate
-  against ground truth, an ensemble agreement score, or anything
-  independently verified. Nothing here checks whether a field the model
-  called `0.9` confident is actually right 90% of the time more often
-  than a field it called `0.6` confident. The threshold gate is real and
-  does hold back low-stated-confidence fields from Box, but "self-reported
-  0.9" and "empirically 90% reliable" are different claims, and only the
-  first one is true of this build today. A genuine calibration signal —
-  e.g. running extraction twice per document and using inter-run
-  agreement as the confidence score instead of a single self-report —
-  would be the honest next step, not yet built.
+- **The OAuth flow is intentionally scoped down.** PKCE, CSRF `state`,
+  and rotating refresh tokens are implemented (`app/mcp/oauth.py`), but
+  there's no persistent (cross-restart) token storage and still one
+  hardcoded demo client rather than dynamic client registration — a
+  deliberate scope cut given the size of the rest of this task.
+- **Confidence calibration exists (dual-extraction agreement and N-way
+  ensemble voting, both in `app/workflow/calibration.py`, plus real
+  approve/reject outcome tracking in `calibration_tracker.py`) but none
+  of it is validated against a live model yet** — see "Real SuperDocs
+  integration" above. The threshold gate itself is real and holds
+  fields back correctly; what's unverified is whether "0.9 confident"
+  actually means "90% reliable" against real SuperDocs responses.
 - **SQLite, not Postgres, for persistence.** The task's own stack section
   calls for Postgres with vector search — appropriate for Task 1's
   register/brief/report system, which genuinely needs retrieval over a
@@ -726,7 +818,7 @@ endpoint wouldn't need this shim.
 
 ## Tests
 
-111/111 passing, offline, no live key:
+290/290 passing, offline, no live key:
 
 ```
 tests/test_pipeline.py            — 11 tests: happy path, honest empty
@@ -861,7 +953,7 @@ tests/test_stage_resumption.py    — 3 tests: a full run makes exactly
                                      own SuperDocs client.
 ```
 
-111/111 passing. Run with `make test`. `make demo-scenario` runs the full
+290/290 passing. Run with `make test`. `make demo-scenario` runs the full
 realistic narrative end to end outside pytest — 5 documents, a review
 approval, the audit trail, and the governance outcome for three
 different files under three different real-world conditions (a normal
