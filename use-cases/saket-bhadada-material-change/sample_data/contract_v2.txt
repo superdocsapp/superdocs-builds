@@ -1,0 +1,24 @@
+MASTER SERVICES AGREEMENT (MSA) — VERSION 2.0 (REVISED BY CLIENT)
+
+This Master Services Agreement ("Agreement") is entered into as of January 15, 2026, by and between Alpha Vendor Inc. ("Vendor") and Beta Enterprises LLC ("Client").
+
+1. SCOPE OF SERVICES
+Vendor shall provide custom software engineering and infrastructure management services as detailed in executed Statements of Work (SOWs), subject to strict service level agreements (SLAs) with fee withholding for any performance delays.
+
+2. FEES AND PAYMENT TERMS
+Client shall pay all invoices within sixty (60) days of receipt (Net 60). No late payment interest or penalties shall accrue during any dispute period or administrative review.
+
+3. LIMITATION OF LIABILITY
+Vendor's aggregate cumulative liability arising out of or related to this Agreement shall be capped at three times (3x) the total contract value or three times (3x) fees paid in the preceding twelve (12) months, whichever is greater. The limitation of liability does not apply to Vendor breaches of confidentiality, data protection, or indemnification obligations.
+
+4. INDEMNIFICATION
+Vendor shall defend, indemnify, and hold harmless Client, its affiliates, and their respective officers and employees from and against any and all claims, liabilities, losses, damages, and expenses (including attorney fees) arising from Vendor's performance, deliverables, or any breach of representations, warranties, or covenants, regardless of negligence or fault.
+
+5. INTELLECTUAL PROPERTY RIGHTS
+Client shall exclusively own all worldwide rights, title, and interest in and to all deliverables, custom code, documentation, and work product created under this Agreement. Vendor assigns all copyright and patent rights to Client upon creation.
+
+6. TERMINATION FOR CONVENIENCE
+Client may terminate this Agreement or any Statement of Work for convenience upon thirty (30) days prior written notice. Vendor may only terminate for cause following a sixty (60) day cure period.
+
+7. GOVERNING LAW AND JURISDICTION
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware. Any disputes shall be resolved exclusively in the state and federal courts located in Wilmington, Delaware.
