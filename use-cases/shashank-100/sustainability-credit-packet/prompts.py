@@ -153,86 +153,129 @@ Add only this section.""",
     ]
 
 
-def scorecard(score: registry.Scorecard) -> str:
-    """Write the cover sheet. Every figure is supplied, none is derived."""
+def scorecard_seed(score: registry.Scorecard) -> str:
+    """Create the cover with only its title block."""
+    return f"""Create a document containing only this heading and nothing else:
+
+LEED Certification Scorecard -- {score.project['name']}"""
+
+
+def scorecard_sections(score: registry.Scorecard) -> list[tuple[str, str]]:
+    """The cover sheet, one gated instruction per section."""
     rows = "\n".join(
-        f"- {c.id} | {c.name} | {c.category} | claimed {c.points_awarded} of "
+        f"- {c.id} | {c.name} | {c.category} | {c.points_awarded} claimed of "
         f"{c.result.points} earned | {c.status}"
         for c in score.credits
     )
-    shortfall = (
+    outstanding = [c for c in score.credits if c.status != registry.DOCUMENTED]
+    outstanding_lines = "\n".join(
+        f"- {c.id} {c.name}: {c.status}"
+        + (f", waiting on {', '.join(e.file for e in c.missing_evidence)}"
+           if c.missing_evidence else "")
+        for c in outstanding
+    ) or "- none"
+
+    gap = (
         f"{score.shortfall_to_target} points short of {score.target_level}"
-        if not score.meets_target
-        else f"meets {score.target_level}"
+        if not score.meets_target else f"meets {score.target_level}"
     )
-    return f"""{GUARDRAIL}
 
-Replace the entire contents of the open document with the scorecard cover
-sheet for a LEED certification submission. Edit the open document in place;
-do not create a new one.
+    return [
+        (
+            "summary",
+            f"""{GUARDRAIL}
 
-PROJECT
-- {score.project['name']}
-- Owner: {score.project['owner']}
-- Architect: {score.project['architect']}
-- {score.project['location']} -- {score.project['floor_area_sf']:,} sf
-- Rating system: {score.project['rating_system']}
+Append a section headed "Certification summary" to the open document. Do not
+repeat the document title.
 
-TOTALS, already computed -- reproduce exactly, do not re-add:
-- Points claimed: {score.points_awarded}
-- Points targeted: {score.points_targeted}
-- Points not currently claimable: {score.points_at_risk}
-- Certification level at this total: {score.level}
-- Target level: {score.target_level} -- {shortfall}
+Under that heading, produce a two-column table of exactly these rows, with the
+left column as the label and the right column as the value, reproducing every
+value exactly as written:
 
-CREDIT REGISTER:
+| Project | {score.project['name']} |
+| Owner | {score.project['owner']} |
+| Architect | {score.project['architect']} |
+| Location | {score.project['location']} |
+| Floor area | {score.project['floor_area_sf']:,} sf |
+| Rating system | {score.project['rating_system']} |
+| Points claimed | {score.points_awarded} |
+| Points targeted | {score.points_targeted} |
+| Points not currently claimable | {score.points_at_risk} |
+| Certification level | {score.level} |
+| Target level | {score.target_level} |
+
+Then one sentence below the table: the submission currently reaches
+{score.level} with {score.points_awarded} points claimed, and {gap}.
+
+Add only this heading, this table and that one sentence.""",
+        ),
+        (
+            "register",
+            f"""{GUARDRAIL}
+
+Append a section headed "Credit register" to the open document.
+
+Produce a table with columns Credit, Name, Category, Points claimed, Status.
+One row per entry below, in this exact order, reproducing every value as
+written.
+
 {rows}
 
-Produce:
+Add only this section.""",
+        ),
+        (
+            "outstanding",
+            f"""{GUARDRAIL}
 
-1. A title block with the project details above.
-2. "Certification summary" -- the totals above as a short table, then one
-   sentence stating the level reached and the gap to target.
-3. "Credit register" -- a table with columns Credit, Name, Category, Points
-   claimed, Status. One row per credit above, in the order given.
-4. "Outstanding items" -- a short list of credits not currently claimable and
-   what each is waiting on. If there are none, say so plainly.
+Append a section headed "Outstanding items" to the open document.
 
-Write only these sections. Do not add commentary or recommendations."""
+List the credits below that are not currently claimable and what each is
+waiting on. If the list says none, write one sentence saying every pursued
+credit is fully documented.
+
+{outstanding_lines}
+
+Add only this section.""",
+        ),
+    ]
 
 
-def propagate(credit: registry.Credit, score: registry.Scorecard,
-              old_status: str, new_status: str) -> str:
-    """One instruction updating both the narrative and the scorecard.
-
-    This is the card's headline mechanic. Both documents move in a single turn
-    so they cannot drift apart, and the changes come back as one batch for one
-    review decision.
-    """
+def propagate_scorecard(credit: registry.Credit, score: registry.Scorecard,
+                        new_status: str) -> str:
+    """Update the cover for a status change. Targeted at the scorecard only."""
     return f"""{GUARDRAIL}
 
-A credit's status has changed. Update both open documents so they agree.
+A credit's status has changed. Update this document to match, changing nothing
+else.
 
-CHANGE
-- Credit {credit.id} ({credit.name})
-- Status was: {old_status}
-- Status is now: {new_status}
-- Points this credit can now claim: {credit.points_awarded}
+In the credit register table, find the row for {credit.id} and set its Status
+cell to "{new_status}" and its Points claimed cell to {credit.points_awarded}.
 
-RECOMPUTED TOTALS, already calculated -- reproduce exactly:
+In the certification summary table, set these values exactly:
 - Points claimed: {score.points_awarded}
 - Points not currently claimable: {score.points_at_risk}
-- Certification level at this total: {score.level}
+- Certification level: {score.level}
 
-In the scorecard document:
-- Update the register row for {credit.id}: status and points claimed.
-- Update the certification summary totals to the figures above.
+Then update the sentence below the summary table to say the submission reaches
+{score.level} with {score.points_awarded} points claimed.
 
-In the {credit.id} narrative document:
-- Update the Status section to "{new_status}" with a one-sentence reason.
-- Adjust only sentences that assert the credit is documented or claimable.
-  Leave the credit narrative argument, the calculation figures and the
-  evidence index untouched.
+Change only those cells and that sentence. Leave every other row, every other
+credit and all remaining text exactly as it is."""
 
-Change only what the status change requires. Do not restate or reformat
-anything else in either document."""
+
+def propagate_narrative(credit: registry.Credit, old_status: str,
+                        new_status: str) -> str:
+    """Update one credit's narrative for a status change."""
+    return f"""{GUARDRAIL}
+
+The status of this credit has changed from {old_status} to {new_status}.
+
+In the Status section, replace the status sentence so it reads:
+
+The credit status is {new_status}.
+
+Keep or update the one following sentence so it explains why, consistent with
+the evidence index already in this document.
+
+Change only the Status section. Leave the credit narrative argument, the
+calculation figures and the evidence index exactly as they are."""

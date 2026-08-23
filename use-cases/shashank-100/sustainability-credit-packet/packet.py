@@ -90,6 +90,9 @@ class Packet:
         # Sections that produced no content even after a retry. Surfaced in
         # verify() rather than leaving a hole in the packet.
         self.empty_sections: list[str] = []
+        # The most recent propagation response, kept so the caller can read
+        # its job id when approving.
+        self.last_propagation: dict = {}
 
     # ------------------------------------------------------------- assembly
     def attach_sources(self, credit: registry.Credit) -> None:
@@ -116,6 +119,68 @@ class Packet:
                 continue
             self.sd.upload(prepared, self.session_id, open_mode="background")
 
+    def _run_section(self, label: str, instruction: str, *, approve: bool,
+                     key: str) -> list[client.Change]:
+        """Send one instruction and handle its gate. Returns its changes.
+
+        Retries once when a section produces nothing at all, because a silently
+        empty section is how a whole calculation went missing on an early run.
+        """
+        response = self.sd.chat_async(instruction, self.session_id, stage=label)
+        changes = self.sd.changes_from(response)
+
+        if response.get("status") != "awaiting_approval" and not changes:
+            response = self.sd.chat_async(
+                instruction, self.session_id, stage=f"{label}:retry"
+            )
+            changes = self.sd.changes_from(response)
+
+        if response.get("status") == "awaiting_approval":
+            self.gated += 1
+            if approve:
+                self.sd.approve(
+                    self.session_id,
+                    [{"change_id": c.change_id, "approved": True} for c in changes],
+                    job_id=response.get("job_id"),
+                )
+                self.sd.wait_until_idle(self.session_id)
+            else:
+                self.pending[key] = Pending(
+                    job_id=response.get("job_id") or "",
+                    session_id=self.session_id,
+                    changes=changes,
+                )
+        elif changes:
+            # Content landed without the gate engaging. Recorded, not glossed
+            # over. See docs/BUGS.md #1.
+            self.ungated.append(key)
+        else:
+            self.empty_sections.append(key)
+
+        return changes
+
+    def build_scorecard(self, *, approve: bool = False) -> Document:
+        """Build the cover sheet, one gated section at a time."""
+        self.sd.chat(
+            prompts.scorecard_seed(self.scorecard), self.session_id, stage="seed:scorecard"
+        )
+        parts: list[str] = []
+        for label, instruction in prompts.scorecard_sections(self.scorecard):
+            changes = self._run_section(
+                f"{label}:scorecard", instruction, approve=approve,
+                key=f"scorecard:{label}",
+            )
+            parts.extend(c.new_html for c in changes if c.new_html)
+
+        doc = Document(
+            key="scorecard",
+            title="Scorecard cover",
+            html="\n".join(parts),
+            session_id=self.session_id,
+        )
+        self.documents["scorecard"] = doc
+        return doc
+
     def build_narrative(self, credit: registry.Credit, *,
                         approve: bool = False) -> Document:
         """Build one credit's section, one gated instruction at a time.
@@ -133,51 +198,10 @@ class Packet:
 
         html_parts: list[str] = []
         for label, instruction in prompts.narrative_sections(credit, self.scorecard.project):
-            response = self.sd.chat_async(
-                instruction, self.session_id, stage=f"{label}:{credit.id}"
+            changes = self._run_section(
+                f"{label}:{credit.id}", instruction, approve=approve,
+                key=f"{credit.id}:{label}",
             )
-            changes = self.sd.changes_from(response)
-            job_id = response.get("job_id")
-
-            if response.get("status") == "awaiting_approval":
-                self.gated += 1
-                if approve:
-                    self.sd.approve(
-                        self.session_id,
-                        [{"change_id": c.change_id, "approved": True} for c in changes],
-                        job_id=job_id,
-                    )
-                    # Approving returns before the job finishes; the next
-                    # instruction would otherwise get a 409 session_busy.
-                    self.sd.wait_until_idle(self.session_id)
-                else:
-                    self.pending[f"{credit.id}:{label}"] = Pending(
-                        job_id=job_id or "", session_id=self.session_id, changes=changes
-                    )
-            elif response.get("status") == "completed" and changes:
-                # The gate did not engage but content was produced. Recorded
-                # rather than passed off as reviewed. See docs/BUGS.md #1.
-                self.ungated.append(f"{credit.id}:{label}")
-            else:
-                # No changes and no gate: the section produced nothing at all.
-                # Retried once, because a silently empty section is how the
-                # calculation went missing on the first real run.
-                retry = self.sd.chat_async(
-                    instruction, self.session_id, stage=f"{label}:{credit.id}:retry"
-                )
-                changes = self.sd.changes_from(retry)
-                if retry.get("status") == "awaiting_approval":
-                    self.gated += 1
-                    if approve:
-                        self.sd.approve(
-                            self.session_id,
-                            [{"change_id": c.change_id, "approved": True} for c in changes],
-                            job_id=retry.get("job_id"),
-                        )
-                        self.sd.wait_until_idle(self.session_id)
-                if not changes:
-                    self.empty_sections.append(f"{credit.id}:{label}")
-
             html_parts.extend(c.new_html for c in changes if c.new_html)
 
         doc = Document(
@@ -187,21 +211,6 @@ class Packet:
             session_id=self.session_id,
         )
         self.documents[credit.id] = doc
-        return doc
-
-    def build_scorecard(self) -> Document:
-        response = self.sd.chat(
-            prompts.scorecard(self.scorecard),
-            self.session_id,
-            stage="scorecard",
-        )
-        doc = Document(
-            key="scorecard",
-            title="Scorecard cover",
-            html=self._html_from(response),
-            session_id=self.session_id,
-        )
-        self.documents["scorecard"] = doc
         return doc
 
     def build(self, credit_ids: list[str] | None = None) -> dict[str, Document]:
@@ -227,11 +236,12 @@ class Packet:
         old_status = before.credit(credit_id).status
         after = registry.set_status(before, credit_id, new_status)
 
-        response = self.sd.chat(
+        response = self.sd.chat_async(
             prompts.propagate(after.credit(credit_id), after, old_status, new_status),
             self.session_id,
             stage=f"propagate:{credit_id}",
         )
+        self.last_propagation = response
         return after, self.sd.changes_from(response)
 
     def apply(self, scorecard: registry.Scorecard, decisions: list[dict],
