@@ -1,0 +1,45 @@
+# Secrets — never commit. See .env.example for the shape.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+token.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Node / frontend build output
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Swift build output
+audio-fetcher/.build/
+audio-fetcher/bin/
+
+# Benchmark artifacts
+benchmarks/exported.*
+benchmarks/*.docx
+benchmarks/*.pdf
+!benchmarks/firm-template*.docx
+
+# OS noise
+.DS_Store
+
+# Compiled Swift capture binary — built from audio-fetcher/src, never committed.
+# See README for the build command; a committed unsigned binary is also
+# quarantined by macOS Gatekeeper on download, so it helps nobody.
+audio-fetcher/build/
+
+# Decoded audio and run artifacts the benchmark harness produces
+*.mp3.wav
+benchmarks/last_result.json
+benchmarks/exported.*

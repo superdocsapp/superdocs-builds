@@ -1,0 +1,20 @@
+# zoom-app has no git of its own (it lives inside Task 1's frozen repo) —
+# `railway up`'s git-aware ignore can't be assumed to see Task 1's root
+# .gitignore from here, so this is explicit rather than relying on it.
+# The one rule that actually matters: never let .env leave this machine.
+
+.env
+.env.*
+!.env.example
+
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+frontend/node_modules/
+frontend/dist/
+
+*.log
+.DS_Store
+backend/smoke_export.html
