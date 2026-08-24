@@ -15,11 +15,7 @@ if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
-from clinical_pipeline import (
-    ClinicalPacketAssembler,
-    PatientDemographics,
-    SBARData,
-)
+from demo_patient import build_demo_assembler
 from packet_builder import ClinicalPDFPacketBuilder
 from superdocs_client import SuperDocsAPIClient
 
@@ -35,83 +31,13 @@ def run_full_clinical_workflow(use_live_superdocs_api: bool = True):
     else:
         print("[!] Running in offline zero-spend test mode (Mock LLM & Local ReportLab Engine).")
 
-    # 1. Initialize patient demographics
-    demo = PatientDemographics(
-        patient_id="patient-883921",
-        name="Eleanor Vance",
-        mrn="883921",
-        dob="1958-04-12",
-        age=68,
-        gender="Female",
-        admission_date="2026-08-10",
-        sending_unit="Medical ICU (Bed 14)",
-        receiving_unit="Step-Down Unit (Bed 202)",
-        attending_physician="Dr. Robert Chen, MD",
-        code_status="FULL CODE",
-    )
-    assembler = ClinicalPacketAssembler(demo)
-
-    # 2. Ingest SBAR Narrative with Citation Provenance
-    sbar = SBARData(
-        situation="68yo female recovering from acute hypoxemic respiratory failure secondary to severe community-acquired pneumonia [transfer_summary.pdf:p1].",
-        background="Admitted 5 days ago to MICU, intubated x 3 days, successfully extubated 48h ago [admission_hnp.pdf:p1]. PMHx: COPD, Type 2 DM, HTN.",
-        assessment="Afebrile, SpO2 96% on 2L nasal cannula. Lungs clear with faint bibasilar crackles. Alert and oriented x 4 [icu_progress_day5.pdf:p2].",
-        recommendation="Transfer to Step-Down unit. Wean O2 as tolerated. Complete 48h IV Ceftriaxone then switch to oral Cefpodoxime [provider_orders.pdf:p1].",
-    )
-    assembler.set_sbar(sbar)
-
-    # 3. Set Allergies
-    assembler.set_allergies(["Penicillin (Anaphylaxis)", "Sulfa drugs (Hives)"])
-
-    # 4. Conservative Medication Reconciliation
-    raw_medications = [
-        {
-            "name": "Heparin Sodium Infusion",
-            "generic": "heparin",
-            "dose": "18 units/kg/hr IV",
-            "route": "IV Continuous",
-            "frequency": "Continuous",
-            "indication": "DVT Prophylaxis / Therapeutic Anticoagulation",
-            "source_doc": "mar_day5.pdf",
-        },
-        {
-            "name": "Insulin Glargine (Lantus)",
-            "generic": "insulin glargine",
-            "dose": "20 units SubQ",
-            "route": "Subcutaneous",
-            "frequency": "Nightly at bedtime",
-            "indication": "Type 2 Diabetes Mellitus",
-            "source_doc": "mar_day5.pdf",
-        },
-        {
-            "name": "Ceftriaxone",
-            "generic": "ceftriaxone",
-            "dose": "1g IV",
-            "route": "Intravenous",
-            "frequency": "Every 24 hours",
-            "indication": "Severe Pneumonia",
-            "source_doc": "provider_orders.pdf",
-        },
-        {
-            "name": "Cefpodoxime",
-            "generic": "cefpodoxime",
-            "dose": "200mg Oral",
-            "route": "Oral",
-            "frequency": "Every 12 hours",
-            "indication": "Step-Down Oral Antibiotic Transition",
-            "source_doc": "discharge_plan.docx",
-        },
-    ]
-    assembler.set_medications(raw_medications)
-
-    # Add source certified documents for appendices
-    for i in range(1, 6):
-        assembler.add_source_document(
-            title=f"Certified Record Appendix 0{i}",
-            doc_type="EHR_EXTRACT",
-            date="2026-08-15",
-            content=f"Primary clinical record payload for appendix {i} of patient MRN 883921",
-        )
+    # 1-4. Ingest the demo patient chart (Eleanor Vance, MRN 883921).
+    # All SBAR citations, orders, pending labs, and mobility/isolation values
+    # are derived from the committed sample_patient_records/ files — the
+    # single source of truth lives in demo_patient.py.
+    assembler = build_demo_assembler()
+    demo = assembler.demographics
+    sbar = assembler.sbar
 
     print("\n[1] Clinical Patient Chart Ingested:")
     print(f"    • Patient: {demo.name} | MRN: {demo.mrn} | Sending: {demo.sending_unit} -> {demo.receiving_unit}")

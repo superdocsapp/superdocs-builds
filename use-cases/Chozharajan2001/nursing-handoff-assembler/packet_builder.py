@@ -89,6 +89,28 @@ class ClinicalPDFPacketBuilder:
             textColor=colors.HexColor("#15803d"),
         )
 
+    def _format_citation_line(self, citations: Optional[List[dict]]) -> str:
+        """Render an SBAR citation line strictly from structured citation data (T2-2 fix).
+
+        Honesty contract (B5): the PDF never prints a citation that was not
+        supplied in the SBARData citation lists. When a section carries no
+        citations, an explicit "none recorded" marker is rendered instead of a
+        fabricated source reference.
+        """
+        parts = []
+        for c in citations or []:
+            if not isinstance(c, dict):
+                continue
+            doc = c.get("doc") or c.get("document") or ""
+            page = c.get("page")
+            if doc and page is not None:
+                parts.append(f"{doc}:p{page}")
+            elif doc:
+                parts.append(str(doc))
+        if not parts:
+            return "<i>Citations: none recorded for this section.</i>"
+        return "<i>Citations: [" + ", ".join(parts) + "]</i>"
+
     def _build_header_table(self) -> Table:
         demo = self.assembler.demographics
         data = [
@@ -158,25 +180,25 @@ class ClinicalPDFPacketBuilder:
         # Situation
         story.append(Paragraph("<b>SITUATION:</b>", self.body_style))
         story.append(Paragraph(sbar.situation, self.body_style))
-        story.append(Paragraph("<i>Citations: [transfer_summary.pdf:p1, admission_hnp.pdf:p1]</i>", self.citation_style))
+        story.append(Paragraph(self._format_citation_line(sbar.situation_citations), self.citation_style))
         story.append(Spacer(1, 8))
 
         # Background
         story.append(Paragraph("<b>BACKGROUND & PAST MEDICAL HISTORY:</b>", self.body_style))
         story.append(Paragraph(sbar.background, self.body_style))
-        story.append(Paragraph("<i>Citations: [admission_hnp.pdf:p1, past_hx_chart.pdf:p2]</i>", self.citation_style))
+        story.append(Paragraph(self._format_citation_line(sbar.background_citations), self.citation_style))
         story.append(Spacer(1, 8))
 
         # Assessment
         story.append(Paragraph("<b>CLINICAL ASSESSMENT & CURRENT TRAJECTORY:</b>", self.body_style))
         story.append(Paragraph(sbar.assessment, self.body_style))
-        story.append(Paragraph("<i>Citations: [icu_progress_day5.pdf:p2, vitals_flowsheet.pdf:p1]</i>", self.citation_style))
+        story.append(Paragraph(self._format_citation_line(sbar.assessment_citations), self.citation_style))
         story.append(Spacer(1, 8))
 
         # Recommendation
         story.append(Paragraph("<b>RECOMMENDATIONS & STEP-DOWN PLAN:</b>", self.body_style))
         story.append(Paragraph(sbar.recommendation, self.body_style))
-        story.append(Paragraph("<i>Citations: [provider_orders.pdf:p1, transfer_plan.pdf:p1]</i>", self.citation_style))
+        story.append(Paragraph(self._format_citation_line(sbar.recommendation_citations), self.citation_style))
 
         # ==========================================
         # PAGE 2: Confirmed Allergies & Code Status Block
@@ -274,26 +296,51 @@ class ClinicalPDFPacketBuilder:
         story.append(Paragraph("4. ACTIVE PHYSICIAN ORDERS & PENDING DIAGNOSTICS", self.section_heading))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#1e3a8a"), spaceAfter=8))
 
-        orders_data = [[Paragraph("<b>ORDER ID</b>", self.body_style), Paragraph("<b>CLINICAL ORDER / TREATMENT</b>", self.body_style), Paragraph("<b>ORDERING PHYSICIAN</b>", self.body_style)]]
-        for ord_item in self.assembler.active_orders or [
-            {"id": "ORD-101", "desc": "Continuous pulse oximetry monitoring. Titrate O2 to SpO2 > 92%", "doc": "Dr. Chen"},
-            {"id": "ORD-102", "desc": "Chest Physical Therapy BID with incentive spirometer q1h while awake", "doc": "Dr. Chen"},
-            {"id": "ORD-103", "desc": "Diabetic diet with standard subcutaneous sliding scale insulin coverage", "doc": "Dr. Miller"},
-        ]:
-            orders_data.append([
-                Paragraph(ord_item["id"], self.body_style),
-                Paragraph(ord_item["desc"], self.body_style),
-                Paragraph(ord_item["doc"], self.body_style),
-            ])
-        t_orders = Table(orders_data, colWidths=[1.2 * inch, 4.5 * inch, 1.8 * inch])
-        t_orders.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
-            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
-            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-            ("TOPPADDING", (0, 0), (-1, -1), 4),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-        ]))
-        story.append(t_orders)
+        # T2-3 honesty fix: orders are rendered ONLY from real ingested data.
+        # When no active orders exist, the packet says so — it never invents
+        # ORD-101..103 fallback content.
+        if self.assembler.active_orders:
+            orders_data = [[Paragraph("<b>ORDER ID</b>", self.body_style), Paragraph("<b>CLINICAL ORDER / TREATMENT</b>", self.body_style), Paragraph("<b>ORDERING PHYSICIAN</b>", self.body_style)]]
+            for ord_item in self.assembler.active_orders:
+                orders_data.append([
+                    Paragraph(str(ord_item.get("id", "")), self.body_style),
+                    Paragraph(str(ord_item.get("desc", "")), self.body_style),
+                    Paragraph(str(ord_item.get("doc", "")), self.body_style),
+                ])
+            t_orders = Table(orders_data, colWidths=[1.2 * inch, 4.5 * inch, 1.8 * inch])
+            t_orders.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
+                ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+            ]))
+            story.append(t_orders)
+        else:
+            story.append(Paragraph(
+                "<b>No active physician orders recorded</b> in the ingested source documents. "
+                "Verify directly with the sending unit before transfer.",
+                self.warning_style,
+            ))
+        story.append(Spacer(1, 10))
+
+        # Pending diagnostics: rendered only from real pending_labs data.
+        story.append(Paragraph("<b>PENDING LABORATORY / DIAGNOSTIC STUDIES:</b>", self.body_style))
+        if self.assembler.pending_labs:
+            for lab_item in self.assembler.pending_labs:
+                test_name = str(lab_item.get("test", ""))
+                lab_status = str(lab_item.get("status", "PENDING"))
+                lab_source = str(lab_item.get("source", ""))
+                source_note = f" <i>[{lab_source}]</i>" if lab_source else ""
+                story.append(Paragraph(
+                    f"• <b>{test_name}</b> — {lab_status}{source_note}",
+                    self.body_style,
+                ))
+        else:
+            story.append(Paragraph(
+                "No pending laboratory or diagnostic studies recorded in the ingested source documents.",
+                self.citation_style,
+            ))
 
         # ==========================================
         # PAGE 5: Mobility, Fall Risk & Infection Control Precautions
@@ -304,62 +351,92 @@ class ClinicalPDFPacketBuilder:
         story.append(Paragraph("5. MOBILITY STATUS, FALL RISK & ISOLATION PRECAUTIONS", self.section_heading))
         story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#1e3a8a"), spaceAfter=8))
 
-        mob_data = [
-            [Paragraph("<b>ASSESSMENT CATEGORY</b>", self.body_style), Paragraph("<b>CLINICAL PARAMETER & INSTRUCTIONS</b>", self.body_style)],
-            [Paragraph("Mobility & Ambulation", self.body_style), Paragraph("Assist x 1 with rolling walker. Up in chair for all meals.", self.body_style)],
-            [Paragraph("Morse Fall Risk Score", self.body_style), Paragraph("Score: 55 (HIGH FALL RISK) • Bed alarm armed • Yellow non-skid socks", self.body_style)],
-            [Paragraph("Skin Integrity & Braden Score", self.body_style), Paragraph("Score: 17 (Mild Risk) • Stage 1 erythema over sacrum, skin barrier cream applied", self.body_style)],
-            [Paragraph("Infection Control & Isolation", self.body_style), Paragraph("STANDARD PRECAUTIONS • Contact precautions discontinued post-MRSA nasal swab negative", self.body_style)],
+        # T2-3 honesty fix: mobility / fall-risk / isolation rows are rendered
+        # ONLY from the assembler's mobility_isolation data (derived from the
+        # ingested records). Rows absent from the data are omitted; when no
+        # data exists at all the packet says so explicitly.
+        mob_labels = [
+            ("mobility", "Mobility & Ambulation"),
+            ("morse_fall_score", "Morse Fall Risk Score"),
+            ("braden_score", "Skin Integrity & Braden Score"),
+            ("isolation", "Infection Control & Isolation"),
         ]
-        t_mob = Table(mob_data, colWidths=[2.5 * inch, 5.0 * inch])
-        t_mob.setStyle(TableStyle([
-            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
-            ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
-            ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
-            ("TOPPADDING", (0, 0), (-1, -1), 5),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-        ]))
-        story.append(t_mob)
+        mob_source = self.assembler.mobility_isolation or {}
+        mob_rows = [
+            (label, str(mob_source[key]))
+            for key, label in mob_labels
+            if mob_source.get(key)
+        ]
+
+        if mob_rows:
+            mob_data = [
+                [Paragraph("<b>ASSESSMENT CATEGORY</b>", self.body_style), Paragraph("<b>CLINICAL PARAMETER & INSTRUCTIONS</b>", self.body_style)],
+            ]
+            for label, value in mob_rows:
+                mob_data.append([
+                    Paragraph(label, self.body_style),
+                    Paragraph(value, self.body_style),
+                ])
+            t_mob = Table(mob_data, colWidths=[2.5 * inch, 5.0 * inch])
+            t_mob.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e2e8f0")),
+                ("BOX", (0, 0), (-1, -1), 1, colors.HexColor("#cbd5e1")),
+                ("INNERGRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#e2e8f0")),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+            ]))
+            story.append(t_mob)
+        else:
+            story.append(Paragraph(
+                "<b>No mobility, fall-risk, or isolation assessments recorded</b> in the ingested "
+                "source documents. Complete the assessments with the sending unit before transfer.",
+                self.warning_style,
+            ))
 
         # ==========================================
         # PAGES 6 to 10: Appended Primary Clinical Notes
         # ==========================================
-        doc_titles = [
-            "Intensive Care Unit (MICU) Admission History & Physical (H&P)",
-            "Multidisciplinary ICU Daily Critical Care Progress Note (Day 5)",
-            "Electronic Medication Administration Record (eMAR) - 24-Hour Log",
-            "Physician Inter-Unit Transfer & Step-Down Provider Orders",
-            "Clinical Laboratory Hematology, Panels & ABG Diagnostic Report",
-        ]
-
+        # Honesty fix: an appendix slot without a real ingested document is
+        # labeled "not available" — no fabricated titles, payloads, or
+        # attestations of verification for content that does not exist.
         for idx in range(1, 6):
             story.append(PageBreak())
             story.append(self._build_header_table())
             story.append(Spacer(1, 10))
             story.append(Paragraph(f"APPENDIX {idx}: PRIMARY CLINICAL SOURCE RECORD (PAGE {5+idx}/10)", self.section_heading))
             story.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor("#1e3a8a"), spaceAfter=8))
-            
+
             src_doc = self.assembler.source_documents[idx-1] if idx-1 < len(self.assembler.source_documents) else None
-            title_text = src_doc.get("title") if (src_doc and src_doc.get("title")) else doc_titles[idx-1]
-            raw_content = src_doc.get("content", "") if src_doc else ""
-            
+
+            if not src_doc:
+                story.append(Paragraph("<b>DOCUMENT:</b> Source document not available", self.body_style))
+                story.append(Spacer(1, 6))
+                story.append(Paragraph(
+                    "No ingested source document exists for this appendix slot. Nothing is rendered "
+                    "here because no record could be verified.",
+                    self.citation_style,
+                ))
+                continue
+
+            title_text = src_doc.get("title") or "Untitled source document"
+            raw_content = src_doc.get("content", "")
+
             story.append(Paragraph(f"<b>DOCUMENT:</b> {title_text}", self.body_style))
-            story.append(Paragraph(f"<b>SOURCE ARCHIVE:</b> Certified Electronic Health Record Appendix 0{idx} • Verified Provenance", self.citation_style))
             story.append(Spacer(1, 6))
 
             if raw_content:
                 # Format clean readable excerpt
                 clean_lines = [line.strip() for line in raw_content.strip().split("\n") if line.strip()][:16]
                 formatted_body = "<br/>".join(clean_lines)
+                story.append(Paragraph(f"<font color='#334155'>{formatted_body}</font>", self.citation_style))
+                story.append(Spacer(1, 10))
+                story.append(Paragraph("<b>CERTIFIED ATTESTATION:</b> Verified authentic unredacted clinical record for inter-unit patient handoff.", self.citation_style))
             else:
-                formatted_body = (
-                    "Primary clinical record payload retrieved and verified from certified EHR database gateway. "
-                    "All data points referenced in SBAR narrative (Page 1) directly trace to this unredacted record."
-                )
-
-            story.append(Paragraph(f"<font color='#334155'>{formatted_body}</font>", self.citation_style))
-            story.append(Spacer(1, 10))
-            story.append(Paragraph("<b>CERTIFIED ATTESTATION:</b> Verified authentic unredacted clinical record for inter-unit patient handoff.", self.citation_style))
+                story.append(Paragraph(
+                    "Source document was ingested but no extractable content is available. "
+                    "No attestation is provided for this record.",
+                    self.citation_style,
+                ))
 
         # ==========================================
         # PAGE 11: Cryptographic Audit Trail & Ledger

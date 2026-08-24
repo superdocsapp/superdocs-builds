@@ -22,11 +22,8 @@ from pydantic import BaseModel, Field
 
 from clinical_pipeline import (
     ClinicalPacketAssembler,
-    PatientDemographics,
-    SBARData,
-    MedicationItem,
-    ConservativeMedReconciliationEngine,
 )
+from demo_patient import build_demo_assembler
 from packet_builder import ClinicalPDFPacketBuilder
 from superdocs_client import SuperDocsAPIClient
 import state_persistence
@@ -102,87 +99,13 @@ app.add_middleware(
 
 
 def init_default_assembler() -> ClinicalPacketAssembler:
-    demo = PatientDemographics(
-        patient_id="patient-883921",
-        name="Eleanor Vance",
-        mrn="883921",
-        dob="1958-04-12",
-        age=68,
-        gender="Female",
-        admission_date="2026-08-10",
-        sending_unit="Medical ICU (Bed 14)",
-        receiving_unit="Step-Down Unit (Bed 202)",
-        attending_physician="Dr. Robert Chen, MD",
-        code_status="FULL CODE",
-    )
-    sbar = SBARData(
-        situation="68yo female recovering from acute hypoxemic respiratory failure secondary to severe community-acquired pneumonia [transfer_summary.pdf:p1].",
-        background="Admitted 5 days ago to MICU, intubated x 3 days, successfully extubated 48h ago [admission_hnp.pdf:p1]. PMHx: COPD, Type 2 DM, HTN.",
-        assessment="Afebrile, SpO2 96% on 2L nasal cannula. Lungs clear with faint bibasilar crackles. Alert and oriented x 4 [icu_progress_day5.pdf:p2].",
-        recommendation="Transfer to Step-Down unit. Wean O2 as tolerated. Complete 48h IV Ceftriaxone then switch to oral Cefpodoxime [provider_orders.pdf:p1].",
-    )
-    inst = ClinicalPacketAssembler(demographics=demo)
-    inst.set_sbar(sbar)
-    inst.set_allergies(["Penicillin (Anaphylaxis)", "Sulfa Drugs (Rash)"])
+    """Seed the demo packet from the shared, record-grounded demo module.
 
-    raw_meds = [
-        {
-            "name": "Heparin Sodium Infusion",
-            "generic": "heparin",
-            "dose": "18 units/kg/hr IV",
-            "route": "IV Continuous",
-            "frequency": "Continuous",
-            "indication": "DVT Prophylaxis in high-risk ICU bedrest",
-            "source_doc": "active_mar.txt",
-        },
-        {
-            "name": "Insulin Glargine (Lantus)",
-            "generic": "insulin glargine",
-            "dose": "20 units SubQ",
-            "route": "Subcutaneous",
-            "frequency": "Nightly at 21:00",
-            "indication": "Type 2 Diabetes Mellitus",
-            "source_doc": "active_mar.txt",
-        },
-        {
-            "name": "Ceftriaxone Sodium",
-            "generic": "ceftriaxone",
-            "dose": "1g IV Piggyback",
-            "route": "Intravenous",
-            "frequency": "Every 24 hours",
-            "indication": "Community-Acquired Pneumonia",
-            "source_doc": "active_mar.txt",
-        },
-        {
-            "name": "Cefpodoxime Proxetil",
-            "generic": "cefpodoxime",
-            "dose": "200mg Oral",
-            "route": "Oral",
-            "frequency": "Every 12 hours",
-            "indication": "Step-Down Oral Transition",
-            "source_doc": "provider_orders.txt",
-        },
-    ]
-    inst.set_medications(raw_meds)
-
-    # Load 5 sample primary records if directory exists
-    if SAMPLE_DIR.exists():
-        for record_file in sorted(SAMPLE_DIR.glob("*.txt")):
-            inst.add_source_document(
-                title=f"Certified {record_file.stem.upper()}",
-                doc_type="EHR_RECORD",
-                date="2026-08-15",
-                content=record_file.read_text(encoding="utf-8"),
-            )
-    else:
-        for i in range(1, 6):
-            inst.add_source_document(
-                title=f"Certified Record Appendix 0{i}",
-                doc_type="EHR_EXTRACT",
-                date="2026-08-15",
-                content=f"Primary clinical record payload for appendix {i} of patient MRN 883921",
-            )
-    return inst
+    All SBAR citations, orders, pending labs, and mobility/isolation values are
+    derived from the committed sample_patient_records/ files (see demo_patient.py)
+    — the server never carries its own copy of the demo clinical content.
+    """
+    return build_demo_assembler(SAMPLE_DIR)
 
 
 # Request/Response Models

@@ -265,6 +265,103 @@ def test_gate_state_survives_restart(tmp_path):
     assert revived.generate_audit_digest() == inst.generate_audit_digest()
 
 
+def test_pdf_sbar_citations_rendered_from_data_not_hardcoded(assembler):
+    """T2-2 remediation proof: PDF citations come from SBARData citation lists.
+
+    The former builder printed hardcoded citation strings referencing documents
+    that were never consulted (past_hx_chart.pdf, vitals_flowsheet.pdf,
+    transfer_plan.pdf). The fixed builder must render ONLY citations supplied
+    in the structured citation fields — and nothing invented.
+    """
+    import reportlab.rl_config
+
+    # Unique citation targets that exist nowhere in the old hardcoded strings.
+    assembler.sbar.situation_citations = [{"doc": "unique_source_alpha.txt", "page": 3}]
+    assembler.sbar.background_citations = []
+    assembler.sbar.assessment_citations = [{"doc": "unique_source_beta.txt", "page": 1}]
+    assembler.sbar.recommendation_citations = [{"doc": "unique_source_gamma.txt", "page": 2}]
+
+    # Unlock gates so the PDF can be generated
+    assembler.confirm_allergy_gate("RN Test", "RN-T1")
+    assembler.confirm_code_status_gate("RN Test", "RN-T1")
+    assembler.confirm_high_risk_meds_gate("RN Test", "RN-T1", "RN Two", "RN-T2")
+
+    old_compression = reportlab.rl_config.pageCompression
+    reportlab.rl_config.pageCompression = 0
+    try:
+        pdf_bytes = ClinicalPDFPacketBuilder(assembler).generate_pdf_bytes()
+    finally:
+        reportlab.rl_config.pageCompression = old_compression
+
+    # Structured citations ARE rendered (doc + page)
+    assert b"unique_source_alpha.txt:p3" in pdf_bytes
+    assert b"unique_source_beta.txt:p1" in pdf_bytes
+    assert b"unique_source_gamma.txt:p2" in pdf_bytes
+
+    # The old fabricated citation sources must NOT appear anywhere.
+    # NOTE: transfer_summary.pdf is intentionally NOT in this list — the
+    # fixture's own SBAR narrative text carries that inline tag, and the
+    # builder honestly renders narrative text it is given. The three sources
+    # below existed ONLY in the old hardcoded citation rows.
+    for fabricated in (
+        b"past_hx_chart.pdf",
+        b"vitals_flowsheet.pdf",
+        b"transfer_plan.pdf",
+    ):
+        assert fabricated not in pdf_bytes, f"Fabricated citation source leaked into PDF: {fabricated!r}"
+
+    # Empty citation list renders the honest marker, not invented sources
+    assert b"none recorded for this section" in pdf_bytes
+
+
+def test_pdf_honest_empty_states_when_no_orders_or_mobility():
+    """T2-3 remediation proof: no invented orders/mobility content in the PDF.
+
+    With empty active_orders and empty mobility_isolation the packet must say
+    so explicitly — the former builder invented ORD-101..103 orders and a
+    hardcoded mobility/Braden/isolation table.
+    """
+    import reportlab.rl_config
+
+    demo = PatientDemographics(
+        patient_id="patient-empty",
+        name="Empty State Patient",
+        mrn="000001",
+        dob="1970-01-01",
+        age=56,
+        gender="Male",
+        admission_date="2026-08-20",
+        sending_unit="Unit A",
+        receiving_unit="Unit B",
+        attending_physician="Dr. Test",
+        code_status="FULL CODE",
+    )
+    inst = ClinicalPacketAssembler(demographics=demo)
+    inst.set_sbar(SBARData(situation="s", background="b", assessment="a", recommendation="r"))
+    inst.set_medications([])
+    # Deliberately NO orders, NO pending labs, NO mobility data.
+
+    inst.confirm_allergy_gate("RN Test", "RN-T1")
+    inst.confirm_code_status_gate("RN Test", "RN-T1")
+    inst.confirm_high_risk_meds_gate("RN Test", "RN-T1", "RN Two", "RN-T2")
+
+    old_compression = reportlab.rl_config.pageCompression
+    reportlab.rl_config.pageCompression = 0
+    try:
+        pdf_bytes = ClinicalPDFPacketBuilder(inst).generate_pdf_bytes()
+    finally:
+        reportlab.rl_config.pageCompression = old_compression
+
+    # Honest empty states are present
+    assert b"No active physician orders recorded" in pdf_bytes
+    assert b"No pending laboratory or diagnostic studies recorded" in pdf_bytes
+    assert b"No mobility, fall-risk, or isolation assessments recorded" in pdf_bytes
+
+    # Invented content from the old fallbacks is gone
+    for fabricated in (b"ORD-101", b"ORD-102", b"ORD-103", b"Braden", b"MRSA"):
+        assert fabricated not in pdf_bytes, f"Invented content leaked into PDF: {fabricated!r}"
+
+
 def test_drug_matching_word_boundary():
     """High-alert drug matching must use word boundaries — 'insulinoma' must NOT match 'insulin'."""
     from clinical_pipeline import ConservativeMedReconciliationEngine

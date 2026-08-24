@@ -60,7 +60,7 @@ This application implements the complete **SuperDocs 4-Call Contract** (`docs.su
 
 ### Prerequisites
 - Python 3.10+
-- `pip install reportlab pytest requests`
+- `pip install -r requirements.txt`
 
 ### Environment Configuration (Optional)
 If connecting to the live SuperDocs API:
