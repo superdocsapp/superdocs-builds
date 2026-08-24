@@ -24,9 +24,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from app.config import get_settings
-from app.integrations.superdocs.client import SuperDocsClient
-from app.integrations.superdocs.exceptions import SuperDocsError
+from app.config import get_settings  # noqa: E402
+from app.integrations.superdocs.client import SuperDocsClient  # noqa: E402
+from app.integrations.superdocs.exceptions import SuperDocsError  # noqa: E402
 
 _PLACEHOLDER_KEYS = {
     "",

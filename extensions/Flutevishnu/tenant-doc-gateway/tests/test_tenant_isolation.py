@@ -1,12 +1,11 @@
-"""TENANT ISOLATION PROOF.
+"""Tenant Isolation Verification Suite.
 
-These tests actively TRY to cross the tenant boundary and assert failure. This is
-the bar from the brief: isolation demonstrated by an attack that fails, not by
-prose asserting "we scope by tenant_id".
+These tests actively attempt to cross the tenant boundary to assert failure.
+Isolation is demonstrated by simulated attacks that verify the boundaries.
 
 Contract under test — the service must NEVER:
 - return, edit, export, or reveal the existence of another tenant's document/job.
-Cross-tenant access returns 404 (not 403) so there is no existence oracle.
+Cross-tenant access returns 404 (not 403) to prevent existence oracles.
 """
 
 from __future__ import annotations

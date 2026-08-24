@@ -20,4 +20,4 @@ class WorkerSettings:
     redis_settings = RedisSettings.from_dsn(get_settings().redis_url)
     # Bound concurrency so a burst of jobs can't exhaust upstream rate limits.
     max_jobs = 10
-    job_timeout = 60 * 10  # 10 minutes; long ops are expected per the brief.
+    job_timeout = 60 * 10  # 10 minutes; long ops are expected upstream.

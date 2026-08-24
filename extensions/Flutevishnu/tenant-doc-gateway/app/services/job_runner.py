@@ -38,7 +38,7 @@ _log = get_logger("job_runner")
 
 _TERMINAL_UPSTREAM = {"completed", "failed"}
 _POLL_INTERVAL_SECONDS = 2.0
-_MAX_POLLS = 150  # ~5 minutes; long ops are expected (brief), so poll patiently.
+_MAX_POLLS = 150  # ~5 minutes; long operations are expected, so poll patiently.
 
 
 async def run_job(

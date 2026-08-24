@@ -7,7 +7,8 @@ we never reveal whether a key merely exists.
 
 from __future__ import annotations
 
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Security, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.context import TenantContext
@@ -24,20 +25,20 @@ _UNAUTHORIZED = HTTPException(
 )
 
 
-def _extract_bearer(authorization: str | None) -> str:
-    if not authorization:
+bearer_scheme = HTTPBearer(auto_error=False)
+
+
+def _extract_bearer(credentials: HTTPAuthorizationCredentials | None) -> str:
+    if not credentials:
         raise _UNAUTHORIZED
-    scheme, _, token = authorization.partition(" ")
-    if scheme.lower() != "bearer" or not token:
-        raise _UNAUTHORIZED
-    return token.strip()
+    return credentials.credentials.strip()
 
 
 async def require_tenant(
-    authorization: str | None = Header(default=None),
+    credentials: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
     session: AsyncSession = Depends(get_session),
 ) -> TenantContext:
-    token = _extract_bearer(authorization)
+    token = _extract_bearer(credentials)
     repo = TenantRepository(session)
     api_key = await repo.get_active_key_by_hash(hash_api_key(token))
     if api_key is None:
@@ -49,9 +50,9 @@ async def require_tenant(
 
 
 async def require_admin(
-    authorization: str | None = Header(default=None),
+    credentials: HTTPAuthorizationCredentials | None = Security(bearer_scheme),
     settings: Settings = Depends(get_settings),
 ) -> None:
-    token = _extract_bearer(authorization)
+    token = _extract_bearer(credentials)
     if not verify_admin_key(token, settings.admin_api_key):
         raise _UNAUTHORIZED

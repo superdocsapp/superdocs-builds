@@ -1,12 +1,11 @@
-"""Data-access layer. TENANT ISOLATION IS ENFORCED HERE, ON PURPOSE.
+"""Data-access layer.
 
-Why a repository layer instead of ad-hoc queries in handlers:
-- Handlers can forget a `WHERE tenant_id = ?`. A repository cannot: every
-  tenant-scoped method takes a `TenantContext` and injects the filter itself.
-- Reads for a missing OR cross-tenant id return None -> the API turns that into
-  a 404 (never 403), so one tenant cannot even confirm another tenant's id
-  exists (no existence oracle / IDOR).
-- This is the single place to audit for isolation correctness.
+Architectural Design for Tenant Isolation:
+- Handlers can omit a `WHERE tenant_id = ?` clause. A repository mitigates this risk: every
+  tenant-scoped method requires a `TenantContext` and injects the filter autonomously.
+- Reads for a missing OR cross-tenant ID return None -> the API translates this to
+  a 404 (never 403), preventing existence oracles and IDOR vulnerabilities.
+- This layer serves as the single source of truth for auditing isolation correctness.
 """
 
 from __future__ import annotations

@@ -1,18 +1,18 @@
 """Idempotency for money/token-costing operations.
 
-CONTRACT (what this must guarantee):
+CONTRACT:
 - The SAME Idempotency-Key + SAME request body must NEVER create two jobs or
   double-charge SuperDocs — even under two truly concurrent requests.
 - The SAME key + a DIFFERENT body is a client bug -> 409 (never a silent wrong
   replay).
 - A completed operation replays its stored response verbatim.
 
-HOW the concurrency guarantee works (this is the important part):
+CONCURRENCY GUARANTEE:
 We do NOT "check then insert" (that has a race window). We INSERT FIRST and let
 the DB's UNIQUE(tenant_id, key) constraint be the arbiter. Exactly one racing
 transaction wins the insert; the other gets an IntegrityError, rolls back, reads
 the winner's row, and replays it. No application-level lock required — the
-database is the single source of truth for "who got there first".
+database is the single source of truth for concurrency arbitration.
 """
 
 from __future__ import annotations

@@ -1,13 +1,12 @@
 """Thin async HTTP client for the SuperDocs REST API.
 
-Endpoint paths and payloads are aligned with the live OpenAPI spec at
-https://api.superdocs.app/openapi.json (verified 2026-08-13).
+Endpoint paths and payloads are aligned with the live OpenAPI specification.
 
-Design notes:
-- One class, one httpx.AsyncClient, injected everywhere so tests can swap in a
-  fake with zero network access (pytest runs with NO live key).
-- parse_changes() still double-parses when SuperDocs returns pending_changes as a
-  JSON-encoded STRING (integrator footgun from the brief).
+Design decisions:
+- Utilizes a single injected `httpx.AsyncClient` to facilitate dependency 
+  injection of mocked clients during test execution without network access.
+- The `parse_changes()` method implements double-parsing to handle cases where 
+  the upstream API returns `pending_changes` as a JSON-encoded string.
 """
 
 from __future__ import annotations

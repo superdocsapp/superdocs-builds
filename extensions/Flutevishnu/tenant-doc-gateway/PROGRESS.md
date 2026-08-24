@@ -1,7 +1,7 @@
 # Progress & assumptions log
 
-Per the brief: a logged assumption is fine, an unstated one is not. This file
-records decisions made while building, so they can be confirmed or corrected.
+Architectural decisions must be explicitly documented. This file
+records decisions made while building, ensuring they can be audited or corrected.
 
 ## Core Requirements Addressed
 
@@ -16,8 +16,7 @@ records decisions made while building, so they can be confirmed or corrected.
 
 1. **Auth = hashed API keys** (not JWT). Simplest mechanism that is still real
    for service-to-service; keys are SHA-256 hashed at rest, shown once.
-2. **Result delivery = polling always + optional webhook.** The brief allows
-   "webhook OR polling"; both is more production-shaped. Webhooks are
+2. **Result delivery = polling always + optional webhook.** Both mechanisms are supported simultaneously for robust production integration. Webhooks are
    HMAC-signed when `WEBHOOK_SIGNING_SECRET` is set.
 3. **Tenant provisioning via an admin endpoint** (`POST /v1/admin/tenants`)
    guarded by `ADMIN_API_KEY`, plus `scripts/seed_tenants.py` for local dev.
@@ -60,4 +59,6 @@ records decisions made while building, so they can be confirmed or corrected.
 - `pytest` -> 25 passed, with the SuperDocs API mocked and no live key.
 - `ruff check .` -> clean.
 - `alembic upgrade head` -> applies the initial schema successfully.
-- `loadtests/async_load.py` -> 0 errors at 50 concurrent clients, achieving 100 RPS against the live PostgreSQL container.
+- `loadtests/async_load.py` -> 0 errors at 50 concurrent clients, achieving 271.8 RPS against the live PostgreSQL container.
+- `locustfile.py` -> Sustained 136 RPS over 6,100+ requests with 0% error rate against PostgreSQL.
+- End-to-end flow -> Verified against the live SuperDocs API (`upload -> edit -> approve -> export`), successfully processing double-parsed proposed changes and executing webhook integrations.

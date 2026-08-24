@@ -1,12 +1,12 @@
 """Estimate SuperDocs operation cost per request.
 
-The brief requires cost-per-request in the logs and budget discipline against
-the 10k free-op allowance. Exact billing is authoritative upstream, so we log
-BOTH our estimate and any usage figure SuperDocs returns.
+Provides cost-per-request tracking for budget discipline against upstream API limits.
+Since exact billing is authoritative upstream, the service logs both local estimates 
+and any usage figure returned by the provider.
 
-Rules encoded from the brief:
-- Edits/searches cost operations (an edit "operation" covers up to 25 sections).
-- Exports/downloads are FREE (0 ops).
+Cost tracking rules:
+- Edits cost operations (one edit operation covers up to 25 sections).
+- Exports and downloads do not consume operations.
 """
 
 from __future__ import annotations

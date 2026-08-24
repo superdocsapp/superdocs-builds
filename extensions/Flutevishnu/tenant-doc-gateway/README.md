@@ -9,7 +9,6 @@ Docker deploy.
 Built for a DevTools audience that needs a *working service*, not a snippet.
 
 > Built by **vishnu vardhan** (GitHub [@Flutevishnu](https://github.com/Flutevishnu)).
-> Uses only synthetic/fictional data. No secrets are committed.
 
 ---
 
@@ -95,7 +94,7 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-24 tests cover auth, tenant isolation (breach attempts that must fail),
+25 tests cover auth, tenant isolation (breach attempts that must fail),
 sequential AND concurrent idempotency, chunked streaming uploads, the job flow,
 per-item approvals, and the SuperDocs double-parse.
 
@@ -133,7 +132,7 @@ sequenceDiagram
   participant W as Worker
   C->>A: POST /edits (Idempotency-Key)
   A->>D: INSERT idempotency row (UNIQUE tenant_id,key)
-  Note over A,D: winner proceeds; duplicate replays stored response
+  Note over A,D: winner proceeds, duplicate replays stored response
   A->>D: create Job (queued)
   A->>Q: enqueue(job_id)
   A-->>C: 202 {job_id}

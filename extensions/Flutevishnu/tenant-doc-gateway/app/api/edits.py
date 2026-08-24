@@ -1,8 +1,9 @@
-"""Edit endpoint: send an instruction -> enqueue a long-running edit job.
+"""Edit endpoint: enqueue a long-running edit instruction.
 
-The HTTP call returns immediately with a job id (202). The actual SuperDocs edit
-runs in the worker, because it can take 30s-several minutes (brief). Results are
-retrieved by polling GET /v1/jobs/{id} or via the optional webhook.
+The HTTP call returns immediately with a job ID (202 Accepted). The actual 
+SuperDocs API interaction executes asynchronously in the worker pool, as edits 
+can take up to several minutes to process. Results are retrieved by polling 
+the jobs endpoint or via optional webhook delivery.
 """
 
 from __future__ import annotations

@@ -8,6 +8,11 @@ from __future__ import annotations
 
 import asyncio
 import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from app.auth.hashing import generate_api_key, hash_api_key, key_prefix
 from app.db.repositories import TenantRepository

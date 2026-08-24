@@ -1,9 +1,9 @@
-"""Structured JSON logging + a request middleware that records cost-per-request.
+"""Structured JSON logging and request middleware for cost tracking.
 
-Two goals from the brief:
-1. Structured logs (machine-parseable JSON), never leaking secrets.
-2. A per-request `ops_cost` field so operators can see what each call cost in
-   SuperDocs operations/tokens.
+Core logging requirements:
+1. Emit structured, machine-parseable JSON logs without leaking secrets.
+2. Include a per-request `ops_cost` field to track downstream API token usage
+   and operation costs for observability.
 """
 
 from __future__ import annotations
