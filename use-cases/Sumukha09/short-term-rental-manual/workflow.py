@@ -56,3 +56,48 @@ def export_manual_once(
     )
     exported = client.export_pdf(document_id=uploaded.document_id, session_id=uploaded.session_id)
     return {"document_id": uploaded.document_id, "session_id": uploaded.session_id, "version": uploaded.version, "export": exported}
+
+
+DEFAULT_EDIT_INSTRUCTION = (
+    "In the House Rules section, update the quiet hours rule to end at 8 AM instead of 7 AM. "
+    "Keep every other section, image, and the page layout exactly as they are."
+)
+
+
+def export_manual_after_approved_edit(
+    client: SuperDocsClient,
+    catalog: PropertyCatalog,
+    property_id: str,
+    language: str = "en",
+    *,
+    edit_instruction: str = DEFAULT_EDIT_INSTRUCTION,
+) -> dict[str, Any]:
+    """Run upload -> chat_async -> approve_change -> export using only MCP tools.
+
+    The async edit is never auto-applied: ``approve_change`` is called only after
+    the proposal is confirmed to be in the ``awaiting_approval`` state.
+    """
+    content = get_property_canonical_content(catalog, property_id, language)
+    uploaded = client.upload_html(
+        generate_manual_html(content), filename=f"{property_id}-guest-manual-{language}.html"
+    )
+    if not uploaded.session_id:
+        raise RuntimeError("SuperDocs upload returned no session_id; the async edit step cannot run.")
+    pending = client.request_async_edit(session_id=uploaded.session_id, instruction=edit_instruction)
+    if pending.status != "awaiting_approval":
+        raise RuntimeError(
+            f"Change '{pending.change_id}' reached status '{pending.status}'; "
+            "refusing to approve anything that is not awaiting_approval."
+        )
+    approved = client.approve_change(session_id=uploaded.session_id, change_id=pending.change_id)
+    exported = client.export_pdf(document_id=uploaded.document_id, session_id=uploaded.session_id)
+    return {
+        "document_id": uploaded.document_id,
+        "session_id": uploaded.session_id,
+        "version": uploaded.version,
+        "change_id": pending.change_id,
+        "status_before_approval": pending.status,
+        "proposed_change": pending.proposed_change,
+        "approved": approved,
+        "export": exported,
+    }

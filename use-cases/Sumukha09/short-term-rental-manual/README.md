@@ -366,7 +366,7 @@ task2a/
 | Feature                          | Demonstrated |
 | -------------------------------- | ------------ |
 | Document ingestion               | Yes          |
-| Chat editing                     | No           |
+| Chat editing                     | Yes (async)  |
 | Async editing                    | Yes          |
 | Human approval                   | Yes          |
 | Export                           | Yes          |

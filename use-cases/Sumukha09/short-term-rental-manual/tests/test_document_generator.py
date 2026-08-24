@@ -31,6 +31,15 @@ def test_listing_respects_character_limit():
     assert len(listing) <= LISTING_MAX_CHARS
 
 
+def test_kannada_listing_has_no_english_template_text():
+    listing = generate_listing_description(get_property_canonical_content(load_mock_catalog(), "green", "kn"))
+    for english_connective in ("Relax in this", "Amenities:", "Check-in:", "Check-out:", "House rules:", "Nearby:"):
+        assert english_connective not in listing
+    for kannada_connective in ("ಆರಾಮವಾಗಿ", "ಸೌಲಭ್ಯಗಳು:", "ಚೆಕ್-ಇನ್:", "ಮನೆಯ ನಿಯಮಗಳು:", "ಹತ್ತಿರದಲ್ಲಿವೆ:"):
+        assert kannada_connective in listing
+    assert len(listing) <= LISTING_MAX_CHARS
+
+
 def test_welcome_card_contains_essential_information():
     card = generate_welcome_card_html(get_property_canonical_content(load_mock_catalog(), "green"))
     for marker in ("GreenGuest", "TEST-NEW-PASSWORD", "2 PM", "11 AM", "112"):

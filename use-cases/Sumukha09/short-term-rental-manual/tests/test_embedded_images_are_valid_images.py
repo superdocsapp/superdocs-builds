@@ -20,3 +20,5 @@ def test_embedded_images_are_valid_images():
         img = Image.open(BytesIO(raw))
         img.verify()
         assert img.format.lower() == ext.lower() or (img.format.lower() == 'jpeg' and ext.lower() == 'jpeg')
+        # Reject 1x1 placeholder images standing in for real photos or the map.
+        assert Image.open(BytesIO(raw)).size > (1, 1), "Embedded image is a 1x1 placeholder"

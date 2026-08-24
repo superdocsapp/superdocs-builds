@@ -8,6 +8,31 @@ from typing import Any
 # Kept as a named policy so operators can align it with a chosen platform.
 LISTING_MAX_CHARS = 1_500
 
+# Sentence templates per supported language. English is the canonical fallback.
+_TEMPLATES = {
+    "en": {
+        "intro": (
+            "Relax in this {property_type} in {address}. The home has {bedrooms} bedrooms, "
+            "{bathrooms} bathrooms, and welcomes up to {maximum_guests} guests."
+        ),
+        "amenities": "Amenities: {amenities}. Wi-Fi: {wifi_network}.",
+        "stay": "Check-in: {check_in} | Check-out: {check_out}",
+        "rules": "House rules: {rules}; maximum {maximum_guests} guests.",
+        "nearby": "Nearby: {nearby}.",
+    },
+    "kn": {
+        "intro": (
+            "{address} ನಲ್ಲಿರುವ ಈ {property_type} ನಲ್ಲಿ ಆರಾಮವಾಗಿ ಉಳಿಯಿರಿ. "
+            "ಮನೆಯಲ್ಲಿ {bedrooms} ಮಲಗುವ ಕೊಠಡಿಗಳು, {bathrooms} ಸ್ನಾನಗೃಹಗಳಿವೆ ಮತ್ತು ಗರಿಷ್ಠ "
+            "{maximum_guests} ಅತಿಥಿಗಳನ್ನು ಸ್ವೀಕರಿಸಲಾಗುತ್ತದೆ."
+        ),
+        "amenities": "ಸೌಲಭ್ಯಗಳು: {amenities}. ವೈ-ಫೈ: {wifi_network}.",
+        "stay": "ಚೆಕ್-ಇನ್: {check_in} | ಚೆಕ್-ಔಟ್: {check_out}",
+        "rules": "ಮನೆಯ ನಿಯಮಗಳು: {rules}; ಗರಿಷ್ಠ {maximum_guests} ಅತಿಥಿಗಳು.",
+        "nearby": "ಹತ್ತಿರದಲ್ಲಿವೆ: {nearby}.",
+    },
+}
+
 
 class ListingLengthError(ValueError):
     """Raised when a listing exceeds the configured platform allowance."""
@@ -30,6 +55,7 @@ def generate_listing_description(
     sync with the manual and welcome card as a property changes.
     """
     property_data = content["property"]
+    templates = _TEMPLATES.get(content.get("language", "en"), _TEMPLATES["en"])
     amenities = ", ".join(appliance["name"] for appliance in content["appliances"])
     nearby = ", ".join(
         f"{recommendation['name']} ({recommendation['distance']})"
@@ -40,15 +66,16 @@ def generate_listing_description(
         for block in content["shared_blocks"]
         if block["block_type"] == "house_rule"
     )
-    listing = (
-        f"{property_data['name']} — {property_data['unit']}\n\n"
-        f"Relax in this {property_data['property_type']} in {property_data['address']}. "
-        f"The home has {property_data['bedrooms']} bedrooms, {property_data['bathrooms']} bathrooms, "
-        f"and welcomes up to {property_data['maximum_guests']} guests.\n\n"
-        f"Amenities: {amenities}. Wi-Fi: {property_data['wifi_network']}.\n\n"
-        f"Check-in: {property_data['check_in']} | Check-out: {property_data['check_out']}\n\n"
-        f"House rules: {rules}; maximum {property_data['maximum_guests']} guests.\n\n"
-        f"Nearby: {nearby}."
+    context = {**property_data, "amenities": amenities, "nearby": nearby, "rules": rules}
+    listing = "\n\n".join(
+        (
+            f"{property_data['name']} — {property_data['unit']}",
+            templates["intro"].format(**context),
+            templates["amenities"].format(**context),
+            templates["stay"].format(**context),
+            templates["rules"].format(**context),
+            templates["nearby"].format(**context),
+        )
     )
     validate_listing_length(listing, maximum=maximum)
     return listing
