@@ -1,0 +1,87 @@
+.superdocs-review-modal {
+  width: min(900px, 90vw);
+}
+
+.superdocs-review-note {
+  color: var(--text-muted);
+  border-left: 3px solid var(--interactive-accent);
+  padding-left: var(--size-4-3);
+  margin-bottom: var(--size-4-3);
+}
+
+.superdocs-review-list {
+  max-height: 55vh;
+  overflow-y: auto;
+}
+
+.superdocs-review-row {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  padding: var(--size-4-3);
+  margin-bottom: var(--size-4-2);
+}
+
+.superdocs-review-row.is-approved {
+  border-color: var(--interactive-accent);
+  background-color: var(--background-modifier-hover);
+}
+
+.superdocs-review-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--size-4-1);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+}
+
+.superdocs-review-reason {
+  color: var(--text-muted);
+  margin: var(--size-4-2) 0;
+}
+
+.superdocs-review-diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--size-4-2);
+}
+
+.superdocs-review-diff pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background-color: var(--background-secondary);
+  border-radius: var(--radius-s);
+  padding: var(--size-4-2);
+  margin: var(--size-4-1) 0 0 0;
+  font-size: var(--font-smaller);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.superdocs-review-now pre {
+  border-left: 3px solid var(--text-faint);
+}
+
+.superdocs-review-proposed pre {
+  border-left: 3px solid var(--color-green);
+}
+
+.superdocs-review-feedback {
+  width: 100%;
+  margin-top: var(--size-4-2);
+}
+
+.superdocs-preview-doc {
+  white-space: pre-wrap;
+  background-color: var(--background-secondary);
+  border-radius: var(--radius-s);
+  padding: var(--size-4-2);
+  max-height: 40vh;
+  overflow-y: auto;
+  font-size: var(--font-smaller);
+}
+
+@media (max-width: 700px) {
+  .superdocs-review-diff {
+    grid-template-columns: 1fr;
+  }
+}

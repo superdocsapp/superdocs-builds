@@ -1,0 +1,9 @@
+{
+  "id": "superdocs-living-note",
+  "name": "SuperDocs Living Note",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.7",
+  "description": "Keep explicitly owned sections of an Obsidian note current from the rest of the vault through SuperDocs.",
+  "author": "Ayam",
+  "isDesktopOnly": false
+}
