@@ -1,0 +1,948 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   DocRelay — "Crisp Editorial" design system.
+
+   One neutral surface ladder, one deep-pine accent, one radius family, one
+   motion curve. Product classes (text-ink, text-muted, bg-surface, bg-canvas)
+   and the shadcn primitive tokens (primary / secondary / muted-foreground)
+   both read from the same semantic variables, so a component never invents a
+   colour.
+
+   The neutrals carry the faintest green cast — enough to stay warm next to
+   the pine, cool enough that no surface reads as beige.
+   ========================================================================== */
+:root {
+  /* --- Surface ladder -----------------------------------------------------
+     Six deliberate layers, each step perceptible on a normal monitor:
+       navigation → working canvas → conversation → document canvas → paper.
+     The document page is the highest value in the product, and it is the only
+     thing that is pure white by default. */
+  --sidebar: #f1f2ee;          /* navigation, quietly separated from the work */
+  --background: #f7f8f5;       /* working canvas the workbench sits inside */
+  --conversation: #f5f7f4;     /* conversation pane: bright, cool, clearly not paper */
+  --chrome: #fbfcfa;           /* the workbench's single top band, both tools */
+  --canvas: #e9ece8;           /* document canvas behind the page */
+  --surface: #ffffff;          /* cards, inputs, controls, document chrome */
+  --surface-elevated: #ffffff; /* document paper, popovers, lifted plates */
+  --surface-muted: #f0f2ee;    /* quiet fills, hover, skeletons */
+  --surface-sunken: #f4f6f3;   /* interactive + secondary bands inside a surface */
+
+  /* --- Text ---------------------------------------------------------------
+     Three steps only. Primary is a confident near-black; secondary is meant to
+     be read, not skimmed past; metadata is quiet but never faint — every step
+     clears 4.5:1 on every surface it is allowed on. */
+  --foreground: #171a18;
+  --muted-text: #5e6762;
+  --muted-soft: #6f7772;
+
+  /* --- Borders ------------------------------------------------------------
+     Exactly three: structure, light edge, interior hairline. */
+  --border: #d6dbd6;           /* structural: frames, controls, inputs */
+  --border-light: #e1e6e1;     /* light edges on raised surfaces */
+  --border-hair: #e9ede9;      /* interior rules inside a surface */
+
+  /* --- Accent -------------------------------------------------------------
+     A single deep pine. It marks selection, approval and verified state and
+     nothing else, so its presence always means "this is decided". */
+  --primary: #0f6b4f;
+  --primary-hover: #0b5a42;
+  --primary-foreground: #ffffff;
+  --primary-soft: #e2f0e9;
+  --primary-line: #b5d4c5;
+
+  --success: #0f6b4f;
+  --success-soft: #e2f0e9;
+  --warning: #8a5a1b;
+  --warning-soft: #f9efdd;
+  --destructive: #a1453b;
+  --destructive-soft: #f9e9e6;
+  --info: #55605b;
+  --info-soft: #ebeeeb;
+
+  /* Contextual review tints. Only the exact changed span is ever coloured —
+     the surrounding sentence always stays neutral, and the band it sits in is
+     paler still so a diff reads as calm evidence rather than an alarm. */
+  --diff-removed-band: #fdf3f1;
+  --diff-removed-edge: #eed8d3;
+  --diff-removed: #f7cec7;
+  --diff-removed-text: #8a3229;
+  --diff-removed-line: #ac5a53;
+  --diff-added-band: #eff7f2;
+  --diff-added-edge: #cee5d8;
+  --diff-added: #c3e6d2;
+  --diff-added-text: #0e5537;
+  --review-mark: #faf0d4;
+  --review-mark-line: #ddc793;
+
+  --ring: #0f6b4f;
+
+  /* --- Geometry -----------------------------------------------------------
+     One radius family across controls, panes and the document page so the
+     product reads as a single assembled grid. */
+  --radius: 0.5rem;
+  --radius-pane: 12px;
+  --radius-card: 10px;
+  --radius-plate: 16px;
+  --workbench-gutter: 9px;
+  --workbench-inset: 12px;
+
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 64px;
+  --shell-nav-width: var(--sidebar-width);
+
+  --conversation-width: 452px;
+  --conversation-width-min: 380px;
+  --conversation-width-max: 640px;
+  --document-width-min: 420px;
+
+  /* --- Elevation ----------------------------------------------------------
+     Four shadows, no more: a hairline lift, a raised control, the overlay
+     stack (menus, dialogs) and the document paper. Ordinary application UI
+     does not float. */
+  --shadow-subtle: 0 1px 2px rgb(23 26 24 / 0.05);
+  --shadow-raised: 0 1px 2px rgb(23 26 24 / 0.05), 0 2px 6px -3px rgb(23 26 24 / 0.06);
+  --shadow-lifted:
+    0 1px 2px rgb(23 26 24 / 0.05),
+    0 8px 20px -10px rgb(23 26 24 / 0.10),
+    0 20px 40px -24px rgb(23 26 24 / 0.10);
+  --shadow-overlay: 0 1px 2px rgb(23 26 24 / 0.08), 0 12px 30px -8px rgb(23 26 24 / 0.18);
+  --shadow-pane: 0 1px 2px rgb(23 26 24 / 0.04);
+  --shadow-document:
+    0 0 0 1px rgb(23 26 24 / 0.05),
+    0 1px 2px rgb(23 26 24 / 0.05),
+    0 14px 30px -16px rgb(23 26 24 / 0.14);
+
+  --motion-duration: 150ms;
+  --motion-duration-lg: 220ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* shadcn primitive aliases */
+  --card: var(--surface);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--foreground);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--foreground);
+  --muted-foreground: var(--muted-text);
+  --input: var(--border);
+
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: #e5e8e2;
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: #dde2dd;
+  --sidebar-ring: var(--primary);
+  --sidebar-muted: #5e6762;
+}
+
+[data-sidebar="collapsed"] {
+  --shell-nav-width: var(--sidebar-width-collapsed);
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-document-serif);
+  --font-heading: var(--font-geist-sans);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--foreground);
+  --color-conversation: var(--conversation);
+  --color-chrome: var(--chrome);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-border-hair: var(--border-hair);
+  --color-muted: var(--muted-text);
+  --color-muted-soft: var(--muted-soft);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-line: var(--primary-line);
+  --color-accent: var(--primary);
+  --color-accent-strong: var(--primary-hover);
+  --color-accent-soft: var(--primary-soft);
+  --color-accent-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-destructive: var(--destructive);
+  --color-error: var(--destructive);
+  --color-error-soft: var(--destructive-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-diff-added: var(--diff-added);
+  --color-diff-added-text: var(--diff-added-text);
+  --color-diff-added-band: var(--diff-added-band);
+  --color-diff-added-edge: var(--diff-added-edge);
+  --color-diff-removed: var(--diff-removed);
+  --color-diff-removed-text: var(--diff-removed-text);
+  --color-diff-removed-band: var(--diff-removed-band);
+  --color-diff-removed-edge: var(--diff-removed-edge);
+  --color-review-mark: var(--review-mark);
+
+  --color-ring: var(--ring);
+  --color-focus-ring: var(--ring);
+  --color-input: var(--input);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-muted: var(--sidebar-muted);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 1.7);
+  --radius-4xl: calc(var(--radius) * 1.9);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: var(--border);
+  }
+
+  html {
+    min-height: 100%;
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv05" 1, "ss01" 1;
+  }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    color: var(--foreground);
+    background: var(--background);
+  }
+
+  body {
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  button,
+  textarea,
+  input,
+  select {
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--ring) 55%, white);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 16%, white);
+    color: var(--foreground);
+  }
+
+  /* Radix ScrollArea gives its viewport child `display: table`, which makes
+     long unbreakable content widen the pane instead of truncating. Blocking it
+     is what keeps a long Recent title inside the sidebar. */
+  [data-slot="scroll-area-viewport"] > div {
+    display: block !important;
+    min-width: 0 !important;
+  }
+}
+
+@layer components {
+  /* ---------------------------------------------------------------------- */
+  /* Panes and page surfaces                                                */
+  /* ---------------------------------------------------------------------- */
+
+  /* An editor pane: the framing shared by the page-level surfaces. Panes
+     create separation, so no adjacent element repeats the divider. */
+  .pane {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-pane);
+    background: var(--surface);
+    box-shadow: var(--shadow-pane);
+    overflow: hidden;
+  }
+
+  /* Section surface used by Watch / Activity page composition. */
+  .surface-section {
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-pane);
+    background: var(--surface);
+    box-shadow: var(--shadow-subtle);
+  }
+
+  /* Shared page composition for Watch, Activity and run detail so no
+     secondary screen invents its own measure or rhythm. */
+  .page-shell {
+    min-height: 100%;
+    background: var(--background);
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  @media (min-width: 640px) {
+    .page-shell { padding: 2.25rem 2rem 4.5rem; }
+  }
+
+  @media (min-width: 1024px) {
+    .page-shell { padding: 2.75rem 2.5rem 5rem; }
+  }
+
+  .page-measure {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 980px;
+  }
+
+  /* Thin chrome rail at the top of a full-bleed workspace screen. Same height
+     as the workbench band, so every screen's top chrome sits on one line. */
+  .chrome-rail {
+    display: flex;
+    height: 3.5rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-inline: 1.25rem;
+  }
+
+  /* Keeps an overlay scrollbar clear of the pane separator it sits beside. */
+  .scrollbar-inset [data-slot="scroll-area-scrollbar"][data-orientation="vertical"] {
+    margin-right: 3px;
+    margin-block: 4px;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Pills and small status chrome                                          */
+  /* ---------------------------------------------------------------------- */
+
+  /* One pill geometry for every small state label, so "In review",
+     "Ready for your review" and "Verified" are visibly the same species. */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    height: 1.5rem;
+    padding-inline: 0.5rem;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    font-size: 0.75rem;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: -0.006em;
+    white-space: nowrap;
+  }
+
+  .pill-neutral {
+    border-color: var(--border);
+    background: var(--surface-sunken);
+    color: var(--muted-text);
+  }
+
+  .pill-accent {
+    border-color: var(--primary-line);
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+
+  .pill-warning {
+    border-color: color-mix(in srgb, var(--warning) 26%, transparent);
+    background: var(--warning-soft);
+    color: var(--warning);
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Navigation rail — expanded / collapsed                                 */
+  /* ---------------------------------------------------------------------- */
+
+  .nav-rail {
+    width: var(--shell-nav-width);
+    min-width: var(--shell-nav-width);
+    max-width: var(--shell-nav-width);
+    overflow: hidden;
+    transition: width var(--motion-duration-lg) var(--motion-ease),
+      min-width var(--motion-duration-lg) var(--motion-ease),
+      max-width var(--motion-duration-lg) var(--motion-ease);
+  }
+
+  /* Expanded, the collapse control stays out of the way until the rail is
+     hovered; collapsed, it is the rail's own header. */
+  .rail-toggle {
+    opacity: 0;
+    transition: opacity var(--motion-duration) var(--motion-ease),
+      background-color var(--motion-duration) var(--motion-ease),
+      color var(--motion-duration) var(--motion-ease);
+  }
+
+  [data-nav="rail"]:hover .rail-toggle,
+  .rail-toggle:focus-visible {
+    opacity: 1;
+  }
+
+  /* Collapsed, the rail's header is the brand mark; the expand control takes
+     its place on hover or focus, so the rail keeps its identity at rest. */
+  .rail-brand {
+    transition: opacity var(--motion-duration) var(--motion-ease);
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"] .rail-toggle {
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -50%;
+    margin-inline: auto;
+    opacity: 0;
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"]:hover .rail-toggle,
+  [data-sidebar="collapsed"] [data-nav="rail"] .rail-toggle:focus-visible {
+    opacity: 1;
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"]:hover .rail-brand,
+  [data-sidebar="collapsed"] [data-nav="rail"]:has(.rail-toggle:focus-visible) .rail-brand {
+    opacity: 0;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Workbench                                                              */
+  /* ---------------------------------------------------------------------- */
+
+  /* One frame around both tools. The conversation and the document are
+     regions inside a single workspace, not two cards on a board: the frame
+     owns the outer border and radius, and the only edge between them is the
+     seam in the resize gutter. */
+  .workbench {
+    background: var(--conversation);
+  }
+
+  @media (min-width: 1024px) {
+    .workbench {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pane);
+      box-shadow: var(--shadow-pane);
+      overflow: hidden;
+    }
+  }
+
+  /* The workbench's top band. Both tools mount the same bar — same height,
+     same tone, same hairline — so a single strip of chrome runs unbroken
+     across the whole workspace and the two panes read as one product. */
+  .chrome-band {
+    display: flex;
+    height: 3.5rem;
+    flex-shrink: 0;
+    align-items: center;
+    background: var(--chrome);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* The drag affordance lives inside the gutter. At rest the boundary is only
+     an interior hairline; the grip appears under the pointer and commits to
+     the accent while the split is actually being dragged. */
+  .split-handle {
+    position: relative;
+    display: none;
+    width: var(--workbench-gutter);
+    flex: 0 0 var(--workbench-gutter);
+    cursor: col-resize;
+    touch-action: none;
+    /* The gutter carries the chrome band's hairline across itself, so the band
+       runs unbroken from the conversation header into the document toolbar
+       instead of stopping at each pane's edge. */
+    background:
+      linear-gradient(var(--border-light), var(--border-light)) 0 3.5rem / 100% 1px no-repeat,
+      var(--conversation);
+    border: 0;
+    padding: 0;
+    outline: none;
+  }
+
+  @media (min-width: 1024px) {
+    .split-handle { display: block; }
+  }
+
+  /* Below the band the seam sits on the boundary itself — the gutter is
+     breathing room on the conversation side, not a gap between two cards. */
+  .split-handle::before {
+    content: "";
+    position: absolute;
+    inset-block: 3.5rem 0;
+    right: 0;
+    width: 1px;
+    background: var(--border-hair);
+    transition: background-color var(--motion-duration) var(--motion-ease);
+  }
+
+  .split-handle:hover::before {
+    background: var(--border);
+  }
+
+  .split-handle::after {
+    content: "";
+    position: absolute;
+    inset-block: calc(3.5rem + 14px) 14px;
+    right: -1.5px;
+    width: 4px;
+    border-radius: 999px;
+    background: var(--muted-soft);
+    opacity: 0;
+    transition: opacity var(--motion-duration) var(--motion-ease),
+      background-color var(--motion-duration) var(--motion-ease);
+  }
+
+  .split-handle:hover::after {
+    opacity: 0.5;
+  }
+
+  .split-handle:focus-visible::after,
+  .split-handle[data-dragging="true"]::after {
+    opacity: 1;
+    background: var(--primary);
+  }
+
+  .split-handle:focus-visible {
+    outline: none;
+  }
+
+  /* While dragging, nothing in the workbench should select or hover. */
+  .split-active,
+  .split-active * {
+    user-select: none !important;
+    cursor: col-resize !important;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Document page                                                          */
+  /* ---------------------------------------------------------------------- */
+
+  /* The canvas is a container, so the page responds to the pane it is in
+     rather than to the viewport. Resizing the conversation reflows the page
+     margins the way a real editor would. It is a flat neutral value: the
+     paper is what should be bright, not the surface behind it. */
+  .document-canvas {
+    container-type: inline-size;
+    container-name: document;
+    background: var(--canvas);
+  }
+
+  /* Paper inside an editor, not a card on a dashboard: a clean white sheet, a
+     near-square corner, a hairline edge and one restrained shadow. The page
+     grows its margins faster than its measure, so the column of text stays at
+     a readable length however wide the document pane is pulled. */
+  .document-page {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    padding: 2.5rem 1.75rem 3.5rem;
+    border-radius: 3px;
+    background: var(--surface-elevated);
+    box-shadow: var(--shadow-document);
+  }
+
+  @container document (min-width: 560px) {
+    .document-page { max-width: 748px; padding: 3.75rem 3.5rem 5rem; }
+  }
+
+  @container document (min-width: 760px) {
+    .document-page { max-width: 772px; padding: 4.5rem 4.75rem 6rem; }
+  }
+
+  @container document (min-width: 980px) {
+    .document-page { max-width: 792px; padding: 5rem 5.5rem 6.5rem; }
+  }
+
+  /* The reader surface is the one place in the product that is not a UI
+     surface, so it gets a text face of its own — and a measure, size and
+     rhythm tuned for reading rather than for scanning chrome. */
+  .document-body {
+    font-family: var(--font-serif), ui-serif, Georgia, "Times New Roman", serif;
+    font-size: 1.078125rem;
+    line-height: 1.72;
+    letter-spacing: 0.001em;
+    color: var(--foreground);
+    text-wrap: pretty;
+  }
+
+  .document-heading {
+    font-family: var(--font-serif), ui-serif, Georgia, "Times New Roman", serif;
+    color: var(--foreground);
+    text-wrap: balance;
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Review evidence bands                                                  */
+  /* ---------------------------------------------------------------------- */
+
+  /* Before/after evidence reads as two stacked plates with a tinted edge,
+     never as two loud blocks of colour. */
+  .diff-band {
+    border-radius: 9px;
+    border: 1px solid;
+    padding: 0.625rem 0.75rem 0.75rem;
+  }
+
+  .diff-band-removed {
+    border-color: var(--diff-removed-edge);
+    background: var(--diff-removed-band);
+  }
+
+  .diff-band-added {
+    border-color: var(--diff-added-edge);
+    background: var(--diff-added-band);
+  }
+
+  .diff-token-removed {
+    border-radius: 4px;
+    background: var(--diff-removed);
+    padding-inline: 3px;
+    font-weight: 500;
+    color: var(--diff-removed-text);
+    text-decoration-line: line-through;
+    text-decoration-color: var(--diff-removed-line);
+    text-decoration-thickness: 1.5px;
+  }
+
+  .diff-token-added {
+    border-radius: 4px;
+    background: var(--diff-added);
+    padding-inline: 3px;
+    font-weight: 600;
+    color: var(--diff-added-text);
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Loading                                                                */
+  /* ---------------------------------------------------------------------- */
+
+  /* A slow light sweep instead of a blinking block: the surface reads as
+     "being prepared" rather than as a broken element. */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-sunken);
+  }
+
+  .sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    translate: -100% 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--surface-elevated) 80%, transparent),
+      transparent
+    );
+    animation: docrelay-sheen 1.8s var(--motion-ease) infinite;
+  }
+
+  @keyframes docrelay-sheen {
+    100% { translate: 100% 0; }
+  }
+
+  /* Slow pulse for a live status dot — one property, no layout cost. */
+  .live-dot {
+    animation: docrelay-live 2.2s var(--motion-ease) infinite;
+  }
+
+  @keyframes docrelay-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  /* Three dots that are always present and only change opacity: work reads as
+     ongoing within a second, and nothing reflows when it stops. Under reduced
+     motion the global rule settles them at their resting opacity. */
+  .live-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+
+  .live-dots > span {
+    width: 3px;
+    height: 3px;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0.24;
+    animation: docrelay-dots 1.4s var(--motion-ease) infinite;
+  }
+
+  .live-dots > span:nth-child(2) { animation-delay: 0.18s; }
+  .live-dots > span:nth-child(3) { animation-delay: 0.36s; }
+
+  @keyframes docrelay-dots {
+    0%, 60%, 100% { opacity: 0.24; }
+    30% { opacity: 1; }
+  }
+
+  /* ---------------------------------------------------------------------- */
+  /* Typography scale                                                       */
+  /* ---------------------------------------------------------------------- */
+
+  /* One small, coherent ladder. Size and weight carry hierarchy; colour only
+     ever says how important the text is, never what kind of text it is. */
+
+  /* Editorial hero — Workspace start screen and equivalent first impressions. */
+  .type-hero-title {
+    font-size: 1.9375rem;
+    line-height: 1.1;
+    font-weight: 600;
+    letter-spacing: -0.034em;
+    color: var(--foreground);
+  }
+
+  @media (min-width: 1024px) {
+    .type-hero-title { font-size: 2.1875rem; }
+  }
+
+  .type-hero-body {
+    font-size: 0.96875rem;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: var(--muted-text);
+  }
+
+  /* Primary page title — Watch, Activity, run detail. */
+  .type-page-title {
+    font-size: 1.6875rem;
+    line-height: 1.18;
+    font-weight: 600;
+    letter-spacing: -0.028em;
+    color: var(--foreground);
+  }
+
+  /* Quiet chrome title used in the thin page header rail. */
+  .type-chrome-title {
+    font-size: 0.84375rem;
+    line-height: 1.2;
+    font-weight: 560;
+    letter-spacing: -0.011em;
+    color: var(--foreground);
+  }
+
+  /* Named title of a document workspace. */
+  .type-document-title {
+    font-size: 1.09375rem;
+    line-height: 1.32;
+    font-weight: 600;
+    letter-spacing: -0.022em;
+    color: var(--foreground);
+  }
+
+  /* Thread title in the conversation header. */
+  .type-conversation-title {
+    font-size: 1rem;
+    line-height: 1.3;
+    font-weight: 570;
+    letter-spacing: -0.019em;
+    color: var(--foreground);
+  }
+
+  /* Section title inside a page — sits above a surface, not inside one. */
+  .type-section-title {
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    font-weight: 590;
+    letter-spacing: -0.016em;
+    color: var(--foreground);
+  }
+
+  /* Small label above a group: quiet, spaced, never smaller than 11.5px. */
+  .type-section-heading {
+    font-size: 0.71875rem;
+    line-height: 1.4;
+    font-weight: 550;
+    letter-spacing: 0.062em;
+    text-transform: uppercase;
+    color: var(--muted-soft);
+  }
+
+  .type-body {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: -0.006em;
+    color: var(--foreground);
+  }
+
+  .type-body-muted {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-weight: 400;
+    letter-spacing: -0.006em;
+    color: var(--muted-text);
+  }
+
+  /* Assistant prose in the conversation column. */
+  .type-message {
+    font-size: 0.90625rem;
+    line-height: 1.62;
+    letter-spacing: -0.008em;
+    color: var(--foreground);
+    text-wrap: pretty;
+  }
+
+  .type-label {
+    font-size: 0.78125rem;
+    line-height: 1.4;
+    font-weight: 500;
+    letter-spacing: -0.006em;
+    color: var(--muted-text);
+  }
+
+  /* Speaker name above a conversation turn. */
+  .type-speaker {
+    font-size: 0.828125rem;
+    line-height: 1.2;
+    font-weight: 580;
+    letter-spacing: -0.013em;
+    color: var(--foreground);
+  }
+
+  .type-button {
+    font-size: 0.828125rem;
+    line-height: 1;
+    font-weight: 510;
+    letter-spacing: -0.009em;
+  }
+
+  .type-nav {
+    font-size: 0.859375rem;
+    line-height: 1.25;
+    font-weight: 500;
+    letter-spacing: -0.013em;
+  }
+
+  .type-caption {
+    font-size: 0.765625rem;
+    line-height: 1.45;
+    font-weight: 400;
+    letter-spacing: -0.002em;
+    color: var(--muted-text);
+  }
+
+  .type-mono {
+    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Layout rules that must outrank a Tailwind display/width/padding utility on
+   the same element live in the utilities layer, where their higher-specificity
+   selectors win the cascade instead of losing it by layer order. */
+@layer utilities {
+  /* Collapse rules are scoped to the desktop rail so the mobile sheet — which
+     renders the same chrome — always stays expanded. Presentation is pure CSS
+     driven by the pre-paint attribute: labels are never squeezed, and the rail
+     never renders a half-collapsed frame while React catches up. */
+  [data-nav] .nav-collapsed-only {
+    display: none;
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"] .nav-label,
+  [data-sidebar="collapsed"] [data-nav="rail"] .nav-expanded-only {
+    display: none;
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"] .nav-collapsed-only {
+    display: block;
+  }
+
+  /* Rail insets own their horizontal padding rather than borrowing a utility,
+     so the collapsed override actually wins. */
+  [data-nav] .nav-inset {
+    padding-inline: 0.875rem;
+  }
+
+  [data-nav] .nav-item {
+    padding-inline: 0.6875rem;
+    gap: 0.6875rem;
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"] .nav-item {
+    justify-content: center;
+    padding-inline: 0;
+    gap: 0;
+  }
+
+  [data-sidebar="collapsed"] [data-nav="rail"] .nav-inset {
+    padding-inline: 0.625rem;
+  }
+
+  /* The split preference is one number (`--conversation-w`); keeping the
+     document pane usable is expressed here, so the guarantee holds at every
+     viewport without measuring anything. Below the desktop breakpoint the
+     split does not exist and the stacked responsive layout takes over. */
+  .conversation-pane {
+    width: 100%;
+  }
+
+  @media (min-width: 1024px) {
+    .conversation-pane {
+      width: max(
+        var(--conversation-width-min),
+        min(
+          var(--conversation-w, var(--conversation-width)),
+          calc(100% - var(--workbench-gutter) - var(--document-width-min))
+        )
+      );
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

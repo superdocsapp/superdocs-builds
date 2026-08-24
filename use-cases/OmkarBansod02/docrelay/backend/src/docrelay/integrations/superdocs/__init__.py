@@ -1,0 +1,1 @@
+"""Responsibility-specific SuperDocs boundaries."""
