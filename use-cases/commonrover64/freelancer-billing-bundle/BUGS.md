@@ -1,5 +1,7 @@
 # SuperDocs bugs found while building the Freelancer Billing Bundle
 
+**Update:** Both bugs below were reproduced during initial development. After SuperDocs shipped a product update (announcement referencing reduced AI hallucination and bug fixes), re-tested both scenarios and could no longer reproduce either issue. Left here as a record of what was found and how it was verified, including the safeguards we built in response, which remain in the code as defense in depth.
+
 ## 1. Job reports "completed" while silently skipping requested edits
 
 **Reproduction:**

@@ -81,14 +81,7 @@ The four required calls: upload (a skeleton HTML document with placeholder field
 
 ## Bugs found in SuperDocs during development
 
-Two real, reproduced issues, full detail in `BUGS.md`:
-
-1. A job can report `status: "completed"` while silently skipping several requested field edits.
-2. A session's grip on the original instruction appears to degrade after several approval rounds, producing generic placeholder text or an incorrect number instead of the real value.
-
-Both are defended against in this build (a bluff detector and a completion validator), not just documented.
-
-## Screenshots
+During initial development, we found and reproduced two real issues (full detail in `BUGS.md`): a job reporting `completed` while silently skipping requested edits, and session degradation across multi-round approvals producing placeholder text or wrong values. We built defenses for both (a bluff detector and a completion validator, still in the code). After SuperDocs shipped a product update, we re-tested and could no longer reproduce either issue, both appear fixed. We kept the safeguards in place regardless, since a validator that checks real output against known-correct values is good practice independent of whether this specific bug exists.
 
 ## Screenshots
 
