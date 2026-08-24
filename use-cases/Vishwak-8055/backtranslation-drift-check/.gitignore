@@ -1,0 +1,15 @@
+*.egg-info/
+*.pyc
+.coverage
+.env
+.env.*
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+build/
+demo_output/
+dist/
+out/
+runs/
