@@ -1,0 +1,27 @@
+[project]
+name = "idem-superdocs"
+version = "1.0.0"
+description = "Idempotency and safe-retry middleware for SuperDocs document operations"
+# The README lives at the repository root, one level up, because it covers
+# both implementations. setuptools will not reference a file outside the
+# package root, so it is simply not declared here.
+requires-python = ">=3.11"
+license = { text = "MIT" }
+# No runtime dependencies. Everything is stdlib: sqlite3 for the durable
+# record, json for the decision table, random for the jitter, urllib for the
+# optional SuperDocs adapter.
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["idem"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

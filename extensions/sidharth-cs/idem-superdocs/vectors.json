@@ -1,0 +1,637 @@
+{
+  "spec_version": 1,
+  "description": "Behavioural test vectors. The cross-language contract: every implementation runs this exact file and must agree on every field of every 'expect'. See SPEC.md section 8.",
+  "notes": {
+    "executions": "How many times the caller's function actually ran. This is the observable form of 'did we double-apply', and it is the assertion that matters most.",
+    "attempts": "A script consumed across all invocations of the vector. Each time the caller's function runs, it takes the next entry and either returns its result or raises a scripted error.",
+    "sent": "Whether the request left the client. Omitted means true: the safe default, since assuming a request was never sent is what causes double-application.",
+    "delays": "Backoff sleeps are captured, never slept. assert_delay_bounds checks each delay i falls in [0, min(max_ms, base_ms * multiplier**i)] rather than pinning an exact value, because seeded RNGs are not portable across languages."
+  },
+  "vectors": [
+    {
+      "id": "V01-success-first-try",
+      "requirement": "R6",
+      "why": "The ordinary case. One execution, result returned, record terminal.",
+      "attempts": [
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-1"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-1"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V02-replay-returns-recorded-result",
+      "requirement": "R3",
+      "why": "N1. The same key submitted twice executes once. The second call replays the recorded result rather than re-running, which is the entire point of an operation key.",
+      "attempts": [
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-2"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-2"
+            }
+          }
+        },
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-2"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V03-retryable-then-success",
+      "requirement": "R10",
+      "why": "A connect timeout never left the client, so retrying it is safe and the second attempt succeeds.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-3"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-3"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 2,
+        "delay_count": 1,
+        "assert_delay_bounds": true
+      }
+    },
+    {
+      "id": "V04-retries-exhausted-releases-key",
+      "requirement": "R10",
+      "why": "Every retryable outcome in the table means provably not applied, so exhausting the budget leaves the key free to be tried again later. Exhaustion is not a failure of the operation, it is a failure to reach the server.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": "RetriesExhausted"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "new",
+        "executions": 5,
+        "delay_count": 4,
+        "assert_delay_bounds": true
+      }
+    },
+    {
+      "id": "V05-conflict-is-terminal",
+      "requirement": "R6",
+      "why": "N5. 409 means the remote state rejects the call. Retrying is guaranteed to fail again. This is the production wedge the table exists to encode.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "HTTPStatusError",
+          "status": 409,
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": "TerminalFailure"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "failed",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V06-unprocessable-is-terminal",
+      "requirement": "R6",
+      "why": "422 is a defect in the request. The identical request will be rejected identically forever.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "HTTPStatusError",
+          "status": 422,
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": "TerminalFailure"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "failed",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V07-read-timeout-refuses",
+      "requirement": "R12",
+      "why": "N2. Sent, no answer. The edit may have landed and been metered. The library refuses rather than guessing, and refusing is the default.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "on_unknown": "refuse",
+          "expect": {
+            "raised": "OutcomeUnknown"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "unknown",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V08-server-error-is-unknown-not-retryable",
+      "requirement": "R6",
+      "why": "The most common double-apply bug in retry libraries is classifying 5xx as retryable. The server received the request; nothing observable says whether it applied it.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "HTTPStatusError",
+          "status": 503,
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "on_unknown": "refuse",
+          "expect": {
+            "raised": "OutcomeUnknown"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "unknown",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V09-unknown-reconciled-applied",
+      "requirement": "R13",
+      "why": "The server says the job finished. The operation is complete; re-running it would be the double-apply. One execution, no error.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        }
+      ],
+      "reconcile_verdict": "applied",
+      "reconcile_result": {
+        "job_id": "j-9",
+        "status": "completed"
+      },
+      "invocations": [
+        {
+          "on_unknown": "reconcile",
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-9",
+              "status": "completed"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V10-unknown-reconciled-not-applied",
+      "requirement": "R13",
+      "why": "The server says no such job was ever created, which turns an unknown outcome into a known one. Only now is a retry safe.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        },
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-10"
+          }
+        }
+      ],
+      "reconcile_verdict": "not_applied",
+      "invocations": [
+        {
+          "on_unknown": "reconcile",
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-10"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 2,
+        "delay_count": 1,
+        "assert_delay_bounds": true
+      }
+    },
+    {
+      "id": "V11-unknown-reconciled-inconclusive-still-refuses",
+      "requirement": "R13",
+      "why": "The honest case. No job id was ever seen, so the server cannot be asked. Asking and failing to learn anything must not be mistaken for permission to retry.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        }
+      ],
+      "reconcile_verdict": "inconclusive",
+      "invocations": [
+        {
+          "on_unknown": "reconcile",
+          "expect": {
+            "raised": "OutcomeUnknown"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "unknown",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V12-retry-anyway-without-assertion-refuses",
+      "requirement": "R12",
+      "why": "Selecting the unsafe policy is not enough on its own. The caller must also assert the operation is naturally idempotent, so the unsafe path cannot be reached by copying a snippet.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "on_unknown": "retry_anyway",
+          "naturally_idempotent": false,
+          "expect": {
+            "raised": "OutcomeUnknown"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "unknown",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V13-retry-anyway-with-assertion-retries",
+      "requirement": "R12",
+      "why": "Some operations genuinely are safe to repeat. A library that pretends otherwise gets worked around, so the escape hatch exists, costs two deliberate arguments, and logs every time it fires.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        },
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-13"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "on_unknown": "retry_anyway",
+          "naturally_idempotent": true,
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-13"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 2,
+        "delay_count": 1,
+        "assert_delay_bounds": true
+      }
+    },
+    {
+      "id": "V14-failed-key-refuses-without-executing",
+      "requirement": "R4",
+      "why": "A terminal failure is an answer, and it is durable. Resubmitting the key does not get a second opinion.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "HTTPStatusError",
+          "status": 409,
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": "TerminalFailure"
+          }
+        },
+        {
+          "expect": {
+            "raised": "TerminalFailure"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "failed",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V15-unrecognised-error-is-unknown",
+      "requirement": "R8",
+      "why": "The table fails closed. An error nobody anticipated is unknown, never retryable.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "SomethingNobodyAnticipated",
+          "sent": true
+        }
+      ],
+      "invocations": [
+        {
+          "on_unknown": "refuse",
+          "expect": {
+            "raised": "OutcomeUnknown"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "unknown",
+        "executions": 1,
+        "delay_count": 0
+      }
+    },
+    {
+      "id": "V16-never-sent-is-retryable-whatever-it-was-called",
+      "requirement": "R6",
+      "why": "The sent flag carries the reasoning, not the error's name. An unrecognised error the caller can attest never left the client is still safe to retry.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "SomethingNobodyAnticipated",
+          "sent": false
+        },
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-16"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-16"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 2,
+        "delay_count": 1,
+        "assert_delay_bounds": true
+      }
+    },
+    {
+      "id": "V17-rate-limit-honours-retry-after",
+      "requirement": "R9",
+      "why": "When the server states how long to wait, that instruction replaces the computed backoff. Guessing shorter is rude and guessing longer is slow.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "HTTPStatusError",
+          "status": 429,
+          "sent": true,
+          "retry_after_ms": 1500
+        },
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-17"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-17"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 2,
+        "delay_count": 1,
+        "delays_exact_ms": [
+          1500
+        ]
+      }
+    },
+    {
+      "id": "V18-backoff-stays-within-its-ceiling",
+      "requirement": "R11",
+      "why": "Four retries with a 200ms base and a 2x multiplier reach 1600ms uncapped, well under the 20s ceiling. Each delay is asserted by bound, never by value.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "error",
+          "class": "ConnectTimeout",
+          "sent": false
+        },
+        {
+          "event": "ok",
+          "result": {
+            "job_id": "j-18"
+          }
+        }
+      ],
+      "invocations": [
+        {
+          "expect": {
+            "raised": null,
+            "result": {
+              "job_id": "j-18"
+            }
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "succeeded",
+        "executions": 5,
+        "delay_count": 4,
+        "assert_delay_bounds": true
+      }
+    },
+    {
+      "id": "V19-repeated-unknowns-still-honour-the-budget",
+      "requirement": "R10",
+      "why": "Found by the fuzzer, not by design. Resolving an unknown outcome releases the key, which resets the record's own attempt count \u2014 so a reconcile that keeps answering NOT_APPLIED started a fresh retry budget every cycle and run() never returned. Unbounded retry is the exact failure this library exists to prevent, so the budget must span the whole call, including every trip through reconciliation.",
+      "attempts": [
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        },
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        },
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        },
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        },
+        {
+          "event": "error",
+          "class": "ReadTimeout",
+          "sent": true
+        }
+      ],
+      "reconcile_verdict": "not_applied",
+      "invocations": [
+        {
+          "on_unknown": "reconcile",
+          "expect": {
+            "raised": "OutcomeUnknown"
+          }
+        }
+      ],
+      "expect": {
+        "final_state": "unknown",
+        "executions": 5,
+        "delay_count": 4,
+        "assert_delay_bounds": true
+      }
+    }
+  ]
+}
