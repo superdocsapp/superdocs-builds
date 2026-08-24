@@ -1,0 +1,77 @@
+# One-command deploy:  docker compose up --build
+# Brings up: postgres, redis, the API, and the queue worker.
+# The API container runs Alembic migrations on start, then serves.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: superdocs
+      POSTGRES_PASSWORD: superdocs
+      POSTGRES_DB: gateway
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superdocs -d gateway"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    # Migrate then serve. One command, reproducible from a clean clone.
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://superdocs:superdocs@postgres:5432/gateway
+      REDIS_URL: redis://redis:6379/0
+      SUPERDOCS_BASE_URL: ${SUPERDOCS_BASE_URL:-https://api.superdocs.app}
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-mock-key-for-local}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:-change-me-admin-key}
+      WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-change-me-webhook-secret}
+      UPLOAD_DIR: /data/uploads
+      SAMPLE_MODE: ${SAMPLE_MODE:-true}
+    volumes:
+      - uploads:/data/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    # Same image/code as the API; just runs the Arq worker instead.
+    command: ["arq", "app.workers.settings.WorkerSettings"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://superdocs:superdocs@postgres:5432/gateway
+      REDIS_URL: redis://redis:6379/0
+      SUPERDOCS_BASE_URL: ${SUPERDOCS_BASE_URL:-https://api.superdocs.app}
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-mock-key-for-local}
+      WEBHOOK_SIGNING_SECRET: ${WEBHOOK_SIGNING_SECRET:-change-me-webhook-secret}
+      UPLOAD_DIR: /data/uploads
+      SAMPLE_MODE: ${SAMPLE_MODE:-true}
+    volumes:
+      - uploads:/data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  uploads:

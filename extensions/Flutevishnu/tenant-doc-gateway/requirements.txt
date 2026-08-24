@@ -1,0 +1,15 @@
+# Runtime dependencies (pinned for reproducible builds).
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+python-dotenv==1.0.1
+SQLAlchemy==2.0.36
+asyncpg==0.30.0
+alembic==1.14.0
+arq==0.26.3
+redis==5.2.1
+httpx==0.28.1
+structlog==24.4.0
+python-multipart==0.0.20
+aiofiles==24.1.0
