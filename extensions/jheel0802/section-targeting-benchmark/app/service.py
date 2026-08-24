@@ -26,6 +26,16 @@ class BenchmarkService:
         if not row: raise ValueError("no benchmark run is selected")
         return row
 
+    def _ensure_benchmark_run_writable(self, benchmark_run_id: int) -> None:
+        row=self.db.one("SELECT read_only FROM benchmark_runs WHERE id=?",(benchmark_run_id,))
+        if not row: raise ValueError("benchmark run not found")
+        if row.get("read_only"): raise ValueError("published benchmark snapshots are read-only; start a fresh benchmark run to make changes")
+
+    def _ensure_execution_writable(self, run_id: int) -> None:
+        row=self.db.one("""SELECT b.read_only FROM runs r JOIN benchmark_runs b ON b.id=r.benchmark_run_id WHERE r.id=?""",(run_id,))
+        if not row: raise ValueError("run not found")
+        if row.get("read_only"): raise ValueError("published benchmark snapshots are read-only; start a fresh benchmark run to make changes")
+
     def list_benchmark_runs(self) -> list[dict[str, Any]]:
         return self.db.all("""SELECT b.*,COUNT(r.id) execution_attempts,
           COUNT(DISTINCT CASE WHEN c.external_case_id IS NOT NULL THEN r.case_id END) official_cases_run,
@@ -99,6 +109,7 @@ class BenchmarkService:
 
     def run_case(self, case_id: int, benchmark_run_id: int | None=None) -> dict[str, Any]:
         benchmark_run_id=benchmark_run_id or self.current_benchmark_run()["id"]
+        self._ensure_benchmark_run_writable(benchmark_run_id)
         if not self.db.one("SELECT 1 FROM benchmark_run_cases WHERE benchmark_run_id=? AND case_id=?",(benchmark_run_id,case_id)): raise ValueError("case is not part of this benchmark run's corpus")
         self.verify_case_integrity(case_id)
         case=self.db.one("SELECT * FROM cases WHERE id=?",(case_id,)); document=self.db.one("SELECT * FROM documents WHERE id=?",(case["document_id"],)) if case else None
@@ -118,6 +129,7 @@ class BenchmarkService:
         if len(case_ids)>max_requests: raise ValueError("selected case count exceeds maximum requests")
         rows=[]
         benchmark_run_id=self.current_benchmark_run()["id"]
+        self._ensure_benchmark_run_writable(benchmark_run_id)
         for cid in case_ids:
             if not self.db.one("SELECT 1 FROM benchmark_run_cases WHERE benchmark_run_id=? AND case_id=?",(benchmark_run_id,cid)): raise ValueError(f"case is not part of this benchmark run: {cid}")
             self.verify_case_integrity(cid)
@@ -136,7 +148,7 @@ class BenchmarkService:
         return {"runs":runs,"cases_run":len(runs),"operations_charged":operations,"stopped_at_cap":len(runs)<len(case_ids) or operations>=max_operations,"preview":preview}
 
     def get_run(self, run_id: int) -> dict[str, Any]:
-        run=self.db.one("""SELECT r.*,f.name failure_category FROM runs r LEFT JOIN failure_categories f ON f.id=r.failure_category_id WHERE r.id=?""",(run_id,))
+        run=self.db.one("""SELECT r.*,f.name failure_category,b.read_only benchmark_run_read_only FROM runs r LEFT JOIN failure_categories f ON f.id=r.failure_category_id JOIN benchmark_runs b ON b.id=r.benchmark_run_id WHERE r.id=?""",(run_id,))
         if not run: raise ValueError("run not found")
         run["failure_category_stored"]=run.get("failure_category")
         run["failure_category"]=simplify_failure_category(run.get("failure_category")) or run.get("failure_category")
@@ -173,6 +185,7 @@ class BenchmarkService:
         return int(usage.get("ops_charged") or (1 if usage.get("was_billable") else 0))
 
     def start_guided_recovery(self, run_id: int, guidance: str) -> dict[str, Any]:
+        self._ensure_execution_writable(run_id)
         guidance=guidance.strip()
         if not guidance: raise ValueError("guidance is required")
         run=self.get_run(run_id); case=self.db.one("SELECT * FROM cases WHERE id=?",(run["case_id"],))
@@ -217,6 +230,7 @@ class BenchmarkService:
         return self.get_guided_recovery(run_id) or {}
 
     def adjudicate_guided_recovery(self, run_id: int, verdict: str, note: str|None=None) -> dict[str, Any]:
+        self._ensure_execution_writable(run_id)
         if verdict not in {"recovered","not_recovered","ambiguous"}: raise ValueError("invalid recovery result")
         if not self.get_guided_recovery(run_id): raise ValueError("guided recovery not found")
         self.db.execute("UPDATE guided_recoveries SET recovery_verdict=?,recovery_note=?,updated_at=? WHERE original_run_id=?",(verdict,note,now(),run_id))
@@ -279,6 +293,7 @@ class BenchmarkService:
         return []
 
     def approve_test_edit(self, run_id: int) -> dict[str, Any]:
+        self._ensure_execution_writable(run_id)
         run=self.get_run(run_id)
         case=self.db.one("SELECT * FROM cases WHERE id=?",(run["case_id"],))
         if not case or case["case_type"]!="edit": raise ValueError("approval is available only for edit cases")
@@ -369,12 +384,14 @@ class BenchmarkService:
         return self.get_applied_verification(run_id)
 
     def save_applied_verification(self, run_id: int, proposal_target_correct: bool | None, applied_target_correct: bool | None, notes: str | None) -> dict[str, Any]:
+        self._ensure_execution_writable(run_id)
         if not self.db.one("SELECT id FROM applied_verifications WHERE run_id=?",(run_id,)): raise ValueError("applied verification is not available")
         self.db.execute("UPDATE applied_verifications SET proposal_target_correct=?,applied_target_correct=?,applied_verification_notes=?,updated_at=? WHERE run_id=?",
           (None if proposal_target_correct is None else int(proposal_target_correct),None if applied_target_correct is None else int(applied_target_correct),notes,now(),run_id))
         return self.get_applied_verification(run_id)
 
     def adjudicate(self, run_id: int, verdict: str, failure_category_id: int | None, note: str | None) -> dict[str, Any]:
+        self._ensure_execution_writable(run_id)
         if verdict not in {"pass","fail","ambiguous"}: raise ValueError("invalid verdict")
         if verdict=="fail" and failure_category_id is None: raise ValueError("failure category is required for fail")
         if failure_category_id and not self.db.one("SELECT id FROM failure_categories WHERE id=? AND active=1",(failure_category_id,)): raise ValueError("failure category not found or inactive")

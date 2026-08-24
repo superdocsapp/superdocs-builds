@@ -4,14 +4,29 @@ A small, manual-review benchmark for evaluating whether SuperDocs uses the inten
 
 Corpus version 1.1.0 contains 14 frozen DOCX documents and 60 benchmark cases. The documents are unchanged. D06-C02 and D08-C02 remain permanently removed.
 
+## Why this exists
+
+Documents often repeat headings such as **Risks**, **Validation**, or **Known Issues**. This benchmark tests whether SuperDocs can resolve the correct section using parent headings, semantic clues, relative position, historical and appendix context, and ambiguity handling.
+
 ## Final results
 
 The tracked final adjudicated run (Benchmark run 4, corpus version 1.1.0) covers 14 frozen DOCX documents and 60 official cases:
 
 - Section targeting: **56 PASS / 4 FAIL / 0 CANNOT DETERMINE — 93.3% accuracy**
+- Correct final outcome: **56 PASS / 4 FAIL — 93.3% accuracy**
 - Search targeting: **42/43 PASS — 97.7% accuracy**
 - Edit targeting: **14/17 PASS — 82.4% accuracy**
-- Strict/end-to-end: **56 PASS / 4 FAIL — 93.3% accuracy**
+
+Observed failures:
+
+- Wrong target: **2**
+- Should have clarified: **1**
+- Unsupported target: **1**
+- Right target, wrong result: **0**
+- Cannot determine: **0**
+
+Run measurements:
+
 - Average latency: **16,438.24 ms**
 - Median latency: **15,389.39 ms**
 - P95 latency: **25,314.93 ms**
@@ -30,26 +45,53 @@ The tracked screenshot is [`outputs/final_run/final-result-dashboard.png`](outpu
 
 Secondary experiments remain separate from the official score. Applied-edit verification contains 15 reviewed approvals: 13 landed in the intended section, 2 could not be determined, and none showed unrelated changes. Guided recovery was attempted twice and recovered both cases.
 
-Targeting accuracy measures whether SuperDocs identified the intended section. Strict accuracy additionally requires the returned answer or proposed edit to be correct and properly scoped. Public failure reporting uses four categories: **Wrong target**, **Should have clarified**, **Unsupported target**, and **Right target, wrong result**. Historical granular adjudication labels remain preserved internally.
+Targeting accuracy measures whether SuperDocs identified the intended section. Correct final outcome additionally requires the returned answer or proposed edit to be correct and properly scoped. Public failure reporting uses four categories: **Wrong target**, **Should have clarified**, **Unsupported target**, and **Right target, wrong result**. Historical granular adjudication labels remain preserved internally.
 
-## Start the app
+## What this benchmark does not claim
+
+- It is not an automatic judge; manual adjudication is part of the methodology.
+- It is not a general document question-answering benchmark.
+- It does not claim that 60 cases represent every document type or targeting challenge.
+- It does not claim that live SuperDocs responses will be identical between runs.
+
+## Quick start from GitHub
 
 Python 3.11 or newer is recommended. Docker is not required.
 
 ```bash
+git clone --branch jheel-section-targeting-benchmark https://github.com/jheel0802/superdocs-builds.git
+cd superdocs-builds/extensions/jheel0802/section-targeting-benchmark
+
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Put your SuperDocs API key in `.env`:
+### Local demo without an API key
+
+Set the client mode in `.env`:
+
+```dotenv
+SUPERDOCS_CLIENT=fake
+```
+
+The fake client exercises case execution, persistence, evidence display, adjudication, and dashboard behavior without contacting SuperDocs. It does not reproduce SuperDocs’ real targeting quality.
+
+### Live reproduction with SuperDocs
+
+To perform a new live evaluation, put your own SuperDocs API key in `.env` and keep the real client enabled:
 
 ```dotenv
 SUPERDOCS_API_KEY=your_real_key_here
+SUPERDOCS_CLIENT=real
 ```
 
-Load the frozen corpus once if the database is new:
+Never commit `.env`; it is intentionally gitignored.
+
+### Import and start
+
+For either mode, load the frozen corpus into a new local SQLite database:
 
 ```bash
 python -m app.import_corpus
@@ -61,7 +103,31 @@ Start the site:
 uvicorn app.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000`. To exercise the app without live SuperDocs calls, set `SUPERDOCS_CLIENT=fake` in `.env` before starting it.
+Open `http://127.0.0.1:8000`.
+
+The repository intentionally excludes `benchmark.db`. The import command loads a sanitized, read-only **Published Benchmark run 4** into your new local database, so the final experiment can be explored in the Results and Cases pages without an API key. It contains no SuperDocs session, job, document, account, or authentication identifiers.
+
+To run your own evaluation, click **Start fresh benchmark run**. That creates a separate empty 60-case run; it never changes the published snapshot. Your new executions and adjudications persist only in your local `benchmark.db`.
+
+### Review the tracked final results
+
+The published Benchmark run 4 evidence does not require an API key or database:
+
+- [`outputs/final_run/results.csv`](outputs/final_run/results.csv) — sanitized latest attempt for each of the 60 official cases
+- [`outputs/final_run/summary.json`](outputs/final_run/summary.json) — authoritative aggregate metrics
+- [`outputs/final_run/final-result-dashboard.png`](outputs/final_run/final-result-dashboard.png) — final Results-page screenshot
+- [`outputs/final_run/public_snapshot.json`](outputs/final_run/public_snapshot.json) — sanitized UI snapshot of the final run, including applied verification and guided recovery evidence
+
+Because SuperDocs is a live external service, a new live run can produce different responses. The corpus, expected targets, scoring workflow, and validation checks remain reproducible.
+
+## Repository map
+
+```text
+app/                         benchmark UI and API
+outputs/benchmark_corpus/    frozen 14-DOCX corpus and manifest
+outputs/final_run/           published 60-case results
+tests/                       deterministic tests
+```
 
 ## How to evaluate the benchmark
 
@@ -87,7 +153,7 @@ SQLite stores benchmark runs, every execution attempt, normalized and raw SuperD
 
 ## Applied-edit verification
 
-The original human adjudication is preserved as the strict/end-to-end verdict. The separate targeting verdict evaluates only whether the first proposal identified the intended section.
+The original human adjudication is preserved as the correct-final-outcome verdict. The separate targeting verdict evaluates only whether the first proposal identified the intended section.
 
 For a freshly run synthetic edit case that is waiting for approval, the case page can additionally:
 
@@ -97,7 +163,7 @@ For a freshly run synthetic edit case that is waiting for approval, the case pag
 4. Compare the before/after HTML by `data-chunk-id` and record modified, created, deleted and unrelated chunks.
 5. Save separate human judgments about proposal placement and applied placement.
 
-Approval affects only the temporary synthetic SuperDocs session. It never rewrites the frozen local DOCX fixture. Applied evidence is stored separately and does not alter targeting or strict metrics. A second proposal batch requires another explicit approval; a large-edit continuation prompt is shown separately and is never treated as a change approval.
+Approval affects only the temporary synthetic SuperDocs session. It never rewrites the frozen local DOCX fixture. Applied evidence is stored separately and does not alter section-targeting or correct-final-outcome metrics. A second proposal batch requires another explicit approval; a large-edit continuation prompt is shown separately and is never treated as a change approval.
 
 ## Architecture
 
@@ -125,15 +191,9 @@ For `create` changes, placement is resolved through `insert_after_chunk_id`. If 
 
 ### Guided Recovery Experiment
 
-The primary benchmark measures first-attempt section targeting. Guided recovery is an optional, secondary experiment asking whether a human can reject one incorrect edit proposal, provide one explicit correction, and obtain a correct second proposal.
+Guided recovery is an optional secondary experiment measuring whether one human correction can turn an incorrect first edit proposal into a correct second proposal. It recovered **2 of 2** attempted cases in the published run and never changes the original benchmark verdict.
 
-For a pending edit, choose **Reject and guide**, enter the correction yourself, and submit it once. The app preserves the original proposal and benchmark verdict and rejects the original change IDs with your guidance in the API feedback field. SuperDocs revises the proposal in the same job; the app polls that job and stores the returned pending-change batch as the recovery proposal. It does not send a redundant second chat request. Recovery latency, operations, and the manual result—**Recovered**, **Did not recover**, or **Cannot determine**—are stored separately. Recovery data never changes targeting accuracy, strict accuracy, or the official run’s 38-operation total. Dollar spend remains unavailable because the API does not report it.
-
-Recommended initial sample (run manually, at most three):
-
-- **D05-C02:** semantic section mismatch between User Experience and Functional Requirements.
-- **D01-C02:** repeated Risks heading selected under the wrong client parent.
-- **D10-C02:** cross-reference confusion, providing a distinct failure mode from the first two.
+To reproduce it, open a failed edit that is still awaiting approval, choose **Reject and guide**, enter one correction, then review and manually score the returned proposal as **Recovered**, **Did not recover**, or **Cannot determine**. Recovery evidence and API-reported operations are stored separately from the official results.
 
 ## Batch limits and API usage
 
@@ -167,4 +227,4 @@ The corpus validator checks document hashes, real heading hierarchy, target cont
 - Removing a benchmark case is a data migration because executions reference cases. Normal startup never resets runs or adjudications.
 - API errors are saved with the execution and do not expose the API key.
 
-Built for the SuperDocs task.
+Built as a reproducible evaluation of section targeting in SuperDocs, with raw results, manual adjudication, and explicit failure reporting.

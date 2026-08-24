@@ -48,7 +48,7 @@ def create_app(settings:Settings|None=None,client:Any=None)->FastAPI:
         return service
 
     @app.get("/api/config")
-    def config(): return {"client_mode":settings.client_mode,"max_batch_cases":settings.max_batch_cases,"max_batch_operations":settings.max_batch_operations,"api_key_configured":bool(settings.api_key),"default_manifest":str(DEFAULT_MANIFEST)}
+    def config(): return {"client_mode":settings.client_mode,"max_batch_cases":settings.max_batch_cases,"max_batch_operations":settings.max_batch_operations,"api_key_configured":bool(settings.api_key),"default_manifest":"outputs/benchmark_corpus/benchmark_manifest.json"}
 
     @app.get("/api/benchmark-runs")
     def benchmark_runs(): return get_service().list_benchmark_runs()

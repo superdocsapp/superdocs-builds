@@ -77,7 +77,7 @@ viewRun=async function(id){
     document.querySelector('#recovery-verdict')?.addEventListener('submit',async e=>{e.preventDefault();await api(`/api/runs/${id}/guided-recovery/adjudication`,{method:'PUT',body:JSON.stringify({verdict,note:document.querySelector('#recovery-note').value})});msg('Recovery result saved separately.');viewRun(id)});
     return;
   }
-  const canReject=r.case.case_type==='edit'&&r.status==='awaiting_approval'&&changes(r.evidence||{}).length&&!r.applied_verification&&((r.raw_response?.job?.metadata||{}).awaiting_kind!=='continue_prompt');
+  const canReject=!r.benchmark_run_read_only&&r.case.case_type==='edit'&&r.status==='awaiting_approval'&&changes(r.evidence||{}).length&&!r.applied_verification&&((r.raw_response?.job?.metadata||{}).awaiting_kind!=='continue_prompt');
   if(!canReject||!proposal)return;
   document.querySelector('#approve-test-edit')?.insertAdjacentHTML('afterend',' <button id="reject-and-guide">Reject and guide</button>');
   document.querySelector('#reject-and-guide').onclick=()=>{

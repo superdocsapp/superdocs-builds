@@ -4,6 +4,7 @@ import csv
 import hashlib
 import itertools
 import json
+import re
 from pathlib import Path
 
 import httpx
@@ -16,9 +17,11 @@ from app.service import BenchmarkService
 from app.superdocs import FakeSuperDocsClient, RealSuperDocsClient, build_chunk_heading_map, resolve_pending_changes
 from app.document_evidence import diff_documents, parse_document_html, render_annotated_document
 from app.targeting import PUBLIC_FAILURE_DEFINITIONS, REVIEWED_STRICT_FAILURES, assess_targeting, verdict_summary
+from app.public_snapshot import PRIVATE_KEYS, import_public_snapshot
 
 ROOT=Path(__file__).resolve().parents[1]
 MANIFEST=ROOT/"outputs"/"benchmark_corpus"/"benchmark_manifest.json"
+PUBLIC_SNAPSHOT=ROOT/"outputs"/"final_run"/"public_snapshot.json"
 
 @pytest.fixture
 def setup(tmp_path):
@@ -85,6 +88,41 @@ def test_expanded_manifest_contains_20_single_target_additions():
     assert all(c["expected_behavior"]!="acceptable_set" for c in additions.values())
     with (MANIFEST.parent/"benchmark_manifest.csv").open(newline="") as handle:
         assert len(list(csv.DictReader(handle)))==60
+
+def test_public_snapshot_bootstraps_latest_experiment_and_fresh_run_is_isolated(tmp_path):
+    db=Database(str(tmp_path/"published.db")); fake=FakeSuperDocsClient(); service=BenchmarkService(db,fake,60,60)
+    service.import_corpus(MANIFEST)
+    imported=import_public_snapshot(db,PUBLIC_SNAPSHOT)
+    assert imported["attempts"]==61
+    published=service.current_benchmark_run()
+    assert published["name"]=="Published Benchmark run 4" and published["read_only"]==1
+    assert len(service.list_benchmark_runs())==1
+    metrics=service.metrics()
+    assert (metrics["official_cases"],metrics["official_cases_run"],metrics["pass"],metrics["fail"],metrics["total_operations_charged"])==(60,60,56,4,38)
+    assert metrics["applied_verification"]=={"verified":15,"landed_in_intended_section":13,"did_not_land_correctly":0,"cannot_determine":2,"unrelated_changes_detected":0}
+    assert metrics["guided_recovery"]["cases_recovered"]==2
+    case_id=db.one("SELECT id FROM cases WHERE external_case_id='D01-C01'")["id"]
+    with pytest.raises(ValueError,match="read-only"): service.run_case(case_id,published["id"])
+    assert fake.jobs=={}
+    fresh=service.start_benchmark_run()
+    assert fresh["read_only"]==0 and service.metrics()["official_cases_run"]==0
+    assert service.metrics(published["id"])["pass"]==56
+
+def test_public_snapshot_contains_no_remote_or_account_identifiers():
+    payload=json.loads(PUBLIC_SNAPSHOT.read_text()); hits=[]
+    def inspect(value,path="root"):
+        if isinstance(value,dict):
+            for key,item in value.items():
+                if key.lower() in PRIVATE_KEYS or (key.lower().endswith("_id") and key.lower() not in {"external_case_id","chunk_id","change_id","insert_after_chunk_id","insert_before_chunk_id"}): hits.append(path+"."+key)
+                inspect(item,path+"."+key)
+        elif isinstance(value,list):
+            for index,item in enumerate(value): inspect(item,f"{path}[{index}]")
+        elif isinstance(value,str) and value[:1] in "[{":
+            try: inspect(json.loads(value),path+"<json>")
+            except json.JSONDecodeError: pass
+    inspect(payload)
+    assert hits==[]
+    assert re.search(r"sk-[A-Za-z0-9_-]{20,}",PUBLIC_SNAPSHOT.read_text()) is None
 
 def test_manifest_import_rejects_sha_mismatch(tmp_path):
     source=json.loads(MANIFEST.read_text()); corpus=tmp_path/"corpus"; docs=corpus/"documents"; docs.mkdir(parents=True)
@@ -177,6 +215,7 @@ def test_taxonomy_definitions_and_official_cases_api(tmp_path):
             assert definitions and all(x["name"] and x["definition"] for x in definitions)
             assert (await client.post("/api/cases",json={})).status_code==405
             assert (await client.post("/api/documents",json={})).status_code==405
+            assert (await client.get("/api/config")).json()["default_manifest"]=="outputs/benchmark_corpus/benchmark_manifest.json"
     asyncio.run(scenario())
 
 def test_api_import_filters_and_batch_preview(tmp_path):

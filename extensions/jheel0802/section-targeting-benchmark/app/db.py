@@ -217,6 +217,8 @@ class Database:
             self._add_columns(db, "runs", {"benchmark_run_id": "INTEGER REFERENCES benchmark_runs(id)"})
             self._add_columns(db, "benchmark_runs", {
                 "corpus_version": "TEXT", "corpus_case_total": "INTEGER NOT NULL DEFAULT 0",
+                "read_only": "INTEGER NOT NULL DEFAULT 0",
+                "snapshot_key": "TEXT",
             })
             self._add_columns(db, "approval_actions", {"changes_json": "TEXT NOT NULL DEFAULT '[]'"})
             self._add_columns(db, "applied_verifications", {"applied_target_paths_json": "TEXT NOT NULL DEFAULT '[]'"})
@@ -243,6 +245,7 @@ class Database:
                         db.execute("UPDATE benchmark_runs SET corpus_version='1.0.1',corpus_case_total=? WHERE id=?",(membership,run_id))
             db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_documents_external_id ON documents(external_document_id) WHERE external_document_id IS NOT NULL")
             db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_cases_external_id ON cases(external_case_id) WHERE external_case_id IS NOT NULL")
+            db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_benchmark_runs_snapshot_key ON benchmark_runs(snapshot_key) WHERE snapshot_key IS NOT NULL")
             for category in DEFAULT_TAXONOMY:
                 db.execute("INSERT INTO failure_categories(name,active) VALUES (?,1) ON CONFLICT(name) DO UPDATE SET active=1", (category,))
             for category in LEGACY_TAXONOMY:
