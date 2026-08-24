@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .db import Database, now
-from .superdocs import RunResult, SuperDocsClient, SuperDocsError, resolve_pending_changes
+from .superdocs import RunResult, SuperDocsClient, SuperDocsError, local_document_html, resolve_pending_changes
 from .document_evidence import diff_documents, parse_document_html, render_annotated_document, resolve_changes
 from .targeting import PUBLIC_FAILURE_DEFINITIONS, assess_targeting, simplify_failure_category, verdict_summary
 
@@ -266,7 +266,10 @@ class BenchmarkService:
         case=self.db.one("SELECT * FROM cases WHERE id=?",(run["case_id"],))
         if not case: raise ValueError("case not found")
         raw=run.get("raw_response") or {}; pre=((raw.get("upload") or {}).get("html"))
-        if not pre: raise ValueError("stored upload HTML is unavailable for this run")
+        if not pre:
+            document=self.db.one("SELECT d.* FROM documents d JOIN cases c ON c.document_id=d.id WHERE c.id=?",(run["case_id"],))
+            if document: pre,_=local_document_html(document)
+        if not pre: raise ValueError("document preview is unavailable for this run")
         applied=self.get_applied_verification(run_id)
         document_html=applied.get("post_approval_html") if stage=="post" and applied else pre
         if stage=="post" and not document_html: raise ValueError("post-approval HTML is unavailable")

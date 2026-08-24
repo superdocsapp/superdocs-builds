@@ -393,6 +393,19 @@ def test_stored_html_viewer_makes_no_superdocs_call(setup):
     viewer=service.viewer_html(run["id"])
     assert "data-chunk-id" in viewer and len(fake.approval_calls)==calls
 
+def test_fake_search_run_retains_local_html_for_viewer(setup):
+    _,fake,service,did=setup
+    run=service.run_case(new_case(service,did,"search"))
+    viewer=service.viewer_html(run["id"])
+    assert "Projects" in viewer and "stored upload HTML is unavailable" not in viewer
+    assert fake.approval_calls==[]
+
+def test_old_fake_run_without_html_uses_stored_document_fallback(setup):
+    db,_,service,did=setup; case_id=new_case(service,did,"search")
+    run_id=db.execute("""INSERT INTO runs(case_id,benchmark_run_id,status,raw_response_json,evidence_json,created_at)
+      VALUES (?,?,?,'{}','{}',?)""",(case_id,service.current_benchmark_run()["id"],"completed",now()))
+    assert "Projects" in service.viewer_html(run_id)
+
 def test_approval_persists_applied_evidence_and_preserves_original_verdict(tmp_path):
     path=str(tmp_path/"approval.db"); db=Database(path)
     fake=FakeSuperDocsClient(post_approval_html='<h1 data-chunk-id="h1">Projects</h1><p data-chunk-id="observed-chunk-1">Deadline: March 27.</p>')

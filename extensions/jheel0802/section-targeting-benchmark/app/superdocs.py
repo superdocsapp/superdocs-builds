@@ -4,6 +4,7 @@ import base64
 import html
 import json
 import re
+from html import escape
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
@@ -101,6 +102,25 @@ def _docx_paragraph_paths(content: bytes) -> list[tuple[str,str|None]]:
         path=" > ".join(headings[key] for key in sorted(headings)) or None
         rows.append((text_value,path))
     return rows
+
+
+def local_document_html(document: dict[str, Any]) -> tuple[str, dict[str, str]]:
+    """Create a local-only viewer representation; never sends or uploads anything."""
+    content=document.get("content") or b""
+    if document.get("content_type")=="text/html":
+        html=content.decode("utf-8",errors="replace")
+        return html,build_chunk_heading_map(html)
+    rows=_docx_paragraph_paths(content)
+    chunks=[]; paths={}
+    previous_path=None
+    for index,(text_value,path) in enumerate(rows,1):
+        chunk_id=f"fake-local-{index}"
+        is_heading=bool(path and path!=previous_path and path.split(" > ")[-1]==text_value)
+        tag=f"h{min(6,path.count(' > ')+1)}" if is_heading else "p"
+        chunks.append(f'<{tag} data-chunk-id="{chunk_id}">{escape(text_value)}</{tag}>')
+        if path: paths[chunk_id]=path
+        previous_path=path
+    return "\n".join(chunks) or "<p>Local document preview unavailable.</p>",paths
 
 
 def build_chunk_heading_map(document_html: str|None, source_content: bytes|None=None, filename: str|None=None) -> dict[str,str]:
@@ -266,8 +286,9 @@ class FakeSuperDocsClient:
             raise SuperDocsError("Fake upstream error")
         session = f"fake_session_{case['id']}"
         if case["case_type"] == "search":
+            pre_html,heading_paths=local_document_html(document)
             raw = {"response": case.get("expected_answer") or "Please clarify which repeated section you mean.", "session_id": session, "usage": {"ops_charged": 1}}
-            return RunResult("completed", session, raw["response"], {"usage": raw["usage"]}, {"upload": {"chunks_count": 4}, "chat": raw}, 12.5, 1)
+            return RunResult("completed", session, raw["response"], {"usage": raw["usage"],"chunk_heading_paths":heading_paths}, {"upload": {"chunks_count": len(heading_paths),"html":pre_html}, "chat": raw}, 12.5, 1)
         job_id = f"fake_job_{case['id']}"
         pre_html = '<h1 data-chunk-id="h1">Projects</h1><p data-chunk-id="observed-chunk-1">Deadline: March 20.</p>'
         pending = [{"change_id": "change-1", "operation": "edit", "chunk_id": "observed-chunk-1", "document_id":"doc_primary", "old_html": "<p data-chunk-id=\"observed-chunk-1\">Deadline: March 20.</p>", "new_html": "<p data-chunk-id=\"observed-chunk-1\">Deadline: March 27.</p>", "ai_explanation": "Updates the named deadline."}]
