@@ -1,0 +1,43 @@
+CLAUSEKEEPER DELIVERABLES — Demo bundle
+Generated: 2026-08-24
+
+FILES
+- clausekeeper-demo.mp4    demo video, ~2:00-3:00, 1920x1080, agent-generated,
+                       synthetic narration (voice: Kokoro TTS am_eric, Apache 2.0,
+                       speed 0.97, paused per-sentence delivery)
+- thumbnail.jpg       YouTube/Drive thumbnail
+- writeup.pdf         one-page write-up (source of truth: docs/writeup.md)
+- architecture.png/.svg rendered from committed docs/architecture.mmd
+- MANIFEST.txt        this file (with sha256 checksums below)
+- SCRUB-AUDIT.txt     secrets scrub record
+
+CHECKSUMS (sha256)
+d3c2c3bfffe961ae9d1deec6c688418b5e7c7adbf27a7b4c4a68f04c42195f53  clausekeeper-demo.mp4
+808821a6d26ed067fab22232a75bb06edb3585e6b1b197f31837dffe62ecdfaf  thumbnail.jpg
+b9206e4007976bccff385218065da3656457648c0686479e922175e005162485  writeup.pdf
+eb2e80e4f12150e053cdcffd676bb201242698f6d563eaa5c17a35cc8b1a7a39  architecture.png
+4515eb01830974d75782676e6f81f4c3e04c76c0f4cc786f8dd54ea33a263337  architecture.svg
+84a5385e8bb689a99c8969a22d9fb344ac3a48b21c4561b1dfd93e8903f5a43b  SCRUB-AUDIT.txt
+
+PROVENANCE (all footage from real runs/artifacts)
+- Beat 1 cold open: clausekeeper edit NM-PRO-04 → approve → gap lands naming change_id
+              (docs/media/transcripts/clausekeeper-gap.txt, hero-1-gap-naming.svg)
+- Beat 2 rename: show proves durable_document_id survives rename
+- Beat 3 pack: branded audit-readiness pack via templates + pre-signed downloads
+- Beat 4 discover: link --discover free-read 0 ops → one batched search capped 1 op
+- Beat 5 measured: measured-results table = docs/writeup.md table
+- Beat 6 close: repo URL + 46 tests
+
+DISCLOSURE
+The entire video is agent-generated including fully synthetic voiceover
+(Kokoro TTS am_eric, Apache 2.0, speed 0.97, per-sentence synthesis with
+0.32 s inter-sentence pauses). No human appears on camera (applicant's
+recorded decision). This disclosure accompanies uploads per
+honesty-over-theater rails.
+
+UPLOAD CHECKLIST
+[ ] YouTube upload (public/unlisted): title contains 'SuperDocs';
+    description contains disclosure line + repo link
+[ ] Google Drive copy: clausekeeper-demo.mp4 + thumbnail.jpg + writeup.pdf
+    + architecture.png
+[ ] Form links when the Google Form arrives

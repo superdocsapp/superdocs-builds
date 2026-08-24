@@ -1,0 +1,134 @@
+[
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/doc-events",
+  "params": {
+   "after_id": "0"
+  },
+  "responses": [
+   {
+    "events": [
+     {
+      "event_id": 14,
+      "type": "document_updated",
+      "document_id": "doc_p04",
+      "job_id": "job_web_900",
+      "occurred_at": "2026-08-23T08:20:00Z",
+      "actor": "human-web-ui"
+     }
+    ],
+    "next_cursor": 14
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/doc-events",
+  "params": {
+   "after_id": "14"
+  },
+  "responses": [
+   {
+    "events": [],
+    "next_cursor": 14
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/documents",
+  "params": {
+   "include_html": "true",
+   "report_changed": "true"
+  },
+  "responses": [
+   {
+    "documents": [
+     {
+      "document_id": "doc_p02",
+      "name": "NM-PRO-02-document-control",
+      "durable_document_id": "dur_0001-p02",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-02: Document Control</h1><div data-chunk-id=\"c25a\"><h2>Creation and approval</h2><p>A document is not effective until both signatures are recorded.</p></div><div data-chunk-id=\"c25b\"><h2>Planning changes to documents or processes</h2><p>The requester completes a change request stating the purpose before any change is made.</p></div>"
+     },
+     {
+      "document_id": "doc_p03",
+      "name": "NM-PRO-03-risk-and-objectives",
+      "durable_document_id": "dur_0002-p03",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-03: Risk and Objectives</h1><div data-chunk-id=\"c61a\"><h2>Risk register</h2><p>Risks are identified, evaluated on a 5x5 scale, and tracked to planned actions.</p></div><div data-chunk-id=\"c62a\"><h2>Quality objectives</h2><p>Annual objectives carry a target, owner, timeframe, and progress tracking.</p></div>"
+     },
+     {
+      "document_id": "doc_p04",
+      "name": "NM-PRO-04-nonconforming-output",
+      "durable_document_id": "dur_0003-p04",
+      "changed": true,
+      "html": "<h1>Procedure NM-PRO-04: Nonconforming Output</h1><div data-chunk-id=\"c87_hold\"><h2>Identifying and containing nonconforming output</h2><p>Suspect product is tagged HOLD and quarantined the same shift.</p></div><div data-chunk-id=\"c102_capa\"><h2>Corrective action</h2><p>The owner performs root-cause analysis documented in the CAPA record.</p></div>"
+     },
+     {
+      "document_id": "doc_p05",
+      "name": "NM-PRO-05-competence-training",
+      "durable_document_id": "dur_0004-p05",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-05: Competence Training Awareness</h1><div data-chunk-id=\"c72_comp\"><h2>Competence requirements</h2><p>Sign-off requires the trainer's confirmation that the person performed the task correctly.</p></div><div data-chunk-id=\"c73_aware\"><h2>Awareness</h2><p>Managers cover why the quality policy matters in quarterly team meetings.</p></div>"
+     },
+     {
+      "document_id": "doc_p06",
+      "name": "NM-PRO-06-operations-suppliers-release",
+      "durable_document_id": "dur_0005-p06",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-06: Operations Suppliers Release</h1><div data-chunk-id=\"c84_sup\"><h2>Supplier selection and evaluation</h2><p>Suppliers are qualified before first order and scorecards run quarterly.</p></div><div data-chunk-id=\"c86_rel\"><h2>Release</h2><p>No lot ships until final inspection passes all acceptance criteria and QA signs the release record.</p></div>"
+     },
+     {
+      "document_id": "doc_qm01",
+      "name": "NM-QM-01-quality-manual",
+      "durable_document_id": "dur_0006-qm01",
+      "changed": false,
+      "html": "<h1>Northgate Medical Devices Quality Manual</h1><div data-chunk-id=\"c44_map\"><h2>Process map</h2><p>Five core process groups each have a named owner and measures reviewed monthly.</p></div><div data-chunk-id=\"c91_mon\"><h2>Monitoring and measurement</h2><p>Monthly quality scorecards track first-pass yield and complaint rate.</p></div>"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/documents/{id}",
+  "responses": [
+   {
+    "document_id": "doc_p04",
+    "html": "<h1>Procedure NM-PRO-04: Nonconforming Output</h1><div data-chunk-id=\"c87_hold\"><h2>Identifying and containing nonconforming output</h2><p>Suspect product is tagged HOLD and quarantined the same shift.</p></div><div data-chunk-id=\"c102_capa\"><h2>Corrective action</h2><p>The owner performs root-cause analysis documented in the CAPA record.</p></div>"
+   }
+  ]
+ },
+ {
+  "method": "POST",
+  "path": "/v1/chat/async",
+  "responses": [
+   {
+    "job_id": "job_verify_floor",
+    "status": "pending"
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/jobs/{id}",
+  "responses": [
+   {
+    "job_id": "job_verify_floor",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"10.2\", \"status\": \"covered\", \"chunk_id\": \"c102_capa\", \"heading_path\": \"Corrective action\", \"quote\": \"root-cause analysis\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 451,
+      "monthly_remaining": 49,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   }
+  ]
+ }
+]

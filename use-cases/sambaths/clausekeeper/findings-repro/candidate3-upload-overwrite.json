@@ -1,0 +1,24 @@
+{
+  "candidate": 3,
+  "title": "session upload overwrite replacing already-held document",
+  "request": {
+    "method": "POST",
+    "path": "/v1/documents/upload",
+    "session_id": "sess_[REDACTED]",
+    "file": "NM-PRO-02-document-control.md"
+  },
+  "before": {
+    "document_id": "doc_[REDACTED]",
+    "durable_id": "dur_[REDACTED]",
+    "title": "Document Control"
+  },
+  "after": {
+    "document_id": "doc_[REDACTED]",
+    "durable_id": "dur_[REDACTED]",
+    "title": "Document Control",
+    "content_hash": "newhash789",
+    "note": "same durable_id but content replaced; no version bump, no warning"
+  },
+  "observation": "Re-uploading a file to same session silently overwrites the held document; caller receives 200 with same IDs but new content, no conflict signal.",
+  "redaction_note": "IDs redacted; shape kept verbatim"
+}

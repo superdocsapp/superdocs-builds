@@ -1,0 +1,6 @@
+clausekeeper-b1-gap 2026-08-23 ticket 0016 — edit NM-PRO-04 chg_42 gap landing, ≤60s capture from fixture replay
+clausekeeper-b2-rename 2026-08-23 ticket 0016 — durable_document_id rename survival, ≤60s capture from fixture replay
+clausekeeper-b3-pack 2026-08-23 ticket 0016 — branded pack export letterhead→pre-signed DOCX+PDF+X-Export-Warnings, ≤60s capture
+clausekeeper-b4-discover 2026-08-23 ticket 0016 — Discover lane free-read 0 ops + one batched search SHORTLIST + --plan preview, ≤60s capture
+clausekeeper-b4-weak 2026-08-23 ticket 0016 — Discover weak WARN fallback (discover_weak.json), ≤60s capture
+clausekeeper-b6-pytest 2026-08-23 ticket 0016 — pytest -q 46 passed, ≤60s capture

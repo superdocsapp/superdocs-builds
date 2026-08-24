@@ -1,0 +1,35 @@
+# Deliberate coverage holes in the Northgate corpus — recorded BEFORE any detection run.
+# Task 1 "seed" discipline applied to the Task 2 demo: each seed states the clause left
+# uncovered and where the detection must surface it.
+seeds:
+  - id: SEED-H1
+    clause_id: "9.2"
+    title: Internal audit
+    reason: >
+      No document in the corpus describes an internal audit program; the quality manual's
+      assurance process group mentions audits only as a review input, with no section that
+      evidences scope, frequency, independence, or follow-up.
+    expect_detection_at: first link audit and every recheck
+
+  - id: SEED-H2
+    clause_id: "7.4"
+    title: Communication
+    reason: >
+      No document defines internal or external communication topics, channels, owners, or
+      cadence. The policy section mentions posting/orientation (5.2) but nothing governs
+      communication itself.
+    expect_detection_at: first link audit and every recheck
+
+# Scripted demo edit (UAT step 2 of ticket 0022): deleting the NCR-evidence
+# sections from NM-PRO-04 must orphan clause 8.7 synchronously in the same
+# approve-response processing, with the gap narrative naming change_id,
+# instruction, job, time. Both sections are deleted because the mapping may
+# bind 8.7 to either (containment or disposition both evidence it).
+scripted_edit:
+  document: NM-PRO-04-nonconforming-output.md
+  instruction: >-
+    Delete the sections 'Identifying and containing nonconforming output' and
+    'Disposition of nonconforming devices' from this procedure; containment and
+    disposition decisions now live only in the ERP workflow.
+  expected_gap_clause: "8.7"
+  expect_detection_at: immediately after approve processing, before any verification turn

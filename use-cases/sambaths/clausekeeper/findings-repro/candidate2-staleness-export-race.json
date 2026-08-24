@@ -1,0 +1,32 @@
+{
+  "candidate": 2,
+  "title": "~3 s apply/read staleness window + export-before-apply race",
+  "sequence": [
+    {
+      "step": "chat_async",
+      "job_id": "job_[REDACTED]",
+      "status": "completed",
+      "applied": true
+    },
+    {
+      "step": "roster immediate",
+      "elapsed_ms": 120,
+      "document_hash": "abc123",
+      "note": "stale \u2014 still old hash"
+    },
+    {
+      "step": "roster after 3100ms",
+      "elapsed_ms": 3100,
+      "document_hash": "def456",
+      "note": "fresh \u2014 hash changed"
+    },
+    {
+      "step": "export immediate after apply",
+      "url": "https://storage.googleapis.com/[REDACTED]?signature=[REDACTED]",
+      "content_contains_edit": false,
+      "note": "export-before-apply race: exported content missing just-applied edit"
+    }
+  ],
+  "observation": "Roster reads within ~3 s return stale hash; export issued immediately after apply lacks the edit. Race loses edits.",
+  "redaction_note": "URL signature redacted; hashes kept verbatim"
+}

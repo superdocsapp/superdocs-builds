@@ -1,0 +1,5 @@
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/01-b1-arrival.png'
+duration 9.79
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/02-b1-rename.png'
+duration 9.79
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/02-b1-rename.png'

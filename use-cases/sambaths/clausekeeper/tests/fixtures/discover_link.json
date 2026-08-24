@@ -1,0 +1,247 @@
+[
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/documents",
+  "params": {
+   "include_html": "true"
+  },
+  "responses": [
+   {
+    "documents": [
+     {
+      "document_id": "doc_p02",
+      "name": "NM-PRO-02-document-control",
+      "durable_document_id": "dur_0001-p02",
+      "changed": false,
+      "html": "<h1>Document control procedure</h1><div data-chunk-id=\"d75\"><h2>Documented information</h2><p>Controlled documents carry creation and approval records.</p></div><div data-chunk-id=\"d63\"><h2>Planning of changes</h2><p>A change request states its purpose before any change.</p></div>"
+     },
+     {
+      "document_id": "doc_p03",
+      "name": "NM-PRO-03-risk-and-objectives",
+      "durable_document_id": "dur_0002-p03",
+      "changed": false,
+      "html": "<h1>Risk procedure</h1><div data-chunk-id=\"d61\"><h2>Actions to address risks and opportunities</h2><p>Risks are scored on a five-by-five matrix and tracked.</p></div><div data-chunk-id=\"d62\"><h2>Quality objectives and planning to achieve them</h2><p>Objectives carry targets, owners, and timeframes.</p></div>"
+     },
+     {
+      "document_id": "doc_p04",
+      "name": "NM-PRO-04-nonconforming-output",
+      "durable_document_id": "dur_0003-p04",
+      "changed": false,
+      "html": "<h1>Nonconforming output procedure</h1><div data-chunk-id=\"d87\"><h2>Control of nonconforming outputs</h2><p>Suspect product is tagged HOLD and quarantined.</p></div><div data-chunk-id=\"d102\"><h2>Nonconformity and corrective action</h2><p>Root cause analysis feeds the CAPA record.</p></div>"
+     },
+     {
+      "document_id": "doc_p05",
+      "name": "NM-PRO-05-competence-training",
+      "durable_document_id": "dur_0004-p05",
+      "changed": false,
+      "html": "<h1>Competence procedure</h1><div data-chunk-id=\"d72\"><h2>Competence</h2><p>Training records verify role competence.</p></div><div data-chunk-id=\"d73\"><h2>Awareness</h2><p>Policy relevance is covered in team meetings.</p></div>"
+     },
+     {
+      "document_id": "doc_p06",
+      "name": "NM-PRO-06-operations-suppliers-release",
+      "durable_document_id": "dur_0005-p06",
+      "changed": false,
+      "html": "<h1>Operations procedure</h1><div data-chunk-id=\"d84\"><h2>Control of externally provided processes, products and services</h2><p>Suppliers are qualified before first order.</p></div><div data-chunk-id=\"d86\"><h2>Release of products and services</h2><p>No lot ships without QA sign-off.</p></div>"
+     },
+     {
+      "document_id": "doc_qm01",
+      "name": "NM-QM-01-quality-manual",
+      "durable_document_id": "dur_0006-qm01",
+      "changed": false,
+      "html": "<h1>Northgate Quality Manual</h1><div data-chunk-id=\"d44\"><h2>Quality management system and its processes</h2><p>Core processes are mapped with owners and measures.</p></div><div data-chunk-id=\"d91\"><h2>Monitoring, measurement, analysis and evaluation</h2><p>Monthly scorecards track yield and complaints.</p></div>"
+     }
+    ]
+   },
+   {
+    "documents": [
+     {
+      "document_id": "doc_p02",
+      "name": "NM-PRO-02-document-control",
+      "durable_document_id": "dur_0001-p02",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-02: Document Control</h1><div data-chunk-id=\"c25a\"><h2>Creation and approval</h2><p>A document is not effective until both signatures are recorded.</p></div><div data-chunk-id=\"c25b\"><h2>Planning changes to documents or processes</h2><p>The requester completes a change request stating the purpose before any change is made.</p></div>"
+     },
+     {
+      "document_id": "doc_p03",
+      "name": "NM-PRO-03-risk-and-objectives",
+      "durable_document_id": "dur_0002-p03",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-03: Risk and Objectives</h1><div data-chunk-id=\"c61a\"><h2>Risk register</h2><p>Risks are identified, evaluated on a 5x5 scale, and tracked to planned actions.</p></div><div data-chunk-id=\"c62a\"><h2>Quality objectives</h2><p>Annual objectives carry a target, owner, timeframe, and progress tracking.</p></div>"
+     },
+     {
+      "document_id": "doc_p04",
+      "name": "NM-PRO-04-nonconforming-output",
+      "durable_document_id": "dur_0003-p04",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-04: Nonconforming Output</h1><div data-chunk-id=\"c87_hold\"><h2>Identifying and containing nonconforming output</h2><p>Suspect product is tagged HOLD and quarantined the same shift.</p></div><div data-chunk-id=\"c_ncr_disp\"><h2>Disposition of nonconforming devices</h2><p>Dispositions are decided by the QA Manager or deputized approver listed on the signature sheet.</p></div><div data-chunk-id=\"c102_capa\"><h2>Corrective action</h2><p>The owner performs root-cause analysis documented in the CAPA record.</p></div>"
+     },
+     {
+      "document_id": "doc_p05",
+      "name": "NM-PRO-05-competence-training",
+      "durable_document_id": "dur_0004-p05",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-05: Competence Training Awareness</h1><div data-chunk-id=\"c72_comp\"><h2>Competence requirements</h2><p>Sign-off requires the trainer's confirmation that the person performed the task correctly.</p></div><div data-chunk-id=\"c73_aware\"><h2>Awareness</h2><p>Managers cover why the quality policy matters in quarterly team meetings.</p></div>"
+     },
+     {
+      "document_id": "doc_p06",
+      "name": "NM-PRO-06-operations-suppliers-release",
+      "durable_document_id": "dur_0005-p06",
+      "changed": false,
+      "html": "<h1>Procedure NM-PRO-06: Operations Suppliers Release</h1><div data-chunk-id=\"c84_sup\"><h2>Supplier selection and evaluation</h2><p>Suppliers are qualified before first order and scorecards run quarterly.</p></div><div data-chunk-id=\"c86_rel\"><h2>Release</h2><p>No lot ships until final inspection passes all acceptance criteria and QA signs the release record.</p></div>"
+     },
+     {
+      "document_id": "doc_qm01",
+      "name": "NM-QM-01-quality-manual",
+      "durable_document_id": "dur_0006-qm01",
+      "changed": false,
+      "html": "<h1>Northgate Medical Devices Quality Manual</h1><div data-chunk-id=\"c44_map\"><h2>Process map</h2><p>Five core process groups each have a named owner and measures reviewed monthly.</p></div><div data-chunk-id=\"c91_mon\"><h2>Monitoring and measurement</h2><p>Monthly quality scorecards track first-pass yield and complaint rate.</p></div>"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "method": "POST",
+  "path": "/v1/chat/async",
+  "responses": [
+   {
+    "job_id": "job_disc_01",
+    "status": "pending"
+   },
+   {
+    "job_id": "job_link_01",
+    "status": "pending"
+   },
+   {
+    "job_id": "job_link_02",
+    "status": "pending"
+   },
+   {
+    "job_id": "job_link_03",
+    "status": "pending"
+   },
+   {
+    "job_id": "job_link_04",
+    "status": "pending"
+   },
+   {
+    "job_id": "job_link_05",
+    "status": "pending"
+   },
+   {
+    "job_id": "job_link_06",
+    "status": "pending"
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/jobs/{id}",
+  "responses": [
+   {
+    "job_id": "job_disc_01",
+    "status": "completed",
+    "result": {
+     "response": "\"[{\\\"clause_id\\\": \\\"4.1\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Understanding the organization and its context\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"context section in manual\\\"}, {\\\"clause_id\\\": \\\"4.2\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Interested parties register\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"stakeholder needs table\\\"}, {\\\"clause_id\\\": \\\"4.3\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Scope of the quality management system\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"scope statement\\\"}, {\\\"clause_id\\\": \\\"5.1\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Leadership commitment\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"management accountability\\\"}, {\\\"clause_id\\\": \\\"5.2\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Quality policy\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"published policy text\\\"}, {\\\"clause_id\\\": \\\"5.3\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Roles and responsibilities matrix\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"authority assignments\\\"}, {\\\"clause_id\\\": \\\"7.1\\\", \\\"durable_document_id\\\": \\\"dur_0002-p03\\\", \\\"heading\\\": \\\"Resource planning\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"resources determined annually\\\"}, {\\\"clause_id\\\": \\\"7.4\\\", \\\"durable_document_id\\\": \\\"dur_0002-p03\\\", \\\"heading\\\": \\\"Communication matrix\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"channels and owners listed\\\"}, {\\\"clause_id\\\": \\\"8.1\\\", \\\"durable_document_id\\\": \\\"dur_0005-p06\\\", \\\"heading\\\": \\\"Operational control criteria\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"day-to-day process controls\\\"}, {\\\"clause_id\\\": \\\"8.2\\\", \\\"durable_document_id\\\": \\\"dur_0005-p06\\\", \\\"heading\\\": \\\"Customer requirements review\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"requirements captured pre-commitment\\\"}, {\\\"clause_id\\\": \\\"8.3\\\", \\\"durable_document_id\\\": \\\"dur_0005-p06\\\", \\\"heading\\\": \\\"Design controls\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"design stages retained\\\"}, {\\\"clause_id\\\": \\\"8.5\\\", \\\"durable_document_id\\\": \\\"dur_0005-p06\\\", \\\"heading\\\": \\\"Production controls and traceability\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"controlled conditions\\\"}, {\\\"clause_id\\\": \\\"9.2\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Internal audit schedule\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"audit program with frequency\\\"}, {\\\"clause_id\\\": \\\"9.3\\\", \\\"durable_document_id\\\": \\\"dur_0006-qm01\\\", \\\"heading\\\": \\\"Management review minutes\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"review cadence and decisions\\\"}, {\\\"clause_id\\\": \\\"10.3\\\", \\\"durable_document_id\\\": \\\"dur_0003-p04\\\", \\\"heading\\\": \\\"Continual improvement log\\\", \\\"chunk_id_if_known\\\": null, \\\"why\\\": \\\"improvement actions tracked\\\"}]\"",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 7,
+      "monthly_remaining": 493,
+      "quota_exhausted": false
+     }
+    }
+   },
+   {
+    "job_id": "job_link_01",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"7.5\", \"status\": \"covered\", \"heading_path\": \"Creation and approval\"}, {\"clause_id\": \"6.3\", \"status\": \"covered\", \"heading_path\": \"Planning changes to documents or processes\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 1,
+      "monthly_remaining": 499,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   },
+   {
+    "job_id": "job_link_02",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"6.1\", \"status\": \"covered\", \"heading_path\": \"Risk register\"}, {\"clause_id\": \"6.2\", \"status\": \"covered\", \"heading_path\": \"Quality objectives\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 2,
+      "monthly_remaining": 498,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   },
+   {
+    "job_id": "job_link_03",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"8.7\", \"status\": \"covered\", \"heading_path\": \"Disposition of nonconforming devices\"}, {\"clause_id\": \"10.2\", \"status\": \"covered\", \"heading_path\": \"Corrective action\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 3,
+      "monthly_remaining": 497,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   },
+   {
+    "job_id": "job_link_04",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"7.2\", \"status\": \"covered\", \"heading_path\": \"Competence requirements\"}, {\"clause_id\": \"7.3\", \"status\": \"covered\", \"heading_path\": \"Awareness\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 4,
+      "monthly_remaining": 496,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   },
+   {
+    "job_id": "job_link_05",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"8.4\", \"status\": \"covered\", \"heading_path\": \"Supplier selection and evaluation\"}, {\"clause_id\": \"8.6\", \"status\": \"covered\", \"heading_path\": \"Release\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 5,
+      "monthly_remaining": 495,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   },
+   {
+    "job_id": "job_link_06",
+    "status": "completed",
+    "result": {
+     "response": "[{\"clause_id\": \"4.4\", \"status\": \"covered\", \"heading_path\": \"Process map\"}, {\"clause_id\": \"9.1\", \"status\": \"covered\", \"heading_path\": \"Monitoring and measurement\"}]",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 6,
+      "monthly_remaining": 494,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+     }
+    }
+   }
+  ]
+ }
+]

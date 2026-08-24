@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="253" viewBox="0 0 1040 253" font-family="Menlo, Consolas, monospace" font-size="14">
+<rect width="1040" height="253" rx="10" fill="#0d1117"/>
+<rect width="1040" height="30" rx="10" fill="#161b22"/>
+<circle cx="16" cy="15" r="5" fill="#ff5f57"/><circle cx="34" cy="15" r="5" fill="#febc2e"/><circle cx="54" cy="15" r="5" fill="#28c840"/>
+<text x="520.0" y="20" text-anchor="middle" fill="#8b949e" font-size="12">clausekeeper show --verbose — gaps name the causing edit</text>
+<text x="24" y="60" fill="#e6edf3" xml:space="preserve" font-weight="bold">UNCOVERED CLAUSES (no evidence anywhere):</text>
+<text x="24" y="79" fill="#e6edf3" xml:space="preserve">  7.1 Resources</text>
+<text x="24" y="98" fill="#e6edf3" xml:space="preserve">  7.4 Communication</text>
+<text x="24" y="117" fill="#e6edf3" xml:space="preserve">  9.2 Internal audit</text>
+<text x="24" y="155" fill="#e6edf3" xml:space="preserve" font-weight="bold">OPEN GAPS:</text>
+<text x="24" y="174" fill="#e6edf3" xml:space="preserve">  [2026-08-22T21:33:51Z] Clause 8.7 has no covering section after verification pass in job `7420ca55-14f0-43bb-a219-b6af6236e6fa` at 2026-08-22T21:33:51Z; the document was checked and no evidencing section remains.</text>
+<text x="24" y="212" fill="#e6edf3" xml:space="preserve">usage: 9 billable ops logged; lowest monthly_remaining seen: 500</text>
+</svg>

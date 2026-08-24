@@ -1,0 +1,33 @@
+# clausekeeper demo narration — six beats, written for the ear
+# Fully synthetic voiceover: Kokoro TTS voice am_eric (Apache 2.0), speed 0.97.
+# Delivery: per-sentence synthesis assembled with a paused cadence in
+# tools/synth_vo.py — 0.15 s lead-in, 0.32 s between sentences, 0.25 s tail.
+# Each [beat N] paragraph below is the exact spoken text handed to the synth.
+# Identifiers, filenames, routes, header names, and timestamps are never
+# spoken; the slide caption bars and terminal footage carry those, the voice
+# carries meaning only.
+# Number parity: every measured number spoken below equals docs/writeup.md
+# (46 tests · about ten seconds · nine operations full cycle · at most one
+# extra operation for discovery · a single operation to pack · twelve of
+# twenty-seven clauses matched free · fifteen via search · zero operations
+# preview · search once exceeded three hundred seconds and fabricated a
+# candidate on seeded gap nine point two).
+# The close ends with the fully-synthetic disclosure line, verbatim.
+
+[beat 1 — cold open: the auditor's question]
+Which change broke this requirement? Every auditor asks it. Clausekeeper answers it as it happens. Edit a controlled procedure, delete a section, approve. Before the approval finishes, a gap appears naming the change responsible, quoting exactly what was lost.
+
+[beat 2 — rename survival]
+Documents get renamed. Links shouldn't break. Here the quality manual gets a new name. Nothing snaps: evidence attaches to the document itself. The matrix never noticed.
+
+[beat 3 — audit-day pack]
+Audit day. Proof hides in scattered runs and logs. Here, one command gathers everything into a branded, audit-ready pack, exported as Word and PDF, with export warnings checked. Packing costs a single operation. The downloads are free.
+
+[beat 4 — discover lane]
+Linking is where cost creeps in. Opt-in discovery reads structure, shortlists matches locally: twelve of twenty-seven clauses matched free, fifteen via search, at most one extra operation. Preview first, at zero operations. If search finds nothing, discover warns honestly, never inventing candidates.
+
+[beat 5 — measured and honest]
+The measured truth. Forty-six tests passed in about ten seconds. A full cycle costs nine operations. One caveat: search once exceeded three hundred seconds and fabricated a candidate on seeded gap nine point two. Search shortlists stay advisory. Humans make the calls.
+
+[beat 6 — close and disclosure]
+Back to our opening question. With clausekeeper, you know which change broke what. Every number traces to a rerunnable artifact, starting at pull request one thirty seven.

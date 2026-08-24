@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="177" viewBox="0 0 1040 177" font-family="Menlo, Consolas, monospace" font-size="14">
+<rect width="1040" height="177" rx="10" fill="#0d1117"/>
+<rect width="1040" height="30" rx="10" fill="#161b22"/>
+<circle cx="16" cy="15" r="5" fill="#ff5f57"/><circle cx="34" cy="15" r="5" fill="#febc2e"/><circle cx="54" cy="15" r="5" fill="#28c840"/>
+<text x="520.0" y="20" text-anchor="middle" fill="#8b949e" font-size="12">rename survival — links bound to durable ids, not names</text>
+<text x="24" y="60" fill="#79c0ff" xml:space="preserve">CLAUSE  STATUS   DOCUMENT                           SECTION</text>
+<text x="24" y="79" fill="#7ee787" xml:space="preserve">10.2    covered  NM-PRO-04-nonconforming-output-v2  4 Corrective action — QA classifies each NCR within two business days: use-as-is (…</text>
+<text x="24" y="98" fill="#ff7b72" xml:space="preserve">8.7     gap      NM-PRO-04-nonconforming-output-v2  1 Identifying and containing nonconforming o — Document code: NM-PRO-04 · Revision F · Owner: QA Manager · …</text>
+<text x="24" y="136" fill="#8b949e" xml:space="preserve">2 matrix rows intact after renaming NM-PRO-04 -&gt; NM-PRO-04-nonconforming-output-v2</text>
+</svg>

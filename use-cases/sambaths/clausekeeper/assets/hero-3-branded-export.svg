@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="652" viewBox="0 0 1040 652" font-family="Menlo, Consolas, monospace" font-size="14">
+<rect width="1040" height="652" rx="10" fill="#0d1117"/>
+<rect width="1040" height="30" rx="10" fill="#161b22"/>
+<circle cx="16" cy="15" r="5" fill="#ff5f57"/><circle cx="34" cy="15" r="5" fill="#febc2e"/><circle cx="54" cy="15" r="5" fill="#28c840"/>
+<text x="520.0" y="20" text-anchor="middle" fill="#8b949e" font-size="12">one generated pack doc -&gt; pre-signed DOCX + PDF, warnings checked</text>
+<text x="24" y="60" fill="#79c0ff" xml:space="preserve">$ python -m clausekeeper pack --template assets/northgate-letterhead.docx</text>
+<text x="24" y="79" fill="#e6edf3" xml:space="preserve">{</text>
+<text x="24" y="98" fill="#e6edf3" xml:space="preserve">  &quot;document&quot;: {</text>
+<text x="24" y="117" fill="#e6edf3" xml:space="preserve">    &quot;session_slot_id&quot;: &quot;doc_created_5f83a243ea&quot;,</text>
+<text x="24" y="136" fill="#e6edf3" xml:space="preserve">    &quot;durable_document_id&quot;: &quot;2730a5ce-c2bd-4bc9-a253-f3b8fb36c931&quot;,</text>
+<text x="24" y="155" fill="#e6edf3" xml:space="preserve">    &quot;name&quot;: &quot;Northgate Medical Devices - Audit Readiness Pack&quot;</text>
+<text x="24" y="174" fill="#e6edf3" xml:space="preserve">  },</text>
+<text x="24" y="193" fill="#e6edf3" xml:space="preserve">  &quot;title&quot;: &quot;Northgate Medical Devices - Audit Readiness Pack&quot;,</text>
+<text x="24" y="212" fill="#e6edf3" xml:space="preserve">  &quot;run_key&quot;: &quot;pack:e497ea64-c08b-411d-ab9d-8a1216b1e514&quot;,</text>
+<text x="24" y="231" fill="#e6edf3" xml:space="preserve">  &quot;template&quot;: {</text>
+<text x="24" y="250" fill="#e6edf3" xml:space="preserve">    &quot;template_id&quot;: &quot;76426aaa-767d-4a75-8fe8-53b59e9dca68&quot;,</text>
+<text x="24" y="269" fill="#e6edf3" xml:space="preserve">    &quot;reused&quot;: false</text>
+<text x="24" y="288" fill="#e6edf3" xml:space="preserve">  },</text>
+<text x="24" y="307" fill="#e6edf3" xml:space="preserve">  &quot;exports&quot;: [</text>
+<text x="24" y="326" fill="#e6edf3" xml:space="preserve">    {</text>
+<text x="24" y="345" fill="#e6edf3" xml:space="preserve">      &quot;format&quot;: &quot;docx&quot;,</text>
+<text x="24" y="364" fill="#e6edf3" xml:space="preserve">      &quot;path&quot;: &quot;exports/northgate-audit-readiness-pack.docx&quot;,</text>
+<text x="24" y="383" fill="#e6edf3" xml:space="preserve">      &quot;bytes&quot;: 39771,</text>
+<text x="24" y="402" fill="#e6edf3" xml:space="preserve">      &quot;warnings&quot;: []</text>
+<text x="24" y="421" fill="#e6edf3" xml:space="preserve">    },</text>
+<text x="24" y="440" fill="#e6edf3" xml:space="preserve">    {</text>
+<text x="24" y="459" fill="#e6edf3" xml:space="preserve">      &quot;format&quot;: &quot;pdf&quot;,</text>
+<text x="24" y="478" fill="#e6edf3" xml:space="preserve">      &quot;path&quot;: &quot;exports/northgate-audit-readiness-pack.pdf&quot;,</text>
+<text x="24" y="497" fill="#e6edf3" xml:space="preserve">      &quot;bytes&quot;: 98638,</text>
+<text x="24" y="516" fill="#e6edf3" xml:space="preserve">      &quot;warnings&quot;: []</text>
+<text x="24" y="535" fill="#e6edf3" xml:space="preserve">    }</text>
+<text x="24" y="554" fill="#e6edf3" xml:space="preserve">  ],</text>
+<text x="24" y="573" fill="#e6edf3" xml:space="preserve">  &quot;ops_spent&quot;: 1,</text>
+<text x="24" y="592" fill="#e6edf3" xml:space="preserve">  &quot;language_rail&quot;: &quot;clean&quot;</text>
+<text x="24" y="611" fill="#e6edf3" xml:space="preserve">}</text>
+</svg>

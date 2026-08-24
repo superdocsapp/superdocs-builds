@@ -1,0 +1,39 @@
+flowchart LR
+  %% Clausekeeper data-flow — roster+save → link → edit → recheck → show → pack → templates → pre-signed downloads → X-Warnings
+  %% Persistence = SQLite matrix + usage_log + shortlists
+  IN["pile QMS docs<br/>Quality Manual + 5 Procedures<br/>corpus/northgate"] --> RO["roster + save<br/>GET /v1/sessions/{id}/documents<br/>POST /v1/sessions/{id}/documents/{id}/save<br/>bind durable_document_id"]
+  RO --> LI["link<br/>compact, 1 turn / doc<br/>clause → section [chunk_id @offset quote]<br/>POST /v1/chat/async → GET /v1/jobs/{id}"]
+  LI --> ED["edit<br/>HITL approve<br/>POST /v1/chat/async → awaiting_approval<br/>POST /v1/chat/{id}/approve<br/>change_id · instruction · job · time"]
+  ED --> RC["recheck<br/>doc-events + batch verify<br/>GET /v1/sessions/{id}/doc-events<br/>GET /v1/sessions/{id}/documents?report_changed<br/>gap lands synchronously on chunk delete"]
+  RC --> SH["show<br/>matrix + gaps + attribution<br/>read SQLite, print narrative"]
+  SH --> PK["pack<br/>letterhead template<br/>POST /v1/templates/upload (once)"]
+  PK --> TP["templates<br/>Northgate letterhead DOCX<br/>assets/northgate-letterhead.docx"]
+  TP --> GEN["generate pack<br/>POST /v1/chat/async (1 op)<br/>audit-readiness pack doc"]
+  GEN --> DL["pre-signed downloads<br/>POST /v1/downloads<br/>DOCX + PDF signed URLs"]
+  DL --> XW["X-Export-Warnings<br/>header decoded every time<br/>font Calibri substituted on page 2"]
+  XW --> OUT["audit-readiness pack<br/>exports/northgate-audit-readiness-pack.docx/.pdf"]
+
+  %% Discover opt-in lane (extends link)
+  LI -.-> DISC["link --discover<br/>free-read structure headings (0 ops)<br/>local match → one batched search turn ≤1 op<br/>SHORTLIST + WARN fallback + --plan preview"]
+
+  %% Persistence band
+  subgraph DB["SQLite persistence (clausekeeper.db)"]
+    direction TB
+    M["matrix<br/>documents + clauses + links + gaps + edits"]
+    U["usage_log<br/>ops_charged · monthly_remaining · quota"]
+    S["shortlists<br/>clause_id · durable_document_id · heading · source local/search"]
+  end
+  LI --- M
+  ED --- M
+  RC --- M
+  SH --- M
+  PK --- M
+  DISC --- S
+  LI --- U
+  ED --- U
+  GEN --- U
+  DISC --- U
+
+  %% Styling
+  classDef db fill:#F7F6F3,stroke:#EAEAEA,stroke-width:1px;
+  class M,U,S db

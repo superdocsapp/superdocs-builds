@@ -1,0 +1,160 @@
+library: ISO 9001:2015
+note: >-
+  Official clause identifiers and titles only (public knowledge). The
+  expectation lines are clausekeeper's own original prose describing what an
+  auditor typically looks for; no standard body text is reproduced anywhere.
+demo_sample:
+  - "4.4"
+  - "7.5"
+  - "8.7"
+  - "9.2"
+  - "10.2"
+clauses:
+  - id: "4"
+    title: Context of the organization
+    level: 1
+    linkable: false
+    expectation: Grouping header for context clauses.
+  - id: "4.1"
+    title: Understanding the organization and its context
+    level: 2
+    expectation: The company shows it has identified the external and internal issues that affect its quality system and revisits that analysis periodically.
+  - id: "4.2"
+    title: Understanding the needs and expectations of interested parties
+    level: 2
+    expectation: Relevant interested parties (customers, regulators, staff, suppliers) are listed with their applicable requirements and how those requirements are monitored.
+  - id: "4.3"
+    title: Determining the scope of the quality management system
+    level: 2
+    expectation: A written scope statement names products/services, sites, and any exclusions with justification.
+  - id: "4.4"
+    title: Quality management system and its processes
+    level: 2
+    expectation: Core processes are mapped with inputs, outputs, sequence, owners, and the measures used to run them.
+  - id: "5"
+    title: Leadership
+    level: 1
+    linkable: false
+    expectation: Grouping header for leadership clauses.
+  - id: "5.1"
+    title: Leadership and commitment
+    level: 2
+    expectation: Top management demonstrably takes accountability for the system, provides resources, and reviews performance rather than delegating ownership.
+  - id: "5.2"
+    title: Policy
+    level: 2
+    expectation: A published quality policy exists, fits the company's purpose, includes improvement commitments, and is communicated and understood.
+  - id: "5.3"
+    title: Organization's roles, responsibilities and authorities
+    level: 2
+    expectation: Roles and decision authority for quality are assigned in writing and people know who is accountable for each process.
+  - id: "6"
+    title: Planning
+    level: 1
+    linkable: false
+    expectation: Grouping header for planning clauses.
+  - id: "6.1"
+    title: Actions to address risks and opportunities
+    level: 2
+    expectation: Risks and opportunities relevant to the system are identified, evaluated, and tracked to planned actions with owners and status.
+  - id: "6.2"
+    title: Quality objectives and planning to achieve them
+    level: 2
+    expectation: Measurable quality objectives exist at relevant functions, each with a target, owner, timeframe, and progress tracking.
+  - id: "6.3"
+    title: Planning of changes
+    level: 2
+    expectation: Changes to the system are planned before they happen, covering purpose, consequences, resource impact, and re-validation where needed.
+  - id: "7"
+    title: Support
+    level: 1
+    linkable: false
+    expectation: Grouping header for support clauses.
+  - id: "7.1"
+    title: Resources
+    level: 2
+    expectation: People, infrastructure, environment, and monitoring resources needed by the system are determined, provided, and maintained.
+  - id: "7.2"
+    title: Competence
+    level: 2
+    expectation: Required competence per role is defined, training or experience is verified against it, and records of competence are kept.
+  - id: "7.3"
+    title: Awareness
+    level: 2
+    expectation: Staff can explain the quality policy, their contribution to the system, and the consequences of not following requirements.
+  - id: "7.4"
+    title: Communication
+    level: 2
+    expectation: Internal and external communication topics, channels, owners, and frequency are defined somewhere reviewable.
+  - id: "7.5"
+    title: Documented information
+    level: 2
+    expectation: Controlled documents have creation, approval, versioning, distribution, and retention rules; obsolete versions are clearly handled.
+  - id: "8"
+    title: Operation
+    level: 1
+    linkable: false
+    expectation: Grouping header for operational clauses.
+  - id: "8.1"
+    title: Operational planning and control
+    level: 2
+    expectation: Day-to-day processes have planned criteria, controlled outputs, and managed changes; outsourced steps are governed.
+  - id: "8.2"
+    title: Requirements for products and services
+    level: 2
+    expectation: Customer and statutory requirements are captured, reviewed before commitment, and changed through a controlled update path.
+  - id: "8.3"
+    title: Design and development of products and services
+    level: 2
+    expectation: Design stages, reviews, verification, validation, and change control are defined with retained evidence.
+  - id: "8.4"
+    title: Control of externally provided processes, products and services
+    level: 2
+    expectation: Suppliers are selected, evaluated, and re-evaluated against defined criteria; purchased inputs are verified before use.
+  - id: "8.5"
+    title: Production and service provision
+    level: 2
+    expectation: Production runs under controlled conditions with traceability, property care, and preservation rules applied.
+  - id: "8.6"
+    title: Release of products and services
+    level: 2
+    expectation: Nothing ships until planned acceptance checks pass and an authorized person signs off, with records retained.
+  - id: "8.7"
+    title: Control of nonconforming outputs
+    level: 2
+    expectation: Nonconforming output is identified, contained, dispositioned (segregate, rework, concession, scrap), and recorded with who decided.
+  - id: "9"
+    title: Performance evaluation
+    level: 1
+    linkable: false
+    expectation: Grouping header for performance-evaluation clauses.
+  - id: "9.1"
+    title: Monitoring, measurement, analysis and evaluation
+    level: 2
+    expectation: What gets measured, how often, with which methods, and how results feed decisions is written down and actually used.
+  - id: "9.2"
+    title: Internal audit
+    level: 2
+    expectation: An internal audit program exists with scope, frequency, independence, findings, and follow-up to closure.
+  - id: "9.3"
+    title: Management review
+    level: 2
+    expectation: Management reviews run on a defined cadence with required inputs and recorded decisions and actions.
+  - id: "10"
+    title: Improvement
+    level: 1
+    linkable: false
+    expectation: Grouping header for improvement clauses.
+  - id: "10.1"
+    title: General
+    level: 2
+    expectation: Improvement intent is visible as part of running the system.
+    linkable: false
+  - id: "10.2"
+    title: Nonconformity and corrective action
+    level: 2
+    expectation: Nonconformities trigger root-cause work, corrective action, effectiveness checks, and updates to the system where warranted.
+  - id: "10.3"
+    title: Continual improvement
+    level: 2
+    expectation: Results from audits, data, and reviews visibly feed improvements to suitability and effectiveness over time.

@@ -1,0 +1,3 @@
+Clause 8.7 lost its evidence: section 'Disposition of nonconforming devices' was deleted by edit chg_42 at 2026-08-22T14:02:00Z, instruction 'remove the NCR section', job job_9f2.
+GATE gap v1 clause-8.7 :: Disposition of nonconforming devices -> gap landed
+durable_document_id: 550e8400-e29b-41d4-a716-446655440001 survives rename

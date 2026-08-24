@@ -1,0 +1,9 @@
+HTTP/1.1 400 Bad Request
+Content-Type: application/xml
+
+<?xml version='1.0' encoding='UTF-8'?>
+<Error>
+  <Code>ExpiredToken</Code>
+  <Message>The provided token has expired.</Message>
+  <Details>Request signature expired at 2026-08-22T14:00:00Z; signature=[REDACTED], url=https://storage.googleapis.com/[REDACTED]?signature=[REDACTED]</Details>
+</Error>

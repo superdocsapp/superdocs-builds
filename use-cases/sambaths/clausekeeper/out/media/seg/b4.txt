@@ -1,0 +1,3 @@
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/05-b4-discover.png'
+duration 21.335
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/05-b4-discover.png'

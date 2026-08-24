@@ -1,0 +1,174 @@
+[
+ {
+  "method": "POST",
+  "path": "/v1/chat/async",
+  "responses": [
+   {
+    "job_id": "job_pack_02",
+    "status": "pending"
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/jobs/{id}",
+  "responses": [
+   {
+    "job_id": "job_pack_02",
+    "status": "in_progress"
+   },
+   {
+    "job_id": "job_pack_02",
+    "status": "completed",
+    "result": {
+     "response": "Created 'Audit Readiness Pack' (job_pack_02).",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 7,
+      "monthly_remaining": 498,
+      "quota_exhausted": false
+     }
+    }
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/documents",
+  "params": {},
+  "responses": [
+   {
+    "documents": [
+     {
+      "document_id": "doc_p02",
+      "name": "NM-PRO-02-document-control",
+      "durable_document_id": "dur_0001-p02",
+      "changed": false
+     },
+     {
+      "document_id": "doc_p03",
+      "name": "NM-PRO-03-risk-and-objectives",
+      "durable_document_id": "dur_0002-p03",
+      "changed": false
+     },
+     {
+      "document_id": "doc_p04",
+      "name": "NM-PRO-04-nonconforming-output",
+      "durable_document_id": "dur_0003-p04",
+      "changed": false
+     },
+     {
+      "document_id": "doc_p05",
+      "name": "NM-PRO-05-competence-training",
+      "durable_document_id": "dur_0004-p05",
+      "changed": false
+     },
+     {
+      "document_id": "doc_p06",
+      "name": "NM-PRO-06-operations-suppliers-release",
+      "durable_document_id": "dur_0005-p06",
+      "changed": false
+     },
+     {
+      "document_id": "doc_qm01",
+      "name": "NM-QM-01-quality-manual",
+      "durable_document_id": "dur_0006-qm01",
+      "changed": false
+     },
+     {
+      "document_id": "doc_pack_02",
+      "name": "Audit Readiness Pack",
+      "durable_document_id": "dur_pack_02",
+      "changed": false
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/documents",
+  "params": {
+   "include_html": "true"
+  },
+  "responses": [
+   {
+    "documents": [
+     {
+      "document_id": "doc_p02",
+      "name": "NM-PRO-02-document-control",
+      "durable_document_id": "dur_0001-p02",
+      "changed": false,
+      "html": "<p>x</p>"
+     },
+     {
+      "document_id": "doc_p03",
+      "name": "NM-PRO-03-risk-and-objectives",
+      "durable_document_id": "dur_0002-p03",
+      "changed": false,
+      "html": "<p>x</p>"
+     },
+     {
+      "document_id": "doc_p04",
+      "name": "NM-PRO-04-nonconforming-output",
+      "durable_document_id": "dur_0003-p04",
+      "changed": false,
+      "html": "<p>x</p>"
+     },
+     {
+      "document_id": "doc_p05",
+      "name": "NM-PRO-05-competence-training",
+      "durable_document_id": "dur_0004-p05",
+      "changed": false,
+      "html": "<p>x</p>"
+     },
+     {
+      "document_id": "doc_p06",
+      "name": "NM-PRO-06-operations-suppliers-release",
+      "durable_document_id": "dur_0005-p06",
+      "changed": false,
+      "html": "<p>x</p>"
+     },
+     {
+      "document_id": "doc_qm01",
+      "name": "NM-QM-01-quality-manual",
+      "durable_document_id": "dur_0006-qm01",
+      "changed": false,
+      "html": "<p>x</p>"
+     },
+     {
+      "document_id": "doc_pack_02",
+      "name": "Audit Readiness Pack",
+      "durable_document_id": "dur_pack_02",
+      "changed": false,
+      "html": "<h1>Audit Readiness Pack</h1><div data-chunk-id=\"pk1\"><h2>Summary</h2><p>This is a readiness assessment against the ISO 9001:2015 clause structure only; it is not an audit.</p></div>"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "method": "POST",
+  "path": "/v1/sessions/ck-demo-01/documents/doc_pack_02/focus",
+  "responses": [
+   {}
+  ]
+ },
+ {
+  "method": "POST",
+  "path": "/v1/downloads",
+  "responses": [
+   {
+    "download_url": "https://signed.example/get/pack2-docx?sig=2",
+    "curl_example": "curl 'https://signed.example/get/pack2-docx?sig=2' -o out.docx",
+    "format": "docx"
+   },
+   {
+    "download_url": "https://signed.example/get/pack2-pdf?sig=2",
+    "curl_example": "curl 'https://signed.example/get/pack2-pdf?sig=2' -o out.pdf",
+    "format": "pdf"
+   }
+  ]
+ }
+]

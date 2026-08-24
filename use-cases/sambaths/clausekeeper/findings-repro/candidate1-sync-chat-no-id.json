@@ -1,0 +1,26 @@
+{
+  "candidate": 1,
+  "title": "sync /v1/chat applies edits immediately and returns no identifier",
+  "request": {
+    "method": "POST",
+    "path": "/v1/chat",
+    "body": {
+      "message": "add rollback subsection under section 4",
+      "session_id": "sess_[REDACTED]",
+      "response_mode": "compact"
+    }
+  },
+  "response": {
+    "status": "completed",
+    "result": {
+      "response": "{\"edits\": [{\"doc_id\": \"doc_[REDACTED]\", \"applied\": true}]}",
+      "usage": {
+        "ops_charged": 1,
+        "was_billable": true,
+        "monthly_remaining": 499
+      }
+    }
+  },
+  "observation": "Response has no job_id / no awaiting_approval state; document already mutated on return. Approval lane impossible.",
+  "redaction_note": "signatures/query params/tokens redacted; shape kept verbatim"
+}

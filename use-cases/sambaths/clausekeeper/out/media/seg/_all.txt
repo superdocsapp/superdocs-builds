@@ -1,0 +1,6 @@
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/seg/b1.mp4'
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/seg/b2.mp4'
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/seg/b3.mp4'
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/seg/b4.mp4'
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/seg/b5.mp4'
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/seg/b6.mp4'

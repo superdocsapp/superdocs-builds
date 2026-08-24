@@ -1,0 +1,49 @@
+[
+  {"method": "POST", "path": "/v1/chat/async",
+   "responses": [{"job_id": "job_edit_01", "session_id": "ck-demo-01",
+                  "status": "pending"}]},
+  {"method": "GET", "path": "/v1/jobs/{id}",
+   "responses": [
+     {"job_id": "job_edit_01", "status": "awaiting_approval",
+      "metadata": {"awaiting_kind": "review", "batch_id": "batch_1",
+                   "batch_total": 1,
+                   "pending_changes": [
+                     {"change_id": "chg_42", "operation": "delete",
+                      "chunk_id": "c_ncr_disp", "document_id": "doc_p04",
+                      "old_html": "<h2>Disposition of nonconforming devices</h2><div data-chunk-id=\"c_ncr_disp\"><p>Dispositions are decided by the QA Manager or deputized approver listed on the signature sheet.</p></div>",
+                      "new_html": "",
+                      "ai_explanation": "Removing the disposition section per instruction"}]}},
+     {"job_id": "job_edit_01", "status": "completed",
+      "result": {"response": "Deleted the disposition section.",
+                 "document_changes": {"chunk_diffs": [
+                   {"change_id": "chg_42", "operation": "delete",
+                    "chunk_id": "c_ncr_disp",
+                    "old_html": "<h2>Disposition of nonconforming devices</h2><div data-chunk-id=\"c_ncr_disp\"><p>Dispositions are decided by the QA Manager or deputized approver listed on the signature sheet.</p></div>",
+                    "new_html": ""}]},
+                 "usage": {"ops_charged": 1, "was_billable": true,
+                           "monthly_used": 7, "monthly_remaining": 493,
+                           "quota_exhausted": false,
+                           "subscription_tier": "free"}},
+      "completed_at": "2026-08-22T14:02:00Z"}
+   ]},
+  {"method": "POST", "path": "/v1/chat/ck-demo-01/approve",
+   "responses": [{"accepted": true, "job_id": "job_edit_01"}]},
+  {"method": "GET", "path": "/v1/sessions/ck-demo-01/documents",
+   "params": {"include_html": "true"},
+   "responses": [{"documents": [
+     {"document_id": "doc_p04",
+      "name": "NM-PRO-04-nonconforming-output",
+      "durable_document_id": "dur_0003-p04", "changed": true,
+      "html": "<h1>Procedure NM-PRO-04: Nonconforming Output</h1><div data-chunk-id=\"c87_hold\"><h2>Identifying and containing nonconforming output</h2><p>Suspect product is tagged HOLD and quarantined the same shift.</p></div><div data-chunk-id=\"c102_capa\"><h2>Corrective action</h2><p>The owner performs root-cause analysis documented in the CAPA record.</p></div>"},
+     {"document_id": "doc_p02", "name": "NM-PRO-02-document-control",
+      "durable_document_id": "dur_0001-p02", "changed": false, "html": ""},
+     {"document_id": "doc_p03", "name": "NM-PRO-03-risk-and-objectives",
+      "durable_document_id": "dur_0002-p03", "changed": false, "html": ""},
+     {"document_id": "doc_p05", "name": "NM-PRO-05-competence-training",
+      "durable_document_id": "dur_0004-p05", "changed": false, "html": ""},
+     {"document_id": "doc_p06", "name": "NM-PRO-06-operations-suppliers-release",
+      "durable_document_id": "dur_0005-p06", "changed": false, "html": ""},
+     {"document_id": "doc_qm01", "name": "NM-QM-01-quality-manual",
+      "durable_document_id": "dur_0006-qm01", "changed": false, "html": ""}
+   ]}]}
+]

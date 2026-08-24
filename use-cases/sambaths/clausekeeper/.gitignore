@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+clausekeeper.db
+*.db-wal
+*.db-shm
+.pytest_cache/
+.venv/
+.DS_Store
+docs/media/raw/*
+!docs/media/raw/MANIFEST.txt

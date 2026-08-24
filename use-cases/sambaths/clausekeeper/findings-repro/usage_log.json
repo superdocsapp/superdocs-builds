@@ -1,0 +1,27 @@
+[
+  {
+    "call": "chat",
+    "ops_charged": 1,
+    "monthly_remaining": 499
+  },
+  {
+    "call": "chat_async",
+    "ops_charged": 1,
+    "monthly_remaining": 498
+  },
+  {
+    "call": "poll_job",
+    "ops_charged": 0,
+    "monthly_remaining": 498
+  },
+  {
+    "call": "request_download",
+    "ops_charged": 0,
+    "monthly_remaining": 498
+  },
+  {
+    "call": "upload_document",
+    "ops_charged": 1,
+    "monthly_remaining": 497
+  }
+]

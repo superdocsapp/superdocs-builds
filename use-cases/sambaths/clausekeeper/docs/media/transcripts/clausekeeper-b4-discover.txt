@@ -1,0 +1,63 @@
+$ python -m clausekeeper --fixture tests/fixtures/init_link.json --db /tmp/ck-disc.db init
+session ck-demo-01: 6 documents bound (0 without durable id)
+
+$ python -m clausekeeper --fixture tests/fixtures/discover_link.json --db /tmp/ck-disc.db link --discover
+DISCOVER pass (opt-in): shortlisting evidence sections before mapping
+  free read  NM-PRO-02-document-control ............ 2 sections
+  free read  NM-PRO-03-risk-and-objectives ......... 2 sections
+  free read  NM-PRO-04-nonconforming-output ........ 2 sections
+  free read  NM-PRO-05-competence-training ......... 2 sections
+  free read  NM-PRO-06-operations-suppliers-release ... 2 sections
+  free read  NM-QM-01-quality-manual ............... 2 sections
+  local match resolved 12/27 linkable clauses from headings alone (0 ops)
+  unresolved: 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 7.1, 7.4, 8.1, 8.2, 8.3, 8.5, 9.2, 9.3, 10.3 -> one batched search turn across all open documents
+  [search] charged 1 op (was_billable=true, ops_charged=1)
+  search resolved 15/15 remaining clauses
+SHORTLIST (candidates found before mapping)
+CLAUSE  DOCUMENT                   CANDIDATE SECTION                        SOURCE
+4.1     NM-QM-01-quality-manual    Understanding the organization and its c search
+4.2     NM-QM-01-quality-manual    Interested parties register              search
+4.3     NM-QM-01-quality-manual    Scope of the quality management system   search
+4.4     NM-QM-01-quality-manual    Northgate Quality Manual > Quality manag local
+5.1     NM-QM-01-quality-manual    Leadership commitment                    search
+5.2     NM-QM-01-quality-manual    Quality policy                           search
+5.3     NM-QM-01-quality-manual    Roles and responsibilities matrix        search
+6.1     NM-PRO-03-risk-and-objecti Risk procedure > Actions to address risk local
+6.2     NM-PRO-03-risk-and-objecti Risk procedure > Quality objectives and  local
+6.3     NM-PRO-02-document-control Document control procedure > Planning of local
+7.1     NM-PRO-03-risk-and-objecti Resource planning                        search
+7.2     NM-PRO-05-competence-train Competence procedure > Competence        local
+7.3     NM-PRO-05-competence-train Competence procedure > Awareness         local
+7.4     NM-PRO-03-risk-and-objecti Communication matrix                     search
+7.5     NM-PRO-02-document-control Document control procedure > Documented  local
+8.1     NM-PRO-06-operations-suppl Operational control criteria             search
+8.2     NM-PRO-06-operations-suppl Customer requirements review             search
+8.3     NM-PRO-06-operations-suppl Design controls                          search
+8.4     NM-PRO-06-operations-suppl Operations procedure > Control of extern local
+8.5     NM-PRO-06-operations-suppl Production controls and traceability     search
+8.6     NM-PRO-06-operations-suppl Operations procedure > Release of produc local
+8.7     NM-PRO-04-nonconforming-ou Nonconforming output procedure > Control local
+9.1     NM-QM-01-quality-manual    Northgate Quality Manual > Monitoring, m local
+9.2     NM-QM-01-quality-manual    Internal audit schedule                  search
+9.3     NM-QM-01-quality-manual    Management review minutes                search
+10.2    NM-PRO-04-nonconforming-ou Nonconforming output procedure > Nonconf local
+10.3    NM-PRO-04-nonconforming-ou Continual improvement log                search
+linked NM-PRO-02-document-control: 2 clauses covered
+linked NM-PRO-03-risk-and-objectives: 2 clauses covered
+linked NM-PRO-04-nonconforming-output: 2 clauses covered
+linked NM-PRO-05-competence-training: 2 clauses covered
+linked NM-PRO-06-operations-suppliers-release: 2 clauses covered
+linked NM-QM-01-quality-manual: 2 clauses covered
+ops charged this run: 7 (mapping 6 + discover search 1)
+seed SEED-H1 clause 9.2: DETECTED
+seed SEED-H2 clause 7.4: DETECTED
+
+$ python -m clausekeeper --fixture tests/fixtures/init_link.json --db /tmp/ck-disc-plan.db init
+session ck-demo-01: 6 documents bound (0 without durable id)
+
+$ python -m clausekeeper --fixture tests/fixtures/discover_link.json --db /tmp/ck-disc-plan.db link --plan --discover
+DISCOVER PLAN (preview mode - zero billable ops)
+  would free-read 6 bound documents (0 ops)
+  local match projects 12/27 resolvable from headings (0 ops)
+  projected search spend: 1 op (one batched turn for 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 7.1, 7.4, 8.1, 8.2, 8.3, 8.5, 9.2, 9.3, 10.3)
+  estimated cost: <=1 op; spent so far: 0

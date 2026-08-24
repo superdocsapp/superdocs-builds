@@ -1,0 +1,14 @@
+SCRUB AUDIT — recorded 2026-08-24
+Method: (1) programmatic scan of every text source feeding the video
+   (transcripts, narration script, writeup, architecture.mmd, all slide HTML)
+   for secret-key patterns, bearer tokens, .env assignments, and personal
+   email domains; (2) frame-level review of all rendered slides (every visible
+   string) plus spot frames from the final encode.
+
+Forbidden-pattern hits: 0
+  zero hits across all scanned sources
+On-screen handles: 'sambaths' only; corpus emails use fictional domains
+   (northwind.example / northgate.example); no .env contents anywhere.
+Redaction policy: any private content found would be solid-boxed, never
+   blurred (none found this run).
+Verdict: PASS — safe for upload.

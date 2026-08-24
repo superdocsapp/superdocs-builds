@@ -1,0 +1,44 @@
+[
+ {
+  "method": "GET",
+  "path": "/v1/sessions/ck-demo-01/documents",
+  "params": {
+   "include_html": "true"
+  },
+  "responses": [
+   {
+    "documents": []
+   }
+  ]
+ },
+ {
+  "method": "POST",
+  "path": "/v1/chat/async",
+  "responses": [
+   {
+    "job_id": "job_disc_floor",
+    "status": "pending"
+   }
+  ]
+ },
+ {
+  "method": "GET",
+  "path": "/v1/jobs/{id}",
+  "responses": [
+   {
+    "job_id": "job_disc_floor",
+    "status": "completed",
+    "result": {
+     "response": "\"[]\"",
+     "usage": {
+      "ops_charged": 1,
+      "was_billable": true,
+      "monthly_used": 451,
+      "monthly_remaining": 49,
+      "quota_exhausted": false
+     }
+    }
+   }
+  ]
+ }
+]

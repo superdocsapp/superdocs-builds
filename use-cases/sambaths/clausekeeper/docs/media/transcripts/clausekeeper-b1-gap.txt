@@ -1,0 +1,65 @@
+$ python -m clausekeeper --fixture tests/fixtures/init_link.json --db /tmp/ck-b1.db init
+session ck-demo-01: 6 documents bound (0 without durable id)
+
+$ python -m clausekeeper --fixture tests/fixtures/init_link.json --db /tmp/ck-b1.db link
+linked NM-PRO-02-document-control: 2 clauses covered
+linked NM-PRO-03-risk-and-objectives: 2 clauses covered
+linked NM-PRO-04-nonconforming-output: 2 clauses covered
+linked NM-PRO-05-competence-training: 2 clauses covered
+linked NM-PRO-06-operations-suppliers-release: 2 clauses covered
+linked NM-QM-01-quality-manual: 2 clauses covered
+ops charged this run: 6
+seed SEED-H1 clause 9.2: DETECTED
+seed SEED-H2 clause 7.4: DETECTED
+
+$ CK_AUTO_APPROVE=1 python -m clausekeeper --fixture tests/fixtures/edit_delete.json --db /tmp/ck-b1.db edit NM-PRO-04 --instruction "Delete the disposition section"
+
+Proposed delete on chunk c_ncr_disp
+  old: <h2>Disposition of nonconforming devices</h2><div data-chunk-id="c_ncr_disp"><p>Dispositions are decided by the QA Manager or deputized approver listed on the signature sheet.</p></div>
+  new: 
+Approve? [y/N]:   [CK_AUTO_APPROVE=1 - approving without a terminal]
+GAP LANDED: clause 8.7 (Control of nonconforming outputs)
+  Clause 8.7 lost its evidence: section 'Disposition of nonconforming devices' was deleted by edit `chg_42` at 2026-08-22T14:02:00Z, instruction 'Delete the disposition section', job `job_edit_01`.
+{
+  "job_id": "job_edit_01",
+  "edits_recorded": 1,
+  "gaps_landed": 1,
+  "status": "completed"
+}
+
+$ python -m clausekeeper --db /tmp/ck-b1.db show
+CLAUSE  STATUS   DOCUMENT                           SECTION
+10.2    covered  NM-PRO-04-nonconforming-output     Corrective action
+4.4     covered  NM-QM-01-quality-manual            Process map
+6.1     covered  NM-PRO-03-risk-and-objectives      Risk register
+6.2     covered  NM-PRO-03-risk-and-objectives      Quality objectives
+6.3     covered  NM-PRO-02-document-control         Planning changes to documents or processes
+7.2     covered  NM-PRO-05-competence-training      Competence requirements
+7.3     covered  NM-PRO-05-competence-training      Awareness
+7.5     covered  NM-PRO-02-document-control         Creation and approval
+8.4     covered  NM-PRO-06-operations-suppliers-release Supplier selection and evaluation
+8.6     covered  NM-PRO-06-operations-suppliers-release Release
+8.7     gap      NM-PRO-04-nonconforming-output     Disposition of nonconforming devices
+9.1     covered  NM-QM-01-quality-manual            Monitoring and measurement
+
+UNCOVERED CLAUSES (no evidence anywhere):
+  4.1 Understanding the organization and its context
+  4.2 Understanding the needs and expectations of interested parties
+  4.3 Determining the scope of the quality management system
+  5.1 Leadership and commitment
+  5.2 Policy
+  5.3 Organization's roles, responsibilities and authorities
+  7.1 Resources
+  7.4 Communication
+  8.1 Operational planning and control
+  8.2 Requirements for products and services
+  8.3 Design and development of products and services
+  8.5 Production and service provision
+  9.2 Internal audit
+  9.3 Management review
+  10.3 Continual improvement
+
+OPEN GAPS:
+  [2026-08-23T00:00:00Z] Clause 8.7 lost its evidence: section 'Disposition of nonconforming devices' was deleted by edit `chg_42` at 2026-08-22T14:02:00Z, instruction 'Delete the disposition section', job `job_edit_01`.
+
+usage: 7 billable ops logged; lowest monthly_remaining seen: 493

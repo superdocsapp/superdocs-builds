@@ -1,0 +1,3 @@
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/06-b5-measured.png'
+duration 21.8
+file '/Users/sambaths/superdocs-builds/use-cases/sambaths/clausekeeper/out/media/slides/06-b5-measured.png'

@@ -1,0 +1,40 @@
+$ python -m clausekeeper --fixture tests/fixtures/init_link.json --db /tmp/ck-pack.db init
+session ck-demo-01: 6 documents bound (0 without durable id)
+
+$ python -m clausekeeper --fixture tests/fixtures/pack_flow.json --db /tmp/ck-pack.db pack --template assets/northgate-letterhead.docx --out /tmp/ck-exports
+{
+  "document": {
+    "session_slot_id": "doc_pack_01",
+    "durable_document_id": "dur_pack_01",
+    "name": "Audit Readiness Pack"
+  },
+  "title": "Northgate Medical Devices - Audit Readiness Pack",
+  "run_key": "pack:job_pack_01",
+  "template": {
+    "template_id": "tpl_lh_01",
+    "reused": false
+  },
+  "exports": [
+    {
+      "format": "docx",
+      "path": "/tmp/ck-exports/northgate-audit-readiness-pack.docx",
+      "bytes": 59,
+      "warnings": [
+        "font Calibri substituted on page 2"
+      ]
+    },
+    {
+      "format": "pdf",
+      "path": "/tmp/ck-exports/northgate-audit-readiness-pack.pdf",
+      "bytes": 58,
+      "warnings": []
+    }
+  ],
+  "ops_spent": 1,
+  "language_rail": "clean"
+}
+
+$ ls -lh /tmp/ck-exports/
+total 16
+-rw-r--r--@ 1 sambaths  wheel    59B Aug 24 00:02 northgate-audit-readiness-pack.docx
+-rw-r--r--@ 1 sambaths  wheel    58B Aug 24 00:02 northgate-audit-readiness-pack.pdf

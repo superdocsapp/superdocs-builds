@@ -1,0 +1,56 @@
+<!doctype html><meta charset='utf-8'><link href='https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=IBM+Plex+Sans:wght@400;600&family=Geist+Mono:wght@400;600&display=swap' rel='stylesheet'><style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { width:1920px; height:1080px; background:#FDFBF7; color:#111111;
+       font-family:-apple-system,'Helvetica Neue',sans-serif; overflow:hidden;
+       display:flex; flex-direction:column; }
+.stage { flex:1; padding:56px 72px 24px; display:flex; flex-direction:column; gap:28px;
+        justify-content:center; }
+h2.beat { font-size:30px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+          color:#787774; font-family:'Fraunces',serif; }
+h2.beat b { color:#111111; }
+.term { background:#FFFFFF; border:1px solid #EAEAEA; border-radius:14px;
+        box-shadow:0 4px 24px rgba(0,0,0,.06); overflow:hidden; }
+.term .bar { display:flex; align-items:center; gap:10px; padding:14px 20px;
+             background:#F7F6F3; border-bottom:1px solid #EAEAEA; }
+.term .bar i { width:14px; height:14px; border-radius:50%; display:inline-block; }
+.term pre { font-family:'Geist Mono','Menlo',monospace; font-size:24px; line-height:1.55;
+            padding:26px 34px; white-space:pre-wrap; color:#1a1a1a; }
+.k { color:#0b4da2; } .g { color:#1a7f37; } .r { color:#cf222e; } .y { color:#9a6700; }
+.d { color:#8b98a5; } .m { color:#d2a8ff; }
+.cards { display:flex; gap:26px; }
+.card { flex:1; background:#FFFFFF; border:1px solid #EAEAEA; border-radius:14px;
+        padding:26px 30px; box-shadow:0 2px 12px rgba(0,0,0,.04); }
+.card h4 { font-size:22px; color:#C41E3A; margin-bottom:12px; letter-spacing:.04em; font-family:'Fraunces',serif; }
+.card p { font-size:24px; line-height:1.5; color:#333333; font-family:'IBM Plex Sans',sans-serif; }
+.card p code { font-family:Menlo,monospace; color:#d29922; font-size:.92em; }
+.shot { display:flex; align-items:center; justify-content:center; gap:40px; flex:1; min-height:0; }
+.shot img { max-width:100%; max-height:100%; border-radius:12px; border:1px solid #1f2733;
+            box-shadow:0 12px 40px rgba(0,0,0,.5); }
+.split { display:flex; gap:32px; flex:1; min-height:0; }
+.pane { flex:1; display:flex; flex-direction:column; min-width:0; }
+.pane h3 { font-size:26px; margin-bottom:14px; letter-spacing:.05em; }
+.split .term pre { font-size:22px !important; padding:18px 24px; }
+.split { align-items:stretch; }
+.pane .term { flex:1; display:flex; flex-direction:column; }
+.pane .term pre { flex:1; }
+.pane .shot { width:100%; flex:1; min-height:0; }
+.pane .shot img { width:100%; height:100%; object-fit:contain; background:#0d1117; }
+.pane .shot img { width:100%; height:auto; }
+.caption { height:96px; display:flex; align-items:center; justify-content:center;
+           padding:0 60px; background:#111111; border-top:1px solid #111111; }
+.caption span { font-size:27px; line-height:1.35; color:#FDFBF7; text-align:center; font-family:'IBM Plex Sans',sans-serif;
+                font-weight:600; max-width:1700px; }
+.center { align-items:center; justify-content:center; text-align:center; }
+.big { font-size:44px; font-weight:800; line-height:1.25; }
+.smallnote { color:#8b98a5; font-size:21px; margin-top:18px; }
+</style><body><div class='stage'>
+<h2 class='beat'>Beat 1 · <b>a gap that names its cause</b></h2>
+<div class='term'><div class='bar'><i style='background:#ff5f57'></i><i style='background:#febc2e'></i><i style='background:#28c840'></i><span style='margin-left:10px;color:#8b98a5;font-size:20px'>python -m clausekeeper edit NM-PRO-04 --instruction &quot;Delete the disposition section&quot; (fixture replay)</span></div><pre>Clause 8.7 lost its evidence: section &#x27;Disposition of nonconforming devices&#x27; was deleted by edit chg_42 at 2026-08-22T14:02:00Z, instruction &#x27;remove the NCR section&#x27;, job job_9f2.
+<span class='k'>GATE gap</span> v1 clause-8.7 :: Disposition of nonconforming devices -&gt; gap landed
+durable_document_id: 550e8400-e29b-41d4-a716-446655440001 survives rename</pre></div>
+<div class='cards'>
+ <div class='card'><h4>attribution</h4><p>every gap names <code>change_id</code>, instruction, job, and time</p></div>
+ <div class='card'><h4>synchronous</h4><p>gap lands during <code>approve</code> response processing</p></div>
+ <div class='card'><h4>provenance</h4><p><code>[chunk_id @offset "quote"]</code> on every link</p></div>
+</div>
+</div><div class="caption"><span>Edit a procedure, approve, and the gap names which change caused it.</span></div></body>
