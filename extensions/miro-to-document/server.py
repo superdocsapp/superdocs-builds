@@ -18,7 +18,8 @@ OUTPUT_DIR = (
 def home():
     return {
         "message": "SuperDocs Miro document server is running",
-        "document": "/miro_document.html"
+        "document": "/miro_document.html",
+        "verified_document": "/superdocs_customer_problems_verified.html"
     }
 
 
@@ -29,6 +30,21 @@ def get_document():
     if not document.exists():
         return {
             "error": "Generated document not found"
+        }
+
+    return FileResponse(
+        document,
+        media_type="text/html"
+    )
+
+
+@app.get("/superdocs_customer_problems_verified.html")
+def get_verified_document():
+    document = OUTPUT_DIR / "superdocs_customer_problems_verified.html"
+
+    if not document.exists():
+        return {
+            "error": "Verified document not found"
         }
 
     return FileResponse(
