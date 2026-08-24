@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6f8;
+  color: #202124;
+}
+
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+header {
+  margin-bottom: 30px;
+}
+
+h1 {
+  margin-bottom: 8px;
+}
+
+header p {
+  color: #666;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.status.pending {
+  background: #fff3cd;
+}
+
+.status.approved {
+  background: #d1e7dd;
+}
+
+.status.rejected {
+  background: #f8d7da;
+}
+
+.section {
+  margin-top: 20px;
+}
+
+.section h3 {
+  font-size: 14px;
+}
+
+.before,
+.after {
+  padding: 15px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+.before {
+  background: #fff0f0;
+  border-left: 4px solid #dc3545;
+}
+
+.after {
+  background: #eefaf1;
+  border-left: 4px solid #198754;
+}
+
+.reason {
+  margin-top: 20px;
+  padding: 12px;
+  background: #f5f5f5;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+button {
+  border: none;
+  padding: 11px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.approve {
+  background: #198754;
+  color: white;
+}
+
+.reject {
+  background: #dc3545;
+  color: white;
+}
+
+.export {
+  background: #212529;
+  color: white;
+  font-size: 16px;
+  padding: 14px 24px;
+}
+
+.footer {
+  margin-top: 30px;
+}
+
+.message {
+  margin-top: 15px;
+  font-weight: bold;
+}

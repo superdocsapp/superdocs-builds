@@ -1,0 +1,17 @@
+{
+  "position": "buyer-friendly",
+  "rules": [
+    {
+      "clause": "Limitation of Liability",
+      "instruction": "Liability should be capped at the total fees paid under the agreement."
+    },
+    {
+      "clause": "Termination",
+      "instruction": "Either party should be allowed to terminate with 30 days written notice."
+    },
+    {
+      "clause": "Confidentiality",
+      "instruction": "Confidential information should not be disclosed to third parties without prior written consent."
+    }
+  ]
+}
