@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "superdocs-review-fsm"
+version = "0.1.0"
+description = "Durable framework-neutral FSM for asynchronous document review jobs"
+requires-python = ">=3.11"
+dependencies = ["fastapi>=0.116,<1", "pydantic>=2.11,<3"]
+
+[project.optional-dependencies]
+dev = ["httpx>=0.28,<1", "pytest>=8.4,<10", "pytest-asyncio>=1.2,<2"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["review_fsm*"]
