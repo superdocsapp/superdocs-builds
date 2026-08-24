@@ -149,6 +149,28 @@ def test_start_review_quality_gate_uses_separate_grading_session_per_item(client
     assert all(s != "sess-6" for s in seen_grading_sessions)
 
 
+def test_finalize_review_appends_pre_export_validation_summary(client, petition, evidence_catalog, tmp_path):
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        session = start_review(client, "sess-val", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+        decisions = {
+            session.items[0].request_id: {"approve": True},
+            session.items[1].request_id: {"approve": False, "feedback": "needs more detail"},
+            # item 3 intentionally omitted -- rejected by silence
+        }
+        finalize_review(client, session, decisions, tmp_path)
+
+        validation_calls = [
+            json.loads(r.text) for r in m.request_history
+            if r.url.endswith("/v1/chat") and "Pre-Export Validation Summary" in json.loads(r.text).get("message", "")
+        ]
+    assert len(validation_calls) == 1
+    message = validation_calls[0]["message"]
+    assert "Every request answered: FAIL" in message
+    assert "Cross-item consistency checked: PASS" in message
+
+
 def test_finalize_review_approves_only_selected_items(client, petition, evidence_catalog, tmp_path):
     with requests_mock.Mocker() as m:
         _mock_pending_review(m)

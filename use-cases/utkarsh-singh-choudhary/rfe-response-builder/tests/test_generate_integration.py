@@ -68,9 +68,46 @@ def test_build_response_packet_answers_all_three_items(client, evidence_catalog,
         manifest = json.loads(manifest_path.read_text())
         assert len(manifest) >= 3  # at least one exhibit per item
 
-        # 1 intro turn + 3 per-item turns + 1 checklist turn + 1 exhibit-list turn = 6 chat calls
+        # 1 intro turn + 3 per-item turns + 1 checklist turn + 1 exhibit-list
+        # turn + 1 pre-export validation summary turn = 7 chat calls
         chat_calls = [r for r in m.request_history if r.path == "/v1/chat"]
-        assert len(chat_calls) == 6
+        assert len(chat_calls) == 7
+
+
+def test_build_response_packet_prints_per_item_progress(client, evidence_catalog, tmp_path, capsys):
+    petition = load_petition(DATA_DIR / "sample_petition_arguments.json")
+    with requests_mock.Mocker() as m:
+        _mock_chat_and_export(m)
+        build_response_packet(
+            client, "rfe-progress-session", "CASE-2002", "Marco Alvarez",
+            NOTICE_TEXT, petition, tmp_path, evidence_catalog=evidence_catalog,
+        )
+    captured = capsys.readouterr()
+    assert "[1/3] Drafting item 1..." in captured.out
+    assert "[2/3] Drafting item 2..." in captured.out
+    assert "[3/3] Drafting item 3..." in captured.out
+
+
+def test_build_response_packet_progress_shows_skip_message_on_resume(client, evidence_catalog, tmp_path, capsys, monkeypatch):
+    import rfe_response_builder.progress as progress_mod
+    monkeypatch.setattr(progress_mod, "PROGRESS_DIR", str(tmp_path / "progress"))
+
+    petition = load_petition(DATA_DIR / "sample_petition_arguments.json")
+    session_id = "rfe-progress-resume-session"
+
+    store = progress_mod.ProgressStore(session_id)
+    store.record("1", answered=True, reply_text=_SUBSTANTIVE_REPLY)
+
+    with requests_mock.Mocker() as m:
+        _mock_chat_and_export(m)
+        build_response_packet(
+            client, session_id, "CASE-2002", "Marco Alvarez",
+            NOTICE_TEXT, petition, tmp_path, evidence_catalog=evidence_catalog,
+        )
+    captured = capsys.readouterr()
+    assert "[1/3] Item 1: already drafted in a prior attempt, skipping." in captured.out
+    assert "[2/3] Drafting item 2..." in captured.out
+    assert "[3/3] Drafting item 3..." in captured.out
 
 
 def test_build_response_packet_raises_on_unparseable_notice(client, tmp_path):
@@ -175,11 +212,11 @@ def test_persistent_failure_can_be_resumed_without_redrafting_answered_items(cli
         out_path, coverage = build_response_packet(
             client, session_id, "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, tmp_path,
         )
-        # Only item 2's drafting turn plus the final checklist-append turn
-        # should have been sent -- no header turn (skipped because
-        # progress already existed) and no resend of items 1/3 (already
-        # recorded as answered).
-        assert len(call_log) == 2
+        # Only item 2's drafting turn plus the final checklist-append and
+        # validation-summary turns should have been sent -- no header
+        # turn (skipped because progress already existed) and no resend
+        # of items 1/3 (already recorded as answered).
+        assert len(call_log) == 3
         assert any("Item 2" in msg or "item 2" in msg.lower() for msg in call_log)
         assert all(row.answered for row in coverage)
         assert out_path.exists()
@@ -262,6 +299,31 @@ def test_build_response_packet_prints_injection_risk_warning(client, tmp_path, c
     captured = capsys.readouterr()
     assert "Possible prompt-injection phrasing detected" in captured.out
     assert "petition argument (p. 1)" in captured.out
+
+
+def test_build_response_packet_appends_pre_export_validation_summary(client, tmp_path, monkeypatch):
+    import rfe_response_builder.progress as progress_mod
+    monkeypatch.setattr(progress_mod, "PROGRESS_DIR", str(tmp_path / "progress"))
+
+    petition = load_petition(DATA_DIR / "sample_petition_arguments.json")
+    sent_messages = []
+
+    def chat_callback(request, context):
+        body = json.loads(request.text)
+        sent_messages.append(body["message"])
+        return {"response": _SUBSTANTIVE_REPLY, "document_changes": {"updated_html": "<p>x</p>"}}
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json=chat_callback)
+        m.post("https://api.superdocs.app/v1/documents/export", content=b"FAKE_DOCX")
+        build_response_packet(
+            client, "rfe-validation-session", "CASE-2002", "Marco Alvarez",
+            NOTICE_TEXT, petition, tmp_path,
+        )
+
+    validation_messages = [m for m in sent_messages if "Pre-Export Validation Summary" in m]
+    assert len(validation_messages) == 1
+    assert "Every request answered: PASS" in validation_messages[0]
 
 
 def test_build_response_packet_prints_cross_item_consistency_warning(client, tmp_path, capsys, monkeypatch):
@@ -401,9 +463,9 @@ def test_resume_false_forces_full_redraft_ignoring_prior_progress(client, tmp_pa
             client, session_id, "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, tmp_path,
             resume=False,
         )
-        # header turn + 3 item turns + checklist turn = 5 calls, ignoring
-        # the pre-seeded progress
-        assert len(call_log) == 5
+        # header turn + 3 item turns + checklist turn + validation-summary
+        # turn = 6 calls, ignoring the pre-seeded progress
+        assert len(call_log) == 6
         assert all(row.answered for row in coverage)
 
 

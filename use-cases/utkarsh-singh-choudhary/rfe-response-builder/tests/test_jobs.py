@@ -93,3 +93,90 @@ def test_prune_stale_removes_old_jobs(engine):
     time.sleep(0.01)
     store.prune_stale()
     assert store.get(job_id) is None
+
+
+# --- update_progress -----------------------------------------------------------
+
+def test_update_progress_records_completed_total_and_label(engine):
+    store = JobStore(engine)
+    job_id = store.create()
+    store.update_progress(job_id, completed=2, total=5, current_item_label="Response to Item 3")
+    job = store.get(job_id)
+    assert job.items_completed == 2
+    assert job.items_total == 5
+    assert job.current_item_label == "Response to Item 3"
+
+
+def test_update_progress_can_be_called_multiple_times(engine):
+    store = JobStore(engine)
+    job_id = store.create()
+    store.update_progress(job_id, completed=1, total=3, current_item_label="Response to Item 1")
+    store.update_progress(job_id, completed=2, total=3, current_item_label="Response to Item 2")
+    job = store.get(job_id)
+    assert job.items_completed == 2
+    assert job.current_item_label == "Response to Item 2"
+
+
+def test_new_job_has_no_progress_until_update_progress_is_called(engine):
+    store = JobStore(engine)
+    job_id = store.create()
+    job = store.get(job_id)
+    assert job.items_total is None
+    assert job.items_completed is None
+    assert job.current_item_label is None
+
+
+# --- self-migration for pre-existing old-schema databases -----------------------
+
+def test_jobstore_self_migrates_a_pre_existing_old_schema_database(tmp_path):
+    """A genuinely pre-existing `background_jobs` table (as it looked
+    before items_total/items_completed/current_item_label existed) must
+    not break JobStore -- SQLAlchemy's create_all() only creates missing
+    tables, it never alters an existing one, so without a real migration
+    step this would fail every read/write with 'no such column'. Builds
+    an actual old-schema SQLite file first (not a mock), then confirms
+    JobStore can read/write it correctly after construction."""
+    from sqlalchemy import Column, Float, MetaData, String, Table
+
+    db_path = tmp_path / "old_schema.sqlite3"
+    engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})
+
+    old_metadata = MetaData()
+    Table(
+        "background_jobs", old_metadata,
+        Column("job_id", String(64), primary_key=True),
+        Column("status", String(16), nullable=False),
+        Column("review_id", String(64), nullable=True),
+        Column("error", String(4000), nullable=True),
+        Column("case_id", String(256), nullable=True),
+        Column("created", Float, nullable=False),
+        Column("updated", Float, nullable=False),
+        # deliberately missing items_total/items_completed/current_item_label
+    )
+    old_metadata.create_all(engine)
+
+    # Now construct JobStore against this pre-existing old-schema database.
+    store = JobStore(engine)
+    job_id = store.create(case_id="CASE-MIGRATION-TEST")
+    store.update_progress(job_id, completed=2, total=5, current_item_label="Response to Item 3")
+    job = store.get(job_id)
+
+    assert job.case_id == "CASE-MIGRATION-TEST"
+    assert job.items_completed == 2
+    assert job.items_total == 5
+    assert job.current_item_label == "Response to Item 3"
+
+
+def test_jobstore_migration_is_idempotent_across_repeated_construction(tmp_path):
+    """Constructing JobStore more than once against the same database
+    (e.g. a second gunicorn worker starting up) must not fail trying to
+    re-add columns that already exist."""
+    db_path = tmp_path / "repeat.sqlite3"
+    engine = create_engine(f"sqlite:///{db_path}", connect_args={"check_same_thread": False})
+
+    JobStore(engine)
+    JobStore(engine)  # must not raise "duplicate column" or similar
+    store = JobStore(engine)
+    job_id = store.create()
+    store.update_progress(job_id, completed=1, total=1, current_item_label="done")
+    assert store.get(job_id).items_completed == 1

@@ -722,3 +722,354 @@ Verified fresh-venv-to-fresh-venv exactly as pass 7 established.
 (unchanged -- see the "Still not done" section from pass 6. This pass,
 like pass 7, was entirely about finding and fixing real bugs via the
 same "untested top-level function" sweep methodology, not new features.)
+
+## Follow-up pass 9 — verifying security middleware that was never actually triggered
+
+Extended the same sweep methodology from pass 8 to a different, arguably
+more important blind spot: security-relevant middleware that's real,
+correctly implemented in `app.py`, and referenced in `render.yaml`'s env
+vars -- but had **never once been genuinely triggered by any test**.
+
+`tests/test_webapp.py`'s own module docstring claims to cover "CSRF,"
+but every test in that file runs via the `client` fixture, which
+explicitly sets `WTF_CSRF_ENABLED=False` for every single test (needed
+so the app's business logic can be tested without CSRF token plumbing
+getting in the way) -- meaning CSRF protection itself had zero test
+coverage despite the docstring's claim. Rate limiting (`flask-limiter`)
+has the same shape: the fixture explicitly disables it
+(`limiter.enabled = False`) for every test.
+
+Three new tests genuinely re-enable each protection (and restore the
+fixture's disabled default afterward, so they don't affect any other
+test in the file):
+- `test_csrf_protection_actually_rejects_request_without_token` --
+  enables `WTF_CSRF_ENABLED=True` for real, confirms a POST to
+  `/generate` without a valid CSRF token gets rejected with 400, not
+  silently accepted.
+- `test_upload_over_max_content_length_returns_413` -- confirms the
+  actual production default (`MAX_UPLOAD_MB=5`, not an artificially
+  tiny test-only value) genuinely rejects an over-limit upload. A prior
+  test (`test_oversized_upload_returns_413`) already existed but
+  patches `MAX_CONTENT_LENGTH` down to 10 bytes to verify the error
+  *handler* is wired correctly -- complementary to this one, not
+  redundant, since neither on its own proved the real 5MB default
+  actually works against a realistically-sized file.
+- `test_rate_limit_actually_returns_429_after_exceeding_configured_limit`
+  -- genuinely re-enables the limiter and makes 11 real requests to
+  `/generate` (the default limit is "10 per hour"), confirming a 429
+  actually appears rather than the limiter being wired up with no
+  verified effect.
+
+**No bugs were found in this pass** -- all three protections work
+correctly as implemented. That's still a meaningful result: "implemented
+correctly" and "verified to work" are different claims, and this pass
+converts three previously-only-implemented protections into three
+genuinely-verified ones, closing real blind spots even without a bug to
+show for it.
+
+All 273 tests pass after this pass (3 new). Verified fresh-venv-to-fresh-venv.
+
+## Still not done
+(unchanged -- see the "Still not done" section from pass 6.)
+
+## Follow-up pass 10 — external review response: doc fixes + pre-export validation summary
+
+An external review of the zip flagged two must-fix documentation bugs, a
+stale test-count claim, and several recommended improvements. Addressed
+as follows:
+
+### Must-fix documentation bugs (both confirmed real before fixing)
+- **Author placeholder**: `README.md` said "Built for the SuperDocs task
+  by [your name here]" verbatim -- fixed.
+- **SQLite/Postgres contradiction**: the "Known limitations" section
+  still described the review-session store as SQLite-only with
+  Postgres as a hypothetical future need, even though `webapp/
+  review_store.py` was migrated to SQLAlchemy with real Postgres support
+  (auto-selected via `DATABASE_URL`/`REVIEW_STORE_URL`) and `render.yaml`
+  provisions a managed Postgres instance -- several passes ago. Rewrote
+  the bullet to accurately describe current behavior.
+- **Stale test count**: README said "253 passed"; actual current count
+  (re-verified, not assumed) is 287. Fixed both occurrences, and added
+  `tests/test_logging_config.py` to the test-file listing (it existed
+  but was missing from the README's own inventory of test files).
+
+### New feature: pre-export validation summary (`rfe_response_builder/validation.py`, new file)
+Every check this package runs (coverage/answered-or-not, grounding,
+cross-item consistency, injection risk, human approval) previously
+surfaced as separate, scattered signals -- a checklist line here, a
+warning banner there. `build_validation_summary()` combines them into
+one explicit, ordered PASS/WARN/FAIL readout. FAIL is reserved
+specifically for the one non-negotiable check this package's whole
+design enforces: an RFE item reaching export without ever being
+answered. Everything else (evidence gaps, consistency flags, injection
+risk) is WARN, consistent with every other heuristic signal in this
+package -- worth a human's attention, never a hard block on its own.
+
+This is a pure aggregator, not a new source of truth -- it reads
+coverage rows, consistency flags, and injection flags that were already
+computed elsewhere; it doesn't re-derive anything, so it can't disagree
+with the per-item checks it's summarizing.
+
+Wired into both export paths as a final appended document section
+("Pre-Export Validation Summary"), logged loudly (`logger.error` on
+FAIL, `logger.warning` on WARN-only) in both `review.finalize_review`
+(webapp) and `generate.build_response_packet` (CLI) -- matching the
+existing pattern used for the Coverage Checklist and Exhibit List
+sections. 12 dedicated tests in `test_validation.py`, plus 2 integration
+tests (one per export path) proving a FAIL status for an unanswered item
+actually appears in the real instruction sent to SuperDocs, not just in
+an isolated unit test of the aggregator function.
+
+Adding one more `client.chat()` call per export required updating 3
+existing tests' exact call-count assertions
+(`test_build_response_packet_answers_all_three_items`,
+`test_persistent_failure_can_be_resumed_without_redrafting_answered_items`,
+`test_resume_false_forces_full_redraft_ignoring_prior_progress`) -- each
+now expects one more call than before. Caught immediately by running the
+full suite after the change, not assumed to still pass.
+
+### README additions
+- **Quick Demo** section added near the top (the reviewer's exact ask:
+  "a reviewer should understand the product in 30 seconds") -- an
+  8-step walkthrough from upload to export.
+- **Strengthened, moved-to-the-top callout** on the one item this pass
+  could NOT address: `review._interpret_job`'s pending-change JSON shape
+  has never been confirmed against a real SuperDocs API response,
+  because this sandbox's network egress allowlist blocks
+  `api.superdocs.app`. This was already documented honestly further down
+  the "Known limitations" section; moved to the very top of that section
+  with explicit next steps (make one real `chat_async` call, inspect the
+  actual JSON, commit it as a fixture) since an external reviewer
+  independently flagged this as "the biggest technical uncertainty" --
+  worth being unmissable rather than one bullet among several.
+
+### Not done (explicitly, not silently)
+- PDF/DOCX text extraction for supporting documents (currently `.txt`
+  only) -- a real, scoped feature request, not started this pass.
+  Would need a document-parsing dependency (e.g. `pypdf`,
+  `python-docx`) and wiring into `arguments_from_free_text`'s ingestion
+  path.
+- Richer in-progress UI (e.g. "Drafting response 3 of 6") -- the
+  background job status page (`job_status.html`) currently only shows
+  pending/running/completed/failed, not per-item progress, even though
+  `ProgressStore` already tracks per-item completion during a CLI run.
+  Wiring that same per-item data into the webapp's job status page is a
+  scoped follow-up, not done this pass.
+
+All 287 tests pass after this pass (14 new: 12 in `test_validation.py`,
+2 integration tests across the CLI and webapp export paths). Verified
+fresh-venv-to-fresh-venv per the established standard.
+
+## Follow-up pass 11 — PDF/DOCX supporting-document extraction
+
+Closes the last open item from the external review's "recommended"
+list: supporting documents were restricted to `.txt` (free text),
+despite real immigration case files overwhelmingly showing up as PDFs
+and Word documents.
+
+### `rfe_response_builder/document_extraction.py` (new file)
+- `extract_text(path)` dispatches on file extension (`.txt`/`.pdf`/
+  `.docx`) and returns extracted plain text. This is a thin layer IN
+  FRONT OF `arguments_from_free_text` (rfe.py), not a replacement --
+  once text is extracted, it goes through the exact same
+  paragraph-splitting, keyword-matching pipeline a `.txt` upload always
+  has. Every citation still traces to a real paragraph in a real
+  uploaded document; extraction only widens what counts as "a real
+  uploaded document."
+- Deliberately conservative about failure: raises
+  `DocumentExtractionError` (a `ValueError` subclass, so it's already
+  caught by every existing exception handler that catches
+  `SchemaValidationError`/`FirmTemplateValidationError`) with a clear,
+  human-readable message for: unsupported extensions, corrupted files,
+  password-protected PDFs, and PDFs/DOCX files with no extractable text
+  (e.g. a scanned image with no OCR text layer) -- never silently
+  returns empty text (which would make a document invisibly vanish from
+  matching) and never lets a raw library exception surface to a
+  paralegal who can't interpret it.
+- **Tested against genuinely generated files, not mocked library
+  calls**: `tests/test_document_extraction.py` uses `reportlab` to
+  generate real PDFs (including a real password-encrypted one via
+  `pypdf.PdfWriter.encrypt`) and `python-docx` to generate real `.docx`
+  files (including one with table content, since supporting letters
+  sometimes put dates/figures in a table rather than body paragraphs),
+  then extracts from those real files. A test that mocked pypdf/
+  python-docx's internals would not have caught real quirks (exactly
+  which exception type a corrupted PDF raises, whether an encrypted PDF
+  needs a blank-password unlock attempt first). 12 tests, covering
+  success, invalid UTF-8, unsupported extension, corrupted PDF/DOCX,
+  blank/no-text PDF, empty DOCX, password-protected PDF, and
+  multi-page PDF extraction.
+
+### Wired into both ingestion paths
+- `generate.load_supporting_documents` (CLI) now calls `extract_text()`
+  before `arguments_from_free_text` instead of `Path.read_text()`.
+  `--supporting-doc`'s help text updated; no argparse-level extension
+  restriction existed to begin with, so no CLI flag changes needed.
+  Verified end-to-end (not just unit-tested) with real generated PDF/
+  DOCX files: confirmed content genuinely extracted, confirmed
+  topically-relevant content gets matched into a dry-run's output as an
+  additional citation, confirmed topically-irrelevant content correctly
+  produces no false match.
+- `webapp/app.py`'s `_read_supporting_docs` rewritten: `ALLOWED_EXTENSIONS
+  ["supporting_docs"]` now includes `.pdf`/`.docx`; each upload is
+  written to a temp file (PDF/DOCX extraction libraries need a real file
+  path, not an in-memory stream) and cleaned up immediately after
+  extraction, success or failure. `DocumentExtractionError` is
+  re-raised as `ValueError` for consistency with the route's existing
+  exception handling.
+- An existing test (`test_supporting_docs_wrong_extension_rejected`)
+  used to upload a `.docx`-named file specifically to prove `.docx` was
+  rejected as an unsupported extension -- since `.docx` is now a
+  supported type, that test's premise no longer held (it would still
+  incidentally pass, but for the wrong reason: the corrupted-file error
+  path, not the extension-rejection path). Fixed to use a genuinely
+  unsupported extension (`.xyz`) instead, and added a new dedicated test
+  for the corrupted-`.docx`-is-still-rejected case, plus an end-to-end
+  test uploading real generated PDF and DOCX files through the actual
+  Flask test client and confirming their content reaches the matcher.
+  Caught by actually running the affected test, not assumed to still be
+  correct after `.docx` became valid.
+- `index.html`'s supporting-document upload field's `accept` attribute
+  and label text updated to advertise `.pdf`/`.docx`.
+
+### Dependencies
+- Added `pypdf`, `python-docx` (runtime) and `reportlab` (test-only, for
+  generating real PDF fixtures) to `requirements.txt` and
+  `pyproject.toml`'s `dev` extras, keeping both install paths in sync
+  per the standard established in pass 7. `webapp/requirements.txt`
+  picks these up automatically via its existing `-r ../requirements.txt`.
+  Verified fresh-venv-to-fresh-venv for both `pip install -r
+  requirements.txt` and `pip install -e ".[dev]"`.
+
+### README updates
+- Every mention of supporting documents as "free-text"/`.txt`-only
+  updated across the Quick Demo, the multi-document-support bullet, the
+  CLI flags table, and the architecture diagram.
+- `test_document_extraction.py` and `test_validation.py` (the latter
+  missing from a prior pass) added to the test-file listing; the "N
+  passed" count corrected again (301, not 273) -- and this time swept
+  every test file against the README's listing programmatically to
+  confirm nothing else is missing, rather than eyeballing it.
+
+All 301 tests pass after this pass (14 new: 12 in
+`test_document_extraction.py`, 1 corrected + 1 new in `test_webapp.py`).
+Verified fresh-venv-to-fresh-venv per the established standard.
+
+## Still not done
+- Richer in-progress UI (per-item drafting progress, e.g. "drafting
+  response 3 of 6") -- `ProgressStore` already tracks this data during a
+  CLI run; wiring it into the webapp's job status page is the one
+  remaining item from the most recent external review, not done this pass.
+- Everything else unchanged from the "Still not done" list in pass 6
+  (Policy Manual RAG, outcome learning loop, real login/accounts, client
+  portal, batch mode, encryption at rest, retention automation, load
+  testing, i18n, and confirming the real SuperDocs API response shape --
+  the latter still blocked by this sandbox's network egress allowlist).
+
+## Follow-up pass 12 — draft/incomplete sweep + per-item progress UI (closes the last open item)
+
+Swept the entire codebase for genuine draft/TODO/placeholder markers
+before starting (`grep -rn "TODO\|FIXME\|XXX\|placeholder\|not implemented\|coming soon\|WIP"` across `.py`/`.html`/`.md`/`.toml`/`.yaml`)
+-- found nothing real; every match was a legitimate use (an ABC's
+`raise NotImplementedError`, HTML input `placeholder=` hints, prose
+discussing the placeholder-secret-key boot guard). Then closed the one
+concretely-scoped item still open: per-item drafting progress on the
+webapp's job status page.
+
+### Per-item progress (`webapp/jobs.py`, `rfe_response_builder/review.py`)
+- `review.start_review` gained an optional `progress_callback(completed,
+  total, current_item_label)` parameter, invoked after each RFE item's
+  drafting turn completes (success, failure, or rejection alike --
+  "completed" means "this item's turn is done," not "answered"). Purely
+  advisory: `start_review`'s behavior and return value are byte-for-byte
+  identical whether or not a callback is given, and a broken callback is
+  caught and logged rather than aborting or corrupting a real drafting run.
+- `webapp/jobs.py`'s `JobStore` gained `items_total`/`items_completed`/
+  `current_item_label` columns and an `update_progress()` method.
+  `webapp/app.py`'s `_do_review_run` passes a callback that calls
+  `_job_store.update_progress(...)`, so the background job's actual
+  drafting progress is now visible to `GET /jobs/<id>` (HTML,
+  meta-refreshing) and `GET /jobs/<id>/status` (JSON) while the job is
+  still `running`, not just its final terminal state.
+- `job_status.html` shows "✓ Drafted N of M item(s) — currently
+  drafting: {label}" with a progress bar, falling back to the previous
+  generic "in progress" message if progress data isn't available yet
+  (e.g. the very first moment after a job starts).
+
+### A real bug found and fixed along the way: JobStore had no schema-migration path
+Adding new columns to `jobs_table` immediately broke 8 existing webapp
+tests with `sqlite3.OperationalError: no such column: background_jobs.items_total`
+-- not because the new code was wrong, but because this sandbox's
+long-lived `/tmp/rfe_review_sessions.sqlite3` already had a
+`background_jobs` table from earlier test runs, and SQLAlchemy's
+`create_all()` only creates tables that don't exist; it never alters an
+existing one. This is a real bug independent of the test environment --
+**any actual production deployment upgrading past this commit would hit
+the exact same error** the moment it started reading/writing jobs
+against its existing database. Fixed with a genuine (if lightweight)
+self-migration: `JobStore.__init__` now inspects the existing table's
+real columns via SQLAlchemy's `inspect()` and issues `ALTER TABLE ADD
+COLUMN` for anything missing, idempotently, on every startup.
+
+**Verified as a real fix, not assumed**: manually built an actual
+pre-existing SQLite file with the old schema (not a mock), confirmed
+`JobStore` could read/write it correctly after construction --
+independently of the test suite, using the exact same reasoning that
+surfaced the original bug. Then added two dedicated regression tests
+(`test_jobstore_self_migrates_a_pre_existing_old_schema_database`,
+`test_jobstore_migration_is_idempotent_across_repeated_construction`)
+and confirmed the first one genuinely fails with the exact original
+`OperationalError` when the migration call is removed, then passes
+again once restored -- not just written and trusted.
+
+### CLI parity: `build_response_packet` was silently missing equivalent real-time output
+While closing the webapp side, checked whether the CLI path had the same
+gap and found it did: `build_response_packet`'s actual drafting loop
+(unlike `dry_run`, which prints per-item output) had NO real-time
+`print()` output at all during real drafting -- someone running a real
+multi-item filing from the CLI had zero terminal feedback about overall
+progress unless they enabled verbose logging, and even then it never
+showed "item N of M." Added `[N/M] Drafting item {id}...` /
+`[N/M] Item {id}: already drafted in a prior attempt, skipping.` output
+to the CLI's per-item loop, verified with a real (mocked-SuperDocs,
+unmocked print) invocation before writing tests, then added 2 dedicated
+tests covering the fresh-drafting and resume-skip cases.
+
+### Testing discipline for the progress feature
+The webapp progress display was verified with a genuinely deterministic
+end-to-end test (`test_job_status_page_shows_per_item_progress_during_a_real_run`)
+-- not a sleep-based race condition. It uses a `threading.Event` to
+pause the mocked SuperDocs job-polling response for item 2 until the
+test has positively confirmed (via a second `threading.Event`) that the
+background thread has reached item 2's poll, guaranteeing item 1's
+`progress_callback` already fired. Only then does the test assert on
+the live `/jobs/<id>/status` JSON and `/jobs/<id>` HTML, before releasing
+the block to let the run finish normally. Run 5 times consecutively to
+confirm no flakiness before considering it done.
+
+### README updates
+- Quick Demo's real-run step now mentions the live progress display.
+- Test count corrected again (309, not 301) -- swept every test file
+  against the README's listing programmatically as in prior passes;
+  nothing missing this time.
+
+All 309 tests pass after this pass (17 new: 4 in `test_jobs.py`
+covering `update_progress` and the schema migration, 1 end-to-end
+webapp progress test, 2 CLI progress-output tests, plus the migration
+fix itself touching 8 previously-passing tests that would otherwise
+have broken). Verified fresh-venv-to-fresh-venv per the established
+standard, and this pass's migration fix was specifically verified
+against a genuinely pre-existing old-schema database file, not just the
+test suite's own fixtures.
+
+## Still not done
+- Confirming the real SuperDocs API's `awaiting_approval` job JSON shape
+  against a live response -- still blocked by this sandbox's network
+  egress allowlist (`api.superdocs.app` unreachable). Documented
+  prominently at the top of "Known limitations" since pass 10; remains
+  the single most important thing to verify before trusting this in
+  front of a real filing.
+- Everything else unchanged from the "Still not done" list in pass 6
+  (Policy Manual RAG, outcome learning loop, real login/accounts, client
+  portal, batch mode, encryption at rest, retention automation, load
+  testing, i18n).

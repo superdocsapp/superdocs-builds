@@ -21,6 +21,35 @@ synthetic — fictional client, fabricated facts. No real filings.
 this code — see that folder's README if you found this repo through a
 use-case listing rather than directly.
 
+## Quick Demo
+
+1. Upload the RFE notice (`.txt`).
+2. Upload the original petition's arguments (`.json`) — see
+   `data/sample_petition_arguments.json` for the shape.
+3. Upload the new-evidence catalog (`.json`, optional) and/or
+   supporting documents (`.txt`/`.pdf`/`.docx`, optional, multiple).
+4. Enter the case ID and client name.
+5. Either run **dry-run** (parses + matches + shows the exact drafting
+   instructions and coverage checklist, zero SuperDocs calls, zero cost)
+   or a **real run** (drafts every section via SuperDocs, gated behind
+   human review — nothing is exported without an explicit approval).
+   A real run shows live per-item progress ("Drafted 2 of 6 items —
+   currently drafting: Response to Item 3") on the job status page while
+   it drafts, since a real filing can take a minute or more.
+6. On a real run: review each drafted section (with grounding,
+   quality-gate, and consistency flags surfaced inline), approve/reject/
+   redraft-with-feedback per item.
+7. Approve → exports:
+   - the RFE response as a `.docx`
+   - a coverage checklist (every item mapped to answered/not-answered)
+   - a numbered exhibit list
+   - a pre-export validation summary (PASS/WARN/FAIL across coverage,
+     consistency, and injection-risk checks)
+   - an exhibit manifest (`.json`)
+
+The CLI (`rfe_response_builder.generate`) mirrors this exact flow for
+batch/CI use — see "CLI flags" below.
+
 ## What strong looks like, and how this meets it
 
 - **Every request maps to an answer, honestly**: `build_coverage_checklist`
@@ -47,8 +76,9 @@ use-case listing rather than directly.
   present in the supplied petition-arguments file or an uploaded
   supporting document, never fabricated.
 - **Multiple source documents, not just one JSON file**:
-  `arguments_from_free_text` lets any number of free-text supporting
-  documents (petition letter, employer letter, expert opinion, etc.) be
+  `arguments_from_free_text` (fed by `document_extraction.py`, which
+  handles `.txt`/`.pdf`/`.docx`) lets any number of supporting documents
+  (petition letter, employer letter, expert opinion, etc.) be
   parsed into candidate arguments and merged with the structured
   petition JSON — each `source_ref` traces to a real paragraph in a
   real uploaded document (`"employer_letter.txt, ¶3"`), so matching
@@ -219,7 +249,7 @@ a `<case-id>-exhibit-manifest.json` alongside it.
 |---|---|---|
 | `--notice` | yes | Path to a plaintext RFE notice |
 | `--petition` | yes | Path to prior petition arguments JSON |
-| `--supporting-doc` | no | Path to a free-text supporting document (repeatable); parsed into candidate arguments and merged with `--petition` |
+| `--supporting-doc` | no | Path to a supporting document, `.txt`/`.pdf`/`.docx` (repeatable); text extracted then parsed into candidate arguments and merged with `--petition` |
 | `--new-evidence` | no | Path to a new-evidence catalog JSON; skipped (no exhibits) if omitted |
 | `--case-id` | yes | Used in the document title and sanitized for output filenames |
 | `--client-name` | yes | Used in the document title |
@@ -240,7 +270,7 @@ produce the same result:
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt      # installs everything needed for the FULL suite, webapp included
 PYTHONPATH=. pytest tests/ -q
-# -> 253 passed
+# -> 309 passed
 ```
 
 or equivalently:
@@ -248,7 +278,7 @@ or equivalently:
 ```bash
 pip install -e ".[dev]"              # what `make install` runs
 PYTHONPATH=. pytest tests/ -q
-# -> 253 passed
+# -> 309 passed
 ```
 
 `make test-offline` runs the same command. Zero network access and zero
@@ -268,15 +298,21 @@ Test files, one per module in `rfe_response_builder/` and `webapp/`:
 - `tests/test_classify.py` — RFE-type classification and response
   deadline extraction.
 - `tests/test_grounding.py` — the fact-grounding (hallucination) heuristic.
+- `tests/test_document_extraction.py` — PDF/DOCX/TXT text extraction,
+  against genuinely generated files (not mocked libraries), including
+  corrupted, password-protected, and no-text-layer edge cases.
 - `tests/test_consistency.py` — cross-item consistency checking.
 - `tests/test_injection_guard.py` — prompt-injection risk scanning.
 - `tests/test_embeddings.py` — the pluggable TF-IDF/API embedding providers.
 - `tests/test_judge.py` — the LLM-as-judge quality gate.
 - `tests/test_firm_templates.py` — firm-level tone/phrasing customization.
+- `tests/test_validation.py` — the pre-export PASS/WARN/FAIL validation summary.
 - `tests/test_schemas.py` — petition/evidence JSON schema validation
   (both the `jsonschema`-backed path and the dependency-light fallback).
 - `tests/test_versioning.py` — draft version history and redraft-with-feedback.
 - `tests/test_audit.py` — the approve/reject audit trail.
+- `tests/test_logging_config.py` — structured JSON/plain-text logging
+  and correlation-id context vars.
 - `tests/test_superdocs_client.py` — retry/backoff and idempotency headers.
 - `tests/test_generate_integration.py` — the full non-interactive CLI
   pipeline against a mocked SuperDocs API, including resumable drafting,
@@ -285,7 +321,10 @@ Test files, one per module in `rfe_response_builder/` and `webapp/`:
 - `tests/test_review_store.py`, `tests/test_jobs.py` — the SQLAlchemy-backed
   (SQLite or Postgres) review-session store and background job queue.
 - `tests/test_webapp.py` — the Flask layer end-to-end, including the
-  session-cookie ownership checks and the redraft flow.
+  session-cookie ownership checks, the redraft flow, and genuine
+  (not just fixture-disabled) verification that CSRF protection, the
+  upload size limit, and rate limiting each actually reject what they're
+  supposed to.
 
 ## Architecture
 
@@ -293,7 +332,7 @@ Test files, one per module in `rfe_response_builder/` and `webapp/`:
 data/sample_rfe_notice.txt        ---parse_rfe_notice--->  list[RFERequest]
 data/sample_petition_arguments.json -> PriorPetition              |
 data/sample_new_evidence.json    -> NewEvidenceCatalog             |
-(optional free-text docs)  --arguments_from_free_text-->    -> merged into PriorPetition
+(optional .txt/.pdf/.docx docs) --extract_text + arguments_from_free_text-->    -> merged into PriorPetition
                                           |                         v
                                           `---best_matches (top-N, both)
                                                                |
@@ -355,6 +394,25 @@ upgrade a guess into a citation.
 
 ## Known limitations (told honestly)
 
+**The single biggest technical uncertainty in this project**: the exact
+JSON shape of an `awaiting_approval` SuperDocs job (what
+`review._interpret_job` parses) has never been confirmed against a live
+API response. This sandbox's network egress allowlist blocks
+`api.superdocs.app` outbound, so every SuperDocs interaction in this
+repo — the entire `tests/` suite included — is exercised against
+`requests_mock`, not a real server. `_interpret_job` is written
+defensively for exactly this reason (tries several plausible field
+names, degrades to showing raw job JSON on an unrecognized shape rather
+than crashing or silently false-approving), but "defensive against the
+unknown" is not the same claim as "verified against the real thing."
+Before trusting this in front of a real filing, someone with real
+`api.superdocs.app` access should: make one real `chat_async` call with
+`approval_mode="ask_every_time"`, inspect the actual returned JSON,
+confirm or correct `_interpret_job` against it, and commit that real
+response shape as a fixture (`tests/fixtures/real_awaiting_approval_job.json`
+or similar) so this stops being an assumption. This is genuinely the
+first thing to check, not documentation polish.
+
 - Matching (both prior-petition and new-evidence) is keyword-overlap
   scoring, ranked to top-N — an improvement over single-best-match, but
   still not semantic; a request phrased very differently from the
@@ -377,15 +435,22 @@ upgrade a guess into a citation.
   degrades to "reviewer sees raw data" rather than a crash or a
   silent false-approve.
 - The web app's review-session store (`webapp/review_store.py`) is
-  SQLite at a local file path (`/tmp` by default), shared by every
-  gunicorn worker on one Render instance — verified live: a session
-  written via one `ReviewSessionStore` instance is readable and
-  deletable from a second instance pointed at the same file
-  (`tests/test_review_store.py`). This solves the multi-*worker* case
-  but not multi-*instance* horizontal scaling, since each Render
-  instance has its own local disk — that would need a real shared
-  store (Postgres/Redis) instead, which only touches
-  `webapp/review_store.py`.
+  SQLAlchemy-backed and supports both SQLite (local development, the
+  zero-config default) and Postgres (production). Backend selection is
+  automatic: `REVIEW_STORE_URL` if set, else `DATABASE_URL` if set
+  (Render's `postgres://` scheme is normalized to
+  `postgresql+psycopg2://`), else local SQLite. `render.yaml` provisions
+  a managed Postgres instance (`rfe-review-db`) and wires `DATABASE_URL`
+  to it automatically, so a real deployment gets Postgres by default —
+  every gunicorn worker AND every Render instance shares the same
+  database, closing the multi-*instance* horizontal-scaling gap a
+  SQLite-only store would have. Verified with SQLite in
+  `tests/test_review_store.py` (this sandbox can't reach a live Postgres
+  server), but the code path is identical SQLAlchemy Core regardless of
+  dialect — only the connection URL differs. `webapp/jobs.py`'s
+  background job queue and `rfe_response_builder/versioning.py`'s draft
+  version history reuse the same engine, so there's one database to
+  provision, not three.
 - The CLI now has a review-gated path too (`--review`, prompts in the
   terminal via `_run_interactive_review` in `generate.py`, tested end
   to end in `test_cli_review_flag_prompts_and_only_exports_approved_items`).
@@ -395,4 +460,4 @@ upgrade a guess into a citation.
   unattended batch job.
 
 ---
-Built for the SuperDocs task by [your name here].
+Built for the SuperDocs task by Utkarsh Singh Choudhary.

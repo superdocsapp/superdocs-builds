@@ -37,6 +37,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable
 
 from .classify import RFECategory, classify, extract_response_deadline
 from .consistency import check_cross_item_consistency
@@ -45,6 +46,7 @@ from .firm_templates import FirmTemplate, apply_firm_customization
 from .grounding import check_grounding
 from .injection_guard import scan_all_inputs_for_injection_risk
 from .judge import QualityVerdict, grade_draft
+from .validation import CheckStatus, build_validation_summary
 from .rfe import (
     CoverageRow,
     Exhibit,
@@ -135,7 +137,18 @@ def _interpret_job(job: dict) -> tuple[str, str, str | None]:
 def start_review(client: SuperDocsClient, session_id: str, case_id: str, client_name: str,
                   notice_text: str, petition: PriorPetition,
                   evidence_catalog: NewEvidenceCatalog | None = None,
-                  firm_template: FirmTemplate | None = None) -> ReviewSession:
+                  firm_template: FirmTemplate | None = None,
+                  progress_callback: "Callable[[int, int, str], None] | None" = None) -> ReviewSession:
+    """`progress_callback`, if given, is invoked as
+    `progress_callback(completed, total, current_item_label)` after EACH
+    RFE item's drafting turn completes (whether it succeeded, failed, or
+    was rejected as non-substantive -- "completed" here means "this item's
+    turn is done," not "this item was answered"). Purely advisory: this
+    function's actual behavior and return value are identical whether or
+    not a callback is given. Exists so a caller with a long-running
+    background job (see webapp/jobs.py's JobStore.update_progress) can
+    surface real per-item progress instead of a static "in progress"
+    spinner for what can be a minute-plus real drafting run."""
     evidence_catalog = evidence_catalog or NewEvidenceCatalog()
     safe_case_id = sanitize_case_id(case_id)
 
@@ -258,6 +271,14 @@ def start_review(client: SuperDocsClient, session_id: str, case_id: str, client_
             )
         )
 
+        if progress_callback is not None:
+            try:
+                progress_callback(len(items), len(requests_list), response_section_heading(r.request_id))
+            except Exception:  # noqa: BLE001 - a broken progress callback must never
+                # abort or corrupt an actual drafting run; progress
+                # reporting is purely advisory.
+                logger.warning("progress_callback raised for request %s -- ignoring", r.request_id, exc_info=True)
+
     # Cross-item consistency check (heuristic -- see consistency.py): runs
     # once across ALL drafted items after the per-item loop above, since
     # it needs every item's text to compare against every other item's.
@@ -322,6 +343,26 @@ def finalize_review(client: SuperDocsClient, session: ReviewSession,
         evidence_matches=session.evidence_matches, exhibits=session.exhibits,
     )
 
+    # Final pre-export validation summary (see validation.py) -- combines
+    # coverage, cross-item consistency, and injection-risk flags into one
+    # explicit go/no-go readout, logged loudly if it FAILs (an item
+    # reaching export unanswered -- the one non-negotiable check this
+    # package enforces). This is a summary of checks already run
+    # elsewhere, not a new gate -- export still proceeds either way,
+    # consistent with every other heuristic signal in this package: a
+    # human decision (the approve/reject choices already made above),
+    # not an automated block.
+    validation_summary = build_validation_summary(
+        coverage, consistency_flags=session.consistency_flags, injection_flags=session.injection_flags,
+        exhibits=session.exhibits,
+    )
+    if validation_summary.has_failures:
+        logger.error("session %s: pre-export validation FAILED -- %s", session.session_id,
+                     [c.detail for c in validation_summary.checks if c.status == CheckStatus.FAIL])
+    elif validation_summary.has_warnings:
+        logger.warning("session %s: pre-export validation has warning(s) -- %s", session.session_id,
+                        [c.detail for c in validation_summary.checks if c.status == CheckStatus.WARN])
+
     def _checklist_line(row: CoverageRow) -> str:
         status = "ANSWERED" if row.answered else "NOT ANSWERED"
         line = f"- Item {row.request_id}: {status} (section: {row.response_section})"
@@ -358,6 +399,18 @@ def finalize_review(client: SuperDocsClient, session: ReviewSession,
                 f"exactly this list of new exhibits accompanying the response:\n{exhibit_lines}"
             ),
         )
+
+    validation_lines = "\n".join(
+        f"- {c.label}: {c.status.value.upper()}" + (f" -- {c.detail}" if c.detail else "")
+        for c in validation_summary.checks
+    )
+    client.chat(
+        session_id=session.session_id,
+        message=(
+            f"Append a final section titled 'Pre-Export Validation Summary' listing, "
+            f"verbatim, exactly this list of checks (do not alter any status):\n{validation_lines}"
+        ),
+    )
 
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{session.safe_case_id}-rfe-response.docx"

@@ -46,6 +46,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from rfe_response_builder.audit import log_decision
+from rfe_response_builder.document_extraction import DocumentExtractionError, extract_text
 from rfe_response_builder.firm_templates import (
     FirmTemplate,
     FirmTemplateValidationError,
@@ -107,7 +108,7 @@ ALLOWED_EXTENSIONS = {
     "petition": {".json"},
     "evidence": {".json"},
     "firm_template": {".json"},
-    "supporting_docs": {".txt"},
+    "supporting_docs": {".txt", ".pdf", ".docx"},
 }
 
 # --- Review-session store -----------------------------------------------------
@@ -290,12 +291,19 @@ def _read_upload(field_name: str) -> str | None:
 
 
 def _read_supporting_docs() -> list[PetitionArgument]:
-    """Multi-document ingestion: any number of free-text supporting
-    documents (petition letter, employer letter, expert opinion, etc.)
-    uploaded under the `supporting_docs` field name, each parsed into
-    candidate PetitionArguments and merged with the structured petition
-    JSON. See arguments_from_free_text's docstring for why this is
-    paragraph-level keyword matching rather than semantic retrieval."""
+    """Multi-document ingestion: any number of supporting documents
+    (petition letter, employer letter, expert opinion, etc.) uploaded
+    under the `supporting_docs` field name -- accepts .txt/.pdf/.docx
+    (see document_extraction.py for the actual extraction), each parsed
+    into candidate PetitionArguments and merged with the structured
+    petition JSON. See arguments_from_free_text's docstring for why this
+    is paragraph-level keyword matching rather than semantic retrieval.
+
+    PDF/DOCX extraction libraries need a real file path, not an in-memory
+    stream, so each upload is written to a temp file first (cleaned up
+    immediately after extraction, success or failure) rather than kept
+    only in memory the way the plain-text uploads elsewhere in this
+    route are."""
     files = request.files.getlist("supporting_docs")
     allowed = ALLOWED_EXTENSIONS["supporting_docs"]
     args: list[PetitionArgument] = []
@@ -305,10 +313,15 @@ def _read_supporting_docs() -> list[PetitionArgument]:
         ext = Path(f.filename).suffix.lower()
         if ext not in allowed:
             raise ValueError(f"'supporting_docs' must be one of {sorted(allowed)}, got '{ext or f.filename}'")
+        with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
+            tmp.write(f.read())
+            tmp_path = Path(tmp.name)
         try:
-            text = f.read().decode("utf-8")
-        except UnicodeDecodeError as e:
-            raise ValueError(f"supporting document '{f.filename}' is not a valid UTF-8 text file") from e
+            text = extract_text(tmp_path)
+        except DocumentExtractionError as e:
+            raise ValueError(str(e)) from e
+        finally:
+            tmp_path.unlink(missing_ok=True)
         args.extend(arguments_from_free_text(f.filename, text))
     return args
 
@@ -409,12 +422,17 @@ def generate():
 
         def _do_review_run(_case_id=case_id, _client_name=client_name, _notice_text=notice_text,
                             _petition=petition, _evidence_catalog=evidence_catalog, _api_key=api_key,
-                            _firm_template=firm_template):
+                            _firm_template=firm_template, _job_id=job_id):
             client = SuperDocsClient(api_key=_api_key)
             session_id = f"rfe-response-{sanitize_case_id(_case_id)}-{uuid.uuid4().hex[:8]}"
+
+            def _on_item_progress(completed: int, total: int, current_item_label: str) -> None:
+                _job_store.update_progress(_job_id, completed=completed, total=total,
+                                            current_item_label=current_item_label)
+
             review_session = start_review(client, session_id, _case_id, _client_name, _notice_text,
                                            _petition, evidence_catalog=_evidence_catalog,
-                                           firm_template=_firm_template)
+                                           firm_template=_firm_template, progress_callback=_on_item_progress)
             review_id = _store_review_session(review_session)
             # Record version 1 for every item that actually has drafted
             # text -- this is what a later "redraft with feedback" diffs
@@ -454,7 +472,11 @@ def job_status(job_id):
     if job.status == STATUS_FAILED:
         flash(f"Drafting failed: {job.error}")
         return redirect(url_for("index"))
-    return render_template("job_status.html", job_id=job_id, status=job.status)
+    return render_template(
+        "job_status.html", job_id=job_id, status=job.status,
+        items_completed=job.items_completed, items_total=job.items_total,
+        current_item_label=job.current_item_label,
+    )
 
 
 @app.route("/jobs/<job_id>/status", methods=["GET"])
@@ -467,7 +489,11 @@ def job_status_json(job_id):
     job = _job_store.get(job_id)
     if job is None:
         return {"error": "not found"}, 404
-    body = {"job_id": job.job_id, "status": job.status}
+    body = {
+        "job_id": job.job_id, "status": job.status,
+        "items_completed": job.items_completed, "items_total": job.items_total,
+        "current_item_label": job.current_item_label,
+    }
     if job.status == STATUS_COMPLETED:
         _own_review(job.review_id)
         body["review_url"] = url_for("review", review_id=job.review_id)

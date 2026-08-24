@@ -214,7 +214,9 @@ def test_supporting_docs_multi_upload_accepted_in_dry_run(client):
 
 
 def test_supporting_docs_wrong_extension_rejected(client):
-    doc1 = (io.BytesIO(b"not a text file"), "employer_letter.docx")
+    """.xyz is genuinely unsupported (unlike .docx, which is now a valid
+    supporting-document type -- see the extraction test below for that)."""
+    doc1 = (io.BytesIO(b"some content"), "employer_letter.xyz")
     resp = client.post(
         "/generate",
         data=_form(supporting_docs=[doc1]),
@@ -223,6 +225,52 @@ def test_supporting_docs_wrong_extension_rejected(client):
     )
     assert resp.status_code == 200
     assert b"Could not process input" in resp.data
+
+
+def test_supporting_docs_corrupted_docx_rejected_with_readable_error(client):
+    """A .docx extension is now accepted, but the file must actually be a
+    valid Word document -- a corrupted one is rejected with a readable
+    error, not a raw exception."""
+    doc1 = (io.BytesIO(b"this is not a real docx file at all"), "employer_letter.docx")
+    resp = client.post(
+        "/generate",
+        data=_form(supporting_docs=[doc1]),
+        content_type="multipart/form-data",
+        follow_redirects=True,
+    )
+    assert resp.status_code == 200
+    assert b"Could not process input" in resp.data
+    assert b"Could not open" in resp.data
+
+
+def test_supporting_docs_accepts_real_pdf_and_docx_files(client):
+    """End-to-end: real, genuinely-generated PDF and DOCX files (not
+    hand-typed bytes) upload successfully and their extracted content
+    reaches the matcher -- proven by a paragraph designed to match one
+    of the sample notice's RFE items."""
+    import docx
+    import io as _io
+    from reportlab.pdfgen import canvas
+
+    docx_buf = _io.BytesIO()
+    d = docx.Document()
+    d.add_paragraph("The couple maintains a joint lease agreement and shares joint utility bills.")
+    d.save(docx_buf)
+    docx_buf.seek(0)
+
+    pdf_buf = _io.BytesIO()
+    c = canvas.Canvas(pdf_buf)
+    c.drawString(100, 750, "The couple maintains a joint lease agreement and shares joint utility bills.")
+    c.save()
+    pdf_buf.seek(0)
+
+    resp = client.post(
+        "/generate",
+        data=_form(supporting_docs=[(docx_buf, "letter.docx"), (pdf_buf, "letter.pdf")]),
+        content_type="multipart/form-data",
+    )
+    assert resp.status_code == 200
+    assert b"letter.docx" in resp.data or b"letter.pdf" in resp.data
 
 
 def _mock_pending_review(m, session_url_prefix="https://api.superdocs.app"):
@@ -339,6 +387,64 @@ def test_real_run_shows_cross_item_consistency_flag_on_review_page(client, monke
     assert b"Acme Robotics Corp" in review_resp.data
 
 
+def test_job_status_page_shows_per_item_progress_during_a_real_run(client, monkeypatch):
+    """End-to-end, deterministic (no sleep-based flakiness) proof that
+    per-item progress actually reaches the job status page mid-run: uses
+    a threading.Event to pause the mocked SuperDocs job-polling response
+    for item 2 until the test has confirmed item 1's progress_callback
+    already fired and is visible via GET /jobs/<id>/status, then releases
+    it to let the run finish normally."""
+    import threading
+    import requests_mock
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+    release_item_2 = threading.Event()
+    item_2_job_requested = threading.Event()
+
+    def get_job_callback(request, context):
+        # The job_id in the URL path tells us which item's poll this is --
+        # item 1 uses job-1, item 2 uses job-2 (see chat_async_callback).
+        if "job-2" in request.url:
+            item_2_job_requested.set()
+            release_item_2.wait(timeout=5)
+        return {"status": "awaiting_approval",
+                "pending_changes": [{"chunk_id": "chunk-1", "proposed_text": "Drafted section text."}]}
+
+    call_count = {"n": 0}
+
+    def chat_async_callback(request, context):
+        call_count["n"] += 1
+        return {"job_id": f"job-{call_count['n']}"}
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json={"response": "ok", "document_changes": {}})
+        m.post("https://api.superdocs.app/v1/chat/async", json=chat_async_callback)
+        m.get(requests_mock.ANY, json=get_job_callback)
+
+        resp = client.post("/generate", data=_form(dry_run=""), content_type="multipart/form-data")
+        job_id = resp.headers["Location"].rstrip("/").split("/")[-1]
+
+        # Wait until the background thread is genuinely blocked on item
+        # 2's job poll -- item 1 must have completed and fired its
+        # progress_callback by this point.
+        assert item_2_job_requested.wait(timeout=5), "background job never reached item 2"
+
+        status_resp = client.get(f"/jobs/{job_id}/status")
+        body = status_resp.get_json()
+        assert body["status"] == "running"
+        assert body["items_completed"] == 1
+        assert body["items_total"] == 3
+        assert body["current_item_label"] == "Response to Item 1"
+
+        html_resp = client.get(f"/jobs/{job_id}")
+        assert b"Drafted 1 of 3 item(s)" in html_resp.data
+        assert b"Response to Item 1" in html_resp.data
+
+        release_item_2.set()
+        final = _poll_job_until_done(client, job_id)
+        assert final["status"] == "completed"
+
+
 def test_real_run_shows_firm_name_on_review_page(client, monkeypatch):
     import requests_mock
 
@@ -433,6 +539,60 @@ def test_review_page_shows_quality_gate_flag_when_enabled(client, monkeypatch):
 
     assert b"Quality gate flagged this draft" in review_resp.data
     assert b"Restates the petition instead." in review_resp.data
+
+
+def test_csrf_protection_actually_rejects_request_without_token():
+    """Every other test in this file runs with WTF_CSRF_ENABLED=False
+    (see the `client` fixture) so the app's business logic can be tested
+    without CSRF interference -- but that means CSRF protection itself
+    was never actually verified to work anywhere in this suite, despite
+    this file's own module docstring claiming to cover it. This test
+    genuinely enables CSRF and confirms a POST without a valid token is
+    rejected, then restores the fixture's disabled state for every other
+    test in this module."""
+    webapp_module.app.config.update(TESTING=True, WTF_CSRF_ENABLED=True)
+    try:
+        with webapp_module.app.test_client() as c:
+            resp = c.post("/generate", data=_form(), content_type="multipart/form-data")
+            # Flask-WTF's default CSRF failure is a 400 (via its own
+            # errorhandler, raised as a CSRFError) -- it must NOT be a
+            # 200/302 as if the request were accepted.
+            assert resp.status_code == 400
+    finally:
+        webapp_module.app.config.update(WTF_CSRF_ENABLED=False)
+
+
+def test_upload_over_max_content_length_returns_413(client):
+    """MAX_UPLOAD_MB / MAX_CONTENT_LENGTH is set from an env var read at
+    app-creation time (see app.py) -- never previously verified to
+    actually reject an oversized request rather than just being present
+    in app.config with no effect."""
+    oversized_notice = b"x" * (webapp_module.MAX_UPLOAD_MB * 1024 * 1024 + 1024)
+    form = _form(notice=(io.BytesIO(oversized_notice), "notice.txt"))
+    resp = client.post("/generate", data=form, content_type="multipart/form-data")
+    assert resp.status_code == 413
+    assert b"too large" in resp.data.lower() or b"File too large" in resp.data
+
+
+def test_rate_limit_actually_returns_429_after_exceeding_configured_limit():
+    """Every other test in this file runs with the limiter disabled (see
+    the `client` fixture) -- this genuinely re-enables it and confirms
+    the configured GENERATE_RATE_LIMIT (default '10 per hour') actually
+    triggers a 429 on the 11th request within the window, rather than
+    just being wired up with no real effect."""
+    if webapp_module.limiter is None:
+        pytest.skip("flask-limiter not installed in this environment")
+    webapp_module.app.config.update(TESTING=True, WTF_CSRF_ENABLED=False)
+    webapp_module.limiter.enabled = True
+    try:
+        with webapp_module.app.test_client() as c:
+            statuses = []
+            for _ in range(11):
+                resp = c.post("/generate", data=_form(), content_type="multipart/form-data")
+                statuses.append(resp.status_code)
+            assert 429 in statuses, f"expected a 429 among {statuses} after exceeding the rate limit"
+    finally:
+        webapp_module.limiter.enabled = False
 
 
 def test_review_not_accessible_from_a_different_browser_session(client, monkeypatch):

@@ -14,3 +14,8 @@ SQLAlchemy>=2.0
 flask>=3.0
 flask-wtf>=1.2
 flask-limiter>=3.7
+pypdf>=5.0
+python-docx>=1.1
+# reportlab is test-only (test_document_extraction.py generates real PDF
+# fixtures with it) -- not imported anywhere by the actual application code.
+reportlab>=4.0

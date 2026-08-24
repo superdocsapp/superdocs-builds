@@ -33,7 +33,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from typing import Callable
 
-from sqlalchemy import Column, Float, MetaData, String, Table, delete, insert, select, update
+from sqlalchemy import Column, Float, Integer, MetaData, String, Table, delete, insert, select, update
 from sqlalchemy.engine import Engine
 
 logger = logging.getLogger("rfe_response_builder.webapp.jobs")
@@ -55,6 +55,9 @@ jobs_table = Table(
     Column("case_id", String(256), nullable=True),
     Column("created", Float, nullable=False),
     Column("updated", Float, nullable=False),
+    Column("items_total", Integer, nullable=True),
+    Column("items_completed", Integer, nullable=True),
+    Column("current_item_label", String(256), nullable=True),
 )
 
 
@@ -67,6 +70,9 @@ class JobRecord:
     case_id: str | None
     created: float
     updated: float
+    items_total: int | None = None
+    items_completed: int | None = None
+    current_item_label: str | None = None
 
 
 class JobStore:
@@ -79,6 +85,31 @@ class JobStore:
         self.engine = engine
         self.ttl_s = ttl_s
         _metadata.create_all(self.engine, tables=[jobs_table])
+        self._migrate_add_missing_columns()
+
+    def _migrate_add_missing_columns(self) -> None:
+        """`create_all()` only creates tables that don't already exist --
+        it never alters an existing table's schema. Any deployment (or,
+        as happened here, this sandbox's own long-lived local SQLite
+        file) that already has a `background_jobs` table from before the
+        `items_total`/`items_completed`/`current_item_label` columns
+        existed would otherwise fail every job read/write with
+        "no such column" the moment this code runs against that database.
+        This is a lightweight, idempotent self-migration: for each column
+        this table is supposed to have, add it if missing. Safe to call
+        on every startup -- a no-op once the columns already exist."""
+        from sqlalchemy import inspect as sa_inspect
+
+        inspector = sa_inspect(self.engine)
+        existing_columns = {col["name"] for col in inspector.get_columns(jobs_table.name)}
+        with self.engine.begin() as conn:
+            for column in jobs_table.columns:
+                if column.name not in existing_columns:
+                    col_type = column.type.compile(dialect=self.engine.dialect)
+                    conn.exec_driver_sql(
+                        f"ALTER TABLE {jobs_table.name} ADD COLUMN {column.name} {col_type}"
+                    )
+                    logger.info("migrated %s: added missing column '%s'", jobs_table.name, column.name)
 
     def create(self, case_id: str | None = None) -> str:
         job_id = uuid.uuid4().hex
@@ -98,6 +129,16 @@ class JobStore:
 
     def mark_failed(self, job_id: str, error: str) -> None:
         self._update(job_id, status=STATUS_FAILED, error=error[:4000])
+
+    def update_progress(self, job_id: str, completed: int, total: int, current_item_label: str | None = None) -> None:
+        """Records per-item drafting progress within a running job (e.g.
+        "drafted 3 of 6 items") so the job status page can show something
+        more useful than a static "in progress" spinner for a real run
+        that can take a minute or more. Called from inside the background
+        thread (see `_do_review_run` in webapp/app.py) after each RFE
+        item's drafting turn completes -- entirely best-effort/advisory,
+        never required for the job to actually complete correctly."""
+        self._update(job_id, items_total=total, items_completed=completed, current_item_label=current_item_label)
 
     def _update(self, job_id: str, **fields) -> None:
         fields["updated"] = time.time()

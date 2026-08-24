@@ -36,10 +36,12 @@ import requests
 
 from .classify import RFECategory, classify, extract_response_deadline
 from .consistency import check_cross_item_consistency
+from .document_extraction import extract_text
 from .embeddings import get_default_provider
 from .firm_templates import FirmTemplate, apply_firm_customization, load_firm_template
 from .grounding import check_grounding
 from .injection_guard import scan_all_inputs_for_injection_risk
+from .validation import CheckStatus, build_validation_summary
 from .judge import QualityVerdict, grade_draft
 from .logging_config import configure_logging, set_case_id, set_request_id
 from .progress import ProgressStore
@@ -76,15 +78,18 @@ def load_petition(path: Path) -> PriorPetition:
 
 
 def load_supporting_documents(paths: list[Path]) -> list[PetitionArgument]:
-    """Multi-document ingestion: any number of free-text supporting
-    documents (petition letter, employer letter, expert opinion, etc.) get
-    parsed into candidate arguments and merged onto the structured
-    petition. Deliberately paragraph-level keyword matching (see
-    `arguments_from_free_text`'s docstring) rather than embeddings, so
-    every match traces to a real paragraph in a real uploaded document."""
+    """Multi-document ingestion: any number of supporting documents
+    (petition letter, employer letter, expert opinion, etc.) get their
+    text extracted (see document_extraction.py -- .txt/.pdf/.docx all
+    supported), then parsed into candidate arguments and merged onto the
+    structured petition. Deliberately paragraph-level keyword matching
+    (see `arguments_from_free_text`'s docstring) rather than embeddings,
+    so every match traces to a real paragraph in a real uploaded
+    document, regardless of what format that document was uploaded in."""
     args: list[PetitionArgument] = []
     for p in paths:
-        args.extend(arguments_from_free_text(p.name, p.read_text()))
+        text = extract_text(p)
+        args.extend(arguments_from_free_text(p.name, text))
     return args
 
 
@@ -333,7 +338,8 @@ def build_response_packet(client: SuperDocsClient, session_id: str, case_id: str
     # NOT ANSWERED -- a 200 response is necessary but not sufficient.
     ungrounded_by_request: dict[str, list[str]] = {}
     weak_by_request: dict[str, str] = {}
-    for r in requests_list:
+    total_items = len(requests_list)
+    for item_index, r in enumerate(requests_list, start=1):
         set_request_id(r.request_id)
         done = prior_progress.get(r.request_id)
         if done is not None:
@@ -341,8 +347,10 @@ def build_response_packet(client: SuperDocsClient, session_id: str, case_id: str
                 answered_ids.add(r.request_id)
             logger.info("request %s: already recorded from a prior attempt (answered=%s) -- skipping redraft",
                         r.request_id, done.answered)
+            print(f"[{item_index}/{total_items}] Item {r.request_id}: already drafted in a prior attempt, skipping.")
             continue
 
+        print(f"[{item_index}/{total_items}] Drafting item {r.request_id}...")
         prior_matches = petition_matches[r.request_id]
         prior_arg = prior_matches[0] if prior_matches else None
         note = new_evidence_note_from_entries(evidence_matches[r.request_id])
@@ -475,6 +483,30 @@ def build_response_packet(client: SuperDocsClient, session_id: str, case_id: str
             ),
         )
 
+    # Final pre-export validation summary (see validation.py) -- see
+    # review.py's finalize_review for the full rationale; same pattern
+    # here for the CLI's non-interactive export path.
+    validation_summary = build_validation_summary(
+        coverage, consistency_flags=consistency_flags, injection_flags=injection_flags, exhibits=exhibits,
+    )
+    if validation_summary.has_failures:
+        logger.error("session %s: pre-export validation FAILED -- %s", session_id,
+                     [c.detail for c in validation_summary.checks if c.status == CheckStatus.FAIL])
+    elif validation_summary.has_warnings:
+        logger.warning("session %s: pre-export validation has warning(s) -- %s", session_id,
+                        [c.detail for c in validation_summary.checks if c.status == CheckStatus.WARN])
+    validation_lines = "\n".join(
+        f"- {c.label}: {c.status.value.upper()}" + (f" -- {c.detail}" if c.detail else "")
+        for c in validation_summary.checks
+    )
+    client.chat(
+        session_id=session_id,
+        message=(
+            f"Append a final section titled 'Pre-Export Validation Summary' listing, "
+            f"verbatim, exactly this list of checks (do not alter any status):\n{validation_lines}"
+        ),
+    )
+
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{safe_case_id}-rfe-response.docx"
     file_bytes = client.export(session_id=session_id, fmt="docx", filename=safe_case_id + "-rfe-response")
@@ -514,9 +546,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--notice", type=Path, required=True, help="Path to a plaintext RFE notice")
     parser.add_argument("--petition", type=Path, required=True, help="Path to prior petition arguments JSON")
     parser.add_argument("--supporting-doc", type=Path, action="append", default=[],
-                         help="Path to a free-text supporting document (petition letter, employer letter, "
-                              "expert opinion, etc.); repeatable. Parsed into candidate arguments and merged "
-                              "with --petition (multi-document ingestion).")
+                         help="Path to a supporting document (petition letter, employer letter, "
+                              "expert opinion, etc.); repeatable. Accepts .txt, .pdf, or .docx -- "
+                              "text is extracted (see document_extraction.py) then parsed into "
+                              "candidate arguments and merged with --petition (multi-document ingestion).")
     parser.add_argument("--new-evidence", type=Path, default=None,
                          help="Path to a new-evidence catalog JSON (optional; skipped if omitted)")
     parser.add_argument("--firm-template", type=Path, default=None,
