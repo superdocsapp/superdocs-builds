@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Live Deliverable — M0 RTMS spike</title>
+<link rel="stylesheet" href="/static/panel.css" />
+<script src="https://appssdk.zoom.us/sdk.js"></script>
+</head>
+<body>
+  <h1>Live Deliverable — Milestone 0</h1>
+  <p class="sub">This page only proves one thing: whether <code>startRTMS()</code> makes <code>meeting.rtms_started</code> arrive at this app's backend. Nothing here drafts anything yet.</p>
+
+  <div id="status" class="status-pending">Connecting to Zoom client…</div>
+
+  <button id="start-btn" disabled>Start RTMS Test</button>
+
+  <pre id="log" aria-live="polite">waiting…</pre>
+
+  <script src="/static/panel.js"></script>
+</body>
+</html>

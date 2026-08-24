@@ -1,0 +1,71 @@
+Demo script for ElevenLabs — paste as-is, break tags included.
+
+WHY THE PAUSES ARE HERE, not a cosmetic choice:
+
+The batcher closes a batch on a 7s silence gap, a 15s ceiling, or 400
+characters. Read continuously, no silence ever arrives, so batches close only
+on the ceiling — which cuts wherever the clock lands, mid-clause. That is how
+"The deliverables should include the website," / "payment integration, mobile
+responsive design." / "and basic analytics will provide the" happened: one
+sentence across three chunks, with the third fusing the end of Deliverables
+onto the start of Assumptions. The gate then correctly refused it as two
+sections' content in one edit.
+
+A pause at each TOPIC boundary lets each batch close on a sentence boundary,
+which is what the whole design assumes. This is not an easier test — it is a
+more realistic one. Real meetings have pauses between thoughts; a script read
+continuously at speed is closer to the worst case than to a real call.
+
+Keep the speaking pace normal. Only the gaps change.
+
+---
+
+Hi, I'd like to discuss a website development project for North Star Goods, a small e-commerce company.
+
+<break time="2.5s" />
+
+We need a modern responsive website where customers can browse products, add items to a cart, and complete payments online.
+
+<break time="2.5s" />
+
+The project should start on September 15th, and the final website should be delivered by October 30th.
+
+<break time="2.5s" />
+
+Our total budget is forty-five thousand dollars. Actually, no — make it fifty-five thousand.
+
+<break time="2.5s" />
+
+The deliverables should include the website, payment integration, mobile responsive design, and basic analytics.
+
+<break time="2.5s" />
+
+We'll provide the product images, descriptions, pricing, branding assets, and access to our existing domain.
+
+<break time="2.5s" />
+
+We expect weekly progress updates, and we'll review each milestone before moving forward.
+
+<break time="2.5s" />
+
+This project does not include ongoing marketing, SEO, or content creation after launch.
+
+<break time="2.5s" />
+
+We want to have a kick-off meeting next week to finalize the requirements and begin development immediately after approval.
+
+---
+
+NOTES
+
+- The correction stays deliberately mid-sentence: "forty-five thousand dollars.
+  Actually, no — make it fifty-five thousand." That is the headline behaviour
+  and it must not be tidied into two clean sentences, or the demo stops
+  proving the hard case.
+
+- Spoken numbers ("forty-five thousand dollars") are the harder input than
+  "$45,000" and closer to how people talk. Whisper renders them as digits.
+
+- If a section still comes out empty on camera, that is the run-to-run
+  variance documented in SUPERDOCS_BUGS.md #11, not a scripting problem.
+  Saying so on camera is stronger than a re-take.

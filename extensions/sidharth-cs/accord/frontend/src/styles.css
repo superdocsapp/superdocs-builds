@@ -1,0 +1,807 @@
+/* ==================================================================
+   ACCORD — meeting-to-document workspace
+   Editorial, restrained, professional. Narrow Zoom panel first.
+   ================================================================== */
+
+:root {
+  --paper: #FAF9F7;
+  --surface: #FFFFFF;
+  --hairline: #ECE8E2;
+  --ink: #1A1A1A;
+  --muted: #8A877F;
+  --faint: #C4BFB6;
+  --navy: #1B2A4A;
+  --navy-deep: #131F38;
+  --live: #1F7A4D;
+  --work: #B26A00;
+  --attention: #A85316;
+  --error: #C0392B;
+
+  --serif: Georgia, 'Times New Roman', serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --gutter: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font: 13px/1.6 var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--paper);
+}
+
+button { font: inherit; color: inherit; }
+
+/* ---- Buttons ------------------------------------------------------- */
+
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn.primary {
+  background: var(--navy);
+  color: #fff;
+}
+.btn.primary:hover { background: var(--navy-deep); }
+.btn.primary:disabled { opacity: 0.45; cursor: default; }
+
+.btn.ghost {
+  background: transparent;
+  border-color: var(--hairline);
+  color: var(--muted);
+}
+.btn.ghost:hover { border-color: #D9D4CC; color: var(--ink); }
+.btn.ghost:disabled { opacity: 0.45; cursor: default; }
+
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+/* ---- Header --------------------------------------------------------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px var(--gutter) 10px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--hairline);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.wordmark {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+
+/* ---- Status dot ----------------------------------------------------- */
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #C9C5BD;
+  flex-shrink: 0;
+}
+.dot.live { background: var(--live); animation: pulse 1.6s ease-in-out infinite; }
+.dot.work { background: var(--work); animation: pulse 1.6s ease-in-out infinite; }
+.dot.attention { background: var(--attention); animation: pulse 1.1s ease-in-out infinite; }
+.dot.ready { background: #C9C5BD; }
+
+.status-label {
+  font-size: 10.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ---- Document tabs -------------------------------------------------- */
+
+.doc-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 0 var(--gutter);
+  background: var(--paper);
+  border-bottom: 1px solid var(--hairline);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.doc-tabs::-webkit-scrollbar { display: none; }
+
+.doc-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 2px 8px;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+.doc-tab.active { border-bottom-color: var(--navy); }
+
+.doc-tab-label {
+  appearance: none;
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+}
+.doc-tab.active .doc-tab-label { color: var(--ink); font-weight: 600; }
+
+.doc-tab-close {
+  appearance: none;
+  background: none;
+  border: none;
+  font-size: 14px;
+  line-height: 1;
+  color: var(--faint);
+  cursor: pointer;
+  padding: 0 1px;
+}
+.doc-tab-close:hover { color: var(--error); }
+
+.doc-tab-new {
+  appearance: none;
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 7px 6px 8px;
+  white-space: nowrap;
+}
+.doc-tab-new:hover { color: var(--navy); }
+
+/* ---- Environment notice (dev browser only) --------------------------- */
+
+.env-notice {
+  padding: 6px var(--gutter);
+  font-size: 11.5px;
+  color: var(--muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline);
+  text-align: center;
+}
+
+/* ---- Capture strip ---------------------------------------------------- */
+
+.capture {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px var(--gutter);
+  font-size: 12px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--paper);
+}
+
+.capture-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C9C5BD;
+  flex-shrink: 0;
+}
+.capture.live .capture-dot,
+.capture.listening .capture-dot { background: var(--live); animation: pulse 1.6s ease-in-out infinite; }
+.capture.work .capture-dot,
+.capture.connecting .capture-dot,
+.capture.stopping .capture-dot,
+.capture.processing .capture-dot { background: var(--work); animation: pulse 1.6s ease-in-out infinite; }
+.capture.review .capture-dot,
+.capture.error .capture-dot { background: var(--attention); animation: pulse 1.1s ease-in-out infinite; }
+.capture.degraded .capture-dot,
+.capture.helper-off .capture-dot { background: var(--faint); }
+
+.capture-label { flex: 1; }
+
+.capture-action { display: flex; gap: 8px; }
+.capture-action .btn { padding: 4px 12px; font-size: 12px; }
+
+/* ---- Session error ----------------------------------------------------- */
+
+.session-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px var(--gutter);
+  font-size: 11.5px;
+  color: var(--attention);
+  background: #FBF6F0;
+  border-bottom: 1px solid var(--hairline);
+}
+.session-error .btn { padding: 2px 10px; font-size: 11px; }
+
+/* ---- Review surface ----------------------------------------------------- */
+
+.review {
+  margin: 14px var(--gutter) 0;
+  padding: 14px var(--gutter);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(27, 42, 74, 0.06);
+  animation: rise 0.2s ease-out;
+}
+
+.review-rule {
+  height: 3px;
+  width: 32px;
+  background: var(--navy);
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.review-reason {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+
+.review-quote {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  font-style: italic;
+  margin: -4px 0 12px;
+  /* The panel is ~340px wide — a long utterance wraps rather than
+     pushing the card into a horizontal scroll. */
+  overflow-wrap: anywhere;
+}
+
+.review-actions { display: flex; gap: 8px; }
+
+/* ---- Document ------------------------------------------------------------ */
+
+.doc-area { padding: 0 var(--gutter); }
+
+.doc {
+  background: var(--surface);
+  border-left: 1px solid var(--hairline);
+  border-right: 1px solid var(--hairline);
+  padding: 20px 18px 26px;
+}
+
+.doc.fresh { animation: doc-update 1.8s ease-out; }
+
+@keyframes doc-update {
+  0% { background: #F7F4ED; }
+  100% { background: var(--surface); }
+}
+
+.doc-head {
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.doc-title {
+  font-family: var(--serif);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0.005em;
+  color: var(--ink);
+}
+
+.doc-subtitle {
+  margin-top: 3px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* --- sections --- */
+
+.doc-section {
+  padding: 13px 0 11px;
+  border-bottom: 1px solid var(--hairline);
+}
+.doc-section:last-of-type { border-bottom: none; }
+
+.doc-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+
+.doc-section.drafting .doc-section-label { color: var(--work); }
+.doc-section-drafting {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--faint);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* A section that already has content, while it is being re-edited. The
+   committed text stays fully legible — only the label picks up the same
+   working colour the "Drafting..." state uses, so an update in progress
+   reads the same way whether or not the section was empty. */
+.doc-section.updating .doc-section-label { color: var(--work); }
+.doc-section-working {
+  margin-left: 8px;
+  font-size: 11px;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--faint);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+.doc-section-body {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--ink);
+}
+
+.doc-section-body p { margin: 0 0 7px; }
+.doc-section-body p:last-child { margin-bottom: 0; }
+
+.doc-section-body ul,
+.doc-section-body ol { margin: 2px 0 8px 0; padding-left: 18px; }
+.doc-section-body li { margin-bottom: 3px; }
+
+.doc-section-body strong { font-weight: 600; }
+
+/* Project Details key/value table → clean rows */
+.doc-section-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2px 0 4px;
+}
+.doc-section-body table tr { border-bottom: 1px solid var(--hairline); }
+.doc-section-body table tr:last-child { border-bottom: none; }
+.doc-section-body table td {
+  padding: 5px 0;
+  vertical-align: top;
+  font-size: 13px;
+}
+.doc-section-body table td:first-child {
+  width: 42%;
+  color: var(--muted);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-right: 10px;
+}
+.doc-section-body table td:last-child { color: var(--ink); }
+
+/* Dates and money already come back as plain text; make them read as
+   values, not as part of the sentence — the source HTML decides emphasis. */
+
+/* ---- Recent changes ------------------------------------------------------ */
+
+.changes {
+  padding: 16px var(--gutter) 4px;
+}
+
+.change-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 12.5px;
+}
+
+.change-verb {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--live);
+  min-width: 58px;
+}
+.change-item.correction .change-verb { color: var(--attention); }
+
+.change-text {
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+/* ---- Transcript ---------------------------------------------------------- */
+
+.transcript {
+  padding: 8px var(--gutter) 10px;
+}
+
+.transcript-toggle {
+  appearance: none;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px 0;
+  border-top: 1px solid var(--hairline);
+}
+.transcript-toggle:hover { color: var(--ink); }
+
+.toggle-caret { font-size: 8px; color: var(--faint); }
+
+.transcript-count {
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+}
+
+.transcript-body {
+  padding: 6px 0 0;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.transcript-empty { font-size: 12px; color: var(--faint); }
+
+.transcript-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 3px 0;
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.transcript-ts {
+  flex-shrink: 0;
+  font-size: 10.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.transcript-speaker {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.transcript-text { color: var(--ink); }
+
+/* ---- Completion ---------------------------------------------------------- */
+
+.completion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* The Zoom side panel is ~300px. Without wrapping, every child competes for
+     width in one row and the whole block collapses to one word per line —
+     which is exactly what the share link did when it was added. */
+  flex-wrap: wrap;
+  padding: 12px var(--gutter);
+  border-top: 1px solid var(--hairline);
+  background: var(--paper);
+}
+
+.completion.ready { border-top: none; }
+.completion .btn { flex-shrink: 0; }
+/* Targeted by NAME, not position. As ":first-of-type" this matched the
+   tick in the "ready" block — which is the first div there — and
+   flex-grow:1 beat its own width:22px on specificity, stretching a 22px
+   circle into a full-width ellipse. The text block is the only child that
+   should absorb slack. */
+.completion-copy { flex: 1 1 140px; min-width: 0; }
+
+.completion-mark {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--live);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Never grows, never shrinks: a flex rule on the parent must not be able
+     to reshape the tick again. */
+  flex: 0 0 22px;
+}
+
+.completion-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.completion-detail {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.completion-checklist {
+  list-style: none;
+  margin-top: 4px;
+}
+.completion-checklist li {
+  font-size: 11.5px;
+  color: var(--muted);
+  padding: 1px 0;
+}
+.completion-checklist li::before {
+  content: "✓ ";
+  color: var(--live);
+  font-weight: 700;
+}
+
+/* ---- Empty state ---------------------------------------------------------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px var(--gutter) 56px;
+}
+
+.empty-brand {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+
+.empty-tagline {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin-bottom: 26px;
+}
+
+.empty-template-select {
+  appearance: none;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  margin-bottom: 18px;
+  min-width: 180px;
+  text-align: center;
+}
+.empty-template-select:hover { border-color: #D9D4CC; }
+
+.empty-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.empty-status .capture-dot { background: #C9C5BD; }
+.empty-status .capture-dot.live { background: var(--live); animation: pulse 1.6s ease-in-out infinite; }
+.empty-status .capture-dot.work,
+.empty-status .capture-dot.connecting,
+.empty-status .capture-dot.stopping,
+.empty-status .capture-dot.processing { background: var(--work); animation: pulse 1.6s ease-in-out infinite; }
+.empty-status .capture-dot.review,
+.empty-status .capture-dot.error { background: var(--attention); animation: pulse 1.1s ease-in-out infinite; }
+.empty-status .capture-dot.degraded,
+.empty-status .capture-dot.helper-off { background: var(--faint); }
+
+.empty-listen {
+  min-width: 96px;
+}
+
+/* ---- Crash boundary --------------------------------------------------------- */
+
+.crash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px var(--gutter) 56px;
+  min-height: 100vh;
+  background: var(--paper);
+}
+
+.crash-brand {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--ink);
+  margin-bottom: 18px;
+}
+
+.crash-title {
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.crash-detail {
+  font-size: 11.5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--attention);
+  background: #FBF6F0;
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+  padding: 8px 10px;
+  margin-bottom: 20px;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+/* ---- Data controls ----------------------------------------------------------- */
+
+.dev {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 10px var(--gutter) 16px;
+  border-top: 1px solid var(--hairline);
+}
+.dev .btn { padding: 4px 12px; font-size: 11px; }
+.dev-label { font-size: 11px; color: var(--muted); }
+
+/* ---- Motion: respect reduced-motion ---------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* The firm's own template — a plain, quiet affordance under the type
+   picker. Its label carries the state (idle / reading / in use), so no
+   separate status line is needed. */
+.empty-upload {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11.5px;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 1px dotted var(--rule);
+  padding-bottom: 1px;
+}
+.empty-upload input { display: none; }
+.empty-upload:hover { color: var(--ink); }
+
+/* Share link — the document reaching the room, not just this laptop. */
+.completion-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; flex-shrink: 0; }
+.share-url {
+  flex-basis: 100%;
+  width: 100%;
+  min-width: 0;
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.share-url code {
+  display: block;
+  margin-top: 3px;
+  padding: 5px 7px;
+  font-size: 10.5px;
+  /* One line with an ellipsis. break-all in a narrow flex column rendered the
+     URL vertically, one character per row. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+  background: var(--surface-2);
+  border-radius: 6px;
+}
+.share-error { margin: 8px 0 0; font-size: 12px; color: var(--attention); }
+
+/* Collaborate — the difference between the host describing the document and
+   the room watching it being written. */
+.collab-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 12px; font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Typed corrections — the fallback when the microphone is the thing that got
+   it wrong. Same pipeline as speech, different input. */
+.correction-bar {
+  display: flex;
+  gap: 6px;
+  padding: 8px var(--gutter);
+  border-top: 1px solid var(--hairline);
+}
+.correction-bar input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  padding: 6px 8px;
+  color: var(--ink);
+  background: var(--surface-2);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
+}
+.correction-bar input::placeholder { color: var(--faint); }
+.correction-bar .btn { flex-shrink: 0; }
+
+/* Shown where the Listen button would be when the panel is running outside
+   Zoom, so the most prominent control is not one that cannot work. */
+.capture-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: right;
+}
+.capture-hint code,
+.empty-hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95em;
+}
+.empty-hint {
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 32ch;
+  margin: 4px auto 0;
+  text-align: center;
+}
