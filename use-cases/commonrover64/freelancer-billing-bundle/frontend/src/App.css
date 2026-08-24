@@ -63,6 +63,17 @@ h3 {
     color: white;
 }
 
+.btn:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.tab-active {
+    background: var(--ink) !important;
+    color: white !important;
+    border-color: var(--ink) !important;
+}
+
 select {
     border: 3px solid var(--ink);
     border-radius: 8px;

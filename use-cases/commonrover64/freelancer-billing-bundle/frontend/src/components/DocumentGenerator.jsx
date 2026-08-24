@@ -99,10 +99,6 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
 
             if (result.isBinary) {
                 const url = URL.createObjectURL(result.blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `${activeType}.docx`;
-                a.click();
 
                 setDocState((prev) => ({
                     ...prev,
@@ -111,6 +107,7 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                         status: "completed",
                         pendingChanges: [],
                         hadRejection,
+                        downloadUrl: url,
                     },
                 }));
             } else {
@@ -159,15 +156,7 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                     return (
                         <button
                             key={doc.key}
-                            className="btn btn-coral"
-                            style={
-                                isActive
-                                    ? {
-                                          borderColor: "var(--violet)",
-                                          borderWidth: "4px",
-                                      }
-                                    : {}
-                            }
+                            className={`btn btn-coral ${isActive ? "tab-active" : ""}`}
                             onClick={() => setActiveType(doc.key)}
                             disabled={loading}
                         >
@@ -177,12 +166,6 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                     );
                 })}
             </div>
-
-            {loading && (
-                <p style={{ fontWeight: 700, marginTop: "1rem" }}>
-                    Working on it...
-                </p>
-            )}
 
             {error && (
                 <p
@@ -206,6 +189,11 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                         Generate{" "}
                         {DOCUMENT_TYPES.find((d) => d.key === activeType).label}
                     </button>
+                    {loading && (
+                        <p style={{ fontWeight: 700, marginTop: "0.5rem" }}>
+                            Working on it...
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -213,9 +201,18 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                 <div style={{ marginTop: "1.5rem" }}>
                     <p style={{ fontWeight: 700 }}>
                         {active.hadRejection
-                            ? "Downloaded, but some fields were rejected and remain blank in the document."
-                            : "Generated and downloaded successfully."}
+                            ? "Some fields were rejected and remain blank in the document."
+                            : "Generated successfully."}
                     </p>
+
+                    <a
+                        href={active.downloadUrl}
+                        download={`${activeType}.docx`}
+                        className="btn btn-teal"
+                        style={{ marginRight: "0.5rem" }}
+                    >
+                        Download
+                    </a>
                     <button
                         className="btn"
                         onClick={() => handleGenerate(activeType)}
@@ -223,6 +220,11 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                     >
                         Regenerate
                     </button>
+                    {loading && (
+                        <p style={{ fontWeight: 700, marginTop: "0.5rem" }}>
+                            Working on it...
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -236,6 +238,11 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                         Retry{" "}
                         {DOCUMENT_TYPES.find((d) => d.key === activeType).label}
                     </button>
+                    {loading && (
+                        <p style={{ fontWeight: 700, marginTop: "0.5rem" }}>
+                            Working on it...
+                        </p>
+                    )}
                 </div>
             )}
 
@@ -244,9 +251,6 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                 active.pendingChanges.length > 0 && (
                     <div style={{ marginTop: "1.5rem" }}>
                         <h3>Review changes for {activeType}</h3>
-                        <p style={{ fontStyle: "italic" }}>
-                            Every item needs a decision before you can submit.
-                        </p>
 
                         {active.pendingChanges.map((change) => {
                             const decision = localDecisions[change.change_id];
@@ -350,6 +354,15 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                             );
                         })}
 
+                        {active.pendingChanges.filter(
+                            (c) => localDecisions[c.change_id] === undefined,
+                        ).length === active.pendingChanges.length && (
+                            <p style={{ fontStyle: "italic" }}>
+                                Every item needs a decision before you can
+                                submit.
+                            </p>
+                        )}
+
                         {(() => {
                             const decidedCount = active.pendingChanges.filter(
                                 (c) =>
@@ -374,6 +387,16 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                                     >
                                         Submit Review
                                     </button>
+                                    {loading && (
+                                        <p
+                                            style={{
+                                                fontWeight: 700,
+                                                marginTop: "0.5rem",
+                                            }}
+                                        >
+                                            Working on it...
+                                        </p>
+                                    )}
                                 </>
                             );
                         })()}
