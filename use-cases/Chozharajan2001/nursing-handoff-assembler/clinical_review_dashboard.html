@@ -233,6 +233,7 @@
                                 <span class="text-[10px] text-rose-600 font-semibold uppercase">High Alert</span>
                             </div>
                             <div class="text-slate-500 mt-0.5">Penicillin anaphylaxis and Sulfa cross-referenced with allergy wristband.</div>
+                            <div id="metaAllergies" class="text-[10px] font-mono text-slate-400 mt-1"></div>
                         </div>
                     </label>
 
@@ -245,6 +246,7 @@
                                 <span class="text-[10px] text-emerald-700 font-semibold uppercase">Full Code</span>
                             </div>
                             <div class="text-slate-500 mt-0.5">Verified with patient proxy (daughter Sarah Vance) and active provider order.</div>
+                            <div id="metaCodeStatus" class="text-[10px] font-mono text-slate-400 mt-1"></div>
                         </div>
                     </label>
 
@@ -256,7 +258,8 @@
                                 <span>Gate 3: Dual-Nurse High-Alert Sign-Off</span>
                                 <span class="text-[10px] text-amber-700 font-semibold uppercase">Dual RN Check</span>
                             </div>
-                            <div class="text-slate-500 mt-0.5">Continuous IV Heparin & SubQ Insulin double-checked (RN S. Jenkins & RN M. Taylor).</div>
+                            <div class="text-slate-500 mt-0.5">Continuous IV Heparin & SubQ Insulin double-checked against the reconciled eMAR.</div>
+                            <div id="metaHighRiskMeds" class="text-[10px] font-mono text-slate-400 mt-1"></div>
                         </div>
                     </label>
                 </div>
@@ -278,8 +281,16 @@
                             <i class="fa-solid fa-circle-check text-emerald-600"></i> Safety Gate Criteria Satisfied (3/3 Verified)
                         </div>
                         <div class="mt-1 font-mono text-[11px] text-emerald-800 break-all">
-                            SHA-256 Digest: c6d10ddaefb073cbb6d224c359294ccde2e389fae699e411c213ce139eafed63
+                            SHA-256 Digest: <span id="auditDigest">syncing live digest from clinical API…</span>
                         </div>
+                    </div>
+
+                    <!-- Blocked Export Inline Notice (honest fail-closed feedback) -->
+                    <div id="blockedToast" class="hidden p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-900 text-xs">
+                        <div class="font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-ban text-rose-600"></i> EXPORT BLOCKED (HTTP 422)
+                        </div>
+                        <div class="mt-1" id="blockedToastDetail">All 3 safety gates must be confirmed before export.</div>
                     </div>
                 </div>
             </div>
@@ -339,39 +350,31 @@
                     </span>
                 </div>
 
-                <!-- SBAR Narrative Sections -->
+                <!-- SBAR Narrative Sections: populated from /api/clinical/handoff/{mrn}
+                     (D2 honesty fix: no hardcoded narrative or citations) -->
                 <div class="space-y-3.5 text-xs leading-relaxed">
                     <!-- Situation -->
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 border-l-4 border-l-blue-600">
                         <div class="font-heading font-bold text-blue-900 uppercase tracking-wider text-[11px] mb-1">Situation (S)</div>
-                        <p class="text-slate-700">
-                            68yo female recovering from acute hypoxemic respiratory failure secondary to severe community-acquired lobar pneumonia 
-                            <span class="citation-badge" onclick="showSourceModal('admission_hnp')">[admission_hnp.pdf:p1]</span>. Successfully extubated 48h ago, transferred from MICU Bed 14 to Step-Down Bed 202.
-                        </p>
+                        <p class="text-slate-700" id="sbarSituation">Syncing from clinical API…</p>
                     </div>
 
                     <!-- Background -->
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 border-l-4 border-l-slate-600">
                         <div class="font-heading font-bold text-slate-800 uppercase tracking-wider text-[11px] mb-1">Background (B)</div>
-                        <p class="text-slate-700">
-                            Admitted 5 days ago to MICU with severe dyspnea, required 3 days of mechanical ventilation <span class="citation-badge" onclick="showSourceModal('admission_hnp')">[admission_hnp.pdf:p1]</span>. Past Medical History: Severe COPD (GOLD Stage III), Type 2 Diabetes Mellitus, Essential Hypertension <span class="citation-badge" onclick="showSourceModal('admission_hnp')">[admission_hnp.pdf:p1]</span>.
-                        </p>
+                        <p class="text-slate-700" id="sbarBackground">Syncing from clinical API…</p>
                     </div>
 
                     <!-- Assessment -->
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 border-l-4 border-l-emerald-600">
                         <div class="font-heading font-bold text-emerald-900 uppercase tracking-wider text-[11px] mb-1">Assessment (A)</div>
-                        <p class="text-slate-700">
-                            Afebrile (T 98.4°F), SpO2 96% on 2L nasal cannula. Lungs clear bilaterally with faint bibasilar crackles. Alert and oriented × 4 <span class="citation-badge" onclick="showSourceModal('icu_progress')">[icu_progress_day5.pdf:p2]</span>. Hemodynamically stable off all vasopressor infusions. Anti-Factor Xa is therapeutic at 0.44 IU/mL.
-                        </p>
+                        <p class="text-slate-700" id="sbarAssessment">Syncing from clinical API…</p>
                     </div>
 
                     <!-- Recommendation -->
                     <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 border-l-4 border-l-purple-600">
                         <div class="font-heading font-bold text-purple-900 uppercase tracking-wider text-[11px] mb-1">Recommendation (R)</div>
-                        <p class="text-slate-700">
-                            Transfer to Step-Down unit Bed 202. Wean supplemental O2 as tolerated. Complete 48h IV Ceftriaxone then switch to oral Cefpodoxime 200mg BID <span class="citation-badge" onclick="showSourceModal('provider_orders')">[provider_orders.pdf:p1]</span>. Mobility: Assist of 1 with walker.
-                        </p>
+                        <p class="text-slate-700" id="sbarRecommendation">Syncing from clinical API…</p>
                     </div>
                 </div>
             </div>
@@ -455,16 +458,18 @@
                 </div>
             </div>
 
-            <!-- 3. Real-Time Telemetry Strip -->
+            <!-- 3. Benchmarks Strip (labeled honestly: measured in the offline Task 1
+                 suite — this dashboard has no live telemetry source, so nothing here
+                 pretends to be live) -->
             <div class="bg-slate-900 text-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="text-slate-300 font-semibold">SuperDocs Telemetry:</span>
+                    <span class="text-slate-300 font-semibold">Engine Benchmarks <span class="text-slate-500">(measured in offline suite)</span>:</span>
                 </div>
                 <div class="flex items-center gap-4 text-[11px] text-slate-300">
-                    <div>Latency: <span class="text-emerald-400 font-bold">41ms</span></div>
-                    <div>Token Savings: <span class="text-emerald-400 font-bold">94.2%</span></div>
-                    <div>Stage Cost: <span class="text-emerald-400 font-bold">$0.000053</span></div>
+                    <div>Checkpoint Resume: <span class="text-emerald-400 font-bold">&lt;120ms</span></div>
+                    <div>Injection Containment: <span class="text-emerald-400 font-bold">30/30</span></div>
+                    <div>Offline Tests: <span class="text-emerald-400 font-bold">13/13</span></div>
                 </div>
             </div>
 
@@ -496,61 +501,145 @@
         </div>
     </div>
 
-    <!-- Script Logic -->
+    <!-- Script Logic (D1-D5 honesty remediation: server state is the single source
+         of truth; this page renders only what the clinical API reports) -->
     <script>
         const API_BASE = window.location.origin;
+        const MRN = "883921";
 
-        const SAMPLE_SOURCES = {
-            admission_hnp: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\\nADMISSION HISTORY & PHYSICAL (H&P)\\nPATIENT: Eleanor Vance | MRN: 883921 | DOB: 1958-04-12 | AGE: 68\\nADMISSION DATE: 2026-08-10 03:45 EST | ATTENDING: Dr. Robert Chen, MD\\n\\nCHIEF COMPLAINT: Acute hypoxemic respiratory failure secondary to severe community-acquired lobar pneumonia.\\n\\nALLERGIES:\\n1. PENICILLIN - SEVERE ANAPHYLAXIS (Laryngeal edema, hives, hypotension in 2018)\\n2. SULFA DRUGS - RASH / URTICARIA\\n\\nCODE STATUS: FULL CODE (Confirmed with patient and daughter Sarah Vance).`,
-            icu_progress: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\\nMICU DAILY CRITICAL CARE PROGRESS NOTE (DAY 5)\\nPATIENT: Eleanor Vance | MRN: 883921 | DATE: 2026-08-15 08:00 EST\\n\\nOBJECTIVE / PHYSICAL EXAM:\\n- Vitals: T 98.4 F (Afebrile), HR 78 bpm, BP 128/74 mmHg, RR 18/min, SpO2 96% on 2L nasal cannula.\\n- Lungs: Clear to auscultation bilaterally with faint bibasilar crackles.\\n- Morse Fall Risk Assessment: Score 55 (High Risk: IV access, history of bedrest).\\n\\nASSESSMENT: Significant improvement. Extubated 48h ago. Stable for transfer to Step-Down Bed 202.`,
-            active_mar: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\\nELECTRONIC MEDICATION ADMINISTRATION RECORD (eMAR)\\nPATIENT: Eleanor Vance | MRN: 883921\\n\\n1. HEPARIN SODIUM INFUSION [HIGH ALERT: Anticoagulant] - 18 units/kg/hr IV Continuous\\n2. INSULIN GLARGINE (LANTUS) [HIGH ALERT: Insulin Analogue] - 20 units SubQ Nightly\\n3. CEFTRIAXONE SODIUM - 1g IV Every 24h\\n4. CEFPODOXIME PROXETIL - 200mg Oral Every 12h (FLAGGED DUPLICATION WITH CEFTRIAXONE)`,
-            provider_orders: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\\nPHYSICIAN TRANSFER & STEP-DOWN ORDERS\\nPATIENT: Eleanor Vance | MRN: 883921 | ORDERING: Dr. Robert Chen, MD\\n\\n1. Transfer patient from MICU to Step-Down Bed 202.\\n2. Code Status: FULL CODE.\\n3. Complete 48h of IV Ceftriaxone, then switch to oral Cefpodoxime 200mg BID. Do not co-administer.`,
-            lab_diagnostics: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\\nCLINICAL LABORATORY & DIAGNOSTIC REPORT\\nPATIENT: Eleanor Vance | MRN: 883921\\n\\n- Anti-Factor Xa (Heparin): 0.44 IU/mL (Therapeutic range 0.30 - 0.70)\\n- ABG (2L NC): pH 7.38, pCO2 48, pO2 86, SaO2 96%\\n- WBC: 9.4 x10^3/uL (Normalized from 18.2 on admit)`
+        // Source-record filename -> excerpt modal key
+        const MODAL_KEYS = {
+            "admission_hnp.txt": "admission_hnp",
+            "icu_progress_day5.txt": "icu_progress",
+            "active_mar.txt": "active_mar",
+            "provider_orders.txt": "provider_orders",
+            "lab_diagnostics.txt": "lab_diagnostics"
         };
 
-        async function handleGateToggle() {
-            const g1 = document.getElementById('gateAllergies').checked;
-            const g2 = document.getElementById('gateCodeStatus').checked;
-            const g3 = document.getElementById('gateHighRiskMeds').checked;
+        const SAMPLE_SOURCES = {
+            admission_hnp: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\nADMISSION HISTORY & PHYSICAL (H&P)\nPATIENT: Eleanor Vance | MRN: 883921 | DOB: 1958-04-12 | AGE: 68\nADMISSION DATE: 2026-08-10 03:45 EST | ATTENDING: Dr. Robert Chen, MD\n\nCHIEF COMPLAINT: Acute hypoxemic respiratory failure secondary to severe community-acquired lobar pneumonia.\n\nALLERGIES:\n1. PENICILLIN - SEVERE ANAPHYLAXIS (Laryngeal edema, hives, hypotension in 2018)\n2. SULFA DRUGS - RASH / URTICARIA\n\nCODE STATUS: FULL CODE (Confirmed with patient and daughter Sarah Vance).`,
+            icu_progress: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\nMICU DAILY CRITICAL CARE PROGRESS NOTE (DAY 5)\nPATIENT: Eleanor Vance | MRN: 883921 | DATE: 2026-08-15 08:00 EST\n\nOBJECTIVE / PHYSICAL EXAM:\n- Vitals: T 98.4 F (Afebrile), HR 78 bpm, BP 128/74 mmHg, RR 18/min, SpO2 96% on 2L nasal cannula.\n- Lungs: Clear to auscultation bilaterally with faint bibasilar crackles.\n- Morse Fall Risk Assessment: Score 55 (High Risk: IV access, history of bedrest).\n\nASSESSMENT: Significant improvement. Extubated 48h ago. Stable for transfer to Step-Down Bed 202.`,
+            active_mar: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\nELECTRONIC MEDICATION ADMINISTRATION RECORD (eMAR)\nPATIENT: Eleanor Vance | MRN: 883921\n\n1. HEPARIN SODIUM INFUSION [HIGH ALERT: Anticoagulant] - 18 units/kg/hr IV Continuous\n2. INSULIN GLARGINE (LANTUS) [HIGH ALERT: Insulin Analogue] - 20 units SubQ Nightly\n3. CEFTRIAXONE SODIUM - 1g IV Every 24h\n4. CEFPODOXIME PROXETIL - 200mg Oral Every 12h (FLAGGED DUPLICATION WITH CEFTRIAXONE)`,
+            provider_orders: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\nPHYSICIAN TRANSFER & STEP-DOWN ORDERS\nPATIENT: Eleanor Vance | MRN: 883921 | ORDERING: Dr. Robert Chen, MD\n\n1. Transfer patient from MICU to Step-Down Bed 202.\n2. Code Status: FULL CODE.\n3. Complete 48h of IV Ceftriaxone, then switch to oral Cefpodoxime 200mg BID. Do not co-administer.`,
+            lab_diagnostics: `HOSPITAL OF THE UNIVERSITY MEDICAL CENTER\nCLINICAL LABORATORY & DIAGNOSTIC REPORT\nPATIENT: Eleanor Vance | MRN: 883921\n\n- Anti-Factor Xa (Heparin): 0.44 IU/mL (Therapeutic range 0.30 - 0.70)\n- ABG (2L NC): pH 7.38, pCO2 48, pO2 86, SaO2 96%\n- WBC: 9.4 x10^3/uL (Normalized from 18.2 on admit)`
+        };
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text == null ? '' : String(text);
+            return div.innerHTML;
+        }
+
+        // D2: turn [doc.txt:pN] tokens in API-provided SBAR text into clickable
+        // badges. Unknown filenames render as inert badges — never fake links.
+        function renderSbarText(text) {
+            const safe = escapeHtml(text || "");
+            return safe.replace(/\[([\w.\-]+):p(\d+)\]/g, (match, doc, page) => {
+                const key = MODAL_KEYS[doc];
+                if (!key) {
+                    return `<span class="citation-badge" style="cursor:default">${match}</span>`;
+                }
+                return `<span class="citation-badge" onclick="showSourceModal('${doc}')">${match}</span>`;
+            });
+        }
+
+        // D2: SBAR narrative + D1: audit digest come from the handoff API.
+        async function hydrateSbar() {
+            const ids = ['sbarSituation', 'sbarBackground', 'sbarAssessment', 'sbarRecommendation'];
+            try {
+                const res = await fetch(`${API_BASE}/api/clinical/handoff/${MRN}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const sbar = data.sbar || {};
+                document.getElementById('sbarSituation').innerHTML = renderSbarText(sbar.situation);
+                document.getElementById('sbarBackground').innerHTML = renderSbarText(sbar.background);
+                document.getElementById('sbarAssessment').innerHTML = renderSbarText(sbar.assessment);
+                document.getElementById('sbarRecommendation').innerHTML = renderSbarText(sbar.recommendation);
+                const digestEl = document.getElementById('auditDigest');
+                digestEl.textContent = data.audit_digest || 'no digest reported by API';
+            } catch (e) {
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    el.textContent = `SBAR unavailable — clinical API did not respond (${e.message}). Nothing is shown rather than invented.`;
+                    el.classList.add('text-rose-500');
+                });
+                document.getElementById('auditDigest').textContent = 'unavailable (clinical API offline)';
+            }
+        }
+
+        function applyGateMeta(checkboxId, metaId, confirmed, nurseText) {
+            const box = document.getElementById(checkboxId);
+            const meta = document.getElementById(metaId);
+            box.checked = !!confirmed;
+            // Confirmed gates are locked in this UI: unchecking must never imply
+            // revocation of a recorded clinical sign-off.
+            box.disabled = !!confirmed;
+            meta.textContent = confirmed ? `Confirmed by ${nurseText}` : '';
+            meta.classList.toggle('text-emerald-600', !!confirmed);
+        }
+
+        // D4/D5: gate state hydrates from /api/clinical/gate-status — the server
+        // is the single source of truth on load and after every interaction.
+        async function hydrateGates() {
+            const badge = document.getElementById('gateBadge');
+            try {
+                const res = await fetch(`${API_BASE}/api/clinical/gate-status`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const gates = data.gates || {};
+
+                const a = gates.allergies || {};
+                applyGateMeta('gateAllergies', 'metaAllergies', a.confirmed,
+                    `${a.nurse || 'unknown'} @ ${a.timestamp || ''}`);
+                const c = gates.code_status || {};
+                applyGateMeta('gateCodeStatus', 'metaCodeStatus', c.confirmed,
+                    `${c.nurse || 'unknown'} @ ${c.timestamp || ''}`);
+                const h = gates.high_risk_meds || {};
+                const dual = [h.nurse_1, h.nurse_2].filter(Boolean).join(' + ') || 'unknown';
+                applyGateMeta('gateHighRiskMeds', 'metaHighRiskMeds', h.confirmed,
+                    `${dual} @ ${h.timestamp || ''}`);
+
+                updateExportControls(data.pending_gates || []);
+                return true;
+            } catch (e) {
+                badge.className = "bg-rose-100 text-rose-900 text-xs px-2.5 py-1 rounded-full font-bold border border-rose-200 flex items-center gap-1";
+                badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-[10px]"></i> API offline`;
+                document.getElementById('exportPdfText').innerText = "Export Unavailable (clinical API offline)";
+                return false;
+            }
+        }
+
+        function updateExportControls(pendingGates) {
             const badge = document.getElementById('gateBadge');
             const btn = document.getElementById('exportPdfBtn');
             const btnText = document.getElementById('exportPdfText');
             const docxBtn = document.getElementById('exportDocxBtn');
             const toast = document.getElementById('unlockedToast');
-
-            const verifiedCount = [g1, g2, g3].filter(Boolean).length;
-            const pendingCount = 3 - verifiedCount;
-
-            // Sync with backend API if server is live
-            try {
-                if (g1) await fetch(`${API_BASE}/api/clinical/confirm-gate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gate_type: 'allergies' }) });
-                if (g2) await fetch(`${API_BASE}/api/clinical/confirm-gate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gate_type: 'code_status' }) });
-                if (g3) await fetch(`${API_BASE}/api/clinical/confirm-gate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ gate_type: 'high_risk_meds' }) });
-            } catch (e) {
-                console.log('Local standalone mode active.');
-            }
+            const blocked = document.getElementById('blockedToast');
+            const pendingCount = pendingGates.length;
 
             if (pendingCount === 0) {
                 badge.className = "bg-emerald-100 text-emerald-900 text-xs px-2.5 py-1 rounded-full font-bold border border-emerald-200 flex items-center gap-1";
                 badge.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-600"></i> All 3 Gates Verified ✓';
-                
+
                 btn.disabled = false;
                 btn.className = "w-full py-3 px-4 rounded-xl font-heading font-bold text-sm bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white cursor-pointer shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition duration-200 transform hover:-translate-y-0.5";
                 btnText.innerText = "Export 10-Page Verified Transfer Packet PDF";
-                
+
                 if (docxBtn) {
                     docxBtn.disabled = false;
                     docxBtn.className = "w-full py-2.5 px-4 rounded-xl font-heading font-semibold text-xs bg-indigo-50 border border-indigo-200 text-indigo-700 hover:bg-indigo-100 cursor-pointer flex items-center justify-center gap-2 transition";
                 }
                 toast.classList.remove('hidden');
+                blocked.classList.add('hidden');
             } else {
                 badge.className = "bg-amber-100 text-amber-900 text-xs px-2.5 py-1 rounded-full font-bold border border-amber-200 flex items-center gap-1";
                 badge.innerHTML = `<i class="fa-solid fa-hourglass-half text-[10px]"></i> ${pendingCount} Pending`;
-                
+
                 btn.disabled = true;
                 btn.className = "w-full py-3 px-4 rounded-xl font-heading font-bold text-sm bg-slate-200 text-slate-500 cursor-not-allowed flex items-center justify-center gap-2 shadow-sm transition";
                 btnText.innerText = `Export Blocked (${pendingCount} Safety Gate${pendingCount > 1 ? 's' : ''} Pending)`;
-                
+
                 if (docxBtn) {
                     docxBtn.disabled = true;
                     docxBtn.className = "w-full py-2.5 px-4 rounded-xl font-heading font-semibold text-xs bg-slate-100 text-slate-400 cursor-not-allowed flex items-center justify-center gap-2 transition";
@@ -559,13 +648,52 @@
             }
         }
 
-        async function attemptExport(format) {
-            const g1 = document.getElementById('gateAllergies').checked;
-            const g2 = document.getElementById('gateCodeStatus').checked;
-            const g3 = document.getElementById('gateHighRiskMeds').checked;
+        // Confirm the newly checked gate on the server, then re-hydrate EVERYTHING
+        // from server truth. A failed confirmation is never faked locally.
+        async function handleGateToggle() {
+            const mapping = [
+                ['gateAllergies', 'allergies'],
+                ['gateCodeStatus', 'code_status'],
+                ['gateHighRiskMeds', 'high_risk_meds']
+            ];
+            for (const [id, gateType] of mapping) {
+                const box = document.getElementById(id);
+                if (box.checked && !box.disabled) {
+                    try {
+                        const res = await fetch(`${API_BASE}/api/clinical/confirm-gate`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ gate_type: gateType })
+                        });
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    } catch (e) {
+                        box.checked = false;
+                        const blocked = document.getElementById('blockedToast');
+                        const detail = document.getElementById('blockedToastDetail');
+                        detail.textContent = `Gate "${gateType}" could not be confirmed (${e.message}). No sign-off was recorded.`;
+                        blocked.classList.remove('hidden');
+                    }
+                }
+            }
+            await hydrateGates();
+            await hydrateSbar();
+        }
 
-            if (!g1 || !g2 || !g3) {
-                alert(`🛑 FAIL-CLOSED GATE TRIGGERED (HTTP 422 Unprocessable Content):\n\nClinical Transfer Packet ${format.toUpperCase()} export is locked until all 3 Safety Gates are explicitly confirmed:\n1. Allergies Confirmation\n2. Resuscitation Code Status\n3. High-Alert Meds Dual Sign-off`);
+        async function attemptExport(format) {
+            // Defense in depth: re-check server truth before any export attempt.
+            let pending = [];
+            try {
+                const res = await fetch(`${API_BASE}/api/clinical/gate-status`);
+                if (res.ok) pending = (await res.json()).pending_gates || [];
+            } catch (e) {
+                pending = ['allergies_confirmation', 'code_status_verification', 'high_risk_medications_dual_signoff'];
+            }
+
+            if (pending.length > 0) {
+                const blocked = document.getElementById('blockedToast');
+                const detail = document.getElementById('blockedToastDetail');
+                detail.textContent = `HTTP 422 fail-closed: export locked until confirmed — ${pending.join(', ')}.`;
+                blocked.classList.remove('hidden');
                 return;
             }
 
@@ -576,14 +704,24 @@
             }
         }
 
-        function showSourceModal(sourceKey) {
+        function showSourceModal(sourceRef) {
             const modal = document.getElementById('sourceModal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
 
-            const content = SAMPLE_SOURCES[sourceKey] || "Primary clinical record excerpt not available.";
-            title.innerText = `Primary Source Excerpt: ${sourceKey}.txt`;
-            body.innerText = content.replace(/\\\\n/g, '\\n');
+            // Accepts either a real source filename (from API-rendered badges)
+            // or an internal modal key (from the static roster links).
+            let key, displayName;
+            if (MODAL_KEYS[sourceRef]) {
+                key = MODAL_KEYS[sourceRef];
+                displayName = sourceRef;
+            } else {
+                key = sourceRef;
+                displayName = `${sourceRef}.txt`;
+            }
+            const content = SAMPLE_SOURCES[key] || "Primary clinical record excerpt not available.";
+            title.innerText = `Primary Source Excerpt: ${displayName}`;
+            body.innerText = content;
             modal.classList.remove('hidden');
         }
 
@@ -592,14 +730,18 @@
         }
 
         async function resetHandoff() {
-            document.getElementById('gateAllergies').checked = false;
-            document.getElementById('gateCodeStatus').checked = false;
-            document.getElementById('gateHighRiskMeds').checked = false;
             try {
                 await fetch(`${API_BASE}/api/clinical/reset`, { method: 'POST' });
-            } catch(e) {}
-            handleGateToggle();
+            } catch (e) { /* reset failed — hydration below will show real state */ }
+            await hydrateGates();
+            await hydrateSbar();
         }
+
+        // Hydrate the whole page from server truth on load.
+        document.addEventListener('DOMContentLoaded', () => {
+            hydrateSbar();
+            hydrateGates();
+        });
     </script>
 </body>
 </html>

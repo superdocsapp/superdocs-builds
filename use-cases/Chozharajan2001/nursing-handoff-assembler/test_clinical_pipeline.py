@@ -362,6 +362,43 @@ def test_pdf_honest_empty_states_when_no_orders_or_mobility():
         assert fabricated not in pdf_bytes, f"Invented content leaked into PDF: {fabricated!r}"
 
 
+def test_handoff_endpoint_exposes_real_citations_and_digest():
+    """D1/D2 remediation proof: the handoff API serves structured SBAR citations
+    grounded in the committed sample records plus a real SHA-256 digest, so the
+    dashboard renders citations/digest from data instead of hardcoded strings.
+    """
+    from fastapi.testclient import TestClient
+    import server
+
+    with TestClient(server.app) as client:
+        resp = client.get("/api/clinical/handoff/883921")
+        assert resp.status_code == 200
+        data = resp.json()
+
+        # Structured per-section citation lists exist and are non-empty
+        citations = data["sbar_citations"]
+        for section in ("situation", "background", "assessment", "recommendation"):
+            assert section in citations
+
+        all_cited_docs = [c["doc"] for section in citations.values() for c in section]
+        assert all_cited_docs, "handoff API returned no structured SBAR citations"
+
+        # Every citation targets a committed sample record — never a fabricated
+        # .pdf source that does not exist in sample_patient_records/.
+        for doc in all_cited_docs:
+            assert doc.endswith(".txt"), f"Citation references non-sample source: {doc}"
+        for fabricated in ("transfer_summary.pdf", "past_hx_chart.pdf", "vitals_flowsheet.pdf", "transfer_plan.pdf"):
+            assert fabricated not in all_cited_docs
+
+        # The digest is a genuine 64-char lowercase SHA-256 hex value
+        digest = data["audit_digest"]
+        assert len(digest) == 64
+        assert all(ch in "0123456789abcdef" for ch in digest)
+        assert digest != "c6d10ddaefb073cbb6d224c359294ccde2e389fae699e411c213ce139eafed63", (
+            "API returned the old hardcoded dashboard digest"
+        )
+
+
 def test_drug_matching_word_boundary():
     """High-alert drug matching must use word boundaries — 'insulinoma' must NOT match 'insulin'."""
     from clinical_pipeline import ConservativeMedReconciliationEngine

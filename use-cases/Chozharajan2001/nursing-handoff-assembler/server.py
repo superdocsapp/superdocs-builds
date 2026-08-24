@@ -198,6 +198,14 @@ def get_handoff_details(mrn: str):
             "assessment": _ACTIVE_ASSEMBLER.sbar.assessment if _ACTIVE_ASSEMBLER.sbar else "",
             "recommendation": _ACTIVE_ASSEMBLER.sbar.recommendation if _ACTIVE_ASSEMBLER.sbar else "",
         },
+        # D2 fix: structured per-section citation lists so clients render
+        # citations from data, never from hardcoded strings.
+        "sbar_citations": {
+            "situation": (_ACTIVE_ASSEMBLER.sbar.situation_citations if _ACTIVE_ASSEMBLER.sbar else []),
+            "background": (_ACTIVE_ASSEMBLER.sbar.background_citations if _ACTIVE_ASSEMBLER.sbar else []),
+            "assessment": (_ACTIVE_ASSEMBLER.sbar.assessment_citations if _ACTIVE_ASSEMBLER.sbar else []),
+            "recommendation": (_ACTIVE_ASSEMBLER.sbar.recommendation_citations if _ACTIVE_ASSEMBLER.sbar else []),
+        },
         "allergies": _ACTIVE_ASSEMBLER.allergies,
         "medications": [
             {
