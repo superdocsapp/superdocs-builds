@@ -903,7 +903,16 @@ submissions and real SuperDocs exports against the live Railway instance).
 
 ---
 
-## Milestone 4 — production-ready RTMSTranscriptProvider
+## Milestone 4 — RTMSTranscriptProvider: implemented and selectable, never exercised against Zoom
+
+> **Read this heading precisely.** The provider is written to production
+> quality and is selectable at runtime (`TRANSCRIPT_PROVIDER=rtms`, gated on
+> `ZOOM_CLIENT_ID`/`ZOOM_CLIENT_SECRET` in `factory.py`). It has **never run
+> against Zoom**: RTMS requires a purchased Zoom Developer Pack, which was
+> not available on this account — confirmed with Zoom, and matching an open
+> developer-forum report of the identical symptom. Its tests exercise it
+> against a fake, never against the platform. "Production-ready" below means
+> the code is complete, not that the integration is proven.
 
 **Goal, restated precisely:** not to make RTMS work on this account — M0
 already answered that (it doesn't, matching an open Zoom developer-forum
@@ -1572,3 +1581,106 @@ rewrite.
    concurrent meeting).
 5. Same M0 decision as ever: session state is in-memory; a backend
    restart loses in-progress sessions (accepted, stated).
+
+---
+
+## Milestone 7 — the capture path that actually ships
+
+Written after the fact, on 2026-08-24, because this log stopped at M6 while
+the system moved on. Everything here is drawn from
+`ACCORD_FINAL_SUBMISSION_AUDIT.md`, which verified each claim against the
+code or a live run. Nothing is reconstructed from memory, and where something
+was not independently verified it says so.
+
+**Why a local capture provider at all.** M0 established RTMS was unavailable
+on this account and M4 built the provider anyway, against the Protocol, for
+when it is granted. M6 made Vexa the default. Vexa's own limitations —
+passcode-protected meetings it cannot join, meetings that gate anonymous
+bots behind a reCAPTCHA wall — meant a demo could fail for reasons that had
+nothing to do with this codebase. A capture path with no third-party joiner
+and no platform entitlement removes that whole class of dependency.
+
+**A7-1 — the control channel is outbound, and authenticated.** The helper
+dials the backend, not the reverse: `WSS /api/ws/helper?token=…`
+(`backend/app/api/routes_helper.py`). The server never needs a route to a
+laptop, and nothing has to be open on the user's machine. A wrong or missing
+token closes the socket with code 4401 before any message is processed. As of
+this milestone the token comparison uses `hmac.compare_digest` rather than
+`!=`, so the handshake does not leak the length of a matching prefix through
+timing.
+
+**A7-2 — helper lifecycle is two messages, not a daemon.** `START` carries the
+meeting UUID; the helper spawns the Swift capture binary as a subprocess with
+`--uuid` and `--backend` and logs `capture process spawned pid=…`. `STOP`
+sends `SIGTERM` (`helper/helper.py:108`), which the capture side observes
+through its `StopFlag` loop, flushing whatever partial chunk it holds before
+exiting. Deliberately no installer and no login item: the user starts it,
+sees it, and kills it. That is stated as a limitation in the README rather
+than dressed up.
+
+**A7-3 — chunks end at a pause, not on a clock.** The capture binary
+originally emitted fixed 4s slices, then fixed 6s. Both cut mid-sentence, and
+Whisper does not return half a sentence — handed a truncated fragment it
+invents an ending. Measured directly against Groq on the committed 77s SOW
+audio, transcribing each strategy's chunks:
+
+| strategy | chunks | cut mid-sentence | invented endings | `$45,000` formatting |
+|---|---|---|---|---|
+| fixed 6s | 13 | 9 of 13 | yes | kept |
+| fixed 10s | 8 | most | yes | **lost** — one chunk came back with no punctuation and spelled-out numbers |
+| pause-bounded, 12s ceiling | 9 | **0** | **none** | kept |
+
+Longer chunks alone make it worse. It is where the boundary falls that
+matters. `AudioChunkSender.endsOnAPause()` therefore treats `chunkSize` as a
+**ceiling** and the pause as the trigger: a chunk ends once the trailing 0.6s
+is below an amplitude floor, subject to a 3s minimum. A room with constant
+background noise degrades to exactly the fixed-slice behaviour this replaced
+— never worse.
+
+Concrete failure this fixed: a 6s boundary once fell between `"delivered by"`
+and `"30th"`, so the word "October" landed in neither chunk's transcript. The
+document read "September 30th", because that is what the pipeline was
+honestly given.
+
+**A7-4 — transcription, and one thing deliberately not done.** Groq Whisper
+`large-v3`, `language=en` pinned because short fragments otherwise pay a
+detection cost and can pick a wrong language. Each chunk replays the previous
+chunk's last 1.5s so a boundary word is heard whole at least once; the repeat
+is stripped server-side by `_dedupe_overlap` (`SequenceMatcher`, 0.75).
+Whisper answers near-silence with caption-style sign-offs — "we'll see you
+next time" — which are stripped at the boundary, after one reached a live
+export.
+
+There is **no dynamic Whisper prompt**, and that is a decision rather than an
+omission. Feeding the previous transcript back as context made Whisper treat
+corrupted boundary text as confirmed prior speech and compound it into a
+self-reinforcing hallucination. The reasoning is recorded at
+`routes_audio.py:142`. Boundary context comes from overlapping the **audio**
+instead: the model re-hears the real sound rather than being told what it
+previously guessed.
+
+**A7-5 — the seam, named exactly.** Capture does not reach into the pipeline.
+`POST /api/meetings/{uuid}/audio` transcribes, then hands the text to the
+existing abstraction (`routes_audio.py:187`):
+
+```python
+event = await session.manual_provider.submit(text)
+```
+
+`ManualTranscriptProvider.submit()` returns a `TranscriptEvent` — the same
+shape Vexa and RTMS produce. Past that call nothing knows or cares that the
+audio came from ScreenCaptureKit. The Batcher, the classifier, the validation
+gate and the export path are unchanged from M3–M5 and were not touched to
+make this work.
+
+That is the point of the M3 Protocol finally being paid off: **the capture
+boundary is swappable.** A production-approved provider — RTMS when the
+Developer Pack exists, or anything else satisfying `TranscriptProvider` — can
+occupy it without touching a line downstream.
+
+**A7-6 — what this milestone does NOT claim.** The Zoom app is in beta
+review; only its author can install it, so this is not marketplace-ready
+public distribution. Live capture is macOS-only and needs screen-recording
+permission. RTMS remains unexercised against Zoom. Document generation
+downstream still shows the run-to-run variance recorded as issue 11 in
+`SUPERDOCS_BUGS.md`, and that finding stands unsoftened.

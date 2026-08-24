@@ -89,6 +89,29 @@ demonstrating the review gate rather than claiming it.
 7. **Reconciles** — content that landed and later vanished is restored.
 8. **Exports** `.docx`, but only after a human approves a specific version.
 
+### Two results, proven separately
+
+Worth separating, because they have different dependencies and different
+failure modes.
+
+**Steps 1–2 are the live transcript pipeline**, and it depends on nothing but
+this codebase and Groq. Real Zoom call → ScreenCaptureKit capture → Groq
+Whisper `large-v3` → `TranscriptEvent`s → the panel's Transcript view
+updating as people speak. This was proven on a real meeting and holds
+independently of anything downstream.
+
+**Steps 3–8 are document generation**, and they run on SuperDocs. Also
+exercised live, including all five templates in one sequential pass —
+Statement of Work 8/8 sections, Meeting Minutes 5/5, Advice Note 7/7,
+Requirements List 6/6, Proposal 8/8 — but subject to the run-to-run variance
+recorded as issue 11 in [SUPERDOCS_BUGS.md](SUPERDOCS_BUGS.md): identical
+input can produce materially different output, and the cause is upstream of
+this pipeline.
+
+The practical consequence: when the drafting stage struggled, capture and the
+live transcript were still working. A SuperDocs-side problem is not a
+whole-system failure, and this README will not describe it as one.
+
 ## How it is wired
 
 Audio never leaves your machine except to the transcriber. The SuperDocs key
@@ -179,7 +202,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the diagrams.
 make setup                 # venv + dependencies
 cp .env.example .env       # fill in the placeholders below
 make dev                   # serves the panel and API on :8010
-make test                  # 383 tests, no network or API key needed
+make test                  # 419 tests, no network or API key needed
 ```
 
 `.env` (never committed — placeholders only):

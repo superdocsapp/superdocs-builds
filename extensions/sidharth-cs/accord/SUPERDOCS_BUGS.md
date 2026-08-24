@@ -61,6 +61,10 @@ hard guarantee." I would still call this a bug rather than a documented
 limit: the request explicitly asked for approval on every edit, and did not
 get it.
 
+**Platform vs ACCORD.** Platform. ACCORD does not rely on SuperDocs' own approval to hold the line — every batch runs past its own deterministic gate first, which is why this did not reach a finished document.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.
+
 ---
 
 ## 2. Placeholder text written into the document
@@ -85,6 +89,10 @@ TBD / TODO, plus a deterministic rejection in `validator.py` and again in
 `integrity.py` for the auto-apply path. The prompt instruction alone was not
 sufficient.
 
+**Platform vs ACCORD.** Platform output. ACCORD-side mitigation: the gate rejects any proposal matching `_PLACEHOLDER_PATTERNS`, so placeholders are refused rather than approved.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.
+
 ---
 
 ## 3. An entire duplicate table invented
@@ -105,6 +113,10 @@ path in bug 1.
 
 **Workaround.** Table-count comparison before/after; any gain is refused.
 
+**Platform vs ACCORD.** Platform output. ACCORD-side mitigation: the gate refuses a proposal that creates a new table, and `check_integrity` independently scans for duplicated blocks.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.
+
 ---
 
 ## 4. One sentence restated as four rephrased paragraphs
@@ -116,6 +128,10 @@ reader notices immediately.
 paragraphs, differently worded, in the same section.
 
 **Workaround.** Sentence-level near-duplicate detection at 0.75 overlap.
+
+**Platform vs ACCORD.** Platform output. ACCORD-side mitigation: `check_integrity` fails a correction batch that touches more than three chunks.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.
 
 ---
 
@@ -146,6 +162,10 @@ under load). Any subsequent `chat_async` on that `session_id` 409s.
 fails fast to a terminal error state rather than retrying. Recovery is
 manual.
 
+**Platform vs ACCORD.** Platform. The approval succeeded on SuperDocs' side and the session was left dirty regardless. ACCORD-side mitigation only: `_is_conflict()` detects the 409, sets `_unrecoverable`, and fails fast to a terminal error instead of retrying. **This is containment, not a fix — the wedge still happens and recovery is still manual.**
+
+**Status as of 2026-08-24.** Still reproduced on 2026-08-23: `denied job did not settle`, then `chat_async` 409 on the same session. Not fixed.
+
 ---
 
 ## 6. `revert_session` returns 409 while a job is in flight
@@ -160,6 +180,10 @@ duplicate paragraphs in one document to precisely this.
 **Workaround.** Rollback now reports whether the remote revert actually
 succeeded; when it did not, the batch is abandoned rather than retried.
 Losing the batch is better than duplicating it.
+
+**Platform vs ACCORD.** Platform. Nothing on this side can make a revert succeed.
+
+**Status as of 2026-08-24.** Still reproduced on 2026-08-23, and observed returning **400, 404 and 409** for the same call in different runs. ACCORD now treats a refused revert as 'the remote kept this edit' and, where `facts_preserved_in_html` has proved the deleted content absent from SuperDocs' own returned HTML, re-drives it. Mitigation, not a fix.
 
 ---
 
@@ -177,6 +201,10 @@ inverts the incentive a review gate is supposed to create.
 **Workaround.** An explicit deny-settlement step that polls the denied job
 to a terminal state before any further call.
 
+**Platform vs ACCORD.** Platform. Rejecting a bad proposal should not be able to wedge the session that follows.
+
+**Status as of 2026-08-24.** Still reproduced on 2026-08-23, after the platform update announced that day. Contained the same way as issue 5, and for the same reason: no revert is issued after a gate denial, because that revert is what killed a live meeting.
+
 ---
 
 ## 8. Export returns the remote document, not what the user reviewed
@@ -190,6 +218,10 @@ received a different one.
 
 **Workaround.** A best-effort reconciliation pass before export that asks
 for the empty headings to be removed, written to never fail export.
+
+**Platform vs ACCORD.** Platform. `export` returns SuperDocs' own document, so anything the panel cleaned up locally is absent from the file.
+
+**Status as of 2026-08-24.** Unchanged as a behaviour. ACCORD-side mitigation: a best-effort pre-export cleanup pass that only ever approves pure removals, and is silently abandoned on any unexpected proposal shape.
 
 ---
 
@@ -208,6 +240,10 @@ result is an empty document rather than a partially filled one.
 What would help: a documented way to say "leave anything unsupported
 untouched" that holds across an unfamiliar structure.
 
+**Platform vs ACCORD.** Platform output when drafting into an uploaded template.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.
+
 ---
 
 ## 10. One session = one live document, and concurrency 409s
@@ -222,6 +258,10 @@ rather than working around it.
 I see latency is already named as the next thing you are working on. Flagging
 it from this angle: for live use it is the serialization that bites, not the
 per-call time.
+
+**Platform vs ACCORD.** Platform design constraint rather than a defect — but it is the single largest contributor to end-to-end latency here, because it forces every edit to be strictly sequential.
+
+**Status as of 2026-08-24.** Unchanged. ACCORD holds `_inflight_lock` so it never issues a concurrent `chat_async` against one session.
 
 ---
 
@@ -253,6 +293,10 @@ otherwise.
 **Repro.** Run the same transcript ten times and diff the resulting
 documents. I would be glad to send the ten documents if useful.
 
+**Platform vs ACCORD.** Platform. Verified not to originate here: the transcript, the batching, the routing and the instructions were each confirmed identical across runs. What changes is what comes back.
+
+**Status as of 2026-08-24.** Still present. Placement and cross-section contamination were noticeably better after the 2026-08-23 platform update — several runs completed all eight sections with zero gate rejections, which had not happened before — but variance across runs remains, and this finding stands as written.
+
 ---
 
 ## 12. Placeholders reach the document even after three explicit rejections
@@ -279,6 +323,10 @@ sufficient to keep refused content out of the document.
 This says something sharper: an edit my gate *explicitly denied* still landed.
 That is the difference between a missing hook and an ignored answer.
 
+**Platform vs ACCORD.** Platform. A rejection that does not prevent the content from landing is a Review-mode failure, not a model-quality one.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.
+
 ---
 
 ## 13. Number words are treated as monetary values
@@ -291,3 +339,7 @@ monetary anchor. Anyone building spoken-input validation against your API
 will likely hit the same thing. We left it unfixed rather than narrow a
 pattern that correctly catches "forty-five thousand" the night before a
 deadline — a deliberate trade, recorded rather than hidden.
+
+**Platform vs ACCORD.** Platform output. ACCORD-side mitigation: money detection requires a digit-bearing value, so number words alone are not treated as amounts on this side.
+
+**Status as of 2026-08-24.** Not re-tested since the original observation; the 2026-08-23 platform update may or may not affect it.

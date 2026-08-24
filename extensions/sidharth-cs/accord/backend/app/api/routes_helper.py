@@ -10,6 +10,7 @@ ACKs. No localhost in this path; the helper always connects outbound.
 
 from __future__ import annotations
 
+import hmac
 import json
 import logging
 
@@ -31,7 +32,13 @@ async def helper_ws(websocket: WebSocket):
     matching meeting session's helper_status."""
     settings = get_settings()
     token = websocket.query_params.get("token", "")
-    if not settings.helper_auth_token or token != settings.helper_auth_token:
+    # compare_digest, not ==: a plain string comparison returns as soon as it
+    # finds a differing byte, which leaks the length of the matching prefix
+    # to anyone who can time the handshake. Same auth decision, no timing
+    # side channel.
+    if not settings.helper_auth_token or not hmac.compare_digest(
+        token, settings.helper_auth_token
+    ):
         await websocket.close(code=4401)
         return
     await websocket.accept()

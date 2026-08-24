@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Deterministic SOW benchmark harness.
 
-Feeds the committed 58-second ElevenLabs SOW audio through the SAME
+Feeds the committed 77-second ElevenLabs SOW audio through the SAME
 production pipeline the Swift audio-fetcher uses — same pause-bounded
 chunking (12s ceiling @ 48k),
 same RMS gate (0.008), same POST /audio wire format — against a LOCAL
@@ -21,7 +21,7 @@ import urllib.request
 from urllib.error import URLError
 import wave
 
-AUDIO = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "sow-58s.mp3")
+AUDIO = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), "sow-paced.mp3")
 # Fresh meeting per run — a reused name collides with the previous run's
 # still-live session (events from both runs interleave; SuperDocs 409s).
 MEETING = sys.argv[2] if len(sys.argv) > 2 else f"benchmark-sow-{int(time.time())}"
