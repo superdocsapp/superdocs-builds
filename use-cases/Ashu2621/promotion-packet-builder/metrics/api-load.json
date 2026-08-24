@@ -1,0 +1,25 @@
+{
+  "acceptance": {
+    "p95_limit_ms": 750.0,
+    "passed": true
+  },
+  "authenticated_persona": "employee",
+  "concurrency": 25,
+  "duration_seconds": 3.177,
+  "latency_ms": {
+    "max": 734.81,
+    "mean": 156.4,
+    "median": 129.83,
+    "min": 36.38,
+    "p95": 360.9,
+    "p99": 668.44,
+    "sample_stdev": 119.59
+  },
+  "request_path": "/packets",
+  "requests": 500,
+  "status_counts": {
+    "200": 500
+  },
+  "throughput_rps": 157.4,
+  "transport_failures": 0
+}

@@ -1,0 +1,190 @@
+{
+  "environment": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "AMD64 Family 23 Model 104 Stepping 1, AuthenticAMD",
+    "python": "3.12.13"
+  },
+  "method": {
+    "clock": "time.perf_counter",
+    "corpus": "committed synthetic in-memory fixture; 1 text document; 2 claims",
+    "decision_pattern": "approve first proposal, reject second proposal",
+    "sample_size": 10,
+    "warmup_runs": 0
+  },
+  "results": {
+    "completed_runs": 10,
+    "correct_runs": 10,
+    "elapsed_ms": {
+      "max": 22.557,
+      "median": 16.309,
+      "min": 14.293,
+      "p95": 22.557,
+      "sample_stdev": 2.597
+    },
+    "final_claim_citation_coverage_percent": 100.0,
+    "mixed_decisions_respected": true,
+    "unchanged_claim_hash_preserved": true
+  },
+  "runs": [
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 22.557,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "9670af9d0c398dd944886e9c2242d54a16aa666003f3b295440fc32bd5366bf4",
+      "run": 1,
+      "stage_timings_ms": {
+        "conflicts": 0.045,
+        "draft": 0.247,
+        "extract": 0.15,
+        "inventory": 0.141,
+        "rules": 0.254
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 16.167,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "acb807492aca689e9f50bdb666417a5e73aedc509f8b9e32f4dc5666addb5a9b",
+      "run": 2,
+      "stage_timings_ms": {
+        "conflicts": 0.045,
+        "draft": 0.042,
+        "extract": 0.095,
+        "inventory": 0.079,
+        "rules": 0.063
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 15.817,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "d57705ffed54afeee45cd935b0c4803091f0ad8c0f6a3a946e61858dda7093b9",
+      "run": 3,
+      "stage_timings_ms": {
+        "conflicts": 0.066,
+        "draft": 0.06,
+        "extract": 0.074,
+        "inventory": 0.055,
+        "rules": 0.086
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 15.104,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "de42b79aca4f8c728e462d060aec1f01374ed997ae68fe9037cd13844a772f3a",
+      "run": 4,
+      "stage_timings_ms": {
+        "conflicts": 0.056,
+        "draft": 0.043,
+        "extract": 0.116,
+        "inventory": 0.066,
+        "rules": 0.057
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 14.293,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "4f50497362d3298422cf811cc1b4142e65cfe2c214b8b685a500022afa2c5e87",
+      "run": 5,
+      "stage_timings_ms": {
+        "conflicts": 0.086,
+        "draft": 0.041,
+        "extract": 0.076,
+        "inventory": 0.063,
+        "rules": 0.059
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 19.653,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "6f9b18f7f55923623c712390535704817eb9caba4f57a4ef349877d016acebaa",
+      "run": 6,
+      "stage_timings_ms": {
+        "conflicts": 0.05,
+        "draft": 0.044,
+        "extract": 0.085,
+        "inventory": 0.084,
+        "rules": 0.055
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 14.749,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "bf70565909c64b9a1a413a5b60b5bf99e2fca2b0f3e736140030f17fc034252d",
+      "run": 7,
+      "stage_timings_ms": {
+        "conflicts": 0.035,
+        "draft": 0.04,
+        "extract": 0.061,
+        "inventory": 0.052,
+        "rules": 0.05
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 17.357,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "7ce14185d1a7ec19a08b0fd4505a0f37affc7407b5fed94f004f6ebb5f1d6666",
+      "run": 8,
+      "stage_timings_ms": {
+        "conflicts": 0.044,
+        "draft": 0.053,
+        "extract": 0.148,
+        "inventory": 0.062,
+        "rules": 0.061
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 19.106,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "175720441f3af4a02dffdbc97020f0679f08c94d6780bb3f3d858cc6190dc239",
+      "run": 9,
+      "stage_timings_ms": {
+        "conflicts": 0.048,
+        "draft": 0.047,
+        "extract": 0.107,
+        "inventory": 0.084,
+        "rules": 0.074
+      }
+    },
+    {
+      "approved": 1,
+      "cited_claims": 1,
+      "elapsed_ms": 16.451,
+      "proposals": 2,
+      "rejected": 1,
+      "result_hash": "54a99db75374afede0992e9a571c270d0993dbf2d20d96bbf29ae8e6174cfa5c",
+      "run": 10,
+      "stage_timings_ms": {
+        "conflicts": 0.052,
+        "draft": 0.064,
+        "extract": 0.134,
+        "inventory": 0.065,
+        "rules": 0.06
+      }
+    }
+  ]
+}
