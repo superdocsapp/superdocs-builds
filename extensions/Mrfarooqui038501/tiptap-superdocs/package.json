@@ -1,0 +1,57 @@
+{
+  "name": "tiptap-superdocs",
+  "version": "1.0.0",
+  "description": "A thin TipTap extension for SuperDocs AI editing built on a shared ProseMirror core.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tiptap": {
+      "types": "./dist/tiptap/index.d.ts",
+      "import": "./dist/tiptap/index.js"
+    },
+    "./blocknote": {
+      "types": "./dist/blocknote/index.d.ts",
+      "import": "./dist/blocknote/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "import": "./dist/core/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "tiptap",
+    "prosemirror",
+    "superdocs",
+    "ai",
+    "editor",
+    "blocknote"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@blocknote/core": "^0.54.0",
+    "@tiptap/core": "^3.30.2",
+    "@tiptap/pm": "^3.30.2"
+  },
+  "devDependencies": {
+    "@tiptap/starter-kit": "^3.30.2",
+    "@types/node": "^26.2.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}
