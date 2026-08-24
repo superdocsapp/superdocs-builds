@@ -9,13 +9,8 @@ from typing import Any, Iterator
 
 
 DEFAULT_TAXONOMY = [
-    "wrong_duplicate", "parent_context_ignored", "semantic_reference_miss",
-    "body_text_confusion", "ordinal_reference_error", "relative_position_error",
-    "historical_current_confusion", "appendix_confusion", "over_targeting",
-    "under_targeting", "no_target_but_modified", "failed_to_clarify",
-    "unnecessary_clarification", "correct_section_wrong_answer",
-    "correct_section_wrong_edit_range", "lexical_normalization_failure",
-    "instruction_scoping_failure", "cross_reference_confusion", "other",
+    "wrong_target", "should_have_clarified", "unsupported_target",
+    "right_target_wrong_result", "other",
 ]
 TAXONOMY_DEFINITIONS = {
     "wrong_duplicate": "Selected a repeated heading under the wrong document section.",
@@ -42,6 +37,15 @@ LEGACY_TAXONOMY = [
     "wrong repeated section", "wrong parent context", "semantic heading confusion",
     "body-text confusion", "over-targeting", "no target found",
     "should have clarified", "wrong answer despite correct target",
+]
+DETAILED_TAXONOMY = [
+    "wrong_duplicate", "parent_context_ignored", "semantic_reference_miss",
+    "body_text_confusion", "ordinal_reference_error", "relative_position_error",
+    "historical_current_confusion", "appendix_confusion", "over_targeting",
+    "under_targeting", "no_target_but_modified", "failed_to_clarify",
+    "unnecessary_clarification", "correct_section_wrong_answer",
+    "correct_section_wrong_edit_range", "lexical_normalization_failure",
+    "instruction_scoping_failure", "cross_reference_confusion",
 ]
 
 
@@ -110,6 +114,11 @@ class Database:
               id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL,
               selected INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS benchmark_run_cases (
+              benchmark_run_id INTEGER NOT NULL REFERENCES benchmark_runs(id) ON DELETE CASCADE,
+              case_id INTEGER NOT NULL REFERENCES cases(id),
+              PRIMARY KEY (benchmark_run_id, case_id)
+            );
             CREATE TABLE IF NOT EXISTS runs (
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               case_id INTEGER NOT NULL REFERENCES cases(id), status TEXT NOT NULL,
@@ -119,6 +128,67 @@ class Database:
               verdict TEXT CHECK(verdict IN ('pass','fail','ambiguous') OR verdict IS NULL),
               failure_category_id INTEGER REFERENCES failure_categories(id),
               adjudication_note TEXT, created_at TEXT NOT NULL, adjudicated_at TEXT
+            );
+            CREATE TABLE IF NOT EXISTS applied_verifications (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              run_id INTEGER NOT NULL UNIQUE REFERENCES runs(id) ON DELETE CASCADE,
+              proposal_target_path TEXT,
+              proposal_target_correct INTEGER,
+              approval_status TEXT NOT NULL DEFAULT 'not_submitted',
+              approval_submitted_at TEXT,
+              post_approval_status TEXT,
+              applied_target_path TEXT,
+              applied_target_paths_json TEXT NOT NULL DEFAULT '[]',
+              create_placements_json TEXT NOT NULL DEFAULT '[]',
+              applied_target_correct INTEGER,
+              changed_chunk_ids_json TEXT NOT NULL DEFAULT '[]',
+              new_chunk_ids_json TEXT NOT NULL DEFAULT '[]',
+              deleted_chunk_ids_json TEXT NOT NULL DEFAULT '[]',
+              unrelated_chunk_ids_json TEXT NOT NULL DEFAULT '[]',
+              unrelated_changes_detected INTEGER,
+              applied_verification_notes TEXT,
+              pre_approval_html TEXT,
+              post_approval_html TEXT,
+              pending_changes_json TEXT NOT NULL DEFAULT '[]',
+              post_job_json TEXT,
+              session_document_id TEXT,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS approval_actions (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              run_id INTEGER NOT NULL REFERENCES runs(id) ON DELETE CASCADE,
+              batch_fingerprint TEXT NOT NULL,
+              change_ids_json TEXT NOT NULL,
+              changes_json TEXT NOT NULL DEFAULT '[]',
+              status TEXT NOT NULL,
+              submitted_at TEXT NOT NULL,
+              response_json TEXT,
+              error TEXT,
+              UNIQUE(run_id,batch_fingerprint)
+            );
+            CREATE TABLE IF NOT EXISTS guided_recoveries (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              original_run_id INTEGER NOT NULL UNIQUE REFERENCES runs(id) ON DELETE CASCADE,
+              original_change_ids_json TEXT NOT NULL DEFAULT '[]',
+              original_pending_changes_json TEXT NOT NULL DEFAULT '[]',
+              original_target_path TEXT,
+              rejected_at TEXT,
+              rejection_response_json TEXT,
+              guidance_text TEXT NOT NULL,
+              recovery_session_id TEXT,
+              recovery_job_id TEXT,
+              recovery_status TEXT NOT NULL,
+              recovery_pending_changes_json TEXT NOT NULL DEFAULT '[]',
+              recovery_target_path TEXT,
+              recovery_raw_response_json TEXT,
+              recovery_latency_ms REAL,
+              recovery_operations INTEGER NOT NULL DEFAULT 0,
+              recovery_verdict TEXT CHECK(recovery_verdict IN ('recovered','not_recovered','ambiguous') OR recovery_verdict IS NULL),
+              recovery_note TEXT,
+              error TEXT,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
             );
             """)
             self._add_columns(db, "documents", {
@@ -133,6 +203,10 @@ class Database:
                 "capability_tested": "TEXT", "likely_failure_category": "TEXT",
                 "rationale": "TEXT", "fixture_version": "TEXT", "expected_document_sha256": "TEXT",
             })
+            # Retain only frozen-manifest cases and their official history.
+            db.execute("DELETE FROM runs WHERE case_id IN (SELECT id FROM cases WHERE external_case_id IS NULL)")
+            db.execute("DELETE FROM cases WHERE external_case_id IS NULL")
+            db.execute("DELETE FROM documents WHERE external_document_id IS NULL AND NOT EXISTS (SELECT 1 FROM cases WHERE cases.document_id=documents.id)")
             removed_case_ids = ("D06-C02", "D08-C02")
             placeholders = ",".join("?" for _ in removed_case_ids)
             db.execute(
@@ -141,6 +215,12 @@ class Database:
             )
             db.execute(f"DELETE FROM cases WHERE external_case_id IN ({placeholders})", removed_case_ids)
             self._add_columns(db, "runs", {"benchmark_run_id": "INTEGER REFERENCES benchmark_runs(id)"})
+            self._add_columns(db, "benchmark_runs", {
+                "corpus_version": "TEXT", "corpus_case_total": "INTEGER NOT NULL DEFAULT 0",
+            })
+            self._add_columns(db, "approval_actions", {"changes_json": "TEXT NOT NULL DEFAULT '[]'"})
+            self._add_columns(db, "applied_verifications", {"applied_target_paths_json": "TEXT NOT NULL DEFAULT '[]'"})
+            self._add_columns(db, "applied_verifications", {"create_placements_json": "TEXT NOT NULL DEFAULT '[]'"})
             selected=db.execute("SELECT id FROM benchmark_runs WHERE selected=1 ORDER BY id DESC LIMIT 1").fetchone()
             if not selected:
                 selected=db.execute("SELECT id FROM benchmark_runs ORDER BY id DESC LIMIT 1").fetchone()
@@ -150,11 +230,25 @@ class Database:
                     cur=db.execute("INSERT INTO benchmark_runs(name,selected,created_at) VALUES (?,?,?)",("Benchmark run 1",1,now()))
                     selected={"id":cur.lastrowid}
             db.execute("UPDATE runs SET benchmark_run_id=? WHERE benchmark_run_id IS NULL",(selected["id"],))
+            # Snapshot the original 40-case corpus for runs created before
+            # corpus-versioned membership existed. Later imports never expand it.
+            for benchmark_run in db.execute("SELECT id FROM benchmark_runs").fetchall():
+                run_id=benchmark_run["id"]
+                membership=db.execute("SELECT COUNT(*) FROM benchmark_run_cases WHERE benchmark_run_id=?",(run_id,)).fetchone()[0]
+                if membership==0:
+                    db.execute("""INSERT OR IGNORE INTO benchmark_run_cases(benchmark_run_id,case_id)
+                      SELECT ?,id FROM cases WHERE external_case_id GLOB 'D??-C0[1-3]'""",(run_id,))
+                    membership=db.execute("SELECT COUNT(*) FROM benchmark_run_cases WHERE benchmark_run_id=?",(run_id,)).fetchone()[0]
+                    if membership:
+                        db.execute("UPDATE benchmark_runs SET corpus_version='1.0.1',corpus_case_total=? WHERE id=?",(membership,run_id))
             db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_documents_external_id ON documents(external_document_id) WHERE external_document_id IS NOT NULL")
             db.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_cases_external_id ON cases(external_case_id) WHERE external_case_id IS NOT NULL")
             for category in DEFAULT_TAXONOMY:
                 db.execute("INSERT INTO failure_categories(name,active) VALUES (?,1) ON CONFLICT(name) DO UPDATE SET active=1", (category,))
             for category in LEGACY_TAXONOMY:
+                db.execute("UPDATE failure_categories SET active=0 WHERE name=?", (category,))
+            for category in DETAILED_TAXONOMY:
+                db.execute("INSERT OR IGNORE INTO failure_categories(name,active) VALUES (?,0)", (category,))
                 db.execute("UPDATE failure_categories SET active=0 WHERE name=?", (category,))
 
     @staticmethod
@@ -185,3 +279,24 @@ class Database:
         for key in ("evidence_json","raw_response_json"):
             raw=run.pop(key,None); run[key.removesuffix("_json")]=json.loads(raw) if raw else None
         return run
+
+    @staticmethod
+    def decode_applied(row: dict[str, Any] | None) -> dict[str, Any] | None:
+        if not row:
+            return None
+        for key in (
+            "applied_target_paths_json", "create_placements_json", "changed_chunk_ids_json", "new_chunk_ids_json", "deleted_chunk_ids_json",
+            "unrelated_chunk_ids_json", "pending_changes_json", "post_job_json",
+        ):
+            raw=row.pop(key,None)
+            row[key.removesuffix("_json")]=json.loads(raw) if raw else (None if key=="post_job_json" else [])
+        for key in ("proposal_target_correct","applied_target_correct","unrelated_changes_detected"):
+            row[key]=None if row.get(key) is None else bool(row[key])
+        return row
+
+    @staticmethod
+    def decode_recovery(row: dict[str, Any] | None) -> dict[str, Any] | None:
+        if not row: return None
+        for key in ("original_change_ids_json","original_pending_changes_json","rejection_response_json","recovery_pending_changes_json","recovery_raw_response_json"):
+            raw=row.pop(key,None); row[key.removesuffix("_json")]=json.loads(raw) if raw else ([] if "changes" in key or "ids" in key else None)
+        return row

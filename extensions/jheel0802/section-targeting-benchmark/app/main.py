@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import base64
 import json
 from pathlib import Path
 from typing import Any
@@ -11,33 +10,28 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from .config import Settings
-from .db import Database, TAXONOMY_DEFINITIONS
+from .db import Database
 from .service import BenchmarkService
 from .superdocs import FakeSuperDocsClient, RealSuperDocsClient, SuperDocsError
+from .targeting import PUBLIC_FAILURE_DEFINITIONS
 
 PROJECT_ROOT=Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST=PROJECT_ROOT/"outputs"/"benchmark_corpus"/"benchmark_manifest.json"
-
-def model_data(model: BaseModel, **kwargs: Any) -> dict[str, Any]:
-    return model.model_dump(**kwargs) if hasattr(model,"model_dump") else model.dict(**kwargs)
-
-class DocumentIn(BaseModel):
-    name:str=Field(min_length=1); filename:str=Field(min_length=1); content_type:str="application/octet-stream"; file_base64:str
-
-class CaseIn(BaseModel):
-    title:str|None=None; case_type:str; document_id:int; instruction:str
-    external_case_id:str|None=None; difficulty:str|None=None; expected_behavior:str="unique_target"
-    expected_section_path:str|None=None; acceptable_section_paths:list[str]=[]; expected_answer:str|None=None
-    expected_edit_scope:str|None=None; must_not_target:list[str]=[]; capability_tested:str|None=None
-    likely_failure_category:str|None=None; rationale:str|None=None; fixture_version:str|None=None
-    expected_document_sha256:str|None=None; notes:str|None=None
 
 class AdjudicationIn(BaseModel):
     verdict:str; failure_category_id:int|None=None; note:str|None=None
 class TaxonomyIn(BaseModel): name:str
 class BatchIn(BaseModel):
     case_ids:list[int]; max_requests:int; max_operations:int; confirmed:bool=False
-class ApprovalIn(BaseModel): changes:list[dict[str,Any]]
+class AppliedVerificationIn(BaseModel):
+    proposal_target_correct:bool|None=None
+    applied_target_correct:bool|None=None
+    notes:str|None=None
+class GuidedRecoveryIn(BaseModel):
+    guidance:str=Field(min_length=1)
+class GuidedRecoveryVerdictIn(BaseModel):
+    verdict:str
+    note:str|None=None
 class BenchmarkRunSelectIn(BaseModel): benchmark_run_id:int
 
 def create_app(settings:Settings|None=None,client:Any=None)->FastAPI:
@@ -78,47 +72,36 @@ def create_app(settings:Settings|None=None,client:Any=None)->FastAPI:
     @app.get("/api/documents")
     def documents(): return db.all("SELECT id,name,filename,content_type,external_document_id,fixture_version,expected_sha256,actual_sha256,created_at FROM documents ORDER BY COALESCE(external_document_id,filename)")
 
-    @app.post("/api/documents",status_code=201)
-    def create_document(body:DocumentIn):
-        try: content=base64.b64decode(body.file_base64,validate=True)
-        except ValueError as exc: raise HTTPException(400,"file_base64 is invalid") from exc
-        did=get_service().create_document(model_data(body,exclude={"file_base64"}),content)
-        return db.one("SELECT id,name,filename,content_type,created_at FROM documents WHERE id=?",(did,))
-
     @app.get("/api/cases")
-    def cases(document_id:int|None=None,case_type:str|None=None,difficulty:str|None=None,expected_behavior:str|None=None,capability:str|None=None,adjudication_state:str|None=None,scope:str|None=None,benchmark_run_id:int|None=None):
+    def cases(document_id:int|None=None,case_type:str|None=None,difficulty:str|None=None,expected_behavior:str|None=None,capability:str|None=None,adjudication_state:str|None=None,benchmark_run_id:int|None=None):
         benchmark_run_id=benchmark_run_id or get_service().current_benchmark_run()["id"]
         sql="""SELECT c.*,d.name document_name,d.filename,
           (SELECT id FROM runs WHERE case_id=c.id AND benchmark_run_id=? ORDER BY id DESC LIMIT 1) latest_run_id,
           (SELECT verdict FROM runs WHERE case_id=c.id AND benchmark_run_id=? ORDER BY id DESC LIMIT 1) latest_verdict,
           (SELECT status FROM runs WHERE case_id=c.id AND benchmark_run_id=? ORDER BY id DESC LIMIT 1) latest_status
-          FROM cases c JOIN documents d ON d.id=c.document_id WHERE 1=1"""; params=[benchmark_run_id]*3
+          FROM benchmark_run_cases brc JOIN cases c ON c.id=brc.case_id JOIN documents d ON d.id=c.document_id
+          WHERE brc.benchmark_run_id=? AND c.external_case_id IS NOT NULL"""; params=[benchmark_run_id]*4
         filters=[("c.document_id",document_id),("c.case_type",case_type),("c.difficulty",difficulty),("c.expected_behavior",expected_behavior),("c.capability_tested",capability)]
         for column,value in filters:
             if value is not None: sql+=f" AND {column}=?"; params.append(value)
-        if scope=="frozen": sql+=" AND c.external_case_id IS NOT NULL"
-        elif scope=="custom": sql+=" AND c.external_case_id IS NULL"
         if adjudication_state=="unevaluated": sql+=" AND NOT EXISTS(SELECT 1 FROM runs r WHERE r.case_id=c.id AND r.benchmark_run_id=? AND r.verdict IS NOT NULL)"; params.append(benchmark_run_id)
         elif adjudication_state in {"pass","fail","ambiguous"}: sql+=" AND (SELECT verdict FROM runs WHERE case_id=c.id AND benchmark_run_id=? ORDER BY id DESC LIMIT 1)=?"; params.extend((benchmark_run_id,adjudication_state))
         elif adjudication_state=="system_error": sql+=" AND (SELECT status FROM runs WHERE case_id=c.id AND benchmark_run_id=? ORDER BY id DESC LIMIT 1)='error'"; params.append(benchmark_run_id)
-        rows=db.all(sql+" ORDER BY COALESCE(c.external_case_id,printf('%09d',c.id))",tuple(params))
+        rows=db.all(sql+" ORDER BY c.external_case_id",tuple(params))
         return [db.decode_case(row) for row in rows]
-
-    @app.post("/api/cases",status_code=201)
-    def create_case(body:CaseIn):
-        try: cid=get_service().create_case(model_data(body)); return db.decode_case(db.one("SELECT * FROM cases WHERE id=?",(cid,)))
-        except ValueError as exc: raise HTTPException(400,str(exc)) from exc
 
     @app.get("/api/runs")
     def runs(benchmark_run_id:int|None=None):
         benchmark_run_id=benchmark_run_id or get_service().current_benchmark_run()["id"]
-        return db.all("""SELECT r.id,r.case_id,r.benchmark_run_id,r.status,r.latency_ms,r.operations_charged,r.error,r.verdict,r.created_at,c.title,c.external_case_id,c.case_type FROM runs r JOIN cases c ON c.id=r.case_id WHERE r.benchmark_run_id=? ORDER BY r.id DESC""",(benchmark_run_id,))
+        return db.all("""SELECT r.id,r.case_id,r.benchmark_run_id,r.status,r.latency_ms,r.operations_charged,r.error,r.verdict,r.created_at,c.title,c.external_case_id,c.case_type FROM runs r JOIN benchmark_run_cases brc ON brc.case_id=r.case_id AND brc.benchmark_run_id=r.benchmark_run_id JOIN cases c ON c.id=r.case_id WHERE r.benchmark_run_id=? ORDER BY r.id DESC""",(benchmark_run_id,))
 
     @app.get("/api/runs/{run_id}")
     def run(run_id:int):
         try: result=get_service().get_run(run_id)
         except ValueError as exc: raise HTTPException(404,str(exc)) from exc
         result["case"]=db.decode_case(db.one("SELECT c.*,d.name document_name,d.filename FROM cases c JOIN documents d ON d.id=c.document_id WHERE c.id=?",(result["case_id"],)))
+        result["applied_verification"]=get_service().get_applied_verification(run_id)
+        result["guided_recovery"]=get_service().get_guided_recovery(run_id)
         return result
 
     @app.get("/api/cases/{case_id}/integrity")
@@ -147,12 +130,39 @@ def create_app(settings:Settings|None=None,client:Any=None)->FastAPI:
         except ValueError as exc: raise HTTPException(400,str(exc)) from exc
 
     @app.post("/api/runs/{run_id}/approval")
-    def approve(run_id:int,body:ApprovalIn):
-        run=get_service().get_run(run_id)
-        if not run.get("session_id") or not run.get("job_id"): raise HTTPException(400,"run has no async job awaiting approval")
-        try: response=get_service(True).client.decide_changes(run["session_id"],run["job_id"],body.changes)
+    def approve(run_id:int):
+        try: return get_service(True).approve_test_edit(run_id)
+        except ValueError as exc: raise HTTPException(409,str(exc)) from exc
         except SuperDocsError as exc: raise HTTPException(502,str(exc)) from exc
-        db.execute("UPDATE runs SET raw_response_json=? WHERE id=?",(json.dumps({**(run.get("raw_response") or {}),"approval":response}),run_id)); return response
+
+    @app.put("/api/runs/{run_id}/applied-verification")
+    def applied_verification(run_id:int,body:AppliedVerificationIn):
+        try: return get_service().save_applied_verification(run_id,body.proposal_target_correct,body.applied_target_correct,body.notes)
+        except ValueError as exc: raise HTTPException(409,str(exc)) from exc
+
+    @app.post("/api/runs/{run_id}/guided-recovery")
+    def guided_recovery(run_id:int,body:GuidedRecoveryIn):
+        try: return get_service(True).start_guided_recovery(run_id,body.guidance)
+        except ValueError as exc: raise HTTPException(409,str(exc)) from exc
+        except SuperDocsError as exc: raise HTTPException(502,str(exc)) from exc
+
+    @app.put("/api/runs/{run_id}/guided-recovery/adjudication")
+    def guided_recovery_adjudication(run_id:int,body:GuidedRecoveryVerdictIn):
+        try: return get_service().adjudicate_guided_recovery(run_id,body.verdict,body.note)
+        except ValueError as exc: raise HTTPException(409,str(exc)) from exc
+
+    @app.get("/api/guided-recovery/summary")
+    def guided_recovery_summary(benchmark_run_id:int|None=None): return get_service().guided_recovery_summary(benchmark_run_id)
+
+    @app.get("/api/runs/{run_id}/viewer")
+    def viewer(run_id:int,stage:str="pre"):
+        if stage not in {"pre","post","recovery"}: raise HTTPException(400,"stage must be pre, post, or recovery")
+        try: content=get_service().viewer_html(run_id,stage)
+        except ValueError as exc: raise HTTPException(404,str(exc)) from exc
+        return Response(content,media_type="text/html",headers={
+          "Content-Security-Policy":"default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src data:",
+          "X-Content-Type-Options":"nosniff",
+        })
 
     @app.get("/api/runs/{run_id}/export")
     def export(run_id:int,format:str="docx"):
@@ -174,7 +184,7 @@ def create_app(settings:Settings|None=None,client:Any=None)->FastAPI:
     @app.get("/api/taxonomy")
     def taxonomy(): return db.all("SELECT * FROM failure_categories WHERE active=1 ORDER BY id")
     @app.get("/api/taxonomy/definitions")
-    def taxonomy_definitions(): return [{"name":name,"definition":definition} for name,definition in TAXONOMY_DEFINITIONS.items()]
+    def taxonomy_definitions(): return [{"name":name,"definition":definition} for name,definition in PUBLIC_FAILURE_DEFINITIONS.items()]
     @app.post("/api/taxonomy",status_code=201)
     def add_taxonomy(body:TaxonomyIn):
         try: cid=db.execute("INSERT INTO failure_categories(name) VALUES (?)",(body.name.strip(),))
@@ -183,7 +193,7 @@ def create_app(settings:Settings|None=None,client:Any=None)->FastAPI:
     @app.delete("/api/taxonomy/{category_id}",status_code=204)
     def delete_taxonomy(category_id:int): db.execute("UPDATE failure_categories SET active=0 WHERE id=?",(category_id,)); return Response(status_code=204)
     @app.get("/api/metrics")
-    def metrics(include_custom:bool=False,benchmark_run_id:int|None=None): return get_service().metrics(include_custom,benchmark_run_id)
+    def metrics(benchmark_run_id:int|None=None): return get_service().metrics(benchmark_run_id)
 
     static=Path(__file__).parent/"static"; app.mount("/static",StaticFiles(directory=static),name="static")
     @app.get("/",include_in_schema=False)

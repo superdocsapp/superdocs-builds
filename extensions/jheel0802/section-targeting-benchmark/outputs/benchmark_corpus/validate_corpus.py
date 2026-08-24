@@ -46,13 +46,22 @@ def special_checks(cid,doc,heads,errors):
  if cid in ordinals:
   name,target,n=ordinals[cid]; occurrences=[h for h in heads if " > " in h and leaf(h)==name]; checks.append(f"ordinal occurrence {n}")
   if len(occurrences)<n or occurrences[n-1]!=target: errors.append(f"{cid}: expected {target} as occurrence {n}; found {occurrences}")
+ if cid=="D03-C05":
+  beacon=" ".join(section_text(doc,f"Beacon Desk > {name}") for name in ("Security Assessment","Commercial Assessment","Recommendation"))
+  checks.append("Beacon sections contain no overall numerical score")
+  if re.search(r"overall.{0,30}score|score.{0,30}overall",beacon,re.I): errors.append("D03-C05: Beacon Desk unexpectedly has an overall score")
+ if cid=="D11-C04":
+  decision=section_text(doc,"Decisions > Decision Log")
+  checks.append("decision due date exists without an owner")
+  if "March 9" not in decision or re.search(r"\b(owner|owns|owned by)\b",decision,re.I): errors.append("D11-C04: decision due-date/owner assumption no longer holds")
  return checks
 
 def main():
  errors=[]; warnings=[]; data=json.loads(MANIFEST.read_text()); files=sorted(DOCS.glob("*.docx"))
  if len(files)!=14: errors.append(f"Expected 14 DOCX files, found {len(files)}")
  if data.get("case_count")!=len(data.get("cases",[])): errors.append("Manifest case_count mismatch")
- if len(data["cases"])!=40: errors.append("Expected exactly 40 benchmark cases")
+ if data.get("corpus_version")!="1.1.0": errors.append("Expected corpus version 1.1.0")
+ if len(data["cases"])!=60: errors.append("Expected exactly 60 benchmark cases")
  ids=[c["case_id"] for c in data["cases"]]
  if len(ids)!=len(set(ids)): errors.append("Case IDs are not unique")
  docs_by_id={d["document_id"]:d for d in data["documents"]}; parsed={}; stats=[]
@@ -110,9 +119,9 @@ def main():
    checks.append("requested specific concept absent")
   checks.extend(special_checks(cid,doc,heads,errors)); audits.append({"case_id":cid,"status":"PASS" if len(errors)==before else "FAIL","checks":checks})
  counts=Counter(c["document_id"] for c in data["cases"])
- expected_counts={f"D{i:02d}":(2 if i in {6,8} else 3) for i in range(1,15)}
+ expected_counts={"D01":4,"D02":5,"D03":5,"D04":4,"D05":5,"D06":3,"D07":5,"D08":4,"D09":4,"D10":4,"D11":4,"D12":5,"D13":4,"D14":4}
  if dict(counts)!=expected_counts: errors.append(f"Unexpected cases per document: {dict(counts)}")
- report={"status":"PASS" if not errors else "FAIL","fixture_version":data.get("fixture_version"),"frozen":data.get("status")=="frozen","documents":stats,"document_count":len(files),"case_count":len(data["cases"]),"cases_per_document":dict(sorted(counts.items())),"case_type_distribution":dict(Counter(c["case_type"] for c in data["cases"])),"difficulty_distribution":dict(Counter(c["difficulty"] for c in data["cases"])),"expected_behavior_distribution":dict(Counter(c["expected_behavior"] for c in data["cases"])),"taxonomy_coverage":dict(sorted(Counter(c["likely_failure_category"] for c in data["cases"]).items())),"case_audits":audits,"errors":errors,"warnings":warnings}
+ report={"status":"PASS" if not errors else "FAIL","corpus_version":data.get("corpus_version"),"fixture_version":data.get("fixture_version"),"frozen":data.get("status")=="frozen","documents":stats,"document_count":len(files),"case_count":len(data["cases"]),"cases_per_document":dict(sorted(counts.items())),"case_type_distribution":dict(Counter(c["case_type"] for c in data["cases"])),"difficulty_distribution":dict(Counter(c["difficulty"] for c in data["cases"])),"expected_behavior_distribution":dict(Counter(c["expected_behavior"] for c in data["cases"])),"taxonomy_coverage":dict(sorted(Counter(c["likely_failure_category"] for c in data["cases"]).items())),"case_audits":audits,"errors":errors,"warnings":warnings}
  (ROOT/"validation_report.json").write_text(json.dumps(report,indent=2)+"\n"); print(json.dumps(report,indent=2)); return 1 if errors else 0
 
 if __name__=="__main__": raise SystemExit(main())

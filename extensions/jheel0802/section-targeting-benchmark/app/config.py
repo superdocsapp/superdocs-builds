@@ -23,8 +23,8 @@ class Settings:
     api_key: str | None = None
     base_url: str = "https://api.superdocs.app"
     client_mode: str = "real"
-    max_batch_cases: int = 40
-    max_batch_operations: int = 40
+    max_batch_cases: int = 60
+    max_batch_operations: int = 60
     poll_interval_seconds: float = 1.0
     poll_timeout_seconds: float = 180.0
 
@@ -36,8 +36,8 @@ class Settings:
             api_key=os.getenv("SUPERDOCS_API_KEY"),
             base_url=os.getenv("SUPERDOCS_BASE_URL", "https://api.superdocs.app").rstrip("/"),
             client_mode=os.getenv("SUPERDOCS_CLIENT", "real"),
-            max_batch_cases=int(os.getenv("BENCHMARK_MAX_BATCH_CASES", "40")),
-            max_batch_operations=int(os.getenv("BENCHMARK_MAX_BATCH_OPERATIONS", "40")),
+            max_batch_cases=int(os.getenv("BENCHMARK_MAX_BATCH_CASES", "60")),
+            max_batch_operations=int(os.getenv("BENCHMARK_MAX_BATCH_OPERATIONS", "60")),
             poll_interval_seconds=float(os.getenv("SUPERDOCS_POLL_INTERVAL_SECONDS", "1")),
             poll_timeout_seconds=float(os.getenv("SUPERDOCS_POLL_TIMEOUT_SECONDS", "180")),
         )

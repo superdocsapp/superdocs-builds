@@ -3,11 +3,13 @@ from __future__ import annotations
 import csv
 import json
 import statistics
-from collections import Counter
 from pathlib import Path
 
 from .config import Settings
 from .db import Database
+from .service import BenchmarkService
+from .superdocs import FakeSuperDocsClient
+from .targeting import PUBLIC_FAILURE_DEFINITIONS, assess_targeting, verdict_summary
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,10 +31,8 @@ def rounded(value: float | None) -> float | None:
 
 
 def export() -> dict:
-    db = Database(Settings.from_env().db_path)
-    benchmark_run = db.one(
-        "SELECT * FROM benchmark_runs WHERE selected=1 ORDER BY id DESC LIMIT 1"
-    )
+    settings=Settings.from_env(); db = Database(settings.db_path)
+    benchmark_run = db.one("SELECT * FROM benchmark_runs WHERE selected=1")
     if not benchmark_run:
         raise RuntimeError("No benchmark run is selected")
 
@@ -41,6 +41,7 @@ def export() -> dict:
         WITH latest AS (
           SELECT r.case_id, MAX(r.id) attempt_id
           FROM runs r
+          JOIN benchmark_run_cases brc ON brc.benchmark_run_id=r.benchmark_run_id AND brc.case_id=r.case_id
           JOIN cases c ON c.id = r.case_id
           WHERE r.benchmark_run_id = ? AND c.external_case_id IS NOT NULL
           GROUP BY r.case_id
@@ -52,7 +53,10 @@ def export() -> dict:
           c.case_type,
           c.expected_behavior,
           c.expected_section_path expected_target,
-          r.verdict,
+          c.acceptable_section_paths_json,
+          c.must_not_target_json,
+          r.verdict strict_verdict,
+          f.name failure_category,
           f.name failure_reason,
           r.adjudication_note reviewer_note,
           r.latency_ms,
@@ -70,51 +74,50 @@ def export() -> dict:
         (benchmark_run["id"],),
     )
 
-    pass_count = sum(row["verdict"] == "pass" for row in rows)
-    fail_count = sum(row["verdict"] == "fail" for row in rows)
-    if len(rows) != 40 or pass_count != 25 or fail_count != 15:
+    for row in rows:
+        row.update(assess_targeting(row))
+
+    pass_count = sum(row["strict_verdict"] == "pass" for row in rows)
+    fail_count = sum(row["strict_verdict"] == "fail" for row in rows)
+    expected_total=int(benchmark_run.get("corpus_case_total") or 0)
+    if len(rows) != expected_total or pass_count + fail_count != expected_total:
         raise RuntimeError(
-            f"Expected 40 cases / 25 pass / 15 fail; found "
-            f"{len(rows)} / {pass_count} / {fail_count}"
+            f"Selected final run is incomplete: expected {expected_total} adjudicated cases; found "
+            f"{len(rows)} cases / {pass_count} pass / {fail_count} fail"
         )
-    if any(row["verdict"] not in {"pass", "fail"} for row in rows):
+    if any(row["strict_verdict"] not in {"pass", "fail"} for row in rows):
         raise RuntimeError("Every final official case must be adjudicated pass or fail")
 
-    def breakdown(case_type: str) -> dict:
+    def breakdown(case_type: str, field: str) -> dict:
         selected = [row for row in rows if row["case_type"] == case_type]
-        passed = sum(row["verdict"] == "pass" for row in selected)
-        return {
-            "total": len(selected),
-            "pass": passed,
-            "fail": len(selected) - passed,
-            "pass_rate": passed / len(selected) if selected else 0,
-        }
+        return verdict_summary(selected,field)
 
     latencies = [float(row["latency_ms"]) for row in rows if row["latency_ms"] is not None]
     behavior_counts = {
         behavior: {
             "total": sum(row["expected_behavior"] == behavior for row in rows),
             "pass": sum(
-                row["expected_behavior"] == behavior and row["verdict"] == "pass"
+                row["expected_behavior"] == behavior and row["strict_verdict"] == "pass"
                 for row in rows
             ),
             "fail": sum(
-                row["expected_behavior"] == behavior and row["verdict"] == "fail"
+                row["expected_behavior"] == behavior and row["strict_verdict"] == "fail"
                 for row in rows
             ),
         }
         for behavior in ("should_clarify", "no_target")
     }
+    service_metrics=BenchmarkService(db,FakeSuperDocsClient()).metrics(benchmark_run["id"])
     summary = {
         "benchmark_run_id": benchmark_run["id"],
         "benchmark_run_name": benchmark_run["name"],
-        "selection_rule": "Latest execution attempt per official case in the selected benchmark run",
+        "corpus_version": benchmark_run.get("corpus_version"),
+        "selection_rule": "Latest execution attempt per official case in the selected complete official benchmark run",
         "total_cases": len(rows),
-        "pass": pass_count,
-        "fail": fail_count,
-        "pass_rate": pass_count / len(rows),
-        "search_question": breakdown("search"),
-        "edit": breakdown("edit"),
+        "targeting": verdict_summary(rows,"targeting_verdict"),
+        "strict": verdict_summary(rows,"strict_verdict"),
+        "targeting_by_case_type": {"search":breakdown("search","targeting_verdict"),"edit":breakdown("edit","targeting_verdict")},
+        "strict_by_case_type": {"search":breakdown("search","strict_verdict"),"edit":breakdown("edit","strict_verdict")},
         "latency_ms": {
             "count": len(latencies),
             "average": rounded(statistics.mean(latencies)) if latencies else None,
@@ -123,20 +126,21 @@ def export() -> dict:
             "sample_standard_deviation": rounded(statistics.stdev(latencies))
             if len(latencies) > 1
             else None,
+            "sample_variance": rounded(statistics.variance(latencies))
+            if len(latencies) > 1
+            else None,
         },
         "total_api_reported_operations_charged": sum(
             int(row["reported_operations"] or 0) for row in rows
         ),
-        "failure_taxonomy_counts": dict(
-            sorted(
-                Counter(
-                    row["failure_reason"]
-                    for row in rows
-                    if row["verdict"] == "fail" and row["failure_reason"]
-                ).items()
-            )
-        ),
+        "simplified_failure_taxonomy_counts": {category:sum(row.get("simplified_failure_category")==category for row in rows) for category in PUBLIC_FAILURE_DEFINITIONS},
+        "budget": {"cap_operations":settings.max_batch_operations,"actual_api_reported_operations":sum(int(row["reported_operations"] or 0) for row in rows),"within_budget":sum(int(row["reported_operations"] or 0) for row in rows)<=settings.max_batch_operations,"dollar_spend_usd":None,"dollar_spend_note":"Dollar spend was not exposed by the stored API responses."},
         "expected_behavior_counts": behavior_counts,
+        "secondary_experiments": {
+            "applied_edit_verification": service_metrics["applied_verification"],
+            "guided_recovery": service_metrics["guided_recovery"],
+            "note": "Secondary experiments do not change the official first-attempt verdicts.",
+        },
         "dollar_spend_usd": None,
         "dollar_spend_note": "Dollar spend was not exposed by the stored API responses.",
     }
@@ -149,7 +153,10 @@ def export() -> dict:
         "case_type",
         "expected_behavior",
         "expected_target",
-        "verdict",
+        "targeting_verdict",
+        "strict_verdict",
+        "simplified_failure_category",
+        "targeting_reason",
         "failure_reason",
         "reviewer_note",
         "latency_ms",
@@ -159,7 +166,7 @@ def export() -> dict:
         "execution_status",
     ]
     with (OUTPUT_DIR / "results.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows({key: row.get(key) for key in fieldnames} for row in rows)
     (OUTPUT_DIR / "summary.json").write_text(

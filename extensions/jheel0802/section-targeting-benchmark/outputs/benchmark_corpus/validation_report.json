@@ -1,5 +1,6 @@
 {
   "status": "PASS",
+  "corpus_version": "1.1.0",
   "fixture_version": "1.0.1",
   "frozen": true,
   "documents": [
@@ -103,52 +104,52 @@
     }
   ],
   "document_count": 14,
-  "case_count": 40,
+  "case_count": 60,
   "cases_per_document": {
-    "D01": 3,
-    "D02": 3,
-    "D03": 3,
-    "D04": 3,
-    "D05": 3,
-    "D06": 2,
-    "D07": 3,
-    "D08": 2,
-    "D09": 3,
-    "D10": 3,
-    "D11": 3,
-    "D12": 3,
-    "D13": 3,
-    "D14": 3
+    "D01": 4,
+    "D02": 5,
+    "D03": 5,
+    "D04": 4,
+    "D05": 5,
+    "D06": 3,
+    "D07": 5,
+    "D08": 4,
+    "D09": 4,
+    "D10": 4,
+    "D11": 4,
+    "D12": 5,
+    "D13": 4,
+    "D14": 4
   },
   "case_type_distribution": {
-    "search": 28,
-    "edit": 12
+    "search": 43,
+    "edit": 17
   },
   "difficulty_distribution": {
-    "hard": 16,
-    "medium": 13,
-    "adversarial": 6,
-    "easy": 5
+    "hard": 25,
+    "medium": 17,
+    "adversarial": 9,
+    "easy": 9
   },
   "expected_behavior_distribution": {
-    "unique_target": 33,
-    "should_clarify": 4,
-    "no_target": 3
+    "unique_target": 50,
+    "should_clarify": 5,
+    "no_target": 5
   },
   "taxonomy_coverage": {
-    "appendix_confusion": 3,
-    "body_text_confusion": 4,
+    "appendix_confusion": 5,
+    "body_text_confusion": 7,
     "correct_section_wrong_answer": 3,
-    "cross_reference_confusion": 1,
-    "failed_to_clarify": 4,
-    "historical_current_confusion": 4,
+    "cross_reference_confusion": 2,
+    "failed_to_clarify": 5,
+    "historical_current_confusion": 5,
     "instruction_scoping_failure": 2,
-    "no_target_but_modified": 3,
+    "no_target_but_modified": 5,
     "ordinal_reference_error": 1,
-    "parent_context_ignored": 2,
+    "parent_context_ignored": 3,
     "relative_position_error": 3,
-    "semantic_reference_miss": 3,
-    "wrong_duplicate": 7
+    "semantic_reference_miss": 5,
+    "wrong_duplicate": 14
   },
   "case_audits": [
     {
@@ -535,6 +536,202 @@
       "checks": [
         "1 distractor paths exist",
         "requested specific concept absent"
+      ]
+    },
+    {
+      "case_id": "D01-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D02-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D02-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D03-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D03-C05",
+      "status": "PASS",
+      "checks": [
+        "3 distractor paths exist",
+        "requested specific concept absent",
+        "Beacon sections contain no overall numerical score"
+      ]
+    },
+    {
+      "case_id": "D04-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 86%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 57%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D06-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D07-C04",
+      "status": "PASS",
+      "checks": [
+        "3 acceptable paths exist",
+        "genuine ambiguity: omitted scope with distinct candidates"
+      ]
+    },
+    {
+      "case_id": "D07-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D08-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist",
+        "repeated heading count 4"
+      ]
+    },
+    {
+      "case_id": "D08-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 67%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D09-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 67%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D10-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D11-C04",
+      "status": "PASS",
+      "checks": [
+        "1 distractor paths exist",
+        "requested specific concept absent",
+        "decision due date exists without an owner"
+      ]
+    },
+    {
+      "case_id": "D12-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 60%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D12-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 71%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D13-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D14-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist",
+        "repeated heading count 3"
       ]
     }
   ],

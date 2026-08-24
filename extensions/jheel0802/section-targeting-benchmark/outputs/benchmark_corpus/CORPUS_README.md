@@ -6,7 +6,7 @@ This frozen corpus supports manual evaluation of whether SuperDocs identifies th
 
 ## Composition
 
-Version 1.0.1 contains 14 realistic professional Word documents and 40 cases. Each document is a genuine DOCX with machine-readable Heading 1 and Heading 2 structure, paragraphs, real Word lists, and tables where the artifact naturally calls for them. The same 14 fixed documents are reused across all cases; no per-case document variants exist.
+Corpus version 1.1.0 contains 14 realistic professional Word documents and 60 cases. The documents remain frozen at fixture version 1.0.1. Each document is a genuine DOCX with machine-readable Heading 1 and Heading 2 structure, paragraphs, real Word lists, and tables where the artifact naturally calls for them. The same 14 fixed documents are reused across all cases; no per-case document variants exist.
 
 The set includes account and status reports, a release plan, vendor evaluation, incident post-mortem, PRD, SOP manual, regional sales report, implementation plan, employment-policy manual, architecture specification, audit report, meeting summary, and multi-product release notes.
 
@@ -24,7 +24,7 @@ Difficulty describes targeting conditions, not an expected pass rate.
 ## Expected behaviors
 
 - `unique_target`: one section path is correct.
-- `acceptable_set`: more than one path may be defensible. Version 1.0.1 defines the representation but contains no pure acceptable-set case; ambiguous cases require clarification instead.
+- `acceptable_set`: more than one path may be defensible. Corpus version 1.1.0 defines the representation but contains no pure acceptable-set case; ambiguous cases require clarification instead.
 - `should_clarify`: SuperDocs should seek missing scope rather than choosing silently. Each rationale states what counts as Pass, Fail, and Ambiguous.
 - `no_target`: the requested specific section or commitment does not exist. Pass means the system says so and does not silently modify unrelated content; a clearly qualified related suggestion is acceptable.
 
@@ -36,7 +36,7 @@ No case IDs, expected answers, target labels, distractor labels, or benchmark an
 
 ## Freezing and versioning
 
-All fixtures are frozen at `fixture_version: 1.0.1`. This patch removes shared template prose without changing headings, benchmark facts, targets, distractors, or case mappings. SHA-256 values in the manifest and validation report identify the exact bytes. Do not silently modify a fixture after collecting results. A content or structural change requires a version bump, a new hash, and an explicit list of affected cases.
+All fixtures are frozen at `fixture_version: 1.0.1`. The expanded case set is identified separately by `corpus_version: 1.1.0`; no DOCX bytes changed. SHA-256 values in the manifest and validation report identify the exact document bytes. Do not silently modify a fixture after collecting results. A content or structural change requires a fixture version bump, a new hash, and an explicit list of affected cases.
 
 ## Validation
 
@@ -52,9 +52,7 @@ The DOCX files were also rendered to page images and visually inspected for legi
 
 ## Using the existing harness
 
-Upload one file from `documents/` once, then create the three manifest cases with the same document selection. Persist ground truth before running. Map `instruction`, `expected_section_path`, `expected_answer`, and `expected_edit_scope` into the corresponding case fields; keep the remaining manifest metadata alongside the run for adjudication. Do not approve proposed edits merely because a benchmark verdict is saved.
-
-The current harness does not bulk-import this richer manifest. Import can be done manually without changing the platform, or via a future dedicated ingestion step after review.
+Run `python -m app.import_corpus` from the project root. The importer verifies all 14 fixture hashes, stores the documents, and imports the 60 cases with their full structured ground truth. Re-running the importer is idempotent. Existing benchmark runs retain their original corpus-version membership; new runs snapshot all 60 cases. Do not approve proposed edits merely because a benchmark verdict is saved.
 
 ## Known limitations
 

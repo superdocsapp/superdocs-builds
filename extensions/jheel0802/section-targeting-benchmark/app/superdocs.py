@@ -15,6 +15,7 @@ from zipfile import ZipFile
 import httpx
 
 from .config import Settings
+from .document_evidence import parse_document_html
 
 
 class SuperDocsError(RuntimeError):
@@ -38,6 +39,8 @@ class SuperDocsClient(Protocol):
     def run(self, case: dict[str, Any], document: dict[str, Any]) -> RunResult: ...
     def decide_changes(self, session_id: str, job_id: str, changes: list[dict[str, Any]]) -> dict[str, Any]: ...
     def get_job(self, job_id: str) -> dict[str, Any]: ...
+    def poll_after_approval(self, job_id: str, approved_change_ids: list[str] | None = None) -> dict[str, Any]: ...
+    def list_session_documents(self, session_id: str) -> dict[str, Any]: ...
     def export(self, session_id: str, format: str = "docx") -> tuple[bytes, str]: ...
 
 
@@ -102,41 +105,16 @@ def _docx_paragraph_paths(content: bytes) -> list[tuple[str,str|None]]:
 
 def build_chunk_heading_map(document_html: str|None, source_content: bytes|None=None, filename: str|None=None) -> dict[str,str]:
     """Resolve official chunk IDs to explicit heading ancestry; unresolved IDs are omitted."""
-    if not document_html: return {}
-    parser=_ChunkHtmlParser(); parser.feed(document_html); mapping={}; headings: dict[int,str]={}; chunks=[]
-    def first_heading(node: _HtmlNode) -> tuple[int,str]|None:
-        for child in node.children:
-            if not isinstance(child,_HtmlNode): continue
-            match=re.fullmatch(r"h([1-6])",child.tag)
-            if match and child.text(): return int(match.group(1)),child.text()
-            nested=first_heading(child)
-            if nested: return nested
-        return None
-    def walk(node: _HtmlNode) -> None:
-        match=re.fullmatch(r"h([1-6])",node.tag)
-        if match:
-            level=int(match.group(1)); title=node.text()
-            if title:
-                headings[level]=title
-                for stale in [key for key in headings if key>level]: headings.pop(stale)
-        chunk_id=node.attrs.get("data-chunk-id")
-        if chunk_id:
-            chunks.append((chunk_id,node.text()))
-            wrapper_heading=first_heading(node) if not match else None
-            if wrapper_heading:
-                level,title=wrapper_heading; path_headings={key:value for key,value in headings.items() if key<level}; path_headings[level]=title
-                mapping[chunk_id]=" > ".join(path_headings[key] for key in sorted(path_headings))
-            elif headings: mapping[chunk_id]=" > ".join(headings[key] for key in sorted(headings))
-        for child in node.children:
-            if isinstance(child,_HtmlNode): walk(child)
-    walk(parser.root)
+    structure=parse_document_html(document_html); mapping=dict(structure.chunk_paths)
     if source_content and (filename or "").lower().endswith(".docx"):
         source_rows=_docx_paragraph_paths(source_content); cursor=0
-        for chunk_id,text_value in chunks:
-            if chunk_id in mapping or not text_value: continue
+        for chunk in structure.chunks:
+            if chunk.chunk_id in mapping: continue
+            text_value=structure.nodes_by_chunk[chunk.chunk_id].text()
+            if not text_value: continue
             for index in range(cursor,len(source_rows)):
                 if source_rows[index][0]==text_value:
-                    if source_rows[index][1]: mapping[chunk_id]=source_rows[index][1]
+                    if source_rows[index][1]: mapping[chunk.chunk_id]=source_rows[index][1]
                     cursor=index+1; break
     return mapping
 
@@ -147,6 +125,8 @@ def resolve_pending_changes(changes: list[dict[str,Any]], chunk_heading_paths: d
         change=dict(original)
         placement_id=change.get("insert_after_chunk_id") if change.get("operation")=="create" else change.get("chunk_id")
         change["resolved_section_path"]=chunk_heading_paths.get(placement_id) if placement_id else None
+        if change.get("operation")=="create" and not placement_id:
+            change["proposal_placement_unavailable"]=True
         resolved.append(change)
     return resolved
 
@@ -232,6 +212,25 @@ class RealSuperDocsClient:
     def get_job(self, job_id: str) -> dict[str, Any]:
         return self._json("GET", f"/v1/jobs/{job_id}")
 
+
+    def poll_after_approval(self, job_id: str, approved_change_ids: list[str] | None = None) -> dict[str, Any]:
+        deadline = time.monotonic() + self.settings.poll_timeout_seconds
+        approved=set(approved_change_ids or [])
+        while True:
+            job = self.get_job(job_id)
+            status=job.get("status")
+            current_ids={str(item.get("change_id")) for item in ((job.get("metadata") or {}).get("pending_changes") or []) if item.get("change_id")}
+            if status=="awaiting_approval" and approved and current_ids==approved:
+                pass
+            elif status in {"awaiting_approval", "completed", "failed", "cancelled"}:
+                return job
+            if time.monotonic() >= deadline:
+                raise SuperDocsError(f"Async job {job_id} did not finish within {self.settings.poll_timeout_seconds:g}s after approval; it may still be processing.")
+            time.sleep(self.settings.poll_interval_seconds)
+
+    def list_session_documents(self, session_id: str) -> dict[str, Any]:
+        return self._json("GET", f"/v1/sessions/{session_id}/documents", params={"include_html": "true"})
+
     def decide_changes(self, session_id: str, job_id: str, changes: list[dict[str, Any]]) -> dict[str, Any]:
         decisions = [{"change_id": item["change_id"], "approved": bool(item["approved"]), "feedback": item.get("feedback")} for item in changes]
         return self._json("POST", f"/v1/chat/{session_id}/approve", json={"job_id": job_id, "approved": all(x["approved"] for x in decisions), "changes": decisions})
@@ -250,10 +249,17 @@ def _ops(payload: dict[str, Any]) -> int:
 
 class FakeSuperDocsClient:
     """Deterministic local client used by tests and optional demo mode."""
-    def __init__(self, async_states: list[str] | None = None, fail: bool = False):
+    def __init__(self, async_states: list[str] | None = None, fail: bool = False, post_approval_html: str | None = None, approval_jobs: list[dict[str, Any]] | None = None, recovery_job: dict[str, Any] | None = None):
         self.async_states = async_states or ["in_progress", "awaiting_approval"]
         self.fail = fail
         self.jobs: dict[str, int] = {}
+        self.approval_calls: list[dict[str, Any]] = []
+        self.post_approval_html = post_approval_html or '<h1 data-chunk-id="h1">Projects</h1><p data-chunk-id="observed-chunk-1">Deadline: March 27.</p>'
+        self.approval_jobs = approval_jobs or [{"status":"completed","result":{"response":"Applied","document_changes":{"chunk_diffs":[]}},"metadata":{}}]
+        self.approval_poll_index = 0
+        self.followup_calls: list[dict[str, Any]] = []
+        self.recovery_job = recovery_job or {"status":"awaiting_approval","result":{"response":"I proposed the guided correction.","usage":{"ops_charged":1}},"metadata":{"awaiting_kind":"change_review","pending_changes":[{"change_id":"recovery-change-1","operation":"edit","chunk_id":"observed-chunk-1","old_html":"<p>Before</p>","new_html":"<p>After</p>"}]}}
+        self.last_decision_approved: bool | None = None
 
     def run(self, case: dict[str, Any], document: dict[str, Any]) -> RunResult:
         if self.fail:
@@ -263,9 +269,10 @@ class FakeSuperDocsClient:
             raw = {"response": case.get("expected_answer") or "Please clarify which repeated section you mean.", "session_id": session, "usage": {"ops_charged": 1}}
             return RunResult("completed", session, raw["response"], {"usage": raw["usage"]}, {"upload": {"chunks_count": 4}, "chat": raw}, 12.5, 1)
         job_id = f"fake_job_{case['id']}"
-        pending = [{"change_id": "change-1", "operation": "edit", "chunk_id": "observed-chunk-1", "old_html": "<p>Deadline: March 20.</p>", "new_html": "<p>Deadline: March 27.</p>", "ai_explanation": "Updates the named deadline."}]
+        pre_html = '<h1 data-chunk-id="h1">Projects</h1><p data-chunk-id="observed-chunk-1">Deadline: March 20.</p>'
+        pending = [{"change_id": "change-1", "operation": "edit", "chunk_id": "observed-chunk-1", "document_id":"doc_primary", "old_html": "<p data-chunk-id=\"observed-chunk-1\">Deadline: March 20.</p>", "new_html": "<p data-chunk-id=\"observed-chunk-1\">Deadline: March 27.</p>", "ai_explanation": "Updates the named deadline."}]
         self.jobs[job_id] = 0
-        return RunResult("awaiting_approval", session, "I proposed the requested deadline update.", {"pending_changes": pending, "usage": {"ops_charged": 1}}, {"upload": {"chunks_count": 4}, "queued": {"job_id": job_id}, "job": {"status": "awaiting_approval", "metadata": {"pending_changes": pending}}}, 24.0, 1, job_id)
+        return RunResult("awaiting_approval", session, "I proposed the requested deadline update.", {"pending_changes": pending, "chunk_heading_paths":{"h1":"Projects","observed-chunk-1":"Projects"}, "usage": {"ops_charged": 1}}, {"upload": {"chunks_count": 2,"html":pre_html,"session_id":session}, "queued": {"job_id": job_id}, "job": {"status": "awaiting_approval", "metadata": {"pending_changes": pending,"awaiting_kind":"change_review"}}}, 24.0, 1, job_id)
 
     def get_job(self, job_id: str) -> dict[str, Any]:
         index = self.jobs.get(job_id, 0)
@@ -274,7 +281,18 @@ class FakeSuperDocsClient:
         return {"job_id": job_id, "status": status, "progress": 100 if status != "in_progress" else 50}
 
     def decide_changes(self, session_id: str, job_id: str, changes: list[dict[str, Any]]) -> dict[str, Any]:
-        return {"job_id": job_id, "status": "processing", "decisions": changes}
+        payload={"job_id":job_id,"approved":all(bool(item.get("approved")) for item in changes),"changes":changes}
+        self.last_decision_approved=payload["approved"]
+        self.approval_calls.append({"session_id":session_id,**payload})
+        return {"job_id": job_id, "status": "processing", "decisions": changes, "approved":payload["approved"]}
+
+    def poll_after_approval(self, job_id: str, approved_change_ids: list[str] | None = None) -> dict[str, Any]:
+        job=self.recovery_job if self.last_decision_approved is False else self.approval_jobs[min(self.approval_poll_index,len(self.approval_jobs)-1)]
+        self.approval_poll_index+=1
+        return {"job_id":job_id,"session_id":"fake", "job_type":"chat", "progress":100, **job}
+
+    def list_session_documents(self, session_id: str) -> dict[str, Any]:
+        return {"documents":[{"document_id":"doc_primary","focused":True,"html":self.post_approval_html}]}
 
     def export(self, session_id: str, format: str = "docx") -> tuple[bytes, str]:
         return b"fake export", "application/octet-stream"
