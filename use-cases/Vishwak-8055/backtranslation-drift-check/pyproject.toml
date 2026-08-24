@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drift-check"
+version = "0.1.0"
+description = "Back-translation drift check for regulated/high-stakes localization QA"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+drift-check = "drift_check.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+drift_check = ["py.typed", "report_assets/*.css"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.mypy]
+python_version = "3.11"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+no_implicit_optional = true
+check_untyped_defs = true
+exclude = ["build/", "dist/"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["UP042"]  # `class X(str, Enum)` is deliberate here — gives JSON-serializable enum values

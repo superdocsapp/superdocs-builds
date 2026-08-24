@@ -1,0 +1,32 @@
+{
+  "back_translations": {
+    "1": "This agreement governs the use of the MedSure Glucose Monitoring System (the \"Device\") and applies to all patients and caregivers who operate it in accordance with these instructions.",
+    "2": "The user is required to calibrate the Device at least once every 90 days using an approved calibration solution. Calibration records should be kept for reference.",
+    "3": "The Device may be operated above 40°C or below 5°C. Operating outside this range may produce inaccurate glucose readings.",
+    "4": "If the Device fails to operate as described, the user should submit a warranty claim through the MedSure support portal. Claims submitted without a proof of purchase will not be processed.",
+    "5": "Warranty claims must be submitted within 60 calendar days of the failure being discovered. Claims submitted after this period will be denied.",
+    "6": "If an optional extended-service invoice is not paid by the due date, a late fee of 15% of the invoice amount will be applied for each month the payment remains outstanding.",
+    "7": "MedSure retains Device usage data for 24 months to support warranty and safety investigations. Data is deleted afterward unless required by law.",
+    "8": "Any safety incident involving the Device must be reported to the Regulatory Authority no later than March 15, 2027. Late reports may result in regulatory penalties.",
+    "9": "Store the Device and test strips between 2°F and 8°F when not in use. Do not freeze.",
+    "10": "Complaints regarding the Device may be filed with the MedSure Ethics Board (MEB) at any time.",
+    "11": "The Device is designed for single-patient use and may be shared among multiple patients as long as proper cleaning or disinfection is performed.",
+    "12": "The Device measures glucose levels in venous whole blood obtained from a laboratory sample."
+  },
+  "semantic_overrides": {
+    "11": {
+      "has_drift": true,
+      "category": "modal_obligation_change",
+      "severity": "critical",
+      "confidence": 0.9,
+      "rationale": "Source establishes an absolute, no-exceptions prohibition on multi-patient sharing; back-translation permits sharing conditional on cleaning, a materially weaker safety posture."
+    },
+    "12": {
+      "has_drift": true,
+      "category": "terminology_change",
+      "severity": "critical",
+      "confidence": 0.85,
+      "rationale": "Source specifies a capillary fingertip sample; back-translation specifies a venous laboratory sample, a different specimen type the device is not described as validated for."
+    }
+  }
+}
