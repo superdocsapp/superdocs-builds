@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+node_modules/
+.DS_Store
+*.db
+*.db-wal
+*.db-shm
+.env
+*.egg-info/
+
+# pip build artefacts. These were committed once and shipped a STALE copy of
+# the library — build/lib/idem/store.py still had the file-descriptor leak long
+# after the real source was fixed. Two versions of one library in one PR.
+build/
+dist/

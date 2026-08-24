@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "description": "The retry decision table. Data, not code. Both the Python and the TypeScript implementation load this exact file. Rules are evaluated top to bottom; the first whose every condition matches wins; the table must end with a catch-all. See SPEC.md sections 4 and 5.",
+
+  "backoff": {
+    "base_ms": 200,
+    "max_ms": 20000,
+    "multiplier": 2.0,
+    "jitter": "full",
+    "max_attempts": 5,
+    "why": "Full jitter: delay drawn uniformly from [0, min(max_ms, base_ms * multiplier**n)]. Equal jitter and decorrelated jitter both keep a floor under the delay, which synchronises clients that failed together. A document edit takes 30s to several minutes, so a 20s ceiling stays small next to the operation it is protecting."
+  },
+
+  "match_fields": {
+    "status": "HTTP status code observed, or null if the request produced no response",
+    "error": "Class name of the raised error, as a plain string. The library never imports an HTTP library to read this.",
+    "sent": "Whether the request left the client. The single most important field in the table: if false, nothing can have been applied."
+  },
+
+  "rules": [
+    {
+      "id": "success",
+      "when": { "status_range": [200, 299] },
+      "outcome": "success",
+      "why": "Observed. The only outcome the library is entitled to call a success (N3)."
+    },
+    {
+      "id": "rate-limited",
+      "when": { "status": 429 },
+      "outcome": "retryable",
+      "honour_retry_after": true,
+      "why": "The server explicitly declined to process the request, so it was not applied. Placed above the general 4xx rule because 429 is the one 4xx that is about timing rather than about the request being wrong."
+    },
+    {
+      "id": "conflict",
+      "when": { "status": 409 },
+      "outcome": "terminal",
+      "requires_reconciliation": true,
+      "why": "SuperDocs returns 409 when the session state rejects the call. Retrying is guaranteed to fail again, and it signals a session that will not accept work. Two sources: a second call against a session with a job still in flight (reproduced live 2026-08-22), and, during 2026-08 testing, an approve that succeeded but never settled, leaving both the next chat_async and revert_session at 409 so the session could neither proceed nor roll back. A retry loop spent roughly six minutes there. The second shape did not reproduce on 2026-08-22 and may be fixed; the rule holds for either. Terminal, and flagged as needing reconciliation rather than another attempt."
+    },
+    {
+      "id": "client-error",
+      "when": { "status_range": [400, 499] },
+      "outcome": "terminal",
+      "why": "The request is wrong and will be rejected identically forever. Observed live as 400 Bad Request from revert_session under load, seven times across runs, never once succeeding on a repeat of the same call."
+    },
+    {
+      "id": "server-error",
+      "when": { "status_range": [500, 599] },
+      "outcome": "unknown",
+      "why": "The server received the request. Nothing observable distinguishes 'failed before applying' from 'applied, then failed to answer'. Classifying this retryable is the single most common way a retry library double-applies a metered operation."
+    },
+    {
+      "id": "never-sent-connect-timeout",
+      "when": { "error": "ConnectTimeout", "sent": false },
+      "outcome": "retryable",
+      "why": "The connection was never established, so the request never left the client and nothing can have been applied. This is the one timeout that is genuinely safe to retry, and telling it apart from a read timeout is most of the value here."
+    },
+    {
+      "id": "never-sent-dns",
+      "when": { "error": "DNSError", "sent": false },
+      "outcome": "retryable",
+      "why": "Same reasoning as a connect timeout: name resolution failed before any request existed."
+    },
+    {
+      "id": "never-sent",
+      "when": { "sent": false },
+      "outcome": "retryable",
+      "why": "The general form of the two rules above. Any failure the caller can attest never left the client is safe to retry, whatever it was called."
+    },
+    {
+      "id": "read-timeout",
+      "when": { "error": "ReadTimeout", "sent": true },
+      "outcome": "unknown",
+      "why": "Sent, no answer. The edit may have been applied and the operation may have been metered. This is the exact shape that produced eight duplicate paragraphs in one document when it was retried."
+    },
+    {
+      "id": "connection-reset",
+      "when": { "error": "ConnectionReset", "sent": true },
+      "outcome": "unknown",
+      "why": "Indistinguishable from a read timeout in what it tells us: the request was sent and the answer was lost."
+    },
+    {
+      "id": "catch-all",
+      "when": {},
+      "outcome": "unknown",
+      "why": "Fail closed (R8). An unrecognised failure is unknown, never retryable. A table that guessed 'probably safe' here would be wrong exactly when it mattered."
+    }
+  ]
+}

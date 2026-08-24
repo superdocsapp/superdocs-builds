@@ -1,0 +1,22 @@
+{
+  "name": "@sidharth-cs/idem-superdocs",
+  "version": "1.0.0",
+  "description": "Idempotency and safe-retry middleware for SuperDocs document operations",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test --experimental-strip-types --no-warnings \"tests/*.test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
