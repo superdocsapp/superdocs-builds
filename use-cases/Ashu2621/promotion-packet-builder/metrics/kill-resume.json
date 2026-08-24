@@ -1,0 +1,9 @@
+{
+  "approved_claims": 1,
+  "checkpoint_history_present": true,
+  "duplicate_logical_effects": 0,
+  "pending_proposals_preserved": 1,
+  "process_was_killed": true,
+  "resume_latency_ms": 18.35,
+  "resumed_status": "COMPLETE"
+}

@@ -1,0 +1,56 @@
+{
+  "release": "0.7.0",
+  "performed_at": "2026-08-20T23:47:15+05:30",
+  "result": "local_pass",
+  "scope_note": "All local gates passed; repository/PR publication, video upload, form submission, and evaluator acceptance remain external human gates.",
+  "python": {
+    "compile": "pass",
+    "ruff": "pass",
+    "mypy_source_files": 91,
+    "bandit_high_findings": 0,
+    "dependency_vulnerabilities": 0,
+    "pip_check": "pass",
+    "secret_scan": "pass",
+    "unit_tests_passed": 212,
+    "integration_tests_passed": 13,
+    "live_contract_tests_passed": 2
+  },
+  "typescript": {
+    "typecheck_workspaces": 3,
+    "web_tests": 4,
+    "word_addin_tests": 2,
+    "production_builds": 3,
+    "npm_vulnerabilities": 0
+  },
+  "standalone_public_packages": {
+    "promotion_packet_builder_tests": 10,
+    "crash_resume_demo_tests": 1,
+    "async_review_fsm_tests": 134
+  },
+  "infrastructure": {
+    "one_command_start_stop": "pass_with_five_processes",
+    "compose_services_healthy": 5,
+    "database_migrations": "pass_at_0013_kafka",
+    "kubernetes_yaml_documents": 25,
+    "authenticated_load_requests": 500,
+    "authenticated_load_http_200": 500,
+    "authenticated_load_p95_ms": 360.9,
+    "backup_restore": "pass",
+    "object_hashes_verified": 11
+  },
+  "container_scans": {
+    "promotion_api": {"digest_prefix": "dd7be5068d5b", "critical": 0, "high": 0},
+    "promotion_worker": {"digest_prefix": "072b3b380fa2", "critical": 0, "high": 0},
+    "promotion_web": {"digest_prefix": "8124533e7dd3", "critical": 0, "high": 0}
+  },
+  "browser": {
+    "public_builder_dom": "pass",
+    "exact_quote_and_revised_round_copy_visible": true
+  },
+  "live_superdocs": {
+    "current_read_only_contract": "pass_on_2026-08-20",
+    "current_checks": ["list_sessions", "mcp_health_and_tool_discovery"],
+    "mutating_workflow_status": "historical_bounded_synthetic_proof",
+    "mutating_workflow_performed_at": "2026-08-14T01:58:08+05:30"
+  }
+}

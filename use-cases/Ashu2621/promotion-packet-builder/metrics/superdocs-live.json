@@ -1,0 +1,37 @@
+{
+  "performed_at": "2026-08-14T01:58:08+05:30",
+  "content_classification": "synthetic fixtures only",
+  "transport": "SuperDocs MCP over HTTPS through backend",
+  "model_tier_requested": "pro",
+  "inputs": {
+    "primary_documents": 1,
+    "evidence_attachments": 2
+  },
+  "observed_states": [
+    "in_progress",
+    "awaiting_approval",
+    "completed"
+  ],
+  "review": {
+    "proposed_changes": 1,
+    "approved": 1,
+    "rejected": 0,
+    "grounded_artifact_names_in_change": 2
+  },
+  "calls_proven": [
+    "upload_document_base64",
+    "upload_attachment_base64",
+    "chat_async",
+    "get_job",
+    "approve_change",
+    "export_document"
+  ],
+  "export": {
+    "format": "docx",
+    "bytes": 37148,
+    "zip_structure_valid": true,
+    "promotion_evidence_present_after_reparse": true
+  },
+  "browser_console_errors_or_warnings": 0,
+  "credential_exposed_to_browser": false
+}

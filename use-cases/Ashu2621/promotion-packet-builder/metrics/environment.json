@@ -1,0 +1,9 @@
+{
+  "os": "Microsoft Windows 11 Home Single Language",
+  "cpu": "AMD Ryzen 5 5500U with Radeon Graphics",
+  "logical_processors": 12,
+  "memory_bytes": 16456007680,
+  "python": "Python 3.12.13",
+  "node": "v24.19.0",
+  "docker": "Docker version 29.6.1, build 8900f1d"
+}
