@@ -53,8 +53,22 @@ function ClientEngagementSelector({ onSelect }) {
     }
 
     return (
-        <div>
-            <label>
+        <div
+            style={{
+                display: "flex",
+                gap: "2rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+            }}
+        >
+            <label
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.6rem",
+                    fontWeight: 700,
+                }}
+            >
                 Client:
                 <select
                     value={selectedClientId}
@@ -73,7 +87,14 @@ function ClientEngagementSelector({ onSelect }) {
             </label>
 
             {selectedClientId && (
-                <label>
+                <label
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.6rem",
+                        fontWeight: 700,
+                    }}
+                >
                     Engagement:
                     <select
                         value={selectedEngagementId}
