@@ -57,7 +57,15 @@ function ClientDetailsPanel({
     if (!client) {
         return (
             <div className="card" style={{ flex: 1 }}>
-                <p>Select a client to see details.</p>
+                <h2>Welcome to the Freelancer Billing Bundle</h2>
+                <p>
+                    Manage clients, rates, and timesheets, then generate an
+                    engagement letter, timesheet, invoice, or payment reminder,
+                    reviewed and approved by you before anything gets committed.
+                </p>
+                <p style={{ fontStyle: "italic" }}>
+                    Select a client to see details.
+                </p>
             </div>
         );
     }
