@@ -57,3 +57,31 @@ export async function reviewDocument({
     const blob = await res.blob();
     return { isBinary: true, blob };
 }
+
+export function createClient(data) {
+    return apiFetch("/clients", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}
+
+export function createRateCard(clientId, data) {
+    return apiFetch(`/clients/${clientId}/rate-cards`, {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}
+
+export function createEngagement(data) {
+    return apiFetch("/engagements", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}
+
+export function createTimesheetEntry(engagementId, data) {
+    return apiFetch(`/timesheet-entries/${engagementId}`, {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}

@@ -94,3 +94,38 @@ select {
     margin: 1.5rem 0 0.75rem 0;
     box-shadow: 3px 3px 0 var(--ink);
 }
+
+form.card label {
+    display: block;
+    margin-bottom: 0.85rem;
+    font-weight: 700;
+}
+
+form.card input {
+    display: block;
+    width: 100%;
+    margin-top: 0.3rem;
+    border: 3px solid var(--ink);
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-family: inherit;
+    font-weight: 600;
+    background: white;
+    box-sizing: border-box;
+}
+
+form.card button {
+    margin-top: 0.5rem;
+}
+
+.selector-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.selector-row:last-child {
+    margin-bottom: 0;
+}
