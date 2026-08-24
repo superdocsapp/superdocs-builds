@@ -21,19 +21,20 @@ The rate-split math (step 4) happens entirely in this codebase, not inside Super
 
 ```
 backend/
-src/
-billing/ rate-split invoice math, tested independently of the API
-db/ Postgres connection, migrations
-repositories/ one file per table, plain SQL queries
-routes/ Express routes
-services/ SuperDocs API client, document templates, bluff/completion detection
-helpers/ snake_case -> camelCase mapping for DB rows
+└── src/
+    ├── billing/       rate-split invoice math, tested independently of the API
+    ├── db/            Postgres connection, migrations
+    ├── repositories/  one file per table, plain SQL queries
+    ├── routes/        Express routes
+    ├── services/      SuperDocs API client, document templates, bluff/completion detection
+    └── helpers/       snake_case → camelCase mapping for DB rows
+
 frontend/
-src/
-components/ UI pieces (sidebar, client details, document modal, forms)
-hooks/ useClientDirectory, useDocumentGeneration, state + API orchestration
-services/ api.js, thin fetch wrapper
-utils/ stripHtml/diff formatting
+└── src/
+    ├── components/    UI pieces (sidebar, client details, document modal, forms)
+    ├── hooks/         useClientDirectory, useDocumentGeneration, state + API orchestration
+    ├── services/      api.js, thin fetch wrapper
+    └── utils/         stripHtml/diff formatting
 ```
 
 ## How to run it
