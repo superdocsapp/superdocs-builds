@@ -13,10 +13,10 @@ export function buildEngagementLetter({ client, engagement, rateHistory }) {
     `.trim();
 
     const instruction = `
-        Fill in the placeholders with these exact values, preserve all formatting. Make one separate edit per placeholder, do not merge multiple placeholders into a single edit, and do not add any content beyond what is described below.
+        Fill in the placeholders with these exact values, preserve all formatting. Propose every edit together as a single batch, do not stage them across multiple review rounds.
         Client: ${client.name}
         Engagement: ${engagement.title}
-        Start Date: ${formatDate(engagement.start_date)}
+        Start Date: ${engagement.start_date}
         Rate: ${currentRate.hourlyRate} ${currentRate.currency} per hour
     `.trim();
 
@@ -62,7 +62,7 @@ export function buildTimesheet({ client, engagement, timesheet }) {
         .join("\n");
 
     const instruction = `
-        Fill in the placeholders, preserve all formatting. Make one separate edit per placeholder, do not merge multiple placeholders into a single edit, and do not add any content beyond what is described below.
+        Fill in the placeholders, preserve all formatting. Propose every edit together as a single batch, do not stage them across multiple review rounds. Make one separate edit per placeholder, do not merge multiple placeholders into a single edit, and do not add any content beyond what is described below.
         Client: ${client.name}
         Engagement: ${engagement.title}
 
@@ -108,8 +108,7 @@ export function buildInvoice({ client, engagement, invoice }) {
         .join("\n");
 
     const instruction = `
-        Fill in the placeholders, preserve all formatting. Make one separate edit per placeholder paragraph or table cell, do not merge multiple placeholders into a single edit, and do not add any rows, columns, or content beyond what is described below:
-
+        Fill in the placeholders, preserve all formatting. Propose every edit together as a single batch, do not stage them across multiple review rounds. Make one separate edit per placeholder, do not merge multiple placeholders into a single edit, and do not add any content beyond what is described below.
         Client: ${client.name}
         Engagement: ${engagement.title}
 
@@ -138,7 +137,7 @@ export function buildPaymentReminder({ client, engagement, invoice }) {
     `.trim();
 
     const instruction = `
-        Fill in the placeholders with these exact values, preserve all formatting:
+        Fill in the placeholders with these exact values, preserve all formatting. Propose every edit together as a single batch, do not stage them across multiple review rounds.
         Client: ${client.name}
         Engagement: ${engagement.title}
         Outstanding Amount: ${invoice.totalAmount} ${invoice.currency}
