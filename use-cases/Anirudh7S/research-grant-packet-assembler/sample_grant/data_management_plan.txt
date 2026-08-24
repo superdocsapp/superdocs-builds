@@ -1,0 +1,34 @@
+DATA MANAGEMENT PLAN
+
+Project: Community-Based Early Detection of Cardiovascular Risk
+
+Principal Investigator: Dr. Ananya Sharma
+Co-Investigator: Dr. Rahul Verma
+
+Data Types
+
+The project will collect participant demographic information, screening measurements, referral information, follow-up status, and implementation observations.
+
+Data Collection
+
+Data will be collected using standardized electronic forms. Research staff will review submitted records for completeness and resolve data-entry errors through documented correction procedures.
+
+Data Storage
+
+Research data will be stored in access-controlled project storage. Access will be limited to authorized members of the research team.
+
+Data Security
+
+Participant information will be protected through access controls and appropriate security procedures. Identifying information will not be included in analytical datasets when it is not required for analysis.
+
+Data Quality
+
+The research team will conduct periodic quality checks to identify missing, inconsistent, or duplicate records. Corrections will be documented.
+
+Data Sharing
+
+De-identified datasets may be shared with qualified researchers when permitted by the study protocol, applicable agreements, and institutional requirements.
+
+Data Retention
+
+Project data will be retained according to applicable institutional policies and funder requirements.

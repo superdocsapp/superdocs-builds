@@ -1,0 +1,17 @@
+# Local environment and secrets
+.env
+
+# Local root development copy
+/app/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local test/output files
+output/
+approval_body.json
+chat_body.json
+hitl_body.json
+export_test.docx
+sample_grant_missing_collaborator/
