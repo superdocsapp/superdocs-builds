@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "superdocs-crash-resume-demo"
+version = "0.1.0"
+description = "Reproducible process-kill and exact-resume proof for document review"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.4,<9"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+[tool.pyright]
+extraPaths = ["."]
