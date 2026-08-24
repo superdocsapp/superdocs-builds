@@ -29,22 +29,19 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
     const [docState, setDocState] = useState({});
     const [activeType, setActiveType] = useState(null);
     const [localDecisions, setLocalDecisions] = useState({});
-    const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const active = activeType ? docState[activeType] : null;
 
     async function handleGenerate(type) {
-        setError(null);
         setLoading(true);
-        setActiveType(type);
         setLocalDecisions({});
 
-        setDocState((prev) => {
-            const next = { ...prev };
-            delete next[type];
-            return next;
-        });
+        setDocState((prev) => ({
+            ...prev,
+            [type]: { status: "generating", pendingChanges: [], error: null },
+        }));
+        setActiveType(type);
 
         try {
             const result = await generateDocument(type, engagementId);
@@ -55,10 +52,18 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                     jobId: result.jobId,
                     sessionId: result.sessionId,
                     pendingChanges: result.pendingChanges || [],
+                    error: null,
                 },
             }));
         } catch (err) {
-            setError(err.message);
+            setDocState((prev) => ({
+                ...prev,
+                [type]: {
+                    status: "failed",
+                    pendingChanges: [],
+                    error: err.message,
+                },
+            }));
         } finally {
             setLoading(false);
         }
@@ -72,7 +77,6 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
 
     async function handleSubmitReview() {
         setLoading(true);
-        setError(null);
 
         const decisions = active.pendingChanges.map((change) => ({
             change_id: change.change_id,
@@ -108,6 +112,7 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                         pendingChanges: [],
                         hadRejection,
                         downloadUrl: url,
+                        error: null,
                     },
                 }));
             } else {
@@ -117,13 +122,13 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                     data.status === "failed_needs_manual_retry" ||
                     data.status === "completed_but_incomplete"
                 ) {
-                    setError(data.reason);
                     setDocState((prev) => ({
                         ...prev,
                         [activeType]: {
                             ...prev[activeType],
                             status: "failed",
                             pendingChanges: [],
+                            error: data.reason,
                         },
                     }));
                 } else {
@@ -133,12 +138,20 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                             ...prev[activeType],
                             pendingChanges: data.pendingChanges || [],
                             hadRejection,
+                            error: null,
                         },
                     }));
                 }
             }
         } catch (err) {
-            setError(err.message);
+            setDocState((prev) => ({
+                ...prev,
+                [activeType]: {
+                    ...prev[activeType],
+                    status: "failed",
+                    error: err.message,
+                },
+            }));
         } finally {
             setLoading(false);
         }
@@ -157,7 +170,9 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                         <button
                             key={doc.key}
                             className={`btn btn-coral ${isActive ? "tab-active" : ""}`}
-                            onClick={() => setActiveType(doc.key)}
+                            onClick={() => {
+                                setActiveType(doc.key);
+                            }}
                             disabled={loading}
                         >
                             {doc.label}
@@ -167,7 +182,7 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                 })}
             </div>
 
-            {error && (
+            {active?.error && (
                 <p
                     style={{
                         color: "var(--coral)",
@@ -175,7 +190,7 @@ function DocumentGenerator({ engagementId, engagementTitle, clientName }) {
                         marginTop: "1rem",
                     }}
                 >
-                    {error}
+                    {active.error}
                 </p>
             )}
 
