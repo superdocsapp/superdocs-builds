@@ -85,3 +85,11 @@ export function createTimesheetEntry(engagementId, data) {
         body: JSON.stringify(data),
     });
 }
+
+export function listRateCardsForClient(clientId) {
+    return apiFetch(`/clients/${clientId}/rate-cards`);
+}
+
+export function getInvoiceForEngagement(engagementId) {
+    return apiFetch(`/invoices/engagement/${engagementId}`);
+}

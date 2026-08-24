@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { createClient, listClients } from "../repositories/clients.js";
-import { createRateCard } from "../repositories/rateCards.js";
+import {
+    createRateCard,
+    getRateHistoryForClient,
+} from "../repositories/rateCards.js";
 
 const router = Router();
 
@@ -20,6 +23,15 @@ router.post("/:clientId/rate-cards", async (req, res) => {
         ...req.body,
     });
     res.json(rateCard);
+});
+
+router.get("/:clientId/rate-cards", async (req, res) => {
+    try {
+        const rates = await getRateHistoryForClient(req.params.clientId);
+        res.json(rates);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 export default router;

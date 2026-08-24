@@ -1,31 +1,60 @@
-import "./App.css";
+import "./App.css"
 import { useState } from "react";
-import ClientEngagementSelector from "./components/ClientEngagementselector.jsx";
-import DocumentGenerator from "./components/DocumentGenerator.jsx";
-// import CreateClientForm from "./components/CreateClientForm.jsx";
+import ClientSidebar from "./components/ClientSidebar.jsx";
+import ClientDetailsPanel from "./components/ClientDetailsPanel.jsx";
+import DocumentActionsPanel from "./components/DocumentActionsPanel.jsx";
+import { useClientDirectory } from "./hooks/useClientDirectory.js";
 
 function App() {
-    const [selection, setSelection] = useState(null);
+    const { clients } = useClientDirectory();
+    const [selectedClientId, setSelectedClientId] = useState(null);
+    const [selectedEngagementId, setSelectedEngagementId] = useState(null);
+    const [selectedEngagementTitle, setSelectedEngagementTitle] =
+        useState(null);
+
+    const selectedClient = clients.find(
+        (c) => String(c.id) === String(selectedClientId),
+    );
+
+    function handleSelectClient(clientId) {
+        setSelectedClientId(clientId);
+        setSelectedEngagementId(null);
+        setSelectedEngagementTitle(null);
+    }
+
+    function handleSelectEngagement(engagementId, title) {
+        setSelectedEngagementId(engagementId || null);
+        setSelectedEngagementTitle(title || null);
+    }
 
     return (
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem" }}>
+        <div style={{ padding: "2rem" }}>
             <h1>Freelancer Billing Bundle</h1>
 
-            <div className="step-label">
-                Step 1, choose client and engagement
-            </div>
-            <div className="card">
-                <ClientEngagementSelector onSelect={setSelection} />
-            </div>
+            <div
+                style={{
+                    display: "flex",
+                    gap: "1.5rem",
+                    alignItems: "flex-start",
+                }}
+            >
+                <ClientSidebar
+                    selectedClientId={selectedClientId}
+                    onSelectClient={handleSelectClient}
+                />
 
-            {selection && (
-                <>
-                    <div className="step-label">
-                        Step 2, generate and review documents
-                    </div>
-                    <DocumentGenerator {...selection} />
-                </>
-            )}
+                <ClientDetailsPanel
+                    client={selectedClient}
+                    selectedEngagementId={selectedEngagementId}
+                    onSelectEngagement={(id) => handleSelectEngagement(id)}
+                />
+
+                <DocumentActionsPanel
+                    engagementId={selectedEngagementId}
+                    engagementTitle={selectedEngagementTitle}
+                    clientName={selectedClient?.name}
+                />
+            </div>
         </div>
     );
 }
