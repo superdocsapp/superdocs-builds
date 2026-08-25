@@ -111,7 +111,7 @@ stage "edit: one instruction, both documents, nothing applied yet" \
     edit "raise the rail torque to 1.6 N·m"
 
 stage "approve: apply what the last step proposed" \
-    "free -- the operation was already spent proposing it" \
+    "free -- the operation was already spent proposing it. Waits for the service to serve what it applied (BUGS #22), then compares the pair passage by passage and spends one operation only if one document was left behind (BUGS #23)" \
     approve
 
 stage "verify: read both documents back and check the pair still agrees" \
@@ -123,7 +123,7 @@ stage "sync: every diagram re-rendered from the parts graph and swapped in" \
     sync
 
 stage "approve: apply the diagram swap" \
-    "free" \
+    "free -- and, again, does not return until the nine new drawings are the ones being served" \
     approve
 
 stage "verify: prove the pair still agrees, pointing at the new diagrams" \

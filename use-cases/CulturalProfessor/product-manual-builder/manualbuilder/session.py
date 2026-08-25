@@ -36,6 +36,7 @@ how a caller checks the pair actually moved together rather than trusting it.
 from __future__ import annotations
 
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlparse
@@ -175,6 +176,13 @@ class Publication:
         if document_id == self.card_id:
             return "quick-start card"
         return document_id
+
+    def document_named(self, name: str) -> str:
+        """The inverse of `name_for`, for a check that reports by role."""
+        for document_id in self.document_ids:
+            if self.name_for(document_id) == name:
+                return document_id
+        raise SuperDocsError(f"this publication has no document called {name!r}")
 
 
 def render_diagrams(spec: Spec) -> dict[str, str]:
@@ -580,6 +588,326 @@ def approve_all(
     ]
 
 
+#: How long to keep re-reading a document that has not caught up with an
+#: approval yet, and how long to wait between reads. Both are wall-clock
+#: patience and nothing else: the reads are free, and the alternative to
+#: spending twenty seconds here is a `verify` that reports a correct document
+#: as wrong. Six seconds was the longest lag seen on a nine-change batch, so
+#: the budget is several times that and the loop leaves the moment it agrees.
+SETTLE_TIMEOUT = 30.0
+SETTLE_POLL = 2.0
+
+
+@dataclass(frozen=True)
+class Settlement:
+    """What the read side was serving after an approval, and how long it took.
+
+    `waited` is reported rather than hidden because it is the only evidence a
+    caller has that the wait was needed. A run that settles on the first read
+    prints nothing; a run that took six seconds is worth a line, and a run that
+    never settled is worth a warning.
+    """
+
+    waited: float
+    reads: int
+    #: document id -> the chunks still serving their pre-approval content.
+    outstanding: dict[str, list[str]] = field(default_factory=dict)
+
+    @property
+    def settled(self) -> bool:
+        return not self.outstanding
+
+
+def arrived(html: str, change: ProposedChange) -> bool:
+    """Whether a document read back carries what this change was approved to put in it.
+
+    Not a comparison of the chunk against `new_html`, which would be the
+    obvious thing and is the wrong thing: the service reflows what it stores,
+    and a chunk that differs only in whitespace or attribute order is the
+    approved content, arrived. So it asks the two questions the approval
+    actually made a claim about -- the new words are in the document, and every
+    image the chunk now points at is one the document is serving.
+
+    Images are compared by URL *path*, for the reason `_same_image` gives: what
+    comes back is signed, and the signature differs on every read.
+    """
+    from manualbuilder import verify as vf
+
+    text = vf.text_of(change.new_html)
+    if text and text not in vf.text_of(html):
+        return False
+    served = {urlparse(src).path for _, src in images_in(html)}
+    return all(urlparse(src).path in served for _, src in images_in(change.new_html))
+
+
+def settle(
+    client: SuperDocs,
+    publication: Publication,
+    changes: list[ProposedChange],
+    timeout: float | None = None,
+    poll: float | None = None,
+) -> Settlement:
+    """Read the documents back until they serve what was just approved.
+
+    `approve` returns before the read side agrees with it. Not in theory: a
+    nine-change diagram swap came back `200`, every change approved, and the
+    next command -- reading each document by its durable id, seconds later --
+    got all nine figures still pointing at the previous drawings, then got the
+    new ones on a re-read with nothing else done in between. Reported as-is,
+    that is `verify` announcing that the documents on the service are not what
+    this program published, about a pair that is entirely correct.
+
+    The honest fix is not to skip the check. It is to wait for the thing the
+    approval promised before checking it, and to say so when the wait was
+    needed -- which is what this does, in free reads, on the same durable ids
+    `verify` uses. If the budget runs out, that is reported too: an approval
+    the service has accepted and is not serving yet is worth a caller knowing
+    about, and it is not something this can fix by looking harder.
+
+    Nothing here is billed.
+    """
+    # Read from the module rather than bound as defaults, so the budget is one
+    # thing to change -- and so a test can shorten it without reaching into a
+    # function signature.
+    timeout = SETTLE_TIMEOUT if timeout is None else timeout
+    poll = SETTLE_POLL if poll is None else poll
+
+    outstanding: dict[str, list[ProposedChange]] = {}
+    for change in changes:
+        outstanding.setdefault(change.document_id or "", []).append(change)
+
+    started, reads = time.monotonic(), 0
+    while True:
+        for document_id in list(outstanding):
+            html = client.document_html(publication.durable_for(document_id))
+            reads += 1
+            waiting = [c for c in outstanding[document_id] if not arrived(html, c)]
+            if waiting:
+                outstanding[document_id] = waiting
+            else:
+                del outstanding[document_id]
+
+        waited = time.monotonic() - started
+        if not outstanding or waited + poll > timeout:
+            return Settlement(
+                waited=waited,
+                reads=reads,
+                outstanding={
+                    document_id: [c.chunk_id for c in waiting]
+                    for document_id, waiting in outstanding.items()
+                },
+            )
+        time.sleep(poll)
+
+
+def read_pair(client: SuperDocs, publication: Publication) -> dict[str, str]:
+    """Both documents as the service is serving them, keyed by role name.
+
+    By durable id, never by session, for the reason `verify` gives at length: a
+    session serves whatever it is focused on, and a check that reads the wrong
+    document reports on it just as confidently. Free, and unbilled.
+    """
+    return {
+        publication.name_for(document_id): client.document_html(
+            publication.durable_for(document_id)
+        )
+        for document_id in publication.document_ids
+    }
+
+
+# ------------------------------------ the pair, after the batch lands --
+#
+# `assert_touched_both_or_absent` asks whether each document proposed
+# *something*, which is the question that catches a card nobody edited. It is
+# not the question that catches this: asked to raise a torque figure, the
+# manual's turn found three places -- the rails step, the gantry step, and the
+# troubleshooting table's own re-torque line -- and the card's turn found two
+# of its three. Both documents proposed something, so the batch passed, and the
+# pair came apart on the one passage the card missed. `verify` reported it
+# afterwards, correctly and too late.
+#
+# So the pair is checked passage by passage, on the documents as the service is
+# actually serving them, and a passage that moved in one and not the other is
+# repaired rather than merely reported: the document that was left behind is
+# asked, in one more turn, to say what the other one now says.
+
+
+def shared_items(spec: Spec) -> list[tuple[str, str, str]]:
+    """(kind, id, body) for every passage the card repeats from the manual.
+
+    The list `verify` compares and the list a repair has to cover, in one
+    place, because a passage in one and not the other is a passage that gets
+    checked and never fixed, or fixed and never checked.
+    """
+    return [("step", step.id, step.body) for step in spec.quick_start()] + [
+        ("fix", fault.id, fault.fix) for fault in spec.quick_start_troubleshooting()
+    ]
+
+
+@dataclass(frozen=True)
+class Drift:
+    """One passage the two documents no longer word the same way.
+
+    `lagging` is the document that still reads the way the spec words it --
+    i.e. the one an edit missed. It is empty when both documents have moved and
+    moved differently, which is a disagreement this cannot resolve on its own:
+    there is no way to tell which of the two wordings was meant, and picking one
+    would be inventing an answer rather than finding it.
+    """
+
+    label: str
+    lagging: str
+    behind: str
+    ahead: str
+
+    @property
+    def repairable(self) -> bool:
+        return bool(self.lagging)
+
+
+def drifted(served: dict[str, str], spec: Spec) -> list[Drift]:
+    """Every shared passage the two documents word differently, and who lags.
+
+    The same comparison `verify.pair_findings` makes and reports; this one
+    returns the two wordings, so something can be done about them. Both are
+    driven by `shared_items`, so neither can drift out of step with the other.
+    """
+    from manualbuilder import verify as vf
+
+    if vf.MANUAL not in served or vf.CARD not in served:
+        return []
+
+    flat = {role: vf.text_of(served[role]) for role in (vf.MANUAL, vf.CARD)}
+    blocks = {role: vf.passages(served[role]) for role in (vf.MANUAL, vf.CARD)}
+
+    out: list[Drift] = []
+    for kind, item_id, body in shared_items(spec):
+        wanted = vf.needle(body)
+        if wanted in flat[vf.MANUAL] and wanted in flat[vf.CARD]:
+            continue  # both still word it the way the spec does: nothing moved
+
+        best = {role: vf.closest(wanted, blocks[role]) for role in (vf.MANUAL, vf.CARD)}
+        if any(score < vf.MATCH for _, score in best.values()):
+            # Rewritten past recognition in at least one of them. `verify` calls
+            # that unanswerable rather than failing it, and a repair that
+            # guessed here would be writing a passage nobody asked for.
+            continue
+
+        manual, card = best[vf.MANUAL][0], best[vf.CARD][0]
+        if manual == card:
+            continue
+
+        lagging = ""
+        if manual == wanted:
+            lagging, behind, ahead = vf.MANUAL, manual, card
+        elif card == wanted:
+            lagging, behind, ahead = vf.CARD, card, manual
+        else:
+            behind, ahead = manual, card  # both moved; neither is the straggler
+        out.append(Drift(f"{kind} {item_id}", lagging, behind, ahead))
+    return out
+
+
+def _align_instruction(drifts: list[Drift]) -> str:
+    passages = "\n".join(
+        f'- the passage that currently reads:\n    "{drift.behind}"\n'
+        f'  must read, exactly:\n    "{drift.ahead}"'
+        for drift in drifts
+    )
+    return (
+        "This document was left behind by an edit that has already been applied "
+        "to its companion document, and the two now say different things about "
+        "the same thing. Make exactly these replacements and nothing else -- do "
+        "not reword, reformat or renumber anything else, and do not touch any "
+        "other passage, table row, figure or caption:\n" + passages
+    )
+
+
+def realign(
+    client: SuperDocs, publication: Publication, drifts: list[Drift]
+) -> list[ProposedChange]:
+    """Ask each document that was left behind to say what the other one says.
+
+    One turn per document, the same shape every other edit here takes, and the
+    same treatment: the wording it has to produce is handed to it verbatim
+    rather than described, and what comes back is checked against it before
+    anybody is asked to approve anything. A model is being used to locate a
+    passage, not to decide what it should say.
+
+    This costs an operation, and it is spent only when the pair has actually
+    come apart.
+    """
+    by_document: dict[str, list[Drift]] = {}
+    for drift in drifts:
+        if drift.repairable:
+            by_document.setdefault(publication.document_named(drift.lagging), []).append(drift)
+
+    if not by_document:
+        raise SuperDocsError(
+            "both documents have moved, and differently, so there is no "
+            "straggler to bring in line. Which wording was meant is a question "
+            "for a person: `edit` says it again for both, and `approve --reject` "
+            "keeps whichever one is right."
+        )
+
+    instructions = {
+        document_id: _align_instruction(drifts) for document_id, drifts in by_document.items()
+    }
+    changes, _ = edit_each(client, publication, instructions)
+    assert_only_the_lagging_passage_moved(changes, drifts)
+    return changes
+
+
+def assert_only_the_lagging_passage_moved(
+    changes: list[ProposedChange], drifts: list[Drift]
+) -> None:
+    """Refuse a realignment that changed anything but the passage that lagged.
+
+    The check is exact, and it can be: the chunk's text with the old wording
+    swapped for the new one is precisely what the chunk's text has to become.
+    A chunk that is a whole troubleshooting table is handled by the same
+    sentence -- one row of it moves, and every other row has to come back
+    character for character as it went in.
+    """
+    from manualbuilder import verify as vf
+
+    if not changes:
+        raise SuperDocsError(
+            "the turn proposed no changes, so the two documents still disagree. "
+            "The passage is in the document -- `verify` found it there -- and "
+            "the wording to give it was in the instruction verbatim."
+        )
+
+    covered: set[str] = set()
+    for change in changes:
+        before, after = vf.text_of(change.old_html), vf.text_of(change.new_html)
+        matched = next(
+            (
+                drift
+                for drift in drifts
+                if drift.behind in before and after == before.replace(drift.behind, drift.ahead)
+            ),
+            None,
+        )
+        if matched is None:
+            raise SuperDocsError(
+                f"change {change.change_id} did not make chunk {change.chunk_id} "
+                f"read the way the companion document reads. Bringing the pair "
+                f"back together is a substitution of one known passage for "
+                f"another, so the whole batch was refused.\n"
+                f"  before: {before[:160]}\n  after:  {after[:160]}"
+            )
+        covered.add(matched.label)
+
+    missed = [drift.label for drift in drifts if drift.repairable and drift.label not in covered]
+    if missed:
+        raise SuperDocsError(
+            f"the turn left {', '.join(missed)} exactly as it was, so the two "
+            f"documents would still disagree on it after this batch. Nothing "
+            f"was approved."
+        )
+
+
 def refresh_diagrams(client: SuperDocs, publication: Publication, spec: Spec) -> dict[str, str]:
     """Re-render every diagram from the graph and re-upload it.
 
@@ -773,21 +1101,30 @@ def _slug(name: str) -> str:
 
 
 __all__ = [
+    "Drift",
     "Publication",
+    "Settlement",
     "approve_all",
+    "arrived",
     "ask",
     "assert_every_figure_swapped",
     "assert_only_the_image_changed",
+    "assert_only_the_lagging_passage_moved",
     "assert_touched_both",
     "assert_touched_both_or_absent",
     "changes_by_document",
+    "drifted",
     "edit_both",
     "edit_each",
     "excusably_empty",
     "images_in",
     "publish",
+    "read_pair",
+    "realign",
     "refresh_diagrams",
     "render_diagrams",
+    "settle",
+    "shared_items",
     "swap_diagrams",
     "upload_diagrams",
 ]

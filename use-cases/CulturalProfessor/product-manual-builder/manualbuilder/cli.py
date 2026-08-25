@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from pathlib import Path
 
 from manualbuilder import localize as lz
@@ -68,6 +69,32 @@ def _next(*lines: str) -> None:
 
 def _spec(args):
     return load_spec(args.spec)
+
+
+def _spec_for(args):
+    """The spec the published pair was rendered from, locale and all.
+
+    A pair published in German is checked against the German spec or not
+    checked at all: the passages `verify` and `drifted` look for are the ones
+    that were rendered into the documents, not the ones in `spec/`. The
+    language comes from the flag if there is one and from `published.json` if
+    there is not, because that is where `publish` wrote what it published.
+    """
+    spec = _spec(args)
+    language = getattr(args, "language", "") or _saved_language()
+    if not language:
+        return spec
+    locales = _locales(spec)
+    if language not in locales:
+        raise SpecError(f"no locales/{language}.yaml, and {OUT / STATE} says the pair is in it")
+    return locales[language]
+
+
+def _saved_language() -> str:
+    path = OUT / STATE
+    if not path.is_file():
+        return ""
+    return json.loads(path.read_text(encoding="utf-8")).get("language", "")
 
 
 def _locales(spec):
@@ -461,6 +488,10 @@ def cmd_edit(args) -> int:
 
         results = session.approve_all(client, published, changes)
         print(f"\n{_green(f'approved {len(changes)} change(s) across {len(results)} turn(s)')}")
+        _settle(client, published, changes)
+        path.unlink(missing_ok=True)
+        if not _realign(client, published, _spec_for(args), getattr(args, "no_repair", False)):
+            return 1
         _next(
             "manualbuilder verify to confirm it landed the same way in both documents",
             "manualbuilder export --format html for the finished pair",
@@ -589,20 +620,151 @@ def cmd_approve(args) -> int:
             print(f"{_red('REFUSED')}: {exc}", file=sys.stderr)
             return 1
 
-    for change in changes:
-        rejected = change.change_id in reject
-        verdict = _red("rejected") if rejected else _green("approved")
-        print(f"  {verdict}  {change.change_id}  {published.name_for(change.document_id or '')}")
-    print(
-        f"\n{len(changes) - len(reject)} approved, {len(reject)} rejected, "
-        f"across {len(results)} turn(s)"
-    )
+        for change in changes:
+            rejected = change.change_id in reject
+            verdict = _red("rejected") if rejected else _green("approved")
+            print(
+                f"  {verdict}  {change.change_id}  {published.name_for(change.document_id or '')}"
+            )
+        print(
+            f"\n{len(changes) - len(reject)} approved, {len(reject)} rejected, "
+            f"across {len(results)} turn(s)"
+        )
+        _settle(client, published, [c for c in changes if c.change_id not in reject])
+
+        path.unlink()  # a batch is applied once; a stale one is a trap
+        if not _realign(client, published, _spec_for(args), args.no_repair):
+            return 1
+
     _next(
         "manualbuilder verify to confirm it landed the same way in both documents",
         "manualbuilder export --format html for the finished pair",
     )
-    path.unlink()  # a batch is applied once; a stale one is a trap
     return 0
+
+
+def _settle(client, published, changes) -> bool:
+    """Wait for the read side to serve what was just approved, and report it.
+
+    An approval returns before the documents come back with it in them. That is
+    BUGS #10 on `export` and BUGS #22 on the read this build actually uses: a nine-change diagram swap was
+    approved, `200`, every change accepted, and `verify` -- reading each
+    document by its durable id, seconds later -- reported all nine figures still
+    pointing at the previous drawings. A re-read minutes later, with nothing
+    done in between, passed. The pair had been correct the whole time.
+
+    So the wait happens here, once, where the write was, rather than being
+    discovered by every command downstream of it. The reads are free, the loop
+    leaves as soon as the documents agree, and the two cases worth a line get
+    one: a wait that was needed, and a wait that ran out.
+    """
+    if not changes:
+        return True
+    report = session.settle(client, published, changes)
+    if report.settled:
+        # One read per document means it was already current; more than that
+        # means this command absorbed a delay that would otherwise have been
+        # reported as a wrong document.
+        if report.reads > len({change.document_id for change in changes}):
+            print(
+                _dim(
+                    f"the service served the pre-approval document for "
+                    f"{report.waited:.1f}s after the approval returned; it is "
+                    f"current now"
+                )
+            )
+        return True
+
+    stuck = sum(len(chunks) for chunks in report.outstanding.values())
+    print(
+        f"\n{_red('not yet visible')}: the approval was accepted, but after "
+        f"{report.waited:.0f}s the service is still serving the previous content "
+        f"for {stuck} chunk(s)."
+    )
+    print(
+        "Nothing is wrong with the batch -- this is the read side lagging the "
+        "write (BUGS #22).\n`verify` run now would report those as an older "
+        "drawing or an unedited step; run it again in a minute."
+    )
+    return False
+
+
+def _realign(client, published, spec, skip: bool = False) -> bool:
+    """Read the pair back, and put right any passage that moved in only one.
+
+    The gap this closes is one `assert_touched_both_or_absent` cannot see.
+    Asked to raise a torque figure, the manual's turn found three passages --
+    the rails step, the gantry step, and the troubleshooting table's own
+    re-torque line -- and the card's turn found two of its three. Both
+    documents proposed something, so the batch was applied, and the pair came
+    apart on the one passage the card missed. `verify` reported it afterwards,
+    correctly and far too late to be useful.
+
+    So the pair is compared passage by passage the moment the batch lands, on
+    the documents as the service is serving them, and the document that was
+    left behind is asked -- once, with the exact wording the other one now has
+    -- to say the same thing. That costs one operation, and only when the pair
+    has actually come apart. `--no-repair` reports and stops instead.
+    """
+    from manualbuilder.superdocs import SuperDocsError
+
+    drifts = session.drifted(session.read_pair(client, published), spec)
+    if not drifts:
+        return True
+
+    print(f"\n{_bold('the pair came apart on ' + str(len(drifts)) + ' passage(s):')}")
+    for drift in drifts:
+        behind = drift.lagging or "one document"
+        # The words that differ, not the two passages: they are near-identical
+        # by construction, so printing both truncates to the same 120
+        # characters and shows a reader nothing at all.
+        print(
+            f"  {drift.label:<22} {behind} still reads the way it did before "
+            f"the edit ({vf.difference(drift.behind, drift.ahead)})"
+        )
+        print(_dim(f"    {drift.behind[:110]}…"))
+
+    stuck = [drift for drift in drifts if not drift.repairable]
+    if stuck or skip:
+        print(
+            "\n"
+            + _red("the manual and the card disagree.")
+            + (
+                " Both documents have moved, and differently, so which wording\n"
+                "was meant is a question for a person rather than for another turn."
+                if stuck
+                else " Not repaired: --no-repair."
+            )
+        )
+        _next(
+            'manualbuilder edit "…" to say it again for both documents',
+            "manualbuilder verify to see the disagreement in full",
+        )
+        return False
+
+    print(_dim("\nasking the document that lagged to say what the other one says (1 operation)"))
+    try:
+        changes = session.realign(client, published, drifts)
+    except SuperDocsError as exc:
+        print(f"\n{_red('REFUSED')}: {exc}")
+        _next("manualbuilder approve --discard to free the session; nothing was applied")
+        return False
+
+    session.approve_all(client, published, changes)
+    for change in changes:
+        print(
+            f"  {_green('approved')}  {change.change_id}  "
+            f"{published.name_for(change.document_id or '')}"
+        )
+    _settle(client, published, changes)
+
+    left = session.drifted(session.read_pair(client, published), spec)
+    if left:
+        print("\n" + _red("the pair still disagrees on: ") + ", ".join(d.label for d in left))
+        _next('manualbuilder edit "…" to say it again for both documents')
+        return False
+    print(_green("the manual and the card agree again, word for word."))
+    return True
 
 
 def cmd_sync(args) -> int:
@@ -658,6 +820,7 @@ def cmd_sync(args) -> int:
 
         results = session.approve_all(client, published, changes)
         print(_green(f"approved {len(changes)} swap(s) across {len(results)} turn(s)"))
+        _settle(client, published, changes)
         _next("manualbuilder verify to confirm the pair still agrees, pointing at the new diagrams")
     path.unlink(missing_ok=True)
     return 0
@@ -799,16 +962,44 @@ def cmd_verify(args) -> int:
     target = OUT / "served"
     target.mkdir(parents=True, exist_ok=True)
 
-    served: dict[str, str] = {}
-    with _client() as client:
-        for document_id in published.document_ids:
-            name = published.name_for(document_id)
-            html = client.document_html(published.durable_for(document_id))
+    def read_pair(client) -> dict[str, str]:
+        served = session.read_pair(client, published)
+        for name, html in served.items():
             (target / f"{name.replace(' ', '-')}.html").write_text(html, encoding="utf-8")
-            served[name] = html
-    print(f"read both documents by id into {target}/ (no quota spent)\n")
+        return served
 
-    findings = vf.verify(served, published.images, spec)
+    stale = False
+    with _client() as client:
+        served = read_pair(client)
+        print(f"read both documents by id into {target}/ (no quota spent)\n")
+        findings = vf.verify(served, published.images, spec)
+
+        # A read taken shortly after an approval can still be the pre-approval
+        # document -- the whole reason `approve` now waits for the read side
+        # before it returns. This command is also run on its own, hours or
+        # machines away from whatever approved last, so it does not get to
+        # assume that wait happened: one failing read buys one re-read, which
+        # is free, before anybody is told the pair is wrong.
+        if vf.failed(findings):
+            print(
+                _dim(
+                    f"{len(vf.failed(findings))} check(s) failed on this read. A read "
+                    f"taken just after an approval can still be the pre-approval "
+                    f"document, so this is read once more before it is reported."
+                )
+            )
+            time.sleep(session.SETTLE_POLL)
+            served = read_pair(client)
+            findings = vf.verify(served, published.images, spec)
+            stale = not vf.failed(findings)
+            print(
+                _dim(
+                    "the first read was stale; what follows is the re-read.\n"
+                    if stale
+                    else "the re-read says the same thing.\n"
+                )
+            )
+
     for finding in findings:
         # Padded before it is coloured, same reason as `publish`'s document
         # column: an escape code has visible width to `str.format`.
@@ -895,6 +1086,15 @@ def main(argv: list[str] | None = None) -> int:
         "--discard",
         action="store_true",
         help="throw the whole batch away and unblock the session",
+    )
+    approve.add_argument(
+        "--no-repair",
+        action="store_true",
+        help=(
+            "report a passage that moved in only one of the two documents "
+            "instead of asking the other one to catch up (which costs an "
+            "operation)"
+        ),
     )
     _published_args(approve)
 

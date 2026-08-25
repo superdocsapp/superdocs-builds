@@ -353,6 +353,10 @@ def test_verify_reports_a_document_that_is_not_what_was_published(monkeypatch, t
 
     monkeypatch.setattr(cli, "OUT", out)
     monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    # A failing read buys one re-read before it is reported, and the wait
+    # between them is real seconds. Nothing here is lagging, so the test does
+    # not spend them.
+    monkeypatch.setattr(cli.session, "SETTLE_POLL", 0.0)
     monkeypatch.chdir(PROJECT_ROOT)
 
     code = cli.main(["verify"])
@@ -361,6 +365,72 @@ def test_verify_reports_a_document_that_is_not_what_was_published(monkeypatch, t
     assert "FAIL" in printed and "breakdown" in printed
     assert "older drawing" in printed
     assert "not what this program recorded publishing" in printed
+    assert "the re-read says the same thing" in printed, "a real failure is still a failure"
+
+
+def test_verify_reads_again_before_it_calls_a_lagging_read_a_failure(monkeypatch, tmp_path, capsys):
+    """The false failure this command is most likely to produce, and does not.
+
+    A read taken shortly after an approval can still be the pre-approval
+    document -- nine figures still pointing at the previous drawings, on a pair
+    that had already been swapped correctly (BUGS #10). Reported as-is that is
+    `verify` announcing the service holds something other than what was
+    published, about documents that are right. So a failing read is read once
+    more, free, before anybody is told anything."""
+    from manualbuilder import projections as pj
+    from manualbuilder import verify as vf
+    from manualbuilder.spec import load_spec
+
+    from .test_verify import served, urls
+
+    spec = load_spec(PROJECT_ROOT / "spec" / "halyard_m1.yaml")
+    images = urls(spec)
+    stale = dict(images, **{pj.BREAKDOWN: "https://storage.example/img/old.svg"})
+    reads: list[str] = []
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def document_html(self, durable_id):
+            role = vf.MANUAL if durable_id == "uuid-m" else vf.CARD
+            reads.append(role)
+            # The first read of each document is the pre-approval one; the
+            # second is what the service settles on, with nothing done in
+            # between. That is the observed behaviour, not a contrived one.
+            settled = reads.count(role) > 1
+            return served(spec, role, images if settled else stale)
+
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "published.json").write_text(
+        json.dumps(
+            {
+                "manual_id": "doc_m",
+                "card_id": "doc_c",
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
+                "language": "",
+                "images": images,
+            }
+        )
+    )
+
+    monkeypatch.setattr(cli, "OUT", out)
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    monkeypatch.setattr(cli.session, "SETTLE_POLL", 0.0)
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    code = cli.main(["verify"])
+    printed = capsys.readouterr().out
+    assert code == 0, "a stale first read is not the pair being wrong"
+    assert "the first read was stale" in printed, "the re-read has to be visible, not silent"
+    assert "0 failed" in printed
+    # And what lands in out/served/ is the document as it actually is now.
+    assert "old.svg" not in (out / "served" / "quick-start-card.html").read_text()
 
 
 def test_verify_refuses_a_publication_with_no_durable_ids(monkeypatch, tmp_path):

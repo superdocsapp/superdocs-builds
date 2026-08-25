@@ -581,3 +581,88 @@ def test_a_document_with_no_durable_id_recorded_says_so():
 
     with pytest.raises(SuperDocsError, match="no durable id recorded"):
         publication.ensure_sessions(client)
+
+
+# --------------------------------- the read that lags the approval --
+
+
+class _Lagging:
+    """A service that keeps serving the pre-approval document for a few reads.
+
+    Which is what the real one did: nine diagram swaps approved, `200`, every
+    change accepted -- and the next command, reading each document back by its
+    durable id seconds later, got all nine figures still pointing at the
+    previous drawings. A later read, with nothing done in between, had the new
+    ones. BUGS #10 has the same shape on `export`.
+    """
+
+    def __init__(self, before: str, after: str, stale_reads: int):
+        self.before, self.after, self.stale_reads = before, after, stale_reads
+        self.reads = 0
+
+    def document_html(self, durable_id: str) -> str:
+        self.reads += 1
+        return self.before if self.reads <= self.stale_reads else self.after
+
+
+def _settling(stale_reads: int) -> tuple[_Lagging, session.Publication, list[ProposedChange]]:
+    old, new = "https://cdn.example/step_laser-v1.svg", IMAGES[LASER]
+    client = _Lagging(
+        before=figure(LASER, old, chunked=True),
+        after=figure(LASER, new, chunked=True),
+        stale_reads=stale_reads,
+    )
+    publication = session.Publication(
+        manual_id="doc_manual",
+        card_id="doc_card",
+        sessions={"doc_manual": "s_manual", "doc_card": "s_card"},
+        durable={"doc_manual": "dur_manual", "doc_card": "dur_card"},
+    )
+    return client, publication, [swap(figure(LASER, new, chunked=True))]
+
+
+def test_a_document_already_serving_the_change_is_not_waited_on():
+    """The common case, and it must cost nothing: one read, no sleep."""
+    client, publication, changes = _settling(stale_reads=0)
+
+    report = session.settle(client, publication, changes, timeout=5.0, poll=0.01)
+
+    assert report.settled and report.outstanding == {}
+    assert report.reads == 1, "asking twice about a document that already agrees is waste"
+
+
+def test_settle_waits_out_a_read_that_is_still_pre_approval():
+    """The live failure, made local. The approval is applied; the read side
+    catches up two reads later; `settle` returns when it does rather than
+    handing the caller the stale answer it happened to get first."""
+    client, publication, changes = _settling(stale_reads=2)
+
+    report = session.settle(client, publication, changes, timeout=5.0, poll=0.01)
+
+    assert report.settled and report.outstanding == {}
+    assert report.reads == 3, "it left as soon as the document agreed, not after a fixed wait"
+
+
+def test_a_change_that_never_arrives_is_reported_rather_than_waited_on_forever():
+    """The budget runs out and the caller is told which chunks are still
+    serving the old content. Reporting it is the point: an approval the
+    service has accepted and is not serving is worth knowing about, and is not
+    something more reading can fix."""
+    client, publication, changes = _settling(stale_reads=10_000)
+
+    report = session.settle(client, publication, changes, timeout=0.05, poll=0.01)
+
+    assert not report.settled
+    assert report.outstanding == {"doc_manual": ["chunk_12"]}
+    assert report.waited < 1.0, "the budget is a budget"
+
+
+def test_the_signature_on_a_served_image_is_not_a_change_that_has_not_arrived():
+    """Every image comes back signed, and the signature differs on every read.
+    Comparing URLs as strings would make a settled document look like one that
+    never catches up, and `settle` would then wait out its whole budget and
+    warn about a document that is entirely correct."""
+    new = IMAGES[LASER]
+    signed = new + "?X-Goog-Expires=604800&X-Goog-Signature=" + "a" * 512
+
+    assert session.arrived(figure(LASER, signed, chunked=True), swap(figure(LASER, new)))

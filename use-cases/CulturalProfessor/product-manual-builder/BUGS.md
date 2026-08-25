@@ -15,14 +15,18 @@ from `/openapi.json` alone. Item 20 is from **2026-08-13**, found while adding
 a test that parks and denies a real batch to prove the busy-session guard
 against the live service rather than a mock of it. Item 21 is from
 **2026-08-14**, found by watching a real, narrated run of this build's own
-commands rather than by testing any one of them in isolation.
+commands rather than by testing any one of them in isolation. Item 22 is from
+**2026-08-25**, found the same way — by watching that narrated run fail its own
+verification stage, on a pair of documents that turned out to be correct. Item
+23 is from that same run, one stage later: the pair really had come apart, on
+one passage, and nothing in this build noticed until `verify` did.
 
 They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
 collects the same list.
 
-**Every item says whose it is.** All twenty-one are SuperDocs, because this build
-talks to nothing else — but three of them are the *model's* behaviour reached
+**Every item says whose it is.** All twenty-three are SuperDocs, because this
+build talks to nothing else — but four of them are the *model's* behaviour reached
 through the API rather than a defect in the API itself, and calling those bugs
 would be unfair to the service. They are marked as such. The sibling build in
 `extensions/CulturalProfessor/runbook-reconciler` carries the Confluence Cloud
@@ -30,7 +34,7 @@ findings, and labels its items the same way.
 
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
-Items 1–7 are ranked by how much they cost me; 8–21 are appended in the order
+Items 1–7 are ranked by how much they cost me; 8–23 are appended in the order
 they turned up rather than renumbering the list. Item 13 is an observation
 without a reproduction, and says so.
 
@@ -40,14 +44,14 @@ did not, and four items are weakened or retracted there. They are corrected in
 place rather than deleted, because a bug report that quietly edits away its
 mistakes is not one anybody should trust.
 
-**Items 2, 10 and 20 are not the latency work.** The known-issues note in the
-task document says latency is being worked on next, and these three are easy
+**Items 2, 10, 20 and 22 are not the latency work.** The known-issues note in
+the task document says latency is being worked on next, and these four are easy
 to misread as the same thing because they are also about timing. They are not:
 a slow call is one that takes a while and then answers correctly; these are
 calls that answer immediately and *incorrectly* for a short window — a write
 returns `200` and a different read endpoint (session focus, document export,
-a session's job list) disagrees with it until it catches up. Three different
-endpoint pairs, the same shape each time. Making every call faster would not
+a session's job list, a document read by id) disagrees with it until it catches
+up. Four different endpoint pairs, the same shape each time. Making every call faster would not
 obviously close that window; only making the read agree with the write it
 follows would.
 
@@ -441,6 +445,11 @@ worked.
 returned, or have the approve reply carry the resulting document version so a
 caller can wait for it. Both would also fix the honest version of the problem,
 which is that right now the only way to be sure is to sleep and hope.
+
+**Update, 2026-08-25.** The same window is on `GET /v1/documents/{id}` — the
+read this build uses precisely *because* it is not export, and the one the
+service's own agent guide recommends for verification. See item 22, which has
+the second observation this item was missing.
 
 ---
 
@@ -999,6 +1008,132 @@ a second, worse consequence behind it: a per-turn way to scope a turn to the
 message and the document, ignoring session history, so an integrator does not
 have to discover — by shipping it — that a stray wrong answer earlier in a
 session can become a fabricated fact two turns later.
+
+---
+
+## 22. A document read by id lags an approval too, and `verify` calls a correct pair wrong
+
+**Whose:** SuperDocs API
+
+**Severity: medium — the free verification path this build is built around
+reports a correct pair as wrong, in the one command whose whole job is to be
+believed.**
+
+**What I did.** Ran the narrated demo end to end. `sync` re-rendered the eight
+diagrams, uploaded them, and proposed nine `<img src>` swaps across the two
+documents; `approve` accepted all nine (`POST /v1/chat/{session_id}/approve`,
+`200`, two turns); then — one keypress later, several seconds — `verify` read
+both documents back with `GET /v1/documents/{durable_id}?include_html=true`.
+
+**What I expected.** Item 10 is this shape on `export`, and `verify` reads by id
+rather than exporting for an unrelated reason (a session serves whatever it is
+focused on; a durable id names the document). I expected the read the service's
+own agent guide points at — *"Verify for free — never export just to check"* —
+to agree with an approval that had already returned.
+
+**What happened.** All nine figures came back pointing at the *previous*
+drawings, and `verify` reported, in red, that the documents on the service were
+not what this program recorded publishing. They were. The same command, re-run
+later with nothing whatsoever done in between, passed 18 of 18 — every figure
+on the new drawing.
+
+One detail makes this sharper than a plain snapshot read: the torque edit
+approved two stages *earlier* in the same run **was** visible in that same stale
+response. So the read is not pinned to some older version of the document — the
+earlier write had settled and the recent one had not, in one body.
+
+Same precision as item 10: one clean observation of the failing window plus its
+passing re-read. I have not measured how long the window is, and measuring it
+properly costs operations. What I can say is that it outlasted a human pressing
+Enter between two commands, which is the interval any narrated run or shell
+one-liner will have.
+
+**Reproduce.** Approve a multi-chunk batch, then `GET
+/v1/documents/{durable_id}?include_html=true` for each edited document within a
+few seconds and compare each chunk against the `new_html` that was approved for
+it. Re-read a minute later.
+
+**Cost to me.** The demo's own verification stage failed, in front of whoever is
+watching it, about a pair of documents that were entirely correct — and the
+failure it prints is the most alarming one this build has.
+
+**Workaround.** `approve` now waits for the read side before it returns:
+`session.settle()` re-reads each edited document by durable id — free, no quota
+— until every approved chunk's content is actually being served, giving up after
+30s with a warning rather than a silent pass. Images are compared by URL *path*,
+because the query is a fresh signature on every read (item 7). `verify` also
+buys one free re-read before it reports a failure, since it is run on its own as
+well, and says which read it is reporting.
+
+**Suggested fix.** Item 10's, with a second endpoint behind it now: have the
+approve reply carry the resulting document version, so a caller can wait for
+that version instead of sleeping and hoping. Failing that, the read-by-id path
+is the one worth making consistent first — it is what the documentation tells
+integrators to verify with, so it is the one whose disagreement gets believed.
+
+---
+
+## 23. One instruction finds three occurrences in one document and two in the other
+
+**Whose:** the model, through SuperDocs
+
+**Severity: high — the two documents end up disagreeing, and every guard this
+build had passed the batch that did it.**
+
+**What I did.** Sent one instruction — *"raise the rail torque to 1.6 N·m"* —
+as two turns, one per document, which is the only shape the service offers
+(there is no call that edits two documents at once; see the top of
+`session.py`). Both turns are `POST /v1/chat/async`, both park at
+`awaiting_approval`, and approval is one decision covering both.
+
+**What I expected.** The same instruction against two documents that share
+their wording to find the same passages in both — or, failing that, for
+something to notice that it had not.
+
+**What happened.** The manual's turn proposed **three** changes: the rails
+step, the gantry step, and the troubleshooting table's own *"re-torque the
+rails alternately to 1.2 N·m"* row. The card's turn proposed **two**: the rails
+step and the gantry step. The card carries that same troubleshooting fix, word
+for word, and its turn left it alone. Approved, the pair shipped with the
+manual reading 1.6 N·m in troubleshooting and the card reading 1.2 N·m in the
+same sentence — the exact failure this build exists to prevent, arrived at
+through the path built to prevent it.
+
+Every guard passed it, and each of them was right about the question it asks.
+`assert_touched_both_or_absent` asks whether both documents proposed
+*something* — both did. `assert_only_the_image_changed` is about diagram
+swaps. `verify` caught it afterwards, correctly, on documents that were
+already published that way.
+
+This is the model, not the API: the service applied precisely what was
+approved. It is in this file anyway, because it is a property of building a
+pair-consistency product on a per-document chat turn, and any integrator doing
+the same thing will meet it.
+
+**Reproduce.** Publish two documents that share a passage verbatim, where the
+fact to change appears in three places in one and three in the other. Send the
+same instruction to each as its own turn. Compare the two change lists by
+passage rather than by count.
+
+**Cost to me.** One demo run's pair, and the realisation that "both documents
+changed" is a much weaker claim than it reads as.
+
+**Workaround.** `approve` now compares the pair passage by passage the moment
+the batch lands — on the served documents, by durable id, free — and any shared
+passage that moved in one document and not the other is repaired rather than
+reported: the document that was left behind is sent one more turn containing
+the other document's exact new wording verbatim, and what comes back is checked
+to be that substitution and nothing else (`assert_only_the_lagging_passage_moved`)
+before it is approved. It costs one operation, and only when the pair has
+actually come apart. `approve --no-repair` reports and stops. Where both
+documents moved and moved *differently*, there is no straggler and no way to
+tell which wording was meant, so it refuses and says so rather than picking one.
+
+**Suggested fix.** For the service: a way to run one turn against several
+documents that actually edits all of them, so "the same edit in both" is one
+operation with one outcome instead of two turns that can disagree. Failing
+that, a reply that says which passages a turn considered and rejected would
+make the gap visible without a second read.
 
 ---
 

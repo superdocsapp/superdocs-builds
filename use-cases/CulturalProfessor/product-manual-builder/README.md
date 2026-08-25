@@ -203,6 +203,20 @@ torque figure, the live service also offered to change the gantry step, which
 legitimately shares the number. Approve the two you asked for, refuse the two
 you did not, in one review.
 
+`approve` does two more things once the batch is applied, and both of them are
+live findings rather than design. It **waits for the read side to serve what it
+just applied** — an approval returns before a read agrees with it, and `verify`
+run in the next breath reported nine correct figures as nine wrong ones
+([#22](BUGS.md)). And it **compares the pair passage by passage**, on the served
+documents, because one instruction does not find the same passages in both: the
+manual's turn found the torque figure in three places and the card's turn found
+two of its three, so the pair shipped disagreeing about a troubleshooting line
+([#23](BUGS.md)). A passage that moved in one document and not the other is
+repaired — the straggler gets one more turn carrying the other document's exact
+new wording, checked to be that substitution and nothing else before it is
+approved. That is the only operation `approve` can spend, and it spends it only
+when the pair has come apart. `--no-repair` reports and stops instead.
+
 ```bash
 ./mb ask "what is the rated laser wavelength?"
 ```
@@ -306,8 +320,11 @@ render, because comparing the two is the point. Exports cost no quota.
 `--format` is `pdf` by default and takes any of `docx`, `pdf`, `html`,
 `markdown`, `txt`; anything else is refused by the service with a `422`.
 
-Give it a moment after `approve`, though — see the caveat under [what is
-verified](#what-is-verified-against-the-live-service).
+`approve` no longer returns until the service is serving what it applied, so an
+`export` straight after one is the finished document rather than the previous
+version of it — see the caveat under [what is
+verified](#what-is-verified-against-the-live-service) for what that is working
+around.
 
 Export is *not* how this project checks its work. It renders whatever the
 session is focused on, so it can hand back a valid document that is not the one
@@ -669,7 +686,7 @@ which is exactly how it stayed wrong through nine commits.
 
 ### What broke while building this
 
-[`BUGS.md`](BUGS.md) — twenty-one numbered findings against the live API, each
+[`BUGS.md`](BUGS.md) — twenty-three numbered findings against the live API, each
 with what was expected, what happened, how to reproduce it and what it cost.
 They sit next to the build that found them rather than in a notes file
 somewhere, because most of them are the reason a particular piece of this code
@@ -679,7 +696,14 @@ swap anchors on captions because of #6 and opens a fresh session because of #8;
 by document id rather than by session because of #11; and `ask` opens a fresh
 session of its own, never shared with `edit`, because of #21 — the same root
 cause as #8, found again with a worse consequence once there were two
-different commands able to land in the same session.
+different commands able to land in the same session. `approve` waits for the
+service to actually serve what it just applied, and `verify` re-reads once
+before it calls anything a failure, because of #22: an approval returns before
+the read side agrees with it, and `verify` reported a correct pair as wrong. And
+`approve` compares the pair passage by passage once the batch lands, repairing
+the one document an edit left behind, because of #23 — the same instruction
+found three passages in the manual and two of the card's three, and every guard
+this build had passed that batch.
 
 Item 13 is an observation without a reproduction, and says so. Items 14–19 came
 from a second pass made after reading `docs.superdocs.app` in full rather than

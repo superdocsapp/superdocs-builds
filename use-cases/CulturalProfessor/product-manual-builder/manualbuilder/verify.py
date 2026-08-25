@@ -106,7 +106,13 @@ def text_of(html: str) -> str:
     return _WS.sub(" ", unescape(_TAG.sub(" ", _DROP.sub(" ", html)))).strip()
 
 
-def _needle(text: str) -> str:
+def needle(text: str) -> str:
+    """A passage reduced to the words in it, for comparing against a document.
+
+    Public because `session.drifted` compares the same passages this module
+    compares, and two functions that must agree about what a passage *is* had
+    better be reading it the same way.
+    """
     return _WS.sub(" ", unescape(text)).strip()
 
 
@@ -118,7 +124,7 @@ def passages(html: str) -> list[str]:
     can be found again after somebody edited it.
     """
     body = _DROP.sub(" ", html)
-    found = (_needle(_TAG.sub(" ", m.group(2))) for m in _BLOCK.finditer(body))
+    found = (needle(_TAG.sub(" ", m.group(2))) for m in _BLOCK.finditer(body))
     return [text for text in found if text]
 
 
@@ -138,11 +144,15 @@ def closest(needle: str, candidates: list[str]) -> tuple[str, float]:
     return best, score
 
 
-def _difference(one: str, other: str, limit: int = 8) -> str:
+def difference(one: str, other: str, limit: int = 8) -> str:
     """The words that differ, for a message somebody has to act on.
 
     "the two have come apart" is a true sentence nobody can do anything with.
     `-1.2 +1.6` is the whole story.
+
+    Public because `approve` reports the same disagreement before it repairs
+    it, and two commands describing one difference two different ways is two
+    things for a reader to reconcile.
     """
     words = [
         w
@@ -222,13 +232,9 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
     manual, card = text_of(served[MANUAL]), text_of(served[CARD])
     blocks = {MANUAL: passages(served[MANUAL]), CARD: passages(served[CARD])}
     out: list[Finding] = []
-    items = [("step", step.id, step.body) for step in spec.quick_start()] + [
-        ("fix", fault.id, fault.fix) for fault in spec.quick_start_troubleshooting()
-    ]
-
-    for kind, item_id, body in items:
-        needle = _needle(body)
-        in_manual, in_card = needle in manual, needle in card
+    for kind, item_id, body in session.shared_items(spec):
+        wanted = needle(body)
+        in_manual, in_card = wanted in manual, wanted in card
         label = f"{kind} {item_id}"
 
         if in_manual and in_card:
@@ -243,7 +249,7 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
         # is the claim this build actually makes. The passage each document has
         # in that place is found by how close it still is to the original, and
         # the two are compared against each other.
-        best = {role: closest(needle, blocks[role]) for role in (MANUAL, CARD)}
+        best = {role: closest(wanted, blocks[role]) for role in (MANUAL, CARD)}
         lost = [role for role, (_, score) in best.items() if score < MATCH]
         if lost and (in_manual or in_card):
             # One document still has the sentence exactly as published and the
@@ -278,7 +284,7 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
                     OK,
                     label,
                     "edited since publish, and both documents carry the same new "
-                    f"wording ({_difference(needle, ours, limit=4) or 'reformatted'})",
+                    f"wording ({difference(wanted, ours, limit=4) or 'reformatted'})",
                 )
             )
         else:
@@ -287,7 +293,7 @@ def pair_findings(served: dict[str, str], spec: Spec) -> list[Finding]:
                     FAIL,
                     label,
                     f"the two documents word this differently -- manual vs card: "
-                    f"{_difference(theirs, ours)}",
+                    f"{difference(theirs, ours)}",
                 )
             )
     return out
@@ -310,8 +316,10 @@ __all__ = [
     "OK",
     "Finding",
     "closest",
+    "difference",
     "failed",
     "image_findings",
+    "needle",
     "pair_findings",
     "passages",
     "text_of",
