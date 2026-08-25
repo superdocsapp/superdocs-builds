@@ -1,5 +1,19 @@
 # CHANGELOG — Production Hardening Pass
 
+⚠️ **Verification pending (read this first):** the pass-by-pass "N tests
+pass" counts throughout this file describe what was true *at the time
+that pass was written*, each independently verified in a fresh
+virtualenv when it was made. They do **not** describe the current state
+of the repo. The most recent changes -- fixing redraft grounding/
+quality-gate/consistency staleness and adding CLI exit-code
+documentation (see the final entry at the bottom of this file) -- added
+5 new tests that have **not yet been run in any environment** (the
+sandbox that wrote them had no network access to install `pytest`/
+`flask`/`requests_mock`). Do not cite any count in this file, including
+the "101 tests" below, as the current passing total. Run
+`PYTHONPATH=. pytest tests/ -q` yourself in a fresh virtualenv and use
+that number.
+
 This documents everything changed in this pass, organized by the original
 seven-item plan. All 101 tests pass (`PYTHONPATH=. python -m pytest tests/ -q`
 from the repo root); 22 of those are new.
@@ -1073,3 +1087,83 @@ test suite's own fixtures.
   (Policy Manual RAG, outcome learning loop, real login/accounts, client
   portal, batch mode, encryption at rest, retention automation, load
   testing, i18n).
+
+## Follow-up pass 11 — external review response: redraft staleness bugs, CLI exit-code clarity, doc consistency
+
+An external reviewer of the previous ZIP found two real, still-open gaps
+in the redraft flow and one CLI ambiguity worth fixing. All three are
+fixed below. **Unlike every prior pass in this file, the tests below have
+not been executed** -- see the warning at the top of this file for why.
+
+### Bug 1: redraft grounding excluded the matched prior petition argument (`webapp/app.py`)
+`redraft_review_item`'s post-redraft grounding check used
+`[item.request_text] + item.new_evidence` as source material -- missing
+the matched prior-petition argument that `start_review()`'s *initial*
+grounding check does include. A redraft that legitimately leaned on
+something already established in the original petition (e.g. a dollar
+figure from a matched prior argument) was wrongly flagged as
+unsupported. Fixed by pulling `session.petition_matches[request_id][0]`
+(the same lookup `start_review()` uses) into the redraft's source list.
+Manually verified outside pytest: `check_grounding()` called directly
+with and without the prior-argument text on a redraft referencing
+"$58,000" from `sample_petition_arguments.json`'s financial_support
+argument -- flagged as ungrounded without the fix, clean with it.
+
+### Bug 2: redraft never reran the quality gate (`webapp/app.py`)
+When `QUALITY_GATE_ENABLED=1`, redrafting an item changed `reply_text`
+but left `item.quality_verdict`/`item.quality_reasoning` from the
+*original* draft's grading call -- stale the moment the text changed.
+Fixed by calling `grade_draft()` again on redraft, on a fresh grading
+session (`{session_id}-grading-{request_id}-redraft-{uuid}`), same
+"separate session, never pollute the drafting conversation" pattern
+`start_review()` already uses.
+
+### Bug 3: redraft never reran cross-item consistency (`webapp/app.py`)
+`check_cross_item_consistency()` only ran once, inside `start_review()`,
+across the initial draft of every item. A redraft that made one item's
+text newly contradict another (already-drafted) item's text left
+`session.consistency_flags` stale. Fixed by rerunning the check across
+*all* current items' text after every successful redraft and
+overwriting `session.consistency_flags` before saving the session.
+
+### New tests (added, not yet executed -- see warning at top of file)
+- `test_redraft_grounds_against_matched_prior_petition_argument`
+- `test_redraft_reruns_quality_gate_when_enabled`
+- `test_redraft_reruns_cross_item_consistency`
+- `test_cli_exit_code_1_after_override_still_means_export_succeeded`
+- `test_cli_review_flag_export_anyway_logs_explicit_success_message`
+
+### CLI exit-code ambiguity (`rfe_response_builder/generate.py`, `README.md`)
+A reviewer flagged that `--allow-export-with-failures` (and the
+interactive "export anyway?" prompt) could produce "export succeeded,
+exit code 1" -- which reads as ambiguous automation output. Kept exit
+code `1` (rather than switching to `0` after an override) since silently
+downgrading a known validation failure to a clean exit code is worse for
+CI than an exit code that needs one extra file-existence check. Made the
+convention explicit instead: both code paths now log `export SUCCEEDED
+(file written to <path>) -- exit code is 1 only to flag that N item(s)
+reached export unanswered; this is not an export failure.`, the
+`--allow-export-with-failures` `--help` text documents it, and the
+README gained a dedicated "Exit codes" section with a table and the same
+explanation.
+
+### README/changelog consistency (this file's own doc-accuracy bug, found by the same reviewer)
+The README's Testing section claimed "309 passed" and described the
+suite as fully verified in a fresh virtualenv -- true when that line was
+written, but no longer true once the tests above were added without
+being run. Fixed by replacing the stale count with an explicit
+verification-pending notice (see README's Testing section) and adding
+the warning banner at the top of this file. This is exactly the kind of
+gap the "What this means for every 'N tests passing' claim in this file
+above" note (pass 7) already warned about -- it recurred here because a
+claim can go stale the moment new tests are added after it, not just
+when a bug is found.
+
+**Verification pending, explicitly:** run
+`PYTHONPATH=. pytest tests/ -q` in a fresh virtualenv and confirm
+`No FAILED` before relying on this pass's fixes being production-ready.
+The logic was checked by hand (direct calls to `check_grounding`,
+`check_cross_item_consistency`, and `build_response_packet` against a
+fake client, and `python -m py_compile` across every changed file) but
+that is not a substitute for an actual pytest run.
+

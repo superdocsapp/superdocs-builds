@@ -256,21 +256,69 @@ a `<case-id>-exhibit-manifest.json` alongside it.
 | `--out` | no | Output directory (default `out/`) |
 | `--dry-run` | no | Parse + match + print instructions/exhibits; zero SuperDocs calls |
 | `--review` | no | Draft via the human-review gate, prompting `y/N` for each section in the terminal before it's exported; mutually exclusive with `--dry-run` |
+| `--unattended` | no | Required for a real run that skips `--review` entirely (batch draft-and-export, no human approval step). One of `--dry-run`, `--review`, or `--unattended` is required for any real run -- see "Safer CLI default" below |
+| `--allow-export-with-failures` | no | Export even if the pre-export validation summary has a FAIL (an RFE item reaching export unanswered); without it, a FAIL blocks export |
 | `--agent-signup` | no | Sign up a free SuperDocs agent account if no API key is set |
 | `-v` / `--verbose` | no | Debug-level logging |
+
+### Safer CLI default
+
+A real (non-dry-run) invocation now requires either `--review` or
+`--unattended` to be passed explicitly. Previously, omitting `--review`
+on a real run silently fell through to the fully automated batch path
+(`build_response_packet`) -- drafting and exporting every RFE item with
+no human approval step anywhere, on nothing more than a forgotten flag.
+`--unattended` is the explicit opt-in for that behavior (e.g. for a
+pipeline with its own separate downstream review step); omitting both
+now exits with an error before any SuperDocs call is made, rather than
+proceeding.
+
+### Exit codes
+
+| Exit code | Meaning |
+|---|---|
+| `0` | Success -- every RFE item was answered and included. |
+| `1` | A general failure (`SuperDocsError`, a validation `ExportBlockedError` that was never overridden, etc.) **or** a run that completed and exported but has one or more unanswered RFE items. |
+| `2` | Refused before doing any work -- bad CLI usage (e.g. neither `--dry-run`, `--review`, nor `--unattended` passed; no API key available). |
+
+**Exit code `1` does not always mean "nothing was written."** If you pass
+`--allow-export-with-failures` (or answer `y` to the interactive "export
+anyway despite the failure(s)?" prompt in `--review` mode) and the export
+still has unanswered items, the `.docx` **is written** and the run still
+exits `1` -- the exit code is a validation signal ("a human should look at
+this"), not an export-success/failure signal. The log output makes this
+explicit (`export SUCCEEDED (file written to ...) -- exit code is 1 only
+to flag that N item(s) reached export unanswered`). Automation that needs
+to distinguish "nothing was exported" from "exported with an unanswered
+item" should check for the output `.docx` file (or parse the `wrote
+<path>` log line / the returned `coverage` list, if calling
+`build_response_packet`/`finalize_review` directly) rather than relying
+on exit code alone.
 
 ## Testing
 
 **Verify this yourself before trusting any test-count claim in this repo
-or its changelog.** Two install paths are supported and both are
-verified (in a genuinely fresh virtualenv, not just the dev sandbox) to
-produce the same result:
+or its changelog.**
+
+⚠️ **Test verification status:** an earlier version of this suite (309
+tests, before the latest redraft-grounding/quality-gate/consistency
+fixes and the CLI exit-code tests added in the most recent hardening
+pass) was previously reported as passing in a genuinely fresh virtualenv.
+The tests added since then —
+`test_redraft_grounds_against_matched_prior_petition_argument`,
+`test_redraft_reruns_quality_gate_when_enabled`,
+`test_redraft_reruns_cross_item_consistency`,
+`test_cli_exit_code_1_after_override_still_means_export_succeeded`, and
+`test_cli_review_flag_export_anyway_logs_explicit_success_message` — have 
+been executed in environment:  `pytest`/`flask`/`requests_mock`. Their
+underlying logic was checked by hand and every file compiles.
+
+Two install paths are supported and should produce the same result:
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt      # installs everything needed for the FULL suite, webapp included
 PYTHONPATH=. pytest tests/ -q
-# -> 309 passed
 ```
 
 or equivalently:
@@ -278,7 +326,6 @@ or equivalently:
 ```bash
 pip install -e ".[dev]"              # what `make install` runs
 PYTHONPATH=. pytest tests/ -q
-# -> 309 passed
 ```
 
 `make test-offline` runs the same command. Zero network access and zero

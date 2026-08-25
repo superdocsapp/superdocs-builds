@@ -110,3 +110,52 @@ def test_fail_takes_precedence_over_warn_in_overall_status():
 def test_empty_coverage_list_does_not_crash():
     summary = build_validation_summary([])
     assert summary.overall_status == CheckStatus.PASS
+
+
+# --- fact-grounding / quality-gate rows (item #9) ------------------------------
+
+def test_grounding_warns_when_ungrounded_facts_present():
+    coverage = [_row("1", True)]
+    summary = build_validation_summary(coverage, ungrounded_by_request={"1": ["a stray unsupported date"]})
+    check = next(c for c in summary.checks if c.label == "Draft text checked for unsupported facts")
+    assert check.status == CheckStatus.WARN
+    assert "1" in check.detail
+    assert summary.overall_status == CheckStatus.WARN
+
+
+def test_grounding_passes_when_ungrounded_by_request_supplied_but_empty():
+    coverage = [_row("1", True)]
+    summary = build_validation_summary(coverage, ungrounded_by_request={})
+    check = next(c for c in summary.checks if c.label == "Draft text checked for unsupported facts")
+    assert check.status == CheckStatus.PASS
+
+
+def test_grounding_passes_trivially_when_not_supplied_at_all():
+    coverage = [_row("1", True)]
+    summary = build_validation_summary(coverage)
+    check = next(c for c in summary.checks if c.label == "Draft text checked for unsupported facts")
+    assert check.status == CheckStatus.PASS
+    assert "not checked" in check.detail.lower()
+
+
+def test_quality_gate_warns_on_weak_verdicts():
+    coverage = [_row("1", True), _row("2", True)]
+    summary = build_validation_summary(coverage, weak_quality_request_ids=["2"])
+    check = next(c for c in summary.checks if c.label == "Quality gate verdicts")
+    assert check.status == CheckStatus.WARN
+    assert "2" in check.detail
+    assert summary.overall_status == CheckStatus.WARN
+
+
+def test_quality_gate_passes_when_no_weak_verdicts():
+    coverage = [_row("1", True)]
+    summary = build_validation_summary(coverage, weak_quality_request_ids=[])
+    check = next(c for c in summary.checks if c.label == "Quality gate verdicts")
+    assert check.status == CheckStatus.PASS
+
+
+def test_quality_gate_passes_trivially_when_not_supplied():
+    coverage = [_row("1", True)]
+    summary = build_validation_summary(coverage)
+    check = next(c for c in summary.checks if c.label == "Quality gate verdicts")
+    assert check.status == CheckStatus.PASS

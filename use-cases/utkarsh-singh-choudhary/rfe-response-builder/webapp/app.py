@@ -46,6 +46,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from rfe_response_builder.audit import log_decision
+from rfe_response_builder.consistency import check_cross_item_consistency
 from rfe_response_builder.document_extraction import DocumentExtractionError, extract_text
 from rfe_response_builder.firm_templates import (
     FirmTemplate,
@@ -54,8 +55,14 @@ from rfe_response_builder.firm_templates import (
 )
 from rfe_response_builder.generate import plan_response
 from rfe_response_builder.grounding import check_grounding
+from rfe_response_builder.judge import QualityVerdict, grade_draft
 from rfe_response_builder.logging_config import configure_logging, set_case_id, set_request_id
-from rfe_response_builder.review import finalize_review, start_review
+from rfe_response_builder.review import (
+    STATUS_NO_PENDING_CHANGE,
+    STATUS_PENDING_REVIEW,
+    finalize_review,
+    start_review,
+)
 from rfe_response_builder.rfe import (
     NewEvidenceCatalog,
     NewEvidenceEntry,
@@ -66,6 +73,7 @@ from rfe_response_builder.rfe import (
 )
 from rfe_response_builder.schemas import SchemaValidationError, validate_evidence_json, validate_petition_json
 from rfe_response_builder.superdocs_client import SuperDocsClient, SuperDocsError
+from rfe_response_builder.validation import ExportBlockedError
 from rfe_response_builder.versioning import VersionStore, diff_versions, redraft_item
 
 configure_logging()
@@ -564,12 +572,54 @@ def redraft_review_item(review_id, request_id):
     item.reply_text = reply_text
     item.status = status
     item.job_id = chunk_id
+
     # Re-run the fact-grounding check against the new text -- a redraft
     # can just as easily introduce an unsupported detail as an initial
-    # draft can.
-    source_texts = [item.request_text] + list(item.new_evidence)
+    # draft can. Source material must match what start_review() used for
+    # the initial draft: the RFE request text, the matched prior petition
+    # argument (if any), and matched new evidence -- NOT just request text
+    # + new evidence, or a redraft that legitimately leans on something
+    # already established in the original petition gets wrongly flagged
+    # as unsupported.
+    prior_matches = session.petition_matches.get(request_id, [])
+    source_texts = [item.request_text]
+    if prior_matches:
+        source_texts.append(prior_matches[0].text)
+    source_texts.extend(item.new_evidence)
     grounding_result = check_grounding(reply_text, source_texts)
     item.ungrounded_facts = grounding_result.ungrounded_facts
+
+    # Re-run the quality gate too, if enabled -- the old verdict was
+    # graded against the pre-redraft text and is stale the moment
+    # reply_text changes. Uses a fresh grading session, same as the
+    # initial draft, so grading turns never pollute the drafting
+    # document's own conversation.
+    if os.environ.get("QUALITY_GATE_ENABLED", "").lower() in {"1", "true", "yes"}:
+        if status in (STATUS_PENDING_REVIEW, STATUS_NO_PENDING_CHANGE):
+            try:
+                grading = grade_draft(
+                    client, f"{session.session_id}-grading-{request_id}-redraft-{uuid.uuid4().hex[:8]}",
+                    item.request_text, reply_text,
+                )
+                item.quality_verdict = grading.verdict.value
+                item.quality_reasoning = grading.reasoning
+            except SuperDocsError as e:
+                logger.error("redraft quality grading failed for review %s item %s: %s", review_id, request_id, e)
+                item.quality_verdict = QualityVerdict.UNKNOWN.value
+                item.quality_reasoning = ""
+        else:
+            item.quality_verdict = QualityVerdict.UNKNOWN.value
+            item.quality_reasoning = ""
+
+    # Re-run cross-item consistency across ALL current items -- a redraft
+    # changes only this item's text, but consistency is a pairwise check
+    # across every item, so any flag involving this item (in either
+    # direction) is now potentially stale and must be recalculated
+    # against the full current set, not just this one item.
+    session.consistency_flags = check_cross_item_consistency(
+        [(i.request_id, i.reply_text) for i in session.items if i.reply_text]
+    )
+
     _review_store.put(review_id, session)
 
     flash(f"Item {request_id} redrafted based on your feedback -- review the new version below.")
@@ -609,11 +659,15 @@ def approve_review(review_id):
         flash("SUPERDOCS_API_KEY is not configured on this server -- cannot finalize a review.")
         return redirect(url_for("index"))
 
+    allow_export_with_failures = request.form.get("allow_export_with_failures") == "on"
+
     client = SuperDocsClient(api_key=api_key)
     try:
         with tempfile.TemporaryDirectory() as tmp:
             out_dir = Path(tmp)
-            out_path, coverage = finalize_review(client, session, decisions, out_dir)
+            out_path, coverage = finalize_review(
+                client, session, decisions, out_dir, allow_export_with_failures=allow_export_with_failures,
+            )
             unanswered = [row for row in coverage if not row.answered]
             if unanswered:
                 logger.warning("case %s: %d/%d RFE item(s) NOT answered", session.safe_case_id, len(unanswered), len(coverage))
@@ -622,6 +676,12 @@ def approve_review(review_id):
                 logger.info("case %s: generated response, all %d item(s) answered", session.safe_case_id, len(coverage))
             _delete_review_session(review_id)
             return send_file(out_path, as_attachment=True, download_name=out_path.name)
+    except ExportBlockedError as e:
+        # session was left as-is in the store (finalize_review raised before
+        # touching SuperDocs' export endpoint), so the reviewer can just
+        # check the box and resubmit rather than starting the review over.
+        flash(f"Export blocked: {e} Check \"Export anyway\" below and resubmit if that's really what you want.")
+        return redirect(url_for("review", review_id=review_id))
     except SuperDocsError as e:
         logger.error("SuperDocs API error while finalizing review: %s", e)
         flash(f"SuperDocs API error: {e}")

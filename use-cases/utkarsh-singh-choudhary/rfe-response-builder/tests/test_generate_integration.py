@@ -137,9 +137,13 @@ def test_build_response_packet_continues_after_one_item_persistently_fails(clien
         m.post("https://api.superdocs.app/v1/chat", json=chat_callback)
         m.post("https://api.superdocs.app/v1/documents/export", content=b"FAKE_DOCX")
 
+        # A NOT ANSWERED item is a validation FAIL (see validation.py), so
+        # export is blocked by default now -- must opt in explicitly to
+        # get the partial packet.
         out_path, coverage = build_response_packet(
             client, "rfe-test-session-2", "CASE-2002", "Marco Alvarez",
             NOTICE_TEXT, petition, tmp_path,
+            allow_export_with_failures=True,
         )
 
         unanswered = [row for row in coverage if not row.answered]
@@ -486,6 +490,7 @@ def test_non_substantive_reply_marked_not_answered_despite_200(client, tmp_path)
         out_path, coverage = build_response_packet(
             client, "rfe-test-session-4", "CASE-2002", "Marco Alvarez",
             NOTICE_TEXT, petition, tmp_path,
+            allow_export_with_failures=True,
         )
 
     assert not any(row.answered for row in coverage)
@@ -648,6 +653,58 @@ def test_agent_signup_does_not_retry_non_transient_4xx(tmp_path, monkeypatch):
     assert not cred_path.exists()
 
 
+def test_cli_main_refuses_real_run_without_review_or_unattended(tmp_path, monkeypatch):
+    """Safer CLI default (item #13): a real (non-dry-run) invocation
+    with neither --review nor --unattended must be refused up front,
+    not silently fall through to an unreviewed batch export."""
+    from rfe_response_builder.generate import main
+
+    notice_path = tmp_path / "notice.txt"
+    notice_path.write_text(NOTICE_TEXT)
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+
+    with requests_mock.Mocker() as m:
+        exit_code = main([
+            "--notice", str(notice_path),
+            "--petition", str(DATA_DIR / "sample_petition_arguments.json"),
+            "--case-id", "CASE-2002",
+            "--client-name", "Marco Alvarez",
+            "--out", str(tmp_path / "out"),
+        ])
+        # Refused before ever calling the API at all.
+        assert m.call_count == 0
+
+    assert exit_code == 2
+    assert not (tmp_path / "out").exists()
+
+
+def test_cli_main_unattended_flag_allows_real_run_without_review(tmp_path, monkeypatch):
+    """--unattended is the explicit opt-in for the old silent-fallthrough
+    behavior -- a real run with no human review step, on purpose."""
+    from rfe_response_builder.generate import main
+
+    notice_path = tmp_path / "notice.txt"
+    notice_path.write_text(NOTICE_TEXT)
+    out_dir = tmp_path / "out"
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json={"response": _SUBSTANTIVE_REPLY, "document_changes": {}})
+        m.post("https://api.superdocs.app/v1/documents/export", content=b"FAKE_DOCX")
+
+        exit_code = main([
+            "--notice", str(notice_path),
+            "--petition", str(DATA_DIR / "sample_petition_arguments.json"),
+            "--case-id", "CASE-2002",
+            "--client-name", "Marco Alvarez",
+            "--out", str(out_dir),
+            "--unattended",
+        ])
+
+    assert exit_code == 0
+    assert list(out_dir.glob("*.docx"))
+
+
 def test_cli_review_flag_prompts_and_only_exports_approved_items(tmp_path, monkeypatch, capsys):
     """End-to-end CLI test of --review: mocks the terminal input (approve
     item 1, reject item 2 with feedback, reject item 3 by leaving it
@@ -661,7 +718,10 @@ def test_cli_review_flag_prompts_and_only_exports_approved_items(tmp_path, monke
     petition_path = DATA_DIR / "sample_petition_arguments.json"
     out_dir = tmp_path / "out"
 
-    answers = iter(["y", "n", "reason for rejecting", "n", ""])
+    # Last "y" answers the new "export anyway despite failures?" prompt --
+    # 2 of 3 items end up unanswered here, which is now a validation FAIL
+    # that finalize_review blocks on by default.
+    answers = iter(["y", "n", "reason for rejecting", "n", "", "y"])
 
     def fake_input(prompt=""):
         return next(answers)
@@ -697,3 +757,102 @@ def test_cli_review_flag_prompts_and_only_exports_approved_items(tmp_path, monke
     # convention as the non-interactive path.
     assert exit_code == 1
     assert list(out_dir.glob("*.docx"))
+
+
+def test_cli_review_flag_export_anyway_logs_explicit_success_message(tmp_path, monkeypatch, caplog):
+    """Same exit-code convention as the non-interactive path (see
+    test_cli_exit_code_1_after_override_still_means_export_succeeded),
+    but for the interactive --review 'export anyway?' prompt: after the
+    override, the log must explicitly say the export succeeded despite
+    the non-zero exit code, not just log a bare warning."""
+    import logging
+    from rfe_response_builder.generate import main
+
+    notice_path = tmp_path / "notice.txt"
+    notice_path.write_text(NOTICE_TEXT)
+    petition_path = DATA_DIR / "sample_petition_arguments.json"
+    out_dir = tmp_path / "out"
+
+    # Reject all 3 items (leaving them unanswered), then say "y" to the
+    # "export anyway despite the failure(s)?" prompt.
+    answers = iter(["n", "", "n", "", "n", "", "y"])
+
+    def fake_input(prompt=""):
+        return next(answers)
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+
+    with caplog.at_level(logging.WARNING), requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json={"response": "ok", "document_changes": {}})
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-1"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-1",
+            json={
+                "status": "awaiting_approval",
+                "pending_changes": [{"chunk_id": "chunk-1",
+                                      "proposed_text": "Drafted section addressing the concern with citations."}],
+            },
+        )
+        import re as _re
+        m.post(_re.compile(r"https://api\.superdocs\.app/v1/chat/.+/approve"), json={"status": "ok"})
+        m.post("https://api.superdocs.app/v1/documents/export", content=b"FAKE_DOCX")
+
+        exit_code = main([
+            "--notice", str(notice_path),
+            "--petition", str(petition_path),
+            "--case-id", "CASE-2002",
+            "--client-name", "Marco Alvarez",
+            "--out", str(out_dir),
+            "--review",
+        ])
+
+    assert exit_code == 1
+    assert list(out_dir.glob("*.docx"))
+    assert any("export SUCCEEDED" in r.message and "not an export failure" in r.message
+               for r in caplog.records)
+    """Documents and locks in the exit-code convention (see README's
+    'Exit codes' section and the --allow-export-with-failures help text):
+    when export is explicitly allowed to proceed despite unanswered
+    items, the .docx IS written, but the process still exits 1 -- exit
+    code reflects validation status, not export success. The log output
+    must say so explicitly rather than leaving a bare exit 1
+    indistinguishable from a run that wrote nothing."""
+    import logging
+    from rfe_response_builder.generate import main
+
+    notice_path = tmp_path / "notice.txt"
+    notice_path.write_text(NOTICE_TEXT)
+    out_dir = tmp_path / "out"
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+
+    with caplog.at_level(logging.WARNING), requests_mock.Mocker() as m:
+        # A 200 response whose text is a hedge/refusal is NOT a
+        # substantive answer (see is_substantive_reply /
+        # test_non_substantive_reply_marked_not_answered_despite_200) --
+        # every item ends up unanswered, which is a validation FAIL that
+        # --allow-export-with-failures is needed to get past.
+        m.post(
+            "https://api.superdocs.app/v1/chat",
+            json={"response": "I don't have enough information to address this request.",
+                  "document_changes": {}},
+        )
+        m.post("https://api.superdocs.app/v1/documents/export", content=b"FAKE_DOCX")
+
+        exit_code = main([
+            "--notice", str(notice_path),
+            "--petition", str(DATA_DIR / "sample_petition_arguments.json"),
+            "--case-id", "CASE-2002",
+            "--client-name", "Marco Alvarez",
+            "--out", str(out_dir),
+            "--unattended",
+            "--allow-export-with-failures",
+        ])
+
+    assert exit_code == 1
+    written = list(out_dir.glob("*.docx"))
+    assert written  # the file WAS written despite exit code 1
+    assert any("export SUCCEEDED" in r.message and "not an export failure" in r.message
+               for r in caplog.records)
+
+

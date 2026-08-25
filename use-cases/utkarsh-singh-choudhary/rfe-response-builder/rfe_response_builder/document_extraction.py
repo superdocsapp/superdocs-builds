@@ -22,12 +22,53 @@ file raises `DocumentExtractionError` with a clear, human-readable
 message rather than silently producing empty text (which would make
 that document invisibly vanish from matching with no indication why) or
 crashing with a raw library exception a paralegal can't interpret.
+
+Also deliberately conservative about resource use: the webapp caps total
+request size (MAX_CONTENT_LENGTH in app.py), but that's a request-body
+limit, not a per-document one, and it doesn't apply at all to the CLI
+path (`generate.py --supporting-doc`), which reads straight off local
+disk with no cap whatsoever. A single absurdly large or absurdly
+long PDF/DOCX -- whether malicious or just a mis-selected file -- could
+otherwise tie up extraction for minutes or blow up memory, in either
+path. The limits below (file size, PDF page count, DOCX paragraph/cell
+count) apply uniformly to both the webapp and CLI, and fail the same
+way as any other unextractable document: a clear DocumentExtractionError
+before any heavyweight parsing happens, not a hang or an OOM.
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 SUPPORTED_EXTENSIONS = {".txt", ".pdf", ".docx"}
+
+# Resource limits (item #8) -- deliberately generous for real filings
+# (petition letters and expert opinions are rarely more than a few dozen
+# pages) while still ruling out pathological inputs. All overridable via
+# environment variable so a deployment with different needs doesn't have
+# to patch this file.
+MAX_FILE_SIZE_MB = int(os.environ.get("DOC_EXTRACTION_MAX_FILE_SIZE_MB", "25"))
+MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
+MAX_PDF_PAGES = int(os.environ.get("DOC_EXTRACTION_MAX_PDF_PAGES", "500"))
+MAX_DOCX_PARAGRAPHS = int(os.environ.get("DOC_EXTRACTION_MAX_DOCX_PARAGRAPHS", "20000"))
+MAX_DOCX_TABLE_CELLS = int(os.environ.get("DOC_EXTRACTION_MAX_DOCX_TABLE_CELLS", "20000"))
+
+
+def _check_file_size(path: Path) -> None:
+    """Checked first, before any format-specific parsing, for every
+    extension -- a plain file-size stat is nearly free and catches the
+    common case (someone attached the wrong huge file) before any
+    PDF/DOCX-specific work starts."""
+    try:
+        size = path.stat().st_size
+    except OSError as e:
+        raise DocumentExtractionError(f"Could not read '{path.name}': {e}") from e
+    if size > MAX_FILE_SIZE_BYTES:
+        raise DocumentExtractionError(
+            f"'{path.name}' is {size / (1024 * 1024):.1f} MB, over the "
+            f"{MAX_FILE_SIZE_MB} MB limit for a supporting document. Split it into "
+            f"smaller files or trim it and re-upload."
+        )
 
 
 class DocumentExtractionError(ValueError):
@@ -40,18 +81,21 @@ class DocumentExtractionError(ValueError):
 def extract_text(path: Path) -> str:
     """Dispatches on file extension and returns extracted plain text.
     Raises `DocumentExtractionError` (never a raw library exception,
-    never silent empty-string success) on anything that goes wrong."""
+    never silent empty-string success) on anything that goes wrong.
+    Checks the file-size limit before any format-specific parsing (see
+    module docstring, item #8)."""
     ext = path.suffix.lower()
+    if ext not in SUPPORTED_EXTENSIONS:
+        raise DocumentExtractionError(
+            f"Unsupported file type '{ext}' for '{path.name}' -- supported types are "
+            f"{', '.join(sorted(SUPPORTED_EXTENSIONS))}."
+        )
+    _check_file_size(path)
     if ext == ".txt":
         return _extract_txt(path)
     if ext == ".pdf":
         return _extract_pdf(path)
-    if ext == ".docx":
-        return _extract_docx(path)
-    raise DocumentExtractionError(
-        f"Unsupported file type '{ext}' for '{path.name}' -- supported types are "
-        f"{', '.join(sorted(SUPPORTED_EXTENSIONS))}."
-    )
+    return _extract_docx(path)
 
 
 def _extract_txt(path: Path) -> str:
@@ -95,6 +139,12 @@ def _extract_pdf(path: Path) -> str:
             )
 
     pages_text = []
+    num_pages = len(reader.pages)
+    if num_pages > MAX_PDF_PAGES:
+        raise DocumentExtractionError(
+            f"'{path.name}' has {num_pages} pages, over the {MAX_PDF_PAGES}-page limit "
+            f"for a supporting document. Split it into smaller files and re-upload."
+        )
     for page in reader.pages:
         try:
             pages_text.append(page.extract_text() or "")
@@ -130,11 +180,24 @@ def _extract_docx(path: Path) -> str:
         raise DocumentExtractionError(f"Could not open '{path.name}' as a Word document: {e}") from e
 
     paragraphs = [p.text for p in document.paragraphs if p.text.strip()]
+    if len(paragraphs) > MAX_DOCX_PARAGRAPHS:
+        raise DocumentExtractionError(
+            f"'{path.name}' has over {MAX_DOCX_PARAGRAPHS} paragraphs, over the limit "
+            f"for a supporting document. Split it into smaller files and re-upload."
+        )
     # Also pull text out of tables -- supporting letters sometimes put
     # dates/figures in a table rather than body paragraphs.
+    cell_count = 0
     for table in document.tables:
         for row in table.rows:
             for cell in row.cells:
+                cell_count += 1
+                if cell_count > MAX_DOCX_TABLE_CELLS:
+                    raise DocumentExtractionError(
+                        f"'{path.name}' has over {MAX_DOCX_TABLE_CELLS} table cells, over "
+                        f"the limit for a supporting document. Split it into smaller files "
+                        f"and re-upload."
+                    )
                 if cell.text.strip():
                     paragraphs.append(cell.text)
 

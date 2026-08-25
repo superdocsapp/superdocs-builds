@@ -159,3 +159,76 @@ def test_multi_page_pdf_extracts_all_pages(tmp_path):
     text = extract_text(path)
     assert "page one" in text
     assert "page two" in text
+
+
+# --- resource limits (item #8) -------------------------------------------------
+# These monkeypatch the module-level limits down to small numbers rather than
+# generating multi-MB fixtures -- proves the same enforcement path without
+# slow tests.
+
+def test_oversized_file_raises_readable_error(tmp_path, monkeypatch):
+    import rfe_response_builder.document_extraction as de
+    monkeypatch.setattr(de, "MAX_FILE_SIZE_BYTES", 10)
+    path = tmp_path / "notes.txt"
+    path.write_text("This is more than ten bytes of content.")
+    with pytest.raises(DocumentExtractionError, match="over the .* MB limit"):
+        extract_text(path)
+
+
+def test_file_under_size_limit_still_extracts(tmp_path, monkeypatch):
+    import rfe_response_builder.document_extraction as de
+    monkeypatch.setattr(de, "MAX_FILE_SIZE_BYTES", 10_000)
+    path = tmp_path / "notes.txt"
+    path.write_text("Short enough.")
+    assert extract_text(path) == "Short enough."
+
+
+def test_pdf_over_page_limit_raises_readable_error(tmp_path, monkeypatch):
+    from reportlab.pdfgen import canvas
+    import rfe_response_builder.document_extraction as de
+    monkeypatch.setattr(de, "MAX_PDF_PAGES", 1)
+    path = tmp_path / "multipage.pdf"
+    c = canvas.Canvas(str(path))
+    c.drawString(100, 750, "Page one content.")
+    c.showPage()
+    c.drawString(100, 750, "Page two content.")
+    c.save()
+    with pytest.raises(DocumentExtractionError, match="pages, over the"):
+        extract_text(path)
+
+
+def test_pdf_within_page_limit_still_extracts(tmp_path, monkeypatch):
+    import rfe_response_builder.document_extraction as de
+    monkeypatch.setattr(de, "MAX_PDF_PAGES", 5)
+    path = tmp_path / "letter.pdf"
+    _make_pdf(path, ["The beneficiary has published three papers."])
+    assert "three papers" in extract_text(path)
+
+
+def test_docx_over_paragraph_limit_raises_readable_error(tmp_path, monkeypatch):
+    import docx
+    import rfe_response_builder.document_extraction as de
+    monkeypatch.setattr(de, "MAX_DOCX_PARAGRAPHS", 2)
+    path = tmp_path / "long.docx"
+    document = docx.Document()
+    for i in range(5):
+        document.add_paragraph(f"Paragraph number {i}.")
+    document.save(str(path))
+    with pytest.raises(DocumentExtractionError, match="paragraphs, over the"):
+        extract_text(path)
+
+
+def test_docx_over_table_cell_limit_raises_readable_error(tmp_path, monkeypatch):
+    import docx
+    import rfe_response_builder.document_extraction as de
+    monkeypatch.setattr(de, "MAX_DOCX_TABLE_CELLS", 4)
+    path = tmp_path / "tables.docx"
+    document = docx.Document()
+    document.add_paragraph("Intro paragraph.")
+    table = document.add_table(rows=3, cols=3)  # 9 cells > limit of 4
+    for row in table.rows:
+        for cell in row.cells:
+            cell.text = "data"
+    document.save(str(path))
+    with pytest.raises(DocumentExtractionError, match="table cells, over"):
+        extract_text(path)

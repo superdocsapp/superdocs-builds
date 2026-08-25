@@ -32,6 +32,14 @@
 <div class="card">
   <p class="status-pill">⚠ Response deadline detected: {{ session.deadline_days }} days
     (matched: "{{ session.deadline_matched_sentence }}") — verify the exact date against the notice.</p>
+  {% if session.deadline_due_date %}
+  <p class="status-pill">Notice date {{ session.deadline_notice_date }} → calculated due date:
+    <strong>{{ session.deadline_due_date }}</strong> — this is a calculation from the detected notice
+    date, not a substitute for verifying the exact date on the notice itself.</p>
+  {% else %}
+  <p class="hint">No labeled "Notice Date" was found in the notice text, so a concrete due date
+    could not be calculated automatically -- check the notice by hand for the issuance date.</p>
+  {% endif %}
 </div>
 {% endif %}
 
@@ -116,6 +124,16 @@
     {% else %}
       <p class="hint">None identified from the supplied evidence catalog.</p>
     {% endif %}
+  </div>
+
+  <div class="card">
+    <label>
+      <input type="checkbox" name="allow_export_with_failures">
+      Export anyway even if an RFE item ends up unanswered
+    </label>
+    <p class="hint">Leave this unchecked normally. If any item is left unanswered (unapproved,
+      rejected, or drafting failed), export is blocked by default so an unanswered item can't
+      silently go out -- check this box only if you've reviewed that and want to export anyway.</p>
   </div>
 
   <button type="submit">Approve selected &amp; generate document</button>

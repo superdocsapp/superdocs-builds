@@ -21,6 +21,14 @@
 <div class="card">
   <p class="status-pill">⚠ Response deadline detected: {{ deadline.days }} days
     (matched: "{{ deadline.matched_sentence }}") — verify the exact date against the notice.</p>
+  {% if deadline.due_date %}
+  <p class="status-pill">Notice date {{ deadline.notice_date }} → calculated due date:
+    <strong>{{ deadline.due_date }}</strong> — this is a calculation from the detected notice date,
+    not a substitute for verifying the exact date on the notice itself.</p>
+  {% else %}
+  <p class="hint">No labeled "Notice Date" was found in the notice text, so a concrete due date
+    could not be calculated automatically -- check the notice by hand for the issuance date.</p>
+  {% endif %}
 </div>
 {% else %}
 <div class="card">

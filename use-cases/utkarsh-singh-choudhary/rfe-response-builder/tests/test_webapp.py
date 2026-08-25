@@ -322,6 +322,29 @@ def test_real_run_redirects_to_review_page(client, monkeypatch):
     assert b"Approve this section" in review_resp.data
 
 
+def test_review_approval_blocked_when_item_unanswered(client, monkeypatch, tmp_path):
+    """Without the allow_export_with_failures checkbox, approving only
+    some items must NOT export -- it should redirect back to the review
+    page with a flash message instead of silently producing a partial doc."""
+    import requests_mock
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        resp = client.post("/generate", data=_form(dry_run=""), content_type="multipart/form-data")
+        job_id = resp.headers["Location"].rstrip("/").split("/")[-1]
+        body = _poll_job_until_done(client, job_id)
+        review_id = body["review_url"].rstrip("/").split("/")[-1]
+
+        approve_form = {"approve_1": "on", "reviewer_name": "jane@firm.com"}  # 2 of 3 unanswered, box unchecked
+        resp2 = client.post(f"/review/{review_id}/approve", data=approve_form)
+
+    assert resp2.status_code == 302
+    assert resp2.headers["Location"].endswith(f"/review/{review_id}")
+    export_posts = [r for r in m.request_history if r.url.endswith("/v1/documents/export")]
+    assert export_posts == []
+
+
 def test_review_approval_gate_exports_only_approved_items(client, monkeypatch, tmp_path):
     import requests_mock
 
@@ -337,7 +360,8 @@ def test_review_approval_gate_exports_only_approved_items(client, monkeypatch, t
         assert body["status"] == "completed"
         review_id = body["review_url"].rstrip("/").split("/")[-1]
 
-        approve_form = {"approve_1": "on", "reviewer_name": "jane@firm.com"}  # only item 1 approved
+        approve_form = {"approve_1": "on", "reviewer_name": "jane@firm.com",
+                         "allow_export_with_failures": "on"}  # only item 1 approved; 2 unanswered -> FAIL, opt in to export anyway
         resp2 = client.post(f"/review/{review_id}/approve", data=approve_form)
         assert resp2.status_code == 200
         assert resp2.headers["Content-Disposition"].startswith("attachment")
@@ -539,6 +563,147 @@ def test_review_page_shows_quality_gate_flag_when_enabled(client, monkeypatch):
 
     assert b"Quality gate flagged this draft" in review_resp.data
     assert b"Restates the petition instead." in review_resp.data
+
+
+def test_redraft_grounds_against_matched_prior_petition_argument(client, monkeypatch):
+    """A redraft that leans on a detail from the MATCHED PRIOR PETITION
+    ARGUMENT (not just the RFE request text or new evidence) must not be
+    flagged as ungrounded -- the redraft grounding check has to use the
+    same source material start_review() used for the initial draft."""
+    import requests_mock
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        resp = client.post("/generate", data=_form(dry_run=""), content_type="multipart/form-data")
+        job_id = resp.headers["Location"].rstrip("/").split("/")[-1]
+        body = _poll_job_until_done(client, job_id)
+        review_id = body["review_url"].rstrip("/").split("/")[-1]
+
+        # Item 3 (financial_support) matches the prior petition argument
+        # "...employment verification letter states an annual salary of
+        # $58,000...". "$58,000" does not appear anywhere in the RFE
+        # item's own text or in the matched new-evidence descriptions --
+        # only in the prior petition argument.
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-redraft-3"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-redraft-3",
+            json={"status": "awaiting_approval",
+                  "pending_changes": [{"chunk_id": "chunk-redraft-3",
+                                        "proposed_text": "As previously documented, the petitioner's annual "
+                                                          "salary of $58,000 demonstrates sufficient income."}]},
+        )
+        redraft_resp = client.post(
+            f"/review/{review_id}/redraft/3",
+            data={"redraft_feedback": "Reference the prior submission explicitly."},
+            follow_redirects=True,
+        )
+    assert redraft_resp.status_code == 200
+    assert b"Possibly-unsupported detail" not in redraft_resp.data
+
+
+def test_redraft_reruns_quality_gate_when_enabled(client, monkeypatch):
+    """After a redraft, the quality verdict/reasoning must reflect the
+    NEW text, not whatever the initial draft was graded as -- proving a
+    second grading call actually happens on redraft."""
+    import requests_mock
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+    monkeypatch.setenv("QUALITY_GATE_ENABLED", "1")
+
+    def chat_callback(request, context):
+        body = request.json()
+        if "-grading-" in body["session_id"] and "redraft" in body["session_id"]:
+            return {"response": '{"addresses_concern": false, "reasoning": "Still off-topic after redraft."}',
+                     "document_changes": {}}
+        if "-grading-" in body["session_id"]:
+            return {"response": '{"addresses_concern": true, "reasoning": "Directly addresses the concern."}',
+                     "document_changes": {}}
+        return {"response": "ok", "document_changes": {}}
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json=chat_callback)
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-1"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-1",
+            json={"status": "awaiting_approval",
+                  "pending_changes": [{"chunk_id": "chunk-1", "proposed_text": "Drafted section text."}]},
+        )
+        resp = client.post("/generate", data=_form(dry_run=""), content_type="multipart/form-data")
+        job_id = resp.headers["Location"].rstrip("/").split("/")[-1]
+        body = _poll_job_until_done(client, job_id)
+        review_id = body["review_url"].rstrip("/").split("/")[-1]
+
+        review_before = client.get(body["review_url"])
+        assert b"Directly addresses the concern." not in review_before.data  # only shown when WEAK
+
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-redraft-1"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-redraft-1",
+            json={"status": "awaiting_approval",
+                  "pending_changes": [{"chunk_id": "chunk-redraft-1", "proposed_text": "Redrafted section text."}]},
+        )
+        redraft_resp = client.post(
+            f"/review/{review_id}/redraft/1",
+            data={"redraft_feedback": "Address the concern directly."},
+            follow_redirects=True,
+        )
+    assert redraft_resp.status_code == 200
+    assert b"Quality gate flagged this draft" in redraft_resp.data
+    assert b"Still off-topic after redraft." in redraft_resp.data
+
+
+def test_redraft_reruns_cross_item_consistency(client, monkeypatch):
+    """Redrafting one item to conflict with another, already-drafted item
+    must surface a fresh cross-item consistency flag -- the check has to
+    be rerun across ALL current items after a redraft, not left stale
+    from the initial start_review() pass."""
+    import requests_mock
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", "sk_test_fake")
+    replies = [
+        "The beneficiary worked at Acme Robotics Corp from 2018 to 2022 as lead engineer.",
+        "The beneficiary demonstrated specialized skill in robotics throughout their career.",
+        "A third, unrelated section with no shared entities.",
+    ]
+    call_count = {"n": 0}
+
+    def get_job_callback(request, context):
+        reply = replies[call_count["n"] % len(replies)]
+        call_count["n"] += 1
+        return {"status": "awaiting_approval",
+                "pending_changes": [{"chunk_id": "chunk-1", "proposed_text": reply}]}
+
+    with requests_mock.Mocker() as m:
+        m.post("https://api.superdocs.app/v1/chat", json={"response": "ok", "document_changes": {}})
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-1"})
+        m.get("https://api.superdocs.app/v1/jobs/job-1", json=get_job_callback)
+        resp = client.post("/generate", data=_form(dry_run=""), content_type="multipart/form-data")
+        job_id = resp.headers["Location"].rstrip("/").split("/")[-1]
+        body = _poll_job_until_done(client, job_id)
+        review_id = body["review_url"].rstrip("/").split("/")[-1]
+
+        review_before = client.get(body["review_url"])
+        assert b"Possible cross-item inconsistency detected" not in review_before.data
+
+        # Redraft item 2 so it now conflicts with item 1's dates for the
+        # same entity ("Acme Robotics Corp").
+        m.post("https://api.superdocs.app/v1/chat/async", json={"job_id": "job-redraft-2"})
+        m.get(
+            "https://api.superdocs.app/v1/jobs/job-redraft-2",
+            json={"status": "awaiting_approval",
+                  "pending_changes": [{"chunk_id": "chunk-redraft-2",
+                                        "proposed_text": "At Acme Robotics Corp, the beneficiary began work "
+                                                          "in 2019 and stayed until 2023."}]},
+        )
+        redraft_resp = client.post(
+            f"/review/{review_id}/redraft/2",
+            data={"redraft_feedback": "Add specific employment dates."},
+            follow_redirects=True,
+        )
+    assert redraft_resp.status_code == 200
+    assert b"Possible cross-item inconsistency detected" in redraft_resp.data
+    assert b"Acme Robotics Corp" in redraft_resp.data
 
 
 def test_csrf_protection_actually_rejects_request_without_token():

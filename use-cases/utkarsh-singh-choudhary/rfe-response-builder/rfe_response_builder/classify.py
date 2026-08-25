@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta
 from enum import Enum
 
 
@@ -230,11 +231,56 @@ _DEADLINE_PATTERNS = [
 _DEADLINE_SENTENCE_RE = re.compile(r"[^.]*\b(?:within|no later than)\b[^.]*\d{1,3}\s*(?:calendar\s+)?days[^.]*\.",
                                     re.IGNORECASE)
 
+# --- Notice date extraction (item #10) ----------------------------------------
+#
+# A day count alone ("respond within 87 days") is only actionable once
+# it's anchored to an actual calendar date -- "within 87 days" of WHAT.
+# USCIS notices consistently print an explicit notice date near the top
+# (commonly labeled "Notice Date"), which is the anchor a real deadline
+# is calculated from. These patterns are deliberately narrow (labeled
+# dates only, e.g. "Notice Date: January 5, 2026" or "Notice Date:
+# 01/05/2026") rather than matching any date-shaped text in the notice,
+# since an unlabeled date could just as easily be a beneficiary's birth
+# date, a prior filing date, or a marriage date -- guessing wrong here
+# would be worse than not computing a due date at all.
+_NOTICE_DATE_LONG_RE = re.compile(
+    r"Notice\s+Date\s*:?\s*([A-Za-z]+\s+\d{1,2},?\s+\d{4})", re.IGNORECASE,
+)
+_NOTICE_DATE_NUMERIC_RE = re.compile(
+    r"Notice\s+Date\s*:?\s*(\d{1,2}/\d{1,2}/\d{4})", re.IGNORECASE,
+)
+_MONTH_DAY_YEAR_FORMATS = ("%B %d, %Y", "%B %d %Y", "%b %d, %Y", "%b %d %Y")
+
+
+def extract_notice_date(notice_text: str) -> date | None:
+    """Best-effort extraction of the labeled "Notice Date" USCIS notices
+    print near the top. Returns None (never raises, never guesses at an
+    unlabeled date) if no recognizable labeled date is found -- exactly
+    the same "surface what's found, or admit nothing was found" contract
+    as extract_response_deadline below."""
+    m = _NOTICE_DATE_NUMERIC_RE.search(notice_text)
+    if m:
+        try:
+            return datetime.strptime(m.group(1), "%m/%d/%Y").date()
+        except ValueError:
+            pass
+    m = _NOTICE_DATE_LONG_RE.search(notice_text)
+    if m:
+        raw = m.group(1).strip()
+        for fmt in _MONTH_DAY_YEAR_FORMATS:
+            try:
+                return datetime.strptime(raw, fmt).date()
+            except ValueError:
+                continue
+    return None
+
 
 @dataclass
 class DeadlineInfo:
     days: int | None
     matched_sentence: str | None
+    notice_date: date | None = None  # see extract_notice_date above
+    due_date: date | None = None  # notice_date + days, only set when both are known
 
     @property
     def found(self) -> bool:
@@ -243,16 +289,27 @@ class DeadlineInfo:
 
 def extract_response_deadline(notice_text: str) -> DeadlineInfo:
     """Best-effort extraction of the stated response window (e.g. "you
-    must respond within 87 days"). Returns `DeadlineInfo(days=None,
-    matched_sentence=None)` -- not an exception, not a guess -- if no
-    recognizable phrasing is found; the caller/UI is responsible for
-    telling the human to check the notice by hand in that case, exactly
-    as they'd have had to before this function existed."""
+    must respond within 87 days"), plus -- when the notice also has a
+    labeled "Notice Date" (see extract_notice_date) -- a concrete
+    calendar `due_date` computed from it (item #10: previously this only
+    ever returned a bare day count, leaving the actual "answer this by
+    WHEN" calculation to whoever read the output). Returns
+    `DeadlineInfo(days=None, matched_sentence=None)` -- not an exception,
+    not a guess -- if no recognizable phrasing is found; the caller/UI is
+    responsible for telling the human to check the notice by hand in
+    that case, exactly as they'd have had to before this function
+    existed. Likewise, `due_date` stays None whenever `notice_date`
+    wasn't found -- a day count with no anchor date is not silently
+    turned into "days from today," since today is not when the notice
+    was issued."""
     for pattern in _DEADLINE_PATTERNS:
         m = pattern.search(notice_text)
         if m:
             days = int(m.group(1))
             sentence_match = _DEADLINE_SENTENCE_RE.search(notice_text)
             matched_sentence = sentence_match.group(0).strip() if sentence_match else m.group(0).strip()
-            return DeadlineInfo(days=days, matched_sentence=matched_sentence)
+            notice_date = extract_notice_date(notice_text)
+            due_date = notice_date + timedelta(days=days) if notice_date is not None else None
+            return DeadlineInfo(days=days, matched_sentence=matched_sentence,
+                                 notice_date=notice_date, due_date=due_date)
     return DeadlineInfo(days=None, matched_sentence=None)

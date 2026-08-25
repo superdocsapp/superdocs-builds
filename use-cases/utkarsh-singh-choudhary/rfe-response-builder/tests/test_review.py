@@ -159,7 +159,7 @@ def test_finalize_review_appends_pre_export_validation_summary(client, petition,
             session.items[1].request_id: {"approve": False, "feedback": "needs more detail"},
             # item 3 intentionally omitted -- rejected by silence
         }
-        finalize_review(client, session, decisions, tmp_path)
+        finalize_review(client, session, decisions, tmp_path, allow_export_with_failures=True)
 
         validation_calls = [
             json.loads(r.text) for r in m.request_history
@@ -169,6 +169,66 @@ def test_finalize_review_appends_pre_export_validation_summary(client, petition,
     message = validation_calls[0]["message"]
     assert "Every request answered: FAIL" in message
     assert "Cross-item consistency checked: PASS" in message
+
+
+def test_finalize_review_blocks_export_when_item_unanswered(client, petition, evidence_catalog, tmp_path):
+    """The one non-negotiable check (validation.py) -- an unanswered item
+    reaching export -- must actually block export by default now, not
+    just log an error."""
+    from rfe_response_builder.validation import ExportBlockedError
+
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        session = start_review(client, "sess-block", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+        decisions = {
+            session.items[0].request_id: {"approve": True},
+            session.items[1].request_id: {"approve": False, "feedback": "needs more detail"},
+            # item 3 intentionally omitted -- rejected by silence
+        }
+        with pytest.raises(ExportBlockedError) as excinfo:
+            finalize_review(client, session, decisions, tmp_path)
+
+    assert "NOT ANSWERED" in str(excinfo.value)
+    # No export call should have been made, and nothing written to disk.
+    export_posts = [r for r in m.request_history if r.url.endswith("/v1/documents/export")]
+    assert export_posts == []
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_finalize_review_allow_export_with_failures_overrides_block(client, petition, evidence_catalog, tmp_path):
+    """allow_export_with_failures=True is the explicit opt-in that lets
+    export proceed despite an unanswered item."""
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        session = start_review(client, "sess-override", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+
+        decisions = {
+            session.items[0].request_id: {"approve": True},
+            session.items[1].request_id: {"approve": False, "feedback": "needs more detail"},
+        }
+        out_path, coverage = finalize_review(
+            client, session, decisions, tmp_path, allow_export_with_failures=True,
+        )
+
+    assert out_path.exists()
+    unanswered = [row for row in coverage if not row.answered]
+    assert len(unanswered) == 2
+    export_posts = [r for r in m.request_history if r.url.endswith("/v1/documents/export")]
+    assert len(export_posts) == 1
+
+
+def test_finalize_review_no_failures_does_not_require_the_flag(client, petition, evidence_catalog, tmp_path):
+    """When every item is answered, there's no FAIL to block on -- export
+    proceeds with the default allow_export_with_failures=False."""
+    with requests_mock.Mocker() as m:
+        _mock_pending_review(m)
+        session = start_review(client, "sess-clean", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
+        decisions = {item.request_id: {"approve": True} for item in session.items}
+        out_path, coverage = finalize_review(client, session, decisions, tmp_path)
+
+    assert out_path.exists()
+    assert all(row.answered for row in coverage)
 
 
 def test_finalize_review_approves_only_selected_items(client, petition, evidence_catalog, tmp_path):
@@ -181,7 +241,7 @@ def test_finalize_review_approves_only_selected_items(client, petition, evidence
             session.items[1].request_id: {"approve": False, "feedback": "needs more detail"},
             # item 3 intentionally omitted -- silence must mean rejected
         }
-        out_path, coverage = finalize_review(client, session, decisions, tmp_path)
+        out_path, coverage = finalize_review(client, session, decisions, tmp_path, allow_export_with_failures=True)
 
     answered = {row.request_id: row.answered for row in coverage}
     assert answered[session.items[0].request_id] is True
@@ -201,7 +261,7 @@ def test_finalize_review_response_section_only_set_when_answered(client, petitio
         _mock_pending_review(m)
         session = start_review(client, "sess-3", "CASE-2002", "Marco Alvarez", NOTICE_TEXT, petition, evidence_catalog)
         decisions = {item.request_id: {"approve": False} for item in session.items}
-        _, coverage = finalize_review(client, session, decisions, tmp_path)
+        _, coverage = finalize_review(client, session, decisions, tmp_path, allow_export_with_failures=True)
 
     assert all(row.response_section == "(not answered)" for row in coverage)
     assert all(not row.answered for row in coverage)
@@ -224,6 +284,6 @@ def test_no_pending_change_still_requires_substantive_text(client, petition, evi
         assert all(item.status == "no_pending_change" for item in session.items)
 
         decisions = {item.request_id: {"approve": True} for item in session.items}
-        _, coverage = finalize_review(client, session, decisions, tmp_path)
+        _, coverage = finalize_review(client, session, decisions, tmp_path, allow_export_with_failures=True)
 
     assert all(not row.answered for row in coverage)

@@ -34,6 +34,31 @@ class CheckStatus(str, Enum):
     FAIL = "fail"
 
 
+class ExportBlockedError(ValueError):
+    """Raised when a pre-export validation summary has one or more FAIL
+    checks and the caller did not explicitly opt in to exporting anyway.
+
+    FAIL is reserved for the one non-negotiable check this package
+    enforces: an RFE item reaching export without ever being answered
+    (see build_validation_summary below). Historically this FAIL was only
+    logged, never enforced, which contradicted the "non-negotiable check"
+    language throughout this module -- callers could export an
+    unanswered item without ever being stopped. This error is how that
+    gets enforced: raise it, and require an explicit
+    allow_export_with_failures=True (or an explicit human "export
+    anyway?" confirmation) before proceeding."""
+
+    def __init__(self, summary: "ValidationSummary"):
+        self.summary = summary
+        failures = [c.detail or c.label for c in summary.checks if c.status == CheckStatus.FAIL]
+        message = (
+            "Pre-export validation FAILED -- export blocked: " + "; ".join(failures)
+            + ". Pass allow_export_with_failures=True (CLI: --allow-export-with-failures) "
+              "to export anyway."
+        )
+        super().__init__(message)
+
+
 @dataclass
 class ValidationCheck:
     label: str
@@ -67,11 +92,29 @@ def build_validation_summary(
     consistency_flags: list | None = None,  # list[consistency.ConsistencyFlag]
     injection_flags: list | None = None,  # list[(source, injection_guard.InjectionRiskResult)]
     exhibits: list | None = None,  # list[rfe.Exhibit]
+    ungrounded_by_request: dict[str, list[str]] | None = None,  # see item #9 below
+    weak_quality_request_ids: list[str] | None = None,  # see item #9 below
 ) -> ValidationSummary:
     """Builds the final pre-export readout from data this package already
     computed. Never re-derives anything -- purely aggregates and labels
     what's already known, so this can't disagree with the underlying
-    per-item checks it's summarizing."""
+    per-item checks it's summarizing.
+
+    `ungrounded_by_request` and `weak_quality_request_ids`, if given, are
+    the same per-item drafting data both review.py's start_review and
+    generate.py's build_response_packet already compute for every
+    substantively-drafted item -- `ungrounded_facts` (see grounding.py)
+    and a WEAK `quality_verdict` (see judge.py, opt-in via
+    QUALITY_GATE_ENABLED). Previously these two heuristic signals were
+    only ever logged (logger.warning) or printed in an ad-hoc post-run
+    summary, never surfaced in the one-glance pre-export readout a
+    reviewer actually looks at -- so a WEAK verdict or an ungrounded fact
+    could sit unnoticed while the validation summary showed a clean bill
+    of health. Passing them here closes that gap: both become explicit
+    WARN rows, same as every other heuristic signal in this summary.
+    Omitted (None/empty dict or list) is fine -- both rows just PASS with
+    a note that nothing was checked, exactly like the other optional
+    inputs above when a caller doesn't have that data."""
     consistency_flags = consistency_flags or []
     injection_flags = injection_flags or []
     checks: list[ValidationCheck] = []
@@ -155,5 +198,43 @@ def build_validation_summary(
         ))
     else:
         checks.append(ValidationCheck(label="Uploaded material scanned for injection risk", status=CheckStatus.PASS))
+
+    # 7. Fact-grounding (heuristic -- see grounding.py).
+    ungrounded_by_request = ungrounded_by_request or {}
+    flagged_ids = [rid for rid, facts in ungrounded_by_request.items() if facts]
+    if ungrounded_by_request:
+        if flagged_ids:
+            total_facts = sum(len(ungrounded_by_request[rid]) for rid in flagged_ids)
+            checks.append(ValidationCheck(
+                label="Draft text checked for unsupported facts", status=CheckStatus.WARN,
+                detail=f"Item(s) {', '.join(sorted(flagged_ids))}: {total_facts} possibly-unsupported "
+                       f"detail(s) -- verify against source material before relying on this draft.",
+            ))
+        else:
+            checks.append(ValidationCheck(label="Draft text checked for unsupported facts", status=CheckStatus.PASS))
+    else:
+        checks.append(ValidationCheck(
+            label="Draft text checked for unsupported facts", status=CheckStatus.PASS,
+            detail="No per-item drafting data supplied -- grounding was not checked here.",
+        ))
+
+    # 8. LLM-as-judge quality gate (opt-in, QUALITY_GATE_ENABLED -- see
+    # judge.py). Absence of `weak_quality_request_ids` covers both "gate
+    # never ran" (the common case, since it's off by default) and
+    # "nothing came back WEAK" -- neither is a finding worth a WARN, only
+    # an actual WEAK verdict is.
+    weak_quality_request_ids = weak_quality_request_ids or []
+    if weak_quality_request_ids:
+        checks.append(ValidationCheck(
+            label="Quality gate verdicts", status=CheckStatus.WARN,
+            detail=f"Item(s) {', '.join(sorted(weak_quality_request_ids))} graded WEAK (drafted text "
+                   f"may not directly address the officer's stated concern) -- review before relying "
+                   f"on this draft.",
+        ))
+    else:
+        checks.append(ValidationCheck(
+            label="Quality gate verdicts", status=CheckStatus.PASS,
+            detail="No item(s) graded WEAK, or the quality gate did not run for this session.",
+        ))
 
     return ValidationSummary(checks=checks)

@@ -117,3 +117,57 @@ def test_extract_response_deadline_prefers_first_matching_pattern():
                "5 days for something else entirely.")
     info = extract_response_deadline(notice)
     assert info.days == 60
+
+
+# --- notice date extraction / due date calculation (item #10) -----------------
+
+from datetime import date  # noqa: E402
+
+from rfe_response_builder.classify import extract_notice_date  # noqa: E402
+
+
+def test_extract_notice_date_finds_long_form_date():
+    notice = "Notice Date: January 5, 2026\n\nSome other content about the case."
+    assert extract_notice_date(notice) == date(2026, 1, 5)
+
+
+def test_extract_notice_date_finds_numeric_date():
+    notice = "Notice Date: 01/05/2026\n\nSome other content about the case."
+    assert extract_notice_date(notice) == date(2026, 1, 5)
+
+
+def test_extract_notice_date_returns_none_when_not_labeled():
+    notice = "This notice was mailed on January 5, 2026 but has no labeled Notice Date field."
+    assert extract_notice_date(notice) is None
+
+
+def test_extract_notice_date_returns_none_when_absent():
+    notice = "No date information at all in this notice."
+    assert extract_notice_date(notice) is None
+
+
+def test_extract_response_deadline_computes_due_date_when_notice_date_present():
+    notice = ("Notice Date: January 5, 2026\n\n"
+               "You must respond to this Request for Evidence within 87 days from the date "
+               "of this notice or your petition may be denied.")
+    info = extract_response_deadline(notice)
+    assert info.found
+    assert info.notice_date == date(2026, 1, 5)
+    assert info.due_date == date(2026, 4, 2)  # Jan 5 + 87 days
+
+
+def test_extract_response_deadline_due_date_none_when_no_notice_date():
+    notice = "You must respond to this Request for Evidence within 87 days from the date of this notice."
+    info = extract_response_deadline(notice)
+    assert info.found
+    assert info.notice_date is None
+    assert info.due_date is None
+
+
+def test_extract_response_deadline_numeric_notice_date_and_calendar_days():
+    notice = ("Notice Date: 03/01/2026\n\n"
+               "A response must be received no later than 30 calendar days from the date "
+               "of this notice.")
+    info = extract_response_deadline(notice)
+    assert info.notice_date == date(2026, 3, 1)
+    assert info.due_date == date(2026, 3, 31)

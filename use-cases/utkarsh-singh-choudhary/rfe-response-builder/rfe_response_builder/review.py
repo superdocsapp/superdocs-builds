@@ -36,6 +36,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 from typing import Callable
 
@@ -46,7 +47,7 @@ from .firm_templates import FirmTemplate, apply_firm_customization
 from .grounding import check_grounding
 from .injection_guard import scan_all_inputs_for_injection_risk
 from .judge import QualityVerdict, grade_draft
-from .validation import CheckStatus, build_validation_summary
+from .validation import CheckStatus, ExportBlockedError, build_validation_summary
 from .rfe import (
     CoverageRow,
     Exhibit,
@@ -108,6 +109,8 @@ class ReviewSession:
     classification_note: str = ""
     deadline_days: int | None = None
     deadline_matched_sentence: str | None = None
+    deadline_notice_date: date | None = None
+    deadline_due_date: date | None = None
     firm_name: str | None = None
     consistency_flags: list = field(default_factory=list)  # list[ConsistencyFlag], see consistency.py
     injection_flags: list = field(default_factory=list)  # list[(source, InjectionRiskResult)], see injection_guard.py
@@ -298,6 +301,8 @@ def start_review(client: SuperDocsClient, session_id: str, case_id: str, client_
         classification_note=profile.legal_framework_note,
         deadline_days=deadline.days,
         deadline_matched_sentence=deadline.matched_sentence,
+        deadline_notice_date=deadline.notice_date,
+        deadline_due_date=deadline.due_date,
         firm_name=firm_template.firm_name if firm_template else None,
         consistency_flags=consistency_flags,
         injection_flags=injection_flags,
@@ -305,13 +310,20 @@ def start_review(client: SuperDocsClient, session_id: str, case_id: str, client_
 
 
 def finalize_review(client: SuperDocsClient, session: ReviewSession,
-                     decisions: dict[str, dict], out_dir: Path) -> tuple[Path, list[CoverageRow]]:
+                     decisions: dict[str, dict], out_dir: Path,
+                     allow_export_with_failures: bool = False) -> tuple[Path, list[CoverageRow]]:
     """`decisions` maps request_id -> {"approve": bool, "feedback": str | None}.
     A request_id missing from `decisions` is treated as rejected -- silence
     is never approval. Only items that are BOTH approved by the human AND
     (for items with no pending change) substantively answered end up in
     `answered_ids`; everything else is NOT ANSWERED in the checklist,
-    exactly like the non-review flow."""
+    exactly like the non-review flow.
+
+    If the pre-export validation summary has a FAIL (see validation.py --
+    currently only "an item reached export unanswered"), this raises
+    ExportBlockedError instead of exporting, unless
+    allow_export_with_failures=True. Nothing is written to disk and
+    SuperDocs' export endpoint is never called when blocked."""
     answered_ids: set[str] = set()
 
     for item in session.items:
@@ -344,21 +356,29 @@ def finalize_review(client: SuperDocsClient, session: ReviewSession,
     )
 
     # Final pre-export validation summary (see validation.py) -- combines
-    # coverage, cross-item consistency, and injection-risk flags into one
-    # explicit go/no-go readout, logged loudly if it FAILs (an item
-    # reaching export unanswered -- the one non-negotiable check this
-    # package enforces). This is a summary of checks already run
-    # elsewhere, not a new gate -- export still proceeds either way,
-    # consistent with every other heuristic signal in this package: a
-    # human decision (the approve/reject choices already made above),
-    # not an automated block.
+    # coverage, cross-item consistency, injection-risk flags, fact-
+    # grounding, and quality-gate verdicts into one explicit go/no-go
+    # readout (item #9: grounding/quality-gate now show up here as their
+    # own rows, not just in logs). A FAIL (an item reaching export
+    # unanswered -- the one non-negotiable check this package enforces)
+    # actually blocks export now: it raises ExportBlockedError unless the
+    # caller explicitly opted in via allow_export_with_failures. WARNs
+    # never block -- consistent with every other heuristic signal in this
+    # package -- they're logged for a human to weigh.
+    ungrounded_by_request = {item.request_id: item.ungrounded_facts for item in session.items if item.ungrounded_facts}
+    weak_quality_request_ids = [
+        item.request_id for item in session.items if item.quality_verdict == QualityVerdict.WEAK.value
+    ]
     validation_summary = build_validation_summary(
         coverage, consistency_flags=session.consistency_flags, injection_flags=session.injection_flags,
-        exhibits=session.exhibits,
+        exhibits=session.exhibits, ungrounded_by_request=ungrounded_by_request,
+        weak_quality_request_ids=weak_quality_request_ids,
     )
     if validation_summary.has_failures:
         logger.error("session %s: pre-export validation FAILED -- %s", session.session_id,
                      [c.detail for c in validation_summary.checks if c.status == CheckStatus.FAIL])
+        if not allow_export_with_failures:
+            raise ExportBlockedError(validation_summary)
     elif validation_summary.has_warnings:
         logger.warning("session %s: pre-export validation has warning(s) -- %s", session.session_id,
                         [c.detail for c in validation_summary.checks if c.status == CheckStatus.WARN])

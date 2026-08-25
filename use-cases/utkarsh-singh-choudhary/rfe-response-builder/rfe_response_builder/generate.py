@@ -41,7 +41,7 @@ from .embeddings import get_default_provider
 from .firm_templates import FirmTemplate, apply_firm_customization, load_firm_template
 from .grounding import check_grounding
 from .injection_guard import scan_all_inputs_for_injection_risk
-from .validation import CheckStatus, build_validation_summary
+from .validation import CheckStatus, ExportBlockedError, build_validation_summary
 from .judge import QualityVerdict, grade_draft
 from .logging_config import configure_logging, set_case_id, set_request_id
 from .progress import ProgressStore
@@ -226,7 +226,14 @@ def dry_run(notice_text: str, petition: PriorPetition, evidence_catalog: NewEvid
     deadline = extract_response_deadline(notice_text)
     if deadline.found:
         print(f"⚠ Response deadline detected: {deadline.days} days "
-              f"(matched: \"{deadline.matched_sentence}\") -- verify the exact date against the notice.\n")
+              f"(matched: \"{deadline.matched_sentence}\") -- verify the exact date against the notice.")
+        if deadline.due_date is not None:
+            print(f"  Notice date: {deadline.notice_date.isoformat()} -> "
+                  f"calculated due date: {deadline.due_date.isoformat()} "
+                  f"-- verify against the notice; this is a calculation, not a substitute for reading it.\n")
+        else:
+            print("  No labeled \"Notice Date\" was found in the notice text, so no concrete due date "
+                  "could be calculated -- check the notice by hand for the issuance date.\n")
     else:
         print("⚠ No response deadline phrase was detected automatically -- "
               "check the notice by hand for the response window.\n")
@@ -270,7 +277,8 @@ def dry_run(notice_text: str, petition: PriorPetition, evidence_catalog: NewEvid
 def build_response_packet(client: SuperDocsClient, session_id: str, case_id: str, client_name: str,
                            notice_text: str, petition: PriorPetition, out_dir: Path,
                            evidence_catalog: NewEvidenceCatalog | None = None,
-                           resume: bool = True, firm_template: FirmTemplate | None = None) -> tuple[Path, list]:
+                           resume: bool = True, firm_template: FirmTemplate | None = None,
+                           allow_export_with_failures: bool = False) -> tuple[Path, list]:
     evidence_catalog = evidence_catalog or NewEvidenceCatalog()
     requests_list, petition_matches, evidence_matches, exhibits, _fuzzy_suggestions = plan_response(
         notice_text, petition, evidence_catalog
@@ -485,13 +493,18 @@ def build_response_packet(client: SuperDocsClient, session_id: str, case_id: str
 
     # Final pre-export validation summary (see validation.py) -- see
     # review.py's finalize_review for the full rationale; same pattern
-    # here for the CLI's non-interactive export path.
+    # here for the CLI's non-interactive export path. ungrounded_by_request
+    # and weak_by_request were already being computed above (item #9: now
+    # surfaced as explicit rows here too, not just logged/printed).
     validation_summary = build_validation_summary(
         coverage, consistency_flags=consistency_flags, injection_flags=injection_flags, exhibits=exhibits,
+        ungrounded_by_request=ungrounded_by_request, weak_quality_request_ids=list(weak_by_request.keys()),
     )
     if validation_summary.has_failures:
         logger.error("session %s: pre-export validation FAILED -- %s", session_id,
                      [c.detail for c in validation_summary.checks if c.status == CheckStatus.FAIL])
+        if not allow_export_with_failures:
+            raise ExportBlockedError(validation_summary)
     elif validation_summary.has_warnings:
         logger.warning("session %s: pre-export validation has warning(s) -- %s", session_id,
                         [c.detail for c in validation_summary.checks if c.status == CheckStatus.WARN])
@@ -566,6 +579,28 @@ def main(argv: list[str] | None = None) -> int:
                          help="Draft via the human-review gate (rfe_response_builder.review): each section is "
                               "shown in the terminal and must be explicitly approved before it counts as "
                               "answered or reaches the exported document. Mutually exclusive with --dry-run.")
+    parser.add_argument("--unattended", action="store_true",
+                         help="Required to run the non-interactive batch path (build_response_packet) against "
+                              "the real SuperDocs API -- drafts and exports every item with NO human approval "
+                              "step. This is a real, unreviewed legal filing produced without a person looking "
+                              "at any of it first, so it's opt-in rather than the default: omitting both "
+                              "--dry-run and --review used to silently fall through to this behavior, which is "
+                              "the easiest way to accidentally ship an unreviewed RFE response. Pass this flag "
+                              "explicitly if that's really what you want (e.g. a fully automated pipeline with "
+                              "its own separate review step downstream).")
+    parser.add_argument("--allow-export-with-failures", action="store_true",
+                         help="Export even if the pre-export validation summary has a FAIL (an RFE item "
+                              "reaching export unanswered). Without this flag, a FAIL blocks export "
+                              "(ExportBlockedError / exit code 1). Defaults to off -- export is blocked "
+                              "by default; opt in explicitly if you really want an unanswered item to "
+                              "go out. Not needed for WARN-only summaries, which never block. In "
+                              "--review mode you'll instead be prompted interactively when this happens, "
+                              "so this flag is mainly for the non-interactive path. NOTE ON EXIT CODE: "
+                              "even when this flag (or the interactive 'export anyway?' prompt) lets the "
+                              "export through, the process still exits 1 if any RFE item is unanswered -- "
+                              "the exit code always reflects validation status, not whether a file was "
+                              "written. Check for the .docx in --out (or parse the 'wrote <path>' log line) "
+                              "to confirm export succeeded; do not infer export failure from exit code alone.")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable debug logging")
     args = parser.parse_args(argv)
 
@@ -584,6 +619,25 @@ def main(argv: list[str] | None = None) -> int:
         except ValueError as e:
             logger.error("FAILED: %s", e)
             return 1
+
+    # Safer CLI default (item #13): --review or --unattended must be
+    # explicit for any real (non-dry-run) run. Checked before touching
+    # SUPERDOCS_API_KEY/agent_signup so a run that's about to be refused
+    # doesn't first sign up for API access it won't use. Previously,
+    # omitting --review on a real run silently fell through to
+    # build_response_packet -- drafting and exporting every item with NO
+    # human approval step anywhere -- making "accidentally file something
+    # nobody looked at" a one-flag-typo away. Now that fallthrough
+    # requires the explicit --unattended opt-in instead of just
+    # happening by omission.
+    if not args.review and not args.unattended:
+        logger.error(
+            "Refusing to run: neither --dry-run, --review, nor --unattended was passed. "
+            "A real (non-dry-run) run with no --review flag drafts and exports every RFE item "
+            "with NO human approval step. Pass --review to approve each section interactively, "
+            "or --unattended to explicitly opt into the fully automated batch path."
+        )
+        return 2
 
     api_key = os.environ.get("SUPERDOCS_API_KEY")
     if not api_key and args.agent_signup:
@@ -606,7 +660,11 @@ def main(argv: list[str] | None = None) -> int:
         out_path, coverage = build_response_packet(
             client, session_id, args.case_id, args.client_name, notice_text, petition, args.out,
             evidence_catalog=evidence_catalog, firm_template=firm_template,
+            allow_export_with_failures=args.allow_export_with_failures,
         )
+    except ExportBlockedError as e:
+        logger.error("FAILED: %s", e)
+        return 1
     except (SuperDocsError, ValueError) as e:
         logger.error("FAILED: %s", e)
         return 1
@@ -617,6 +675,14 @@ def main(argv: list[str] | None = None) -> int:
         logger.warning("some RFE items were not answered:")
         for row in unanswered:
             logger.warning("  - item %s: %s...", row.request_id, row.request_text[:80])
+        # Documented exit-code convention (see --allow-export-with-failures
+        # help text): the file at out_path WAS written above -- this exit
+        # code is a validation signal for automation, not an export-failure
+        # signal. Log that distinction explicitly rather than letting a
+        # bare "exit 1" look indistinguishable from "nothing was written".
+        logger.warning("export SUCCEEDED (file written to %s) -- exit code is 1 only to flag that "
+                        "%d item(s) reached export unanswered; this is not an export failure.",
+                        out_path, len(unanswered))
         return 1
     return 0
 
@@ -658,13 +724,32 @@ def _run_interactive_review(client: SuperDocsClient, session_id: str, args, noti
         decisions[item.request_id] = {"approve": approve, "feedback": feedback}
         print()
 
-    out_path, coverage = finalize_review(client, session, decisions, args.out)
+    try:
+        out_path, coverage = finalize_review(
+            client, session, decisions, args.out,
+            allow_export_with_failures=args.allow_export_with_failures,
+        )
+    except ExportBlockedError as e:
+        print(f"\n{e}\n")
+        answer = input("Export anyway despite the failure(s) above? [y/N]: ").strip().lower()
+        if answer != "y":
+            logger.error("FAILED: export blocked, and export-anyway was declined.")
+            return 1
+        out_path, coverage = finalize_review(
+            client, session, decisions, args.out, allow_export_with_failures=True,
+        )
     unanswered = [row for row in coverage if not row.answered]
     logger.info("%s: wrote %s -- %d RFE items, %d unanswered", args.case_id, out_path, len(coverage), len(unanswered))
     if unanswered:
         logger.warning("some RFE items were not answered (rejected or failed):")
         for row in unanswered:
             logger.warning("  - item %s: %s...", row.request_id, row.request_text[:80])
+        # Same documented exit-code convention as the non-interactive path
+        # above: out_path WAS written -- exit 1 here signals validation
+        # status (unanswered items), not that the export itself failed.
+        logger.warning("export SUCCEEDED (file written to %s) -- exit code is 1 only to flag that "
+                        "%d item(s) reached export unanswered; this is not an export failure.",
+                        out_path, len(unanswered))
         return 1
     return 0
 
