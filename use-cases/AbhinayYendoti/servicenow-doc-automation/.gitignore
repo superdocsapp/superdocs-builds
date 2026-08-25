@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+npm-debug.log*
+
+# Run state persisted by the server so a restart does not strand open reviews.
+.runs/
+.runs*.json
