@@ -1,0 +1,17 @@
+{
+  "response": "Tightened the abstract. Equations were left unchanged.",
+  "session_id": "lab-note-1",
+  "document_changes": {
+    "updated_html": "<div data-chunk-id=\"c1\"><h1>Mean-value lab note</h1></div>",
+    "version_id": "v1",
+    "changes_summary": "Abstract shortened"
+  },
+  "usage": {
+    "monthly_used": 1,
+    "monthly_limit": 500,
+    "monthly_remaining": 499,
+    "was_billable": true,
+    "ops_charged": 1,
+    "subscription_tier": "free"
+  }
+}

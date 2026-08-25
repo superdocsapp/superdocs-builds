@@ -1,0 +1,21 @@
+{
+  "job_id": "job_hitl",
+  "session_id": "lab-note-1",
+  "job_type": "chat",
+  "status": "awaiting_approval",
+  "created_at": "2026-08-25T00:00:00Z",
+  "updated_at": "2026-08-25T00:00:01Z",
+  "progress": 80,
+  "metadata": {
+    "pending_changes": [
+      {
+        "change_id": "ch_1",
+        "operation": "edit",
+        "chunk_id": "c-abs",
+        "old_html": "<p>wordy abstract</p>",
+        "new_html": "<p>short abstract</p>",
+        "ai_explanation": "Tightened the abstract"
+      }
+    ]
+  }
+}
