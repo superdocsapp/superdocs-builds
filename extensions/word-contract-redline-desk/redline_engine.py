@@ -1,6 +1,10 @@
 import json
 from pathlib import Path
+from datetime import datetime, timezone
+
 from docx import Document
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 
 class RedlineEngine:
@@ -32,21 +36,18 @@ class RedlineEngine:
         paragraphs = self.load_document(document_path)
 
         proposals = []
-
         current_clause = None
 
         for paragraph in paragraphs:
 
             text = paragraph["text"]
 
-            # Detect clause headings
             for rule in self.playbook["rules"]:
 
                 if rule["clause"].lower() in text.lower():
                     current_clause = rule
                     break
 
-            # Check the paragraph belonging to the current clause
             if current_clause:
 
                 proposal = self._create_proposal(
@@ -106,6 +107,82 @@ class RedlineEngine:
                 proposal["paragraph_index"]
             ]
 
-            paragraph.text = proposal["after"]
+            # Remove existing paragraph content,
+            # but preserve paragraph properties.
+            for child in list(paragraph._p):
+                if child.tag != qn("w:pPr"):
+                    paragraph._p.remove(child)
+
+            # -----------------------------
+            # TRACKED DELETION
+            # -----------------------------
+
+            deletion = OxmlElement("w:del")
+
+            deletion.set(
+                qn("w:id"),
+                str(proposal["id"])
+            )
+
+            deletion.set(
+                qn("w:author"),
+                "SuperDocs"
+            )
+
+            deletion.set(
+                qn("w:date"),
+                datetime.now(timezone.utc).isoformat()
+            )
+
+            deleted_run = OxmlElement("w:r")
+
+            deleted_text = OxmlElement("w:delText")
+            deleted_text.set(
+                "{http://www.w3.org/XML/1998/namespace}space",
+                "preserve"
+            )
+
+            deleted_text.text = proposal["before"]
+
+            deleted_run.append(deleted_text)
+            deletion.append(deleted_run)
+
+            paragraph._p.append(deletion)
+
+            # -----------------------------
+            # TRACKED INSERTION
+            # -----------------------------
+
+            insertion = OxmlElement("w:ins")
+
+            insertion.set(
+                qn("w:id"),
+                str(proposal["id"] + 1000)
+            )
+
+            insertion.set(
+                qn("w:author"),
+                "SuperDocs"
+            )
+
+            insertion.set(
+                qn("w:date"),
+                datetime.now(timezone.utc).isoformat()
+            )
+
+            inserted_run = OxmlElement("w:r")
+
+            inserted_text = OxmlElement("w:t")
+            inserted_text.set(
+                "{http://www.w3.org/XML/1998/namespace}space",
+                "preserve"
+            )
+
+            inserted_text.text = proposal["after"]
+
+            inserted_run.append(inserted_text)
+            insertion.append(inserted_run)
+
+            paragraph._p.append(insertion)
 
         document.save(output_path)

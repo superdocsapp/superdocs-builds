@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        SuperDocs Contract Redline Desk
+    </title>
+
+    <script
+        src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js">
+    </script>
+<script src="taskpane.js"></script>
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 16px;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f7f7f7;
+
+            color: #222;
+        }
+
+        h1 {
+            margin-top: 0;
+
+            font-size: 20px;
+        }
+
+        #status {
+            margin-bottom: 16px;
+
+            padding: 10px;
+
+            background: #ffffff;
+
+            border: 1px solid #ddd;
+
+            border-radius: 6px;
+
+            font-size: 13px;
+        }
+
+        .toolbar {
+            display: flex;
+
+            gap: 8px;
+
+            margin-bottom: 16px;
+        }
+
+        button {
+            border: none;
+
+            border-radius: 5px;
+
+            padding: 8px 12px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+
+            cursor: not-allowed;
+        }
+
+        #refreshButton {
+            background: #e5e5e5;
+        }
+
+        #exportButton {
+            background: #2563eb;
+
+            color: white;
+        }
+
+        .proposal {
+            background: white;
+
+            border: 1px solid #ddd;
+
+            border-radius: 8px;
+
+            padding: 14px;
+
+            margin-bottom: 14px;
+        }
+
+        .proposal-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 12px;
+        }
+
+        .status {
+            padding: 4px 8px;
+
+            border-radius: 12px;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d1fae5;
+
+            color: #065f46;
+        }
+
+        .status-rejected {
+            background: #fee2e2;
+
+            color: #991b1b;
+        }
+
+        .before,
+        .after,
+        .reason {
+            margin-top: 10px;
+
+            padding: 10px;
+
+            border-radius: 6px;
+
+            font-size: 13px;
+
+            line-height: 1.4;
+        }
+
+        .before {
+            background: #fff1f2;
+
+            border-left: 4px solid #dc2626;
+        }
+
+        .after {
+            background: #ecfdf5;
+
+            border-left: 4px solid #16a34a;
+        }
+
+        .reason {
+            background: #f3f4f6;
+
+            border-left: 4px solid #6b7280;
+        }
+
+        .before p,
+        .after p,
+        .reason p {
+            margin-bottom: 0;
+        }
+
+        .actions {
+            display: flex;
+
+            gap: 8px;
+
+            margin-top: 12px;
+        }
+
+        .actions button:first-child {
+            background: #16a34a;
+
+            color: white;
+        }
+
+        .actions button:last-child {
+            background: #dc2626;
+
+            color: white;
+        }
+
+        .empty {
+            padding: 20px;
+
+            text-align: center;
+
+            color: #666;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <h1>
+        SuperDocs Contract Redline Desk
+    </h1>
+
+
+    <div id="status">
+        Loading proposals...
+    </div>
+
+
+    <div class="toolbar">
+
+        <button id="refreshButton">
+            Refresh
+        </button>
+
+        <button id="exportButton">
+            Export Redlined DOCX
+        </button>
+
+    </div>
+
+
+    <div id="proposals"></div>
+
+
+</body>
+
+</html>

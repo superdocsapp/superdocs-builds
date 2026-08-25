@@ -1,0 +1,11 @@
+[
+  {
+    "id": 68,
+    "clause": "Limitation of Liability",
+    "paragraph_index": 5,
+    "before": "The liability of each party under this Agreement shall be unlimited.",
+    "after": "The liability of each party under this Agreement shall be limited to the total fees paid under this Agreement.",
+    "reason": "Liability should be capped at the total fees paid under the agreement.",
+    "status": "rejected"
+  }
+]
