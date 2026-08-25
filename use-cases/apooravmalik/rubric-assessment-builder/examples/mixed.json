@@ -1,0 +1,5 @@
+{
+  "name": "mixed-concept-assessment",
+  "question_blueprint": ["definition", "process", "inputs_outputs", "comparison", "application"],
+  "rubric_levels": ["full_credit", "partial_credit", "no_credit"]
+}

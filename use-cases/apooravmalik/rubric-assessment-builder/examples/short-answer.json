@@ -1,0 +1,5 @@
+{
+  "name": "short-answer-assessment",
+  "question_blueprint": ["short_answer", "short_answer", "short_answer", "short_answer", "short_answer"],
+  "rubric_levels": ["full_credit", "partial_credit", "no_credit"]
+}
