@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ModelManifest",
+  "description": "Schema for ML model and system card static metadata and operational specifications",
+  "type": "object",
+  "properties": {
+    "model_name": {
+      "type": "string",
+      "description": "The official name or title of the model"
+    },
+    "version": {
+      "type": "string",
+      "description": "Model version or release tag (e.g. 1.0.0, v2-preview)"
+    },
+    "release_date": {
+      "type": "string",
+      "description": "Release or publication date (ISO 8601 or YYYY-MM-DD)"
+    },
+    "model_type": {
+      "type": "string",
+      "description": "Category of model (e.g. LLM, Vision-Language, Dense Transformer, Mixture of Experts)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Executive summary and high-level description of the model"
+    },
+    "intended_purpose": {
+      "type": ["string", "array", "object"],
+      "description": "Primary intended use cases, applications, and target domains"
+    },
+    "limitations": {
+      "type": ["string", "array", "object"],
+      "description": "Known technical, context-length, factual, or capability limitations"
+    },
+    "out_of_scope_uses": {
+      "type": ["string", "array", "object"],
+      "description": "Explicit prohibited, non-supported, or dangerous deployment scenarios"
+    },
+    "maintenance_contact": {
+      "type": ["string", "object"],
+      "description": "Contact email, team, or repository for maintenance and vulnerability reports"
+    },
+    "training_data_summary": {
+      "type": ["string", "object", "array"],
+      "description": "Summary of pre-training datasets, curation filters, token counts, and knowledge cutoff"
+    },
+    "model_architecture": {
+      "type": ["string", "object"],
+      "description": "Architecture details such as parameter count, layers, context window, and attention mechanism"
+    },
+    "ethical_considerations": {
+      "type": ["string", "array", "object"],
+      "description": "Safety evaluations, red-teaming insights, fairness, bias mitigation, and environmental impact"
+    },
+    "license": {
+      "type": "string",
+      "description": "Software or weights license under which the model is distributed"
+    },
+    "citation": {
+      "type": "string",
+      "description": "BibTeX or formal academic citation for the model"
+    },
+    "hardware_and_compute": {
+      "type": ["string", "object"],
+      "description": "Compute infrastructure, accelerators, and carbon emissions during training"
+    },
+    "author_organization": {
+      "type": "string",
+      "description": "Developing organization, lab, or institution"
+    }
+  },
+  "additionalProperties": true
+}

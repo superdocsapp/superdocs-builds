@@ -1,0 +1,98 @@
+{
+  "run_id": "eval-run-20260817-v1.2",
+  "timestamp": "2026-08-17 10:30:00 UTC",
+  "model_name": "Nexus-70B-Instruct",
+  "baseline_model": "Nexus-70B-v1.1",
+  "results": [
+    {
+      "task_id": "mmlu",
+      "score": 88.4,
+      "baseline_score": 84.1,
+      "metric": "Accuracy (5-shot)",
+      "unit": "%",
+      "num_samples": 14042,
+      "few_shot": 5,
+      "notes": "57 subjects across STEM, humanities, social sciences"
+    },
+    {
+      "task_id": "gsm8k",
+      "score": 93.6,
+      "baseline_score": 89.2,
+      "metric": "Exact Match (Pass@1)",
+      "unit": "%",
+      "num_samples": 1319,
+      "few_shot": 8,
+      "notes": "Multi-step grade school math word problems"
+    },
+    {
+      "task_id": "math",
+      "score": 68.2,
+      "baseline_score": 61.5,
+      "metric": "Exact Match",
+      "unit": "%",
+      "num_samples": 5000,
+      "few_shot": 4,
+      "notes": "Challenging competition math problems"
+    },
+    {
+      "task_id": "humaneval",
+      "score": 86.6,
+      "baseline_score": 81.0,
+      "metric": "Pass@1",
+      "unit": "%",
+      "num_samples": 164,
+      "few_shot": 0,
+      "notes": "Python functional code generation evaluated with unit tests"
+    },
+    {
+      "task_id": "mbpp",
+      "score": 84.2,
+      "baseline_score": 80.5,
+      "metric": "Pass@1",
+      "unit": "%",
+      "num_samples": 974,
+      "few_shot": 3,
+      "notes": "Introductory Python programming benchmark"
+    },
+    {
+      "task_id": "arc_challenge",
+      "score": 94.1,
+      "baseline_score": 91.8,
+      "metric": "Accuracy (25-shot)",
+      "unit": "%",
+      "num_samples": 1172,
+      "few_shot": 25,
+      "notes": "Grade-school science questions requiring deep reasoning"
+    },
+    {
+      "task_id": "hellaswag",
+      "score": 91.5,
+      "baseline_score": 89.4,
+      "metric": "Accuracy (10-shot)",
+      "unit": "%",
+      "num_samples": 10042,
+      "few_shot": 10,
+      "notes": "Challenging commonsense NLI reasoning"
+    },
+    {
+      "task_id": "truthfulqa",
+      "score": 79.8,
+      "baseline_score": 74.3,
+      "metric": "MC2",
+      "unit": "%",
+      "num_samples": 817,
+      "few_shot": 0,
+      "notes": "Factuality & resistance to human misconceptions"
+    },
+    {
+      "task_id": "alpaca_eval",
+      "score": 52.4,
+      "baseline_score": 46.1,
+      "metric": "Win Rate (LC)",
+      "unit": "%",
+      "num_samples": 805,
+      "few_shot": 0,
+      "notes": "Length-controlled instruction following benchmark"
+    }
+  ]
+}

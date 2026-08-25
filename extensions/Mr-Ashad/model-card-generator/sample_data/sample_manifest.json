@@ -1,0 +1,52 @@
+{
+  "model_name": "Nexus-70B-Instruct",
+  "version": "v1.2.0",
+  "release_date": "2026-08-15",
+  "model_type": "Dense Decoder-only Transformer LLM",
+  "description": "Nexus-70B-Instruct is a high-capability generative language model optimized for complex reasoning, multi-turn coding, and instruction following across enterprise workflows.",
+  "intended_purpose": [
+    "Complex reasoning, quantitative analysis, and mathematical problem solving",
+    "Software engineering assistance and multi-language code generation",
+    "Technical document summarization and executive brief preparation",
+    "Enterprise agentic tool use and workflow orchestration"
+  ],
+  "limitations": [
+    "Context window limited to 128k tokens; attention quality degrades on >100k distractors",
+    "May occasionally hallucinate citations when querying real-time world events beyond knowledge cutoff",
+    "Non-English low-resource language performance is lower than high-resource benchmarks"
+  ],
+  "out_of_scope_uses": [
+    "Autonomous medical diagnosis or clinical prescription without certified human-in-the-loop oversight",
+    "Generation of malicious cyber-attack scripts, malware, or exploit payloads",
+    "High-frequency algorithmic trading decision making without backtesting guardrails",
+    "Automated legal sentencing, credit denial, or biometric surveillance decisions"
+  ],
+  "maintenance_contact": {
+    "team": "Nexus Foundation AI Safety & Alignment Group",
+    "email": "ai-safety@nexus-models.example.org",
+    "security_reports": "https://security.nexus-models.example.org/report"
+  },
+  "training_data_summary": {
+    "total_tokens": "15.2 Trillion tokens",
+    "composition": "Curated web crawl (55%), Technical papers & textbooks (20%), Synthetic reasoning datasets (15%), High-quality source code (10%)",
+    "cutoff_date": "March 2026",
+    "filtering": "Strict toxicity, PII redaction, deduplication, and synthetic quality scoring"
+  },
+  "model_architecture": {
+    "parameters": "70 Billion parameters",
+    "layers": 80,
+    "heads": 64,
+    "kv_heads": 8,
+    "context_window": "131,072 tokens",
+    "activation": "SwiGLU",
+    "positional_embeddings": "RoPE (Rotary Position Embeddings) with theta=500000"
+  },
+  "ethical_considerations": [
+    "Extensively red-teamed against prompt injection, jailbreaking, and hazardous chemical/biological requests",
+    "Reinforcement learning with Human & AI Feedback (RLHF/RLAIF) applied for helpfulness and safety",
+    "Carbon emissions offset verified: 120 tCO2eq neutralized via certified carbon credits"
+  ],
+  "license": "Apache-2.0 with Responsible AI Deployment Addendum",
+  "citation": "@article{nexus2026,\n  title={Nexus-70B: Technical Report on Frontier Reasoning and Agentic Capabilities},\n  author={Nexus Research Team},\n  journal={arXiv preprint arXiv:2608.01234},\n  year={2026}\n}",
+  "author_organization": "Nexus AI Research Foundation"
+}

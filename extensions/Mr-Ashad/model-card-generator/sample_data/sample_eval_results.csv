@@ -1,0 +1,10 @@
+task_id,score,baseline_score,metric,unit,few_shot,num_samples,notes
+mmlu,88.4,84.1,Accuracy,%,5,14042,General reasoning across 57 domains
+gsm8k,93.6,89.2,Exact Match,%,8,1319,Grade school math word problems
+math,68.2,61.5,Exact Match,%,4,5000,Advanced competition math
+humaneval,86.6,81.0,Pass@1,%,0,164,Functional code generation
+mbpp,84.2,80.5,Pass@1,%,3,974,Python benchmark problems
+arc_challenge,94.1,91.8,Accuracy,%,25,1172,Science challenge questions
+hellaswag,91.5,89.4,Accuracy,%,10,10042,Commonsense reasoning
+truthfulqa,79.8,74.3,MC2,%,0,817,Hallucination resistance
+alpaca_eval,52.4,46.1,Win Rate (LC),%,0,805,Instruction following quality
