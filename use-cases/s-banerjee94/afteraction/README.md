@@ -9,11 +9,15 @@ After a big outage a utility owes its regulator a report: what happened, when, h
 > **SuperDocs does the editing. This tool decides what the document should say.**
 > Built *on* SuperDocs, not a version *of* it — no second review screen, because the document already is one.
 
-![The drafted report — Observed in blue, Assessed in amber, every claim carrying the record it came from](docs/screenshot-report.jpg)
+![The drafted report — Observed in blue, Assessed in amber, and every claim carrying the record it came from, prefixed by which of the six record sets that was](docs/screenshot-report.jpg)
 
-![The human gate: every change shown before and after, approved or rejected one at a time](docs/screenshot-review-gate.jpg)
+![Sections 7 and 8 of the exported report: the restoration curve and the consumer-contacts chart, both sitting inside the document rather than beside it](docs/screenshot-curve-in-document.jpg)
 
-*`--gate interactive`: nothing is written until a person says so, and a rejection carries a reason back to the model.*
+*Both charts are rendered from the records, uploaded as images and placed **inside** the document. The pink band on the curve is a declared telemetry gap — the line breaks across it instead of guessing through it.*
+
+![The human gate: the full instruction that was sent, then the proposed change before and after, then the approval prompt](docs/screenshot-review-gate.jpg)
+
+*`--gate interactive`: nothing is written until a person says so. The instruction is printed above the change it produced, because approving an answer without seeing the question proves nothing — and a rejection carries a reason back to the model.*
 
 ---
 
