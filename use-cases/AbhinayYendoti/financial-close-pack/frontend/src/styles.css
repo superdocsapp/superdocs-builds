@@ -1,0 +1,1149 @@
+:root {
+  --canvas: #f3f0ee;
+  --lifted: #fcfbfa;
+  --ink: #141413;
+  --charcoal: #262627;
+  --muted: #696969;
+  --line: rgba(20, 20, 19, 0.12);
+  --orange: #f37338;
+  --rust: #cf4500;
+  --blue: #3860be;
+  --green: #2d6a4f;
+  font-family: "Sofia Sans", Inter, Arial, sans-serif;
+  color: var(--ink);
+  background: var(--canvas);
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--canvas);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* Buttons are disabled while a request is in flight, which prevents double submits. */
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.shell,
+.auth-screen {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(243, 115, 56, 0.1), transparent 28%),
+    linear-gradient(180deg, var(--canvas), #ebe4dc 100%);
+}
+
+.top-nav {
+  position: sticky;
+  top: 24px;
+  z-index: 10;
+  width: min(1180px, calc(100% - 32px));
+  margin: 24px auto 0;
+  min-height: 72px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: rgba(0, 0, 0, 0.04) 0 4px 24px;
+  backdrop-filter: blur(16px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.logo-mark {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--canvas);
+  background: var(--ink);
+  isolation: isolate;
+}
+
+.logo-mark::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 2px solid var(--orange);
+  border-left-color: transparent;
+  border-radius: 50%;
+  transform: rotate(-24deg);
+}
+
+.logo-core {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.logo-satellite {
+  position: absolute;
+  right: -2px;
+  top: 8px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--orange);
+  border: 3px solid #fff;
+}
+
+.top-nav nav {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+}
+
+.top-nav a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.icon-button {
+  width: 48px;
+  height: 48px;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--ink);
+}
+
+.menu {
+  display: none;
+}
+
+/* Revealed only when the Search control is toggled on; the default bar is unchanged. */
+.nav-search {
+  width: min(240px, 42vw);
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+}
+
+.nav-search:focus {
+  border-color: var(--orange);
+}
+
+.workspace {
+  width: min(1180px, calc(100% - 32px));
+  margin: 32px auto 72px;
+}
+
+.hero-band {
+  position: relative;
+  min-height: 330px;
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1.35fr 0.65fr;
+  gap: 40px;
+  align-items: center;
+  border-radius: 40px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(20, 20, 19, 0.95), rgba(38, 38, 39, 0.82)),
+    linear-gradient(90deg, rgba(243, 115, 56, 0.14), transparent);
+  color: var(--canvas);
+  box-shadow: rgba(0, 0, 0, 0.08) 0 24px 48px;
+}
+
+.hero-band::after,
+.auth-orbit::after {
+  content: "";
+  position: absolute;
+  inset: 28px -10% auto auto;
+  width: 62%;
+  height: 76%;
+  border: 1.5px solid rgba(243, 115, 56, 0.55);
+  border-left: 0;
+  border-bottom: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.eyebrow span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 18px;
+  max-width: 760px;
+  font-size: clamp(42px, 6vw, 68px);
+  line-height: 1;
+  font-weight: 650;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.08;
+  font-weight: 650;
+}
+
+h3 {
+  margin-bottom: 8px;
+  font-size: 28px;
+  line-height: 1.16;
+}
+
+.hero-copy,
+.auth-hero p {
+  max-width: 620px;
+  color: rgba(243, 240, 238, 0.78);
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+.readiness-orbit {
+  position: relative;
+  width: min(280px, 100%);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.readiness-orbit svg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.orbit-track,
+.orbit-progress {
+  fill: none;
+  stroke-width: 10;
+}
+
+.orbit-track {
+  stroke: rgba(255, 255, 255, 0.12);
+}
+
+.orbit-progress {
+  stroke: var(--orange);
+  stroke-linecap: round;
+}
+
+.readiness-orbit div {
+  display: grid;
+  place-items: center;
+}
+
+.readiness-orbit strong {
+  font-size: 54px;
+  line-height: 1;
+}
+
+.readiness-orbit span {
+  color: rgba(243, 240, 238, 0.72);
+}
+
+.app-grid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.side-rail,
+.work-surface,
+.auth-hero,
+.review-item,
+.signoff {
+  border: 1px solid var(--line);
+  background: rgba(252, 251, 250, 0.82);
+}
+
+.side-rail {
+  position: sticky;
+  top: 112px;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 32px;
+}
+
+.close-chip,
+.status {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.close-chip {
+  margin-bottom: 8px;
+  background: #fff;
+}
+
+.rail-item {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 16px;
+  color: var(--charcoal);
+  background: transparent;
+  text-align: left;
+}
+
+.rail-item.active,
+.rail-item:hover {
+  color: var(--canvas);
+  background: var(--ink);
+}
+
+.work-surface {
+  min-height: 620px;
+  padding: 32px;
+  border-radius: 40px;
+}
+
+.panel-flow {
+  display: grid;
+  gap: 24px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.primary-button,
+.secondary-button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 20px;
+  padding: 8px 22px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.primary-button {
+  border: 1.5px solid var(--ink);
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+.secondary-button {
+  border: 1.5px solid var(--ink);
+  background: #fff;
+  color: var(--ink);
+}
+
+.compact {
+  min-height: 38px;
+  padding: 6px 16px;
+}
+
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.metric {
+  min-height: 140px;
+  display: grid;
+  align-content: space-between;
+  justify-items: start;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 22px;
+  color: var(--ink);
+  background: #fff;
+  text-align: left;
+}
+
+.metric strong {
+  font-size: 34px;
+}
+
+.blocker-band,
+.failure-band {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-radius: 32px;
+  padding: 28px;
+}
+
+.blocker-band {
+  background: #efe3d8;
+}
+
+.failure-band {
+  color: #fff;
+  background: var(--rust);
+}
+
+.stage-list,
+.table-list,
+.review-stack,
+.pack-list,
+.timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.stage-row,
+.data-row,
+.timeline-row {
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: #fff;
+}
+
+.button-row {
+  width: 100%;
+  border: 0;
+  color: var(--ink);
+  text-align: left;
+}
+
+.data-row div {
+  display: grid;
+  gap: 4px;
+}
+
+.data-row span,
+.review-header span,
+.signoff p,
+.timeline-row {
+  color: var(--muted);
+}
+
+.status.ready {
+  color: #fff;
+  background: var(--green);
+}
+
+.status.pending {
+  color: var(--ink);
+  background: #f1d8c8;
+}
+
+.empty-dot {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+
+/* SuperDocs integration surface: operation ledger rows and approval receipts. */
+code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+.superdocs-receipt {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+/* The ledger can list dozens of calls; keep the panel scrollable rather than endless. */
+.superdocs-ledger {
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.review-item {
+  display: grid;
+  gap: 18px;
+  border-radius: 32px;
+  padding: 24px;
+}
+
+.review-header,
+.decision-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.review-header div {
+  display: grid;
+  gap: 4px;
+}
+
+.diff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.diff-grid div {
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  padding: 18px;
+  background: #fff;
+}
+
+.diff-grid small {
+  color: var(--blue);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.signoff-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.signoff {
+  min-height: 220px;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border-radius: 32px;
+  padding: 24px;
+}
+
+.signoff span:first-child {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.signoff strong {
+  font-size: 25px;
+}
+
+.close-period-button {
+  min-height: 58px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--canvas);
+  font-weight: 850;
+}
+
+.auth-hero {
+  position: relative;
+  width: min(1180px, calc(100% - 32px));
+  min-height: calc(100vh - 148px);
+  margin: 32px auto;
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  align-items: center;
+  gap: 48px;
+  border-radius: 40px;
+  padding: 56px;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+.auth-orbit {
+  position: relative;
+  min-height: 420px;
+}
+
+.portrait {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.22) 38%, transparent 39%),
+    linear-gradient(135deg, #fff, #f1d8c8);
+  box-shadow: rgba(0, 0, 0, 0.08) 0 24px 48px;
+}
+
+.portrait::after {
+  content: "→";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 24px;
+}
+
+.portrait.one {
+  width: 260px;
+  height: 260px;
+  left: 8%;
+  top: 4%;
+}
+
+.portrait.two {
+  width: 220px;
+  height: 220px;
+  right: 6%;
+  top: 34%;
+}
+
+.portrait.three {
+  width: 170px;
+  height: 170px;
+  left: 28%;
+  bottom: 0;
+}
+
+@media (max-width: 900px) {
+  .top-nav nav {
+    display: none;
+  }
+
+  .menu {
+    display: inline-grid;
+  }
+
+  /* The Menu button now reveals the nav it was always meant to control. */
+  .top-nav.nav-open {
+    flex-wrap: wrap;
+  }
+
+  .top-nav.nav-open nav {
+    display: flex;
+    order: 3;
+    flex-basis: 100%;
+    gap: 24px;
+    padding-top: 8px;
+  }
+
+  .hero-band,
+  .auth-hero,
+  .app-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .side-rail {
+    position: static;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metric-grid,
+  .signoff-grid,
+  .diff-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading,
+  .blocker-band,
+  .review-header,
+  .decision-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .auth-orbit {
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 620px) {
+  .workspace,
+  .auth-hero {
+    width: min(100% - 20px, 1180px);
+  }
+
+  .hero-band,
+  .auth-hero,
+  .work-surface {
+    padding: 24px;
+    border-radius: 32px;
+  }
+
+  .side-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-row,
+  .data-row {
+    grid-template-columns: auto 1fr;
+    border-radius: 28px;
+  }
+
+  .data-row .status,
+  .data-row .secondary-button {
+    grid-column: 1 / -1;
+  }
+
+  .portrait.one {
+    width: 210px;
+    height: 210px;
+  }
+
+  .portrait.two {
+    width: 165px;
+    height: 165px;
+  }
+
+  .portrait.three {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Navigation state, identity, and the guidance surfaces.
+   The nav previously had no active or hover style at all, so a click that did
+   work looked identical to one that did not.
+   --------------------------------------------------------------------------- */
+
+.top-nav a {
+  position: relative;
+  padding: 6px 2px;
+  transition: color 120ms ease;
+}
+
+.top-nav a:hover {
+  color: var(--rust);
+}
+
+.top-nav a.active {
+  color: var(--rust);
+}
+
+.top-nav a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--orange);
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 14px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.user-initials {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--canvas);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.user-meta {
+  display: grid;
+  line-height: 1.2;
+}
+
+.user-meta strong {
+  font-size: 13px;
+}
+
+.user-meta small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.page-lede {
+  margin: 6px 0 0;
+  max-width: 62ch;
+  color: var(--muted);
+}
+
+/* The one sentence that says what to do right now. */
+.next-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(243, 115, 56, 0.35);
+  background: linear-gradient(180deg, rgba(243, 115, 56, 0.1), rgba(243, 115, 56, 0.03));
+}
+
+.next-step h3 {
+  margin: 4px 0 2px;
+}
+
+.next-step p {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* The close, as the ordered sequence a controller works through. */
+.step-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step button {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.step button:hover {
+  border-color: var(--orange);
+}
+
+.step-index {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.step-body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.step-body strong {
+  font-size: 14px;
+}
+
+.step-body small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.step.done .step-index {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.step.current button {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(243, 115, 56, 0.14);
+}
+
+.step.current .step-index {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: #fff;
+}
+
+.step.todo button {
+  opacity: 0.72;
+}
+
+/* Every blocker, linked to the tab that resolves it. */
+.blocker-list {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blocker-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--rust);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* A disabled control must say why it is disabled. */
+.action-with-reason {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
+.action-with-reason .reason {
+  max-width: 34ch;
+  text-align: right;
+  color: var(--rust);
+  font-size: 12px;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state > div {
+  display: grid;
+  gap: 4px;
+  flex: 1 1 220px;
+}
+
+.empty-state span {
+  color: var(--muted);
+}
+
+.hint-band {
+  display: grid;
+  gap: 10px;
+  padding: 16px 20px;
+  border-radius: 20px;
+  background: rgba(56, 96, 190, 0.08);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chip.subtle {
+  background: transparent;
+  color: var(--muted);
+}
+
+.row-tag {
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--orange);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.type-select {
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.type-select:focus {
+  outline: none;
+  border-color: var(--orange);
+}
+
+.template-card {
+  display: grid;
+  gap: 12px;
+  padding: 20px 24px;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.template-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  color: var(--muted);
+}
+
+.template-facts b {
+  color: var(--ink);
+}
+
+/* The rail doubles as a progress indicator. */
+.rail-label {
+  display: grid;
+  gap: 1px;
+  text-align: left;
+  min-width: 0;
+}
+
+.rail-label small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.rail-item.is-current {
+  border-color: var(--orange);
+}
+
+.rail-item.is-done svg {
+  color: var(--green);
+}
+
+.timeline-row > div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.timeline-row strong {
+  font-weight: 700;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Destructive confirmation on a document row. */
+.danger-button {
+  border: 1px solid var(--rust);
+  border-radius: 999px;
+  background: var(--rust);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.icon-button.compact,
+.danger-button.compact {
+  width: auto;
+  height: 40px;
+  padding: 0 16px;
+}
+
+.icon-button.compact {
+  width: 40px;
+  padding: 0;
+}
+
+.icon-button.compact:hover:not(:disabled) {
+  border-color: var(--rust);
+  color: var(--rust);
+}
