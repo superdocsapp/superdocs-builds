@@ -1,0 +1,35 @@
+{
+  "name": "prosemirror-superdocs",
+  "version": "1.0.0",
+  "description": "ProseMirror integration for SuperDocs API with data-chunk-id preservation",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "prosemirror",
+    "superdocs",
+    "editor"
+  ],
+  "author": "SuperDocs",
+  "license": "MIT",
+  "dependencies": {
+    "prosemirror-commands": "^1.6.2",
+    "prosemirror-history": "^1.4.1",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-model": "^1.23.0",
+    "prosemirror-schema-basic": "^1.2.3",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-view": "^1.37.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^8.0.1",
+    "@babel/preset-env": "^8.0.2",
+    "babel-jest": "^30.4.1"
+  }
+}
