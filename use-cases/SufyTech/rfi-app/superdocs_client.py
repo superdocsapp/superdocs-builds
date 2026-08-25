@@ -433,7 +433,18 @@ class SuperDocsClient:
                         f"occurrence would silently corrupt an unaffected section. Inspect the "
                         f"document manually before re-running."
                     )
-
+            print("---- DEBUG: verification mismatch ----")
+            print("OLD_HTML (normalized):", repr(_normalize_for_compare(old_html)) if old_html else None)
+            print("NEW_HTML (normalized):", repr(_normalize_for_compare(new_html)))
+            import re
+            marker = re.escape((old_html or new_html)[:30])
+            match = re.search(marker, doc_html)
+            if match:
+                start = max(0, match.start() - 50)
+                print("DOC_HTML around match:", repr(doc_html[start:start+300]))
+            else:
+                print("DOC_HTML: no nearby match found at all for first 30 chars")
+            print("---------------------------------------")
             raise RuntimeError(
                 f"verify_and_get_final_html: change for chunk {chunk_id!r} could not be "
                 f"verified as landed OR as still-pending - neither its old_html nor its "

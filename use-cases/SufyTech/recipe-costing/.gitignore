@@ -1,4 +1,20 @@
-__pycache__/
-venv/
-.pytest_cache/
+# secrets
 .env
+
+# python
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.egg-info/
+.pytest_cache/
+
+# os
+.DS_Store
+
+# editors
+.vscode/
+.idea/
+
+# local outputs
+*.docx

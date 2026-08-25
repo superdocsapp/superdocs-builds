@@ -150,6 +150,7 @@ def test_run_build2_raises_loudly_if_no_api_key(monkeypatch, capsys):
 
     monkeypatch.delenv("SUPERDOCS_API_KEY", raising=False)
     importlib.reload(run_build2)
+    monkeypatch.delenv("SUPERDOCS_API_KEY", raising=False)
 
     with pytest.raises(SystemExit):
         run_build2.main()
