@@ -1,0 +1,1 @@
+"""VocDigest package."""

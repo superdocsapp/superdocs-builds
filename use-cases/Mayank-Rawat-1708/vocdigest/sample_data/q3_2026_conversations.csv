@@ -1,0 +1,201 @@
+id,text,date,category
+conv-0113,Notification emails are not arriving. I checked spam and they are not there either.,2026-09-14,notifications
+conv-0060,Trying to export a filtered view gives me an empty file with only headers. My account ID is ACCT-93737.,2026-08-25,export
+conv-0120,Notification emails are not arriving. I checked spam and they are not there either.,2026-09-24,notifications
+conv-0080,Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-930668 if that helps.,2026-08-28,dashboard
+conv-0051,"The export button does nothing when I click it. No file, no error, nothing happens at all.",2026-08-08,export
+conv-0180,There is no clear way to see our seat count versus what we are paying for.,2026-09-28,billing
+conv-0130,"Hello — Sarah Dubois here. Email notifications arrive hours late, if they arrive at all.",2026-07-25,notifications
+conv-0022,"Hi, I'm Raj Patel from Northwind Logistics. Exporting my board to CSV silently fails every single time. I've tried three browsers. Ticket reference TKT-167357 if that helps.",2026-07-25,export
+conv-0127,This is Diego at Bluepeak Health. Notification emails are not arriving. I checked spam and they are not there either. Call me on 555-461-8578 if easier.,2026-07-27,notifications
+conv-0177,This is Marcus at Corvid Analytics. I cannot find where to update our payment card in the billing section.,2026-08-28,billing
+conv-0193,Just wanted to say the new timeline view is genuinely excellent. Thank you. Ticket reference TKT-760198 if that helps.,2026-08-19,misc
+conv-0184,Billing settings are impossible to navigate. I gave up and emailed support. Call me on 555-622-9791 if easier.,2026-07-21,billing
+conv-0025,This is Diego at Bluepeak Health. Export to Excel produces a zero-byte file. Opening it just gives an error. My account ID is ACCT-68760.,2026-07-05,export
+conv-0035,Export to Excel produces a zero-byte file. Opening it just gives an error.,2026-09-19,export
+conv-0007,The export feature stopped working after the last update. It worked fine before that. Ticket reference TKT-954087 if that helps.,2026-09-15,export
+conv-0154,Hello — Raj Nakamura here. Orbin crashes on my iPhone whenever I open a project with attachments. Ticket reference TKT-118586 if that helps.,2026-09-18,mobile
+conv-0195,Does Orbin support single sign-on with Okta on the team plan? Ticket reference TKT-615158 if that helps.,2026-09-05,misc
+conv-0034,"Hi, I'm Marcus Nakamura from Northwind Logistics. CSV export has been broken for us all week. This blocks the weekly report I send to my director.",2026-09-13,export
+conv-0129,"Our team is not getting any notification emails, so deadlines are being missed. Ticket reference TKT-374952 if that helps.",2026-08-03,notifications
+conv-0197,Can we change the default view for new projects at the workspace level?,2026-07-27,misc
+conv-0061,This is Chloe at Corvid Analytics. The dashboard takes over thirty seconds to load every morning. It used to be instant.,2026-09-07,dashboard
+conv-0057,This is Marcus at Northwind Logistics. The export feature stopped working after the last update. It worked fine before that. Call me on 555-696-4405 if easier.,2026-08-05,export
+conv-0045,"Hi, I'm Tom Silva from Northwind Logistics. Export to Excel produces a zero-byte file. Opening it just gives an error.",2026-07-30,export
+conv-0123,"This is Marcus at Vertex Media. Email notifications arrive hours late, if they arrive at all.",2026-09-13,notifications
+conv-0145,"Hello — Elena Chen here. Mobile app is unusable. It crashes within seconds of opening, every time.",2026-08-23,mobile
+conv-0063,This is Ben at Bluepeak Health. Loading the main dashboard is painfully slow and often times out completely.,2026-09-12,dashboard
+conv-0182,I cannot find where to update our payment card in the billing section. Ticket reference TKT-448711 if that helps.,2026-09-15,billing
+conv-0111,Mention notifications never send. People assume I am ignoring them.,2026-08-21,notifications
+conv-0003,"I click Export and the spinner runs forever, then stops without producing a download.",2026-07-15,export
+conv-0185,Hello — Chloe Chen here. There is no clear way to see our seat count versus what we are paying for. Call me on 555-550-3979 if easier.,2026-08-07,billing
+conv-0106,Hello — Sarah Novak here. Notification emails are not arriving. I checked spam and they are not there either.,2026-07-29,notifications
+conv-0164,"Hi, I'm Chloe Novak from Bluepeak Health. The iPhone app force-closes when switching between workspaces. My account ID is ACCT-75320.",2026-07-11,mobile
+conv-0067,Hello — Aisha Chen here. Every morning the dashboard spins for ages before showing any of our data. My account ID is ACCT-86627.,2026-09-30,dashboard
+conv-0013,"Hi, I'm Priya Silva from Bluepeak Health. I click Export and the spinner runs forever, then stops without producing a download. You can reach me at priya.silva@bluepeak.com.",2026-08-08,export
+conv-0169,"Hi, I'm Aisha Nakamura from Corvid Analytics. Mobile app is unusable. It crashes within seconds of opening, every time.",2026-08-07,mobile
+conv-0028,I cannot export any of my project data. The download never starts.,2026-09-16,export
+conv-0179,Billing settings are impossible to navigate. I gave up and emailed support.,2026-07-02,billing
+conv-0054,CSV export has been broken for us all week. This blocks the weekly report I send to my director.,2026-09-27,export
+conv-0015,Hello — Diego Dubois here. Export to Excel produces a zero-byte file. Opening it just gives an error. Ticket reference TKT-423379 if that helps.,2026-07-09,export
+conv-0079,Loading the main dashboard is painfully slow and often times out completely. Ticket reference TKT-555417 if that helps.,2026-07-16,dashboard
+conv-0006,Hello — Marcus Patel here. Every export attempt fails without telling me why. There is no error message anywhere.,2026-08-09,export
+conv-0097,Hello — Marcus Okafor here. The overview page is extremely slow since we passed fifty active projects. Call me on 555-821-1840 if easier.,2026-07-03,dashboard
+conv-0117,This is Sarah at Northwind Logistics. I have notifications switched on but nothing ever reaches my inbox.,2026-08-08,notifications
+conv-0048,I cannot export any of my project data. The download never starts. Call me on 555-643-6643 if easier.,2026-08-28,export
+conv-0172,I cannot find where to update our payment card in the billing section. You can reach me at aisha.chen@vertex.com.,2026-08-25,billing
+conv-0091,Every morning the dashboard spins for ages before showing any of our data. Ticket reference TKT-803011 if that helps.,2026-07-17,dashboard
+conv-0194,"Hi, I'm Sarah Okafor from Corvid Analytics. How do I archive a project without deleting its history? You can reach me at sarah.okafor@corvid.com.",2026-09-11,misc
+conv-0147,The iOS app crashes immediately on launch since the latest update. My account ID is ACCT-85880.,2026-08-26,mobile
+conv-0014,CSV export has been broken for us all week. This blocks the weekly report I send to my director. Ticket reference TKT-726310 if that helps.,2026-08-17,export
+conv-0150,App crashes on iOS 18 as soon as I tap into the board view. You can reach me at aisha.hansen@bluepeak.com.,2026-09-07,mobile
+conv-0081,The overview page is extremely slow since we passed fifty active projects.,2026-07-04,dashboard
+conv-0085,Hello — Chloe Dubois here. The dashboard takes over thirty seconds to load every morning. It used to be instant. Call me on 555-629-3568 if easier.,2026-08-25,dashboard
+conv-0174,This is Tom at Bluepeak Health. Billing settings are impossible to navigate. I gave up and emailed support. Ticket reference TKT-964098 if that helps.,2026-07-17,billing
+conv-0066,Dashboard load times have roughly tripled in the last month for our whole team.,2026-08-20,dashboard
+conv-0018,Hello — Tom Dubois here. I cannot export any of my project data. The download never starts. Call me on 555-454-8099 if easier.,2026-08-29,export
+conv-0002,Exporting my board to CSV silently fails every single time. I've tried three browsers. You can reach me at diego.nakamura@northwind.com.,2026-08-28,export
+conv-0088,Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-488645 if that helps.,2026-08-10,dashboard
+conv-0189,Billing settings are impossible to navigate. I gave up and emailed support. You can reach me at diego.novak@northwind.com.,2026-07-11,billing
+conv-0100,Performance on the dashboard is bad enough that people have stopped using it. You can reach me at tom.chen@corvid.com.,2026-09-05,dashboard
+conv-0160,Orbin crashes on my iPhone whenever I open a project with attachments.,2026-08-20,mobile
+conv-0140,Hello — Elena Silva here. Digest emails simply stopped. Nothing changed in our settings.,2026-08-11,notifications
+conv-0114,I stopped receiving email alerts about task assignments roughly two weeks ago.,2026-07-27,notifications
+conv-0167,"Hi, I'm Chloe Patel from Northwind Logistics. The mobile app closes itself every time I try to add a comment.",2026-07-31,mobile
+conv-0183,The invoice page shows a different amount from what we were charged.,2026-07-06,billing
+conv-0134,Notification emails are not arriving. I checked spam and they are not there either. You can reach me at chloe.novak@bluepeak.com.,2026-07-25,notifications
+conv-0198,"Hi, I'm Marcus Chen from Vertex Media. Just wanted to say the new timeline view is genuinely excellent. Thank you.",2026-08-12,misc
+conv-0017,Hello — Tom Silva here. The export feature stopped working after the last update. It worked fine before that. My account ID is ACCT-82966.,2026-09-16,export
+conv-0012,This is Raj at Bluepeak Health. Exporting my board to CSV silently fails every single time. I've tried three browsers.,2026-08-24,export
+conv-0092,Hello — Priya Silva here. Performance on the dashboard is bad enough that people have stopped using it.,2026-07-04,dashboard
+conv-0009,Export silently does nothing for boards with more than about 200 items. My account ID is ACCT-61152.,2026-08-14,export
+conv-0139,"Hi, I'm Tom Nakamura from Northwind Logistics. Mention notifications never send. People assume I am ignoring them.",2026-08-15,notifications
+conv-0135,This is Aisha at Corvid Analytics. I stopped receiving email alerts about task assignments roughly two weeks ago.,2026-09-28,notifications
+conv-0109,"This is Aisha at Northwind Logistics. Email notifications arrive hours late, if they arrive at all. My account ID is ACCT-10890.",2026-08-29,notifications
+conv-0187,I cannot find where to update our payment card in the billing section. My account ID is ACCT-54309.,2026-08-29,billing
+conv-0011,"Hi, I'm Tom Nakamura from Corvid Analytics. The export button does nothing when I click it. No file, no error, nothing happens at all. Ticket reference TKT-680943 if that helps.",2026-09-28,export
+conv-0159,The iOS app crashes immediately on launch since the latest update.,2026-08-16,mobile
+conv-0027,This is Marcus at Vertex Media. The export feature stopped working after the last update. It worked fine before that.,2026-09-28,export
+conv-0148,Orbin crashes on my iPhone whenever I open a project with attachments. Call me on 555-605-8597 if easier.,2026-07-31,mobile
+conv-0010,Hello — Priya Chen here. Trying to export a filtered view gives me an empty file with only headers. Call me on 555-852-2851 if easier.,2026-09-23,export
+conv-0043,"Hi, I'm Elena Okafor from Bluepeak Health. I click Export and the spinner runs forever, then stops without producing a download.",2026-09-08,export
+conv-0192,Can we change the default view for new projects at the workspace level? My account ID is ACCT-26974.,2026-09-08,misc
+conv-0149,The mobile app closes itself every time I try to add a comment. Call me on 555-822-8232 if easier.,2026-07-14,mobile
+conv-0020,This is Marcus at Northwind Logistics. Trying to export a filtered view gives me an empty file with only headers.,2026-07-30,export
+conv-0146,The iPhone app force-closes when switching between workspaces. Ticket reference TKT-518605 if that helps.,2026-09-10,mobile
+conv-0125,Mention notifications never send. People assume I am ignoring them.,2026-07-01,notifications
+conv-0095,Loading the main dashboard is painfully slow and often times out completely.,2026-09-03,dashboard
+conv-0094,Hello — Raj Chen here. Dashboard performance has degraded badly. With twenty projects open it is unusable.,2026-09-27,dashboard
+conv-0166,Orbin crashes on my iPhone whenever I open a project with attachments.,2026-08-25,mobile
+conv-0072,Hello — Marcus Silva here. Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-399742 if that helps.,2026-09-20,dashboard
+conv-0032,"Hi, I'm Tom Silva from Northwind Logistics. Exporting my board to CSV silently fails every single time. I've tried three browsers.",2026-07-15,export
+conv-0065,The overview page is extremely slow since we passed fifty active projects. Ticket reference TKT-663317 if that helps.,2026-08-05,dashboard
+conv-0176,This is Tom at Northwind Logistics. The billing portal is confusing. I cannot tell which plan we are actually on. My account ID is ACCT-27391.,2026-07-06,billing
+conv-0075,Every morning the dashboard spins for ages before showing any of our data. My account ID is ACCT-51430.,2026-09-26,dashboard
+conv-0096,Our dashboard hangs on load for close to a minute before anything appears. Call me on 555-287-6693 if easier.,2026-08-15,dashboard
+conv-0023,"This is Ben at Corvid Analytics. I click Export and the spinner runs forever, then stops without producing a download.",2026-07-13,export
+conv-0024,CSV export has been broken for us all week. This blocks the weekly report I send to my director.,2026-08-28,export
+conv-0090,Dashboard load times have roughly tripled in the last month for our whole team. Ticket reference TKT-124361 if that helps.,2026-08-30,dashboard
+conv-0118,This is Sarah at Northwind Logistics. Mention notifications never send. People assume I am ignoring them.,2026-08-06,notifications
+conv-0152,The iPhone app force-closes when switching between workspaces. Call me on 555-588-8363 if easier.,2026-08-28,mobile
+conv-0173,"Hi, I'm Raj Hansen from Vertex Media. The invoice page shows a different amount from what we were charged. Call me on 555-391-6234 if easier.",2026-07-01,billing
+conv-0069,This is Elena at Corvid Analytics. The dashboard takes over thirty seconds to load every morning. It used to be instant. You can reach me at elena.hansen@corvid.com.,2026-08-16,dashboard
+conv-0071,Loading the main dashboard is painfully slow and often times out completely. Ticket reference TKT-450690 if that helps.,2026-09-20,dashboard
+conv-0137,"Email notifications arrive hours late, if they arrive at all.",2026-08-09,notifications
+conv-0143,Hello — Marcus Hansen here. The mobile app closes itself every time I try to add a comment. Ticket reference TKT-670621 if that helps.,2026-09-25,mobile
+conv-0064,"Hi, I'm Sarah Dubois from Vertex Media. Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-962348 if that helps.",2026-09-03,dashboard
+conv-0076,Performance on the dashboard is bad enough that people have stopped using it.,2026-09-16,dashboard
+conv-0101,"Hi, I'm Sarah Okafor from Bluepeak Health. The dashboard takes over thirty seconds to load every morning. It used to be instant.",2026-07-05,dashboard
+conv-0037,The export feature stopped working after the last update. It worked fine before that.,2026-08-18,export
+conv-0103,Loading the main dashboard is painfully slow and often times out completely.,2026-08-08,dashboard
+conv-0199,How do I archive a project without deleting its history?,2026-07-16,misc
+conv-0086,Hello — Raj Silva here. Dashboard performance has degraded badly. With twenty projects open it is unusable. You can reach me at raj.silva@corvid.com.,2026-09-30,dashboard
+conv-0138,Hello — Aisha Novak here. I have notifications switched on but nothing ever reaches my inbox. My account ID is ACCT-55518.,2026-08-23,notifications
+conv-0144,App crashes on iOS 18 as soon as I tap into the board view. Call me on 555-902-4352 if easier.,2026-07-07,mobile
+conv-0136,"Our team is not getting any notification emails, so deadlines are being missed.",2026-07-22,notifications
+conv-0105,The overview page is extremely slow since we passed fifty active projects. Ticket reference TKT-736476 if that helps.,2026-09-24,dashboard
+conv-0181,"Hi, I'm Marcus Patel from Bluepeak Health. The billing portal is confusing. I cannot tell which plan we are actually on. My account ID is ACCT-81520.",2026-07-04,billing
+conv-0001,"The export button does nothing when I click it. No file, no error, nothing happens at all.",2026-07-27,export
+conv-0082,"Hi, I'm Priya Dubois from Corvid Analytics. Dashboard load times have roughly tripled in the last month for our whole team. Call me on 555-566-4277 if easier.",2026-07-27,dashboard
+conv-0038,I cannot export any of my project data. The download never starts. Ticket reference TKT-326170 if that helps.,2026-09-14,export
+conv-0124,"Hi, I'm Raj Chen from Vertex Media. I have notifications switched on but nothing ever reaches my inbox.",2026-08-18,notifications
+conv-0142,Orbin crashes on my iPhone whenever I open a project with attachments. My account ID is ACCT-30844.,2026-09-23,mobile
+conv-0070,Dashboard performance has degraded badly. With twenty projects open it is unusable.,2026-09-03,dashboard
+conv-0190,"Hi, I'm Marcus Okafor from Corvid Analytics. There is no clear way to see our seat count versus what we are paying for.",2026-08-31,billing
+conv-0165,The iOS app crashes immediately on launch since the latest update.,2026-08-10,mobile
+conv-0053,"I click Export and the spinner runs forever, then stops without producing a download. Ticket reference TKT-428145 if that helps.",2026-07-23,export
+conv-0131,I have notifications switched on but nothing ever reaches my inbox. My account ID is ACCT-34966.,2026-09-09,notifications
+conv-0093,This is Priya at Northwind Logistics. The dashboard takes over thirty seconds to load every morning. It used to be instant.,2026-07-16,dashboard
+conv-0110,I have notifications switched on but nothing ever reaches my inbox.,2026-09-07,notifications
+conv-0141,The iOS app crashes immediately on launch since the latest update.,2026-07-04,mobile
+conv-0068,Hello — Priya Dubois here. Performance on the dashboard is bad enough that people have stopped using it.,2026-08-07,dashboard
+conv-0047,This is Tom at Corvid Analytics. The export feature stopped working after the last update. It worked fine before that. You can reach me at tom.okafor@corvid.com.,2026-07-09,export
+conv-0126,Digest emails simply stopped. Nothing changed in our settings. Call me on 555-638-9862 if easier.,2026-08-21,notifications
+conv-0191,Is there a keyboard shortcut for creating a new task? I could not find one documented.,2026-08-31,misc
+conv-0112,Hello — Raj Silva here. Digest emails simply stopped. Nothing changed in our settings. Ticket reference TKT-758456 if that helps.,2026-08-08,notifications
+conv-0056,Every export attempt fails without telling me why. There is no error message anywhere. Ticket reference TKT-830519 if that helps.,2026-08-23,export
+conv-0004,"Hi, I'm Aisha Hansen from Northwind Logistics. CSV export has been broken for us all week. This blocks the weekly report I send to my director. My account ID is ACCT-41065.",2026-08-13,export
+conv-0163,"Mobile app is unusable. It crashes within seconds of opening, every time.",2026-07-31,mobile
+conv-0162,"Hi, I'm Raj Hansen from Northwind Logistics. App crashes on iOS 18 as soon as I tap into the board view.",2026-09-28,mobile
+conv-0062,Hello — Chloe Patel here. Dashboard performance has degraded badly. With twenty projects open it is unusable. My account ID is ACCT-95904.,2026-07-29,dashboard
+conv-0196,Is there a keyboard shortcut for creating a new task? I could not find one documented.,2026-07-19,misc
+conv-0157,"Mobile app is unusable. It crashes within seconds of opening, every time.",2026-07-05,mobile
+conv-0041,"The export button does nothing when I click it. No file, no error, nothing happens at all. Ticket reference TKT-219746 if that helps.",2026-08-16,export
+conv-0119,Digest emails simply stopped. Nothing changed in our settings. Call me on 555-447-7605 if easier.,2026-08-17,notifications
+conv-0031,"Hi, I'm Tom Dubois from Corvid Analytics. The export button does nothing when I click it. No file, no error, nothing happens at all. You can reach me at tom.dubois@corvid.com.",2026-07-18,export
+conv-0089,The overview page is extremely slow since we passed fifty active projects.,2026-08-27,dashboard
+conv-0005,Hello — Diego Dubois here. Export to Excel produces a zero-byte file. Opening it just gives an error. My account ID is ACCT-28177.,2026-08-04,export
+conv-0016,Hello — Chloe Novak here. Every export attempt fails without telling me why. There is no error message anywhere. You can reach me at chloe.novak@bluepeak.com.,2026-09-06,export
+conv-0021,"The export button does nothing when I click it. No file, no error, nothing happens at all. Call me on 555-644-5624 if easier.",2026-09-02,export
+conv-0073,Hello — Elena Hansen here. The overview page is extremely slow since we passed fifty active projects. Call me on 555-219-1122 if easier.,2026-07-20,dashboard
+conv-0019,Export silently does nothing for boards with more than about 200 items. You can reach me at elena.chen@vertex.com.,2026-07-13,export
+conv-0151,"Hello — Ben Silva here. Mobile app is unusable. It crashes within seconds of opening, every time. My account ID is ACCT-12283.",2026-09-06,mobile
+conv-0046,"Hi, I'm Ben Chen from Corvid Analytics. Every export attempt fails without telling me why. There is no error message anywhere.",2026-08-12,export
+conv-0186,The billing portal is confusing. I cannot tell which plan we are actually on. You can reach me at tom.dubois@northwind.com.,2026-07-21,billing
+conv-0116,"Email notifications arrive hours late, if they arrive at all. You can reach me at priya.chen@northwind.com.",2026-09-27,notifications
+conv-0052,This is Marcus at Northwind Logistics. Exporting my board to CSV silently fails every single time. I've tried three browsers.,2026-08-18,export
+conv-0078,Dashboard performance has degraded badly. With twenty projects open it is unusable. You can reach me at chloe.silva@bluepeak.com.,2026-07-18,dashboard
+conv-0039,Export silently does nothing for boards with more than about 200 items.,2026-07-20,export
+conv-0178,This is Chloe at Corvid Analytics. The invoice page shows a different amount from what we were charged.,2026-08-20,billing
+conv-0050,Trying to export a filtered view gives me an empty file with only headers.,2026-08-22,export
+conv-0049,This is Sarah at Northwind Logistics. Export silently does nothing for boards with more than about 200 items.,2026-09-01,export
+conv-0115,"Hi, I'm Priya Nakamura from Bluepeak Health. Our team is not getting any notification emails, so deadlines are being missed.",2026-08-15,notifications
+conv-0128,"Hi, I'm Chloe Chen from Northwind Logistics. I stopped receiving email alerts about task assignments roughly two weeks ago. My account ID is ACCT-34855.",2026-09-16,notifications
+conv-0077,The dashboard takes over thirty seconds to load every morning. It used to be instant. You can reach me at diego.chen@bluepeak.com.,2026-07-09,dashboard
+conv-0059,Export silently does nothing for boards with more than about 200 items. Call me on 555-737-2996 if easier.,2026-08-01,export
+conv-0122,"This is Marcus at Northwind Logistics. Our team is not getting any notification emails, so deadlines are being missed. Ticket reference TKT-363557 if that helps.",2026-08-19,notifications
+conv-0104,Our dashboard hangs on load for close to a minute before anything appears.,2026-09-20,dashboard
+conv-0008,I cannot export any of my project data. The download never starts. Ticket reference TKT-515674 if that helps.,2026-07-17,export
+conv-0098,This is Marcus at Vertex Media. Dashboard load times have roughly tripled in the last month for our whole team. Call me on 555-967-1321 if easier.,2026-09-05,dashboard
+conv-0107,I stopped receiving email alerts about task assignments roughly two weeks ago. My account ID is ACCT-40108.,2026-07-18,notifications
+conv-0102,Dashboard performance has degraded badly. With twenty projects open it is unusable.,2026-07-27,dashboard
+conv-0155,Hello — Sarah Hansen here. The mobile app closes itself every time I try to add a comment. My account ID is ACCT-68716.,2026-09-24,mobile
+conv-0108,"Hello — Diego Patel here. Our team is not getting any notification emails, so deadlines are being missed. Call me on 555-721-8518 if easier.",2026-07-19,notifications
+conv-0200,This is Priya at Northwind Logistics. Does Orbin support single sign-on with Okta on the team plan? Call me on 555-886-2241 if easier.,2026-08-15,misc
+conv-0099,Every morning the dashboard spins for ages before showing any of our data. My account ID is ACCT-58387.,2026-09-08,dashboard
+conv-0083,Hello — Aisha Okafor here. Every morning the dashboard spins for ages before showing any of our data.,2026-07-03,dashboard
+conv-0084,Performance on the dashboard is bad enough that people have stopped using it. Ticket reference TKT-888457 if that helps.,2026-07-10,dashboard
+conv-0168,This is Elena at Vertex Media. App crashes on iOS 18 as soon as I tap into the board view.,2026-08-08,mobile
+conv-0036,Every export attempt fails without telling me why. There is no error message anywhere. You can reach me at ben.okafor@vertex.com.,2026-08-26,export
+conv-0132,Hello — Aisha Novak here. Mention notifications never send. People assume I am ignoring them. Call me on 555-256-9242 if easier.,2026-09-06,notifications
+conv-0171,"Hi, I'm Sarah Patel from Vertex Media. The billing portal is confusing. I cannot tell which plan we are actually on.",2026-08-13,billing
+conv-0044,CSV export has been broken for us all week. This blocks the weekly report I send to my director.,2026-07-25,export
+conv-0033,"I click Export and the spinner runs forever, then stops without producing a download.",2026-07-14,export
+conv-0026,Hello — Elena Chen here. Every export attempt fails without telling me why. There is no error message anywhere. Call me on 555-978-4553 if easier.,2026-08-20,export
+conv-0121,"Hi, I'm Sarah Dubois from Bluepeak Health. I stopped receiving email alerts about task assignments roughly two weeks ago.",2026-07-05,notifications
+conv-0058,I cannot export any of my project data. The download never starts.,2026-08-12,export
+conv-0042,Exporting my board to CSV silently fails every single time. I've tried three browsers.,2026-08-08,export
+conv-0040,Trying to export a filtered view gives me an empty file with only headers. My account ID is ACCT-52001.,2026-09-29,export
+conv-0055,Export to Excel produces a zero-byte file. Opening it just gives an error. My account ID is ACCT-91642.,2026-09-09,export
+conv-0030,Hello — Aisha Okafor here. Trying to export a filtered view gives me an empty file with only headers. My account ID is ACCT-38724.,2026-09-17,export
+conv-0153,The iOS app crashes immediately on launch since the latest update. Ticket reference TKT-786589 if that helps.,2026-08-28,mobile
+conv-0087,Loading the main dashboard is painfully slow and often times out completely.,2026-08-14,dashboard
+conv-0133,Hello — Diego Nakamura here. Digest emails simply stopped. Nothing changed in our settings. My account ID is ACCT-99736.,2026-08-25,notifications
+conv-0074,Dashboard load times have roughly tripled in the last month for our whole team.,2026-07-01,dashboard
+conv-0158,This is Chloe at Corvid Analytics. The iPhone app force-closes when switching between workspaces. You can reach me at chloe.okafor@corvid.com.,2026-09-13,mobile
+conv-0170,"Hi, I'm Elena Patel from Vertex Media. The iPhone app force-closes when switching between workspaces.",2026-07-09,mobile
+conv-0029,Export silently does nothing for boards with more than about 200 items. You can reach me at marcus.okafor@bluepeak.com.,2026-07-30,export
+conv-0161,This is Raj at Vertex Media. The mobile app closes itself every time I try to add a comment. Ticket reference TKT-816819 if that helps.,2026-07-20,mobile
+conv-0188,"Hi, I'm Chloe Okafor from Bluepeak Health. The invoice page shows a different amount from what we were charged. You can reach me at chloe.okafor@bluepeak.com.",2026-09-26,billing
+conv-0156,App crashes on iOS 18 as soon as I tap into the board view. Ticket reference TKT-206271 if that helps.,2026-09-26,mobile
+conv-0175,There is no clear way to see our seat count versus what we are paying for. You can reach me at aisha.chen@northwind.com.,2026-07-22,billing

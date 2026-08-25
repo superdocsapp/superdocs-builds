@@ -1,0 +1,44 @@
+# VocDigest backend dependencies.
+# Versions are those the test suite was actually verified against, with a compatible-
+# release bound (~=) so patch fixes are picked up but a minor bump cannot silently
+# change behaviour. Regenerate deliberately, not automatically.
+
+# --- web layer ---
+fastapi~=0.141.1
+uvicorn[standard]~=0.52.1
+python-multipart~=0.0.32       # multipart/form-data for the upload endpoint
+
+# --- config & validation ---
+pydantic~=2.13.4
+pydantic-settings~=2.15.0
+
+# --- database ---
+SQLAlchemy[asyncio]~=2.0.51
+asyncpg~=0.31.0                # Postgres driver (production)
+aiosqlite~=0.22.1              # SQLite driver (tests, and the zero-infra demo path)
+alembic~=1.19.0
+pgvector~=0.5.0                # vector column type on Postgres
+
+# --- agent orchestration ---
+langgraph~=1.2.10
+
+# --- HTTP clients ---
+httpx~=0.28.1                  # SuperDocs and Groq clients
+
+# --- MCP server ---
+fastmcp~=3.4.6
+
+# --- document parsing ---
+python-docx~=1.2.0             # reads a .docx prior-quarter digest
+
+# --- embeddings (optional) ---
+# Not installed by default: it pulls torch, which is a ~2GB download and unnecessary
+# for the test suite or a demo run. Install it for real semantic clustering:
+#   pip install "sentence-transformers~=3.0"
+# Without it the system falls back to the deterministic hash embedder and says so.
+# sentence-transformers~=3.0
+
+# --- development ---
+pytest~=9.1.1
+pytest-asyncio~=1.4.0
+ruff~=0.16.2

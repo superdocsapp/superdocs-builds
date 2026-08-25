@@ -1,0 +1,1002 @@
+[
+  {
+    "id": "conv-0113",
+    "text": "Notification emails are not arriving. I checked spam and they are not there either.",
+    "date": "2026-09-14"
+  },
+  {
+    "id": "conv-0060",
+    "text": "Trying to export a filtered view gives me an empty file with only headers. My account ID is ACCT-93737.",
+    "date": "2026-08-25"
+  },
+  {
+    "id": "conv-0120",
+    "text": "Notification emails are not arriving. I checked spam and they are not there either.",
+    "date": "2026-09-24"
+  },
+  {
+    "id": "conv-0080",
+    "text": "Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-930668 if that helps.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0051",
+    "text": "The export button does nothing when I click it. No file, no error, nothing happens at all.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0180",
+    "text": "There is no clear way to see our seat count versus what we are paying for.",
+    "date": "2026-09-28"
+  },
+  {
+    "id": "conv-0130",
+    "text": "Hello \u2014 Sarah Dubois here. Email notifications arrive hours late, if they arrive at all.",
+    "date": "2026-07-25"
+  },
+  {
+    "id": "conv-0022",
+    "text": "Hi, I'm Raj Patel from Northwind Logistics. Exporting my board to CSV silently fails every single time. I've tried three browsers. Ticket reference TKT-167357 if that helps.",
+    "date": "2026-07-25"
+  },
+  {
+    "id": "conv-0127",
+    "text": "This is Diego at Bluepeak Health. Notification emails are not arriving. I checked spam and they are not there either. Call me on 555-461-8578 if easier.",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "conv-0177",
+    "text": "This is Marcus at Corvid Analytics. I cannot find where to update our payment card in the billing section.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0193",
+    "text": "Just wanted to say the new timeline view is genuinely excellent. Thank you. Ticket reference TKT-760198 if that helps.",
+    "date": "2026-08-19"
+  },
+  {
+    "id": "conv-0184",
+    "text": "Billing settings are impossible to navigate. I gave up and emailed support. Call me on 555-622-9791 if easier.",
+    "date": "2026-07-21"
+  },
+  {
+    "id": "conv-0025",
+    "text": "This is Diego at Bluepeak Health. Export to Excel produces a zero-byte file. Opening it just gives an error. My account ID is ACCT-68760.",
+    "date": "2026-07-05"
+  },
+  {
+    "id": "conv-0035",
+    "text": "Export to Excel produces a zero-byte file. Opening it just gives an error.",
+    "date": "2026-09-19"
+  },
+  {
+    "id": "conv-0007",
+    "text": "The export feature stopped working after the last update. It worked fine before that. Ticket reference TKT-954087 if that helps.",
+    "date": "2026-09-15"
+  },
+  {
+    "id": "conv-0154",
+    "text": "Hello \u2014 Raj Nakamura here. Orbin crashes on my iPhone whenever I open a project with attachments. Ticket reference TKT-118586 if that helps.",
+    "date": "2026-09-18"
+  },
+  {
+    "id": "conv-0195",
+    "text": "Does Orbin support single sign-on with Okta on the team plan? Ticket reference TKT-615158 if that helps.",
+    "date": "2026-09-05"
+  },
+  {
+    "id": "conv-0034",
+    "text": "Hi, I'm Marcus Nakamura from Northwind Logistics. CSV export has been broken for us all week. This blocks the weekly report I send to my director.",
+    "date": "2026-09-13"
+  },
+  {
+    "id": "conv-0129",
+    "text": "Our team is not getting any notification emails, so deadlines are being missed. Ticket reference TKT-374952 if that helps.",
+    "date": "2026-08-03"
+  },
+  {
+    "id": "conv-0197",
+    "text": "Can we change the default view for new projects at the workspace level?",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "conv-0061",
+    "text": "This is Chloe at Corvid Analytics. The dashboard takes over thirty seconds to load every morning. It used to be instant.",
+    "date": "2026-09-07"
+  },
+  {
+    "id": "conv-0057",
+    "text": "This is Marcus at Northwind Logistics. The export feature stopped working after the last update. It worked fine before that. Call me on 555-696-4405 if easier.",
+    "date": "2026-08-05"
+  },
+  {
+    "id": "conv-0045",
+    "text": "Hi, I'm Tom Silva from Northwind Logistics. Export to Excel produces a zero-byte file. Opening it just gives an error.",
+    "date": "2026-07-30"
+  },
+  {
+    "id": "conv-0123",
+    "text": "This is Marcus at Vertex Media. Email notifications arrive hours late, if they arrive at all.",
+    "date": "2026-09-13"
+  },
+  {
+    "id": "conv-0145",
+    "text": "Hello \u2014 Elena Chen here. Mobile app is unusable. It crashes within seconds of opening, every time.",
+    "date": "2026-08-23"
+  },
+  {
+    "id": "conv-0063",
+    "text": "This is Ben at Bluepeak Health. Loading the main dashboard is painfully slow and often times out completely.",
+    "date": "2026-09-12"
+  },
+  {
+    "id": "conv-0182",
+    "text": "I cannot find where to update our payment card in the billing section. Ticket reference TKT-448711 if that helps.",
+    "date": "2026-09-15"
+  },
+  {
+    "id": "conv-0111",
+    "text": "Mention notifications never send. People assume I am ignoring them.",
+    "date": "2026-08-21"
+  },
+  {
+    "id": "conv-0003",
+    "text": "I click Export and the spinner runs forever, then stops without producing a download.",
+    "date": "2026-07-15"
+  },
+  {
+    "id": "conv-0185",
+    "text": "Hello \u2014 Chloe Chen here. There is no clear way to see our seat count versus what we are paying for. Call me on 555-550-3979 if easier.",
+    "date": "2026-08-07"
+  },
+  {
+    "id": "conv-0106",
+    "text": "Hello \u2014 Sarah Novak here. Notification emails are not arriving. I checked spam and they are not there either.",
+    "date": "2026-07-29"
+  },
+  {
+    "id": "conv-0164",
+    "text": "Hi, I'm Chloe Novak from Bluepeak Health. The iPhone app force-closes when switching between workspaces. My account ID is ACCT-75320.",
+    "date": "2026-07-11"
+  },
+  {
+    "id": "conv-0067",
+    "text": "Hello \u2014 Aisha Chen here. Every morning the dashboard spins for ages before showing any of our data. My account ID is ACCT-86627.",
+    "date": "2026-09-30"
+  },
+  {
+    "id": "conv-0013",
+    "text": "Hi, I'm Priya Silva from Bluepeak Health. I click Export and the spinner runs forever, then stops without producing a download. You can reach me at priya.silva@bluepeak.com.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0169",
+    "text": "Hi, I'm Aisha Nakamura from Corvid Analytics. Mobile app is unusable. It crashes within seconds of opening, every time.",
+    "date": "2026-08-07"
+  },
+  {
+    "id": "conv-0028",
+    "text": "I cannot export any of my project data. The download never starts.",
+    "date": "2026-09-16"
+  },
+  {
+    "id": "conv-0179",
+    "text": "Billing settings are impossible to navigate. I gave up and emailed support.",
+    "date": "2026-07-02"
+  },
+  {
+    "id": "conv-0054",
+    "text": "CSV export has been broken for us all week. This blocks the weekly report I send to my director.",
+    "date": "2026-09-27"
+  },
+  {
+    "id": "conv-0015",
+    "text": "Hello \u2014 Diego Dubois here. Export to Excel produces a zero-byte file. Opening it just gives an error. Ticket reference TKT-423379 if that helps.",
+    "date": "2026-07-09"
+  },
+  {
+    "id": "conv-0079",
+    "text": "Loading the main dashboard is painfully slow and often times out completely. Ticket reference TKT-555417 if that helps.",
+    "date": "2026-07-16"
+  },
+  {
+    "id": "conv-0006",
+    "text": "Hello \u2014 Marcus Patel here. Every export attempt fails without telling me why. There is no error message anywhere.",
+    "date": "2026-08-09"
+  },
+  {
+    "id": "conv-0097",
+    "text": "Hello \u2014 Marcus Okafor here. The overview page is extremely slow since we passed fifty active projects. Call me on 555-821-1840 if easier.",
+    "date": "2026-07-03"
+  },
+  {
+    "id": "conv-0117",
+    "text": "This is Sarah at Northwind Logistics. I have notifications switched on but nothing ever reaches my inbox.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0048",
+    "text": "I cannot export any of my project data. The download never starts. Call me on 555-643-6643 if easier.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0172",
+    "text": "I cannot find where to update our payment card in the billing section. You can reach me at aisha.chen@vertex.com.",
+    "date": "2026-08-25"
+  },
+  {
+    "id": "conv-0091",
+    "text": "Every morning the dashboard spins for ages before showing any of our data. Ticket reference TKT-803011 if that helps.",
+    "date": "2026-07-17"
+  },
+  {
+    "id": "conv-0194",
+    "text": "Hi, I'm Sarah Okafor from Corvid Analytics. How do I archive a project without deleting its history? You can reach me at sarah.okafor@corvid.com.",
+    "date": "2026-09-11"
+  },
+  {
+    "id": "conv-0147",
+    "text": "The iOS app crashes immediately on launch since the latest update. My account ID is ACCT-85880.",
+    "date": "2026-08-26"
+  },
+  {
+    "id": "conv-0014",
+    "text": "CSV export has been broken for us all week. This blocks the weekly report I send to my director. Ticket reference TKT-726310 if that helps.",
+    "date": "2026-08-17"
+  },
+  {
+    "id": "conv-0150",
+    "text": "App crashes on iOS 18 as soon as I tap into the board view. You can reach me at aisha.hansen@bluepeak.com.",
+    "date": "2026-09-07"
+  },
+  {
+    "id": "conv-0081",
+    "text": "The overview page is extremely slow since we passed fifty active projects.",
+    "date": "2026-07-04"
+  },
+  {
+    "id": "conv-0085",
+    "text": "Hello \u2014 Chloe Dubois here. The dashboard takes over thirty seconds to load every morning. It used to be instant. Call me on 555-629-3568 if easier.",
+    "date": "2026-08-25"
+  },
+  {
+    "id": "conv-0174",
+    "text": "This is Tom at Bluepeak Health. Billing settings are impossible to navigate. I gave up and emailed support. Ticket reference TKT-964098 if that helps.",
+    "date": "2026-07-17"
+  },
+  {
+    "id": "conv-0066",
+    "text": "Dashboard load times have roughly tripled in the last month for our whole team.",
+    "date": "2026-08-20"
+  },
+  {
+    "id": "conv-0018",
+    "text": "Hello \u2014 Tom Dubois here. I cannot export any of my project data. The download never starts. Call me on 555-454-8099 if easier.",
+    "date": "2026-08-29"
+  },
+  {
+    "id": "conv-0002",
+    "text": "Exporting my board to CSV silently fails every single time. I've tried three browsers. You can reach me at diego.nakamura@northwind.com.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0088",
+    "text": "Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-488645 if that helps.",
+    "date": "2026-08-10"
+  },
+  {
+    "id": "conv-0189",
+    "text": "Billing settings are impossible to navigate. I gave up and emailed support. You can reach me at diego.novak@northwind.com.",
+    "date": "2026-07-11"
+  },
+  {
+    "id": "conv-0100",
+    "text": "Performance on the dashboard is bad enough that people have stopped using it. You can reach me at tom.chen@corvid.com.",
+    "date": "2026-09-05"
+  },
+  {
+    "id": "conv-0160",
+    "text": "Orbin crashes on my iPhone whenever I open a project with attachments.",
+    "date": "2026-08-20"
+  },
+  {
+    "id": "conv-0140",
+    "text": "Hello \u2014 Elena Silva here. Digest emails simply stopped. Nothing changed in our settings.",
+    "date": "2026-08-11"
+  },
+  {
+    "id": "conv-0114",
+    "text": "I stopped receiving email alerts about task assignments roughly two weeks ago.",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "conv-0167",
+    "text": "Hi, I'm Chloe Patel from Northwind Logistics. The mobile app closes itself every time I try to add a comment.",
+    "date": "2026-07-31"
+  },
+  {
+    "id": "conv-0183",
+    "text": "The invoice page shows a different amount from what we were charged.",
+    "date": "2026-07-06"
+  },
+  {
+    "id": "conv-0134",
+    "text": "Notification emails are not arriving. I checked spam and they are not there either. You can reach me at chloe.novak@bluepeak.com.",
+    "date": "2026-07-25"
+  },
+  {
+    "id": "conv-0198",
+    "text": "Hi, I'm Marcus Chen from Vertex Media. Just wanted to say the new timeline view is genuinely excellent. Thank you.",
+    "date": "2026-08-12"
+  },
+  {
+    "id": "conv-0017",
+    "text": "Hello \u2014 Tom Silva here. The export feature stopped working after the last update. It worked fine before that. My account ID is ACCT-82966.",
+    "date": "2026-09-16"
+  },
+  {
+    "id": "conv-0012",
+    "text": "This is Raj at Bluepeak Health. Exporting my board to CSV silently fails every single time. I've tried three browsers.",
+    "date": "2026-08-24"
+  },
+  {
+    "id": "conv-0092",
+    "text": "Hello \u2014 Priya Silva here. Performance on the dashboard is bad enough that people have stopped using it.",
+    "date": "2026-07-04"
+  },
+  {
+    "id": "conv-0009",
+    "text": "Export silently does nothing for boards with more than about 200 items. My account ID is ACCT-61152.",
+    "date": "2026-08-14"
+  },
+  {
+    "id": "conv-0139",
+    "text": "Hi, I'm Tom Nakamura from Northwind Logistics. Mention notifications never send. People assume I am ignoring them.",
+    "date": "2026-08-15"
+  },
+  {
+    "id": "conv-0135",
+    "text": "This is Aisha at Corvid Analytics. I stopped receiving email alerts about task assignments roughly two weeks ago.",
+    "date": "2026-09-28"
+  },
+  {
+    "id": "conv-0109",
+    "text": "This is Aisha at Northwind Logistics. Email notifications arrive hours late, if they arrive at all. My account ID is ACCT-10890.",
+    "date": "2026-08-29"
+  },
+  {
+    "id": "conv-0187",
+    "text": "I cannot find where to update our payment card in the billing section. My account ID is ACCT-54309.",
+    "date": "2026-08-29"
+  },
+  {
+    "id": "conv-0011",
+    "text": "Hi, I'm Tom Nakamura from Corvid Analytics. The export button does nothing when I click it. No file, no error, nothing happens at all. Ticket reference TKT-680943 if that helps.",
+    "date": "2026-09-28"
+  },
+  {
+    "id": "conv-0159",
+    "text": "The iOS app crashes immediately on launch since the latest update.",
+    "date": "2026-08-16"
+  },
+  {
+    "id": "conv-0027",
+    "text": "This is Marcus at Vertex Media. The export feature stopped working after the last update. It worked fine before that.",
+    "date": "2026-09-28"
+  },
+  {
+    "id": "conv-0148",
+    "text": "Orbin crashes on my iPhone whenever I open a project with attachments. Call me on 555-605-8597 if easier.",
+    "date": "2026-07-31"
+  },
+  {
+    "id": "conv-0010",
+    "text": "Hello \u2014 Priya Chen here. Trying to export a filtered view gives me an empty file with only headers. Call me on 555-852-2851 if easier.",
+    "date": "2026-09-23"
+  },
+  {
+    "id": "conv-0043",
+    "text": "Hi, I'm Elena Okafor from Bluepeak Health. I click Export and the spinner runs forever, then stops without producing a download.",
+    "date": "2026-09-08"
+  },
+  {
+    "id": "conv-0192",
+    "text": "Can we change the default view for new projects at the workspace level? My account ID is ACCT-26974.",
+    "date": "2026-09-08"
+  },
+  {
+    "id": "conv-0149",
+    "text": "The mobile app closes itself every time I try to add a comment. Call me on 555-822-8232 if easier.",
+    "date": "2026-07-14"
+  },
+  {
+    "id": "conv-0020",
+    "text": "This is Marcus at Northwind Logistics. Trying to export a filtered view gives me an empty file with only headers.",
+    "date": "2026-07-30"
+  },
+  {
+    "id": "conv-0146",
+    "text": "The iPhone app force-closes when switching between workspaces. Ticket reference TKT-518605 if that helps.",
+    "date": "2026-09-10"
+  },
+  {
+    "id": "conv-0125",
+    "text": "Mention notifications never send. People assume I am ignoring them.",
+    "date": "2026-07-01"
+  },
+  {
+    "id": "conv-0095",
+    "text": "Loading the main dashboard is painfully slow and often times out completely.",
+    "date": "2026-09-03"
+  },
+  {
+    "id": "conv-0094",
+    "text": "Hello \u2014 Raj Chen here. Dashboard performance has degraded badly. With twenty projects open it is unusable.",
+    "date": "2026-09-27"
+  },
+  {
+    "id": "conv-0166",
+    "text": "Orbin crashes on my iPhone whenever I open a project with attachments.",
+    "date": "2026-08-25"
+  },
+  {
+    "id": "conv-0072",
+    "text": "Hello \u2014 Marcus Silva here. Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-399742 if that helps.",
+    "date": "2026-09-20"
+  },
+  {
+    "id": "conv-0032",
+    "text": "Hi, I'm Tom Silva from Northwind Logistics. Exporting my board to CSV silently fails every single time. I've tried three browsers.",
+    "date": "2026-07-15"
+  },
+  {
+    "id": "conv-0065",
+    "text": "The overview page is extremely slow since we passed fifty active projects. Ticket reference TKT-663317 if that helps.",
+    "date": "2026-08-05"
+  },
+  {
+    "id": "conv-0176",
+    "text": "This is Tom at Northwind Logistics. The billing portal is confusing. I cannot tell which plan we are actually on. My account ID is ACCT-27391.",
+    "date": "2026-07-06"
+  },
+  {
+    "id": "conv-0075",
+    "text": "Every morning the dashboard spins for ages before showing any of our data. My account ID is ACCT-51430.",
+    "date": "2026-09-26"
+  },
+  {
+    "id": "conv-0096",
+    "text": "Our dashboard hangs on load for close to a minute before anything appears. Call me on 555-287-6693 if easier.",
+    "date": "2026-08-15"
+  },
+  {
+    "id": "conv-0023",
+    "text": "This is Ben at Corvid Analytics. I click Export and the spinner runs forever, then stops without producing a download.",
+    "date": "2026-07-13"
+  },
+  {
+    "id": "conv-0024",
+    "text": "CSV export has been broken for us all week. This blocks the weekly report I send to my director.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0090",
+    "text": "Dashboard load times have roughly tripled in the last month for our whole team. Ticket reference TKT-124361 if that helps.",
+    "date": "2026-08-30"
+  },
+  {
+    "id": "conv-0118",
+    "text": "This is Sarah at Northwind Logistics. Mention notifications never send. People assume I am ignoring them.",
+    "date": "2026-08-06"
+  },
+  {
+    "id": "conv-0152",
+    "text": "The iPhone app force-closes when switching between workspaces. Call me on 555-588-8363 if easier.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0173",
+    "text": "Hi, I'm Raj Hansen from Vertex Media. The invoice page shows a different amount from what we were charged. Call me on 555-391-6234 if easier.",
+    "date": "2026-07-01"
+  },
+  {
+    "id": "conv-0069",
+    "text": "This is Elena at Corvid Analytics. The dashboard takes over thirty seconds to load every morning. It used to be instant. You can reach me at elena.hansen@corvid.com.",
+    "date": "2026-08-16"
+  },
+  {
+    "id": "conv-0071",
+    "text": "Loading the main dashboard is painfully slow and often times out completely. Ticket reference TKT-450690 if that helps.",
+    "date": "2026-09-20"
+  },
+  {
+    "id": "conv-0137",
+    "text": "Email notifications arrive hours late, if they arrive at all.",
+    "date": "2026-08-09"
+  },
+  {
+    "id": "conv-0143",
+    "text": "Hello \u2014 Marcus Hansen here. The mobile app closes itself every time I try to add a comment. Ticket reference TKT-670621 if that helps.",
+    "date": "2026-09-25"
+  },
+  {
+    "id": "conv-0064",
+    "text": "Hi, I'm Sarah Dubois from Vertex Media. Our dashboard hangs on load for close to a minute before anything appears. Ticket reference TKT-962348 if that helps.",
+    "date": "2026-09-03"
+  },
+  {
+    "id": "conv-0076",
+    "text": "Performance on the dashboard is bad enough that people have stopped using it.",
+    "date": "2026-09-16"
+  },
+  {
+    "id": "conv-0101",
+    "text": "Hi, I'm Sarah Okafor from Bluepeak Health. The dashboard takes over thirty seconds to load every morning. It used to be instant.",
+    "date": "2026-07-05"
+  },
+  {
+    "id": "conv-0037",
+    "text": "The export feature stopped working after the last update. It worked fine before that.",
+    "date": "2026-08-18"
+  },
+  {
+    "id": "conv-0103",
+    "text": "Loading the main dashboard is painfully slow and often times out completely.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0199",
+    "text": "How do I archive a project without deleting its history?",
+    "date": "2026-07-16"
+  },
+  {
+    "id": "conv-0086",
+    "text": "Hello \u2014 Raj Silva here. Dashboard performance has degraded badly. With twenty projects open it is unusable. You can reach me at raj.silva@corvid.com.",
+    "date": "2026-09-30"
+  },
+  {
+    "id": "conv-0138",
+    "text": "Hello \u2014 Aisha Novak here. I have notifications switched on but nothing ever reaches my inbox. My account ID is ACCT-55518.",
+    "date": "2026-08-23"
+  },
+  {
+    "id": "conv-0144",
+    "text": "App crashes on iOS 18 as soon as I tap into the board view. Call me on 555-902-4352 if easier.",
+    "date": "2026-07-07"
+  },
+  {
+    "id": "conv-0136",
+    "text": "Our team is not getting any notification emails, so deadlines are being missed.",
+    "date": "2026-07-22"
+  },
+  {
+    "id": "conv-0105",
+    "text": "The overview page is extremely slow since we passed fifty active projects. Ticket reference TKT-736476 if that helps.",
+    "date": "2026-09-24"
+  },
+  {
+    "id": "conv-0181",
+    "text": "Hi, I'm Marcus Patel from Bluepeak Health. The billing portal is confusing. I cannot tell which plan we are actually on. My account ID is ACCT-81520.",
+    "date": "2026-07-04"
+  },
+  {
+    "id": "conv-0001",
+    "text": "The export button does nothing when I click it. No file, no error, nothing happens at all.",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "conv-0082",
+    "text": "Hi, I'm Priya Dubois from Corvid Analytics. Dashboard load times have roughly tripled in the last month for our whole team. Call me on 555-566-4277 if easier.",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "conv-0038",
+    "text": "I cannot export any of my project data. The download never starts. Ticket reference TKT-326170 if that helps.",
+    "date": "2026-09-14"
+  },
+  {
+    "id": "conv-0124",
+    "text": "Hi, I'm Raj Chen from Vertex Media. I have notifications switched on but nothing ever reaches my inbox.",
+    "date": "2026-08-18"
+  },
+  {
+    "id": "conv-0142",
+    "text": "Orbin crashes on my iPhone whenever I open a project with attachments. My account ID is ACCT-30844.",
+    "date": "2026-09-23"
+  },
+  {
+    "id": "conv-0070",
+    "text": "Dashboard performance has degraded badly. With twenty projects open it is unusable.",
+    "date": "2026-09-03"
+  },
+  {
+    "id": "conv-0190",
+    "text": "Hi, I'm Marcus Okafor from Corvid Analytics. There is no clear way to see our seat count versus what we are paying for.",
+    "date": "2026-08-31"
+  },
+  {
+    "id": "conv-0165",
+    "text": "The iOS app crashes immediately on launch since the latest update.",
+    "date": "2026-08-10"
+  },
+  {
+    "id": "conv-0053",
+    "text": "I click Export and the spinner runs forever, then stops without producing a download. Ticket reference TKT-428145 if that helps.",
+    "date": "2026-07-23"
+  },
+  {
+    "id": "conv-0131",
+    "text": "I have notifications switched on but nothing ever reaches my inbox. My account ID is ACCT-34966.",
+    "date": "2026-09-09"
+  },
+  {
+    "id": "conv-0093",
+    "text": "This is Priya at Northwind Logistics. The dashboard takes over thirty seconds to load every morning. It used to be instant.",
+    "date": "2026-07-16"
+  },
+  {
+    "id": "conv-0110",
+    "text": "I have notifications switched on but nothing ever reaches my inbox.",
+    "date": "2026-09-07"
+  },
+  {
+    "id": "conv-0141",
+    "text": "The iOS app crashes immediately on launch since the latest update.",
+    "date": "2026-07-04"
+  },
+  {
+    "id": "conv-0068",
+    "text": "Hello \u2014 Priya Dubois here. Performance on the dashboard is bad enough that people have stopped using it.",
+    "date": "2026-08-07"
+  },
+  {
+    "id": "conv-0047",
+    "text": "This is Tom at Corvid Analytics. The export feature stopped working after the last update. It worked fine before that. You can reach me at tom.okafor@corvid.com.",
+    "date": "2026-07-09"
+  },
+  {
+    "id": "conv-0126",
+    "text": "Digest emails simply stopped. Nothing changed in our settings. Call me on 555-638-9862 if easier.",
+    "date": "2026-08-21"
+  },
+  {
+    "id": "conv-0191",
+    "text": "Is there a keyboard shortcut for creating a new task? I could not find one documented.",
+    "date": "2026-08-31"
+  },
+  {
+    "id": "conv-0112",
+    "text": "Hello \u2014 Raj Silva here. Digest emails simply stopped. Nothing changed in our settings. Ticket reference TKT-758456 if that helps.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0056",
+    "text": "Every export attempt fails without telling me why. There is no error message anywhere. Ticket reference TKT-830519 if that helps.",
+    "date": "2026-08-23"
+  },
+  {
+    "id": "conv-0004",
+    "text": "Hi, I'm Aisha Hansen from Northwind Logistics. CSV export has been broken for us all week. This blocks the weekly report I send to my director. My account ID is ACCT-41065.",
+    "date": "2026-08-13"
+  },
+  {
+    "id": "conv-0163",
+    "text": "Mobile app is unusable. It crashes within seconds of opening, every time.",
+    "date": "2026-07-31"
+  },
+  {
+    "id": "conv-0162",
+    "text": "Hi, I'm Raj Hansen from Northwind Logistics. App crashes on iOS 18 as soon as I tap into the board view.",
+    "date": "2026-09-28"
+  },
+  {
+    "id": "conv-0062",
+    "text": "Hello \u2014 Chloe Patel here. Dashboard performance has degraded badly. With twenty projects open it is unusable. My account ID is ACCT-95904.",
+    "date": "2026-07-29"
+  },
+  {
+    "id": "conv-0196",
+    "text": "Is there a keyboard shortcut for creating a new task? I could not find one documented.",
+    "date": "2026-07-19"
+  },
+  {
+    "id": "conv-0157",
+    "text": "Mobile app is unusable. It crashes within seconds of opening, every time.",
+    "date": "2026-07-05"
+  },
+  {
+    "id": "conv-0041",
+    "text": "The export button does nothing when I click it. No file, no error, nothing happens at all. Ticket reference TKT-219746 if that helps.",
+    "date": "2026-08-16"
+  },
+  {
+    "id": "conv-0119",
+    "text": "Digest emails simply stopped. Nothing changed in our settings. Call me on 555-447-7605 if easier.",
+    "date": "2026-08-17"
+  },
+  {
+    "id": "conv-0031",
+    "text": "Hi, I'm Tom Dubois from Corvid Analytics. The export button does nothing when I click it. No file, no error, nothing happens at all. You can reach me at tom.dubois@corvid.com.",
+    "date": "2026-07-18"
+  },
+  {
+    "id": "conv-0089",
+    "text": "The overview page is extremely slow since we passed fifty active projects.",
+    "date": "2026-08-27"
+  },
+  {
+    "id": "conv-0005",
+    "text": "Hello \u2014 Diego Dubois here. Export to Excel produces a zero-byte file. Opening it just gives an error. My account ID is ACCT-28177.",
+    "date": "2026-08-04"
+  },
+  {
+    "id": "conv-0016",
+    "text": "Hello \u2014 Chloe Novak here. Every export attempt fails without telling me why. There is no error message anywhere. You can reach me at chloe.novak@bluepeak.com.",
+    "date": "2026-09-06"
+  },
+  {
+    "id": "conv-0021",
+    "text": "The export button does nothing when I click it. No file, no error, nothing happens at all. Call me on 555-644-5624 if easier.",
+    "date": "2026-09-02"
+  },
+  {
+    "id": "conv-0073",
+    "text": "Hello \u2014 Elena Hansen here. The overview page is extremely slow since we passed fifty active projects. Call me on 555-219-1122 if easier.",
+    "date": "2026-07-20"
+  },
+  {
+    "id": "conv-0019",
+    "text": "Export silently does nothing for boards with more than about 200 items. You can reach me at elena.chen@vertex.com.",
+    "date": "2026-07-13"
+  },
+  {
+    "id": "conv-0151",
+    "text": "Hello \u2014 Ben Silva here. Mobile app is unusable. It crashes within seconds of opening, every time. My account ID is ACCT-12283.",
+    "date": "2026-09-06"
+  },
+  {
+    "id": "conv-0046",
+    "text": "Hi, I'm Ben Chen from Corvid Analytics. Every export attempt fails without telling me why. There is no error message anywhere.",
+    "date": "2026-08-12"
+  },
+  {
+    "id": "conv-0186",
+    "text": "The billing portal is confusing. I cannot tell which plan we are actually on. You can reach me at tom.dubois@northwind.com.",
+    "date": "2026-07-21"
+  },
+  {
+    "id": "conv-0116",
+    "text": "Email notifications arrive hours late, if they arrive at all. You can reach me at priya.chen@northwind.com.",
+    "date": "2026-09-27"
+  },
+  {
+    "id": "conv-0052",
+    "text": "This is Marcus at Northwind Logistics. Exporting my board to CSV silently fails every single time. I've tried three browsers.",
+    "date": "2026-08-18"
+  },
+  {
+    "id": "conv-0078",
+    "text": "Dashboard performance has degraded badly. With twenty projects open it is unusable. You can reach me at chloe.silva@bluepeak.com.",
+    "date": "2026-07-18"
+  },
+  {
+    "id": "conv-0039",
+    "text": "Export silently does nothing for boards with more than about 200 items.",
+    "date": "2026-07-20"
+  },
+  {
+    "id": "conv-0178",
+    "text": "This is Chloe at Corvid Analytics. The invoice page shows a different amount from what we were charged.",
+    "date": "2026-08-20"
+  },
+  {
+    "id": "conv-0050",
+    "text": "Trying to export a filtered view gives me an empty file with only headers.",
+    "date": "2026-08-22"
+  },
+  {
+    "id": "conv-0049",
+    "text": "This is Sarah at Northwind Logistics. Export silently does nothing for boards with more than about 200 items.",
+    "date": "2026-09-01"
+  },
+  {
+    "id": "conv-0115",
+    "text": "Hi, I'm Priya Nakamura from Bluepeak Health. Our team is not getting any notification emails, so deadlines are being missed.",
+    "date": "2026-08-15"
+  },
+  {
+    "id": "conv-0128",
+    "text": "Hi, I'm Chloe Chen from Northwind Logistics. I stopped receiving email alerts about task assignments roughly two weeks ago. My account ID is ACCT-34855.",
+    "date": "2026-09-16"
+  },
+  {
+    "id": "conv-0077",
+    "text": "The dashboard takes over thirty seconds to load every morning. It used to be instant. You can reach me at diego.chen@bluepeak.com.",
+    "date": "2026-07-09"
+  },
+  {
+    "id": "conv-0059",
+    "text": "Export silently does nothing for boards with more than about 200 items. Call me on 555-737-2996 if easier.",
+    "date": "2026-08-01"
+  },
+  {
+    "id": "conv-0122",
+    "text": "This is Marcus at Northwind Logistics. Our team is not getting any notification emails, so deadlines are being missed. Ticket reference TKT-363557 if that helps.",
+    "date": "2026-08-19"
+  },
+  {
+    "id": "conv-0104",
+    "text": "Our dashboard hangs on load for close to a minute before anything appears.",
+    "date": "2026-09-20"
+  },
+  {
+    "id": "conv-0008",
+    "text": "I cannot export any of my project data. The download never starts. Ticket reference TKT-515674 if that helps.",
+    "date": "2026-07-17"
+  },
+  {
+    "id": "conv-0098",
+    "text": "This is Marcus at Vertex Media. Dashboard load times have roughly tripled in the last month for our whole team. Call me on 555-967-1321 if easier.",
+    "date": "2026-09-05"
+  },
+  {
+    "id": "conv-0107",
+    "text": "I stopped receiving email alerts about task assignments roughly two weeks ago. My account ID is ACCT-40108.",
+    "date": "2026-07-18"
+  },
+  {
+    "id": "conv-0102",
+    "text": "Dashboard performance has degraded badly. With twenty projects open it is unusable.",
+    "date": "2026-07-27"
+  },
+  {
+    "id": "conv-0155",
+    "text": "Hello \u2014 Sarah Hansen here. The mobile app closes itself every time I try to add a comment. My account ID is ACCT-68716.",
+    "date": "2026-09-24"
+  },
+  {
+    "id": "conv-0108",
+    "text": "Hello \u2014 Diego Patel here. Our team is not getting any notification emails, so deadlines are being missed. Call me on 555-721-8518 if easier.",
+    "date": "2026-07-19"
+  },
+  {
+    "id": "conv-0200",
+    "text": "This is Priya at Northwind Logistics. Does Orbin support single sign-on with Okta on the team plan? Call me on 555-886-2241 if easier.",
+    "date": "2026-08-15"
+  },
+  {
+    "id": "conv-0099",
+    "text": "Every morning the dashboard spins for ages before showing any of our data. My account ID is ACCT-58387.",
+    "date": "2026-09-08"
+  },
+  {
+    "id": "conv-0083",
+    "text": "Hello \u2014 Aisha Okafor here. Every morning the dashboard spins for ages before showing any of our data.",
+    "date": "2026-07-03"
+  },
+  {
+    "id": "conv-0084",
+    "text": "Performance on the dashboard is bad enough that people have stopped using it. Ticket reference TKT-888457 if that helps.",
+    "date": "2026-07-10"
+  },
+  {
+    "id": "conv-0168",
+    "text": "This is Elena at Vertex Media. App crashes on iOS 18 as soon as I tap into the board view.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0036",
+    "text": "Every export attempt fails without telling me why. There is no error message anywhere. You can reach me at ben.okafor@vertex.com.",
+    "date": "2026-08-26"
+  },
+  {
+    "id": "conv-0132",
+    "text": "Hello \u2014 Aisha Novak here. Mention notifications never send. People assume I am ignoring them. Call me on 555-256-9242 if easier.",
+    "date": "2026-09-06"
+  },
+  {
+    "id": "conv-0171",
+    "text": "Hi, I'm Sarah Patel from Vertex Media. The billing portal is confusing. I cannot tell which plan we are actually on.",
+    "date": "2026-08-13"
+  },
+  {
+    "id": "conv-0044",
+    "text": "CSV export has been broken for us all week. This blocks the weekly report I send to my director.",
+    "date": "2026-07-25"
+  },
+  {
+    "id": "conv-0033",
+    "text": "I click Export and the spinner runs forever, then stops without producing a download.",
+    "date": "2026-07-14"
+  },
+  {
+    "id": "conv-0026",
+    "text": "Hello \u2014 Elena Chen here. Every export attempt fails without telling me why. There is no error message anywhere. Call me on 555-978-4553 if easier.",
+    "date": "2026-08-20"
+  },
+  {
+    "id": "conv-0121",
+    "text": "Hi, I'm Sarah Dubois from Bluepeak Health. I stopped receiving email alerts about task assignments roughly two weeks ago.",
+    "date": "2026-07-05"
+  },
+  {
+    "id": "conv-0058",
+    "text": "I cannot export any of my project data. The download never starts.",
+    "date": "2026-08-12"
+  },
+  {
+    "id": "conv-0042",
+    "text": "Exporting my board to CSV silently fails every single time. I've tried three browsers.",
+    "date": "2026-08-08"
+  },
+  {
+    "id": "conv-0040",
+    "text": "Trying to export a filtered view gives me an empty file with only headers. My account ID is ACCT-52001.",
+    "date": "2026-09-29"
+  },
+  {
+    "id": "conv-0055",
+    "text": "Export to Excel produces a zero-byte file. Opening it just gives an error. My account ID is ACCT-91642.",
+    "date": "2026-09-09"
+  },
+  {
+    "id": "conv-0030",
+    "text": "Hello \u2014 Aisha Okafor here. Trying to export a filtered view gives me an empty file with only headers. My account ID is ACCT-38724.",
+    "date": "2026-09-17"
+  },
+  {
+    "id": "conv-0153",
+    "text": "The iOS app crashes immediately on launch since the latest update. Ticket reference TKT-786589 if that helps.",
+    "date": "2026-08-28"
+  },
+  {
+    "id": "conv-0087",
+    "text": "Loading the main dashboard is painfully slow and often times out completely.",
+    "date": "2026-08-14"
+  },
+  {
+    "id": "conv-0133",
+    "text": "Hello \u2014 Diego Nakamura here. Digest emails simply stopped. Nothing changed in our settings. My account ID is ACCT-99736.",
+    "date": "2026-08-25"
+  },
+  {
+    "id": "conv-0074",
+    "text": "Dashboard load times have roughly tripled in the last month for our whole team.",
+    "date": "2026-07-01"
+  },
+  {
+    "id": "conv-0158",
+    "text": "This is Chloe at Corvid Analytics. The iPhone app force-closes when switching between workspaces. You can reach me at chloe.okafor@corvid.com.",
+    "date": "2026-09-13"
+  },
+  {
+    "id": "conv-0170",
+    "text": "Hi, I'm Elena Patel from Vertex Media. The iPhone app force-closes when switching between workspaces.",
+    "date": "2026-07-09"
+  },
+  {
+    "id": "conv-0029",
+    "text": "Export silently does nothing for boards with more than about 200 items. You can reach me at marcus.okafor@bluepeak.com.",
+    "date": "2026-07-30"
+  },
+  {
+    "id": "conv-0161",
+    "text": "This is Raj at Vertex Media. The mobile app closes itself every time I try to add a comment. Ticket reference TKT-816819 if that helps.",
+    "date": "2026-07-20"
+  },
+  {
+    "id": "conv-0188",
+    "text": "Hi, I'm Chloe Okafor from Bluepeak Health. The invoice page shows a different amount from what we were charged. You can reach me at chloe.okafor@bluepeak.com.",
+    "date": "2026-09-26"
+  },
+  {
+    "id": "conv-0156",
+    "text": "App crashes on iOS 18 as soon as I tap into the board view. Ticket reference TKT-206271 if that helps.",
+    "date": "2026-09-26"
+  },
+  {
+    "id": "conv-0175",
+    "text": "There is no clear way to see our seat count versus what we are paying for. You can reach me at aisha.chen@northwind.com.",
+    "date": "2026-07-22"
+  }
+]

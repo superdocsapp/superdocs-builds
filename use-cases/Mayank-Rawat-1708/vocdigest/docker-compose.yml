@@ -1,0 +1,81 @@
+# VocDigest local stack: Postgres with pgvector, the API, the MCP server, and the
+# frontend. Postgres is the only service that must be running for the test suite to be
+# irrelevant — the tests use SQLite and need nothing from here.
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: vocdigest-postgres
+    environment:
+      POSTGRES_USER: vocdigest
+      POSTGRES_PASSWORD: vocdigest
+      POSTGRES_DB: vocdigest
+    ports:
+      - "5432:5432"
+    volumes:
+      - vocdigest_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Other services wait on this rather than sleeping a fixed number of seconds,
+      # which is the usual cause of a flaky first boot.
+      test: ["CMD-SHELL", "pg_isready -U vocdigest -d vocdigest"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: vocdigest-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://vocdigest:vocdigest@postgres:5432/vocdigest
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      CORS_ORIGINS: http://localhost:3000
+      EMBEDDING_BACKEND: ${EMBEDDING_BACKEND:-hash}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./sample_data:/app/sample_data:ro
+      - vocdigest_data:/app/data
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn backend.main:app --host 0.0.0.0 --port 8000"
+
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: vocdigest-mcp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://vocdigest:vocdigest@postgres:5432/vocdigest
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      EMBEDDING_BACKEND: ${EMBEDDING_BACKEND:-hash}
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./sample_data:/app/sample_data:ro
+      - vocdigest_data:/app/data
+    command: python -m backend.mcp.server
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vocdigest-frontend
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+
+volumes:
+  vocdigest_pgdata:
+  vocdigest_data:
