@@ -37,6 +37,31 @@ stay on screen at every size**. An empty preview now takes no room at all, and
 both the status and preview carry their full text as a tooltip. Sizes scale
 with the host's DPI/font scaling rather than a hardcoded factor.
 
+**v0.3.4 — whole-doc drafting on an empty document actually lands.** A
+drafting instruction in whole-document mode on an empty doc comes back as
+pending changes that are all *pure insertions* (no `old_html` anchor). The
+write-back's honesty rule skipped those — correct in a non-empty document,
+where their position would be a guess, but on an empty document it meant
+"Applied 1 of 11 change(s)" with the page still blank while the approved
+(billed) copy lived only server-side. There is exactly one case with nothing
+to misplace an insertion against: a document that started with no text and no
+tables. In that case the insertions are now appended in job order, which
+reconstructs the draft; pure insertions into a non-empty document are still
+skipped and reported, never guessed at.
+
+**v0.3.5 — a full rewrite no longer wipes the document.** A rewrite of a
+NON-empty document can come back as one deletion covering the whole old
+content plus pure insertions carrying its replacement. The deletion found its
+anchor and applied; the insertions were skipped — "Applied 1 of 11" that
+emptied the page and dropped the new content (user-hit: an existing fitness
+plan, instruction "create a proper fitness plan for weight gain"). A rescue
+pass in `apply_changes` now covers it: when the approved deletions leave the
+document EMPTY, the skipped pure insertions are appended in job order —
+wherever they sat relative to the deletion in the batch. Same no-guessing
+rule as v0.3.4; the document just reached "nothing to misplace against"
+mid-batch instead of starting there. Deletions that leave any content behind
+still leave pure insertions skipped and reported.
+
 ## Screenshots
 
 **Selection mode (Linux, WSLg):**
@@ -138,7 +163,10 @@ profile; they never touch your normal LibreOffice or its profile.
   doc and proves the write-back invariants: unique match applied in place
   (entities decoded, inline tags stripped), a multi-paragraph run replaced as
   one range, ambiguous and not-found changes skipped with both copies
-  untouched, table content untouched. Ends with
+  untouched, table content untouched, pure insertions skipped in a non-empty
+  doc but appended in job order into an empty one (v0.3.4), and a
+  delete-everything + insertions rewrite rebuilt in order instead of wiped,
+  while a partial deletion still leaves insertions skipped (v0.3.5). Ends with
   `WHOLE-DOC WRITE-BACK TEST: ALL PASS`.
 - `tests/run_whole_doc_live_test.sh` — the same flow end to end against the
   real API: UNO doc → .docx export → `request_doc_edit` → approve → write-back

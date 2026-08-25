@@ -8,6 +8,15 @@ document, and replace exactly that range with a style-preserving setString.
 The honesty rule: a change whose original text cannot be found, or matches more
 than one place, is SKIPPED and reported — never guessed at. Content outside a
 matched range is never touched.
+
+One placement IS unambiguous: when the document holds no text at all, appending
+pure insertions in job order reconstructs the draft without guessing — there is
+no existing content to misplace them against. That covers two shapes: a doc
+that STARTED empty (drafting, every change a pure insertion), and a full
+rewrite that arrives as delete-everything + pure insertions — once the approved
+deletions have emptied the doc, the skipped insertions are appended in job
+order (the rescue pass in apply_changes). Pure insertions into a document that
+still has content stay skipped: their position would be a guess.
 """
 import html as _html
 import re
@@ -47,6 +56,19 @@ def _paragraphs(doc):
     return out
 
 
+def _doc_is_empty(doc):
+    """No visible body text and no tables — the only state where appending a
+    pure insertion cannot misplace it relative to existing content."""
+    enum = doc.getText().createEnumeration()
+    while enum.hasMoreElements():
+        node = enum.nextElement()
+        if not node.supportsService("com.sun.star.text.Paragraph"):
+            return False  # a table (or other content) counts as content
+        if _norm(node.getString()):
+            return False
+    return True
+
+
 def _find_runs(paras, wanted):
     """Start indexes where consecutive paragraphs equal `wanted` (normalized)."""
     texts = [_norm(p.getString()) for p in paras]
@@ -54,11 +76,16 @@ def _find_runs(paras, wanted):
     return [i for i in range(len(texts) - n + 1) if texts[i:i + n] == wanted]
 
 
-def apply_change(doc, change):
+def apply_change(doc, change, append_insertions=False):
     """Apply one approved change. Returns (applied: bool, reason: str)."""
     old_paras = html_paragraphs(change.get("old_html"))
     new_paras = html_paragraphs(change.get("new_html"))
     if not old_paras:
+        if not new_paras:
+            return False, "empty change (no old or new text)"
+        if append_insertions:
+            insert_paragraphs(doc, new_paras)
+            return True, "appended in order (document had no other content)"
         return False, "pure insertion (no anchor text) - apply manually"
     # fresh scan for every change: an earlier write-back moves paragraphs
     paras = _paragraphs(doc)
@@ -78,9 +105,22 @@ def apply_change(doc, change):
 
 def apply_changes(doc, pending):
     """Apply approved changes range by range. Returns per-change result dicts."""
-    return [{"change_id": change.get("change_id"), "applied": applied, "reason": reason}
-            for change in pending
-            for applied, reason in [apply_change(doc, change)]]
+    # decided ONCE up front: a doc that started empty keeps accepting appends
+    # even as the first insertions fill it (they arrive in job order)
+    doc_started_empty = _doc_is_empty(doc)
+    results = [{"change_id": change.get("change_id"), "applied": applied, "reason": reason}
+               for change in pending
+               for applied, reason in [apply_change(doc, change, doc_started_empty)]]
+    # Rescue pass: a full rewrite arrives as delete-everything + pure
+    # insertions (in either order). If the approved deletions left the doc
+    # EMPTY, the skipped insertions no longer have anything to be misplaced
+    # against - append them in job order instead of losing the whole rewrite
+    # ("Applied 1 of 11" that deletes the doc and drops its replacement).
+    if not doc_started_empty and _doc_is_empty(doc):
+        for change, r in zip(pending, results):
+            if not r["applied"] and "pure insertion" in r["reason"]:
+                r["applied"], r["reason"] = apply_change(doc, change, True)
+    return results
 
 
 PARAGRAPH_BREAK = 0  # com.sun.star.text.ControlCharacter.PARAGRAPH_BREAK
