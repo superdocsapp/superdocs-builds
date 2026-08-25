@@ -8,4 +8,4 @@
 
 Section targeting and correct final outcome are both **56/60 (93.3%)**. Search targeting is **42/43 (97.7%)** and edit targeting is **14/17 (82.4%)**. The pre-declared cap was **60 operations**; actual API-reported usage was **38 operations**, so the run was within budget. Dollar spend was not reported by the API.
 
-Secondary experiments do not change the official first-attempt results. Applied-edit verification reviewed 15 approvals (13 landed correctly, 2 could not be determined, 0 unrelated changes). Guided recovery recovered both of its 2 attempts.
+Guided recovery does not change the official first-attempt results and recovered both of its 2 attempts.

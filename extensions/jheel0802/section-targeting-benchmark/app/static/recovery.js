@@ -10,7 +10,7 @@ async function renderRecoverySummary(){
 }
 
 async function renderRecoverySummaryOnce(){
-  const m=await api('/api/metrics'),g=m.guided_recovery,a=m.applied_verification;
+  const m=await api('/api/metrics'),g=m.guided_recovery;
   document.querySelector('#secondary-results')?.remove();
   document.querySelector('#experimental-run-label')?.remove();
   if(!document.querySelector('.primary-metrics'))return;
@@ -35,7 +35,7 @@ async function renderRecoverySummaryOnce(){
   failureCard.classList.add('failure-summary');
   failureCard.innerHTML=`<h3>Observed failures</h3><div class="failure-rows">${failureRows.map(x=>`<div class="failure-row"><span>${esc(x.name)}</span><div><i style="width:${Math.round(x.count/maximum*100)}%"></i></div><strong>${x.count}</strong></div>`).join('')}</div>`;
   failureCard.parentNode.insertBefore(failureCard,runCard);
-  const block=`<section id="secondary-results"><h2>Additional experiments</h2><p class="secondary-label">Secondary experiments — separate from official benchmark scores.</p><div class="experiment-grid"><article class="card compact"><h3>Applied edit verification</h3><div class="experiment-values"><p><span>Verified</span><b>${a.verified}</b></p><p><span>Landed correctly</span><b>${a.landed_in_intended_section}</b></p><p><span>Unrelated changes</span><b>${a.unrelated_changes_detected}</b></p></div></article><article class="card compact"><h3>Guided recovery</h3><div class="experiment-values"><p><span>Attempted</span><b>${g.cases_attempted}</b></p><p><span>Recovered</span><b>${g.cases_recovered}</b></p><p><span>Did not recover</span><b>${g.cases_not_recovered}</b></p></div></article></div></section>`;
+  const block=`<section id="secondary-results"><h2>Additional experiment</h2><p class="secondary-label">This is separate from official benchmark scores.</p><div class="experiment-grid"><article class="card compact"><h3>Guided recovery</h3><div class="experiment-values"><p><span>Attempted</span><b>${g.cases_attempted}</b></p><p><span>Recovered</span><b>${g.cases_recovered}</b></p><p><span>Did not recover</span><b>${g.cases_not_recovered}</b></p></div></article></div></section>`;
   runCard.insertAdjacentHTML('afterend',block);
 }
 
@@ -62,8 +62,7 @@ viewRun=async function(id){
   const r=await api(`/api/runs/${id}`),g=r.guided_recovery;
   const proposal=document.querySelector('.evidence-pane .card:nth-of-type(3)');
   if(r.session_id&&r.applied_verification?.approval_status==='completed'){
-    const appliedCard=[...document.querySelectorAll('.evidence-pane .card')].find(x=>x.querySelector('h3')?.textContent==='Applied verification');
-    appliedCard?.insertAdjacentHTML('beforeend',`<a class="button" href="/api/runs/${id}/export?format=docx">Export DOCX</a>`);
+    proposal?.insertAdjacentHTML('beforeend',`<a class="button" href="/api/runs/${id}/export?format=docx">Export DOCX</a>`);
   }
   if(g){
     document.querySelector('#approve-test-edit')?.remove();

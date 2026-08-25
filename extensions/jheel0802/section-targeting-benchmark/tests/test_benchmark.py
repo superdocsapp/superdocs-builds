@@ -584,7 +584,7 @@ def test_guided_recovery_dashboard_metrics_are_run_scoped(setup):
 
 def test_dashboard_labels_guided_recovery_separately():
     script=(ROOT/"app"/"static"/"recovery.js").read_text()
-    assert "Additional experiments" in script and "Guided recovery" in script
+    assert "Additional experiment" in script and "Guided recovery" in script
     assert "separate from official benchmark scores" in script
     assert "API-reported operations" in script and "Not reported by API" in script
     assert "new MutationObserver" in script and "document.querySelector('.primary-metrics')" in script
@@ -618,11 +618,11 @@ def test_applied_verification_summary_uses_only_applied_records(setup):
     assert summary=={"verified":2,"landed_in_intended_section":1,"did_not_land_correctly":1,"cannot_determine":0,"unrelated_changes_detected":1}
     assert (service.metrics()["pass"],service.metrics()["fail"])==before==(2,1)
 
-def test_empty_applied_verification_summary_and_ui_message(setup):
+def test_applied_verification_summary_is_not_rendered_on_dashboard(setup):
     _,_,service,_=setup
     assert service.metrics()["applied_verification"]=={"verified":0,"landed_in_intended_section":0,"did_not_land_correctly":0,"cannot_determine":0,"unrelated_changes_detected":0}
     script=(ROOT/"app"/"static"/"recovery.js").read_text()
-    assert "Applied edit verification" in script and "Landed correctly" in script
+    assert "Applied edit verification" not in script and "Landed correctly" not in script
 
 @pytest.mark.parametrize("case_id",["D02-C01","D02-C02"])
 def test_correct_section_wrong_result_is_targeting_pass_strict_fail(case_id):

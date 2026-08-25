@@ -43,7 +43,7 @@ The tracked final evidence is in [`outputs/final_run/results.csv`](outputs/final
 
 The tracked screenshot is [`outputs/final_run/final-result-dashboard.png`](outputs/final_run/final-result-dashboard.png). It captures Benchmark run 4’s final 60-case dashboard and contains no API key or raw technical response. The CSV and JSON are the authoritative metric artifacts.
 
-Secondary experiments remain separate from the official score. Applied-edit verification contains 15 reviewed approvals: 13 landed in the intended section, 2 could not be determined, and none showed unrelated changes. Guided recovery was attempted twice and recovered both cases.
+Guided recovery remains separate from the official score. It was attempted twice and recovered both cases.
 
 Targeting accuracy measures whether SuperDocs identified the intended section. Correct final outcome additionally requires the returned answer or proposed edit to be correct and properly scoped. Public failure reporting uses four categories: **Wrong target**, **Should have clarified**, **Unsupported target**, and **Right target, wrong result**. Historical granular adjudication labels remain preserved internally.
 
@@ -116,7 +116,7 @@ The published Benchmark run 4 evidence does not require an API key or database:
 - [`outputs/final_run/results.csv`](outputs/final_run/results.csv) — sanitized latest attempt for each of the 60 official cases
 - [`outputs/final_run/summary.json`](outputs/final_run/summary.json) — authoritative aggregate metrics
 - [`outputs/final_run/final-result-dashboard.png`](outputs/final_run/final-result-dashboard.png) — final Results-page screenshot
-- [`outputs/final_run/public_snapshot.json`](outputs/final_run/public_snapshot.json) — sanitized UI snapshot of the final run, including applied verification and guided recovery evidence
+- [`outputs/final_run/public_snapshot.json`](outputs/final_run/public_snapshot.json) — sanitized UI snapshot of the final run and guided recovery evidence
 
 Because SuperDocs is a live external service, a new live run can produce different responses. The corpus, expected targets, scoring workflow, and validation checks remain reproducible.
 
@@ -150,20 +150,6 @@ SQLite stores benchmark runs, every execution attempt, normalized and raw SuperD
 - **Start fresh benchmark run** creates an empty scoring run against the current 60-case corpus. It does not delete prior runs or call SuperDocs.
 - **Run again** creates a new attempt and requires fresh adjudication. Older attempts remain stored.
 - Dashboard metrics are calculated from the latest attempt for each case in the selected run.
-
-## Applied-edit verification
-
-The original human adjudication is preserved as the correct-final-outcome verdict. The separate targeting verdict evaluates only whether the first proposal identified the intended section.
-
-For a freshly run synthetic edit case that is waiting for approval, the case page can additionally:
-
-1. Render the stored uploaded document with labelled expected-section and proposed-target markers.
-2. Let a human explicitly choose **Approve test edit**. Nothing is approved automatically.
-3. Resume polling the same SuperDocs job and re-fetch the session document after completion.
-4. Compare the before/after HTML by `data-chunk-id` and record modified, created, deleted and unrelated chunks.
-5. Save separate human judgments about proposal placement and applied placement.
-
-Approval affects only the temporary synthetic SuperDocs session. It never rewrites the frozen local DOCX fixture. Applied evidence is stored separately and does not alter section-targeting or correct-final-outcome metrics. A second proposal batch requires another explicit approval; a large-edit continuation prompt is shown separately and is never treated as a change approval.
 
 ## Architecture
 
