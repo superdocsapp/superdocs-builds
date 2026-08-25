@@ -114,11 +114,23 @@ export default function App() {
     if (!selectedDoc || !jobId) return;
     setBusy(true);
     try {
-      await api.reviewChanges(matterId, selectedDoc.document_id, userId, jobId, [
+      const result = await api.reviewChanges(matterId, selectedDoc.document_id, userId, jobId, [
         { change_id: change.change_id, approved },
       ]);
-      setPendingChanges((prev) => prev.filter((c) => c.change_id !== change.change_id));
-      setStatus(approved ? "Change approved." : "Change rejected - document untouched.");
+      // Trust the server's remaining_pending_changes as the new full list,
+      // rather than just removing the one just decided from local state.
+      // SuperDocs can surface a change that was never part of the original
+      // edit response - filtering locally silently drops it, and nothing
+      // then stops check-in from proceeding as if review were complete.
+      const remaining = result.remaining_pending_changes || [];
+      setPendingChanges(remaining);
+      if (remaining.length > 0) {
+        setStatus(
+          `${remaining.length} more change(s) to review - SuperDocs proposed additional edits.`
+        );
+      } else {
+        setStatus(approved ? "Change approved." : "Change rejected - document untouched.");
+      }
     } catch (err) {
       reportError(err);
     } finally {
@@ -138,6 +150,11 @@ export default function App() {
       await refreshVersions(selectedDoc.document_id);
       await handleLoadDocuments();
     } catch (err) {
+      if (err.detail?.pending_changes) {
+        // The server refused because SuperDocs still has undecided changes
+        // on this session - show them instead of just an error string.
+        setPendingChanges(err.detail.pending_changes);
+      }
       reportError(err);
     } finally {
       setBusy(false);

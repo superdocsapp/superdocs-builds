@@ -35,6 +35,7 @@ app.add_middleware(
 )
 _dms_store = build_seeded_store()
 _superdocs_client: SuperDocsClient | None = None
+_workflow: DocumentWorkflow | None = None
 
 
 def get_dms() -> DMSStore:
@@ -57,7 +58,20 @@ def get_superdocs() -> SuperDocsClient:
 
 
 def get_workflow() -> DocumentWorkflow:
-    return DocumentWorkflow(get_dms(), get_superdocs())
+    """
+    MUST be a singleton. DocumentWorkflow carries per-checkout session state
+    (which HTML the session started from, and whether any edit was actually
+    approved) that spans four separate HTTP requests: checkout -> edit ->
+    review -> checkin. Returning a fresh instance per request - as this did
+    originally - silently emptied that state between every call, so checkin
+    always believed nothing had been approved and filed the PREVIOUS
+    version's bytes as the new version: HTTP 200, new version number, stale
+    content, no error anywhere. See tests/test_app_wiring.py.
+    """
+    global _workflow
+    if _workflow is None:
+        _workflow = DocumentWorkflow(get_dms(), get_superdocs())
+    return _workflow
 
 
 api_router = APIRouter()

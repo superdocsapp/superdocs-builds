@@ -10,8 +10,15 @@ async function request(path, { method = "GET", userId, body } = {}) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const detail = typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail);
-    throw new Error(detail || `Request failed (${response.status})`);
+    const isStructured = data.detail && typeof data.detail === "object";
+    const message = isStructured ? data.detail.message : data.detail;
+    const err = new Error(message || `Request failed (${response.status})`);
+    // Some errors (e.g. checkin refusing over unresolved changes) carry
+    // structured detail beyond a message - attach it so a caller can react
+    // (re-render the changes still needing a decision) instead of just
+    // displaying text.
+    if (isStructured) err.detail = data.detail;
+    throw err;
   }
   return data;
 }

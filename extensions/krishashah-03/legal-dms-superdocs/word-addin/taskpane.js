@@ -25,7 +25,15 @@ async function api(path, options = {}) {
   });
   const body = await response.json();
   if (!response.ok) {
-    throw new Error(body.detail ? JSON.stringify(body.detail) : "Request failed");
+    const isStructured = body.detail && typeof body.detail === "object";
+    const message = isStructured ? body.detail.message : body.detail;
+    const err = new Error(message || "Request failed");
+    // Some errors (e.g. checkin refusing over unresolved changes) carry
+    // structured detail beyond a message - attach it so a caller can react
+    // (re-render the changes still needing a decision) instead of just
+    // displaying text.
+    if (isStructured) err.detail = body.detail;
+    throw err;
   }
   return body;
 }
@@ -109,7 +117,7 @@ async function handleDecision(change, approved) {
   try {
     setStatus(approved ? "Applying approved change..." : "Discarding rejected change...");
 
-    await api(
+    const result = await api(
       `/matters/${state.matterId}/documents/${state.documentId}/review`,
       {
         method: "POST",
@@ -124,11 +132,20 @@ async function handleDecision(change, approved) {
       await insertApprovedChange(change);
     }
 
-    state.pendingChanges = state.pendingChanges.filter(
-      (c) => c.change_id !== change.change_id
-    );
+    // Trust the server's remaining_pending_changes as the new full list,
+    // rather than just filtering out the one just decided. SuperDocs can
+    // surface a change that was never part of the original edit response -
+    // filtering locally silently drops it, and nothing then stops check-in
+    // from proceeding as if review were complete.
+    state.pendingChanges = result.remaining_pending_changes || [];
     renderPendingChanges();
-    setStatus(approved ? "Change applied to the document." : "Change discarded - document untouched.");
+    setStatus(
+      state.pendingChanges.length > 0
+        ? `${state.pendingChanges.length} more change(s) to review - SuperDocs proposed additional edits.`
+        : approved
+        ? "Change applied to the document."
+        : "Change discarded - document untouched."
+    );
   } catch (err) {
     setStatus(`Failed to process decision: ${err.message}`);
   }
@@ -189,6 +206,12 @@ async function handleCheckin() {
     setStatus(`Checked in as version ${result.new_version}.`);
     await loadVersionHistory();
   } catch (err) {
+    if (err.detail?.pending_changes) {
+      // The server refused because SuperDocs still has undecided changes on
+      // this session - show them instead of just an error string.
+      state.pendingChanges = err.detail.pending_changes;
+      renderPendingChanges();
+    }
     setStatus(`Checkin failed: ${err.message}`);
   }
 }

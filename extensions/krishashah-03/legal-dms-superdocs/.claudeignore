@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+vendor/
+
+# Python
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+.env/
+*.egg-info/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key

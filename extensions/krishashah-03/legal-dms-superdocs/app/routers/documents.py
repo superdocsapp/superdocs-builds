@@ -30,7 +30,7 @@ from app.models import (
     VersionSummary,
 )
 from app.services.precedent_search import search_precedents
-from app.services.workflow import NotEditableError
+from app.services.workflow import CheckoutStateLostError, NotEditableError, UnresolvedChangesError
 from app.superdocs.client import PendingChange
 
 _MEDIA_TYPES = {
@@ -51,6 +51,24 @@ def _translate_dms_error(exc: Exception) -> HTTPException:
         return HTTPException(status_code=404, detail=str(exc))
     if isinstance(exc, NotEditableError):
         return HTTPException(status_code=409, detail=str(exc))
+    if isinstance(exc, CheckoutStateLostError):
+        # 409, not 500: the request is well-formed, the server is healthy,
+        # the checkout just can't be completed from here. The client's move
+        # is discard-checkout and redo, which is a conflict-resolution step.
+        return HTTPException(status_code=409, detail=str(exc))
+    if isinstance(exc, UnresolvedChangesError):
+        # detail is structured, not a plain string: the client needs the
+        # actual pending changes back to render them for one more review
+        # round, not just an error message telling a human to go look.
+        return HTTPException(
+            status_code=409,
+            detail={
+                "message": str(exc),
+                "pending_changes": [
+                    _to_proposed_change(c).model_dump() for c in exc.pending_changes
+                ],
+            },
+        )
     return HTTPException(status_code=500, detail=str(exc))
 
 

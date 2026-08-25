@@ -50,6 +50,29 @@ class FakeSuperDocsClient:
         self.upload_calls: list[dict] = []
         self.export_calls: list[dict] = []
         self.chat_calls: list[dict] = []  # audit trail for document_html checks
+        # Test hook to simulate SuperDocs' documented propagation lag: "job
+        # status can report completed before the session's actual document
+        # content has been updated server-side". Set
+        # stale_export_countdown[session_id] = N to make the next N calls to
+        # export_document(session_id=...) (NOT html=... calls) return the
+        # PRE-approval content instead of the current session content.
+        self.stale_export_countdown: dict[str, int] = {}
+        self._pre_approval_html: dict[str, str] = {}
+        # Test hook to replicate a real behavior found live: approving a
+        # change can come back with status="awaiting_approval" again and a
+        # NEW pending change that was never part of the original propose_edit
+        # response. Set surface_extra_change_on_approval[session_id] = a
+        # pending-change dict (see the shape used in chat_async below) to
+        # have the NEXT approve_changes_for_session() call on that session
+        # surface it - consumed once, then cleared.
+        self.surface_extra_change_on_approval: dict[str, dict] = {}
+        # Test hook to replicate a real behavior found live: the approve
+        # response can still list the change_id that was JUST decided in the
+        # same call, as if it were still pending - an eventual-consistency
+        # echo. Set echo_decided_change_back[session_id] = True to have the
+        # NEXT approve_changes_for_session() call on that session include the
+        # just-decided change in its returned pending_changes.
+        self.echo_decided_change_back: dict[str, bool] = {}
 
     # ---------- 1. upload ----------
 
@@ -164,10 +187,14 @@ class FakeSuperDocsClient:
         session = self.sessions[session_id]
         job = self.jobs[job_id]
         pending = session.pending_change
+        pre_approval_html = session.html
+        decided_raw = list(job["metadata"]["pending_changes"])
         if pending and pending["job_id"] == job_id:
             for decision in decisions:
                 if decision["change_id"] == pending["change_id"] and decision["approved"]:
                     session.html = pending["new_html"]
+        if session.html != pre_approval_html:
+            self._pre_approval_html[session_id] = pre_approval_html
         session.pending_change = None
         job["status"] = "completed"
         job["metadata"]["pending_changes"] = []
@@ -175,13 +202,39 @@ class FakeSuperDocsClient:
             "response": "Change applied.",
             "document_changes": {"updated_html": session.html},
         }
+
+        if self.echo_decided_change_back.pop(session_id, False):
+            job["status"] = "awaiting_approval"
+            job["metadata"]["pending_changes"] = decided_raw
+
+        extra = self.surface_extra_change_on_approval.pop(session_id, None)
+        if extra is not None:
+            job["status"] = "awaiting_approval"
+            job["metadata"]["pending_changes"] = [extra]
+            session.pending_change = {
+                "job_id": job_id,
+                "change_id": extra["change_id"],
+                "base_html": session.html,
+                "new_html": session.html + f"\n{extra['new_html']}",
+                "message": "(surfaced after approval)",
+            }
+
         return self.get_job(job_id)
 
     # ---------- 4. export ----------
 
     def export_document(self, format="docx", html=None, session_id=None, options=None) -> bytes:
         self.export_calls.append({"format": format, "session_id": session_id})
-        content = html if html is not None else self.sessions[session_id].html
+        if html is not None:
+            content = html
+        elif session_id is not None and self.stale_export_countdown.get(session_id, 0) > 0:
+            # Replicates the real "completed but not yet propagated" lag:
+            # this export call lands before the session has caught up to the
+            # approval it already reported as done.
+            self.stale_export_countdown[session_id] -= 1
+            content = self._pre_approval_html[session_id]
+        else:
+            content = self.sessions[session_id].html
         if format == "html":
             return content.encode("utf-8")
         return f"FAKE-{format.upper()}::{content}".encode("utf-8")
