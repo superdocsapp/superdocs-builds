@@ -1,0 +1,145 @@
+{
+  "document_family": "employee_onboarding_letter",
+
+  "fixed_sections": [
+    "company_header",
+    "onboarding_title",
+    "letter_date",
+    "employee_greeting_and_info_table",
+    "welcome",
+    "role_and_department",
+    "first_day_information",
+    "orientation",
+    "initial_training",
+    "before_you_arrive",
+    "hr_contact",
+    "closing",
+    "signature"
+  ],
+
+  "expected_section_order": [
+    "company_header",
+    "onboarding_title",
+    "letter_date",
+    "employee_greeting_and_info_table",
+    "welcome",
+    "role_and_department",
+    "first_day_information",
+    "remote_work_setup_OR_office_access_desk_setup",
+    "department_specific_section",
+    "orientation",
+    "initial_training",
+    "leadership_orientation (if applicable)",
+    "equipment_allocation (if applicable)",
+    "before_you_arrive",
+    "hr_contact",
+    "closing",
+    "signature"
+  ],
+
+  "variable_fields": [
+    { "name": "employee_name", "type": "string" },
+    { "name": "employee_id", "type": "string" },
+    { "name": "letter_date", "type": "date" },
+    { "name": "job_title", "type": "string" },
+    { "name": "department", "type": "enum", "values": ["Engineering", "Marketing", "Finance", "Human Resources", "Operations", "Sales"] },
+    { "name": "employee_level", "type": "enum", "values": ["Junior", "Mid", "Lead", "Manager"] },
+    { "name": "manager_name", "type": "string" },
+    { "name": "manager_title", "type": "string" },
+    { "name": "joining_date", "type": "date" },
+    { "name": "first_day_time", "type": "time" },
+    { "name": "work_location", "type": "string" },
+    { "name": "work_mode", "type": "enum", "values": ["Remote", "Office"] },
+    { "name": "team_name", "type": "string" },
+    { "name": "orientation_date", "type": "date" },
+    { "name": "orientation_time", "type": "time" },
+    { "name": "orientation_location", "type": "string" },
+    { "name": "training_program", "type": "string" },
+    { "name": "hr_contact_name", "type": "string" },
+    { "name": "hr_contact_email", "type": "string" },
+    { "name": "special_equipment_required", "type": "enum", "values": ["Yes", "No"] },
+    { "name": "equipment", "type": "list[string]", "note": "populated only when special_equipment_required == Yes" }
+  ],
+
+  "fixed_company_identity": {
+    "name": "Brightfield Technologies Inc.",
+    "address": "4200 Meridian Parkway, Suite 310, Austin, TX 78731",
+    "email": "hello@brightfieldtech.com",
+    "phone": "(512) 555-0142",
+    "website": "www.brightfieldtech.com",
+    "internal_portal_name": "Brightfield Connect",
+    "note": "Identical across all 12 documents; the 'signature' block uses the employee's own manager as the authorized representative, so the signer name/title varies per document even though the company identity does not."
+  },
+
+  "conditional_sections": [
+    {
+      "name": "remote_work_setup",
+      "condition": "work_mode == Remote",
+      "mutually_exclusive_with": "office_access_desk_setup"
+    },
+    {
+      "name": "office_access_desk_setup",
+      "condition": "work_mode == Office",
+      "mutually_exclusive_with": "remote_work_setup"
+    },
+    {
+      "name": "technical_environment_setup",
+      "condition": "department == Engineering"
+    },
+    {
+      "name": "marketing_systems_onboarding",
+      "condition": "department == Marketing"
+    },
+    {
+      "name": "finance_systems_onboarding",
+      "condition": "department == Finance"
+    },
+    {
+      "name": "hr_systems_onboarding",
+      "condition": "department == 'Human Resources'"
+    },
+    {
+      "name": "operations_systems_onboarding",
+      "condition": "department == Operations"
+    },
+    {
+      "name": "sales_systems_onboarding",
+      "condition": "department == Sales"
+    },
+    {
+      "name": "leadership_orientation",
+      "condition": "employee_level in [Manager, Lead]"
+    },
+    {
+      "name": "equipment_allocation",
+      "condition": "special_equipment_required == Yes"
+    }
+  ],
+
+  "important_formatting_characteristics": {
+    "page_size": "US Letter",
+    "header_style": "Bold uppercase company name, address line, contact line separated by a horizontal rule",
+    "title_style": "Bold uppercase 'EMPLOYEE ONBOARDING LETTER' beneath the header, followed by the letter date",
+    "section_headings": "Bold uppercase small-caps-style headings with a thin bottom rule, in a consistent navy/slate color scheme",
+    "info_tables": "Two-column shaded-label tables used for (1) employee ID/position/department, (2) first-day logistics, (3) orientation logistics",
+    "lists": "Bulleted lists used for Equipment Allocation and Before You Arrive sections",
+    "signature_block": "Horizontal rule, then bold name, title (italicized/gray), and company name of the authorized representative — the employee's own manager signs each letter",
+    "typeface": "Single sans-serif font (Calibri) throughout",
+    "color_palette": ["#1F3A5F (navy, headings)", "#44546A (slate, secondary text)", "#EDF1F6 (light table shading)"]
+  },
+
+  "documents": [
+    { "file": "onboarding_001", "employee_name": "Priya Nandakumar", "department": "Engineering", "employee_level": "Mid", "work_mode": "Remote", "special_equipment_required": "Yes" },
+    { "file": "onboarding_002", "employee_name": "Marcus Whitfield", "department": "Marketing", "employee_level": "Junior", "work_mode": "Office", "special_equipment_required": "No" },
+    { "file": "onboarding_003", "employee_name": "Elena Castellano", "department": "Finance", "employee_level": "Mid", "work_mode": "Remote", "special_equipment_required": "No" },
+    { "file": "onboarding_004", "employee_name": "Tobias Reinholt", "department": "Human Resources", "employee_level": "Junior", "work_mode": "Office", "special_equipment_required": "No" },
+    { "file": "onboarding_005", "employee_name": "Aisha Bello", "department": "Operations", "employee_level": "Manager", "work_mode": "Office", "special_equipment_required": "Yes" },
+    { "file": "onboarding_006", "employee_name": "Liam Fitzgerald", "department": "Sales", "employee_level": "Mid", "work_mode": "Remote", "special_equipment_required": "No" },
+    { "file": "onboarding_007", "employee_name": "Naomi Kessler", "department": "Engineering", "employee_level": "Lead", "work_mode": "Remote", "special_equipment_required": "Yes" },
+    { "file": "onboarding_008", "employee_name": "Diego Alvarado", "department": "Marketing", "employee_level": "Junior", "work_mode": "Office", "special_equipment_required": "No" },
+    { "file": "onboarding_009", "employee_name": "Fatima Rashid", "department": "Finance", "employee_level": "Manager", "work_mode": "Office", "special_equipment_required": "Yes" },
+    { "file": "onboarding_010", "employee_name": "Connor Blake", "department": "Operations", "employee_level": "Mid", "work_mode": "Office", "special_equipment_required": "No" },
+    { "file": "onboarding_011", "employee_name": "Yuki Tanaka", "department": "Sales", "employee_level": "Manager", "work_mode": "Remote", "special_equipment_required": "Yes" },
+    { "file": "onboarding_012", "employee_name": "Samuel Okonkwo", "department": "Human Resources", "employee_level": "Lead", "work_mode": "Office", "special_equipment_required": "No" }
+  ]
+}

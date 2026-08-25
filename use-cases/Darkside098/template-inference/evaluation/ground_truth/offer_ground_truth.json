@@ -1,0 +1,123 @@
+{
+  "document_family": "employee_offer_letter",
+  "num_documents": 12,
+  "fictional_company": {
+    "name": "Cobalt Ridge Technologies",
+    "address": "482 Fenwick Lane, Suite 300, Meridian, TX 75001",
+    "email": "careers@cobaltridgetech.com",
+    "website": "www.cobaltridgetech.com",
+    "phone": "(512) 555-0134",
+    "note": "Wholly fictional; shared identically across all 12 documents."
+  },
+  "fixed_sections": [
+    "company_header",
+    "contact_bar",
+    "offer_title",
+    "date_and_reference",
+    "candidate_information",
+    "greeting",
+    "introduction",
+    "position_details",
+    "compensation_and_benefits",
+    "conditions_of_employment",
+    "acceptance",
+    "closing",
+    "signature_block"
+  ],
+  "expected_section_order": [
+    "company_header",
+    "contact_bar",
+    "offer_title",
+    "date_and_reference",
+    "candidate_information",
+    "greeting",
+    "introduction",
+    "position_details",
+    "compensation_and_benefits",
+    "remote_work_arrangement",
+    "relocation_assistance",
+    "leadership_performance_expectations",
+    "conditions_of_employment",
+    "acceptance",
+    "closing",
+    "signature_block"
+  ],
+  "section_order_note": "The three conditional sections (remote_work_arrangement, relocation_assistance, leadership_performance_expectations) are inserted, when present, in that fixed relative order between 'compensation_and_benefits' and 'conditions_of_employment'. They never appear in any other position.",
+  "variable_fields": [
+    { "name": "candidate_name", "type": "string", "unique_per_document": true },
+    { "name": "candidate_address", "type": "string" },
+    { "name": "candidate_email", "type": "email" },
+    { "name": "candidate_phone", "type": "phone" },
+    { "name": "offer_date", "type": "date" },
+    { "name": "offer_reference", "type": "string", "format": "CRT-OFR-YYYY-MMDD" },
+    { "name": "job_title", "type": "string" },
+    { "name": "department", "type": "string" },
+    { "name": "employee_level", "type": "enum", "values": ["Junior", "Mid", "Senior", "Lead"] },
+    { "name": "reporting_manager", "type": "string" },
+    { "name": "manager_title", "type": "string" },
+    { "name": "employment_type", "type": "enum", "values": ["Office", "Remote"] },
+    { "name": "work_location", "type": "string" },
+    { "name": "relocation_required", "type": "boolean" },
+    { "name": "joining_date", "type": "date" },
+    { "name": "annual_ctc", "type": "currency", "unit": "USD" },
+    { "name": "monthly_salary", "type": "currency", "unit": "USD", "derived_from": "annual_ctc / 12, rounded" },
+    { "name": "probation_period", "type": "string", "values": ["3 months", "6 months"] },
+    { "name": "offer_expiry_date", "type": "date" },
+    { "name": "hr_representative", "type": "string" },
+    { "name": "hr_title", "type": "string" },
+    { "name": "pto_days", "type": "integer" }
+  ],
+  "conditional_sections": [
+    {
+      "name": "remote_work_arrangement",
+      "heading_text": "Remote Work Arrangement",
+      "condition": "employment_type == 'Remote'",
+      "documents_present": ["002", "004", "005", "008", "010", "012"]
+    },
+    {
+      "name": "relocation_assistance",
+      "heading_text": "Relocation Assistance",
+      "condition": "relocation_required == true",
+      "documents_present": ["003", "005", "009", "012"]
+    },
+    {
+      "name": "leadership_performance_expectations",
+      "heading_text": "Leadership / Performance Expectations",
+      "condition": "employee_level in ['Senior', 'Lead']",
+      "documents_present": ["003", "005", "007", "010", "012"]
+    },
+    {
+      "name": "performance_bonus_bullet",
+      "location": "extra bullet inside compensation_and_benefits",
+      "bullet_text": "Annual performance bonus eligibility, based on individual and company performance",
+      "condition": "employee_level in ['Senior', 'Lead']",
+      "documents_present": ["003", "005", "007", "010", "012"]
+    }
+  ],
+  "important_formatting_characteristics": {
+    "page_size": "US Letter",
+    "header": "Company name (centered, bold, accent color) + address/email/website/phone contact line, separated from body by a horizontal rule",
+    "footer": "Company name, offer reference, and page number, centered, small gray text",
+    "accent_color_hex": "2E4A62",
+    "heading_style": "Heading 2, bold, accent color, for each named section",
+    "title_style": "Centered, bold, large, 'Employment Offer Letter'",
+    "lists": "True bulleted lists (not literal bullet characters) for Position Details and Benefits",
+    "signature_block": "HR representative name/title, followed by two horizontal-line signature fields (authorized signature, candidate signature) and a date blank",
+    "no_placeholders": true,
+    "text_variation": "Introduction and closing paragraphs are drawn from 3 rotating phrasing templates per field, cycled by document index, so wording differs across documents that share the same underlying meaning"
+  },
+  "per_document_summary": [
+    { "id": "001", "candidate_name": "Maria Chen", "job_title": "Software Engineer II", "employee_level": "Mid", "employment_type": "Office", "relocation_required": false, "probation_period": "3 months" },
+    { "id": "002", "candidate_name": "James Whitfield", "job_title": "Data Analyst", "employee_level": "Junior", "employment_type": "Remote", "relocation_required": false, "probation_period": "3 months" },
+    { "id": "003", "candidate_name": "Priya Natarajan", "job_title": "Senior Product Manager", "employee_level": "Senior", "employment_type": "Office", "relocation_required": true, "probation_period": "6 months" },
+    { "id": "004", "candidate_name": "David Okafor", "job_title": "UX Designer", "employee_level": "Mid", "employment_type": "Remote", "relocation_required": false, "probation_period": "3 months" },
+    { "id": "005", "candidate_name": "Sofia Ramirez", "job_title": "Lead Software Architect", "employee_level": "Lead", "employment_type": "Remote", "relocation_required": true, "probation_period": "6 months" },
+    { "id": "006", "candidate_name": "Ethan Brooks", "job_title": "Customer Success Associate", "employee_level": "Junior", "employment_type": "Office", "relocation_required": false, "probation_period": "3 months" },
+    { "id": "007", "candidate_name": "Aisha Bello", "job_title": "Senior Financial Analyst", "employee_level": "Senior", "employment_type": "Office", "relocation_required": false, "probation_period": "6 months" },
+    { "id": "008", "candidate_name": "Lucas Fernandez", "job_title": "Marketing Coordinator", "employee_level": "Junior", "employment_type": "Remote", "relocation_required": false, "probation_period": "3 months" },
+    { "id": "009", "candidate_name": "Grace Kim", "job_title": "Operations Manager", "employee_level": "Mid", "employment_type": "Office", "relocation_required": true, "probation_period": "3 months" },
+    { "id": "010", "candidate_name": "Noah Peterson", "job_title": "Lead DevOps Engineer", "employee_level": "Lead", "employment_type": "Remote", "relocation_required": false, "probation_period": "6 months" },
+    { "id": "011", "candidate_name": "Isabella Rossi", "job_title": "HR Business Partner", "employee_level": "Mid", "employment_type": "Office", "relocation_required": false, "probation_period": "3 months" },
+    { "id": "012", "candidate_name": "Michael Thompson", "job_title": "Senior Sales Executive", "employee_level": "Senior", "employment_type": "Remote", "relocation_required": true, "probation_period": "6 months" }
+  ]
+}
