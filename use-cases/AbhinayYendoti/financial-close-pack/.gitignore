@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+*.tsbuildinfo
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+.coverage
+*.pyc
+.DS_Store
+# sqlite database, uploaded documents, exported packs, session secret
+var/

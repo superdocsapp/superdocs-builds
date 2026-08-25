@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: financial-close-pack-api
+    runtime: python
+    pythonVersion: "3.12"
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    # A Render disk keeps sqlite and uploaded documents across deploys. Without it
+    # both live on ephemeral disk and are wiped on every restart.
+    disk:
+      name: close-pack-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: SUPERDOCS_MODE
+        value: mock
+      - key: DATABASE_URL
+        value: sqlite:////var/data/close_pack.db
+      - key: STORAGE_DIR
+        value: /var/data/storage
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: SUPERDOCS_API_KEY
+        sync: false
+      - key: SUPERDOCS_BASE_URL
+        sync: false
