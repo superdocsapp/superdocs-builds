@@ -9,6 +9,7 @@ import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
 import XLSX from "xlsx";
 import Groq from "groq-sdk";
+import { Blob } from "buffer"; // ✅ Added for SuperDocs
 
 dotenv.config();
 
@@ -17,6 +18,10 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// ✅ SuperDocs configuration
+const SUPERDOCS_BASE_URL = "https://api.superdocs.app";
+const SUPERDOCS_API_KEY = process.env.SUPERDOCS_API_KEY;
 
 app.use(cors());
 app.use(express.json());
@@ -35,6 +40,12 @@ if (!fs.existsSync(uploadDir)) {
 
 // Track uploaded files (in-memory)
 let uploadedFiles = [];
+
+// ============================================================
+// HUMAN REVIEW STATE
+// ============================================================
+
+let reviewItems = [];
 
 // Clear uploads folder on server start
 if (fs.existsSync(uploadDir)) {
@@ -212,6 +223,98 @@ app.delete("/api/clear", (req, res) => {
       error: error.message,
     });
   }
+});
+
+// ============================================================
+// HUMAN REVIEW ENDPOINTS
+// ============================================================
+
+// Get all AI findings waiting for human review
+app.get("/api/review", (req, res) => {
+  res.status(200).json({
+    total: reviewItems.length,
+    pending: reviewItems.filter(
+      (item) => item.status === "pending"
+    ).length,
+    approved: reviewItems.filter(
+      (item) => item.status === "approved"
+    ).length,
+    rejected: reviewItems.filter(
+      (item) => item.status === "rejected"
+    ).length,
+    items: reviewItems,
+  });
+});
+
+// Approve or reject an AI finding
+app.post("/api/review/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      decision,
+      reviewerNote = "",
+    } = req.body;
+
+    if (!["approved", "rejected"].includes(decision)) {
+      return res.status(400).json({
+        message:
+          'decision must be either "approved" or "rejected"',
+      });
+    }
+
+    const item = reviewItems.find(
+      (review) => review.id === id
+    );
+
+    if (!item) {
+      return res.status(404).json({
+        message: "Review item not found",
+      });
+    }
+
+    item.status = decision;
+    item.decision = decision;
+    item.reviewerNote = reviewerNote;
+
+    console.log(
+      `Review ${id}: ${decision}`
+    );
+
+    res.status(200).json({
+      message: `Finding ${decision} successfully`,
+      item,
+    });
+  } catch (error) {
+    console.error("Review error:", error);
+
+    res.status(500).json({
+      message: "Failed to update review",
+      error: error.message,
+    });
+  }
+});
+
+// Get current review status
+app.get("/api/review/status", (req, res) => {
+  const pending = reviewItems.filter(
+    (item) => item.status === "pending"
+  ).length;
+
+  const approved = reviewItems.filter(
+    (item) => item.status === "approved"
+  ).length;
+
+  const rejected = reviewItems.filter(
+    (item) => item.status === "rejected"
+  ).length;
+
+  res.status(200).json({
+    total: reviewItems.length,
+    pending,
+    approved,
+    rejected,
+    complete: pending === 0,
+  });
 });
 
 // Analyze uploaded documents
@@ -498,8 +601,43 @@ Generate a detailed report in JSON format with the following structure:
   "feedbackInsights": "Analysis of attendee feedback, satisfaction scores, and key themes.",
   "financialInsights": "Analysis of budget, spending, and financial performance.",
   "documentConflicts": ["Any conflicting information found across documents", "Or empty array if none"],
-  "recommendations": ["Recommendation 1", "Recommendation 2", "Recommendation 3"]
+  "recommendations": ["Recommendation 1", "Recommendation 2", "Recommendation 3"],
+
+  "sponsorDelivery": [
+    {
+      "sponsorName": "Exact sponsor name from the documents",
+      "contractedActivations": [
+        "Activation promised in the sponsor agreement or event document"
+      ],
+      "deliveredActivations": [
+        "Activation that the documents confirm was actually delivered"
+      ],
+      "missingActivations": [
+        "Contracted activation that the documents indicate was not delivered"
+      ],
+      "status": "Complete | Partial | Not Delivered | Unknown",
+      "evidence": [
+        {
+          "sourceDocument": "Exact source document filename",
+          "snippet": "Short supporting excerpt or factual summary from the source"
+        }
+      ]
+    }
+  ]
 }
+
+Sponsor delivery rules:
+
+- Identify sponsors only when their names or sponsorship information appear in the provided documents.
+- For each sponsor, compare contracted/promised activations against activations that were actually delivered.
+- Contracted activations may include items such as logo placement, booth space, speaking slots, stage mentions, social media mentions, branding, passes, workshops, or other benefits explicitly stated in the documents.
+- Do not invent sponsor names, contractual obligations, or delivery results.
+- If a sponsor is mentioned but there is insufficient evidence to determine delivery status, use "Unknown".
+- If there is no sponsor information in the documents, return an empty sponsorDelivery array.
+- Every sponsor finding should include the source document(s) supporting the finding.
+- Keep evidence snippets short and factual.
+- Distinguish clearly between what was promised and what was actually delivered.
+- Do not treat a general mention of a sponsor as proof that every contracted activation was delivered.
 
 Make the insights specific to the event content provided. If certain data is not available, acknowledge that in the analysis.
 Return ONLY valid JSON, no markdown or other text.
@@ -544,6 +682,65 @@ Return ONLY valid JSON, no markdown or other text.
       throw new Error("Failed to parse AI-generated report");
     }
 
+    // ============================================================
+    // CREATE HUMAN REVIEW ITEMS
+    // ============================================================
+
+    reviewItems = [];
+
+    // Review document conflicts
+    (aiReport.documentConflicts || []).forEach((conflict, index) => {
+      reviewItems.push({
+        id: `conflict-${Date.now()}-${index}`,
+        type: "document_conflict",
+        title: "Document Conflict",
+        finding: conflict,
+        status: "pending",
+        confidence: "medium",
+        decision: null,
+        reviewerNote: "",
+      });
+    });
+
+    // Review sponsor delivery findings
+    (aiReport.sponsorDelivery || []).forEach((sponsor, index) => {
+      if (
+        sponsor.status === "Partial" ||
+        sponsor.status === "Not Delivered" ||
+        sponsor.status === "Unknown"
+      ) {
+        reviewItems.push({
+          id: `sponsor-${Date.now()}-${index}`,
+          type: "sponsor_delivery",
+          title: `${sponsor.sponsorName} — Sponsor Delivery`,
+          finding: sponsor,
+          status: "pending",
+          confidence:
+            sponsor.status === "Unknown" ? "low" : "medium",
+          decision: null,
+          reviewerNote: "",
+        });
+      }
+    });
+
+    // Review recommendations
+    (aiReport.recommendations || []).forEach((recommendation, index) => {
+      reviewItems.push({
+        id: `recommendation-${Date.now()}-${index}`,
+        type: "recommendation",
+        title: "AI Recommendation",
+        finding: recommendation,
+        status: "pending",
+        confidence: "medium",
+        decision: null,
+        reviewerNote: "",
+      });
+    });
+
+    console.log(
+      `Created ${reviewItems.length} human review items`
+    );
+
     // Create final report
     const report = {
       title: "Post-Event Impact Report",
@@ -553,6 +750,10 @@ Return ONLY valid JSON, no markdown or other text.
 
       totalWords,
       totalCharacters: cleanedCombinedText.length,
+
+      reviewItems,
+      reviewStatus:
+        reviewItems.length === 0 ? "approved" : "pending_review",
 
       executiveSummary: aiReport.executiveSummary,
 
@@ -569,6 +770,8 @@ Return ONLY valid JSON, no markdown or other text.
       documentConflicts: aiReport.documentConflicts || [],
 
       recommendations: aiReport.recommendations || [],
+
+      sponsorDelivery: aiReport.sponsorDelivery || [],
 
       // Keep individual document information
       documentSummaries: extractedDocuments.map((doc) => ({
@@ -593,6 +796,395 @@ Return ONLY valid JSON, no markdown or other text.
     });
   }
 });
+
+// ============================================================
+// SUPERDOCS INTEGRATION
+// ============================================================
+
+function superdocsHeaders(json = false) {
+  return {
+    Authorization: `Bearer ${SUPERDOCS_API_KEY}`,
+    ...(json ? { "Content-Type": "application/json" } : {}),
+  };
+}
+
+
+// ------------------------------------------------------------
+// 1. Upload document to SuperDocs
+// ------------------------------------------------------------
+
+app.post(
+  "/api/superdocs/upload",
+  upload.single("document"),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          message: "No document uploaded",
+        });
+      }
+
+      const sessionId = req.body.session_id;
+
+      if (!sessionId) {
+        return res.status(400).json({
+          message: "session_id is required",
+        });
+      }
+
+      const fileBuffer = fs.readFileSync(req.file.path);
+
+      const formData = new FormData();
+
+      formData.append(
+        "file",
+        new Blob([fileBuffer], {
+          type: req.file.mimetype || "application/octet-stream",
+        }),
+        req.file.originalname
+      );
+
+      formData.append("session_id", sessionId);
+
+      const response = await fetch(
+        `${SUPERDOCS_BASE_URL}/v1/documents/upload`,
+        {
+          method: "POST",
+          headers: superdocsHeaders(),
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("SuperDocs upload error:", data);
+
+        return res.status(response.status).json({
+          message:
+            data.detail ||
+            data.message ||
+            "SuperDocs document upload failed",
+        });
+      }
+
+      res.status(200).json({
+        message: "Document uploaded to SuperDocs successfully",
+        ...data,
+
+        // Keep frontend-compatible information
+        document: {
+          originalName: req.file.originalname,
+          filename: data.filename || req.file.filename,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+          status: "Ready",
+        },
+      });
+    } catch (error) {
+      console.error("SuperDocs upload error:", error);
+
+      res.status(500).json({
+        message: "Failed to upload document to SuperDocs",
+        error: error.message,
+      });
+    }
+  }
+);
+
+
+// ------------------------------------------------------------
+// 2. Send report generation instruction to SuperDocs
+// ------------------------------------------------------------
+
+app.post("/api/superdocs/chat", async (req, res) => {
+  try {
+    const {
+      session_id,
+      document_html = "",
+      message,
+      approval_mode = "ask_every_time",
+    } = req.body;
+
+    if (!session_id) {
+      return res.status(400).json({
+        message: "session_id is required",
+      });
+    }
+
+    if (!message) {
+      return res.status(400).json({
+        message: "message is required",
+      });
+    }
+
+    const response = await fetch(
+      `${SUPERDOCS_BASE_URL}/v1/chat/async`,
+      {
+        method: "POST",
+        headers: superdocsHeaders(true),
+        body: JSON.stringify({
+          message,
+          session_id,
+          document_html,
+          approval_mode,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("SuperDocs chat error:", data);
+
+      return res.status(response.status).json({
+        message:
+          data.detail ||
+          data.message ||
+          "SuperDocs report generation failed",
+      });
+    }
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("SuperDocs chat error:", error);
+
+    res.status(500).json({
+      message: "Failed to start SuperDocs report generation",
+      error: error.message,
+    });
+  }
+});
+
+
+// ------------------------------------------------------------
+// 3. Check async job status (UPDATED with logging & non-JSON handling)
+// ------------------------------------------------------------
+
+app.get("/api/superdocs/job/:jobId", async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    if (!jobId) {
+      return res.status(400).json({
+        message: "jobId is required",
+      });
+    }
+
+    const response = await fetch(
+      `${SUPERDOCS_BASE_URL}/v1/jobs/${jobId}`,
+      {
+        method: "GET",
+        headers: superdocsHeaders(),
+      }
+    );
+
+    // --- Read raw response text first ---
+    const responseText = await response.text();
+
+    let data;
+
+    // Try to parse as JSON
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error(
+        "SuperDocs returned non-JSON response:",
+        response.status,
+        response.headers.get("content-type"),
+        responseText.slice(0, 500)
+      );
+
+      return res.status(502).json({
+        message: "SuperDocs returned an invalid response",
+        status: response.status,
+        raw: responseText,
+      });
+    }
+
+    // Log the full response for debugging
+    console.log(
+      "========== SUPERDOCS JOB RESPONSE =========="
+    );
+    console.log(JSON.stringify(data, null, 2));
+    console.log(
+      "============================================="
+    );
+
+    // Check HTTP status
+    if (!response.ok) {
+      console.error("SuperDocs job status error:", data);
+
+      return res.status(response.status).json({
+        message:
+          data?.detail ||
+          data?.message ||
+          "Failed to retrieve SuperDocs job",
+      });
+    }
+
+    return res.status(200).json(data);
+
+  } catch (error) {
+    console.error("SuperDocs job error:", error);
+
+    return res.status(500).json({
+      message: "Failed to check SuperDocs job",
+      error: error.message,
+    });
+  }
+});
+
+
+// ------------------------------------------------------------
+// 4. Approve proposed changes
+// ------------------------------------------------------------
+
+app.post("/api/superdocs/approve", async (req, res) => {
+  try {
+    const {
+      session_id,
+      job_id,
+      approved = true,
+      changes = [],
+    } = req.body;
+
+    if (!session_id || !job_id) {
+      return res.status(400).json({
+        message: "session_id and job_id are required",
+      });
+    }
+
+    const response = await fetch(
+      `${SUPERDOCS_BASE_URL}/v1/chat/${session_id}/approve`,
+      {
+        method: "POST",
+        headers: superdocsHeaders(true),
+        body: JSON.stringify({
+          job_id,
+          approved,
+          changes,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("SuperDocs approval error:", data);
+
+      return res.status(response.status).json({
+        message:
+          data.detail ||
+          data.message ||
+          "Failed to approve SuperDocs changes",
+      });
+    }
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("SuperDocs approval error:", error);
+
+    res.status(500).json({
+      message: "Failed to approve SuperDocs changes",
+      error: error.message,
+    });
+  }
+});
+
+
+// ------------------------------------------------------------
+// 5. Export report
+// ------------------------------------------------------------
+
+app.post("/api/superdocs/export", async (req, res) => {
+  try {
+    const {
+      session_id,
+      format = "pdf",
+    } = req.body;
+
+    if (!session_id) {
+      return res.status(400).json({
+        message: "session_id is required",
+      });
+    }
+
+    const allowedFormats = [
+      "pdf",
+      "docx",
+      "html",
+      "markdown",
+      "txt",
+    ];
+
+    if (!allowedFormats.includes(format)) {
+      return res.status(400).json({
+        message: `Unsupported export format: ${format}`,
+      });
+    }
+
+    const response = await fetch(
+      `${SUPERDOCS_BASE_URL}/v1/documents/export`,
+      {
+        method: "POST",
+        headers: superdocsHeaders(true),
+        body: JSON.stringify({
+          session_id,
+          format,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      let errorData = {};
+
+      try {
+        errorData = await response.json();
+      } catch {
+        // Ignore JSON parse failure
+      }
+
+      return res.status(response.status).json({
+        message:
+          errorData.detail ||
+          errorData.message ||
+          "SuperDocs export failed",
+      });
+    }
+
+    const contentType =
+      response.headers.get("content-type") ||
+      "application/octet-stream";
+
+    const buffer = Buffer.from(
+      await response.arrayBuffer()
+    );
+
+    res.setHeader(
+      "Content-Type",
+      contentType
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="Impact_Report.${format}"`
+    );
+
+    res.send(buffer);
+  } catch (error) {
+    console.error("SuperDocs export error:", error);
+
+    res.status(500).json({
+      message: "Failed to export SuperDocs report",
+      error: error.message,
+    });
+  }
+});
+
+// ============================================================
+// END SUPERDOCS INTEGRATION
+// ============================================================
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
