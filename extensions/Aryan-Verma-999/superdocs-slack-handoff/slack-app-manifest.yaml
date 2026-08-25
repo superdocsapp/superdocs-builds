@@ -1,0 +1,35 @@
+_metadata:
+  major_version: 2
+  minor_version: 1
+display_information:
+  name: SuperDocs Handoff
+  description: Send a Slack file to SuperDocs for a human-reviewed document workflow.
+  background_color: "#241B4F"
+features:
+  bot_user:
+    display_name: SuperDocs
+    always_online: false
+  shortcuts:
+    - name: Send file to SuperDocs
+      type: message
+      callback_id: superdocs_intake_file
+      description: Create a SuperDocs review from one Slack file.
+  slash_commands:
+    - command: /superdocs
+      url: https://REPLACE_WITH_PUBLIC_HOST/slack/commands
+      description: Get help using SuperDocs Handoff.
+      usage_hint: Use the message shortcut on a Slack file.
+oauth_config:
+  scopes:
+    bot:
+      - chat:write
+      - commands
+      - files:read
+      - files:write
+settings:
+  interactivity:
+    is_enabled: true
+    request_url: https://REPLACE_WITH_PUBLIC_HOST/slack/interactions
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

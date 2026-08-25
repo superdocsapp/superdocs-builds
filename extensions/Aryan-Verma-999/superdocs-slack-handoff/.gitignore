@@ -1,0 +1,6 @@
+.env
+.venv/
+data/
+slack-app-manifest.local.yaml
+__pycache__/
+*.pyc
