@@ -1,0 +1,21 @@
+stateDiagram-v2
+    [*] --> NOT_ISSUED: Seed / Register Base Suppliers
+    
+    NOT_ISSUED --> ISSUED: Stage 1 (Issue Tailored Questionnaire Package)
+    note right of ISSUED: Compiles Tier 1/2/3 scopes + EU CSRD/APAC Labor/US UFLPA Annexes
+    
+    ISSUED --> SUBMITTED: Stage 2 (Supplier Uploads PDF / DOCX / TXT)
+    note right of SUBMITTED: Memory-safe stream parsing without full RAM buffering
+    
+    SUBMITTED --> NORMALIZED: Automated Data Extraction & Exact Quote Citation
+    note right of NORMALIZED: Decomposed Evaluators calculate E, S, G sub-scores & extract verbatim evidence
+    
+    NORMALIZED --> UNDER_REVIEW: Stage 3 (Human Review Gate Triggered)
+    
+    UNDER_REVIEW --> APPROVED: Human Compliance Officer Approves (0 Gaps Clean)
+    UNDER_REVIEW --> FOLLOW_UP_REQUIRED: Human Officer Approves Identified Shortfalls
+    
+    FOLLOW_UP_REQUIRED --> DEFICIENCY_NOTICE_SENT: Stage 4 (Generate Letter Quoting Exact Supplier Words)
+    DEFICIENCY_NOTICE_SENT --> APPROVED: Supplier Resolves 30-Day Corrective Action Audit
+    
+    APPROVED --> [*]: Executive Programme Report PDF Generated
