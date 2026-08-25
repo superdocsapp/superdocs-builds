@@ -25,7 +25,7 @@ No API key. No configuration. No network.
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, a few seconds
-uv run pytest                        # 162 tests
+uv run pytest                        # 163 tests
 ```
 
 [uv](https://docs.astral.sh/uv/) builds the environment from `uv.lock` on first run.
@@ -122,26 +122,115 @@ A verifier that only ever says "clean" is worse than none, so the mock can be to
 
 ## Commands
 
+Five commands. Everything is offline unless you pass `--live`.
+
+| Command | What it does | Costs money? |
+|---|---|---|
+| `demo` | Runs every event in `data/` in order, from a cleared register, so you can see the carry-forward work | no |
+| `build <event>` | Drafts one event's report | only with `--live` |
+| `verify <event>` | Reads the records and prints what they support. Drafts nothing, calls nothing | no |
+| `lessons` | Shows the register: what is open, what is closed, and which event raised it | no |
+| `events` | Lists the events with data on disk, oldest first | no |
+
 ```bash
-uv run python -m afteraction demo               # every event in order, from a cleared register
-uv run python -m afteraction build storm-a      # one event
-uv run python -m afteraction verify storm-a     # what the records support, drafts nothing
-uv run python -m afteraction lessons            # the register: open, closed, and where
+uv run python -m afteraction demo
+uv run python -m afteraction build storm-a
+uv run python -m afteraction verify storm-a
+uv run python -m afteraction lessons
+uv run python -m afteraction events
 ```
 
-| Flag on `build` | What it does |
+Every command takes `--help`.
+
+### Flags
+
+**`build <event>`**
+
+| Flag | What it does |
 |---|---|
 | *(none)* | offline mock — free, instant, the default |
-| `--live` | the real API. **Costs operations** |
-| `--limit 2` | stop after 2 edits. Use on a first live run |
-| `--gate interactive` | **you** approve or reject each change, with reasons |
-| `--gate reject-all` | refuse everything, to prove rejection works |
-| `--prompts` | print each instruction before the change it produces |
-| `--store <path>` | carry-forward register to use |
+| `--live` | use the real SuperDocs API. **Costs operations** |
+| `--limit N` | stop after N edits. Use this on a first live run |
+| `--gate interactive` | **you** approve or reject each change, with a reason |
+| `--gate reject-all` | refuse everything, to prove rejection really works |
+| `--gate approve-all` | approve everything (the default) |
+| `--prompts` / `--no-prompts` | print each instruction before the change it produces. On by default with `--gate interactive` |
+| `--model-tier` | `core` (default), `turbo`, `pro`, `max` |
+| `--store PATH` | which carry-forward register to use. Default is `state/lessons.json` |
+| `--out PATH` | where to write the report. Default is `out/<event>/` |
+
+**`demo`** takes `--live`, `--prompts`, and `--store` (default `out/demo-lessons.json`).
+**`lessons`** takes `--store`. **`verify`** and **`events`** take no flags.
+
+### How do I…
+
+**…see it work, without an API key**
+
+```bash
+uv run python -m afteraction demo
+```
+
+Both storms, a few seconds, and the second report opens the first one's lessons.
+
+**…see what the records support before anything is drafted**
+
+```bash
+uv run python -m afteraction verify storm-a
+```
+
+Prints every Observed statement with its citation, every Assessed judgement, and every gap. Nothing is sent anywhere.
+
+**…do my first live run without spending much**
+
+```bash
+cp .env.example .env      # then set SUPERDOCS_API_KEY=your-key-here
+uv run python -m afteraction build storm-a --live --limit 1 --store out/scratch.json
+```
+
+One edit, one operation. Proves upload → chat → approve → export end to end.
+
+**…approve the changes myself**
+
+```bash
+uv run python -m afteraction build storm-a --gate interactive
+```
+
+Each change is shown in full, before and after. Press Enter to approve, `n` to reject and type a reason. A full storm-a is 19 prompts, so add `--limit 2` while you get the feel of it.
+
+**…see the instructions being sent**
+
+```bash
+uv run python -m afteraction build storm-a --prompts
+```
+
+Prints each instruction in full, then the change it produced.
+
+**…prove that rejecting actually works**
+
+```bash
+uv run python -m afteraction build storm-a --gate reject-all
+```
+
+Refuses every change and reports the run as incomplete rather than pretending.
+
+**…refresh both live reports properly**
+
+```bash
+rm state/lessons.json
+uv run python -m afteraction build storm-a --live      # ~10 operations
+uv run python -m afteraction build storm-b --live      # ~10 operations
+uv run python -m afteraction lessons
+```
+
+Run them in this order. Storm B reads Storm A's register, so out of order it will fail with a carry-forward error.
+
+**…add a new storm**
+
+Drop a folder into `data/` with an `event.json` and the six record files. Every command picks it up. Events are ordered by their start date, never by folder name.
+
+> **One thing worth knowing.** `state/lessons.json` is committed to the repository. Any `build` without `--store` rewrites it, so a half-finished or capped run leaves a half-finished register in your working tree. Point `--store` at something in `out/` (which is gitignored) for anything you are only experimenting with, and let the real register be written only by a clean full run.
 
 **Offline is the default everywhere.** A tool that spends money by default spends it by accident.
-
-Adding a storm is a data change: drop a folder into `data/` with an `event.json` and the record files.
 
 ---
 
