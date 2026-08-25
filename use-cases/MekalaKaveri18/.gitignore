@@ -1,4 +1,6 @@
 .env
+_probe_live.py
+_probe*.py
 .venv/
 venv/
 __pycache__/
