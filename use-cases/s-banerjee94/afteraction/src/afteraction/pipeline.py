@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any, Callable, Protocol
 
 from . import sections as S
-from .client import Approver, approve_all
+from .client import Approver, SuperDocsError, approve_all
 from .corpus import load_corpus, load_lessons_opened, load_resolutions
 from .curve import render_complaints, render_curve
 from .facts import SECTION_TITLES, FactSet, build_facts
@@ -189,7 +189,30 @@ def run_event(
         path.unlink(missing_ok=True)
         return fingerprints(text)
 
+    # --- the document as it currently stands, rewritten after every turn
+    #
+    # A live run takes several minutes, and until it ends the only thing a person can
+    # watch is a progress line claiming a section was drafted. This writes the whole
+    # document to one HTML file after every turn and overwrites it in place, so anyone
+    # can open it three or five sections in and read what the document actually says
+    # now. Exports cost no operations, so the only price is a moment of latency.
+    #
+    # It refreshes whether the change was approved, rejected, or landed as nothing at
+    # all — a rejected turn leaving the page unchanged is itself worth being able to
+    # see, and a view that only appeared on success would hide exactly the runs worth
+    # watching.
+    progress_page = out_dir / f"{event_id}-in-progress.html"
+
+    def publish() -> None:
+        try:
+            backend.export(session_id, progress_page, "html")
+        except SuperDocsError as exc:
+            # A convenience view must never fail a run that is otherwise sound. If the
+            # format is refused, say so once and carry on drafting.
+            note("progress", f"cannot refresh {progress_page.name}: {exc}")
+
     current = snapshot()
+    publish()
 
     def turn(instruction: str, aimed_at: str, gate: Approver | None = None) -> None:
         nonlocal current
@@ -208,6 +231,7 @@ def run_event(
         for stray in surgical.record(aimed_at, current, after):
             note("surgical", f"editing “{aimed_at}” also changed “{stray}”")
         current = after
+        publish()
 
     # --- one instruction per section
     edits = 0

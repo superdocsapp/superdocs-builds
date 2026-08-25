@@ -261,12 +261,21 @@ def build(
     backend = SuperDocsClient(_load_key()) if live else MockSuperDocs()
     where = "live SuperDocs API" if live else "offline mock"
     typer.echo(typer.style(f"\n{event} — building against the {where}\n", bold=True))
+    out_dir = out or Path("out") / event
+    # Named before the run rather than after it. A live run takes minutes, and this
+    # file is refreshed after every turn, so naming it once the run has finished would
+    # be describing a window to someone who has stopped needing to look through it.
+    typer.echo(
+        "  watch     "
+        + typer.style(str(out_dir / f"{event}-in-progress.html"), fg=typer.colors.CYAN)
+    )
+    typer.echo()
     try:
         result = run_event(
             event,
             backend,
             store_path=store,
-            out_dir=out or Path("out") / event,
+            out_dir=out_dir,
             approver=_gate_for(gate),
             sections_limit=limit,
             model_tier=model_tier,

@@ -29,7 +29,7 @@ No API key. No configuration. No network.
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, a few seconds
-uv run pytest                        # 163 tests
+uv run pytest                        # 166 tests
 ```
 
 [uv](https://docs.astral.sh/uv/) builds the environment from `uv.lock` on first run.
@@ -66,6 +66,20 @@ edit and left their placeholder standing. The check reads the exported document 
 the reply, caught both, re-issued both, and they landed.
 
 Output lands in `out/<event>/`: a Word `.docx`, a Markdown copy, both charts. Finished examples are committed in `docs/` so you can judge the output without running anything.
+
+### Watching a run while it happens
+
+A live run takes several minutes. While it is going, `out/<event>/<event>-in-progress.html` holds the whole document as it currently stands:
+
+```
+out/storm-a/storm-a-in-progress.html
+```
+
+It is rewritten after **every** turn and overwrites itself, so there is only ever one file to open. Stop after three sections, open it in a browser, and you are reading what the document actually says right now — not a progress line claiming a section was drafted.
+
+It refreshes whether the change was approved, rejected, or landed as nothing at all. A rejected turn leaving the page untouched is itself worth being able to see, and a view that only appeared on success would hide exactly the runs worth watching.
+
+Exports cost no operations, which is the only reason this is affordable to do on every turn.
 
 ---
 

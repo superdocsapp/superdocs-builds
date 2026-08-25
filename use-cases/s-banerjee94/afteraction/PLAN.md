@@ -424,7 +424,7 @@ The register the two runs produced is byte-identical to the committed one, which
 carry-forward behaving as a pure function of the data rather than of the run.
 
 The three screenshots in `docs/` still predate the rebuild and need retaking. Offline the
-suite is green at 163 tests and both storms build clean end to end.
+suite is green at 166 tests and both storms build clean end to end.
 
 ### Not built, deliberately
 
@@ -471,3 +471,40 @@ of what to check, and every list is built from `SECTION_TITLES`. Any section tha
 by another route is invisible to all of them by default, and invisible in the quiet
 direction — the run passes. A new section type needs adding to those lists, not just to
 the pipeline.
+
+---
+
+## Addition, 26 August: the document is readable while it is still being written
+
+A live run takes between four and eight minutes. Until it ended, the only thing a person
+could watch was a stream of progress lines saying a section had been drafted — and the
+whole reason the checks exist is that such a line is exactly the thing that turns out not
+to be true. A run that reported ten successful edits and shipped a report with the
+timeline still holding its placeholder is not hypothetical; it happened on 26 August, and
+the only way to notice before the end was to wait for the end.
+
+So after every turn the whole document is exported to
+`out/<event>/<event>-in-progress.html` and overwritten in place. One file, always the
+current state. Three sections in, open it in a browser and read what the document says.
+
+Three decisions inside that:
+
+- **After every turn, not after every successful turn.** A rejected change leaves the
+  page untouched, and that is worth seeing. A view that only refreshed on success would
+  go quiet in precisely the runs worth watching.
+- **Overwrite rather than accumulate.** A numbered file per turn would leave twelve files
+  and make the reader work out which is newest. There is one file and it is always now.
+- **A refused export must not fail the run.** The progress view is a convenience laid
+  beside the real work. If the service will not produce HTML, that is reported once and
+  the drafting continues — a run whose citations, section boundaries and prose are all
+  sound must not be failed by a viewing aid. It is wrapped in its own try, and a test
+  asserts the run still passes when the format is refused.
+
+Exports cost no operations, so the only price is a second of latency per turn. That same
+fact is what already pays for exporting after every turn to check the section boundaries;
+this rides along on a property the build had already established rather than buying a
+new one.
+
+Verified live rather than assumed: `--live --limit 1` produced a real styled HTML page
+with section 1 drafted and the remaining seventeen placeholders still standing, which is
+precisely the mid-run state the file exists to show.

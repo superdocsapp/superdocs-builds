@@ -720,3 +720,76 @@ def test_the_summary_asks_the_model_to_read_the_document_not_a_second_copy_of_th
     assert "Do not carry citations into the summary" in text
     # no record ids are supplied: there is nothing to copy from
     assert not re.search(r"\b(WEA|TEL|DMG|CRW|COM|FLD)-\d{4}\b", text)
+
+
+# ------------------------------------------------- the document, while it is being written
+
+
+def test_the_page_is_rewritten_after_every_turn(store, tmp_path):
+    """A live run takes minutes and, until it ends, the only thing to watch is a progress
+    line claiming a section was drafted. The in-progress page exists so a person can open
+    one file part-way through and read what the document actually says — so it has to be
+    refreshed on every turn, not written once at the end."""
+    seen: list[str] = []
+
+    class Watching(MockSuperDocs):
+        def export(self, session_id, out_path, fmt="docx"):
+            path = super().export(session_id, out_path, fmt)
+            if path.name.endswith("-in-progress.html"):
+                seen.append(path.read_text(encoding="utf-8"))
+            return path
+
+    result = _run("storm-a", store, tmp_path, backend=Watching())
+
+    # one baseline before any edit, then one per turn
+    assert len(seen) == result.edits + 1, f"{len(seen)} refreshes for {result.edits} turns"
+    # the baseline is all placeholder; the final one is the finished document
+    assert "Placeholder for observed statements in 1. Event Overview" in seen[0]
+    assert "Placeholder for observed statements in 1. Event Overview" not in seen[-1]
+    # and it genuinely fills in as it goes rather than appearing at the end
+    filled = [s.count("Placeholder") for s in seen]
+    assert filled[0] > filled[len(filled) // 2] > filled[-1], filled
+
+
+def test_the_page_is_refreshed_even_when_every_change_is_rejected(store, tmp_path):
+    """A rejected turn leaves the document unchanged, and that is worth being able to
+    see. A view that only appeared on success would hide exactly the runs worth watching."""
+    seen: list[str] = []
+
+    class Watching(MockSuperDocs):
+        def export(self, session_id, out_path, fmt="docx"):
+            path = super().export(session_id, out_path, fmt)
+            if path.name.endswith("-in-progress.html"):
+                seen.append(path.read_text(encoding="utf-8"))
+            return path
+
+    def reject_all(change):
+        return False, "not this time"
+
+    _run("storm-a", store, tmp_path, backend=Watching(), approver=reject_all)
+
+    assert len(seen) > 1, "the page was never refreshed after a turn"
+    # nothing was approved, so the document never moved off its placeholders
+    assert all("Placeholder for observed statements in 1. Event Overview" in s for s in seen)
+
+
+def test_a_service_that_refuses_html_does_not_fail_the_run(store, tmp_path):
+    """The progress view is a convenience. If the export format is refused it must be
+    reported once and stepped over — it cannot be allowed to fail a run whose drafting,
+    citations and section boundaries are all sound."""
+    from afteraction.client import SuperDocsError
+
+    class NoHtml(MockSuperDocs):
+        def export(self, session_id, out_path, fmt="docx"):
+            if fmt == "html":
+                raise SuperDocsError("export -> 400: unsupported format 'html'")
+            return super().export(session_id, out_path, fmt)
+
+    notes: list[tuple[str, str]] = []
+    result = _run(
+        "storm-a", store, tmp_path, backend=NoHtml(),
+        on_event=lambda stage, detail: notes.append((stage, detail)),
+    )
+
+    assert result.ok, "a refused progress export failed an otherwise clean run"
+    assert any(stage == "progress" for stage, _ in notes), "the refusal was never reported"
