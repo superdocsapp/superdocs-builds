@@ -412,7 +412,7 @@ truncate proposed text.
 
 The two live reports in `docs/`, both report screenshots and the verified 28/28 and 23/23
 figures were all produced against the old data and are stale. They need a live re-run.
-Offline the suite is green at 162 tests and both storms build clean end to end.
+Offline the suite is green at 163 tests and both storms build clean end to end.
 
 ### Not built, deliberately
 

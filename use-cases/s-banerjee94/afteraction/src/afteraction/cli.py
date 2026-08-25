@@ -75,6 +75,20 @@ def _echo_prompt(instruction: str) -> None:
     typer.echo()
 
 
+def _echo_claim(tag: str, text: str, width: int, colour: str | None = None) -> None:
+    """One claim, wrapped to the terminal rather than cut off at a fixed width.
+
+    This used to truncate at 140 characters. A claim's citation sits at the end of its
+    sentence, so the cut removed the citation from 17 of storm-a's 22 claims — the one
+    thing this command exists to show. The gate already refuses to truncate proposed
+    text for the same reason; `verify` now behaves the same way.
+    """
+    lines = textwrap.wrap(text, width=width) or [""]
+    out = [f"    {tag} {lines[0]}"] + [f"          {line}" for line in lines[1:]]
+    for line in out:
+        typer.echo(typer.style(line, fg=colour) if colour else line)
+
+
 def _load_key() -> str:
     """Read the key from the environment, falling back to a local .env.
 
@@ -344,6 +358,7 @@ def verify(event: str = typer.Argument(..., help="event id, e.g. storm-a")) -> N
         f"  {len(facts.corpus.log)} log entries · {len(facts.corpus.crews)} crews · "
         f"{len(facts.corpus.comms)} communications · {len(facts.readings)} consumer counts"
     )
+    width = max(60, min(shutil.get_terminal_size((100, 24)).columns - 12, 116))
     for key, title in SECTION_TITLES.items():
         claims = facts.for_section(key)
         observed = sum(1 for c in claims if c.kind is Kind.OBSERVED)
@@ -352,9 +367,9 @@ def verify(event: str = typer.Argument(..., help="event id, e.g. storm-a")) -> N
         typer.echo(f"\n  {typer.style(title, bold=True)}: {observed} observed, {assessed} assessed, {gaps} gaps")
         for claim in claims:
             tag = "OBS" if claim.kind is Kind.OBSERVED else "ASS"
-            typer.echo(f"    [{tag}] {claim.rendered()[:140]}")
+            _echo_claim(f"[{tag}]", claim.rendered(), width)
         for gap in facts.gaps_for(key):
-            typer.echo(typer.style(f"    [GAP] {gap.detail[:140]}", fg=typer.colors.YELLOW))
+            _echo_claim("[GAP]", gap.detail, width, colour=typer.colors.YELLOW)
     typer.echo()
 
 

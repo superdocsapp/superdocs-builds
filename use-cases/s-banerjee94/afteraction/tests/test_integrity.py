@@ -183,6 +183,23 @@ def test_a_chart_that_lands_first_time_is_not_retried(store, tmp_path):
     assert result.retried == []
     assert result.ok
 
+
+def test_verify_never_cuts_a_citation_off():
+    """`verify` truncated every claim at 140 characters, which removed the citation from
+    17 of storm-a's 22 claims — the one thing the command exists to show, and the thing
+    the demo narration claims is on screen."""
+    from typer.testing import CliRunner
+    from afteraction.cli import app
+
+    out = CliRunner().invoke(app, ["verify", "storm-a"]).output
+    facts = build_facts(load_corpus("storm-a"))
+
+    for claim in facts.claims:
+        tail = claim.rendered().rsplit(" ", 1)[-1]     # the closing citation or marker
+        assert tail in out, f"{tail} never reached the screen"
+    assert "..." not in out
+
+
 # ------------------------------------------------------------------ surgical precision
 
 
