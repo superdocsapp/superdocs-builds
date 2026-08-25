@@ -99,7 +99,13 @@ class ApplyResult:
         if self.already_applied:
             parts.append(f"{len(self.already_applied)} already applied (resumed)")
         if self.escalated:
-            parts.append(f"{len(self.escalated)} escalated — the passage moved")
+            # Each escalation carries its own reason, and they are not all "the
+            # passage moved": a finding whose wording never came back escalates
+            # too, and naming the wrong cause in the summary line is the sort of
+            # confident-and-wrong sentence this whole project is against.
+            reasons = {why for _, why in self.escalated}
+            why = reasons.pop() if len(reasons) == 1 else "see the reasons below"
+            parts.append(f"{len(self.escalated)} escalated — {why}")
         if self.conflicts:
             parts.append(f"{len(self.conflicts)} version conflicts")
         if self.rolled_back:

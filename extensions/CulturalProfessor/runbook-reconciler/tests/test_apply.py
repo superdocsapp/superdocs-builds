@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pytest
 
-from reconciler.apply import apply_approved
+from reconciler.apply import ApplyResult, apply_approved
 from reconciler.check.vertical import check_page
 from reconciler.claims import Finding
 from reconciler.config import Config
@@ -168,6 +168,25 @@ def test_a_finding_with_no_replacement_text_is_escalated(
 
     assert result.applied == []
     assert result.escalated and "no replacement text" in result.escalated[0][1]
+
+
+def test_the_summary_line_does_not_name_a_cause_it_did_not_check() -> None:
+    """Every escalation carries its own reason, and they are not all the same
+    one. The line that summarises them said "the passage moved" over findings
+    that escalated because their wording never came back -- which is a
+    confident sentence about something nothing had checked, in the summary a
+    reviewer reads first."""
+    unworded = ApplyResult(escalated=[("f1", "no replacement text was produced")])
+    assert "no replacement text was produced" in unworded.summary_line()
+    assert "the passage moved" not in unworded.summary_line()
+
+    mixed = ApplyResult(
+        escalated=[
+            ("f1", "no replacement text was produced"),
+            ("f2", "the passage changed after this was reviewed"),
+        ]
+    )
+    assert "2 escalated — see the reasons below" in mixed.summary_line()
 
 
 def test_a_page_edited_after_review_is_escalated_not_guessed(
