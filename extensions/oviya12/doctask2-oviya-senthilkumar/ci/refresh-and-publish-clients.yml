@@ -1,0 +1,47 @@
+name: Refresh and publish SuperDocs clients
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extensions/oviya12/doctask2-oviya-senthilkumar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: https://registry.npmjs.org
+      - run: SUPERDOCS_SPEC_URL=https://docs.superdocs.app/openapi.json bash scripts/fetch.sh
+      - id: changed
+        run: |
+          if git diff --quiet -- specs/superdocs-new.json; then
+            echo 'value=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'value=true' >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.changed.outputs.value == 'true'
+        run: SKIP_FETCH=1 RELEASE_VERSION_SUFFIX=1 make all
+      - if: steps.changed.outputs.value == 'true'
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test -n "$PYPI_API_TOKEN"
+          test -n "$NPM_TOKEN"
+          python -m pip install --upgrade build twine
+          python -m build clients/python
+          TWINE_USERNAME=__token__ TWINE_PASSWORD="$PYPI_API_TOKEN" twine upload clients/python/dist/*
+          npm --prefix clients/typescript install
+          NODE_AUTH_TOKEN="$NPM_TOKEN" npm --prefix clients/typescript publish

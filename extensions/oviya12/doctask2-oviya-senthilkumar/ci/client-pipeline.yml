@@ -1,0 +1,26 @@
+name: SuperDocs client pipeline
+
+on:
+  push:
+    paths:
+      - 'extensions/oviya12/doctask2-oviya-senthilkumar/**'
+  pull_request:
+    paths:
+      - 'extensions/oviya12/doctask2-oviya-senthilkumar/**'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extensions/oviya12/doctask2-oviya-senthilkumar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: make all
