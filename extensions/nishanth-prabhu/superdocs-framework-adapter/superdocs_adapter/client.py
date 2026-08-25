@@ -206,6 +206,8 @@ class SuperDocsClient(SuperDocsAdapter):
         method: str = "GET",
         data: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
+        import ssl
+
         url = f"{self.base_url}/{endpoint.lstrip('/')}"
 
         headers = {
@@ -230,10 +232,27 @@ class SuperDocsClient(SuperDocsAdapter):
             method=method,
         )
 
+        # Use a permissive SSL context so macOS Python installations that lack
+        # the system CA bundle (common with python.org builds) don't fail for
+        # well-known hosts.  For production use, swap for ssl.create_default_context()
+        # with an explicit cafile.
+        ssl_ctx = ssl.create_default_context()
+        try:
+            ssl_ctx.load_default_certs()
+        except Exception:
+            pass
+        try:
+            import certifi  # type: ignore[import]
+            ssl_ctx.load_verify_locations(certifi.where())
+        except ImportError:
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
+
         try:
             with urllib.request.urlopen(
                 request,
                 timeout=self.timeout,
+                context=ssl_ctx,
             ) as response:
                 response_body = response.read().decode("utf-8")
 
