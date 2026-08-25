@@ -1,0 +1,15 @@
+[project]
+name = "declare-server"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi[standard]",
+  "pydantic>=2",
+  "httpx",
+]
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
