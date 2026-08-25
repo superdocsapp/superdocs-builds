@@ -4,6 +4,14 @@ A contract-redlining workflow built with FastAPI, PostgreSQL, and the SuperDocs 
 
 The application compares a dealer-returned agreement against an approved master agreement and a negotiation playbook, detects deviations, classifies them, and routes them through a human-in-the-loop approval process before applying redlines and exporting the final document.
 
+## Screenshots
+
+![Dealer Agreement Redline - Screenshot 1](./screenshots/image1.png)
+
+![Dealer Agreement Redline - Screenshot 2](./screenshots/image2.png)
+
+![Dealer Agreement Redline - Screenshot 3](./screenshots/image3.png)
+
 ---
 
 ## Current Status
