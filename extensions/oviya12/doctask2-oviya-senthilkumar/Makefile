@@ -11,14 +11,14 @@ fetch:          ## Re-fetch the pinned spec versions and rebuild the breaking de
 	bash scripts/fetch.sh
 
 compat:         ## Regenerate the compatibility report (old -> new) with CI gate
-	docker run --rm -v "$(CURDIR):/work" tufin/oasdiff changelog -f json \
+	docker run --rm -v "$(CURDIR):/work" tufin/oasdiff@sha256:8f7daabad46bc986290da569589046813de8bfd669fc4bffc3c78060ab2a548d changelog -f json \
 	  /work/specs/superdocs-old.json /work/specs/superdocs-new.json > reports/changelog.json
 	python scripts/compat.py --changelog reports/changelog.json \
 	  --base specs/superdocs-old.json --revision specs/superdocs-new.json --out reports --gate
 
 mock:           ## Start the Prism mock server on :4010 (Ctrl-C to stop)
 	docker run --rm --name superdocs-mock -p 4010:4010 -v "$(CURDIR):/tmp" \
-	  stoplight/prism:4 mock -h 0.0.0.0 /tmp/specs/superdocs-new.json
+	  stoplight/prism@sha256:08dc16243047a3263beca814b544a5be81e9ec25ca5757cdc4170c84f7431355 mock -h 0.0.0.0 /tmp/specs/superdocs-new.json
 
 clean:          ## Remove generated clients, reports, and local deps
 	rm -rf clients/python clients/typescript reports/changelog*.json \

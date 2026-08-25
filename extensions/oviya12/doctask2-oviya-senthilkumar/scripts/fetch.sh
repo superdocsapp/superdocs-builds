@@ -20,5 +20,5 @@ fetch_spec() {
 mkdir -p specs
 echo "fetching pinned specs from github.com/superdocsapp/docs ..."
 fetch_spec "https://raw.githubusercontent.com/superdocsapp/docs/${OLD_SHA}/openapi.json" specs/superdocs-old.json
-fetch_spec "https://raw.githubusercontent.com/superdocsapp/docs/${NEW_SHA}/openapi.json" specs/superdocs-new.json
+fetch_spec "${SUPERDOCS_SPEC_URL:-https://raw.githubusercontent.com/superdocsapp/docs/${NEW_SHA}/openapi.json}" specs/superdocs-new.json
 python scripts/make_breaking_demo.py

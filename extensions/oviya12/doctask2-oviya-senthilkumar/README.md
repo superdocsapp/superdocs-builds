@@ -34,6 +34,7 @@ What it does, in order:
 |---|---|---|
 | Fetch | `curl` (pinned commit SHAs) | `specs/superdocs-old.json`, `superdocs-new.json` |
 | Generate | **openapi-generator 7.12** (Docker) | `clients/python/`, `clients/typescript/` |
+| Patch | `scripts/patch_generated.py` | real package metadata + SDK version from the spec |
 | **Compat report** | **oasdiff** (Docker) + `scripts/compat.py` | `reports/compat.md` + `compat.json`, **CI gate** |
 | Mock | **Stoplight Prism** (Docker) | mock server on `:4010`, schema-valid examples |
 | Smoke | pytest (Py) + tsx (TS) | one typed call per client through the mock |
@@ -55,8 +56,19 @@ What it does, in order:
 - **Stoplight Prism** (not a stub server): mocks the API straight from the spec,
   returning schema-valid example responses — so the smoke tests exercise the
   generated clients with **zero** hand-written server code and **no** API key.
-- **Docker for all three**: the reproducibility guarantee. A reviewer with only
-  Docker installed gets identical tool versions.
+- **Docker for all three**: the reproducibility guarantee. The images are pinned
+  in the pipeline; a reviewer with Docker gets identical generator and diff
+  behavior.
+
+## Post-generation patches
+
+`scripts/patch_generated.py` is intentionally the only patch step. It changes no
+generated request, model, or transport code. It replaces OpenAPI Generator's
+placeholder repository metadata in both packages and makes their package version
+match `info.version` in the input spec. Scheduled releases add a deterministic
+spec-hash suffix because a registry needs a unique version even when the published
+spec changes without an API version bump. The script asserts the expected generated
+shape, so a generator upgrade cannot silently make a patch apply incorrectly.
 
 ## The compatibility report (the centerpiece)
 
@@ -110,10 +122,10 @@ synthesized artifact; everything else is the real published spec.
 specs/          vendored spec versions (old, new) + synthesized breaking demo
 clients/        generated Python + TypeScript clients (git-ignored; make all rebuilds)
 reports/        compat.md + compat.json (the deliverable) + breaking-demo/
-scripts/        fetch.sh, pipeline.sh, compat.py, make_breaking_demo.py
+scripts/        fetch.sh, pipeline.sh, compat.py, make_breaking_demo.py, patch_generated.py
 tests/          python/ (pytest) and typescript/ (tsx) smoke tests
 mock/           (Prism runs from the spec directly)
-.github/workflows/pipeline.yml   CI: runs `make all`, gates on the report
+/.github/workflows/              root CI + scheduled refresh/publish workflows
 Makefile        one-command entry
 ```
 
@@ -121,15 +133,17 @@ Makefile        one-command entry
 
 Scoped as a one-day build. What we deliberately left out and why:
 
-- **No real registry publishing** (PyPI / npm). We generate and *prove the
-  clients work*; publishing is a packaging/release concern orthogonal to the
-  spec-driven point, and it would need registry credentials.
+- **Registry publishing is credential-gated.** The scheduled root workflow
+  detects a published-spec change, runs this pipeline, commits the refreshed
+  specs and reports, then publishes Python to PyPI and TypeScript to npm. It
+  requires `PYPI_API_TOKEN` and `NPM_TOKEN`; without them it fails rather than
+  claiming a release succeeded. Normal PR CI never publishes.
 - **Two languages** (Python + TypeScript). They prove the pattern; Go, Java, etc.
   are each a one-line `openapi-generator` target, not new engineering.
-- **Smoke test, not full contract coverage.** One representative typed call per
-  language (`GET /v1/users/me`) proves the generated client can build a request,
-  reach the server, and deserialize a typed response. Exhaustively testing all
-  77 paths is volume, not signal, for one day.
+- **Smoke test, not full contract coverage.** Python proves typed response
+  deserialization on `GET /v1/users/me`; TypeScript additionally sends the
+  baseline upload -> chat -> approve -> export workflow. Exhaustively testing all
+  paths is volume, not signal, for one day.
 - **Mock-only, no live API.** Prism from the spec keeps the whole pipeline
   hermetic, keyless, and reproducible. No auth or integration against production.
 - **Generated clients used as-is.** No hand-editing of generator output — that

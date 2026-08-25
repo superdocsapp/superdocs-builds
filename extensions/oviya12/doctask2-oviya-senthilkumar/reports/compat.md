@@ -4,7 +4,7 @@
 
 - Base: `superdocs-old.json` — Universal Document AI API v2.0.0 (65 paths)
 - Revision: `superdocs-new.json` — Universal Document AI API v2.0.0 (77 paths)
-- Generated: 2026-08-19T12:25:29+00:00
+- Generated: 2026-08-24T05:27:19+00:00
 
 **0 breaking**, 0 warning, 32 safe (32 total changes).
 

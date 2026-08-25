@@ -1,0 +1,72 @@
+name: Refresh and publish SuperDocs clients
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-and-publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extensions/oviya12/doctask2-oviya-senthilkumar
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: https://registry.npmjs.org
+      - name: Fetch the current published specification
+        run: SUPERDOCS_SPEC_URL=https://docs.superdocs.app/openapi.json bash scripts/fetch.sh
+      - name: Detect a specification change
+        id: changed
+        run: |
+          if git diff --quiet -- specs/superdocs-new.json; then
+            echo 'value=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'value=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Regenerate, gate, and smoke test changed clients
+        if: steps.changed.outputs.value == 'true'
+        run: SKIP_FETCH=1 RELEASE_VERSION_SUFFIX=1 make all
+      - name: Require registry credentials
+        if: steps.changed.outputs.value == 'true'
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          test -n "$PYPI_API_TOKEN"
+          test -n "$NPM_TOKEN"
+      - name: Build and publish Python client
+        if: steps.changed.outputs.value == 'true'
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          python -m pip install --upgrade build twine
+          python -m build clients/python
+          twine upload clients/python/dist/*
+      - name: Build and publish TypeScript client
+        if: steps.changed.outputs.value == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          npm --prefix clients/typescript install
+          npm --prefix clients/typescript publish
+      - name: Commit refreshed spec and reports
+        if: steps.changed.outputs.value == 'true'
+        run: |
+          git config user.name 'superdocs-client-bot'
+          git config user.email 'superdocs-client-bot@users.noreply.github.com'
+          git add specs reports
+          git commit -m 'chore(clients): refresh generated clients from published spec'
+          git push
