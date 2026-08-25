@@ -14,6 +14,7 @@ Built for the SuperDocs engineering round. Everything here is **on** SuperDocs (
 | Kind | Folder | What |
 |---|---|
 | Open-list class (Slack-shaped) | [`slack-standup-status/`](slack-standup-status/) | Standup dump → CISO-safe status memo |
+| Open list (Gmail card) | [`gmail-thread-letter/`](gmail-thread-letter/) | Messy thread → letter of *dated* commitments only |
 | Original (long book) | [`plot-spine/`](plot-spine/) | Bible + targeted SuperDocs repair; ch. 3/8 hashes hold |
 | Original (proof) | [`hashlock/`](hashlock/) | SHA-256 receipt for `data-lock` clauses; FAIL is the demo |
 | Coding tools | [`../../../extensions/MekalaKaveri18/cursor-edit-selection/`](../../../extensions/MekalaKaveri18/cursor-edit-selection/) | Cursor/VS Code: SuperDocs edits **selection only** (sideload) |

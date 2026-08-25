@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gmail thread → letter</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="nav">
+        <div>Thread desk</div>
+        <span class="pill">Open list · Gmail thread to formal letter · SuperDocs</span>
+      </header>
+      <section class="hero">
+        <p class="eyebrow">Deal desk · in-house legal ops</p>
+        <h1>What the thread <em>promised</em>, not what it hoped.</h1>
+        <p class="lede">Open-list card: extract actual commitments. “Soon” and “maybe” do not become dates.</p>
+      </section>
+      <main class="grid">
+        <section class="panel">
+          <div class="kicker">Gmail-shaped export</div>
+          <pre id="raw"></pre>
+          <div class="row"><button id="run">Write the letter</button></div>
+          <p class="cite" id="status"></p>
+        </section>
+        <section class="panel">
+          <div class="kicker">Letter</div>
+          <article class="doc" id="doc"></article>
+          <a id="export" class="btn hidden" href="#">Export</a>
+        </section>
+      </main>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      fetch("/fixture").then((r) => r.json()).then((j) => { $("raw").textContent = JSON.stringify(j, null, 2); });
+      $("run").onclick = async () => {
+        $("status").textContent = "Working…";
+        const r = await fetch("/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        const j = await r.json();
+        $("status").textContent = j.status + (j.offline ? " (offline)" : "");
+        $("doc").innerHTML = j.html || "";
+        if (j.id) { $("export").classList.remove("hidden"); $("export").href = "/jobs/" + j.id + "/export"; }
+      };
+    </script>
+  </body>
+</html>
