@@ -267,8 +267,10 @@ def build(
     # be describing a window to someone who has stopped needing to look through it.
     typer.echo(
         "  watch     "
-        + typer.style(str(out_dir / f"{event}-in-progress.html"), fg=typer.colors.CYAN)
+        + typer.style(str(out_dir / f"{event}-in-progress"), fg=typer.colors.CYAN)
+        + typer.style(".html .docx .md", fg=typer.colors.CYAN)
     )
+    typer.echo("            rewritten after every change, approved or not")
     typer.echo()
     try:
         result = run_event(

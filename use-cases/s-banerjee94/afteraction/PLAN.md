@@ -424,7 +424,7 @@ The register the two runs produced is byte-identical to the committed one, which
 carry-forward behaving as a pure function of the data rather than of the run.
 
 The three screenshots in `docs/` still predate the rebuild and need retaking. Offline the
-suite is green at 166 tests and both storms build clean end to end.
+suite is green at 168 tests and both storms build clean end to end.
 
 ### Not built, deliberately
 
@@ -483,11 +483,20 @@ to be true. A run that reported ten successful edits and shipped a report with t
 timeline still holding its placeholder is not hypothetical; it happened on 26 August, and
 the only way to notice before the end was to wait for the end.
 
-So after every turn the whole document is exported to
-`out/<event>/<event>-in-progress.html` and overwritten in place. One file, always the
-current state. Three sections in, open it in a browser and read what the document says.
+So after every turn the whole document is written to `out/<event>/<event>-in-progress`
+in all three formats and overwritten in place. Always the current state. Three sections
+in, open one and read what the document says.
 
-Three decisions inside that:
+All three, because which one a person reaches for depends on why they are looking. HTML
+opens in a browser with the charts and the colours. `.docx` is what the report actually
+ships as, so it is the one that shows what the reader will receive. `.md` is plain text,
+which is the one to diff or grep when a section looks wrong.
+
+The markdown copy is free. It was already being pulled down every turn for the section
+fingerprints and then deleted; keeping the file instead costs nothing. Only the HTML and
+the `.docx` are extra round trips.
+
+Four decisions inside that:
 
 - **After every turn, not after every successful turn.** A rejected change leaves the
   page untouched, and that is worth seeing. A view that only refreshed on success would
@@ -505,6 +514,8 @@ fact is what already pays for exporting after every turn to check the section bo
 this rides along on a property the build had already established rather than buying a
 new one.
 
-Verified live rather than assumed: `--live --limit 1` produced a real styled HTML page
-with section 1 drafted and the remaining seventeen placeholders still standing, which is
-precisely the mid-run state the file exists to show.
+Verified live rather than assumed. `--live --limit 2` produced all three: a styled HTML
+page, a `.docx` that unzips as valid Open XML with seventeen parts, and the markdown —
+each showing two sections drafted and the rest still holding their placeholders, which is
+precisely the mid-run state these files exist to show. The mock cannot render real Open
+XML, so the `.docx` half of this could only ever have been proved against the live API.

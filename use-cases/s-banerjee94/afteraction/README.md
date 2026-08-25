@@ -29,7 +29,7 @@ No API key. No configuration. No network.
 cd use-cases/s-banerjee94/afteraction
 
 uv run python -m afteraction demo    # both storms, offline, a few seconds
-uv run pytest                        # 166 tests
+uv run pytest                        # 168 tests
 ```
 
 [uv](https://docs.astral.sh/uv/) builds the environment from `uv.lock` on first run.
@@ -69,13 +69,15 @@ Output lands in `out/<event>/`: a Word `.docx`, a Markdown copy, both charts. Fi
 
 ### Watching a run while it happens
 
-A live run takes several minutes. While it is going, `out/<event>/<event>-in-progress.html` holds the whole document as it currently stands:
+A live run takes several minutes. While it is going, the whole document is written to disk after every turn, in all three formats:
 
 ```
-out/storm-a/storm-a-in-progress.html
+out/storm-a/storm-a-in-progress.html     open in a browser — charts, colours, the lot
+out/storm-a/storm-a-in-progress.docx     what the report actually ships as
+out/storm-a/storm-a-in-progress.md       plain text, for diffing or grepping a bad section
 ```
 
-It is rewritten after **every** turn and overwrites itself, so there is only ever one file to open. Stop after three sections, open it in a browser, and you are reading what the document actually says right now — not a progress line claiming a section was drafted.
+Each is overwritten in place, so there is never a question of which file is newest. Stop after three sections, open one, and you are reading what the document actually says right now — not a progress line claiming a section was drafted.
 
 It refreshes whether the change was approved, rejected, or landed as nothing at all. A rejected turn leaving the page untouched is itself worth being able to see, and a view that only appeared on success would hide exactly the runs worth watching.
 

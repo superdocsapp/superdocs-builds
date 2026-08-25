@@ -183,33 +183,40 @@ def run_event(
     scratch = out_dir / f"{event_id}-snapshot.md"
     surgical = SurgicalReport()
 
-    def snapshot() -> dict[str, str]:
-        path = backend.export(session_id, scratch, "markdown")
-        text = path.read_text(encoding="utf-8")
-        path.unlink(missing_ok=True)
-        return fingerprints(text)
-
     # --- the document as it currently stands, rewritten after every turn
     #
     # A live run takes several minutes, and until it ends the only thing a person can
-    # watch is a progress line claiming a section was drafted. This writes the whole
-    # document to one HTML file after every turn and overwrites it in place, so anyone
-    # can open it three or five sections in and read what the document actually says
-    # now. Exports cost no operations, so the only price is a moment of latency.
+    # watch is a progress line claiming a section was drafted. That line is exactly the
+    # thing these checks exist because it is sometimes untrue. So the whole document is
+    # written to disk after every turn and overwritten in place: one set of files, always
+    # the current state, openable three or five sections in.
+    #
+    # All three formats, because which one a person reaches for depends on why they are
+    # looking. HTML opens in a browser with the charts and the colours; .docx is what the
+    # report actually ships as, so it is the one that shows what the reader will receive;
+    # .md is plain text, which is the one to diff or grep when a section looks wrong.
     #
     # It refreshes whether the change was approved, rejected, or landed as nothing at
-    # all — a rejected turn leaving the page unchanged is itself worth being able to
+    # all — a rejected turn leaving the document unchanged is itself worth being able to
     # see, and a view that only appeared on success would hide exactly the runs worth
     # watching.
-    progress_page = out_dir / f"{event_id}-in-progress.html"
+    progress = out_dir / f"{event_id}-in-progress"
+
+    def snapshot() -> dict[str, str]:
+        # The markdown export doubles as the progress copy. It is already being pulled
+        # down every turn for the section fingerprints, so keeping the file instead of
+        # deleting it makes the plain-text view free rather than an extra round trip.
+        path = backend.export(session_id, progress.with_suffix(".md"), "markdown")
+        return fingerprints(path.read_text(encoding="utf-8"))
 
     def publish() -> None:
-        try:
-            backend.export(session_id, progress_page, "html")
-        except SuperDocsError as exc:
-            # A convenience view must never fail a run that is otherwise sound. If the
-            # format is refused, say so once and carry on drafting.
-            note("progress", f"cannot refresh {progress_page.name}: {exc}")
+        for fmt in ("html", "docx"):
+            try:
+                backend.export(session_id, progress.with_suffix(f".{fmt}"), fmt)
+            except SuperDocsError as exc:
+                # A convenience view must never fail a run that is otherwise sound. If a
+                # format is refused, say so and carry on drafting.
+                note("progress", f"cannot refresh the {fmt} view: {exc}")
 
     current = snapshot()
     publish()

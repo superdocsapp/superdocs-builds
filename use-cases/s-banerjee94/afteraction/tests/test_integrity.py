@@ -725,69 +725,84 @@ def test_the_summary_asks_the_model_to_read_the_document_not_a_second_copy_of_th
 # ------------------------------------------------- the document, while it is being written
 
 
-def test_the_page_is_rewritten_after_every_turn(store, tmp_path):
+class _Watching(MockSuperDocs):
+    """Records every export the pipeline asks for, by format and by path."""
+
+    def __init__(self):
+        super().__init__()
+        self.asked: list[tuple[str, str]] = []
+
+    def export(self, session_id, out_path, fmt="docx"):
+        path = super().export(session_id, out_path, fmt)
+        if "-in-progress" in out_path.name:
+            self.asked.append((fmt, path.read_text(encoding="utf-8") if fmt != "docx" else ""))
+        return path
+
+
+def test_all_three_formats_are_refreshed_after_every_turn(store, tmp_path):
     """A live run takes minutes and, until it ends, the only thing to watch is a progress
-    line claiming a section was drafted. The in-progress page exists so a person can open
-    one file part-way through and read what the document actually says — so it has to be
-    refreshed on every turn, not written once at the end."""
-    seen: list[str] = []
+    line claiming a section was drafted. The in-progress copies exist so a person can open
+    one file part-way through and read what the document actually says. All three formats
+    refresh every turn: html to read, docx to see what ships, md to diff."""
+    backend = _Watching()
+    result = _run("storm-a", store, tmp_path, backend=backend)
 
-    class Watching(MockSuperDocs):
-        def export(self, session_id, out_path, fmt="docx"):
-            path = super().export(session_id, out_path, fmt)
-            if path.name.endswith("-in-progress.html"):
-                seen.append(path.read_text(encoding="utf-8"))
-            return path
-
-    result = _run("storm-a", store, tmp_path, backend=Watching())
-
-    # one baseline before any edit, then one per turn
-    assert len(seen) == result.edits + 1, f"{len(seen)} refreshes for {result.edits} turns"
-    # the baseline is all placeholder; the final one is the finished document
-    assert "Placeholder for observed statements in 1. Event Overview" in seen[0]
-    assert "Placeholder for observed statements in 1. Event Overview" not in seen[-1]
-    # and it genuinely fills in as it goes rather than appearing at the end
-    filled = [s.count("Placeholder") for s in seen]
-    assert filled[0] > filled[len(filled) // 2] > filled[-1], filled
+    expected = result.edits + 1  # one baseline before any edit, then one per turn
+    for fmt in ("markdown", "html", "docx"):
+        got = sum(1 for f, _ in backend.asked if f == fmt)
+        assert got == expected, f"{fmt} refreshed {got} times for {result.edits} turns"
 
 
-def test_the_page_is_refreshed_even_when_every_change_is_rejected(store, tmp_path):
+def test_the_progress_copies_fill_in_as_the_run_goes(store, tmp_path):
+    """Written once at the end would satisfy a naive count. These have to get *fuller*."""
+    backend = _Watching()
+    _run("storm-a", store, tmp_path, backend=backend)
+
+    pages = [text for fmt, text in backend.asked if fmt == "html"]
+    assert "Placeholder for observed statements in 1. Event Overview" in pages[0]
+    assert "Placeholder for observed statements in 1. Event Overview" not in pages[-1]
+    left = [text.count("Placeholder") for text in pages]
+    assert left[0] > left[len(left) // 2] > left[-1], left
+
+
+def test_the_markdown_copy_is_kept_rather_than_re_exported(store, tmp_path):
+    """The markdown is already pulled down every turn for the section fingerprints.
+    Keeping that file is free; exporting a second copy would be a wasted round trip."""
+    result = _run("storm-a", store, tmp_path)
+
+    # the plain-text copy is on disk and is the same document that was exported at the end
+    progress = tmp_path / "storm-a" / "storm-a-in-progress.md"
+    assert progress.exists(), "the plain-text progress copy was never written"
+    assert progress.read_text(encoding="utf-8") == result.exports["markdown"].read_text(
+        encoding="utf-8"
+    )
+
+
+def test_the_copies_refresh_even_when_every_change_is_rejected(store, tmp_path):
     """A rejected turn leaves the document unchanged, and that is worth being able to
-    see. A view that only appeared on success would hide exactly the runs worth watching."""
-    seen: list[str] = []
+    see. A view that only appeared on success would hide the runs worth watching."""
+    backend = _Watching()
+    _run("storm-a", store, tmp_path, backend=backend, approver=lambda c: (False, "not this time"))
 
-    class Watching(MockSuperDocs):
-        def export(self, session_id, out_path, fmt="docx"):
-            path = super().export(session_id, out_path, fmt)
-            if path.name.endswith("-in-progress.html"):
-                seen.append(path.read_text(encoding="utf-8"))
-            return path
-
-    def reject_all(change):
-        return False, "not this time"
-
-    _run("storm-a", store, tmp_path, backend=Watching(), approver=reject_all)
-
-    assert len(seen) > 1, "the page was never refreshed after a turn"
-    # nothing was approved, so the document never moved off its placeholders
-    assert all("Placeholder for observed statements in 1. Event Overview" in s for s in seen)
+    pages = [text for fmt, text in backend.asked if fmt == "html"]
+    assert len(pages) > 1, "the document was never refreshed after a turn"
+    assert all("Placeholder for observed statements in 1. Event Overview" in p for p in pages)
 
 
-def test_a_service_that_refuses_html_does_not_fail_the_run(store, tmp_path):
-    """The progress view is a convenience. If the export format is refused it must be
-    reported once and stepped over — it cannot be allowed to fail a run whose drafting,
-    citations and section boundaries are all sound."""
+def test_a_format_the_service_refuses_does_not_fail_the_run(store, tmp_path):
+    """The progress copies are a convenience. A refused format is reported and stepped
+    over — it cannot fail a run whose citations and section boundaries are sound."""
     from afteraction.client import SuperDocsError
 
-    class NoHtml(MockSuperDocs):
+    class NoDocx(MockSuperDocs):
         def export(self, session_id, out_path, fmt="docx"):
-            if fmt == "html":
-                raise SuperDocsError("export -> 400: unsupported format 'html'")
+            if fmt == "docx" and "-in-progress" in out_path.name:
+                raise SuperDocsError("export -> 400: unsupported format 'docx'")
             return super().export(session_id, out_path, fmt)
 
     notes: list[tuple[str, str]] = []
     result = _run(
-        "storm-a", store, tmp_path, backend=NoHtml(),
+        "storm-a", store, tmp_path, backend=NoDocx(),
         on_event=lambda stage, detail: notes.append((stage, detail)),
     )
 
