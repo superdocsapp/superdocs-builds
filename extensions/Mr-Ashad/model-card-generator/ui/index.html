@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Card Generator & SuperDocs Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Minimal Top Header -->
+  <header class="navbar">
+    <div class="brand">
+      <span class="brand-icon">🏛️</span>
+      <div>
+        <h1>Model Card Generator</h1>
+        <p>Simple & automated documentation engine with SuperDocs 4-Call Sync</p>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-superdocs" onclick="openSuperdocsModal()">
+        ⚡ SuperDocs 4-Call AI Sync
+      </button>
+      <button class="btn btn-ghost" id="themeBtn" onclick="toggleTheme()">☀️ Light</button>
+      <button class="btn btn-ghost" onclick="loadSampleData()">⚡ Load Sample Files</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Upload Section -->
+    <section class="upload-section">
+      <div class="section-title-wrap">
+        <h2>1. Select or Upload Files</h2>
+        <p>Upload your model manifest and evaluation benchmark files to generate the card.</p>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Manifest Upload Card -->
+        <div class="upload-card" id="manifestDropZone" onclick="document.getElementById('manifestInput').click()">
+          <input type="file" id="manifestInput" accept=".json" style="display: none;" onchange="handleManifestUpload(event)" />
+          <div class="upload-icon">📄</div>
+          <div class="upload-info">
+            <span class="upload-label">Step 1: Model Manifest</span>
+            <span class="upload-hint">Upload <strong>manifest.json</strong></span>
+          </div>
+          <div class="file-status" id="manifestStatus">No file selected</div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); document.getElementById('manifestInput').click()">
+            Browse JSON
+          </button>
+        </div>
+
+        <!-- Evaluation Results Upload Card -->
+        <div class="upload-card" id="evalDropZone" onclick="document.getElementById('evalInput').click()">
+          <input type="file" id="evalInput" accept=".json,.csv" style="display: none;" onchange="handleEvalUpload(event)" />
+          <div class="upload-icon">📊</div>
+          <div class="upload-info">
+            <span class="upload-label">Step 2: Evaluation Results</span>
+            <span class="upload-hint">Upload <strong>eval_results.json</strong> or <strong>.csv</strong></span>
+          </div>
+          <div class="file-status" id="evalStatus">No file selected</div>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); document.getElementById('evalInput').click()">
+            Browse JSON / CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Bar -->
+      <div class="generate-bar">
+        <button class="btn btn-sample" onclick="loadSampleData()">
+          ⚡ Quick Demo (Use Sample Data)
+        </button>
+        <button class="btn btn-primary btn-large" id="generateBtn" onclick="generateCard()">
+          ✨ Generate Model Card
+        </button>
+      </div>
+    </section>
+
+    <!-- Generated Card & Actions Section -->
+    <section class="card-display-section" id="cardDisplaySection">
+      
+      <!-- Card Toolbar -->
+      <div class="card-toolbar">
+        <div class="toolbar-left">
+          <span class="status-indicator"><span class="dot"></span> Generated Card Preview</span>
+          <span class="superdocs-badge" id="superdocsDocBadge">Doc ID: DOC-70B-SYNC</span>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-superdocs-sm" onclick="openSuperdocsModal()">
+            ⚡ SuperDocs AI Tools
+          </button>
+          <button class="btn btn-primary" onclick="openEditModal('form')">
+            ✏️ Edit Card
+          </button>
+          <button class="btn btn-secondary" onclick="openEditModal('json')">
+            { } Edit JSON
+          </button>
+          <button class="btn btn-secondary" onclick="openEditModal('markdown')">
+            📝 Edit MD
+          </button>
+          <button class="btn btn-secondary" onclick="copyMarkdown()">
+            📋 Copy MD
+          </button>
+          <button class="btn btn-secondary" onclick="downloadMarkdown()">
+            💾 Download .MD
+          </button>
+          <button class="btn btn-accent" onclick="window.print()">
+            📄 Print / PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Model Card Bordered Document Frame -->
+      <div class="model-card-frame">
+        <div class="model-card-frame-header">
+          <span class="frame-label">🏛️ MODEL CARD</span>
+          <span class="frame-sub">Official Technical & System Specification</span>
+        </div>
+
+        <!-- Rendered Card View -->
+        <div class="card-container" id="cardContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Clean Edit Modal (Form, JSON, and MD Source Modes) -->
+  <div class="modal-backdrop" id="editModal" onclick="closeEditModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header with Editor Mode Switcher -->
+      <div class="modal-header">
+        <div>
+          <h3>✏️ Edit Model Card</h3>
+          <p>Choose an editor mode below to modify card metadata or raw sources.</p>
+        </div>
+        <button class="btn-close" onclick="closeEditModal()">✕</button>
+      </div>
+
+      <!-- Mode Selector Tabs -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" id="tabBtn-form" onclick="switchEditMode('form')">
+          📋 Form Fields
+        </button>
+        <button class="modal-tab-btn" id="tabBtn-json" onclick="switchEditMode('json')">
+          { } Manifest JSON
+        </button>
+        <button class="modal-tab-btn" id="tabBtn-markdown" onclick="switchEditMode('markdown')">
+          📝 Raw Markdown (.md)
+        </button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Mode 1: Form Fields -->
+        <div class="edit-pane active" id="editPane-form">
+          <!-- General Info -->
+          <div class="edit-group-title">1. Identity & Overview</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Model Name</label>
+              <input type="text" id="edit_model_name" />
+            </div>
+            <div class="form-group">
+              <label>Version</label>
+              <input type="text" id="edit_version" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Model Type / Architecture</label>
+              <input type="text" id="edit_model_type" />
+            </div>
+            <div class="form-group">
+              <label>License</label>
+              <input type="text" id="edit_license" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Organization / Author</label>
+              <input type="text" id="edit_org" />
+            </div>
+            <div class="form-group">
+              <label>Release Date</label>
+              <input type="text" id="edit_release_date" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Executive Summary / Description</label>
+            <textarea id="edit_description" rows="3"></textarea>
+          </div>
+
+          <!-- Operational Scope -->
+          <div class="edit-group-title">2. Scope & Limitations (one item per line)</div>
+          <div class="form-group">
+            <label>Intended Purpose & Uses</label>
+            <textarea id="edit_intended" rows="3" placeholder="Line 1: Use case A&#10;Line 2: Use case B"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Known Limitations</label>
+            <textarea id="edit_limitations" rows="3" placeholder="Line 1: Limitation A&#10;Line 2: Limitation B"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Prohibited / Out-of-Scope Uses</label>
+            <textarea id="edit_out_of_scope" rows="3" placeholder="Line 1: Prohibited use A&#10;Line 2: Prohibited use B"></textarea>
+          </div>
+
+          <!-- Training Data & Hardware -->
+          <div class="edit-group-title">3. Dataset & Hardware</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Training Data Volume</label>
+              <input type="text" id="edit_data_tokens" />
+            </div>
+            <div class="form-group">
+              <label>Hardware / Compute</label>
+              <input type="text" id="edit_hardware" />
+            </div>
+          </div>
+
+          <!-- Maintenance & Citation -->
+          <div class="edit-group-title">4. Governance & Citation</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Maintenance Team</label>
+              <input type="text" id="edit_contact_team" />
+            </div>
+            <div class="form-group">
+              <label>Contact Email</label>
+              <input type="text" id="edit_contact_email" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Citation (BibTeX)</label>
+            <textarea id="edit_citation" rows="3"></textarea>
+          </div>
+        </div>
+
+        <!-- Mode 2: Raw Manifest JSON Editor -->
+        <div class="edit-pane" id="editPane-json">
+          <div class="editor-subhead">
+            <span>Directly edit the underlying JSON manifest payload:</span>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="formatJsonEditor()">✨ Format JSON</button>
+          </div>
+          <textarea id="rawJsonEditor" class="code-textarea" spellcheck="false" placeholder="{\n  &quot;model_name&quot;: &quot;...&quot;\n}"></textarea>
+        </div>
+
+        <!-- Mode 3: Raw Markdown (.md) Editor -->
+        <div class="edit-pane" id="editPane-markdown">
+          <div class="editor-subhead">
+            <span>Directly edit the complete Markdown source:</span>
+            <button type="button" class="btn btn-sm btn-ghost" onclick="copyMarkdown()">📋 Copy MD</button>
+          </div>
+          <textarea id="rawMarkdownEditor" class="code-textarea" spellcheck="false" placeholder="# Model Card..."></textarea>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditedCard()">💾 Save & Apply Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SuperDocs 4-Call Lifecycle Modal -->
+  <div class="modal-backdrop" id="superdocsModal" onclick="closeSuperdocsModal(event)">
+    <div class="modal-box superdocs-modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="superdocs-modal-title">
+          <span class="superdocs-icon">⚡</span>
+          <div>
+            <h3>SuperDocs 4-Call Document Lifecycle</h3>
+            <p>Upload, Chat/Edit with AI instructions, Approve double-JSON diffs, and Export synchronized cards.</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeSuperdocsModal()">✕</button>
+      </div>
+
+      <!-- Lifecycle Steps Tracker -->
+      <div class="superdocs-steps-tracker">
+        <div class="step-badge active" id="step1-badge">
+          <span class="step-num">1</span> Upload
+        </div>
+        <div class="step-line"></div>
+        <div class="step-badge" id="step2-badge">
+          <span class="step-num">2</span> Chat / Edit
+        </div>
+        <div class="step-line"></div>
+        <div class="step-badge" id="step3-badge">
+          <span class="step-num">3</span> Approve
+        </div>
+        <div class="step-line"></div>
+        <div class="step-badge" id="step4-badge">
+          <span class="step-num">4</span> Export
+        </div>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- 1. Document Session Info -->
+        <div class="superdocs-panel-card">
+          <div class="panel-head">
+            <strong>📤 Step 1: Document Session Contract</strong>
+            <span class="badge-status-green" id="sessionStatusText">Ready / Connected</span>
+          </div>
+          <div class="session-info-grid">
+            <div>
+              <label>Document ID:</label>
+              <input type="text" id="sd_doc_id" value="doc-nexus-70b-v1" readonly />
+            </div>
+            <div>
+              <label>API Endpoint Mode:</label>
+              <input type="text" value="SuperDocs Cloud / Local Simulation Adapter" readonly />
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="superdocsUpload()">
+            🔄 Re-upload Base Scaffold to Session
+          </button>
+        </div>
+
+        <!-- 2. Chat & Targeted Edit Instruction -->
+        <div class="superdocs-panel-card">
+          <div class="panel-head">
+            <strong>💬 Step 2: AI Chat & Targeted Instruction</strong>
+            <span class="badge-tag">Section Boundary Preserving</span>
+          </div>
+          <p class="panel-desc">Send targeted instructions to update evaluation tables or sections while guaranteeing 100% preservation of human narrative outside evaluation anchors.</p>
+          
+          <div class="form-group">
+            <label>Edit Instruction Prompt:</label>
+            <input type="text" id="sd_chat_instruction" value="Refresh quantitative benchmark evaluation table with latest run metrics and baseline deltas." />
+          </div>
+
+          <div class="instruction-presets">
+            <span>Quick Prompts:</span>
+            <button type="button" class="btn-chip" onclick="setPromptPreset('benchmarks')">📊 Refresh Benchmarks</button>
+            <button type="button" class="btn-chip" onclick="setPromptPreset('safety')">🛡️ Add Enterprise Red-Teaming Safeguard</button>
+            <button type="button" class="btn-chip" onclick="setPromptPreset('hardware')">⚡ Upgrade Compute Specs to H200 GPUs</button>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-sm" onclick="superdocsChat()">
+            ✨ Send Instruction & Generate Diff
+          </button>
+        </div>
+
+        <!-- 3. Proposed Diff & Double JSON Deserialization -->
+        <div class="superdocs-panel-card" id="diffApprovalPanel" style="display: none;">
+          <div class="panel-head">
+            <strong>✅ Step 3: Diff Verification & 2x JSON Parse</strong>
+            <span class="badge-tag">Double Deserialization Guaranteed</span>
+          </div>
+          <p class="panel-desc">SuperDocs payload parsed with outer + inner JSON deserialization. Review proposed modifications:</p>
+          
+          <div class="diff-view" id="diffViewContainer">
+            <!-- Diff contents -->
+          </div>
+
+          <div class="diff-actions">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="superdocsRejectDiff()">✕ Reject Diff</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="superdocsApproveDiff()">✅ Approve & Apply Diff</button>
+          </div>
+        </div>
+
+        <!-- 4. Export & Exponential Backoff Polling -->
+        <div class="superdocs-panel-card">
+          <div class="panel-head">
+            <strong>🚀 Step 4: Export (Markdown & PDF)</strong>
+            <span class="badge-tag">Async Exponential Backoff Polling</span>
+          </div>
+          <p class="panel-desc">Asynchronously trigger synchronized export to publication-ready Markdown and print-ready PDF formats.</p>
+          
+          <div class="export-polling-bar" id="exportProgressBarWrap" style="display: none;">
+            <div class="polling-label">
+              <span id="exportStatusText">Polling SuperDocs Document Transformation Service...</span>
+              <span id="exportPercentText">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="exportProgressFill"></div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="button" class="btn btn-accent btn-sm" onclick="superdocsExport()">
+              🚀 Run Synchronized SuperDocs Export (.MD & .PDF)
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeSuperdocsModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast">Action completed</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

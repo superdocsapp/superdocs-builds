@@ -1,0 +1,102 @@
+{
+  "tasks": {
+    "mmlu": {
+      "name": "MMLU (Massive Multitask Language Understanding)",
+      "domain": "General Knowledge & Reasoning",
+      "metric": "Accuracy",
+      "unit": "%",
+      "description": "57 subjects spanning STEM, humanities, social sciences, and professional domains"
+    },
+    "gsm8k": {
+      "name": "GSM8K (Grade School Math 8K)",
+      "domain": "Mathematical Reasoning",
+      "metric": "Exact Match (Pass@1)",
+      "unit": "%",
+      "description": "Multi-step grade school mathematical reasoning and word problems"
+    },
+    "humaneval": {
+      "name": "HumanEval",
+      "domain": "Code Generation",
+      "metric": "Pass@1",
+      "unit": "%",
+      "description": "Python coding benchmark evaluating functional correctness against unit tests"
+    },
+    "hellaswag": {
+      "name": "HellaSwag",
+      "domain": "Commonsense Reasoning",
+      "metric": "Accuracy (10-shot)",
+      "unit": "%",
+      "description": "Challenging commonsense natural language inference and sentence completion"
+    },
+    "arc_challenge": {
+      "name": "ARC (Challenge)",
+      "domain": "Scientific Reasoning",
+      "metric": "Accuracy (25-shot)",
+      "unit": "%",
+      "description": "Grade-school level scientific questions requiring multi-step reasoning"
+    },
+    "truthfulqa": {
+      "name": "TruthfulQA",
+      "domain": "Factuality & Hallucination Resistance",
+      "metric": "MC2 Score",
+      "unit": "%",
+      "description": "Measures model propensity to mimic human false beliefs and falsehoods"
+    },
+    "winogrande": {
+      "name": "WinoGrande",
+      "domain": "Commonsense Reasoning",
+      "metric": "Accuracy (5-shot)",
+      "unit": "%",
+      "description": "Large-scale adversarial benchmark for pronoun resolution and commonsense"
+    },
+    "math": {
+      "name": "MATH",
+      "domain": "Advanced Mathematics",
+      "metric": "Exact Match",
+      "unit": "%",
+      "description": "Challenging high-school competition mathematical problem solving"
+    },
+    "mbpp": {
+      "name": "MBPP (Mostly Basic Python Problems)",
+      "domain": "Code Generation",
+      "metric": "Pass@1",
+      "unit": "%",
+      "description": "Foundational Python coding tasks designed for introductory coders"
+    },
+    "alpaca_eval": {
+      "name": "AlpacaEval 2.0",
+      "domain": "Instruction Following",
+      "metric": "Win Rate (LC)",
+      "unit": "%",
+      "description": "Length-controlled automated evaluation of general instruction-following quality"
+    },
+    "arena_hard": {
+      "name": "Arena-Hard Auto",
+      "domain": "Complex Instruction & Dialogue",
+      "metric": "Win Rate",
+      "unit": "%",
+      "description": "Challenging real-world user prompts evaluating advanced assistant capabilities"
+    },
+    "agieval": {
+      "name": "AGIEval",
+      "domain": "Human-Centric Exam Capability",
+      "metric": "Average Accuracy",
+      "unit": "%",
+      "description": "Standardized admission tests (SAT, GRE, GMAT, LSAT, Gaokao)"
+    }
+  },
+  "domains": [
+    "General Knowledge & Reasoning",
+    "Mathematical Reasoning",
+    "Advanced Mathematics",
+    "Code Generation",
+    "Scientific Reasoning",
+    "Commonsense Reasoning",
+    "Factuality & Hallucination Resistance",
+    "Instruction Following",
+    "Complex Instruction & Dialogue",
+    "Human-Centric Exam Capability",
+    "Other Benchmarks"
+  ],
+  "default_domain": "Other Benchmarks"
+}

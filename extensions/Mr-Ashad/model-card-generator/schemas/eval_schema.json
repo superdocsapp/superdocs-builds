@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EvaluationResults",
+  "description": "Schema for machine-readable ML benchmark evaluation results and metric comparisons",
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MetricRecord"
+      }
+    },
+    {
+      "type": "object",
+      "properties": {
+        "run_id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "model_name": { "type": "string" },
+        "model_version": { "type": "string" },
+        "baseline_model": { "type": "string" },
+        "eval_environment": { "type": "string" },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MetricRecord"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MetricRecord"
+          }
+        },
+        "metadata": { "type": "object" }
+      },
+      "additionalProperties": true
+    }
+  ],
+  "definitions": {
+    "MetricRecord": {
+      "type": "object",
+      "required": ["task_id", "score"],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "description": "Identifier matching benchmark mapping key (e.g. mmlu, gsm8k)"
+        },
+        "task_name": {
+          "type": "string",
+          "description": "Optional human readable name override"
+        },
+        "score": {
+          "type": "number",
+          "description": "Current evaluation score or percentage value"
+        },
+        "baseline_score": {
+          "type": "number",
+          "description": "Prior or baseline model score for delta calculations"
+        },
+        "delta": {
+          "type": "number",
+          "description": "Explicit delta if precalculated"
+        },
+        "metric": {
+          "type": "string",
+          "description": "Metric name (e.g. Accuracy, Pass@1, Exact Match)"
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of measurement (e.g. %, score, ms)"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Capability domain override"
+        },
+        "few_shot": {
+          "type": "integer",
+          "description": "Number of in-context few-shot examples used"
+        },
+        "num_samples": {
+          "type": "integer",
+          "description": "Total number of evaluation examples"
+        },
+        "split": {
+          "type": "string",
+          "description": "Dataset split (e.g. test, validation)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional test conditions or execution parameters"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}
