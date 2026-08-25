@@ -1,0 +1,47 @@
+{
+  "generated_at": "2026-08-24T05:27:20+00:00",
+  "base": {
+    "file": "superdocs-new.json",
+    "version": "2.0.0",
+    "title": "Universal Document AI API",
+    "paths": 77
+  },
+  "revision": {
+    "file": "superdocs-breaking.json",
+    "version": "2.0.0",
+    "title": "Universal Document AI API",
+    "paths": 76
+  },
+  "compatible": false,
+  "counts": {
+    "breaking": 3,
+    "warnings": 0,
+    "safe": 1,
+    "total": 4
+  },
+  "breaking": [
+    {
+      "id": "request-parameter-became-required",
+      "endpoint": "POST /v1/chat",
+      "detail": "the `header` request parameter `authorization` became required"
+    },
+    {
+      "id": "api-path-removed-without-deprecation",
+      "endpoint": "POST /v1/documents/export",
+      "detail": "api path removed without deprecation"
+    },
+    {
+      "id": "request-parameter-type-changed",
+      "endpoint": "GET /v1/documents/{document_id}",
+      "detail": "for the `path` request parameter `document_id`, the `type` was changed from `string` to `integer`"
+    }
+  ],
+  "warnings": [],
+  "safe": [
+    {
+      "id": "api-version-not-bumped",
+      "endpoint": "",
+      "detail": "a breaking change was detected but the version is still `2.0.0`"
+    }
+  ]
+}

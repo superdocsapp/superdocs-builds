@@ -1,0 +1,4 @@
+# Shell scripts must stay LF so they run on the Linux CI runner (CRLF breaks bash).
+*.sh text eol=lf
+# Everything else: normalize to LF in the repo.
+* text=auto eol=lf
