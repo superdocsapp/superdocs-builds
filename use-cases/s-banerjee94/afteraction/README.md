@@ -43,10 +43,23 @@ uv run python -m afteraction build storm-a --live --limit 2
 
 Two storms, run in order. The second one **remembers** the first.
 
+Offline (`demo`), which is what you get with no key:
+
 ```
 storm-a   ok  37/37 claims traced (100%)   0 inherited, 4 raised here
 storm-b   ok  26/26 claims traced (100%)   4 inherited (2 open, 2 closed), 1 raised here
 ```
+
+Against the real API (`--live`), which is what `docs/live-storm-*` were built from:
+
+```
+storm-a   ok  38/38 claims traced (100%)   10 turns, every edit confined to its own section
+storm-b   ok  28/28 claims traced (100%)   12 turns — 2 re-issued after an edit did not land
+```
+
+Storm B's two extra turns are the point, not a blemish. Two sections reported a successful
+edit and left their placeholder standing. The check reads the exported document rather than
+the reply, caught both, re-issued both, and they landed.
 
 Output lands in `out/<event>/`: a Word `.docx`, a Markdown copy, both charts. Finished examples are committed in `docs/` so you can judge the output without running anything.
 

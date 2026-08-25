@@ -410,9 +410,21 @@ truncate proposed text.
 
 ### What this cost
 
-The two live reports in `docs/`, both report screenshots and the verified 28/28 and 23/23
-figures were all produced against the old data and are stale. They need a live re-run.
-Offline the suite is green at 163 tests and both storms build clean end to end.
+The two live reports in `docs/` have been rebuilt against the six-record data. Storm A
+verified 38/38 claims traced, storm B 28/28, both at 100% with nothing flagged, and both
+runs kept every edit inside its own section.
+
+Storm B's run is the one worth reading. The retry fired twice — Restoration Performance
+and Consumer Communications each reported a successful edit and left their placeholder
+standing. Both were caught on the exported document, re-issued, and landed. That check
+was written after a live run exported a placeholder where the restoration curve belongs;
+this is the second time it has paid for itself, and the first time on two sections at once.
+
+The register the two runs produced is byte-identical to the committed one, which is the
+carry-forward behaving as a pure function of the data rather than of the run.
+
+The three screenshots in `docs/` still predate the rebuild and need retaking. Offline the
+suite is green at 163 tests and both storms build clean end to end.
 
 ### Not built, deliberately
 
