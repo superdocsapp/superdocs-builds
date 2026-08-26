@@ -8,8 +8,7 @@ GitHub CLI extension for the SuperDocs document-editing API. Upload documents, s
 
 ## Screenshot
 
-<!-- TODO: Replace this with an actual screenshot before merging -->
-![gh-superdocs demo](TODO-add-screenshot.png)
+![gh-superdocs demo](screenshot.png)
 
 ## What it does
 
