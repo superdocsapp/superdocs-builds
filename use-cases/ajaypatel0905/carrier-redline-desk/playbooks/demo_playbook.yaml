@@ -1,0 +1,50 @@
+# Three-clause demo playbook: one unacceptable position replaced, one detention
+# term rewritten, one missing clause inserted. Same schema as shipper_playbook.yaml.
+shipper: Bluepeak Consumer Goods, Inc.
+author_tag: Redline Desk
+rules:
+  - id: R-101
+    name: Liability cap
+    clause_keywords: ["liability", "cargo loss", "loss or damage"]
+    required_position: >
+      Carrier is liable for the full actual invoice value of lost or damaged
+      cargo, up to at least $250,000 per shipment. Caps below $250,000 or
+      per-pound released rates are unacceptable.
+    fallback_wording: >
+      Carrier shall be liable for cargo loss or damage in the amount of the
+      full actual invoice value of the affected goods, up to $250,000 per
+      shipment. No released rates or per-pound limitations shall apply unless
+      agreed by Shipper in a signed writing.
+    when_missing: insert
+    severity: deal_breaker
+
+  - id: R-105
+    name: Detention terms
+    clause_keywords: ["detention", "free time"]
+    required_position: >
+      At least 3 hours of free time at each facility; detention thereafter at
+      no more than $65 per hour, capped at $400 per calendar day. Less free
+      time, higher rates, or an uncapped daily amount are unacceptable.
+    fallback_wording: >
+      Shipper allows three (3) hours of free time for loading or unloading at
+      each facility. Detention accrues thereafter at $65 per hour or fraction
+      thereof, not to exceed $400 per calendar day, invoiced with supporting
+      arrival and departure records.
+    when_missing: insert
+    severity: standard
+
+  - id: R-113
+    name: Safety and compliance
+    clause_keywords: ["safety rating", "fmcsa", "operating authority"]
+    required_position: >
+      Carrier maintains valid FMCSA operating authority and at least a
+      Satisfactory safety rating, and must notify Shipper within 48 hours of
+      any downgrade, revocation, or out-of-service order.
+    fallback_wording: >
+      Carrier represents that it holds valid FMCSA operating authority and a
+      Satisfactory safety rating (or is unrated with no pending downgrade).
+      Carrier shall notify Shipper in writing within forty-eight (48) hours
+      of any change in its safety rating, authority, or insurance, or of any
+      out-of-service order.
+    when_missing: insert
+    severity: deal_breaker

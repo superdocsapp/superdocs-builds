@@ -25,19 +25,20 @@ Kill/resume was verified live: a run killed with `kill -9` after four rules resu
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 cp .env.example .env                      # put your real key in .env
 
-# interactive — you are the reviewer, clause by clause:
-.venv/bin/python -m redline_desk run \
-  --contract samples/carrier_agreement.docx \
-  --playbook playbooks/shipper_playbook.yaml \
-  --run-name demo
+# three-clause demo (~2 minutes) — you are the reviewer:
+.venv/bin/python -m redline_desk run --contract samples/carrier_agreement.docx --playbook playbooks/demo_playbook.yaml
+
+# the full 13-rule playbook:
+.venv/bin/python -m redline_desk run --contract samples/carrier_agreement.docx --playbook playbooks/shipper_playbook.yaml --run-name full
 
 #   --auto          approve every in-scope proposal (unattended / machine mode)
 #   --max-rules 3   small-sample mode: learn the cost profile before a full run
+#   --run-name X    name the run (default: demo); re-using a name resumes it
 ```
 
-Outputs in `runs/demo/`: `redlined_contract.docx` (tracked changes), `negotiation_summary.docx`, `summary.json`, `VERIFICATION.md`.
+Outputs land in `runs/<run-name>/`: `redlined_contract.docx` (tracked changes), `negotiation_summary.docx`, `summary.json`, `VERIFICATION.md`.
 
-At each clause the reviewer sees the carrier's text, the proposed text, and the AI's reason, and answers `y`, `n`, or `n <feedback>` — feedback goes back to the AI, which proposes a revision in a follow-up round. Ctrl-C mid-review pauses; re-running the same command resumes at that clause. Re-using a `--run-name` always resumes.
+The demo playbook covers the three shapes of decision in three questions: a liability cap to replace, detention terms to rewrite, and a safety clause the carrier's paper lacks (inserted from the playbook, no AI involved). While the AI works you see live progress — what it is doing, how long it has taken, and its own interim messages as they arrive. At each clause you see the carrier's text and the proposed text and answer `y`, `n`, or `n <feedback>`; feedback goes back to the AI, which returns a revision in a follow-up round. Ctrl-C mid-review pauses; re-running the same command resumes at that exact clause.
 
 ```bash
 .venv/bin/python -m pytest tests/       # 9 tests: no key, no network
@@ -78,7 +79,7 @@ redline_desk/
   document.py     SuperDocs chunked-HTML parser (chunk ids are the keys)
   playbook.py     YAML playbook loader/validator      summary.py   negotiation summary from change records
   superdocs.py    thin client, injectable transport   cli.py       run / mermaid, interactive reviewer
-playbooks/        the shipper's rules, as data        samples/     synthetic carrier paper + generator
+playbooks/        shipper_playbook.yaml (13 rules) + demo_playbook.yaml (3)   samples/  synthetic carrier paper + generator
 example-output/   a committed full run: redline, summary, summary.json, VERIFICATION.md, pipeline.mmd
 tests/            fake SuperDocs API with recorded response shapes; 9 tests
 ```

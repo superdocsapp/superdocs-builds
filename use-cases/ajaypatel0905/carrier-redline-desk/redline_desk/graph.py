@@ -58,7 +58,7 @@ class RunState(TypedDict, total=False):
 
 
 class RedlineNodes:
-    def __init__(self, client: SuperDocsClient, playbook: Playbook, run_dir: pathlib.Path, review_mode: str = "interactive", model_tier: Optional[str] = None, max_rules: Optional[int] = None, log=print):
+    def __init__(self, client: SuperDocsClient, playbook: Playbook, run_dir: pathlib.Path, review_mode: str = "interactive", model_tier: Optional[str] = None, max_rules: Optional[int] = None, log=print, progress=None):
         self.client = client
         self.playbook = playbook
         self.run_dir = run_dir
@@ -66,7 +66,19 @@ class RedlineNodes:
         self.model_tier = model_tier
         self.max_rules = max_rules
         self.log = log
+        self.progress = progress  # optional: object with start(label, verbs), on_job(job), stop()
         self.jobs_registry = run_dir / "jobs.json"
+
+    def _wait(self, job_id: str, label: str, verbs: tuple[str, ...]) -> dict:
+        """Wait for a job while streaming progress (spinner, elapsed time, and
+        the AI's intermediate messages as they arrive) to the progress sink."""
+        if not self.progress:
+            return self.client.wait_for_job(job_id)
+        self.progress.start(label, verbs)
+        try:
+            return self.client.wait_for_job(job_id, on_poll=self.progress.on_job)
+        finally:
+            self.progress.stop()
 
     # -- idempotent job registry ------------------------------------------
     def _job_for(self, key: str) -> Optional[str]:
@@ -133,7 +145,7 @@ class RedlineNodes:
             self.log(f"[{rule.id}] {rule.name}: sending clause for AI evaluation")
             job_id = self.client.chat_async(state["session_id"], self._rule_message(rule, item, state), approval_mode="ask_every_time", model_tier=self.model_tier, stage=f"rules:{rule.id}")
             self._remember_job(key, job_id)
-        job = self.client.wait_for_job(job_id)
+        job = self._wait(job_id, f"{rule.id} {rule.name}", ("Reading the clause", "Thinking", "Checking it against the playbook", "Drafting the redline"))
         current = {"rule_id": rule.id, "kind": "edit", "round": 0, "job_id": job_id, "chunk_ids": item["chunk_ids"], "pending": [], "done": False}
         records: list[dict] = []
         if job["status"] == "awaiting_approval":
@@ -198,7 +210,7 @@ class RedlineNodes:
             verdict = "out_of_scope_proposal" if d.get("auto") == "out_of_scope" else "position_unacceptable"
             records.append(self._rec(rule, verdict=verdict, decision="approved" if d["approved"] else "denied", detail=change.get("ai_explanation", ""), change=change))
         self.client.approve(state["session_id"], current["job_id"], payload)
-        job = self.client.wait_for_job(current["job_id"])
+        job = self._wait(current["job_id"], f"{rule.id}", ("Applying your decision", "Thinking", "Revising"))
         self.client.record_job_usage(f"rules:{rule.id}", job)
         if job["status"] == "awaiting_approval" and current["round"] + 1 < MAX_REVIEW_ROUNDS:
             pending = self.client.pending_changes(job)

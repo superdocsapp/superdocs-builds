@@ -89,7 +89,7 @@ class SuperDocsClient:
     def get_job(self, job_id: str) -> dict:
         return self._call("GET", f"/jobs/{job_id}").json()
 
-    def wait_for_job(self, job_id: str, *, poll_seconds: float = 4.0, timeout_seconds: float = 1800.0, on_poll: Optional[Callable[[dict], None]] = None) -> dict:
+    def wait_for_job(self, job_id: str, *, poll_seconds: float = 1.5, timeout_seconds: float = 1800.0, on_poll: Optional[Callable[[dict], None]] = None) -> dict:
         deadline = time.monotonic() + timeout_seconds
         while True:
             job = self.get_job(job_id)

@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
+import json
 import os
 import pathlib
 import re
 import sys
+import threading
+import time
 
 from langgraph.types import Command
 
@@ -26,6 +30,73 @@ def _plain(html: str | None) -> str:
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html or "")).strip()
 
 
+class Progress:
+    """Terminal progress while the AI works: a spinner with elapsed time and
+    rotating status verbs, plus the AI's own intermediate messages streamed as
+    the job reports them. Falls back to plain lines when not on a TTY."""
+
+    FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    def __init__(self, out=sys.stdout):
+        self.out = out
+        self.tty = out.isatty()
+        self._stop = threading.Event()
+        self._thread = None
+        self._seen: set = set()
+        self._label = ""
+        self._verbs: tuple = ("Thinking",)
+
+    def start(self, label: str, verbs: tuple) -> None:
+        self._label, self._verbs = label, verbs  # _seen persists: one job's messages print once across waits
+        self._stop.clear()
+        self._t0 = time.monotonic()
+        if self.tty:
+            self._thread = threading.Thread(target=self._spin, daemon=True)
+            self._thread.start()
+        else:
+            self.out.write(f"  {verbs[0]} — {label}…\n"); self.out.flush()
+
+    def _spin(self) -> None:
+        for frame in itertools.cycle(self.FRAMES):
+            if self._stop.is_set():
+                return
+            elapsed = int(time.monotonic() - self._t0)
+            verb = self._verbs[min(elapsed // 6, len(self._verbs) - 1)]
+            self.out.write(f"\r  {frame} {verb}… {self._label} · {elapsed}s ")
+            self.out.flush()
+            time.sleep(0.08)
+
+    def on_job(self, job: dict) -> None:
+        for msg in (job.get("metadata") or {}).get("intermediate_responses") or []:
+            key = (job.get("job_id"), msg.get("sequence"))
+            if msg.get("type") == "user_facing" and key not in self._seen:
+                self._seen.add(key)
+                text = " ".join(str(msg.get("content", "")).split())
+                if text:
+                    self._clear(); self.out.write(f"  ↳ {text}\n"); self.out.flush()
+
+    def _clear(self) -> None:
+        if self.tty:
+            self.out.write("\r" + " " * 100 + "\r")
+
+    def stop(self) -> None:
+        self._stop.set()
+        if self._thread:
+            self._thread.join()
+        self._clear()
+        self.out.flush()
+
+
+def _why(change: dict) -> str:
+    """The AI's explanation, minus boilerplate that merely restates the proposed
+    text (SuperDocs also truncates long explanations with an ellipsis)."""
+    why = _plain(change.get("ai_explanation"))
+    proposed = _plain(change.get("new_html"))
+    if not why or why.startswith("Proposed:") or proposed[:60] in why:
+        return ""
+    return why
+
+
 def prompt_reviewer(payload: dict) -> dict:
     print(f"\n{'=' * 70}\nREVIEW — {payload['rule_id']} {payload['rule_name']}  [{payload['severity']}]")
     print(f"Required position: {payload['required_position']}\n")
@@ -35,7 +106,9 @@ def prompt_reviewer(payload: dict) -> dict:
         if change["old_html"]:
             print(f"  CARRIER'S TEXT: {_plain(change['old_html'])}")
         print(f"  PROPOSED TEXT:  {_plain(change['new_html'])}")
-        print(f"  WHY: {_plain(change.get('ai_explanation'))}")
+        why = _why(change)
+        if why:
+            print(f"  WHY: {why}")
         while True:
             answer = input("  approve? [y]es / [n]o / n + feedback (e.g. `n keep the cap wording`): ").strip()
             if answer.lower().startswith("y"):
@@ -54,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
     run = sub.add_parser("run", help="run (or resume) a redline over a carrier contract")
     run.add_argument("--contract", required=True, type=pathlib.Path)
     run.add_argument("--playbook", required=True, type=pathlib.Path)
-    run.add_argument("--run-name", required=True, help="run identifier; re-using it resumes from the checkpoint")
+    run.add_argument("--run-name", default="demo", help="run identifier (default: demo); re-using it resumes from the checkpoint")
     run.add_argument("--auto", action="store_true", help="approve every in-scope proposal (machine mode); default is interactive review")
     run.add_argument("--model-tier", default=None, choices=["core", "turbo", "pro", "max"])
     run.add_argument("--max-rules", type=int, default=None, help="small-sample mode: process only the first N planned rules")
@@ -76,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
     run_dir.mkdir(parents=True, exist_ok=True)
     client = SuperDocsClient(api_key)
     playbook = load_playbook(args.playbook)
-    nodes = RedlineNodes(client, playbook, run_dir, review_mode="auto" if args.auto else "interactive", model_tier=args.model_tier, max_rules=args.max_rules)
+    nodes = RedlineNodes(client, playbook, run_dir, review_mode="auto" if args.auto else "interactive", model_tier=args.model_tier, max_rules=args.max_rules, progress=Progress())
     checkpointer = open_checkpointer(run_dir)
     graph = build_graph(nodes, checkpointer)
     config = {"configurable": {"thread_id": args.run_name}}
