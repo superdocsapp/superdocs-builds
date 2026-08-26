@@ -474,14 +474,41 @@ def cmd_publish(args) -> int:
 
 def cmd_edit(args) -> int:
     """One instruction, both documents, nothing applied without a look."""
+    from manualbuilder import superdocs
     from manualbuilder.superdocs import SuperDocsError
 
     published = _load(args)
     with _client() as client:
-        changes, _ = session.edit_both(client, published, args.instruction)
+        changes, replies = session.edit_both(
+            client, published, args.instruction, thinking_depth=args.thinking
+        )
+        if args.thinking:
+            # The endpoint every edit goes through does not document these, so
+            # what the job says it ran at is the only evidence it was not
+            # dropped on the floor.
+            ran_at = {
+                (job.get("metadata") or {}).get("thinking_depth") or "unreported"
+                for job in replies.values()
+            }
+            print(
+                _dim(
+                    f"asked for thinking_depth={args.thinking}; the job(s) report {', '.join(sorted(ran_at))}"
+                )
+            )
 
         if not changes:
             print("the turn proposed no changes.")
+            # And what it said instead, which is the whole difference between a
+            # document that had nothing to change and a turn that asked a
+            # question or refused (BUGS #9). `sync` learned this the hard way;
+            # `edit` had the same hole, and a live run where both documents
+            # proposed nothing printed nothing about why.
+            for document_id, job in replies.items():
+                said = superdocs.reply_text(job)
+                if said:
+                    print(
+                        _dim(f"  the {published.name_for(document_id)}'s turn said: {said[:300]}")
+                    )
             _next(
                 'manualbuilder ask "…" to see what the document currently says',
                 "a more specific instruction, if the fact is there and was missed",
@@ -1163,6 +1190,15 @@ def main(argv: list[str] | None = None) -> int:
     edit = sub.add_parser("edit", help="one instruction, both documents")
     edit.add_argument("instruction")
     _published_args(edit)
+    edit.add_argument(
+        "--thinking",
+        choices=("fast", "balanced", "deep"),
+        default="",
+        help=(
+            "how hard the turn thinks. Undocumented on the async endpoint every "
+            "edit uses, so the job's own report of what it ran at is printed back"
+        ),
+    )
     edit.add_argument(
         "--yes",
         action="store_true",

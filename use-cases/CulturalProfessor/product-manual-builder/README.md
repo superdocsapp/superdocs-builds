@@ -242,7 +242,9 @@ edit, and per
 [docs.superdocs.app/guides/model-selection](https://docs.superdocs.app/guides/model-selection#thinking-depth)
 that's roughly a sixth of the reasoning tokens the server's own default
 (`balanced`) would spend. Nothing else in this project sets `model_tier` or
-`thinking_depth` at all — every other call runs at the server's own default,
+`thinking_depth` by default — every other call runs at the server's own default,
+though `edit --thinking deep` now sets it, and prints what the job reports back
+because the async endpoint does not document the field (#25) —
 left alone on purpose, because the right tier depends on what the turn is for
 and a wording edit is exactly the "paragraph rewrite" case the docs already
 recommend `core` + `balanced` for.
@@ -693,7 +695,7 @@ which is exactly how it stayed wrong through nine commits.
 
 ### What broke while building this
 
-[`BUGS.md`](BUGS.md) — twenty-four numbered findings against the live API, each
+[`BUGS.md`](BUGS.md) — twenty-five numbered findings against the live API, each
 with what was expected, what happened, how to reproduce it and what it cost.
 They sit next to the build that found them rather than in a notes file
 somewhere, because most of them are the reason a particular piece of this code

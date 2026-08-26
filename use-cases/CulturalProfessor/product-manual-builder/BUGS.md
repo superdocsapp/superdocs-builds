@@ -20,13 +20,15 @@ commands rather than by testing any one of them in isolation. Item 22 is from
 verification stage, on a pair of documents that turned out to be correct. Item
 23 is from that same run, one stage later: the pair really had come apart, on
 one passage, and nothing in this build noticed until `verify` did. Item 24 is
-from **2026-08-27**, and cost three `sync` runs to see whole.
+from **2026-08-27**, and cost three `sync` runs to see whole. Item 25 is from
+the same day, from asking why an edit finds a different set of passages every
+time it is run.
 
 They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
 collects the same list.
 
-**Every item says whose it is.** All twenty-four are SuperDocs, because this
+**Every item says whose it is.** All twenty-five are SuperDocs, because this
 build talks to nothing else — but five of them are the *model's* behaviour reached
 through the API rather than a defect in the API itself, and calling those bugs
 would be unfair to the service. They are marked as such. The sibling build in
@@ -35,7 +37,7 @@ findings, and labels its items the same way.
 
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
-Items 1–7 are ranked by how much they cost me; 8–24 are appended in the order
+Items 1–7 are ranked by how much they cost me; 8–25 are appended in the order
 they turned up rather than renumbering the list. Item 13 is an observation
 without a reproduction, and says so.
 
@@ -1194,6 +1196,53 @@ tool that accepts a URL already in the service's own storage. Everything about
 this operation is mechanical — a model is in the path only because there is no
 other way in, and the tool it reaches for cannot see the file the same API just
 stored.
+
+---
+
+## 25. `thinking_depth` is documented on `/v1/chat`, and the endpoint every edit needs is `/v1/chat/async`
+
+**Whose:** SuperDocs API — documentation, and it turns out the feature is there
+
+**Severity: low, and it cost a real thing anyway — every edit this build has
+ever made ran at a default nobody chose.**
+
+**What I did.** Read
+`https://docs.superdocs.app/guides/model-selection#thinking-depth`, which
+recommends `thinking_depth: "deep"` for *"high-stakes edits where one bad
+output is more expensive than the extra tokens."* Every edit here is that: two
+documents that have to end up saying the same thing.
+
+**What I expected.** To be able to set it on the call that makes an edit.
+
+**What happened.** The guide documents `thinking_depth` on `/v1/chat`, and
+`/v1/chat` is the endpoint whose jobs go straight to `completed` — approving
+against one comes back *"Job is not awaiting approval"*, so no edit can ever be
+made through it (item 11's neighbourhood). Every edit has to go through
+`/v1/chat/async`, which the guide does not mention at all. Nothing said whether
+the field applies there, so this project sent neither `thinking_depth` nor
+`model_tier` on any edit for its whole life — not as a decision, as an absence.
+
+**It does work.** Sent on `/v1/chat/async`, the parked job comes back with
+`metadata.thinking_depth: "deep"`. Three runs at `deep` against three runs at
+the default, same instruction, same pair, counting how many of the three
+passages holding the figure each turn found: default 3, 3 and 0 in the manual
+and 2, 1 and 3 in the card; `deep` 3, 3 and 2 in the manual and 3, 3 and 3 in
+the card. Better, on a sample far too small to put a number on — and note the
+`deep` run that still found two of three. It shifts the odds; it does not make
+the turn exhaustive, and item 23's guard is still what keeps the pair together.
+
+**Reproduce.** `POST /v1/chat/async` with `thinking_depth: "deep"`, then
+`GET /v1/jobs/{id}` and read `metadata.thinking_depth`.
+
+**Cost to me.** Nothing dramatic, and it is the kind of gap that stays
+expensive quietly: a documented lever for exactly this problem, on an endpoint
+that cannot do the operation the lever is recommended for.
+
+**Suggested fix.** Document `thinking_depth` and `model_tier` on
+`/v1/chat/async` too — or say plainly on the model-selection page that an edit
+that can be approved has to be async, and that both fields carry there. The
+guide is the page an integrator reads *before* writing the client, and it
+describes the endpoint they cannot use for edits.
 
 ---
 

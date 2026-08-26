@@ -247,7 +247,10 @@ def publish(client: SuperDocs, spec: Spec, language: str = "") -> Publication:
 
 
 def edit_both(
-    client: SuperDocs, publication: Publication, instruction: str
+    client: SuperDocs,
+    publication: Publication,
+    instruction: str,
+    thinking_depth: str | None = None,
 ) -> tuple[list[ProposedChange], dict[str, dict[str, Any]]]:
     """One instruction, both documents, nothing applied by either turn.
 
@@ -273,7 +276,12 @@ def edit_both(
     different conversations, so they run at the same time and the pair costs one
     wait rather than two.
     """
-    return edit_each(client, publication, dict.fromkeys(publication.document_ids, instruction))
+    return edit_each(
+        client,
+        publication,
+        dict.fromkeys(publication.document_ids, instruction),
+        thinking_depth=thinking_depth,
+    )
 
 
 def _refuse_if_busy(client: SuperDocs, publication: Publication, document_id: str) -> None:
@@ -350,7 +358,10 @@ def ask(
 
 
 def edit_each(
-    client: SuperDocs, publication: Publication, instructions: dict[str, str]
+    client: SuperDocs,
+    publication: Publication,
+    instructions: dict[str, str],
+    thinking_depth: str | None = None,
 ) -> tuple[list[ProposedChange], dict[str, dict[str, Any]]]:
     """A turn per document, each with its own instruction.
 
@@ -384,7 +395,10 @@ def edit_each(
         # parks its job at `awaiting_approval` with the same changes in
         # `metadata.pending_changes`, and that job is what approval needs.
         job_id = client.chat_async(
-            instruction, publication.session_for(document_id), document_id=document_id
+            instruction,
+            publication.session_for(document_id),
+            document_id=document_id,
+            thinking_depth=thinking_depth,
         )
         started.append((document_id, job_id))
 

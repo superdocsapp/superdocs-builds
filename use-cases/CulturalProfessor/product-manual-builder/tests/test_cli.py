@@ -181,7 +181,7 @@ def test_edit_lets_a_manual_only_fact_through_and_says_so(monkeypatch, tmp_path,
         def active_jobs(self, session_id):
             return []
 
-        def chat_async(self, message, session_id, document_id=None):
+        def chat_async(self, message, session_id, document_id=None, **kw):
             return "job_manual" if document_id == "doc_m" else "job_card"
 
         def wait_for_job(self, job_id):
@@ -519,3 +519,45 @@ def test_publish_clears_what_the_previous_pair_left_behind(monkeypatch, tmp_path
     # owns it. Publishing must not touch it.
     assert (out / "manual.preview.html").is_file()
     assert (out / "published.json").is_file()
+
+
+def test_edit_says_what_the_turn_said_when_it_proposed_nothing(monkeypatch, tmp_path, capsys):
+    """A turn with nothing to change and a turn that asked a question come back
+    the same shape. A live run had both documents propose nothing and printed
+    only "the turn proposed no changes" -- which is the one case where the
+    words are the entire information."""
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def active_jobs(self, session_id):
+            return []
+
+        def chat_async(self, message, session_id, document_id=None, **kw):
+            return f"job_{document_id}"
+
+        def wait_for_job(self, job_id):
+            return {
+                "status": "completed",
+                "metadata": {
+                    "pending_changes": [],
+                    "response": "Which of the rail steps did you mean?",
+                },
+            }
+
+        def pending_changes(self, job):
+            return []
+
+    _published(tmp_path / "out")
+    monkeypatch.setattr(cli, "OUT", tmp_path / "out")
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+
+    code, printed = _run(monkeypatch, ["edit", "raise the rail torque to 1.6 N·m"], capsys)
+
+    assert code == 0
+    assert "the turn proposed no changes" in printed
+    assert "Which of the rail steps did you mean?" in printed

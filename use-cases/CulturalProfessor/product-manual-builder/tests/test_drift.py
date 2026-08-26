@@ -130,7 +130,7 @@ class _Turn:
     def active_jobs(self, session_id):
         return []
 
-    def chat_async(self, message, session_id, document_id=None):
+    def chat_async(self, message, session_id, document_id=None, **kw):
         self.asked[document_id] = message
         return f"job_{document_id}"
 

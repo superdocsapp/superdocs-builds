@@ -379,7 +379,24 @@ class SuperDocs:
             payload["thinking_depth"] = thinking_depth
         return self._post("/v1/chat", payload)
 
-    def chat_async(self, message: str, session_id: str, document_id: str | None = None) -> str:
+    def chat_async(
+        self,
+        message: str,
+        session_id: str,
+        document_id: str | None = None,
+        thinking_depth: str | None = None,
+        model_tier: str | None = None,
+    ) -> str:
+        """Start a turn that parks at `awaiting_approval`.
+
+        `thinking_depth` and `model_tier` are documented on `/v1/chat` and not
+        on this endpoint, which is the one every edit here goes through -- so
+        for a long time nothing in this project sent either, and every edit and
+        every diagram swap ran at the server default without that ever being a
+        decision. They are sent when asked for now, and the job echoes back
+        what it ran at (`metadata.thinking_depth`), which is the only way to
+        find out whether this endpoint honours them or drops them.
+        """
         payload: dict[str, Any] = {
             "message": message,
             "session_id": session_id,
@@ -387,6 +404,10 @@ class SuperDocs:
         }
         if document_id:
             payload["document_id"] = document_id
+        if thinking_depth:
+            payload["thinking_depth"] = thinking_depth
+        if model_tier:
+            payload["model_tier"] = model_tier
         body = self._post("/v1/chat/async", payload)
         job_id = body.get("job_id") or body.get("id")
         if not job_id:
