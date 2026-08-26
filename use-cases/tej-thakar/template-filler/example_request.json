@@ -1,0 +1,23 @@
+{
+  "document_title": "Employment Offer Letter",
+  "template_text": "Dear {candidate_name},\n\nWe are pleased to offer you the position of {role_title} at {company_name}.\n\nStart date: {start_date}\nCompensation: {salary_currency} {annual_salary} per annum\nReporting to: {reporting_manager}\nWork location: {office_location}\n\n[SECTION: relocation_allowance]\nAs you will be relocating, we will provide a relocation allowance of {relocation_amount}.\n[/SECTION: relocation_allowance]\n\nThis offer is contingent upon satisfactory completion of a background check.\n\nPlease confirm your acceptance by {acceptance_deadline}.\n\nWarm regards,\n{hr_signatory}\nHuman Resources\n{company_name}",
+  "record": {
+    "candidate_name": "Priya Sharma",
+    "role_title": "Senior Engineer",
+    "company_name": "InSureCo Ltd.",
+    "start_date": "1 September 2026",
+    "salary_currency": "INR",
+    "annual_salary": "2,400,000",
+    "reporting_manager": "Anand Mehta",
+    "office_location": "Pune, Maharashtra",
+    "hr_signatory": "Kavita Desai"
+  },
+  "conditional_rules": [
+    {
+      "field": "relocation_amount",
+      "operator": "exists",
+      "section_label": "relocation_allowance"
+    }
+  ],
+  "gap_marker_style": "[MISSING: {field}]"
+}

@@ -1,0 +1,123 @@
+INFO:     Started server process [68711]
+INFO:     Waiting for application startup.
+WARNING:main:SUPERDOCS_API_KEY is not set. Copy .env.example → .env and add your key before making requests.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8010): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [68934]
+INFO:     Waiting for application startup.
+WARNING:main:SUPERDOCS_API_KEY is not set. Copy .env.example → .env and add your key before making requests.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8010 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58624 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [68934]
+INFO:     Started server process [70812]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8010 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58849 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58862 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58862 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Finished server process [70812]
+INFO:     Started server process [71373]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8010 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58965 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58972 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59287 - "OPTIONS /normalize HTTP/1.1" 200 OK
+INFO:main:Processing resume r1 ...
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=awaiting_approval
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/resume-r1-c5407e3d/approve "HTTP/1.1 200 OK"
+INFO:main:Resume r1: approved 2 proposed change(s)
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d962fa95-2b25-42f0-9fe3-ba216c736474 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+INFO:main:Processing resume r2 ...
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5ae65b5b-2b60-4392-843f-1af1bda69eae "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5ae65b5b-2b60-4392-843f-1af1bda69eae "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5ae65b5b-2b60-4392-843f-1af1bda69eae "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5ae65b5b-2b60-4392-843f-1af1bda69eae "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+WARNING:main:Resume r2: export text did not parse as JSON, trying fallbacks
+INFO:main:Processing resume r3 ...
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/cf2863df-94d5-4ac0-bea0-c92befc3ac2a "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/cf2863df-94d5-4ac0-bea0-c92befc3ac2a "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/cf2863df-94d5-4ac0-bea0-c92befc3ac2a "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+WARNING:main:Resume r3: export text did not parse as JSON, trying fallbacks
+INFO:     127.0.0.1:59287 - "POST /normalize HTTP/1.1" 200 OK
+INFO:main:Processing resume r1 ...
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d5f2ef3e-0bf4-4f67-bc6a-7e2ec9a278f6 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d5f2ef3e-0bf4-4f67-bc6a-7e2ec9a278f6 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d5f2ef3e-0bf4-4f67-bc6a-7e2ec9a278f6 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d5f2ef3e-0bf4-4f67-bc6a-7e2ec9a278f6 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d5f2ef3e-0bf4-4f67-bc6a-7e2ec9a278f6 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=awaiting_approval
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/resume-r1-d7feaccf/approve "HTTP/1.1 200 OK"
+INFO:main:Resume r1: approved 1 proposed change(s)
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/d5f2ef3e-0bf4-4f67-bc6a-7e2ec9a278f6 "HTTP/1.1 200 OK"
+INFO:main:Resume r1: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+INFO:main:Processing resume r2 ...
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/e23bbbfa-ea2a-4e81-831a-883fa1a9f418 "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/e23bbbfa-ea2a-4e81-831a-883fa1a9f418 "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/e23bbbfa-ea2a-4e81-831a-883fa1a9f418 "HTTP/1.1 200 OK"
+INFO:main:Resume r2: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+WARNING:main:Resume r2: export text did not parse as JSON, trying fallbacks
+INFO:main:Processing resume r3 ...
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/8ca763a5-2442-47ee-b391-7164b4745d95 "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/8ca763a5-2442-47ee-b391-7164b4745d95 "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/8ca763a5-2442-47ee-b391-7164b4745d95 "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/8ca763a5-2442-47ee-b391-7164b4745d95 "HTTP/1.1 200 OK"
+INFO:main:Resume r3: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+WARNING:main:Resume r3: export text did not parse as JSON, trying fallbacks
+INFO:     127.0.0.1:59313 - "POST /normalize HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71373]

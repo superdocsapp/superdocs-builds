@@ -1,0 +1,49 @@
+INFO:     Started server process [68713]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8012): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [68936]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8012 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58628 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [68936]
+INFO:     Started server process [70814]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8012 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58853 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Finished server process [70814]
+INFO:     Started server process [71375]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8012 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58969 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58976 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59325 - "OPTIONS /fill HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5c724ee7-e33d-46e0-a37c-5f345fca7ec6 "HTTP/1.1 200 OK"
+INFO:main:Fill [fill-6902bf0ea1b2]: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5c724ee7-e33d-46e0-a37c-5f345fca7ec6 "HTTP/1.1 200 OK"
+INFO:main:Fill [fill-6902bf0ea1b2]: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5c724ee7-e33d-46e0-a37c-5f345fca7ec6 "HTTP/1.1 200 OK"
+INFO:main:Fill [fill-6902bf0ea1b2]: job_status=awaiting_approval
+INFO:     127.0.0.1:59325 - "POST /fill HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59343 - "OPTIONS /approve/fill-6902bf0ea1b2 HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/fill-6902bf0ea1b2/approve "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/5c724ee7-e33d-46e0-a37c-5f345fca7ec6 "HTTP/1.1 200 OK"
+INFO:main:Fill post-approve [fill-6902bf0ea1b2]: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+WARNING:main:Fill [fill-6902bf0ea1b2]: export text did not parse as JSON, trying fallbacks
+INFO:main:Fill [fill-6902bf0ea1b2]: using raw export text as filled_text (inline edit mode)
+INFO:     127.0.0.1:59343 - "POST /approve/fill-6902bf0ea1b2 HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71375]
