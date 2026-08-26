@@ -1,0 +1,51 @@
+# Case facts supplied by the engagement team. The draft may use ONLY these
+# figures and explanations; anything not covered here must be flagged as
+# "information awaited from client", never invented.
+client: Meridian Ornaments LLP
+gstin: 27AABCK5678G1Z3
+period: April 2026 - June 2026
+notice_ref: ZD270826001234X
+notice_din: 20260827XYZ00019
+firm: S. R. Mehta & Associates, Chartered Accountants (fictional)
+signatory: CA Sanjay Mehta, Partner, M.No. 123456
+
+replies:
+  - discrepancy: 1
+    position: >
+      The difference of Rs. 3,10,000 arises from credit notes issued in June
+      2026 against sales returns (jewellery buy-back), reported in Table 9B
+      of FORM GSTR-1 but netted against outward supplies in Table 3.1(a) of
+      FORM GSTR-3B, as permitted. Net taxable outward supply is identical in
+      both returns; there is no short payment of tax.
+    figures:
+      credit_notes_value: "Rs. 3,10,000"
+      credit_note_numbers: "CN-2026/014 to CN-2026/019"
+    annexure: "Annexure A - copies of credit notes with GSTR-1 Table 9B extract"
+
+  - discrepancy: 2
+    position: >
+      Of the difference of Rs. 45,000, credit of Rs. 45,000 pertains to
+      invoices of M/s Kanchan Polishers uploaded late by the supplier and
+      reflected in FORM GSTR-2B of July 2026. The credit was reversed in the
+      June 2026 return (Table 4B) and re-availed in July 2026 upon its
+      appearance in GSTR-2B. There is no excess availment on a cumulative
+      basis.
+    figures:
+      late_invoices: "INV-881 dated 22-May-2026"
+      reversal_reference: "GSTR-3B June 2026, Table 4B(2)"
+    annexure: "Annexure B - supplier invoice, GSTR-2B (July 2026) extract, reversal working"
+
+  - discrepancy: 3
+    position: >
+      Interest under section 50 of Rs. 1,142 for the 8-day delay for May 2026
+      was computed on the net cash liability and stands paid voluntarily via
+      FORM GST DRC-03 dated 05-Aug-2026, prior to receipt of this notice.
+    figures:
+      interest_paid: "Rs. 1,142"
+      drc03_arn: "AD270826000456B"
+    annexure: "Annexure C - DRC-03 challan and interest computation"
+
+prayer: >
+  In view of the above, the discrepancies stand reconciled/discharged and it
+  is respectfully prayed that the scrutiny for the said period be dropped
+  and the notice be vacated.
