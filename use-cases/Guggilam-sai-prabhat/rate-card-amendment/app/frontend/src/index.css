@@ -1,0 +1,40 @@
+:root {
+  color-scheme: light dark;
+  font: 15px/1.5 system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+}
+
+button {
+  font: inherit;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #555;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+input, select {
+  font: inherit;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: transparent;
+  color: inherit;
+}
