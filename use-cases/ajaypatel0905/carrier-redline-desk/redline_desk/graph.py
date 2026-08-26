@@ -32,7 +32,7 @@ from .document import parse_chunks
 from .matcher import group_clauses, match_rules, scan_for_embedded_instructions
 from .playbook import Playbook, Rule
 from .summary import build_summary_html
-from .superdocs import SuperDocsClient
+from .superdocs import SuperDocsClient, SuperDocsError
 
 ACCEPTABLE_MARKER = "CLAUSE_ACCEPTABLE"
 MAX_REVIEW_ROUNDS = 3
@@ -79,6 +79,21 @@ class RedlineNodes:
             return self.client.wait_for_job(job_id, on_poll=self.progress.on_job)
         finally:
             self.progress.stop()
+
+    def _start_turn(self, session_id: str, message: str, rule_id: str) -> str:
+        """Start a review-mode turn. If the session is blocked by a job left
+        awaiting approval (an interrupted review from a run we no longer
+        track), cancel that orphan — its staged changes belong to nobody — and
+        retry once. Anything else propagates."""
+        try:
+            return self.client.chat_async(session_id, message, approval_mode="ask_every_time", model_tier=self.model_tier, stage=f"rules:{rule_id}")
+        except SuperDocsError as exc:
+            detail = (exc.body or {}).get("detail", {}) if isinstance(exc.body, dict) else {}
+            if exc.status == 409 and detail.get("error_code") == "session_busy" and detail.get("blocking_job_id"):
+                self.log(f"[{rule_id}] session blocked by orphaned job {detail['blocking_job_id'][:8]} (awaiting approval from an untracked run) -> cancelling it and retrying")
+                self.client.cancel_job(detail["blocking_job_id"])
+                return self.client.chat_async(session_id, message, approval_mode="ask_every_time", model_tier=self.model_tier, stage=f"rules:{rule_id}")
+            raise
 
     # -- idempotent job registry ------------------------------------------
     def _job_for(self, key: str) -> Optional[str]:
@@ -143,7 +158,7 @@ class RedlineNodes:
         job_id = self._job_for(key)
         if not job_id:
             self.log(f"[{rule.id}] {rule.name}: sending clause for AI evaluation")
-            job_id = self.client.chat_async(state["session_id"], self._rule_message(rule, item, state), approval_mode="ask_every_time", model_tier=self.model_tier, stage=f"rules:{rule.id}")
+            job_id = self._start_turn(state["session_id"], self._rule_message(rule, item, state), rule.id)
             self._remember_job(key, job_id)
         job = self._wait(job_id, f"{rule.id} {rule.name}", ("Reading the clause", "Thinking", "Checking it against the playbook", "Drafting the redline"))
         current = {"rule_id": rule.id, "kind": "edit", "round": 0, "job_id": job_id, "chunk_ids": item["chunk_ids"], "pending": [], "done": False}

@@ -171,3 +171,13 @@ def test_out_of_scope_proposal_is_denied(env):
     r101 = [r for r in out["records"] if r["rule_id"] == "R-101"][0]
     assert r101["verdict"] == "out_of_scope_proposal" and r101["decision"] == "denied"
     assert out["touched_chunk_ids"] == []
+
+
+def test_session_busy_from_orphaned_job_is_recovered(env):
+    fake, _client, playbook, run_dir, contract = env
+    busy = FakeSuperDocs(busy_once=True)
+    client = SuperDocsClient("sk_test", transport=busy)
+    nodes = RedlineNodes(client, playbook, run_dir, review_mode="auto", log=lambda *_: None)
+    out = build_graph(nodes, MemorySaver()).invoke(_initial(contract), {"configurable": {"thread_id": "t5"}})
+    assert busy.cancel_calls == ["orphan-job-1"]  # the blocker was cancelled, not worked around
+    assert {r["rule_id"]: r["decision"] for r in out["records"]}["R-101"] == "approved"  # and the run completed

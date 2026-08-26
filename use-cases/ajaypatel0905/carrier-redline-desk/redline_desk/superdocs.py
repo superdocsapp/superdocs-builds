@@ -101,6 +101,9 @@ class SuperDocsClient:
                 raise SuperDocsError(f"job {job_id} still {job['status']} after {timeout_seconds}s")
             time.sleep(poll_seconds)
 
+    def cancel_job(self, job_id: str) -> dict:
+        return self._call("POST", f"/jobs/{job_id}/cancel").json()
+
     def approve(self, session_id: str, job_id: str, decisions: list[dict], feedback: Optional[str] = None) -> dict:
         payload: dict[str, Any] = {"job_id": job_id}
         if len(decisions) == 1 and not feedback:

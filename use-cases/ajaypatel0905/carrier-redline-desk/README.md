@@ -93,6 +93,7 @@ The carrier's paper is untrusted input. The sample agreement's clause 15 instruc
 - **One HITL turn per rule** rather than one turn for all rules. Costs 10 operations per full run instead of ~1, but every change traces to exactly one rule without asking the model to label its own work — the traceability is structural. Batching is a one-line change if cost ever matters more than provenance.
 - **Diff computed in code, not requested from the model.** The AI returns the replacement text; the desk computes the tracked-changes markup. That is what makes the round-trip proofs possible — a generated diff could not be checked.
 - **Insertions appended at the end with continued numbering** rather than repositioned next to related clauses. Renumbering existing clauses would violate the untouched-bytes guarantee; the trade was taken consciously.
+- **One SuperDocs session per run, never shared.** A fresh run gets a fresh session id; resuming reuses the old one. If a session is still blocked by a job left awaiting approval from a run that no longer exists (a review interrupted, then the run discarded), the desk cancels that orphan and retries once — its staged changes belonged to nobody. Found by hitting `409 session_busy` while re-recording a demo.
 - **Usage read from the terminal job, not the async response.** The async chat response carries no usage block (the docs say it does — reported); the ledger records `result.usage` when a job finishes.
 
 ## Honest limitations

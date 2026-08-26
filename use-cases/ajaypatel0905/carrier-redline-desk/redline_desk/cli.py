@@ -165,7 +165,8 @@ def main(argv: list[str] | None = None) -> int:
     if not fresh and not snapshot.next:
         print(f"Run '{args.run_name}' already finished — outputs are in {run_dir}/. Pick another --run-name, or add --fresh to start it over.")
         return 0
-    initial = {"contract_path": str(args.contract), "session_id": f"redline-{args.run_name}-{digest}"} if fresh else None
+    nonce = hashlib.sha256(os.urandom(8)).hexdigest()[:6]  # a fresh run always gets a fresh SuperDocs session
+    initial = {"contract_path": str(args.contract), "session_id": f"redline-{args.run_name}-{digest}-{nonce}"} if fresh else None
     if not fresh:
         print(f"[resume] continuing run '{args.run_name}' from its checkpoint")
 

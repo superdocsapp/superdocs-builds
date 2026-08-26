@@ -43,17 +43,25 @@ class FakeSuperDocs:
     """Scripted behavior: the liability rule draws one proposed change; the
     confidentiality rule completes as CLAUSE_ACCEPTABLE; approves complete jobs."""
 
-    def __init__(self):
+    def __init__(self, busy_once: bool = False):
         self.jobs: dict[str, dict] = {}
         self.chat_async_calls: list[dict] = []
         self.approve_calls: list[dict] = []
         self.export_calls: list[dict] = []
+        self.cancel_calls: list[str] = []
+        self._busy_once = busy_once
 
     def __call__(self, method: str, path: str, **kwargs) -> FakeResponse:
         if method == "POST" and path == "/documents/upload":
             return FakeResponse({"html": CONTRACT_HTML, "session_id": kwargs["data"]["session_id"], "chunks_count": 5, "document_id": "doc_primary"})
+        if method == "POST" and path.endswith("/cancel"):
+            self.cancel_calls.append(path.split("/")[-2])
+            return FakeResponse({"status": "cancelled"})
         if method == "POST" and path == "/chat/async":
             body = kwargs["json"]
+            if self._busy_once:  # an orphaned job from an earlier, untracked run blocks the session
+                self._busy_once = False
+                return FakeResponse({"detail": {"error_code": "session_busy", "blocking_job_id": "orphan-job-1", "blocking_status": "awaiting_approval"}}, status=409)
             self.chat_async_calls.append(body)
             job_id = str(uuid.uuid4())
             # faithful to live behavior: the async response carries NO usage block;
