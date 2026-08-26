@@ -67,7 +67,11 @@ class TestWaterCalculation:
         result = calc.indoor_water_reduction(
             CORPUS / "fixture_schedule.csv", CORPUS / "occupancy_assumptions.csv"
         )
-        assert result.value == pytest.approx(40.55, abs=0.01)
+        # 41.69%, not the 40.55% this asserted before: the earlier sum resolved
+        # a private-lavatory design rate and then never billed the 12 installed
+        # private fixtures, understating the reduction and leaving the fourth
+        # point resting 0.55% above its threshold.
+        assert result.value == pytest.approx(41.69, abs=0.01)
         assert result.points == 4
 
     def test_inputs_are_preserved_for_the_narrative(self):

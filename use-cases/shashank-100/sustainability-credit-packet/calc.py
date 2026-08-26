@@ -105,17 +105,37 @@ def indoor_water_reduction(fixture_csv: Path, occupancy_csv: Path) -> CalcResult
         "shower": installed("Showerhead", 2.5),
     }
 
+    # Lavatory uses split across public and private fixtures in proportion to
+    # how many of each the schedule installs. The occupancy table records one
+    # lav_uses figure per group and does not distinguish the two, so the split
+    # is derived from the fixture counts already in evidence rather than
+    # assumed -- and the private fixtures are counted, which matters because
+    # their baseline-to-design delta (2.2 -> 1.20) is far larger than the
+    # public one (0.5 -> 0.35).
+    def _count(name: str) -> float:
+        row = fixtures.get(name)
+        return float(row["quantity"]) if row and row.get("quantity") else 0.0
+
+    public_n, private_n = _count("Public lavatory faucet"), _count("Private lavatory faucet")
+    lav_total = public_n + private_n
+    public_share = public_n / lav_total if lav_total else 1.0
+    private_share = private_n / lav_total if lav_total else 0.0
+
     baseline_gal = design_gal = 0.0
     for group in groups:
         count, days = float(group["count"]), float(group["days_per_year"])
         uses = _daily_uses(group)
         person_days = count * days
-        for key, rate_key in (
-            ("wc", "wc"), ("urinal", "urinal"),
-            ("lav", "public_lav"), ("shower", "shower"), ("kitchen", "kitchen"),
+        for key, rate_key, share in (
+            ("wc", "wc", 1.0), ("urinal", "urinal", 1.0),
+            ("lav", "public_lav", public_share),
+            ("lav", "private_lav", private_share),
+            ("shower", "shower", 1.0), ("kitchen", "kitchen", 1.0),
         ):
-            baseline_gal += person_days * uses[key] * baseline_rates[rate_key]
-            design_gal += person_days * uses[key] * design_rates[rate_key]
+            if not share:
+                continue
+            baseline_gal += person_days * uses[key] * share * baseline_rates[rate_key]
+            design_gal += person_days * uses[key] * share * design_rates[rate_key]
 
     reduction = (baseline_gal - design_gal) / baseline_gal * 100 if baseline_gal else 0.0
     points = points_for(reduction, WATER_POINTS)
@@ -131,6 +151,12 @@ def indoor_water_reduction(fixture_csv: Path, occupancy_csv: Path) -> CalcResult
             "fixture_types": len(fixtures),
             "baseline_flow_rates": baseline_rates,
             "design_flow_rates": design_rates,
+            "lavatory_split": {
+                "public_fixtures": public_n,
+                "private_fixtures": private_n,
+                "public_share": round(public_share, 4),
+                "private_share": round(private_share, 4),
+            },
         },
         steps=[
             f"Baseline annual consumption: {baseline_gal:,.0f} gallons",

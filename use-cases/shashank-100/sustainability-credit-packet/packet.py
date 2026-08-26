@@ -235,14 +235,34 @@ class Packet:
         before = self.scorecard
         old_status = before.credit(credit_id).status
         after = registry.set_status(before, credit_id, new_status)
+        credit = after.credit(credit_id)
 
-        response = self.sd.chat_async(
-            prompts.propagate(after.credit(credit_id), after, old_status, new_status),
-            self.session_id,
-            stage=f"propagate:{credit_id}",
-        )
-        self.last_propagation = response
-        return after, self.sd.changes_from(response)
+        # Two targeted instructions, one per document, rather than one
+        # instruction against the whole session: the scorecard cover and the
+        # credit narrative say different things about a status change, and a
+        # single edit aimed at both rewrites more than it should.
+        targets = [
+            ("scorecard", prompts.propagate_scorecard(credit, after, new_status)),
+            (credit_id, prompts.propagate_narrative(credit, old_status, new_status)),
+        ]
+
+        responses, changes = [], []
+        for doc_key, instruction in targets:
+            doc = self.documents.get(doc_key)
+            if doc is None:
+                continue
+            extra = {"document_id": doc.document_id} if doc.document_id else {}
+            response = self.sd.chat_async(
+                instruction,
+                self.session_id,
+                stage=f"propagate:{doc_key}",
+                **extra,
+            )
+            responses.append(response)
+            changes.extend(self.sd.changes_from(response))
+
+        self.last_propagation = responses
+        return after, changes
 
     def apply(self, scorecard: registry.Scorecard, decisions: list[dict],
               *, job_id: str | None = None) -> dict:

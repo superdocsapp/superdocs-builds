@@ -188,7 +188,14 @@ def set_status(scorecard: Scorecard, credit_id: str, status: str) -> Scorecard:
             f"cannot mark {credit_id} documented while evidence is missing: {missing}"
         )
 
-    # Clearing the override restores the derived status.
-    override = None if status == DOCUMENTED else status
+    # Clearing the override restores the derived status. DOCUMENTED clears it
+    # for a complete credit; EVIDENCE_OUTSTANDING clears it for one whose
+    # evidence is incomplete, which DOCUMENTED cannot do -- without this a
+    # credit flagged at risk could never be un-flagged, because the only route
+    # back is barred by the missing evidence that prompted the flag.
+    if status == EVIDENCE_OUTSTANDING and target.missing_evidence:
+        override = None
+    else:
+        override = None if status == DOCUMENTED else status
     updated = [replace(c, override=override) if c.id == credit_id else c for c in scorecard.credits]
     return replace(scorecard, credits=updated)

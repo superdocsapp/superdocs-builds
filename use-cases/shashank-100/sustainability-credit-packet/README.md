@@ -46,7 +46,7 @@ python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 
 cp .env.example .env        # then add your key from use.superdocs.app
-.venv/bin/python -m pytest tests/ -q          # 63 tests, no API key needed
+.venv/bin/python -m pytest tests/ -q          # 73 tests, no API key needed
 ```
 
 The test suite runs green without a key or a network connection: the
