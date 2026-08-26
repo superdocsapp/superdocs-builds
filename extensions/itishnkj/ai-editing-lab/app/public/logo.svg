@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="48" viewBox="0 0 200 48" role="img" aria-label="AI Editing Lab">
+  <rect x="4" y="4" width="40" height="40" rx="10" fill="hsl(178, 84%, 24%)"/>
+  <g transform="translate(12, 12)" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 20h9"/>
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+  </g>
+  <text x="56" y="30" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="hsl(30, 12%, 16%)">AI Editing Lab</text>
+</svg>
