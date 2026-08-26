@@ -1,0 +1,39 @@
+# ── Personal / internal — not for the public repo ─────────────────────────────
+submission-questions.md
+WORKLOG.md
+demo-script.md
+test-outputs/
+
+# ── Runtime state ──────────────────────────────────────────────────────────────
+# HITL session stores written by the services at runtime
+**/.sessions.json
+
+# ── Python build artefacts ────────────────────────────────────────────────────
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+**/*.egg-info/
+**/dist/
+**/build/
+
+# ── Virtual environments ───────────────────────────────────────────────────────
+**/.venv/
+**/venv/
+**/env/
+
+# ── Test / coverage artefacts ─────────────────────────────────────────────────
+**/.pytest_cache/
+**/.coverage
+**/htmlcov/
+
+# ── Environment files — keys must never be committed ──────────────────────────
+**/.env
+**/.env.*
+!**/.env.example
+
+# ── IDE ────────────────────────────────────────────────────────────────────────
+**/.idea/
+**/.vscode/
+**/*.swp
+

@@ -1,0 +1,77 @@
+INFO:     Started server process [68712]
+INFO:     Waiting for application startup.
+WARNING:main:SUPERDOCS_API_KEY is not set. Copy .env.example → .env and add your key before making requests.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8011): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [68935]
+INFO:     Waiting for application startup.
+WARNING:main:SUPERDOCS_API_KEY is not set. Copy .env.example → .env and add your key before making requests.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58626 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [68935]
+INFO:     Started server process [70813]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58851 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58864 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58864 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58864 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Finished server process [70813]
+INFO:     Started server process [71374]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8011 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58967 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58974 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59319 - "OPTIONS /generate HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/c9e50ac2-927a-4caf-a079-f0c07cc4cf31 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0314: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/c9e50ac2-927a-4caf-a079-f0c07cc4cf31 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0314: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/c9e50ac2-927a-4caf-a079-f0c07cc4cf31 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0314: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/c9e50ac2-927a-4caf-a079-f0c07cc4cf31 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0314: job_status=awaiting_approval
+INFO:main:Claim CLM-2026-0314: HITL gate reached — 22 change(s) pending review
+INFO:     127.0.0.1:59319 - "POST /generate HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59338 - "OPTIONS /approve/claim-CLM-2026-0314-13d914e5 HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/claim-CLM-2026-0314-13d914e5/approve "HTTP/1.1 200 OK"
+INFO:main:Session claim-CLM-2026-0314-13d914e5: approved 22 change(s)
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/c9e50ac2-927a-4caf-a079-f0c07cc4cf31 "HTTP/1.1 200 OK"
+INFO:main:Session claim-CLM-2026-0314-13d914e5: post-approval status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+INFO:     127.0.0.1:59338 - "POST /approve/claim-CLM-2026-0314-13d914e5 HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/01c1665e-1474-4e7c-a82c-e93e57d48534 "HTTP/1.1 200 OK"
+INFO:main:Claim CLM-2026-0533: job_status=awaiting_approval
+INFO:main:Claim CLM-2026-0533: HITL gate reached — 25 change(s) pending review
+INFO:     127.0.0.1:59350 - "POST /generate HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71374]

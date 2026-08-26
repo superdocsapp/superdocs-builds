@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuperDocs Builds — Test Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #fbfaf6;
+    --surface: #ffffff;
+    --border:  #e5e0d8;
+    --borderL: #eeeae4;
+    --text:    #1c1917;
+    --muted:   #78716c;
+    --faint:   #a8a29e;
+    --tag:     #f5f2ec;
+    --blue:    #1d4ed8;
+    --blueL:   #eff6ff;
+    --green:   #15803d;
+    --greenL:  #f0fdf4;
+    --amber:   #b45309;
+    --amberL:  #fffbeb;
+    --red:     #b91c1c;
+    --redL:    #fef2f2;
+    --purple:  #7e22ce;
+    --purpleL: #faf5ff;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 6px rgba(0,0,0,.04);
+  }
+  .header-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .status-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .svc-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: var(--tag);
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .svc-pill .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--faint);
+    transition: background .3s;
+    flex-shrink: 0;
+  }
+  .svc-pill.online .dot { background: var(--green); }
+  .svc-pill.offline .dot { background: var(--red); }
+  .svc-pill.checking .dot { background: var(--amber); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+  /* ── Service tabs ── */
+  .tab-bar {
+    display: flex;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    overflow-x: auto;
+    gap: 0;
+  }
+  .tab-btn {
+    padding: 14px 22px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    color: var(--muted);
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    transition: all .15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .tab-btn.active {
+    color: var(--blue);
+    font-weight: 600;
+    border-bottom-color: var(--blue);
+  }
+  .tab-btn:hover:not(.active) {
+    color: var(--text);
+  }
+  .tab-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--faint);
+    flex-shrink: 0;
+  }
+  .tab-btn[data-svc="normaliser"] .tab-dot { background: #6366f1; }
+  .tab-btn[data-svc="claims"] .tab-dot { background: #0891b2; }
+  .tab-btn[data-svc="template"] .tab-dot { background: #d97706; }
+  .tab-btn[data-svc="style"] .tab-dot { background: #db2777; }
+
+  /* ── Panel ── */
+  .panel { display: none; padding: 32px; max-width: 1100px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .card-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 22px;
+    line-height: 1.6;
+  }
+
+  /* ── Form elements ── */
+  .field-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    display: block;
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    resize: vertical;
+    transition: border-color .15s;
+    line-height: 1.7;
+  }
+  textarea:focus, input[type="text"]:focus {
+    border-color: var(--blue);
+  }
+  textarea.lg { min-height: 180px; }
+  textarea.sm { min-height: 90px; }
+  .field-group { margin-bottom: 16px; }
+
+  /* ── Buttons ── */
+  .btn {
+    padding: 10px 22px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    transition: opacity .15s, transform .1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .btn:hover { opacity: .88; }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-danger  { background: var(--red);   color: #fff; }
+  .btn-ghost   { background: var(--tag); color: var(--text); border: 1px solid var(--border); }
+
+  .btn-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+
+  /* ── Spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Output area ── */
+  .output-pane {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .output-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .output-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .output-body {
+    padding: 20px;
+    min-height: 120px;
+  }
+
+  /* ── Status badges ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .badge-pending  { background: #fff7ed; color: #c2410c; }
+  .badge-success  { background: var(--greenL); color: var(--green); }
+  .badge-error    { background: var(--redL); color: var(--red); }
+  .badge-info     { background: var(--blueL); color: var(--blue); }
+  .badge-s1       { background: var(--greenL); color: var(--green); }
+  .badge-s2       { background: var(--blueL); color: var(--blue); }
+
+  /* ── JSON renderer ── */
+  .json-block {
+    background: #1a1917;
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.8;
+    color: #e7e5e4;
+    overflow-x: auto;
+    white-space: pre;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .json-key   { color: #93c5fd; }
+  .json-str   { color: #86efac; }
+  .json-num   { color: #fde68a; }
+  .json-bool  { color: #f9a8d4; }
+  .json-null  { color: #a8a29e; }
+
+  /* ── Rendered letter ── */
+  .letter-render {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
+  /* ── HITL gate ── */
+  .hitl-gate {
+    background: #fff7ed;
+    border: 1.5px solid #fb923c;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .hitl-gate-icon { font-size: 22px; flex-shrink: 0; }
+  .hitl-gate-title { font-weight: 700; font-size: 14px; color: #c2410c; margin-bottom: 5px; }
+  .hitl-gate-sub { font-size: 13px; color: #9a3412; line-height: 1.5; }
+  .session-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--tag);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--muted);
+    margin-top: 8px;
+    display: inline-block;
+    cursor: pointer;
+    user-select: all;
+  }
+
+  /* ── Violation card ── */
+  .violation-card {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--red);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    background: var(--surface);
+  }
+  .violation-card.format { border-left-color: var(--amber); }
+  .violation-type {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 6px;
+  }
+  .violation-type.language { color: var(--red); }
+  .violation-type.format { color: var(--amber); }
+  .violation-text { font-size: 13px; color: var(--text); margin-bottom: 8px; line-height: 1.5; }
+  .violation-cite {
+    font-size: 12px;
+    color: var(--blue);
+    background: var(--blueL);
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+  }
+
+  /* ── Gap markers ── */
+  .gap-marker {
+    display: inline-block;
+    background: #fef9c3;
+    border: 1px dashed #ca8a04;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #a16207;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* ── Normalised resume card ── */
+  .resume-card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    background: var(--bg);
+  }
+  .resume-name { font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+  .resume-email { font-size: 13px; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+  .chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .chip {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--blueL);
+    color: var(--blue);
+    border: 1px solid #bfdbfe;
+  }
+  .chip.exp { background: var(--purpleL); color: var(--purple); border-color: #ddd6fe; }
+  .chip.edu { background: var(--greenL); color: var(--green); border-color: #bbf7d0; }
+
+  /* ── What to expect box ── */
+  .expect-box {
+    background: var(--blueL);
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--blue);
+    line-height: 1.6;
+  }
+  .expect-box strong { font-weight: 700; }
+
+  /* ── Error box ── */
+  .error-box {
+    background: var(--redL);
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--red);
+    line-height: 1.5;
+    margin-top: 12px;
+  }
+
+  /* ── Scenario bar ── */
+  .scenario-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .scenario-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--muted);
+    margin-right: 4px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .sc-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--tag);
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    color: var(--text);
+    transition: all .12s;
+  }
+  .sc-btn:hover { background: var(--blueL); border-color: #bfdbfe; color: var(--blue); }
+  .sc-btn.sc-active { background: var(--blueL); border-color: var(--blue); color: var(--blue); font-weight: 600; }
+  .sc-btn.sc-break { border-color: #fecaca; color: var(--red); background: var(--redL); }
+  .sc-btn.sc-break:hover { background: #fee2e2; border-color: var(--red); }
+  .sc-btn.sc-break.sc-active { background: #fee2e2; border-color: var(--red); font-weight: 600; }
+
+  /* ── Placeholder ── */
+  .placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--faint);
+    font-size: 14px;
+  }
+  .placeholder-icon { font-size: 36px; margin-bottom: 10px; }
+
+  /* ── Grid ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── Info row ── */
+  .info-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--tag);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  /* ── Filled text ── */
+  .filled-text {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-size: 14px;
+    line-height: 1.9;
+    white-space: pre-wrap;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+  }
+
+  /* ── Clean banner ── */
+  .clean-banner {
+    background: var(--greenL);
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* ── Paper-style letter ── */
+  .letter-paper {
+    background: #fff;
+    border: 1px solid #d6d3d1;
+    border-radius: 10px;
+    padding: 36px 40px;
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: #1c1917;
+    max-height: 600px;
+    overflow-y: auto;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.04);
+  }
+  .letter-paper table { width:100%; border-collapse:collapse; margin:14px 0; }
+  .letter-paper th, .letter-paper td { border:1px solid #d6d3d1; padding:8px 12px; font-size:13px; }
+  .letter-paper th { background:#f5f5f4; font-weight:700; }
+  .letter-paper h1,.letter-paper h2,.letter-paper h3 { font-family:'Plus Jakarta Sans',sans-serif; }
+  .letter-paper ins { background:#d4edda; text-decoration:none; }
+  .letter-paper del { background:#f8d7da; text-decoration:line-through; }
+
+  /* ── Form section divider ── */
+  .form-section {
+    font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--muted);margin:16px 0 12px;padding-bottom:6px;
+    border-bottom:1px solid var(--borderL);
+  }
+  .form-section:first-child { margin-top:0; }
+
+  /* ── Claim stat box ── */
+  .claim-stats {
+    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;
+  }
+  @media(max-width:700px) { .claim-stats { grid-template-columns:repeat(2,1fr); } }
+  .stat-box {
+    border-radius:10px;padding:12px 14px;text-align:center;
+    border:1px solid var(--border);
+  }
+  .stat-label { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px; }
+  .stat-value { font-size:17px;font-weight:800; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="header">
+  <div>
+    <div class="header-title">SuperDocs Builds — Test Dashboard</div>
+    <div class="header-sub">Task 2 · 4 services · Scenario presets · Edge cases + break tests · Live API output</div>
+  </div>
+  <div class="status-row" id="statusRow">
+    <div class="svc-pill checking" id="pill-normaliser" onclick="switchTab('normaliser')">
+      <div class="dot"></div>
+      Resume Normaliser :8010
+    </div>
+    <div class="svc-pill checking" id="pill-claims" onclick="switchTab('claims')">
+      <div class="dot"></div>
+      Claims Generator :8011
+    </div>
+    <div class="svc-pill checking" id="pill-template" onclick="switchTab('template')">
+      <div class="dot"></div>
+      Template Filler :8012
+    </div>
+    <div class="svc-pill checking" id="pill-style" onclick="switchTab('style')">
+      <div class="dot"></div>
+      House-Style :8013
+    </div>
+    <button class="btn btn-ghost" style="font-size:12px; padding:6px 14px;" onclick="checkAllServices()">↺ Refresh</button>
+  </div>
+</header>
+
+<!-- ═══ TAB BAR ═══ -->
+<div class="tab-bar">
+  <button class="tab-btn active" data-svc="normaliser" onclick="switchTab('normaliser')">
+    <div class="tab-dot"></div>
+    Resume Normaliser
+    <span class="badge badge-s1" style="font-size:10px; padding:1px 7px;">S1 · Assigned</span>
+  </button>
+  <button class="tab-btn" data-svc="claims" onclick="switchTab('claims')">
+    <div class="tab-dot"></div>
+    Claims Generator
+    <span class="badge badge-s1" style="font-size:10px; padding:1px 7px;">S1 · Assigned</span>
+  </button>
+  <button class="tab-btn" data-svc="template" onclick="switchTab('template')">
+    <div class="tab-dot"></div>
+    Template Filler
+    <span class="badge badge-s2" style="font-size:10px; padding:1px 7px;">S1 · Open List</span>
+  </button>
+  <button class="tab-btn" data-svc="style" onclick="switchTab('style')">
+    <div class="tab-dot"></div>
+    House-Style Enforcer
+    <span class="badge badge-s2" style="font-size:10px; padding:1px 7px;">S2 · Open List</span>
+  </button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL 1: RESUME NORMALISER
+═══════════════════════════════════════════════════════════════ -->
+<div class="panel active" id="panel-normaliser">
+
+  <div class="expect-box">
+    <strong>What this build does:</strong> Takes raw resume text (messy, unstructured) and returns a clean, structured JSON record for each resume — full name, email, phone, skills list, work experience with dates, and education. Batch of 3 processed in one API call. All SuperDocs document edits happen server-side; the API returns the normalised schema. HITL gate auto-approved for bulk jobs.
+    <br><br>
+    <strong>Expected output:</strong> <code>{"total": 3, "succeeded": 3, "failed": 0, "results": [...]}</code> — each result has status <code>"normalised"</code> and a structured <code>normalised</code> object.
+  </div>
+
+  <div class="scenario-bar">
+    <span class="scenario-label">📋 Scenario:</span>
+    <button class="sc-btn sc-active" id="sc-norm-default" onclick="loadScenario('normaliser','default')">Default (3 resumes)</button>
+    <button class="sc-btn" id="sc-norm-minimal" onclick="loadScenario('normaliser','minimal')">Minimal info</button>
+    <button class="sc-btn" id="sc-norm-typos" onclick="loadScenario('normaliser','typos')">Heavy typos</button>
+    <button class="sc-btn" id="sc-norm-single" onclick="loadScenario('normaliser','single')">Single resume only</button>
+    <button class="sc-btn sc-break" id="sc-norm-empty" onclick="loadScenario('normaliser','empty')">💥 All inputs empty</button>
+    <button class="sc-btn sc-break" id="sc-norm-noise" onclick="loadScenario('normaliser','noise')">💥 Garbage / XSS</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Input — 3 Sample Resumes</div>
+      <div class="card-sub">Raw text resumes. Edit any field to try different inputs. The normaliser handles mixed formats, typos, and inconsistent date styles.</div>
+
+      <div class="field-group">
+        <label class="field-label">Resume 1 — Software Engineer</label>
+        <textarea class="sm" id="resume1">John Smith
+john.smith@email.com | +1-555-0100
+Software Engineer at Acme Corp (Jan 2020 – Mar 2024)
+Junior Dev at StartupXYZ 2018-2020
+Skills: Python, JavaScript, React, PostgreSQL, Docker
+B.Sc Computer Science, MIT, 2018</textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Resume 2 — Product Manager</label>
+        <textarea class="sm" id="resume2">Priya Sharma · priya.sharma@email.com
+Sr. Product Manager @ TechStartup Inc | Jan 2021 - Present
+Associate PM at BigCorp (2019-2021)
+MBA IIM Ahmedabad 2019 | B.Com Delhi University 2017
+Tools & Skills: JIRA, Figma, SQL, Mixpanel, Roadmapping, A/B testing</textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Resume 3 — Data Scientist</label>
+        <textarea class="sm" id="resume3">Raj Patel — rpatel@gmail.com — 9876543210
+Data Scientist / ML Engineer
+DataCo (Senior DS) 2021–2023 · AI Labs 2018–2021
+Expertise: TensorFlow PyTorch scikit-learn Spark Kafka Python R
+M.Tech Machine Learning, IIT Bombay, 2018
+B.E. Electronics, VIT, 2016</textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-normalise" onclick="runNormaliser()">
+          ▶ Run Normaliser
+        </button>
+        <span style="font-size:12px; color:var(--muted);">Calls POST /normalize on :8010</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="output-pane">
+        <div class="output-header">
+          <div class="output-title">
+            <span>📤</span> Output
+          </div>
+          <div id="normaliser-badge"></div>
+        </div>
+        <div class="output-body" id="normaliser-output">
+          <div class="placeholder">
+            <div class="placeholder-icon">📄</div>
+            Hit "Run Normaliser" to see structured output here
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px 18px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:10px;">How to read the output</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+          Each result in <code>results[]</code> has:
+          <ul style="margin:8px 0 0 18px; line-height:2;">
+            <li><code>status: "normalised"</code> — processed OK</li>
+            <li><code>normalised.full_name</code> — cleaned name</li>
+            <li><code>normalised.email</code> — primary email</li>
+            <li><code>normalised.skills[]</code> — deduplicated skill list</li>
+            <li><code>normalised.work_experience[]</code> — title, company, dates</li>
+            <li><code>normalised.education[]</code> — degree, institution, year</li>
+          </ul>
+          Failed resumes have <code>status: "error"</code> and an <code>error</code> field — the batch still returns 200.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL 2: CLAIMS GENERATOR
+═══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-claims">
+
+  <div class="expect-box">
+    <strong>What this build does:</strong> Generates a professional insurance claims correspondence letter using the SuperDocs API — then pauses at a <strong>Human-in-the-Loop gate</strong> for review before the letter is finalised. Two-step flow: generate → HITL review → approve/reject. On approval, returns the final letter as HTML + plain text.
+    <br><br>
+    <strong>Expected output:</strong> Step 1 → <code>{"status": "pending_hitl", "session_id": "..."}</code>. Step 2 (approve) → <code>{"status": "approved", "letter_html": "...", "letter_text": "..."}</code>.
+  </div>
+
+  <div class="scenario-bar">
+    <span class="scenario-label">📋 Scenario:</span>
+    <button class="sc-btn sc-active" id="sc-cl-default" onclick="loadScenario('claims','default')">Homeowner partial</button>
+    <button class="sc-btn" id="sc-cl-auto" onclick="loadScenario('claims','auto')">Auto full approval</button>
+    <button class="sc-btn" id="sc-cl-denial" onclick="loadScenario('claims','denial')">Life denial</button>
+    <button class="sc-btn" id="sc-cl-info" onclick="loadScenario('claims','info')">Request more info</button>
+    <button class="sc-btn sc-break" id="sc-cl-empty" onclick="loadScenario('claims','empty')">💥 All fields empty</button>
+    <button class="sc-btn sc-break" id="sc-cl-negative" onclick="loadScenario('claims','negative')">💥 Negative amounts</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Step 1 — Generate Letter</div>
+      <div class="card-sub">Fill in the claim details. Choose a letter type. The API drafts a professional letter and holds it for your review.</div>
+
+      <div class="form-section">Claimant</div>
+      <div class="grid2" style="gap:12px; margin-bottom:12px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Name</label>
+          <input type="text" id="c-name" value="Priya Sharma">
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Email</label>
+          <input type="text" id="c-email" value="priya.sharma.test@example.com">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Address</label>
+        <input type="text" id="c-address" value="47 Ferndale Avenue, Austin, TX 78701">
+      </div>
+
+      <div class="form-section">Policy</div>
+      <div class="grid2" style="gap:12px; margin-bottom:12px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Policy Number</label>
+          <input type="text" id="p-number" value="HO-2026-TX-009142">
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Coverage Type</label>
+          <input type="text" id="p-coverage" value="homeowner">
+        </div>
+      </div>
+      <div class="grid2" style="gap:12px;">
+        <div class="field-group">
+          <label class="field-label">Coverage Limit ($)</label>
+          <input type="text" id="p-limit" value="80000">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Deductible ($)</label>
+          <input type="text" id="p-deductible" value="6000">
+        </div>
+      </div>
+
+      <div class="form-section">Claim</div>
+      <div class="grid2" style="gap:12px; margin-bottom:12px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Claim Number</label>
+          <input type="text" id="cl-number" value="CLM-2026-0314">
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Incident Date</label>
+          <input type="text" id="cl-date" value="2026-06-28">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Incident Type</label>
+        <input type="text" id="cl-type" value="hail and wind damage">
+      </div>
+      <div class="grid2" style="gap:12px; margin-bottom:12px;">
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Claimed Amount ($)</label>
+          <input type="text" id="cl-claimed" value="72000">
+        </div>
+        <div class="field-group" style="margin-bottom:0;">
+          <label class="field-label">Adjuster Estimate ($)</label>
+          <input type="text" id="cl-adjuster" value="58500">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Adjuster Notes</label>
+        <input type="text" id="cl-notes" value="Roof replacement approved at 80%">
+      </div>
+
+      <div class="form-section">Letter Config</div>
+      <div class="grid2" style="gap:12px;">
+        <div class="field-group">
+          <label class="field-label">Letter Type</label>
+          <select id="cl-lettertype" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--bg);color:var(--text);outline:none;">
+            <option value="partial_approval">Partial Approval</option>
+            <option value="approval">Full Approval</option>
+            <option value="denial">Denial</option>
+            <option value="information_request">Request More Information</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Company Name</label>
+          <input type="text" id="cl-company" value="MapleCrest Insurance Group">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-generate" onclick="runClaimsGenerate()">
+          ▶ Generate Letter
+        </button>
+        <button class="btn btn-success" id="btn-approve-claim" onclick="runClaimsApprove(true)" style="display:none">
+          ✓ Approve Letter
+        </button>
+        <button class="btn btn-danger" id="btn-reject-claim" onclick="runClaimsApprove(false)" style="display:none">
+          ✗ Reject
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="output-pane">
+        <div class="output-header">
+          <div class="output-title"><span>📨</span> Output</div>
+          <div id="claims-badge"></div>
+        </div>
+        <div class="output-body" id="claims-output">
+          <div class="placeholder">
+            <div class="placeholder-icon">📨</div>
+            Generate a letter to begin the HITL flow
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px 18px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:10px;">HITL Flow</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.8;">
+          <div style="margin-bottom:6px;">① <strong>Generate</strong> → API drafts letter → status <code>pending_hitl</code></div>
+          <div style="margin-bottom:6px;">② <strong>Review</strong> → letter preview appears here</div>
+          <div>③ <strong>Approve</strong> → letter finalised, <code>letter_html</code> returned</div>
+          <div style="margin-top:8px; color:var(--red);">Reject → session deleted, draft discarded</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL 3: TEMPLATE FILLER
+═══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-template">
+
+  <div class="expect-box">
+    <strong>What this build does:</strong> Takes a document template with <code>{{placeholder}}</code> markers and a data record, fills every placeholder from the record, and shows <span class="gap-marker">[MISSING: field_name]</span> for fields not present in the record. Pauses at a HITL gate — you review the filled document before it's finalised. The gaps list tells you exactly what was missing.
+    <br><br>
+    <strong>Expected output:</strong> Approve flow → <code>{"status": "approved", "filled_text": "...", "gaps": ["approved_amount", "next_steps"]}</code>. The two intentionally missing fields above will show as gap markers.
+  </div>
+
+  <div class="scenario-bar">
+    <span class="scenario-label">📋 Scenario:</span>
+    <button class="sc-btn sc-active" id="sc-tpl-default" onclick="loadScenario('template','default')">Insurance letter (2 gaps)</button>
+    <button class="sc-btn" id="sc-tpl-nogaps" onclick="loadScenario('template','nogaps')">All fields provided</button>
+    <button class="sc-btn" id="sc-tpl-nda" onclick="loadScenario('template','nda')">NDA template</button>
+    <button class="sc-btn" id="sc-tpl-offer" onclick="loadScenario('template','offer')">Offer letter</button>
+    <button class="sc-btn sc-break" id="sc-tpl-allgaps" onclick="loadScenario('template','allgaps')">💥 All fields missing</button>
+    <button class="sc-btn sc-break" id="sc-tpl-badjson" onclick="loadScenario('template','badjson')">💥 Invalid JSON</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Template + Record</div>
+      <div class="card-sub">The template has <code>{{placeholders}}</code>. The record has 5 of 7 fields. Two will intentionally become gap markers — watch for them in the output.</div>
+
+      <div class="field-group">
+        <label class="field-label">Document Template</label>
+        <textarea class="lg" id="t-template">Dear {{claimant_name}},
+
+Re: Claim {{claim_number}} — Filed on {{incident_date}}
+
+We are writing to you regarding your {{coverage_type}} insurance claim under Policy No. {{policy_number}}.
+
+Claimed amount: {{claimed_amount}}
+Approved amount: {{approved_amount}}
+
+Next steps: {{next_steps}}
+
+Sincerely,
+MapleCrest Insurance Group</textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Data Record (JSON — 5 of 7 fields provided, 2 intentionally missing)</label>
+        <textarea id="t-record" style="min-height:160px;">{
+  "claimant_name": "Priya Sharma",
+  "claim_number": "CLM-2026-0314",
+  "incident_date": "2026-06-28",
+  "coverage_type": "homeowner",
+  "policy_number": "HO-2026-TX-009142",
+  "claimed_amount": "$72,000"
+}</textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-fill" onclick="runTemplateFill()">
+          ▶ Fill Template
+        </button>
+        <button class="btn btn-success" id="btn-approve-template" onclick="runTemplateApprove(true)" style="display:none">
+          ✓ Approve
+        </button>
+        <button class="btn btn-danger" id="btn-reject-template" onclick="runTemplateApprove(false)" style="display:none">
+          ✗ Reject
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="output-pane">
+        <div class="output-header">
+          <div class="output-title"><span>📝</span> Output</div>
+          <div id="template-badge"></div>
+        </div>
+        <div class="output-body" id="template-output">
+          <div class="placeholder">
+            <div class="placeholder-icon">📝</div>
+            Fill the template to see the result with gap markers
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px 18px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:10px;">Gap Markers</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+          Missing fields become <span class="gap-marker">[MISSING: field_name]</span> markers — visible in the filled document.<br><br>
+          The <code>gaps[]</code> array in the response lists every field that wasn't in your record. Add those fields to the record and re-run to fill them.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PANEL 4: HOUSE-STYLE ENFORCER
+═══════════════════════════════════════════════════════════════ -->
+<div class="panel" id="panel-style">
+
+  <div class="expect-box">
+    <strong>What this build does:</strong> Audits a document against a plain-English style guide — no rules config files, just paste your guide. Returns two lanes of violations: <strong>language</strong> (wrong words, passive voice, brand name errors) and <strong>formatting</strong> (wrong heading case, wrong number format). Each violation cites the exact style guide rule it broke. Single API call, no HITL.
+    <br><br>
+    <strong>Expected output:</strong> <code>{"clean": false, "language_violations": [...], "formatting_violations": [...]}</code>. The sample document below deliberately breaks 4 rules — watch for them.
+  </div>
+
+  <div class="scenario-bar">
+    <span class="scenario-label">📋 Scenario:</span>
+    <button class="sc-btn sc-active" id="sc-st-default" onclick="loadScenario('style','default')">4 violations (default)</button>
+    <button class="sc-btn" id="sc-st-clean" onclick="loadScenario('style','clean')">Clean doc (0 violations)</button>
+    <button class="sc-btn" id="sc-st-heavy" onclick="loadScenario('style','heavy')">Heavy violations</button>
+    <button class="sc-btn" id="sc-st-tech" onclick="loadScenario('style','tech')">Tech startup guide</button>
+    <button class="sc-btn sc-break" id="sc-st-noguide" onclick="loadScenario('style','noguide')">💥 Empty style guide</button>
+    <button class="sc-btn sc-break" id="sc-st-nodoc" onclick="loadScenario('style','nodoc')">💥 Empty document</button>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Style Guide + Document</div>
+      <div class="card-sub">The sample document breaks 4 rules on purpose. You'll see all 4 flagged in the output with citations back to the rule.</div>
+
+      <div class="field-group">
+        <label class="field-label">Style Guide (plain English, one rule per line)</label>
+        <textarea id="sg-guide" style="min-height:150px;">1. Always use "we" (not "I") when speaking as the company.
+2. Brand name is "MapleCrest" — never "maplecrest", "Maple Crest", or "maple crest".
+3. Headings and section labels use sentence case (e.g. "What we need from you"), not title case.
+4. Dollar amounts under $1 million: write "$58 thousand", not "$58,000" or "$58000".
+5. Avoid passive voice where active voice is possible.</textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Document Title</label>
+        <input type="text" id="sg-title" value="Partial Approval Letter — CLM-2026-0314">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Document Text (breaks rules 1, 2, 3, and 4 — active voice throughout so rule 5 is satisfied)</label>
+        <textarea class="lg" id="sg-doc">Dear Mr Jones,
+
+I am writing to you about your maplecrest claim filed on 28 June 2026.
+
+The Following Documents Are Required:
+- Proof of residency
+- Original receipts
+
+We reviewed your claim for $72,000 and found that partial approval is warranted based on our adjuster estimate of $58,500.
+
+Please send the required documents within 14 days.</textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-audit" onclick="runStyleAudit()">
+          ▶ Run Style Audit
+        </button>
+        <span style="font-size:12px; color:var(--muted);">Single call — instant result</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="output-pane">
+        <div class="output-header">
+          <div class="output-title"><span>🔍</span> Violations</div>
+          <div id="style-badge"></div>
+        </div>
+        <div class="output-body" id="style-output">
+          <div class="placeholder">
+            <div class="placeholder-icon">🔍</div>
+            Run the audit to see violations with style guide citations
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:16px 18px;">
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:10px;">Reading Violations</div>
+        <div style="font-size:13px; color:var(--muted); line-height:1.7;">
+          <strong style="color:var(--red);">Language violations</strong> — wrong words, passive voice, brand name errors<br><br>
+          <strong style="color:var(--amber);">Formatting violations</strong> — wrong case, wrong number format, structure issues<br><br>
+          Each violation shows: the offending text, what it should be, and the <strong>exact style guide rule</strong> it violates.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  UTILITY
+// ═══════════════════════════════════════════════════════════════
+
+const PORTS = {
+  normaliser: 8010,
+  claims:     8011,
+  template:   8012,
+  style:      8013,
+}
+
+function base(svc) {
+  return `http://localhost:${PORTS[svc]}`
+}
+
+async function apiFetch(url, opts = {}) {
+  const res = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...opts,
+  })
+  const data = await res.json()
+  if (!res.ok) {
+    // FastAPI Pydantic 422 errors come as detail: [{loc, msg, type}, ...]
+    let msg
+    if (Array.isArray(data.detail)) {
+      msg = data.detail
+        .map(e => {
+          const field = (e.loc || []).slice(1).join('.') || 'field'
+          return `${field}: ${e.msg}`
+        })
+        .join('\n')
+    } else {
+      msg = data.detail || data.error || `HTTP ${res.status}`
+    }
+    const err = new Error(msg)
+    err.httpStatus = res.status
+    throw err
+  }
+  return data
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId)
+  if (!btn) return
+  btn.disabled = loading
+  if (loading) {
+    btn.dataset.origText = btn.innerHTML
+    btn.innerHTML = `<div class="spinner"></div> Running…`
+  } else {
+    btn.innerHTML = btn.dataset.origText || btn.innerHTML
+  }
+}
+
+function showBadge(id, text, cls) {
+  const el = document.getElementById(id)
+  if (el) el.innerHTML = `<span class="badge badge-${cls}">${text}</span>`
+}
+
+function showError(outputId, err) {
+  document.getElementById(outputId).innerHTML = `
+    <div class="error-box">
+      <strong>Error:</strong> ${err}<br>
+      <span style="font-size:12px; margin-top:6px; display:block;">Make sure the service is running: <code>uvicorn main:app --port ${
+        Object.values(PORTS).find(p => document.getElementById(outputId)?.closest('.panel')?.id?.includes(['normaliser','claims','template','style'].find(s => outputId.includes(s)))) || '???'
+      }</code></span>
+    </div>`
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TAB SWITCHING
+// ═══════════════════════════════════════════════════════════════
+
+function switchTab(svc) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.svc === svc))
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === `panel-${svc}`))
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SERVICE STATUS CHECK
+// ═══════════════════════════════════════════════════════════════
+
+async function checkService(svc) {
+  const pill = document.getElementById(`pill-${svc}`)
+  pill.className = 'svc-pill checking'
+  try {
+    const res = await fetch(`${base(svc)}/health`, { signal: AbortSignal.timeout(2000) })
+    pill.className = res.ok ? 'svc-pill online' : 'svc-pill offline'
+  } catch {
+    // Try a simpler ping via docs endpoint
+    try {
+      const res2 = await fetch(`${base(svc)}/docs`, { signal: AbortSignal.timeout(2000) })
+      pill.className = res2.ok ? 'svc-pill online' : 'svc-pill offline'
+    } catch {
+      pill.className = 'svc-pill offline'
+    }
+  }
+}
+
+async function checkAllServices() {
+  await Promise.all(Object.keys(PORTS).map(checkService))
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RESUME NORMALISER
+// ═══════════════════════════════════════════════════════════════
+
+async function runNormaliser() {
+  const resumes = [
+    { id: 'r1', raw_text: document.getElementById('resume1').value.trim() },
+    { id: 'r2', raw_text: document.getElementById('resume2').value.trim() },
+    { id: 'r3', raw_text: document.getElementById('resume3').value.trim() },
+  ].filter(r => r.raw_text)
+
+  if (!resumes.length) return
+
+  setLoading('btn-normalise', true)
+  showBadge('normaliser-badge', 'Running…', 'pending')
+
+  try {
+    const data = await apiFetch(`${base('normaliser')}/normalize`, {
+      method: 'POST',
+      body: JSON.stringify({ resumes }),
+    })
+    renderNormaliserOutput(data)
+    showBadge('normaliser-badge', `✓ ${data.succeeded}/${data.total} normalised`, 'success')
+  } catch (e) {
+    showBadge('normaliser-badge', 'Error', 'error')
+    document.getElementById('normaliser-output').innerHTML = `
+      <div class="error-box">
+        <strong>Cannot reach :8010</strong><br>
+        Start the service: <code>cd use-cases/tej-thakar/resume-normaliser && uvicorn main:app --port 8010</code><br><br>
+        Error detail: ${e.message}
+      </div>`
+  } finally {
+    setLoading('btn-normalise', false)
+  }
+}
+
+function renderNormaliserOutput(data) {
+  const cards = (data.results || []).map((r, i) => {
+    if (r.status === 'error') {
+      return `<div class="resume-card" style="border-left:4px solid var(--red)">
+        <div class="resume-name" style="color:var(--red)">Resume ${i+1} — Error</div>
+        <div style="font-size:13px; color:var(--muted);">${r.error || 'Unknown error'}</div>
+      </div>`
+    }
+    const n = r  // fields are on r directly, no .normalised wrapper
+    const skills = (n.skills || []).slice(0, 10)
+    const exp = (n.work_experience || [])
+    const edu = (n.education || [])
+    return `
+    <div class="resume-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+        <div class="resume-name">${n.full_name || '(name not found)'}</div>
+        <span class="badge badge-success">normalised</span>
+      </div>
+      <div class="resume-email">${[n.email, n.phone, n.location].filter(Boolean).join(' · ') || '—'}</div>
+      ${n.years_of_experience != null ? `<div style="font-size:12px; color:var(--muted); margin:4px 0;">${n.years_of_experience} yrs experience</div>` : ''}
+      ${skills.length ? `
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin:10px 0 6px;">Skills (${(n.skills||[]).length})</div>
+        <div class="chip-row">${skills.map(s => `<span class="chip">${s}</span>`).join('')}${(n.skills||[]).length > 10 ? `<span style="font-size:12px; color:var(--faint); align-self:center;">+${(n.skills||[]).length-10} more</span>` : ''}</div>
+      ` : ''}
+      ${exp.length ? `
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin:10px 0 6px;">Experience</div>
+        <div class="chip-row">${exp.map(e => `<span class="chip exp">${e.title || ''}${e.company ? ' @ '+e.company : ''}${e.start_year ? ' ('+e.start_year+(e.end_year?' – '+e.end_year:' – present')+')' : ''}</span>`).join('')}</div>
+      ` : ''}
+      ${edu.length ? `
+        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin:10px 0 6px;">Education</div>
+        <div class="chip-row">${edu.map(e => `<span class="chip edu">${e.degree || ''}${e.field ? ' in '+e.field : ''}${e.institution ? ' · '+e.institution : ''}${e.year_completed ? ' ('+e.year_completed+')' : ''}</span>`).join('')}</div>
+      ` : ''}
+      ${n.normalisation_notes ? `<div style="font-size:12px; color:var(--amber); margin-top:8px;">⚠ ${n.normalisation_notes}</div>` : ''}
+    </div>`
+  }).join('')
+
+  document.getElementById('normaliser-output').innerHTML = `
+    <div style="display:flex; gap:16px; margin-bottom:18px; flex-wrap:wrap;">
+      <div style="background:var(--greenL); border:1px solid #bbf7d0; border-radius:8px; padding:10px 18px; text-align:center;">
+        <div style="font-size:24px; font-weight:800; color:var(--green); font-family:'Plus Jakarta Sans',sans-serif;">${data.succeeded}</div>
+        <div style="font-size:11px; color:var(--green); margin-top:2px;">Succeeded</div>
+      </div>
+      <div style="background:var(--redL); border:1px solid #fecaca; border-radius:8px; padding:10px 18px; text-align:center;">
+        <div style="font-size:24px; font-weight:800; color:var(--red); font-family:'Plus Jakarta Sans',sans-serif;">${data.failed}</div>
+        <div style="font-size:11px; color:var(--red); margin-top:2px;">Failed</div>
+      </div>
+      <div style="background:var(--blueL); border:1px solid #bfdbfe; border-radius:8px; padding:10px 18px; text-align:center;">
+        <div style="font-size:24px; font-weight:800; color:var(--blue); font-family:'Plus Jakarta Sans',sans-serif;">${data.total}</div>
+        <div style="font-size:11px; color:var(--blue); margin-top:2px;">Total</div>
+      </div>
+    </div>
+    ${cards}
+  `
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CLAIMS GENERATOR
+// ═══════════════════════════════════════════════════════════════
+
+let claimsSessionId = null
+
+async function runClaimsGenerate() {
+  claimsSessionId = null
+  document.getElementById('btn-approve-claim').style.display = 'none'
+  document.getElementById('btn-reject-claim').style.display  = 'none'
+
+  const payload = {
+    claimant: {
+      full_name: document.getElementById('c-name').value,
+      address:   document.getElementById('c-address').value,
+      email:     document.getElementById('c-email').value,
+    },
+    policy: {
+      policy_number:  document.getElementById('p-number').value,
+      coverage_type:  document.getElementById('p-coverage').value,
+      coverage_limit: Number(document.getElementById('p-limit').value),
+      deductible:     Number(document.getElementById('p-deductible').value),
+    },
+    claim: {
+      claim_number:      document.getElementById('cl-number').value,
+      incident_date:     document.getElementById('cl-date').value,
+      incident_type:     document.getElementById('cl-type').value,
+      claimed_amount:    Number(document.getElementById('cl-claimed').value),
+      adjuster_estimate: Number(document.getElementById('cl-adjuster').value),
+      adjuster_notes:    document.getElementById('cl-notes').value,
+    },
+    letter_type:  document.getElementById('cl-lettertype').value,
+    company_name: document.getElementById('cl-company').value,
+  }
+
+  setLoading('btn-generate', true)
+  showBadge('claims-badge', 'Generating…', 'pending')
+  document.getElementById('claims-output').innerHTML = `
+    <div style="padding:20px; color:var(--muted); font-size:14px; text-align:center;">
+      <div style="font-size:28px; margin-bottom:8px;">⏳</div>
+      Drafting letter via SuperDocs API…
+    </div>`
+
+  try {
+    const data = await apiFetch(`${base('claims')}/generate`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+
+    claimsSessionId = data.session_id
+
+    // If generate already returned an approved letter (job completed without HITL gate),
+    // render it directly — don't show the approve button, there's nothing to approve.
+    if (data.status === 'approved' && (data.letter_html || data.letter_text)) {
+      showBadge('claims-badge', '✓ Letter finalised', 'success')
+      renderClaimsOutput(data)
+      return
+    }
+
+    // status === 'pending_hitl' — show the HITL gate
+    showBadge('claims-badge', 'Awaiting Review', 'pending')
+    const preview = data.draft_preview || data.letter_preview || ''
+    document.getElementById('claims-output').innerHTML = `
+      <div class="hitl-gate">
+        <div class="hitl-gate-icon">🔴</div>
+        <div>
+          <div class="hitl-gate-title">HITL Gate — Letter ready for review</div>
+          <div class="hitl-gate-sub">The letter has been drafted. Review the preview below, then Approve to finalise or Reject to discard.</div>
+          <div class="session-id" title="Click to copy">Session ID: ${data.session_id}</div>
+        </div>
+      </div>
+      ${preview ? `
+        <div style="margin-bottom:16px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px;">Draft Preview</div>
+          <div class="letter-render">${preview.replace(/\n/g, '<br>')}</div>
+        </div>
+      ` : '<div style="color:var(--muted); font-size:13px; padding:12px 0;">Draft ready — click Approve to generate the full letter.</div>'}
+      <div style="font-size:12px; color:var(--muted); margin-top:8px;">Use the <strong>Approve Letter</strong> or <strong>Reject</strong> buttons above.</div>
+    `
+
+    document.getElementById('btn-approve-claim').style.display = 'inline-flex'
+    document.getElementById('btn-reject-claim').style.display  = 'inline-flex'
+
+  } catch (e) {
+    showBadge('claims-badge', 'Error', 'error')
+    const isValidation = e.httpStatus === 422
+    document.getElementById('claims-output').innerHTML = isValidation
+      ? `<div class="error-box">
+           <strong>❌ Validation rejected — request blocked before hitting the LLM</strong><br><br>
+           <div style="white-space:pre-line; font-family:monospace; font-size:12px; background:rgba(0,0,0,.05); padding:10px; border-radius:6px; margin-top:6px;">${e.message}</div>
+           <div style="margin-top:10px; font-size:12px; color:var(--muted);">Fix the field values above and try again.</div>
+         </div>`
+      : `<div class="error-box">
+           <strong>Cannot reach :8011</strong><br>
+           Start: <code>cd use-cases/tej-thakar/claims-generator && uvicorn main:app --port 8011</code><br><br>
+           Error: ${e.message}
+         </div>`
+  } finally {
+    setLoading('btn-generate', false)
+  }
+}
+
+async function runClaimsApprove(approved) {
+  if (!claimsSessionId) return
+
+  const btnId = approved ? 'btn-approve-claim' : 'btn-reject-claim'
+  setLoading(btnId, true)
+  showBadge('claims-badge', approved ? 'Approving…' : 'Rejecting…', 'pending')
+
+  try {
+    const data = await apiFetch(`${base('claims')}/approve/${claimsSessionId}`, {
+      method: 'POST',
+      body: JSON.stringify({ approved }),
+    })
+
+    document.getElementById('btn-approve-claim').style.display = 'none'
+    document.getElementById('btn-reject-claim').style.display  = 'none'
+
+    if (!approved) {
+      showBadge('claims-badge', 'Rejected', 'error')
+      document.getElementById('claims-output').innerHTML = `
+        <div style="background:var(--redL); border:1px solid #fecaca; border-radius:10px; padding:20px; text-align:center;">
+          <div style="font-size:28px; margin-bottom:8px;">✗</div>
+          <div style="font-weight:700; color:var(--red);">Letter Rejected</div>
+          <div style="font-size:13px; color:var(--muted); margin-top:6px;">The draft was discarded. Generate a new one with different parameters.</div>
+        </div>`
+      return
+    }
+
+    showBadge('claims-badge', '✓ Approved', 'success')
+    renderClaimsOutput(data)
+
+  } catch (e) {
+    showBadge('claims-badge', 'Error', 'error')
+    document.getElementById('claims-output').innerHTML += `<div class="error-box">${e.message}</div>`
+  } finally {
+    setLoading(btnId, false)
+  }
+}
+
+function renderClaimsOutput(data) {
+  const letter = data.letter_html || (data.letter_text || '(no letter content)').replace(/\n/g, '<br>')
+  const letterType = (data.letter_type || '').replace(/_/g, ' ')
+
+  // Pull form values for the summary row
+  const claimed  = Number(document.getElementById('cl-claimed')?.value)
+  const adjuster = Number(document.getElementById('cl-adjuster')?.value)
+  const deduct   = Number(document.getElementById('p-deductible')?.value)
+  const payout   = (!isNaN(adjuster) && !isNaN(deduct)) ? Math.max(0, adjuster - deduct) : NaN
+  const fmt = n => isNaN(n)||!n ? '—' : '$' + n.toLocaleString('en-US')
+
+  const statsHtml = (claimed || adjuster) ? `
+    <div class="claim-stats">
+      <div class="stat-box" style="background:#faf5ff;border-color:#ddd6fe;">
+        <div class="stat-label" style="color:#7e22ce;">Claimed</div>
+        <div class="stat-value" style="color:#7e22ce;">${fmt(claimed)}</div>
+      </div>
+      <div class="stat-box" style="background:#f0f9ff;border-color:#bae6fd;">
+        <div class="stat-label" style="color:#0369a1;">Estimate</div>
+        <div class="stat-value" style="color:#0369a1;">${fmt(adjuster)}</div>
+      </div>
+      <div class="stat-box" style="background:#fffbeb;border-color:#fde68a;">
+        <div class="stat-label" style="color:#b45309;">Deductible</div>
+        <div class="stat-value" style="color:#b45309;">${fmt(deduct)}</div>
+      </div>
+      <div class="stat-box" style="background:#f0fdf4;border-color:#bbf7d0;">
+        <div class="stat-label" style="color:#15803d;">Payout</div>
+        <div class="stat-value" style="color:#15803d;">${fmt(payout)}</div>
+      </div>
+    </div>` : ''
+
+  const cleanText = data.letter_text
+    ? data.letter_text.replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,'').replace(/\n{3,}/g,'\n\n').trim()
+    : null
+
+  document.getElementById('claims-output').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <span style="font-size:26px;">✅</span>
+      <div>
+        <div style="font-weight:700;font-size:15px;color:var(--green);">Letter Approved &amp; Finalised</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">
+          <span style="font-family:'JetBrains Mono',monospace;">${data.session_id||''}</span>
+          ${letterType ? ` &middot; <span style="text-transform:capitalize;">${letterType}</span>` : ''}
+        </div>
+      </div>
+    </div>
+    ${statsHtml}
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:8px;">Final Letter</div>
+    <div class="letter-paper">${letter}</div>
+    ${cleanText ? `
+    <details style="margin-top:14px;">
+      <summary style="font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none;letter-spacing:.5px;">▸ PLAIN TEXT</summary>
+      <div class="json-block" style="max-height:200px;white-space:pre-wrap;margin-top:8px;">${cleanText}</div>
+    </details>` : ''}
+  `
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TEMPLATE FILLER
+// ═══════════════════════════════════════════════════════════════
+
+let templateSessionId = null
+
+async function runTemplateFill() {
+  templateSessionId = null
+  document.getElementById('btn-approve-template').style.display = 'none'
+  document.getElementById('btn-reject-template').style.display  = 'none'
+
+  let record
+  try {
+    record = JSON.parse(document.getElementById('t-record').value)
+  } catch {
+    document.getElementById('template-output').innerHTML = `<div class="error-box">Invalid JSON in Data Record field. Fix the JSON and try again.</div>`
+    return
+  }
+
+  const payload = {
+    template_text: document.getElementById('t-template').value,
+    record,
+  }
+
+  setLoading('btn-fill', true)
+  showBadge('template-badge', 'Filling…', 'pending')
+
+  try {
+    const data = await apiFetch(`${base('template')}/fill`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+
+    templateSessionId = data.session_id
+
+    // If fill already completed without hitting the HITL gate, render directly
+    if (data.status === 'approved') {
+      if (data.filled_text) {
+        showBadge('template-badge', '✓ Document filled', 'success')
+        renderTemplateOutput(data)
+      } else {
+        showBadge('template-badge', 'Error', 'error')
+        document.getElementById('template-output').innerHTML = `<div class="error-box"><strong>Fill completed but export returned no text.</strong><br>Check service logs — the SuperDocs export may have returned unexpected content.</div>`
+      }
+      return
+    }
+
+    // status === 'error' — service returned an error, never show approve buttons
+    if (data.status === 'error') {
+      showBadge('template-badge', 'Error', 'error')
+      document.getElementById('template-output').innerHTML = `
+        <div class="error-box">
+          <strong>Fill failed</strong><br>${data.error || 'Unknown error — check service logs at :8012'}
+        </div>`
+      return
+    }
+
+    // status === 'pending_hitl' — show the HITL gate with approve / reject buttons
+    showBadge('template-badge', 'Awaiting Review', 'pending')
+    const preview = data.preview || data.filled_text || ''
+    const gaps = data.gaps || []
+
+    document.getElementById('template-output').innerHTML = `
+      <div class="hitl-gate">
+        <div class="hitl-gate-icon">🔴</div>
+        <div>
+          <div class="hitl-gate-title">HITL Gate — Review filled document</div>
+          <div class="hitl-gate-sub">
+            ${gaps.length ? `<strong>${gaps.length} gap${gaps.length>1?'s':''} detected:</strong> ${gaps.map(g => `<span class="gap-marker">[MISSING: ${g}]</span>`).join(' ')} — these appear in the document below.` : 'All placeholders filled — no gaps detected.'}
+          </div>
+          <div class="session-id">Session ID: ${data.session_id}</div>
+        </div>
+      </div>
+      ${preview ? `
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px;">Filled Document Preview</div>
+          <div class="filled-text">${highlightGaps(preview)}</div>
+        </div>
+      ` : ''}
+    `
+
+    document.getElementById('btn-approve-template').style.display = 'inline-flex'
+    document.getElementById('btn-reject-template').style.display  = 'inline-flex'
+
+  } catch (e) {
+    showBadge('template-badge', 'Error', 'error')
+    document.getElementById('template-output').innerHTML = `
+      <div class="error-box">
+        <strong>Cannot reach :8012</strong><br>
+        Start: <code>cd use-cases/tej-thakar/template-filler && uvicorn main:app --port 8012</code><br><br>
+        Error: ${e.message}
+      </div>`
+  } finally {
+    setLoading('btn-fill', false)
+  }
+}
+
+function renderTemplateOutput(data) {
+  // Renders the filled document for the no-HITL path (job completed directly).
+  // Also called after approve — same layout, just no "approved by human" wording.
+  const filled = data.filled_text || ''
+  const gaps   = data.gaps || []
+  document.getElementById('template-output').innerHTML = `
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+      <span style="font-size:28px;">✅</span>
+      <div>
+        <div style="font-weight:700; font-size:15px; color:var(--green);">Template Filled</div>
+        <div style="font-size:13px; color:var(--muted);">
+          ${gaps.length
+            ? `${gaps.length} gap${gaps.length > 1 ? 's' : ''} remain: ${gaps.join(', ')}`
+            : 'All placeholders filled — no gaps'}
+        </div>
+      </div>
+    </div>
+    ${gaps.length ? `
+      <div style="background:var(--amberL); border:1px solid #fde68a; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:13px; color:var(--amber);">
+        ⚠️ <strong>${gaps.length} field${gaps.length > 1 ? 's' : ''} missing from record:</strong>
+        ${gaps.map(g => `<span class="gap-marker">[MISSING: ${g}]</span>`).join(' ')}
+        — add them to the record and re-fill to complete the document.
+      </div>
+    ` : ''}
+    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px;">Filled Document</div>
+    <div class="filled-text">${highlightGaps(filled)}</div>
+    <div style="margin-top:16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px;">Gaps Array</div>
+    <div class="json-block">${JSON.stringify({ gaps }, null, 2)}</div>
+  `
+}
+
+function highlightGaps(text) {
+  return text
+    .replace(/\[MISSING: ([^\]]+)\]/g, (_, f) => `<span class="gap-marker">[MISSING: ${f}]</span>`)
+    .replace(/\n/g, '<br>')
+}
+
+async function runTemplateApprove(approved) {
+  if (!templateSessionId) return
+
+  const btnId = approved ? 'btn-approve-template' : 'btn-reject-template'
+  setLoading(btnId, true)
+
+  try {
+    const data = await apiFetch(`${base('template')}/approve/${templateSessionId}`, {
+      method: 'POST',
+      body: JSON.stringify({ approved }),
+    })
+
+    document.getElementById('btn-approve-template').style.display = 'none'
+    document.getElementById('btn-reject-template').style.display  = 'none'
+
+    if (!approved) {
+      showBadge('template-badge', 'Rejected', 'error')
+      document.getElementById('template-output').innerHTML = `
+        <div style="background:var(--redL); border:1px solid #fecaca; border-radius:10px; padding:20px; text-align:center;">
+          <div style="font-size:28px; margin-bottom:8px;">✗</div>
+          <div style="font-weight:700; color:var(--red);">Rejected — draft discarded</div>
+        </div>`
+      return
+    }
+
+    showBadge('template-badge', '✓ Approved', 'success')
+    const gaps = data.gaps || []
+    const filled = data.filled_text || ''
+
+    document.getElementById('template-output').innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+        <span style="font-size:28px;">✅</span>
+        <div>
+          <div style="font-weight:700; font-size:15px; color:var(--green);">Template Filled & Approved</div>
+          <div style="font-size:13px; color:var(--muted);">${gaps.length ? `${gaps.length} gap${gaps.length>1?'s':''} remain: ${gaps.join(', ')}` : 'All placeholders filled — no gaps'}</div>
+        </div>
+      </div>
+      ${gaps.length ? `
+        <div style="background:var(--amberL); border:1px solid #fde68a; border-radius:8px; padding:10px 14px; margin-bottom:16px; font-size:13px; color:var(--amber);">
+          ⚠️ <strong>${gaps.length} field${gaps.length>1?'s':''} missing from record:</strong> ${gaps.map(g=>`<span class="gap-marker">[MISSING: ${g}]</span>`).join(' ')} — add them to the record and re-fill to complete the document.
+        </div>
+      ` : ''}
+      <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px;">Final Document</div>
+      <div class="filled-text">${highlightGaps(filled)}</div>
+      <div style="margin-top:16px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); margin-bottom:8px;">Gaps Array</div>
+      <div class="json-block">${JSON.stringify({ gaps }, null, 2)}</div>
+    `
+  } catch (e) {
+    showBadge('template-badge', 'Error', 'error')
+    document.getElementById('template-output').innerHTML += `<div class="error-box">${e.message}</div>`
+  } finally {
+    setLoading(btnId, false)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HOUSE-STYLE ENFORCER
+// ═══════════════════════════════════════════════════════════════
+
+async function runStyleAudit() {
+  const payload = {
+    style_guide_text: document.getElementById('sg-guide').value,
+    document_text:    document.getElementById('sg-doc').value,
+    document_title:   document.getElementById('sg-title').value,
+  }
+
+  setLoading('btn-audit', true)
+  showBadge('style-badge', 'Auditing…', 'pending')
+  document.getElementById('style-output').innerHTML = `
+    <div style="padding:20px; color:var(--muted); font-size:14px; text-align:center;">
+      <div style="font-size:28px; margin-bottom:8px;">🔍</div>
+      Checking document against style guide…
+    </div>`
+
+  try {
+    const data = await apiFetch(`${base('style')}/audit`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+
+    const langV  = data.language_violations  || []
+    const fmtV   = data.formatting_violations || []
+    const total  = langV.length + fmtV.length
+
+    showBadge('style-badge',
+      data.clean ? '✓ Clean' : `${total} violation${total!==1?'s':''}`,
+      data.clean ? 'success' : 'error'
+    )
+
+    if (data.clean) {
+      document.getElementById('style-output').innerHTML = `
+        <div class="clean-banner">
+          <span style="font-size:24px;">✅</span>
+          Document passes all style guide rules — no violations found.
+        </div>`
+      return
+    }
+
+    let html = `
+      <div style="display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap;">
+        <div style="background:var(--redL); border:1px solid #fecaca; border-radius:8px; padding:10px 18px; text-align:center;">
+          <div style="font-size:24px; font-weight:800; color:var(--red); font-family:'Plus Jakarta Sans',sans-serif;">${langV.length}</div>
+          <div style="font-size:11px; color:var(--red); margin-top:2px;">Language</div>
+        </div>
+        <div style="background:var(--amberL); border:1px solid #fde68a; border-radius:8px; padding:10px 18px; text-align:center;">
+          <div style="font-size:24px; font-weight:800; color:var(--amber); font-family:'Plus Jakarta Sans',sans-serif;">${fmtV.length}</div>
+          <div style="font-size:11px; color:var(--amber); margin-top:2px;">Formatting</div>
+        </div>
+      </div>
+    `
+
+    if (langV.length) {
+      html += `<div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--red); margin-bottom:10px;">Language Violations</div>`
+      html += langV.map(v => `
+        <div class="violation-card">
+          <div class="violation-type language">Language</div>
+          <div class="violation-text">${v.description || v.text || v.issue || JSON.stringify(v)}</div>
+          ${(v.suggested_fix || v.suggestion) ? `<div style="font-size:12px; color:var(--green); margin-bottom:6px;">✓ Suggested: <em>${v.suggested_fix || v.suggestion}</em></div>` : ''}
+          ${v.style_guide_citation || v.rule_citation ? `<span class="violation-cite">Rule: ${v.style_guide_citation || v.rule_citation}</span>` : ''}
+        </div>`).join('')
+    }
+
+    if (fmtV.length) {
+      html += `<div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--amber); margin:16px 0 10px;">Formatting Violations</div>`
+      html += fmtV.map(v => `
+        <div class="violation-card format">
+          <div class="violation-type format">Formatting</div>
+          <div class="violation-text">${v.description || v.text || v.issue || JSON.stringify(v)}</div>
+          ${(v.suggested_fix || v.suggestion) ? `<div style="font-size:12px; color:var(--green); margin-bottom:6px;">✓ Suggested: <em>${v.suggested_fix || v.suggestion}</em></div>` : ''}
+          ${v.style_guide_citation || v.rule_citation ? `<span class="violation-cite">Rule: ${v.style_guide_citation || v.rule_citation}</span>` : ''}
+        </div>`).join('')
+    }
+
+    // Raw JSON toggle
+    html += `
+      <details style="margin-top:16px;">
+        <summary style="cursor:pointer; font-size:12px; color:var(--muted); font-weight:600;">View raw JSON response</summary>
+        <div class="json-block" style="margin-top:8px;">${JSON.stringify(data, null, 2)}</div>
+      </details>`
+
+    document.getElementById('style-output').innerHTML = html
+
+  } catch (e) {
+    showBadge('style-badge', 'Error', 'error')
+    document.getElementById('style-output').innerHTML = `
+      <div class="error-box">
+        <strong>Cannot reach :8013</strong><br>
+        Start: <code>cd use-cases/tej-thakar/house-style-enforcer && uvicorn main:app --port 8013</code><br><br>
+        Error: ${e.message}
+      </div>`
+  } finally {
+    setLoading('btn-audit', false)
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  SCENARIO PRESETS
+// ═══════════════════════════════════════════════════════════════
+
+const SCENARIOS = {
+
+  // ── Resume Normaliser ──────────────────────────────────────
+  normaliser: {
+    default: {
+      r1: `John Smith\njohn.smith@email.com | +1-555-0100\nSoftware Engineer at Acme Corp (Jan 2020 – Mar 2024)\nJunior Dev at StartupXYZ 2018-2020\nSkills: Python, JavaScript, React, PostgreSQL, Docker\nB.Sc Computer Science, MIT, 2018`,
+      r2: `Priya Sharma · priya.sharma@email.com\nSr. Product Manager @ TechStartup Inc | Jan 2021 - Present\nAssociate PM at BigCorp (2019-2021)\nMBA IIM Ahmedabad 2019 | B.Com Delhi University 2017\nTools & Skills: JIRA, Figma, SQL, Mixpanel, Roadmapping, A/B testing`,
+      r3: `Raj Patel — rpatel@gmail.com — 9876543210\nData Scientist / ML Engineer\nDataCo (Senior DS) 2021–2023 · AI Labs 2018–2021\nExpertise: TensorFlow PyTorch scikit-learn Spark Kafka Python R\nM.Tech Machine Learning, IIT Bombay, 2018\nB.E. Electronics, VIT, 2016`,
+    },
+    // Edge: very short, missing key fields
+    minimal: {
+      r1: `Alice Johnson\nalice@example.com\nPython developer. Some web experience.`,
+      r2: `Bob K\nNo email provided\nDid some marketing work, around 3 years`,
+      r3: `Carol\nteacher for 5 years, no other info`,
+    },
+    // Edge: heavy typos + inconsistent formatting — can the model recover?
+    typos: {
+      r1: `JHON SMYTH · johnsmyth@emal.com | 555 0100\nSoftware Enginner, Acme Corperation — jan 20 to march 24\nJunior devloper at startuprx (2018 to 2020)\nskils: pyhon, javascrip, recat, postgre sql, dokcer\nBchelor of compter scince MIT 2018`,
+      r2: `priya sharma, priya.shar@mail.com\nSnior PM Techstartup inc jan21-now\nassocaite pm bigcorp (19 to 21)\nmba iim 2019 bcom du 2017\nTools jira figma slq mixpanl AB testin`,
+      r3: `raj patell — rpatel @gmil.com — 98765-43210\nData Scentist / ML engneer\ndatco snr ds 21–23 · AiLabs 18–21\nExpertize: tensorfow, pytoch, skleran, sprak, kafak\nM.tec ML iit bombey 2018 / B.e electronix vit 2016`,
+    },
+    // Edge: only 1 resume, 2 blank — does batch handle partial?
+    single: {
+      r1: `Maria Garcia\nmaria.garcia@email.com | +1-555-0200\nSenior UX Designer at DesignCo (2020–Present)\nUI Designer at AgencyXYZ (2017–2020)\nSkills: Figma, Sketch, Adobe XD, User Research, Prototyping\nB.Des Graphic Design, Parsons, 2017`,
+      r2: ``,
+      r3: ``,
+    },
+    // Break: all 3 resumes completely blank — should fail gracefully (0 succeeded, 0 failed, 0 total OR 400)
+    empty: { r1: ``, r2: ``, r3: `` },
+    // Break: garbage / XSS / JSON — not resume-shaped text at all
+    noise: {
+      r1: `asdf qwer zxcv 1234 !!!! lorem ipsum dolor sit amet\nconsectetur adipiscing elit sed do eiusmod tempor`,
+      r2: `<html><body><script>alert('xss')<\/script></body></html>`,
+      r3: `{"not": "a resume", "but": "valid JSON", "nested": {"key": 42}}`,
+    },
+  },
+
+  // ── Claims Generator ───────────────────────────────────────
+  claims: {
+    default: {
+      name: 'Priya Sharma', address: '47 Ferndale Avenue, Austin, TX 78701',
+      email: 'priya.sharma.test@example.com', policyNum: 'HO-2026-TX-009142',
+      coverage: 'homeowner', limit: '80000', deductible: '6000',
+      claimNum: 'CLM-2026-0314', date: '2026-06-28', type: 'hail and wind damage',
+      claimed: '72000', adjuster: '58500', notes: 'Roof replacement approved at 80%',
+      letterType: 'partial_approval', company: 'MapleCrest Insurance Group',
+    },
+    // Different insurer + coverage + claimant
+    auto: {
+      name: 'James Okonkwo', address: '22 Lakeview Drive, Chicago, IL 60601',
+      email: 'james.okonkwo@example.com', policyNum: 'AUTO-2026-IL-001287',
+      coverage: 'auto', limit: '25000', deductible: '1000',
+      claimNum: 'CLM-2026-0201', date: '2026-05-15', type: 'rear-end collision — total loss',
+      claimed: '18000', adjuster: '18000', notes: 'Total loss confirmed; vehicle scrapped',
+      letterType: 'approval', company: 'SafeDrive Insurance Co.',
+    },
+    // Life insurance denial — tests different letter type
+    denial: {
+      name: 'Sandra Lee', address: '88 Maple Street, Boston, MA 02101',
+      email: 'sandra.lee@example.com', policyNum: 'LIFE-2026-MA-000742',
+      coverage: 'life', limit: '500000', deductible: '0',
+      claimNum: 'CLM-2026-0089', date: '2026-01-10', type: 'term life claim',
+      claimed: '500000', adjuster: '0',
+      notes: 'Policy lapsed 3 months prior to incident — claim outside coverage period',
+      letterType: 'denial', company: 'SecureLife Insurance',
+    },
+    // Request more info — adjuster hasn't assessed yet
+    info: {
+      name: 'Arjun Mehta', address: '14 Garden View, Seattle, WA 98101',
+      email: 'arjun.mehta@example.com', policyNum: 'PROP-2026-WA-004411',
+      coverage: 'commercial property', limit: '200000', deductible: '5000',
+      claimNum: 'CLM-2026-0533', date: '2026-07-01', type: 'water damage (burst pipe)',
+      claimed: '45000', adjuster: '0',
+      notes: 'Inspection pending; scope of damage not yet determined',
+      letterType: 'information_request', company: 'CommercialGuard Insurance',
+    },
+    // Break: all fields blank — service should return 422 validation error
+    empty: {
+      name: '', address: '', email: '', policyNum: '', coverage: '',
+      limit: '', deductible: '', claimNum: '', date: '', type: '',
+      claimed: '', adjuster: '', notes: '', letterType: 'partial_approval', company: '',
+    },
+    // Break: negative numbers + invalid date format
+    negative: {
+      name: 'Test User', address: 'Test Address', email: 'test@example.com',
+      policyNum: 'TEST-001', coverage: 'homeowner', limit: '-50000', deductible: '-1000',
+      claimNum: 'CLM-INVALID', date: 'not-a-date', type: 'test',
+      claimed: '-99999', adjuster: '-1',
+      notes: 'Negative amounts + bad date — should the API reject or handle gracefully?',
+      letterType: 'partial_approval', company: 'Test Co',
+    },
+  },
+
+  // ── Template Filler ────────────────────────────────────────
+  template: {
+    default: {
+      template: `Dear {{claimant_name}},\n\nRe: Claim {{claim_number}} — Filed on {{incident_date}}\n\nWe are writing to you regarding your {{coverage_type}} insurance claim under Policy No. {{policy_number}}.\n\nClaimed amount: {{claimed_amount}}\nApproved amount: {{approved_amount}}\n\nNext steps: {{next_steps}}\n\nSincerely,\nMapleCrest Insurance Group`,
+      record: `{\n  "claimant_name": "Priya Sharma",\n  "claim_number": "CLM-2026-0314",\n  "incident_date": "2026-06-28",\n  "coverage_type": "homeowner",\n  "policy_number": "HO-2026-TX-009142",\n  "claimed_amount": "$72,000"\n}`,
+    },
+    // Same template but all 7 fields present — expect 0 gaps
+    nogaps: {
+      template: `Dear {{claimant_name}},\n\nRe: Claim {{claim_number}} — Filed on {{incident_date}}\n\nWe are writing to you regarding your {{coverage_type}} insurance claim under Policy No. {{policy_number}}.\n\nClaimed amount: {{claimed_amount}}\nApproved amount: {{approved_amount}}\n\nNext steps: {{next_steps}}\n\nSincerely,\nMapleCrest Insurance Group`,
+      record: `{\n  "claimant_name": "Priya Sharma",\n  "claim_number": "CLM-2026-0314",\n  "incident_date": "2026-06-28",\n  "coverage_type": "homeowner",\n  "policy_number": "HO-2026-TX-009142",\n  "claimed_amount": "$72,000",\n  "approved_amount": "$58,500",\n  "next_steps": "Please submit the signed repair agreement within 14 days to begin disbursement."\n}`,
+    },
+    // Completely different template type — NDA; missing 2 fields (governing_state, signing_date)
+    nda: {
+      template: `NON-DISCLOSURE AGREEMENT\n\nThis Agreement is entered into as of {{agreement_date}} between {{party_a}} ("Disclosing Party") and {{party_b}} ("Receiving Party").\n\n1. CONFIDENTIAL INFORMATION\nThe Receiving Party agrees to keep confidential all information disclosed by {{party_a}} related to {{project_name}}.\n\n2. TERM\nThis Agreement shall remain in effect for {{term_years}} years from the date of signing.\n\n3. GOVERNING LAW\nThis Agreement shall be governed by the laws of {{governing_state}}.\n\nSigned: {{signatory_title}}, {{party_b}}\nDate: {{signing_date}}`,
+      record: `{\n  "agreement_date": "2026-08-20",\n  "party_a": "Acme Corp",\n  "party_b": "Consulting Partners LLC",\n  "project_name": "Project Horizon",\n  "term_years": "2"\n}`,
+    },
+    // Job offer letter — different domain, missing equity_grant + contingencies
+    offer: {
+      template: `OFFER LETTER\n\nDear {{candidate_name}},\n\nWe are pleased to offer you the position of {{job_title}} at {{company_name}}, reporting to {{reporting_manager}}.\n\nSTART DATE: {{start_date}}\nBASE SALARY: {{salary}} per annum\nBONUS: Up to {{bonus_pct}}% of annual base salary\nEQUITY: {{equity_grant}} stock options vesting over 4 years\nCONTINGENCIES: {{contingencies}}\n\nPlease sign and return by {{acceptance_deadline}}.\n\nWarm regards,\n{{hr_signatory}}\nHead of People, {{company_name}}`,
+      record: `{\n  "candidate_name": "Jordan Rivera",\n  "job_title": "Senior Software Engineer",\n  "company_name": "TechFlow Inc",\n  "reporting_manager": "Dana Kim (Engineering Lead)",\n  "start_date": "2026-09-15",\n  "salary": "$195,000",\n  "bonus_pct": "15",\n  "acceptance_deadline": "2026-08-27",\n  "hr_signatory": "Priya Nair"\n}`,
+    },
+    // Break: empty record — all 7 placeholders should become [MISSING: ...]
+    allgaps: {
+      template: `Dear {{claimant_name}},\n\nRe: Claim {{claim_number}} — Filed on {{incident_date}}\n\nWe are writing to you regarding your {{coverage_type}} insurance claim under Policy No. {{policy_number}}.\n\nClaimed amount: {{claimed_amount}}\nApproved amount: {{approved_amount}}\n\nNext steps: {{next_steps}}\n\nSincerely,\nMapleCrest Insurance Group`,
+      record: `{}`,
+    },
+    // Break: invalid JSON — dashboard catches this before calling API, should show inline error
+    badjson: {
+      template: `Hello {{name}}, your {{item}} is ready at {{location}}.`,
+      record: `{ "name": "Alice", "item": "package", location: "Store #5" }`,
+    },
+  },
+
+  // ── House-Style Enforcer ───────────────────────────────────
+  style: {
+    default: {
+      guide: `1. Always use "we" (not "I") when speaking as the company.\n2. Brand name is "MapleCrest" — never "maplecrest", "Maple Crest", or "maple crest".\n3. Headings and section labels use sentence case (e.g. "What we need from you"), not title case.\n4. Dollar amounts under $1 million: write "$58 thousand", not "$58,000" or "$58000".\n5. Avoid passive voice where active voice is possible.`,
+      title: 'Partial Approval Letter — CLM-2026-0314',
+      doc: `Dear Mr Jones,\n\nI am writing to you about your maplecrest claim filed on 28 June 2026.\n\nThe Following Documents Are Required:\n- Proof of residency\n- Original receipts\n\nYour claim for $72,000 has been reviewed. It was determined that partial approval is warranted based on the adjuster estimate of $58,500.\n\nPlease send the required documents within 14 days.`,
+    },
+    // A document that intentionally follows every rule — expect clean: true
+    clean: {
+      guide: `1. Always use "we" (not "I") when speaking as the company.\n2. Brand name is "MapleCrest" — never "maplecrest", "Maple Crest", or "maple crest".\n3. Headings and section labels use sentence case (e.g. "What we need from you"), not title case.\n4. Dollar amounts under $1 million: write "$58 thousand", not "$58,000" or "$58000".\n5. Avoid passive voice where active voice is possible.`,
+      title: 'Full approval — CLM-2026-0201',
+      doc: `Dear Ms Rivera,\n\nWe are pleased to confirm that we have approved your MapleCrest claim in full.\n\nDocuments required:\n- Proof of residency\n- Original receipts\n\nWe reviewed your claim for $18 thousand and confirmed that the full amount is payable under your policy. We will process the disbursement within 5 business days.\n\nPlease contact us if you have any questions.`,
+    },
+    // Breaks every single rule multiple times — expect high violation count
+    heavy: {
+      guide: `1. Always use "we" (not "I") when speaking as the company.\n2. Brand name is "MapleCrest" — never "maplecrest", "Maple Crest", or "maple crest".\n3. Headings and section labels use sentence case (e.g. "What we need from you"), not title case.\n4. Dollar amounts under $1 million: write "$58 thousand", not "$58,000" or "$58000".\n5. Avoid passive voice where active voice is possible.`,
+      title: 'Claim Decision Letter — multiple violations',
+      doc: `Dear Customer,\n\nI am reaching out to inform you that I have reviewed your maple crest policy claim. I have determined a decision.\n\nThe Following Steps Have Been Taken By Our Team:\n- A decision was made by the adjuster\n- Documents were collected by the staff\n- An assessment was performed by us\n\nYour Claim For $72,000 Has Been Reviewed. I have concluded that partial approval is warranted. The adjusted settlement is $58,500. An additional payment of $5,000 may be considered by management.\n\nAction Required By You:\n- $200 In Processing Fees Must Be Sent By You\n- Required Forms Must Be Submitted by you\n- A Response Is Needed From You Within 7 Days\n\nThis Approval Was Granted By Management At maple crest.\n\nSincerely, I the undersigned`,
+    },
+    // Completely different style guide domain — tech startup
+    tech: {
+      guide: `1. Write in plain English — no jargon, no legalese.\n2. Company name is always "Stackline" — never "StackLine", "STACKLINE", or "stack line".\n3. Use "you" and "your" — never "the user", "the customer", or "the individual".\n4. Sentences should be under 20 words wherever possible.\n5. Never use exclamation marks — they undermine credibility.\n6. Job titles use lowercase (e.g. "engineering lead", not "Engineering Lead").`,
+      title: 'Product update email',
+      doc: `Hello valued customer!\n\nThe StackLine team is excited to announce updates made to the individual user experience by our Engineering Lead, Sarah Chen!\n\nThe following improvements have been made by our team for the benefit of the user:\n- Performance was improved by 40% by the infrastructure team\n- The dashboard has been redesigned\n- Bugs reported by users have been fixed by QA\n\nWe hope the customer finds these updates valuable! Please do not hesitate to reach out to STACKLINE support if the individual has questions!!`,
+    },
+    // Break: empty style guide — what does the service do with no rules?
+    noguide: {
+      guide: ``,
+      title: 'Test document with empty style guide',
+      doc: `This is a perfectly normal document. It does some things and says some words.\n\nWe wonder: if there are no rules, can anything be wrong?\n\nSincerely, the test runner.`,
+    },
+    // Break: empty document — what does the service return?
+    nodoc: {
+      guide: `1. Always use "we" (not "I") when speaking as the company.\n2. Brand name is "MapleCrest" — always capitalised correctly.`,
+      title: '',
+      doc: ``,
+    },
+  },
+}
+
+function setActiveScenarioBtn(tab, key) {
+  const prefix = { normaliser: 'norm', claims: 'cl', template: 'tpl', style: 'st' }[tab]
+  document.querySelectorAll(`[id^="sc-${prefix}-"]`).forEach(btn => btn.classList.remove('sc-active'))
+  const btn = document.getElementById(`sc-${prefix}-${key}`)
+  if (btn) btn.classList.add('sc-active')
+}
+
+function loadScenario(tab, key) {
+  const s = SCENARIOS[tab]?.[key]
+  if (!s) return
+  setActiveScenarioBtn(tab, key)
+
+  if (tab === 'normaliser') {
+    document.getElementById('resume1').value = s.r1 || ''
+    document.getElementById('resume2').value = s.r2 || ''
+    document.getElementById('resume3').value = s.r3 || ''
+    document.getElementById('normaliser-output').innerHTML = `<div class="placeholder"><div class="placeholder-icon">📄</div>Hit "Run Normaliser" to see structured output here</div>`
+    document.getElementById('normaliser-badge').innerHTML = ''
+  }
+
+  if (tab === 'claims') {
+    document.getElementById('c-name').value      = s.name     || ''
+    document.getElementById('c-address').value   = s.address  || ''
+    document.getElementById('c-email').value     = s.email    || ''
+    document.getElementById('p-number').value    = s.policyNum   || ''
+    document.getElementById('p-coverage').value  = s.coverage    || ''
+    document.getElementById('p-limit').value     = s.limit       || ''
+    document.getElementById('p-deductible').value = s.deductible || ''
+    document.getElementById('cl-number').value   = s.claimNum || ''
+    document.getElementById('cl-date').value     = s.date     || ''
+    document.getElementById('cl-type').value     = s.type     || ''
+    document.getElementById('cl-claimed').value  = s.claimed  || ''
+    document.getElementById('cl-adjuster').value = s.adjuster || ''
+    document.getElementById('cl-notes').value    = s.notes    || ''
+    document.getElementById('cl-lettertype').value = s.letterType || 'partial_approval'
+    document.getElementById('cl-company').value  = s.company  || ''
+    // Reset HITL state
+    claimsSessionId = null
+    document.getElementById('btn-approve-claim').style.display = 'none'
+    document.getElementById('btn-reject-claim').style.display  = 'none'
+    document.getElementById('claims-output').innerHTML = `<div class="placeholder"><div class="placeholder-icon">📨</div>Generate a letter to begin the HITL flow</div>`
+    document.getElementById('claims-badge').innerHTML = ''
+  }
+
+  if (tab === 'template') {
+    document.getElementById('t-template').value = s.template || ''
+    document.getElementById('t-record').value   = s.record   || ''
+    // Reset HITL state
+    templateSessionId = null
+    document.getElementById('btn-approve-template').style.display = 'none'
+    document.getElementById('btn-reject-template').style.display  = 'none'
+    document.getElementById('template-output').innerHTML = `<div class="placeholder"><div class="placeholder-icon">📝</div>Fill the template to see the result with gap markers</div>`
+    document.getElementById('template-badge').innerHTML = ''
+  }
+
+  if (tab === 'style') {
+    document.getElementById('sg-guide').value = s.guide || ''
+    document.getElementById('sg-title').value = s.title || ''
+    document.getElementById('sg-doc').value   = s.doc   || ''
+    document.getElementById('style-output').innerHTML = `<div class="placeholder"><div class="placeholder-icon">🔍</div>Run the audit to see violations with style guide citations</div>`
+    document.getElementById('style-badge').innerHTML = ''
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+
+checkAllServices()
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+{
+  "_note": "Fictional claim data for testing the claims-generator. All names, addresses, and policy numbers are invented.",
+
+  "test_cases": [
+    {
+      "_label": "Partial approval — property damage, adjuster vs. claimant discrepancy",
+      "claimant": {
+        "full_name": "Priya Sharma",
+        "address": "47 Ferndale Avenue, Austin, TX 78701",
+        "email": "priya.sharma.test@example.com"
+      },
+      "policy": {
+        "policy_number": "HO-2026-TX-009142",
+        "coverage_limit": 80000,
+        "deductible": 6000,
+        "coverage_type": "homeowner"
+      },
+      "claim": {
+        "claim_number": "CLM-2026-0314",
+        "incident_date": "2026-06-28",
+        "incident_type": "hail and wind damage — roof and siding",
+        "claimed_amount": 72000,
+        "adjuster_estimate": 58500,
+        "adjuster_notes": "Claimant included pre-existing soffit deterioration not caused by the June storm. Roof replacement approved at 80 % replacement cost; siding agreed at full replacement cost."
+      },
+      "letter_type": "partial_approval",
+      "company_name": "MapleCrest Insurance Group"
+    },
+
+    {
+      "_label": "Denial — policy exclusion (flood, not covered under standard HO policy)",
+      "claimant": {
+        "full_name": "Dmitri Volkov",
+        "address": "18 Riverside Court, Nashville, TN 37201",
+        "email": "dmitri.volkov.test@example.com"
+      },
+      "policy": {
+        "policy_number": "HO-2026-TN-034821",
+        "coverage_limit": 200000,
+        "deductible": 5000,
+        "coverage_type": "homeowner"
+      },
+      "claim": {
+        "claim_number": "CLM-2026-0481",
+        "incident_date": "2026-07-04",
+        "incident_type": "rising floodwater — basement and first floor",
+        "claimed_amount": 145000,
+        "adjuster_estimate": 145000,
+        "adjuster_notes": "Damage confirmed and consistent with reported flooding. However, standard homeowner policy HO-2026-TN-034821 does not include flood coverage. Water intrusion was caused by rising external surface water, not a sudden plumbing failure."
+      },
+      "letter_type": "denial",
+      "company_name": "MapleCrest Insurance Group"
+    },
+
+    {
+      "_label": "Information request — missing documentation for auto claim",
+      "claimant": {
+        "full_name": "Saoirse Ó'Brien",
+        "address": "7 Clover Lane, Chicago, IL 60601",
+        "email": "saoirse.obrien.test@example.com"
+      },
+      "policy": {
+        "policy_number": "AUTO-2026-IL-771920",
+        "coverage_limit": 50000,
+        "deductible": 1000,
+        "coverage_type": "comprehensive auto"
+      },
+      "claim": {
+        "claim_number": "CLM-2026-0559",
+        "incident_date": "2026-07-19",
+        "incident_type": "collision — rear-end impact at traffic light",
+        "claimed_amount": 12400,
+        "adjuster_estimate": null,
+        "adjuster_notes": "Cannot complete estimate. Missing: police report number, photos of damage, and repair estimate from licensed body shop. Claim opened — documentation pending."
+      },
+      "letter_type": "information_request",
+      "company_name": "MapleCrest Insurance Group"
+    }
+  ]
+}

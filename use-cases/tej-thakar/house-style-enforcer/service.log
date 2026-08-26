@@ -1,0 +1,47 @@
+INFO:     Started server process [68714]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ERROR:    [Errno 48] error while attempting to bind on address ('0.0.0.0', 8013): address already in use
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Started server process [68937]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8013 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58630 - "GET /health HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [68937]
+INFO:     Started server process [70815]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8013 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58855 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58866 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58866 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     Shutting down
+INFO:     Finished server process [70815]
+INFO:     Started server process [71376]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8013 (Press CTRL+C to quit)
+INFO:     127.0.0.1:58970 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58978 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59331 - "OPTIONS /audit HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/chat/async "HTTP/1.1 200 OK"
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/939b7b58-6a19-4583-b45e-39e268ac47db "HTTP/1.1 200 OK"
+INFO:main:Audit [Partial Approval Letter — CLM-2026-0314]: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/939b7b58-6a19-4583-b45e-39e268ac47db "HTTP/1.1 200 OK"
+INFO:main:Audit [Partial Approval Letter — CLM-2026-0314]: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/939b7b58-6a19-4583-b45e-39e268ac47db "HTTP/1.1 200 OK"
+INFO:main:Audit [Partial Approval Letter — CLM-2026-0314]: job_status=in_progress
+INFO:httpx:HTTP Request: GET https://api.superdocs.app/v1/jobs/939b7b58-6a19-4583-b45e-39e268ac47db "HTTP/1.1 200 OK"
+INFO:main:Audit [Partial Approval Letter — CLM-2026-0314]: job_status=completed
+INFO:httpx:HTTP Request: POST https://api.superdocs.app/v1/documents/export "HTTP/1.1 200 OK"
+WARNING:main:Audit [Partial Approval Letter — CLM-2026-0314]: export text did not parse as JSON, trying fallbacks
+INFO:     127.0.0.1:59331 - "POST /audit HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [71376]
