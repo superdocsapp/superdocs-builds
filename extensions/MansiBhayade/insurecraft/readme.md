@@ -122,7 +122,7 @@ pip install -r requirements.txt
 
 Start fast API Backend
 ```bash
-uvicorn app.main:app --reload --port 5000
+python -m uvicorn backend.server:app --reload --port 5000
 ```
 
 5. Start the Word Add-in
