@@ -54,6 +54,20 @@ export async function generateReport({
     );
   }
 
+  // Persist SuperDocs session/job for Review Queue + export
+  const finalSessionId = data.session_id || sessionId;
+
+  if (finalSessionId) {
+    localStorage.setItem("superdocs.sessionId", finalSessionId);
+  }
+
+  if (data.job_id) {
+    localStorage.setItem("superdocs.jobId", data.job_id);
+  }
+
+  console.log("SuperDocs session saved:", finalSessionId);
+  console.log("SuperDocs job saved:", data.job_id);
+
   return data;
 }
 

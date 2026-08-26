@@ -578,6 +578,179 @@ function Documents() {
         </div>
       )}
 
+      {/* ============================================================
+          HUMAN REVIEW QUEUE
+      ============================================================ */}
+      {reviewItems.length > 0 && (
+        <section className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+          
+          {/* Header */}
+          <div className="border-b border-slate-200 px-6 py-5">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-slate-900">
+                    Human Review Queue
+                  </h2>
+
+                  <span className="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700">
+                    {
+                      reviewItems.filter(
+                        (item) => item.status === "pending"
+                      ).length
+                    } Pending
+                  </span>
+                </div>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Review AI findings before they are accepted into the final report.
+                </p>
+              </div>
+
+              {/* Review summary */}
+              <div className="flex items-center gap-3 text-sm">
+                <span className="rounded-full bg-emerald-50 px-3 py-1 font-medium text-emerald-700">
+                  {
+                    reviewItems.filter(
+                      (item) => item.status === "approved"
+                    ).length
+                  } Approved
+                </span>
+
+                <span className="rounded-full bg-red-50 px-3 py-1 font-medium text-red-700">
+                  {
+                    reviewItems.filter(
+                      (item) => item.status === "rejected"
+                    ).length
+                  } Rejected
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Loading */}
+          {reviewLoading ? (
+            <div className="px-6 py-10 text-center text-slate-500">
+              Loading review findings...
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {reviewItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-6"
+                >
+                  {/* Finding header */}
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-lg font-bold text-slate-900">
+                          {item.title}
+                        </h3>
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            item.confidence === "high"
+                              ? "bg-emerald-50 text-emerald-700"
+                              : item.confidence === "low"
+                              ? "bg-red-50 text-red-700"
+                              : "bg-amber-50 text-amber-700"
+                          }`}
+                        >
+                          {item.confidence} confidence
+                        </span>
+                      </div>
+
+                      <p className="mt-1 text-xs text-slate-400">
+                        Type: {item.type}
+                      </p>
+                    </div>
+
+                    {/* Status */}
+                    <span
+                      className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+                        item.status === "pending"
+                          ? "bg-amber-50 text-amber-700"
+                          : item.status === "approved"
+                          ? "bg-emerald-50 text-emerald-700"
+                          : "bg-red-50 text-red-700"
+                      }`}
+                    >
+                      {item.status === "pending"
+                        ? "Pending Review"
+                        : item.status === "approved"
+                        ? "Approved"
+                        : "Rejected"}
+                    </span>
+                  </div>
+
+                  {/* Finding content */}
+                  <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="mb-2 text-sm font-semibold text-slate-700">
+                      AI Finding
+                    </p>
+
+                    <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-6 text-slate-700">
+                      {typeof item.finding === "object"
+                        ? JSON.stringify(item.finding, null, 2)
+                        : item.finding}
+                    </pre>
+                  </div>
+
+                  {/* Reviewer note */}
+                  {item.reviewerNote && (
+                    <div className="mt-3 rounded-xl bg-blue-50 p-4">
+                      <p className="text-sm font-semibold text-blue-800">
+                        Reviewer Note
+                      </p>
+
+                      <p className="mt-1 text-sm text-blue-700">
+                        {item.reviewerNote}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  {item.status === "pending" && (
+                    <div className="mt-5 flex flex-wrap gap-3">
+                      
+                      <button
+                        onClick={() =>
+                          handleReviewDecision(item.id, "approved")
+                        }
+                        disabled={reviewActionId === item.id}
+                        className="flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <CheckCircle size={18} />
+
+                        {reviewActionId === item.id
+                          ? "Saving..."
+                          : "Approve"}
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          handleReviewDecision(item.id, "rejected")
+                        }
+                        disabled={reviewActionId === item.id}
+                        className="flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <XCircle size={18} />
+
+                        {reviewActionId === item.id
+                          ? "Saving..."
+                          : "Reject"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
       {/* Generated Report Display - now renders HTML */}
       {report && (
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

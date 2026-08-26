@@ -5,6 +5,7 @@ import {
   FileText,
   Sparkles,
   CalendarDays,
+  ClipboardCheck,   // ← new icon
 } from "lucide-react";
 
 const navItems = [
@@ -12,6 +13,11 @@ const navItems = [
   { id: "event-data", label: "Event Data", icon: BarChart3 },
   { id: "sponsors", label: "Sponsors", icon: Building2 },
   { id: "documents", label: "Documents", icon: FileText },
+  {
+    id: "review",
+    label: "Review Queue",
+    icon: ClipboardCheck,
+  },
 ];
 
 function Sidebar({ activePage, setActivePage }) {

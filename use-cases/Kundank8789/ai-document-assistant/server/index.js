@@ -9,7 +9,7 @@ import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
 import XLSX from "xlsx";
 import Groq from "groq-sdk";
-import { Blob } from "buffer"; // ✅ Added for SuperDocs
+import { Blob } from "buffer";
 
 dotenv.config();
 
@@ -46,6 +46,126 @@ let uploadedFiles = [];
 // ============================================================
 
 let reviewItems = [];
+
+// ============================================================
+// CREATE HUMAN REVIEW ITEMS FROM SUPERDOCS REPORT
+// ============================================================
+
+function createReviewItemsFromSuperDocs(data) {
+  const items = [];
+
+  const html =
+    data?.result?.document_changes?.updated_html || "";
+
+  if (!html) {
+    console.log("No SuperDocs HTML available for review");
+    return items;
+  }
+
+  console.log("Parsing completed SuperDocs report...");
+
+  // ------------------------------------------------------------
+  // Helper: remove HTML tags
+  // ------------------------------------------------------------
+
+  function cleanText(value = "") {
+    return value
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/gi, "&")
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;/gi, "'")
+      .replace(/&nbsp;/gi, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // ============================================================
+  // 1. IDENTIFIED CONFLICTS & GAPS
+  // ============================================================
+
+  const conflictSectionMatch = html.match(
+    /<h2[^>]*>\s*4\.\s*Identified\s+Conflicts\s*&amp;\s*Gaps\s*<\/h2>([\s\S]*?)<h2[^>]*>\s*5\.\s*Strategic\s+Recommendations/i
+  );
+
+  if (conflictSectionMatch) {
+    const conflictSection = conflictSectionMatch[1];
+
+    const conflictMatches = [
+      ...conflictSection.matchAll(
+        /<li[^>]*>\s*<strong[^>]*>(.*?)<\/strong>\s*:\s*([\s\S]*?)<\/li>/gi
+      ),
+    ];
+
+    console.log(
+      `Found ${conflictMatches.length} conflict findings`
+    );
+
+    conflictMatches.forEach((match, index) => {
+      const title = cleanText(match[1]);
+      const finding = cleanText(match[2]);
+
+      if (title && finding) {
+        items.push({
+          id: `conflict-${Date.now()}-${index}`,
+          type: "document_conflict",
+          title,
+          finding,
+          status: "pending",
+          confidence: "medium",
+          decision: null,
+          reviewerNote: "",
+        });
+      }
+    });
+  }
+
+  // ============================================================
+  // 2. STRATEGIC RECOMMENDATIONS
+  // ============================================================
+
+  const recommendationSectionMatch = html.match(
+    /<h2[^>]*>\s*5\.\s*Strategic\s+Recommendations\s*<\/h2>([\s\S]*?)<div[^>]*style="margin-top:60px/i
+  );
+
+  if (recommendationSectionMatch) {
+    const recommendationSection =
+      recommendationSectionMatch[1];
+
+    const recommendationMatches = [
+      ...recommendationSection.matchAll(
+        /<strong[^>]*>(.*?)<\/strong>([\s\S]*?)(?=<strong[^>]*>|<\/td>)/gi
+      ),
+    ];
+
+    console.log(
+      `Found ${recommendationMatches.length} recommendations`
+    );
+
+    recommendationMatches.forEach((match, index) => {
+      const title = cleanText(match[1]);
+      const finding = cleanText(match[2]);
+
+      if (title && finding) {
+        items.push({
+          id: `recommendation-${Date.now()}-${index}`,
+          type: "recommendation",
+          title,
+          finding,
+          status: "pending",
+          confidence: "medium",
+          decision: null,
+          reviewerNote: "",
+        });
+      }
+    });
+  }
+
+  console.log(
+    `Created ${items.length} human review items from SuperDocs`
+  );
+
+  return items;
+}
 
 // Clear uploads folder on server start
 if (fs.existsSync(uploadDir)) {
@@ -1021,6 +1141,18 @@ app.get("/api/superdocs/job/:jobId", async (req, res) => {
           data?.message ||
           "Failed to retrieve SuperDocs job",
       });
+    }
+
+    // ============================================================
+    // CREATE HUMAN REVIEW ITEMS WHEN SUPERDOCS JOB COMPLETES
+    // ============================================================
+
+    if (data?.status === "completed") {
+      reviewItems = createReviewItemsFromSuperDocs(data);
+
+      console.log(
+        `Review queue ready: ${reviewItems.length} items`
+      );
     }
 
     return res.status(200).json(data);
