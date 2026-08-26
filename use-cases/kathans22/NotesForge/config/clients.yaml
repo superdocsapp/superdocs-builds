@@ -1,0 +1,69 @@
+# Invented advisory clients for a fictitious RIA firm, used to exercise the
+# compliance pipeline end to end. No real persons or entities.
+#
+# risk_profile_reviewed_on may be null — that itself is a compliance gap
+# (never reviewed), not a loader error.
+clients:
+  - id: CL-01
+    name: "Ananya Rao"
+    onboarded_on: "2021-03-10"
+    advisory_type: individual
+    ai_assisted: false
+    agreement_version: v1
+    risk_profile_reviewed_on: "2022-04-01"
+
+  - id: CL-02
+    name: "Vikram Deshmukh"
+    onboarded_on: "2023-06-15"
+    advisory_type: individual
+    ai_assisted: true
+    agreement_version: v2
+    risk_profile_reviewed_on: "2025-05-20"
+
+  - id: CL-03
+    name: "Meera Family Trust"
+    onboarded_on: "2020-11-02"
+    advisory_type: trust
+    ai_assisted: false
+    agreement_version: v1
+    risk_profile_reviewed_on: null
+
+  - id: CL-04
+    name: "Kunal Sharma"
+    onboarded_on: "2024-01-20"
+    advisory_type: individual
+    ai_assisted: true
+    agreement_version: v2
+    risk_profile_reviewed_on: "2026-06-20"
+
+  - id: CL-05
+    name: "Rohan Textiles Pvt Ltd"
+    onboarded_on: "2022-09-05"
+    advisory_type: corporate
+    ai_assisted: false
+    agreement_version: v1
+    risk_profile_reviewed_on: "2023-09-10"
+
+  - id: CL-06
+    name: "Priya Nair"
+    onboarded_on: "2025-02-11"
+    advisory_type: individual
+    ai_assisted: true
+    agreement_version: v2
+    risk_profile_reviewed_on: "2025-02-15"
+
+  - id: CL-07
+    name: "Sanjay Mehta HUF"
+    onboarded_on: "2019-07-01"
+    advisory_type: huf
+    ai_assisted: false
+    agreement_version: v1
+    risk_profile_reviewed_on: "2021-08-01"
+
+  - id: CL-08
+    name: "Ishaan Kapoor"
+    onboarded_on: "2025-08-01"
+    advisory_type: individual
+    ai_assisted: true
+    agreement_version: v2
+    risk_profile_reviewed_on: "2025-08-05"

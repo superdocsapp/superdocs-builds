@@ -1,0 +1,15 @@
+new hire notes - priya
+
+day 1
+- laptop setup ok
+- github access pending (ask devops)
+- assigned buddy: jonas
+
+things she asked abt
+- where are the design docs?? (told her confluence, need to double check that's still current)
+- how do we do code review here, blocking or non blocking
+- vpn keeps dropping for her, known issue?
+
+follow up in 2 wks, check how shes doing
+
+misc: order more monitors, we're out of the 27in ones

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+out/*
+!out/.gitkeep
+run-log.json
+compliance-*-log.json
+.env
+agent_credentials.json
+.claude/settings.local.json

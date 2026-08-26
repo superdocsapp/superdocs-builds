@@ -1,0 +1,12 @@
+mon standup
+
+- kathan: fixed the login bug (was a race condn on token refresh)  ~2hrs
+- need to talk to design abt the new nav, still waiting on figma link
+- deploy pipeline broken again?? check w/ devops
+- 3 tickets left in sprint, 1 blocked
+
+blocked ticket: SDK-441 waiting on vendor api creds
+	- opened 7/18, still nothing back
+	- maybe escalate
+
+remember: standup notes go in #eng-daily not here lol

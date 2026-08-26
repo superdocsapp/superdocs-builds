@@ -1,0 +1,134 @@
+{
+  "template_versions": [
+    {
+      "template_id": "ria-advisory-agreement",
+      "version": "v1",
+      "effective_from": "2015-04-01",
+      "requirement_ids": [
+        "RIA-AGR-01"
+      ],
+      "content_hash": "20784161a9307cbdecb9a226cd67970040ccfbc527aab0fd70a757dcc99f640e",
+      "superseded_by": "v2"
+    },
+    {
+      "template_id": "ria-advisory-agreement",
+      "version": "v2",
+      "effective_from": "2023-01-01",
+      "requirement_ids": [
+        "RIA-AGR-01",
+        "RIA-AI-01"
+      ],
+      "content_hash": "f9550577c77d806b95632f64edb7fbb2116b2deeb371b90d15a97b89a7f855ef",
+      "superseded_by": "v3"
+    },
+    {
+      "template_id": "ria-advisory-agreement",
+      "version": "v3",
+      "effective_from": "2026-08-22",
+      "requirement_ids": [
+        "RIA-AGR-01",
+        "RIA-AI-01"
+      ],
+      "content_hash": "13ff28c301875eefd337d50135614ae66de67e4420e15b2b815a3590a408d661",
+      "superseded_by": null
+    }
+  ],
+  "client_versions": [
+    {
+      "client_id": "CL-01",
+      "template_id": "ria-advisory-agreement",
+      "version": "v1",
+      "issued_on": "2021-03-10",
+      "consented_on": "2021-03-10",
+      "consent_evidence": "client-onboarding-notes.md:6"
+    },
+    {
+      "client_id": "CL-02",
+      "template_id": "ria-advisory-agreement",
+      "version": "v2",
+      "issued_on": "2023-06-15",
+      "consented_on": "2023-06-15",
+      "consent_evidence": "client-onboarding-notes.md:12"
+    },
+    {
+      "client_id": "CL-03",
+      "template_id": "ria-advisory-agreement",
+      "version": "v1",
+      "issued_on": "2020-11-02",
+      "consented_on": "2020-11-02",
+      "consent_evidence": "client-onboarding-notes.md:19"
+    },
+    {
+      "client_id": "CL-04",
+      "template_id": "ria-advisory-agreement",
+      "version": "v2",
+      "issued_on": "2024-01-20",
+      "consented_on": "2024-01-20",
+      "consent_evidence": "client-onboarding-notes.md:27"
+    },
+    {
+      "client_id": "CL-05",
+      "template_id": "ria-advisory-agreement",
+      "version": "v1",
+      "issued_on": "2022-09-05",
+      "consented_on": "2022-09-05",
+      "consent_evidence": "client-onboarding-notes.md:33"
+    },
+    {
+      "client_id": "CL-06",
+      "template_id": "ria-advisory-agreement",
+      "version": "v2",
+      "issued_on": "2025-02-11",
+      "consented_on": "2025-02-11",
+      "consent_evidence": "client-onboarding-notes.md:40"
+    },
+    {
+      "client_id": "CL-07",
+      "template_id": "ria-advisory-agreement",
+      "version": "v1",
+      "issued_on": "2019-07-01",
+      "consented_on": "2019-07-01",
+      "consent_evidence": "client-onboarding-notes.md:47"
+    },
+    {
+      "client_id": "CL-08",
+      "template_id": "ria-advisory-agreement",
+      "version": "v2",
+      "issued_on": "2025-08-01",
+      "consented_on": "2025-08-01",
+      "consent_evidence": "client-onboarding-notes.md:55"
+    },
+    {
+      "client_id": "CL-02",
+      "template_id": "ria-advisory-agreement",
+      "version": "v3",
+      "issued_on": "2026-08-22",
+      "consented_on": null,
+      "consent_evidence": null
+    },
+    {
+      "client_id": "CL-04",
+      "template_id": "ria-advisory-agreement",
+      "version": "v3",
+      "issued_on": "2026-08-22",
+      "consented_on": null,
+      "consent_evidence": null
+    },
+    {
+      "client_id": "CL-06",
+      "template_id": "ria-advisory-agreement",
+      "version": "v3",
+      "issued_on": "2026-08-22",
+      "consented_on": null,
+      "consent_evidence": null
+    },
+    {
+      "client_id": "CL-08",
+      "template_id": "ria-advisory-agreement",
+      "version": "v3",
+      "issued_on": "2026-08-22",
+      "consented_on": null,
+      "consent_evidence": null
+    }
+  ]
+}

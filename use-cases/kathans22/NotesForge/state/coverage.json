@@ -1,0 +1,596 @@
+{
+  "generated_at": "2026-08-22T19:05:35.420Z",
+  "notes_dir": "./corpus/ria-compliance",
+  "summary": {
+    "EVIDENCED": 20,
+    "STALE": 8,
+    "MISSING": 9,
+    "INCONSISTENT": 1
+  },
+  "entries": [
+    {
+      "requirement_id": "RIA-NW-01",
+      "client_id": null,
+      "status": "EVIDENCED",
+      "detail": "evidenced in 2 file(s)",
+      "evidence": [
+        {
+          "file": "compliance-officer-notes.md",
+          "line": 36,
+          "excerpt": "— Net worth Q3 due ~10 Oct, don't forget like last year."
+        },
+        {
+          "file": "net-worth-review-2026-Q2.md",
+          "line": 1,
+          "excerpt": "Meridian Advisory Services — Net Worth Review, Q2 FY26-27 (Apr-Jun 2026)"
+        },
+        {
+          "file": "net-worth-review-2026-Q2.md",
+          "line": 6,
+          "excerpt": "Net worth as on 30/06/2026: Rs. 68,42,000"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-01",
+      "status": "STALE",
+      "detail": "last reviewed 2022-04-01, 1604 days ago (annual review is overdue)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 5,
+          "excerpt": "CL-01 Ananya Rao | 01/04/22 | self-serve, checked by RM: J.Verma | Moderate."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-02",
+      "status": "STALE",
+      "detail": "last reviewed 2025-05-20, 459 days ago (annual review is overdue)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 8,
+          "excerpt": "CL-02 Vikram Deshmukh | 20/05/25 | RM: J.Verma | Aggressive-moderate blend,"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-03",
+      "status": "MISSING",
+      "detail": "no risk profiling review on record for this client",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 11,
+          "excerpt": "CL-03 Meera Family Trust | — | — | NOT DONE. Chased trustees 03/23, 09/23,"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-04",
+      "status": "EVIDENCED",
+      "detail": "last reviewed 2026-06-20, 63 days ago (within the annual window)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 14,
+          "excerpt": "CL-04 Kunal Sharma | 20/06/26 (redo; prev 18/01/25) | RM: S.Iyer |"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-05",
+      "status": "STALE",
+      "detail": "last reviewed 2023-09-10, 1077 days ago (annual review is overdue)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 18,
+          "excerpt": "CL-05 Rohan Textiles Pvt Ltd | 10/09/23 | RM: J.Verma (used board inv."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-06",
+      "status": "STALE",
+      "detail": "last reviewed 2025-02-15, 553 days ago (annual review is overdue)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 22,
+          "excerpt": "CL-06 Priya Nair | 15/02/25 | RM: S.Iyer | Moderate, first-time investor,"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-07",
+      "status": "STALE",
+      "detail": "last reviewed 2021-08-01, 1847 days ago (annual review is overdue)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 25,
+          "excerpt": "CL-07 Sanjay Mehta HUF | 01/08/21 | RM: J.Verma | Conservative-moderate."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-RISK-01",
+      "client_id": "CL-08",
+      "status": "STALE",
+      "detail": "last reviewed 2025-08-05, 382 days ago (annual review is overdue)",
+      "evidence": [
+        {
+          "file": "risk-profiling-log.md",
+          "line": 28,
+          "excerpt": "CL-08 Ishaan Kapoor | 05/08/25 | RM: S.Iyer | Aggressive, confirmed"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-REC-01",
+      "client_id": null,
+      "status": "MISSING",
+      "detail": "no mention of \"record retention\" / \"records retained\" / \"record index\" / \"records index\" / \"retention window\" / \"records retriev\" found anywhere in the corpus",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-01",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 6,
+          "excerpt": "Agreement v1 signed 10/03/21. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-01",
+      "status": "EVIDENCED",
+      "detail": "fee disclosure consistent across records",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 6,
+          "excerpt": "Agreement v1 signed 10/03/21. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-02",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 12,
+          "excerpt": "Agreement v2 signed 15/06/23. Fee: 1.2% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AI-01",
+      "client_id": "CL-02",
+      "status": "EVIDENCED",
+      "detail": "AI usage disclosure and tracking present in the register",
+      "evidence": [
+        {
+          "file": "ai-usage-register.md",
+          "line": 15,
+          "excerpt": "Disclosed: 15/06/23 (at onboarding — agreement v2 has the AI-usage clause"
+        },
+        {
+          "file": "ai-usage-register.md",
+          "line": 17,
+          "excerpt": "Usage: PortfolioSense scenario runs, ~2-3x/yr around review calls. RM"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-02",
+      "status": "INCONSISTENT",
+      "detail": "onboarding notes show 1.2% but the fee-schedule change records 1.5% effective — the two documents disagree",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 14,
+          "excerpt": "Fee: 1.2% AUA (unchanged per him — need to check against new schedule, TBD)"
+        },
+        {
+          "file": "fee-schedule-change-2026.md",
+          "line": 8,
+          "excerpt": "Revised fee: 1.2% -> 1.5% AUA, effective 01/07/26. Letter sent 28/06/26"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-02",
+      "status": "MISSING",
+      "detail": "no suitability note found for this client",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-03",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 19,
+          "excerpt": "Agreement v1. Conservative mandate, capital preservation priority."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-03",
+      "status": "MISSING",
+      "detail": "no fee disclosure found for this client",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-03",
+      "status": "MISSING",
+      "detail": "no suitability note found for this client",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-04",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 27,
+          "excerpt": "Agreement v2 signed 20/01/24. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AI-01",
+      "client_id": "CL-04",
+      "status": "EVIDENCED",
+      "detail": "AI usage disclosure and tracking present in the register",
+      "evidence": [
+        {
+          "file": "ai-usage-register.md",
+          "line": 21,
+          "excerpt": "Disclosed: 20/01/24 (onboarding — clause + standalone page signed, same"
+        },
+        {
+          "file": "ai-usage-register.md",
+          "line": 23,
+          "excerpt": "Usage: PortfolioSense fairly regularly given his mandate (aggressive,"
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-04",
+      "status": "EVIDENCED",
+      "detail": "fee disclosure consistent across records",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 27,
+          "excerpt": "Agreement v2 signed 20/01/24. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-04",
+      "status": "EVIDENCED",
+      "detail": "advice explicitly linked to a current risk profile",
+      "evidence": [
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 4,
+          "excerpt": "18/01/25 profile."
+        },
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 6,
+          "excerpt": "Advice Feb'26: increased equity allocation via smallcap+midcap fund"
+        },
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 8,
+          "excerpt": "against his profile — fund fact sheets reviewed, volatility explained on"
+        },
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 9,
+          "excerpt": "call 11/02/26, he confirmed comfort). Profile used: 18/01/25 (still"
+        },
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 12,
+          "excerpt": "Advice Jun'26: rebalance call post market run-up, booked partial profit"
+        },
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 14,
+          "excerpt": "mentioned (planning a down payment ~2027). Profile used: 20/06/26 redo."
+        },
+        {
+          "file": "suitability-notes-kunal-sharma.md",
+          "line": 16,
+          "excerpt": "Both instances logged w/ explicit profile-to-advice linkage per RM notes."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-05",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 33,
+          "excerpt": "Agreement v1. Fee: fixed, Rs. 1,20,000/yr."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-05",
+      "status": "EVIDENCED",
+      "detail": "fixed-fee arrangement on file, no revision this cycle",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 33,
+          "excerpt": "Agreement v1. Fee: fixed, Rs. 1,20,000/yr."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-05",
+      "status": "MISSING",
+      "detail": "no suitability note found for this client",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-06",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 40,
+          "excerpt": "Agreement v2 signed 11/02/25. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AI-01",
+      "client_id": "CL-06",
+      "status": "MISSING",
+      "detail": "client is marked ai_assisted but has no entry in the AI usage register",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-06",
+      "status": "EVIDENCED",
+      "detail": "fee disclosure consistent across records",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 40,
+          "excerpt": "Agreement v2 signed 11/02/25. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-06",
+      "status": "MISSING",
+      "detail": "no suitability note found for this client",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-07",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 47,
+          "excerpt": "Agreement v1. Fee: 0.9% AUA (grandfathered rate)."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-07",
+      "status": "EVIDENCED",
+      "detail": "fee disclosure consistent across records",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 47,
+          "excerpt": "Agreement v1. Fee: 0.9% AUA (grandfathered rate)."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AGR-01",
+      "client_id": "CL-08",
+      "status": "EVIDENCED",
+      "detail": "agreement execution recorded in onboarding notes",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 55,
+          "excerpt": "Agreement v2 signed 01/08/25. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-AI-01",
+      "client_id": "CL-08",
+      "status": "EVIDENCED",
+      "detail": "AI usage disclosure and tracking present in the register",
+      "evidence": [
+        {
+          "file": "ai-usage-register.md",
+          "line": 28,
+          "excerpt": "Disclosed: 01/08/25 (walked through verbally + standalone page signed"
+        },
+        {
+          "file": "ai-usage-register.md",
+          "line": 30,
+          "excerpt": "Usage: one PortfolioSense run so far (Sep'25), nothing since — new"
+        },
+        {
+          "file": "ai-usage-register.md",
+          "line": 31,
+          "excerpt": "client, expect more usage once portfolio's built out."
+        },
+        {
+          "file": "ai-usage-register.md",
+          "line": 35,
+          "excerpt": "the disclosure + high-level usage tracker only."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-FEE-01",
+      "client_id": "CL-08",
+      "status": "EVIDENCED",
+      "detail": "fee disclosure consistent across records",
+      "evidence": [
+        {
+          "file": "client-onboarding-notes.md",
+          "line": 55,
+          "excerpt": "Agreement v2 signed 01/08/25. Fee: 1% AUA."
+        }
+      ],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-08",
+      "status": "MISSING",
+      "detail": "no suitability note found for this client",
+      "evidence": [],
+      "method": "deterministic"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-01",
+      "status": "STALE",
+      "detail": "The client's risk profile from 2022 is explicitly noted as overdue for renewal, rendering the advice stale.",
+      "evidence": [
+        {
+          "file": "suitability-notes-ananya-rao.md",
+          "line": 3,
+          "excerpt": "Advice given: SIP top-up recommendation Feb'26 (large-cap + hybrid fund"
+        },
+        {
+          "file": "suitability-notes-ananya-rao.md",
+          "line": 4,
+          "excerpt": "combo), consistent w moderate profile from 2022 RPQ (only one on file —"
+        },
+        {
+          "file": "suitability-notes-ananya-rao.md",
+          "line": 5,
+          "excerpt": "profile itself is overdue for redo, using it as-is for now since nothing"
+        },
+        {
+          "file": "suitability-notes-ananya-rao.md",
+          "line": 8,
+          "excerpt": "Rationale noted briefly in advice email thread (not reproduced here)."
+        },
+        {
+          "file": "suitability-notes-ananya-rao.md",
+          "line": 10,
+          "excerpt": "TODO: once risk profile redone, revisit this rec if profile shifts."
+        }
+      ],
+      "method": "model"
+    },
+    {
+      "requirement_id": "RIA-SUIT-01",
+      "client_id": "CL-07",
+      "status": "STALE",
+      "detail": "The client's risk profile from 2021 is explicitly noted as stale.",
+      "evidence": [
+        {
+          "file": "suitability-notes-sanjay-mehta-huf.md",
+          "line": 3,
+          "excerpt": "Only one advice instance logged recently — debt fund rebalance suggested"
+        },
+        {
+          "file": "suitability-notes-sanjay-mehta-huf.md",
+          "line": 4,
+          "excerpt": "Mar'24, in line w/ conservative-moderate (2021 profile, stale — see risk"
+        },
+        {
+          "file": "suitability-notes-sanjay-mehta-huf.md",
+          "line": 8,
+          "excerpt": "calls, no fresh advice given in a while so not much to log."
+        }
+      ],
+      "method": "model"
+    }
+  ]
+}

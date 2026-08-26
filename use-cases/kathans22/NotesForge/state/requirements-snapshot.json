@@ -1,0 +1,88 @@
+[
+  {
+    "id": "RIA-NW-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 8 read with the Third Schedule",
+    "title": "Net worth maintained continuously",
+    "obligation": "The adviser must maintain the prescribed minimum net worth (or net tangible assets, if an individual) at all times, certified by a practising Chartered Accountant.",
+    "evidence_expected": [
+      "Net worth / net tangible assets certificate from a practising Chartered Accountant, with membership number",
+      "Latest certified financial statement supporting the certificate"
+    ],
+    "frequency": "continuous",
+    "applies_to": "firm"
+  },
+  {
+    "id": "RIA-AGR-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 19A read with Annexure A",
+    "title": "Client agreement executed before advice",
+    "obligation": "No investment advice may be rendered and no fee charged until the client has signed an investment advisory agreement covering scope of service, fees and conflicts of interest, and has been given a copy of it.",
+    "evidence_expected": [
+      "Signed investment advisory agreement, dated before the first advice given",
+      "Proof the signed copy was provided to the client"
+    ],
+    "frequency": "on_onboarding",
+    "applies_to": "advisory_clients"
+  },
+  {
+    "id": "RIA-RISK-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 16",
+    "title": "Risk profiling completed and recorded",
+    "obligation": "A risk profile must be developed for each client before advice is given, assessing risk absorption capacity and appetite, and reviewed periodically.",
+    "evidence_expected": [
+      "Completed risk profiling questionnaire, signed or acknowledged by the client",
+      "Record of the most recent periodic review of that risk profile"
+    ],
+    "frequency": "annual",
+    "applies_to": "advisory_clients"
+  },
+  {
+    "id": "RIA-SUIT-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 17",
+    "title": "Suitability assessment documented and linked to advice",
+    "obligation": "Advice given to a client must be shown to be consistent with that client's risk profile, investment objectives and capacity for loss — the link between profile and specific advice must be documented, not merely asserted.",
+    "evidence_expected": [
+      "Suitability assessment note for the advice period under review",
+      "Explicit mapping from the client's risk profile to the advice/recommendations given"
+    ],
+    "frequency": "continuous",
+    "applies_to": "advisory_clients"
+  },
+  {
+    "id": "RIA-FEE-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 15A read with Regulation 18",
+    "title": "Fee disclosure current and consistent with the agreement",
+    "obligation": "Fees charged must follow one of the two permitted modes (assets-under-advice or fixed fee, each capped), be disclosed to the client, and stay consistent with what the signed agreement states — any change in fee structure must be disclosed before it takes effect.",
+    "evidence_expected": [
+      "Current fee disclosure shown or given to the client",
+      "Confirmation the disclosed fee matches the agreement on file, including any amendment"
+    ],
+    "frequency": "on_change",
+    "applies_to": "advisory_clients"
+  },
+  {
+    "id": "RIA-AI-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 15(14) and Regulation 18(9), inserted by the SEBI (Investment Advisers) (Second Amendment) Regulations, 2024 — the per-model traceability clause below is Meridian's own internal policy tightening, not a further SEBI amendment",
+    "title": "AI-assisted advice documented and disclosed",
+    "obligation": "Where AI tools assist in generating advice, the adviser remains solely responsible for the advice, the security and confidentiality of client data, and compliance with applicable law. The extent of AI tool usage must be disclosed to the client at onboarding and whenever it materially changes, and the models, their limits, and an audit trail of their use must be documented with reasonable explainability. Effective this cycle, Meridian's internal compliance policy additionally requires a per-client record identifying which specific AI model produced which recommendation, so that any individual piece of advice can be traced back to the model that generated it — adopted ahead of anticipated supervisory expectations, not itself a new SEBI mandate.",
+    "evidence_expected": [
+      "AI usage disclosure given to the client, dated at or before onboarding",
+      "Internal note naming the AI tool/model(s) used, their known limits, and how outputs are reviewed before being given as advice",
+      "Audit log or record of AI-assisted advice generated for this client",
+      "Per-client log mapping each AI-assisted recommendation to the specific model that produced it"
+    ],
+    "frequency": "continuous",
+    "applies_to": "advisory_clients"
+  },
+  {
+    "id": "RIA-REC-01",
+    "citation": "SEBI (Investment Advisers) Regulations, 2013, Regulation 19",
+    "title": "Records maintained and retrievable",
+    "obligation": "Records of investment advisory activity must be maintained and kept retrievable for five years from the first interaction with each client (longer if a dispute is open or SEBI directs otherwise).",
+    "evidence_expected": [
+      "Index or log showing records are retained and locatable per client",
+      "Confirmation no records have been purged inside the five-year (or extended) retention window"
+    ],
+    "frequency": "continuous",
+    "applies_to": "firm"
+  }
+]

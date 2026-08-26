@@ -1,0 +1,3 @@
+# Synced from ../state, ../config, ../corpus and ../out by `npm run sync` — regenerate, don't commit.
+public/data/
+public/out/

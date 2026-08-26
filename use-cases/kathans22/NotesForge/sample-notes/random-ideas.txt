@@ -1,0 +1,15 @@
+random stuff dont lose this
+
+- what if notes app could auto tag ppl mentioned
+- pricing tiers?? 9 / 29 / 99 maybe. or 12/39/129
+- competitor "scribeflow" raised 4.2M seed apparently
+- talk to raj about the caching layer, he mentioned redis vs in-mem
+- draft blog post title: "your notes are a mess and thats fine"
+
+todo (someday)
+* dark mode
+* export to notion
+* keyboard shortcuts cheatsheet
+
+overheard in meeting: "we dont need another tool we need less tools"
+^ maybe use this as tagline somewhere

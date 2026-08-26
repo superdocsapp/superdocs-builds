@@ -1,0 +1,349 @@
+{
+  "generated_at": "2026-08-22T18:27:58.857Z",
+  "packs": [
+    {
+      "client_id": "CL-02",
+      "client_name": "Vikram Deshmukh",
+      "title": "Vikram Deshmukh - Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "6e8fecfd-f9f6-425a-a6eb-d0e21fe15365",
+      "sessionId": "notesforge-compliance-pack-CL-02-1787414431059",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Stale (risk-profiling-log.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Missing",
+          "status": "MISSING"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Inconsistent (client-onboarding-notes.md)",
+          "status": "INCONSISTENT"
+        },
+        {
+          "requirement_id": "RIA-AI-01",
+          "title": "AI-assisted advice documented and disclosed",
+          "heading": "AI-assisted advice documented and disclosed — Evidenced (ai-usage-register.md)",
+          "status": "EVIDENCED"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-02\\Vikram Deshmukh - Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-02\\Vikram Deshmukh - Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T16:01:05.610Z"
+    },
+    {
+      "client_id": "CL-01",
+      "client_name": "Ananya Rao",
+      "title": "Ananya Rao - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "95178b18-66c2-4295-9487-1f2a11198181",
+      "sessionId": "notesforge-compliance-pack-CL-01-1787423070247",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Stale (risk-profiling-log.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Stale (suitability-notes-ananya-rao.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-01\\Ananya Rao - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-01\\Ananya Rao - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:24:53.121Z"
+    },
+    {
+      "client_id": "CL-03",
+      "client_name": "Meera Family Trust",
+      "title": "Meera Family Trust - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "d82eb224-cc5f-4e2c-adcd-3447d96199df",
+      "sessionId": "notesforge-compliance-pack-CL-03-1787423113152",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Missing (risk-profiling-log.md)",
+          "status": "MISSING"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Missing",
+          "status": "MISSING"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Missing",
+          "status": "MISSING"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-03\\Meera Family Trust - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-03\\Meera Family Trust - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:25:50.832Z"
+    },
+    {
+      "client_id": "CL-04",
+      "client_name": "Kunal Sharma",
+      "title": "Kunal Sharma - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "ca9b96bf-4615-4dbe-a4bc-74ff81bcf077",
+      "sessionId": "notesforge-compliance-pack-CL-04-1787423150832",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Evidenced (risk-profiling-log.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Evidenced (suitability-notes-kunal-sharma.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-AI-01",
+          "title": "AI-assisted advice documented and disclosed",
+          "heading": "AI-assisted advice documented and disclosed — Evidenced (ai-usage-register.md)",
+          "status": "EVIDENCED"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-04\\Kunal Sharma - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-04\\Kunal Sharma - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:26:13.202Z"
+    },
+    {
+      "client_id": "CL-05",
+      "client_name": "Rohan Textiles Pvt Ltd",
+      "title": "Rohan Textiles Pvt Ltd - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "339a86ff-e1ad-4d69-8790-0643fc7de8a7",
+      "sessionId": "notesforge-compliance-pack-CL-05-1787423173203",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Stale (risk-profiling-log.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Missing",
+          "status": "MISSING"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-05\\Rohan Textiles Pvt Ltd - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-05\\Rohan Textiles Pvt Ltd - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:26:41.531Z"
+    },
+    {
+      "client_id": "CL-06",
+      "client_name": "Priya Nair",
+      "title": "Priya Nair - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "bad1ec8c-d1a8-406f-bdf8-b66a4f9ab5df",
+      "sessionId": "notesforge-compliance-pack-CL-06-1787423201532",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Stale (risk-profiling-log.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Missing",
+          "status": "MISSING"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-AI-01",
+          "title": "AI-assisted advice documented and disclosed",
+          "heading": "AI-assisted advice documented and disclosed — Missing",
+          "status": "MISSING"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-06\\Priya Nair - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-06\\Priya Nair - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:27:19.993Z"
+    },
+    {
+      "client_id": "CL-07",
+      "client_name": "Sanjay Mehta HUF",
+      "title": "Sanjay Mehta HUF - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "d8a3b65a-acea-4add-8401-8df0303c7b48",
+      "sessionId": "notesforge-compliance-pack-CL-07-1787423239993",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Stale (risk-profiling-log.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Stale (suitability-notes-sanjay-mehta-huf.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-07\\Sanjay Mehta HUF - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-07\\Sanjay Mehta HUF - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:27:38.872Z"
+    },
+    {
+      "client_id": "CL-08",
+      "client_name": "Ishaan Kapoor",
+      "title": "Ishaan Kapoor - SEBI Compliance Pack",
+      "documentId": "doc_primary",
+      "durableDocumentId": "848d723a-31d2-4225-842f-568740e8ba94",
+      "sessionId": "notesforge-compliance-pack-CL-08-1787423258872",
+      "verified": true,
+      "plannedSections": [
+        {
+          "requirement_id": "RIA-AGR-01",
+          "title": "Client agreement executed before advice",
+          "heading": "Client agreement executed before advice — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-RISK-01",
+          "title": "Risk profiling completed and recorded",
+          "heading": "Risk profiling completed and recorded — Stale (risk-profiling-log.md)",
+          "status": "STALE"
+        },
+        {
+          "requirement_id": "RIA-SUIT-01",
+          "title": "Suitability assessment documented and linked to advice",
+          "heading": "Suitability assessment documented and linked to advice — Missing",
+          "status": "MISSING"
+        },
+        {
+          "requirement_id": "RIA-FEE-01",
+          "title": "Fee disclosure current and consistent with the agreement",
+          "heading": "Fee disclosure current and consistent with the agreement — Evidenced (client-onboarding-notes.md)",
+          "status": "EVIDENCED"
+        },
+        {
+          "requirement_id": "RIA-AI-01",
+          "title": "AI-assisted advice documented and disclosed",
+          "heading": "AI-assisted advice documented and disclosed — Evidenced (ai-usage-register.md)",
+          "status": "EVIDENCED"
+        }
+      ],
+      "exportedFiles": [
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-08\\Ishaan Kapoor - SEBI Compliance Pack.docx",
+        "C:\\Users\\hp\\Desktop\\SuperDocs_Round2\\Task_2\\Task_2.3\\superdocs-builds\\use-cases\\kathans22\\NotesForge\\out\\CL-08\\Ishaan Kapoor - SEBI Compliance Pack.pdf"
+      ],
+      "generated_at": "2026-08-22T18:27:58.854Z"
+    }
+  ]
+}
