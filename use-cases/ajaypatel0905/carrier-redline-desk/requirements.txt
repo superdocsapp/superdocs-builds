@@ -1,0 +1,5 @@
+langgraph>=1.0
+langgraph-checkpoint-sqlite>=2.0
+requests>=2.31
+PyYAML>=6.0
+pytest>=8.0
