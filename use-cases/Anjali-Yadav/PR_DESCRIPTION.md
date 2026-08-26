@@ -53,10 +53,8 @@ The builds use:
 - HACCP placement evidence is advisory and is not food-safety or regulatory certification.
 - PDF/DOCX checks validate readable export containers, not WCAG/PDF-UA conformance.
 - Live smoke testing is manual because it requires a secret and consumes an operation.
-- Task 4 demo video, one-page write-up, and architecture diagram are submission-form/Drive deliverables rather than fabricated repository files.
 
-## Safety and Scope
+## Scope
 
-No real confidential documents are included. Local `.env` files are ignored and no API key is included in this PR. `project_dump.txt`, generated output, caches, and credentials are excluded from submission.
 
 This PR contains the two assigned Task 2 builds. Task 1 is maintained separately in its own private repository.
