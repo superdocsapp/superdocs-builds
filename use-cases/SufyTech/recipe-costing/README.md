@@ -57,7 +57,7 @@ All four happen in one flow, in `run_build1.py`:
 ## What actually happened on a real, live run
 
 This build **has been run against the real SuperDocs API** repeatedly
-(not just tested with mocks), and eight real bugs were found and fixed
+(not just tested with mocks), and ten real bugs were found and fixed
 along the way — most of them only surfaced by actually opening and
 checking the exported files or the raw error responses, not by
 trusting a call's success status. Same discipline as the rest of this
