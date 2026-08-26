@@ -48,6 +48,20 @@ REST routes include `POST /v1/builds/manual`, `GET /v1/manuals/{manual_id}`,
 `POST /v1/manuals/{manual_id}/export`. The same lifecycle is available at `POST /mcp` with
 `manual_start`, `manual_get`, `manual_chat`, `manual_review`, `manual_decide`, and `manual_export`.
 
+## React Review UI
+
+The browser review UI is in `frontend/` and covers manual metadata, the paired before/after proposal,
+consistency findings, and review/export decisions.
+
+Run the API and frontend in separate terminals:
+
+```bash
+python3 -m iso_manual.api
+python3 -m http.server 5173 -d frontend
+```
+
+Open `http://localhost:5173`, select **Open fixture**, then submit and approve the step-3 proposal.
+
 ## SuperDocs Surface
 
 The workflow maps to SuperDocs chat editing, review approval, images/diagram rendering, and export. This
