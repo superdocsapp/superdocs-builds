@@ -131,6 +131,7 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--auto", action="store_true", help="approve every in-scope proposal (machine mode); default is interactive review")
     run.add_argument("--model-tier", default=None, choices=["core", "turbo", "pro", "max"])
     run.add_argument("--max-rules", type=int, default=None, help="small-sample mode: process only the first N planned rules")
+    run.add_argument("--fresh", action="store_true", help="discard any previous run with this name and start over")
     sub.add_parser("mermaid", help="print the pipeline graph as Mermaid (for the architecture diagram)")
     args = parser.parse_args(argv)
 
@@ -146,6 +147,10 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     run_dir = pathlib.Path("runs") / args.run_name
+    if args.fresh and run_dir.exists():
+        import shutil
+        shutil.rmtree(run_dir)
+        print(f"[fresh] discarded previous run '{args.run_name}'")
     run_dir.mkdir(parents=True, exist_ok=True)
     client = SuperDocsClient(api_key)
     playbook = load_playbook(args.playbook)
@@ -155,7 +160,11 @@ def main(argv: list[str] | None = None) -> int:
     config = {"configurable": {"thread_id": args.run_name}}
 
     digest = hashlib.sha256(args.contract.read_bytes()).hexdigest()[:12]
-    fresh = graph.get_state(config).created_at is None
+    snapshot = graph.get_state(config)
+    fresh = snapshot.created_at is None
+    if not fresh and not snapshot.next:
+        print(f"Run '{args.run_name}' already finished — outputs are in {run_dir}/. Pick another --run-name, or add --fresh to start it over.")
+        return 0
     initial = {"contract_path": str(args.contract), "session_id": f"redline-{args.run_name}-{digest}"} if fresh else None
     if not fresh:
         print(f"[resume] continuing run '{args.run_name}' from its checkpoint")

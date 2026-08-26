@@ -33,7 +33,7 @@ cp .env.example .env                      # put your real key in .env
 
 #   --auto          approve every in-scope proposal (unattended / machine mode)
 #   --max-rules 3   small-sample mode: learn the cost profile before a full run
-#   --run-name X    name the run (default: demo); re-using a name resumes it
+#   --run-name X    name the run (default: demo); re-using a name resumes it — add --fresh to start over
 ```
 
 Outputs land in `runs/<run-name>/`: `redlined_contract.docx` (tracked changes), `negotiation_summary.docx`, `summary.json`, `VERIFICATION.md`.
