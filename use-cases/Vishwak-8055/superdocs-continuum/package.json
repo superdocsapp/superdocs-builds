@@ -1,0 +1,17 @@
+{
+  "name": "superdocs-reality-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone prototype: a consequence-aware document intelligence engine, built as a seed contribution for SuperDocs. Not yet integrated into a SuperDocs codebase — none was available in this workspace.",
+  "main": "src/engine.js",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "node build/assemble.js",
+    "check": "node --check src/data.js && node --check src/engine.js && node build/assemble.js && node build/validate-jsx.js"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-react": "^7.29.7"
+  }
+}
