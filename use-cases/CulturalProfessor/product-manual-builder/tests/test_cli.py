@@ -473,3 +473,49 @@ def test_verify_refuses_a_publication_with_no_durable_ids(monkeypatch, tmp_path)
 
     with pytest.raises(SuperDocsError, match="no durable id recorded"):
         cli.main(["verify"])
+
+
+def test_publish_clears_what_the_previous_pair_left_behind(monkeypatch, tmp_path, capsys):
+    """`out/served/` and `out/export/` are reads of one specific pair, saved
+    under filenames that say only "manual" and "quick-start card". A new
+    publish used to replace `published.json` and nothing else, so those files
+    went on sitting there looking current -- and were read as current, and
+    reasoned about, for a pair that no longer existed."""
+    from manualbuilder import session
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    out = tmp_path / "out"
+    (out / "served").mkdir(parents=True)
+    (out / "export").mkdir(parents=True)
+    (out / "served" / "manual.html").write_text("<p>the pair before this one</p>")
+    (out / "export" / "manual.html").write_text("<p>the pair before this one</p>")
+    (out / "proposal.json").write_text("{}")
+    (out / "manual.preview.html").write_text("<p>a local render of the spec</p>")
+
+    published = session.Publication(
+        manual_id="doc_m",
+        card_id="doc_c",
+        sessions={"doc_m": "s_manual", "doc_c": "s_card"},
+        durable={"doc_m": "uuid-m", "doc_c": "uuid-c"},
+        images={"breakdown": "https://cdn.example/breakdown.svg"},
+    )
+    monkeypatch.setattr(cli, "OUT", out)
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    monkeypatch.setattr(cli.session, "publish", lambda client, spec, language="": published)
+
+    code, printed = _run(monkeypatch, ["publish"], capsys)
+
+    assert code == 0
+    assert not (out / "served").exists() and not (out / "export").exists()
+    assert not (out / "proposal.json").exists(), "it names the replaced pair's sessions and jobs"
+    assert "cleared" in printed and "served" in printed, "silently deleting files is its own trap"
+    # The local render is not a read of any pair -- it is the spec, and `build`
+    # owns it. Publishing must not touch it.
+    assert (out / "manual.preview.html").is_file()
+    assert (out / "published.json").is_file()

@@ -397,6 +397,37 @@ def _load(args):
     return published
 
 
+def _clear_stale_views() -> list[str]:
+    """Remove what the previous pair left in `out/`, and name what went.
+
+    `out/served/` and `out/export/` are reads of a *specific* pair, written
+    under filenames that say only "manual" and "quick-start card". A new
+    publish makes a new pair and replaces `published.json`, and until this
+    existed it replaced nothing else -- so those two directories went on
+    holding documents that no longer existed anywhere, indistinguishable from
+    fresh ones. That cost a long detour: two files were read as the current
+    pair, their torque figures compared, and a conclusion drawn about documents
+    they had nothing to do with.
+
+    `proposal.json` goes for a sharper reason: it names sessions and jobs of the
+    pair that has just been replaced, and `approve` would apply it -- to the old
+    documents, while `published.json` names the new ones. `approve --discard`
+    deliberately needs no file, so the batch can still be thrown away.
+    """
+    import shutil
+
+    gone: list[str] = []
+    for directory in (OUT / "served", OUT / "export"):
+        if directory.is_dir():
+            shutil.rmtree(directory)
+            gone.append(f"{directory}/")
+    stale = OUT / PROPOSAL
+    if stale.is_file():
+        stale.unlink()
+        gone.append(str(stale))
+    return gone
+
+
 def cmd_publish(args) -> int:
     """Upload one language's pair. One pair per run, deliberately.
 
@@ -420,6 +451,7 @@ def cmd_publish(args) -> int:
     with _client() as client:
         published = session.publish(client, spec, language=args.language)
     path = _save(published, args.language)
+    cleared = _clear_stale_views()
     for document_id in published.document_ids:
         # Padded before it is coloured: an escape code has visible width to
         # `str.format`, which does not know it is not a printed character, so
@@ -429,6 +461,10 @@ def cmd_publish(args) -> int:
         print(f"{_bold(name)} {document_id}  in {published.sessions[document_id]}")
     print(f"images  {len(published.images)} uploaded")
     print(f"\nwritten to {path}")
+    if cleared:
+        print(
+            _dim(f"cleared {', '.join(cleared)} -- they described the pair this " f"run replaced")
+        )
     _next(
         'manualbuilder ask "…" to explore a document before changing it',
         'manualbuilder edit "…" to propose a wording change to both',

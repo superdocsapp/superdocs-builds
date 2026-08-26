@@ -314,6 +314,13 @@ ids are written back to `out/published.json`.
 ./mb export --format html
 ```
 
+`publish` clears `out/served/` and `out/export/` when it writes the new
+`published.json`, along with any `out/proposal.json`: all three describe the
+pair that has just been replaced, under filenames that name only the role. A
+stale `served/manual.html` is indistinguishable from a fresh one, and reading
+one as current is a mistake this project has actually made. The local render
+from `build` is untouched — it is the spec, not a read of any pair.
+
 `export` renders both finished documents into `out/export/` — the deliverable,
 the thing somebody prints. It is deliberately a different folder from the local
 render, because comparing the two is the point. Exports cost no quota.
