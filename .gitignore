@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Test / tool caches
+.pytest_cache/
+__pycache__/
+results/
+
+# OS
+.DS_Store
+Thumbs.db
