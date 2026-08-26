@@ -1,0 +1,14 @@
+{
+  "four_call_contract": {
+    "chat_async": {"method": "POST", "path": "/v1/chat/async", "requires": ["message", "session_id"], "hitl": "approval_mode=ask_every_time"},
+    "get_job":    {"method": "GET",  "path": "/v1/jobs/{job_id}", "awaits": "awaiting_approval|completed"},
+    "approve":    {"method": "POST", "path": "/v1/chat/{session_id}/approve", "requires": ["job_id", "change_id"], "never": "chunk_id"},
+    "export":     {"method": "POST", "path": "/v1/documents/export", "returns": "docx bytes"}
+  },
+  "ambiguities": [
+    {"id": 1, "what": "proposed-change content is a JSON-encoded string (needs a second parse)"},
+    {"id": 2, "what": "SSE /stream auth token passed in the URL query string"},
+    {"id": 3, "what": "approve requires job_id + change_id; the prose says chunk_id"}
+  ],
+  "note": "Runnable parity suite (Python) lives at doctask-arun-s/tests/test_conformance.py. Each client (python/typescript/go) implements this identical contract."
+}

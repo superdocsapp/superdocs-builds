@@ -1,0 +1,31 @@
+{
+  "clauses": [
+    {"id": "lol-pref", "topic": "limitation_of_liability", "position": "preferred",
+     "tags": ["liability", "cap", "damages", "fees"],
+     "text": "In no event shall either party's aggregate liability exceed the total fees paid under this Agreement in the twelve months preceding the claim."},
+    {"id": "lol-fb1", "topic": "limitation_of_liability", "position": "fallback-1",
+     "tags": ["liability", "cap", "fees"],
+     "text": "Each party's aggregate liability shall be capped at two times the fees paid in the prior twelve months."},
+    {"id": "lol-fb2", "topic": "limitation_of_liability", "position": "fallback-2",
+     "tags": ["liability", "direct", "consequential"],
+     "text": "Liability is limited to direct damages; neither party is liable for indirect or consequential damages."},
+
+    {"id": "conf-pref", "topic": "confidentiality", "position": "preferred",
+     "tags": ["confidential", "nda", "secrecy", "information"],
+     "text": "Each party shall keep the other's Confidential Information secret and use it solely to perform this Agreement, for three years after disclosure."},
+    {"id": "conf-fb1", "topic": "confidentiality", "position": "fallback-1",
+     "tags": ["confidential", "information"],
+     "text": "The receiving party shall protect Confidential Information with the same care it uses for its own, for two years after disclosure."},
+
+    {"id": "law-pref", "topic": "governing_law", "position": "preferred",
+     "tags": ["governing", "law", "jurisdiction", "courts"],
+     "text": "This Agreement is governed by the laws of India and the courts of Bengaluru have exclusive jurisdiction."},
+
+    {"id": "term-pref", "topic": "termination_for_convenience", "position": "preferred",
+     "tags": ["terminate", "convenience", "notice"],
+     "text": "Either party may terminate this Agreement for convenience on thirty days' written notice."},
+    {"id": "term-fb1", "topic": "termination_for_convenience", "position": "fallback-1",
+     "tags": ["terminate", "convenience", "notice"],
+     "text": "Either party may terminate this Agreement for convenience on sixty days' written notice."}
+  ]
+}
