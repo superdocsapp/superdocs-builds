@@ -1,0 +1,18 @@
+[
+  {
+    "step": "Receiving raw chicken from supplier",
+    "hazard": "Risk of salmonella contamination from raw poultry"
+  },
+  {
+    "step": "Cooking chicken nuggets",
+    "hazard": "Cook to internal temperature of 165F for at least 15 seconds to eliminate pathogens"
+  },
+  {
+    "step": "Checking fryer oil temperature during cooking",
+    "hazard": "Record oil temperature every 30 minutes to confirm the cooking step is holding its critical limit"
+  },
+  {
+    "step": "Cooking temperature falls below 165F",
+    "hazard": "If internal temperature does not reach 165F, reject the batch and re-cook or discard"
+  }
+]
