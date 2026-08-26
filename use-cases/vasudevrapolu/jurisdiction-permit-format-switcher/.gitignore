@@ -1,0 +1,22 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+
+# Node
+node_modules/
+dist/
+build/
+
+# Databases / local files
+*.db
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
