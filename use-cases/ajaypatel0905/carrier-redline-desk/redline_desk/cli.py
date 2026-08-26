@@ -93,7 +93,12 @@ def main(argv: list[str] | None = None) -> int:
         if not interrupts:
             graph.invoke(None, config)
             continue
-        graph.invoke(Command(resume=prompt_reviewer(interrupts[0].value)), config)
+        try:
+            decisions = prompt_reviewer(interrupts[0].value)
+        except (EOFError, KeyboardInterrupt):
+            print(f"\n[paused] review stopped before a decision; nothing was applied. Re-run the same command to resume run '{args.run_name}' at this exact clause.")
+            return 3
+        graph.invoke(Command(resume=decisions), config)
 
     print(f"\nDone. Outputs in {run_dir}/: redlined_contract.docx, negotiation_summary.docx, summary.json, VERIFICATION.md")
     return 0
