@@ -17,6 +17,8 @@ No network: a proposed change is a dataclass, and that is all these need.
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from manualbuilder import session
@@ -474,6 +476,67 @@ def test_ask_is_unaffected_by_a_parked_batch_on_edits_session():
 
     reply = session.ask(Fake(), publication, publication.manual_id, "any question")
     assert reply["response"] == "answered anyway"
+
+
+def test_a_figure_is_located_by_the_chunk_that_holds_it_not_by_its_caption():
+    """The stored document holds a figure as `<p><img alt="X"></p>` and its
+    caption as a separate paragraph of the same words X. An instruction that
+    says "the figure whose caption is X" therefore matches a block of plain
+    text just as well as the image, and a live turn duly replaced the caption
+    paragraph with an `<img>`. The chunk id matches one of them."""
+    served = (
+        '<h2 data-chunk-id="head">What is in the box</h2>'
+        '<p data-chunk-id="figure-chunk"><img alt="Halyard M1 parts breakdown" '
+        'src="https://cdn.example/breakdown-v1.svg"/></p>'
+        '<p data-chunk-id="caption-chunk">Halyard M1 parts breakdown</p>'
+    )
+
+    assert session.image_chunks(served) == {"Halyard M1 parts breakdown": "figure-chunk"}
+
+
+def test_a_figure_left_behind_is_named_by_role_not_by_a_session_scoped_id():
+    """`doc_9a9c4e4090` is a session-scoped id: the same document carries a
+    different one in every session it is opened in, so a refusal that prints it
+    is telling a reader to go and look it up. The caller knows which document
+    is which, and hands the check a way to say so."""
+    asked = {"doc_9a9c4e4090": {LASER: "step:laser", "Halyard M1 parts breakdown": "breakdown"}}
+    changes = [
+        replace(swap(figure(LASER, IMAGES[LASER], chunked=True)), document_id="doc_9a9c4e4090")
+    ]
+
+    with pytest.raises(SuperDocsError, match="in the manual were not swapped"):
+        session.assert_every_figure_swapped(changes, asked, name=lambda _: "manual")
+
+    # And with no namer it still says something, rather than raising on the
+    # missing argument -- every other caller of this is a test.
+    with pytest.raises(SuperDocsError, match="doc_9a9c4e4090"):
+        session.assert_every_figure_swapped(changes, asked)
+
+
+def test_what_a_turn_said_is_recoverable_when_it_proposed_nothing():
+    """The whole point of keeping the reply: a turn that had nothing to do and
+    a turn that asked a question are the same shape, and the words are the only
+    thing that tells them apart."""
+    from manualbuilder.superdocs import reply_text
+
+    assert reply_text({"metadata": {"response": "Which of the seven did you mean?"}}) == (
+        "Which of the seven did you mean?"
+    )
+    assert reply_text({"result": {"response": "  I can see\n  only one figure.  "}}) == (
+        "I can see only one figure."
+    )
+    assert (
+        reply_text(
+            {
+                "intermediate_responses": [
+                    {"type": "proposed_change_batch", "content": "[{...}]"},
+                    {"type": "message", "content": "Swapped them."},
+                ]
+            }
+        )
+        == "Swapped them."
+    )
+    assert reply_text({"status": "completed", "metadata": {"pending_changes": []}}) == ""
 
 
 def test_the_signature_the_service_appends_is_not_a_different_image():

@@ -389,3 +389,161 @@ def test_no_repair_reports_the_drift_and_spends_nothing(monkeypatch, tmp_path, c
     assert code == 1
     assert FIX in printed and "--no-repair" in printed
     assert "the manual and the card disagree" in printed
+
+
+# ------------------------------------- a refresh that moved a word anyway --
+
+
+def test_approve_refuses_to_call_a_refresh_clean_when_the_wording_moved(
+    monkeypatch, tmp_path, capsys, spec
+):
+    """`sync` proves every proposed change was an image URL, which is a claim
+    about the batch. This is the claim about the documents, checked after the
+    write: a diagram refresh must leave the text exactly as it read before it.
+
+    It is here because of one observation nothing else explains -- a passage
+    that read 1.6 N·m in both documents read 1.2 in both a few minutes later,
+    with a diagram refresh in between, and every check passed either way. This
+    does not prevent that. It makes it loud."""
+    fix = _fix(spec)
+    before = _pair(spec, manual_torque="1.6", card_torque="1.6")
+    after = _pair(spec, manual_torque="1.2", card_torque="1.2")
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def document_html(self, durable_id):
+            return after[vf.MANUAL if durable_id == "uuid-m" else vf.CARD]
+
+        def approve(self, session_id, job_id, decisions, approved_by_default=True):
+            return {"status": "ok"}
+
+        def chat_async(self, *a, **kw):  # pragma: no cover
+            raise AssertionError("a wording check must not send a turn")
+
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "published.json").write_text(
+        json.dumps(
+            {
+                "manual_id": "doc_m",
+                "card_id": "doc_c",
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
+                "language": "",
+                "images": {},
+            }
+        )
+    )
+    (out / "proposal.json").write_text(
+        json.dumps(
+            {
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "jobs": {"doc_m": "job_m"},
+                "unchanged_text": {
+                    "doc_m": vf.text_of(before[vf.MANUAL]),
+                    "doc_c": vf.text_of(before[vf.CARD]),
+                },
+                "changes": [
+                    {
+                        "change_id": "s1",
+                        "operation": "edit",
+                        "chunk_id": "chunk_figure",
+                        "document_id": "doc_m",
+                        "old_html": '<p data-chunk-id="chunk_figure"><img alt="a" src="old.svg"/></p>',
+                        "new_html": '<p data-chunk-id="chunk_figure"><img alt="a" src="new.svg"/></p>',
+                        "explanation": "swapped the drawing",
+                    }
+                ],
+            }
+        )
+    )
+
+    monkeypatch.setattr(cli, "OUT", out)
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    monkeypatch.setattr(cli.session, "SETTLE_POLL", 0.0)
+    monkeypatch.setattr(cli.session, "SETTLE_TIMEOUT", 0.0)
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    code = cli.main(["approve"])
+    printed = capsys.readouterr().out
+
+    assert code == 1
+    assert "the wording moved" in printed
+    assert "-1.6 +1.2" in printed, "the words that moved, not the fact that some did"
+    assert fix.fix  # the passage this is about is a real one in the spec
+
+
+def test_a_refresh_that_really_changed_nothing_says_nothing_about_wording(
+    monkeypatch, tmp_path, capsys, spec
+):
+    """The check has to be silent when it passes, or every clean refresh grows
+    a paragraph about the one that did not."""
+    pair = _pair(spec, manual_torque="1.6", card_torque="1.6")
+
+    class FakeClient:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def document_html(self, durable_id):
+            return pair[vf.MANUAL if durable_id == "uuid-m" else vf.CARD]
+
+        def approve(self, session_id, job_id, decisions, approved_by_default=True):
+            return {"status": "ok"}
+
+    out = tmp_path / "out"
+    out.mkdir()
+    (out / "published.json").write_text(
+        json.dumps(
+            {
+                "manual_id": "doc_m",
+                "card_id": "doc_c",
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "durable": {"doc_m": "uuid-m", "doc_c": "uuid-c"},
+                "language": "",
+                "images": {},
+            }
+        )
+    )
+    (out / "proposal.json").write_text(
+        json.dumps(
+            {
+                "sessions": {"doc_m": "s_manual", "doc_c": "s_card"},
+                "jobs": {"doc_m": "job_m"},
+                "unchanged_text": {
+                    "doc_m": vf.text_of(pair[vf.MANUAL]),
+                    "doc_c": vf.text_of(pair[vf.CARD]),
+                },
+                "changes": [
+                    {
+                        "change_id": "s1",
+                        "operation": "edit",
+                        "chunk_id": "chunk_figure",
+                        "document_id": "doc_m",
+                        "old_html": '<p data-chunk-id="chunk_figure"><img alt="a" src="old.svg"/></p>',
+                        "new_html": '<p data-chunk-id="chunk_figure"><img alt="a" src="new.svg"/></p>',
+                        "explanation": "swapped the drawing",
+                    }
+                ],
+            }
+        )
+    )
+
+    monkeypatch.setattr(cli, "OUT", out)
+    monkeypatch.setattr(cli, "_client", lambda: FakeClient())
+    monkeypatch.setattr(cli.session, "SETTLE_POLL", 0.0)
+    monkeypatch.setattr(cli.session, "SETTLE_TIMEOUT", 0.0)
+    monkeypatch.chdir(PROJECT_ROOT)
+
+    code = cli.main(["approve"])
+    printed = capsys.readouterr().out
+
+    assert code == 0
+    assert "the wording moved" not in printed

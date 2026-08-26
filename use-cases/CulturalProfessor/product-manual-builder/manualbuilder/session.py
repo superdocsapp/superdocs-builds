@@ -37,6 +37,7 @@ from __future__ import annotations
 
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 from urllib.parse import urlparse
@@ -247,7 +248,7 @@ def publish(client: SuperDocs, spec: Spec, language: str = "") -> Publication:
 
 def edit_both(
     client: SuperDocs, publication: Publication, instruction: str
-) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
+) -> tuple[list[ProposedChange], dict[str, dict[str, Any]]]:
     """One instruction, both documents, nothing applied by either turn.
 
     The wording case: "raise the rail torque to 1.6 N·m" is one sentence and it
@@ -350,7 +351,7 @@ def ask(
 
 def edit_each(
     client: SuperDocs, publication: Publication, instructions: dict[str, str]
-) -> tuple[list[ProposedChange], list[dict[str, Any]]]:
+) -> tuple[list[ProposedChange], dict[str, dict[str, Any]]]:
     """A turn per document, each with its own instruction.
 
     Same machinery as `edit_both` and a different question per document, which
@@ -388,10 +389,13 @@ def edit_each(
         started.append((document_id, job_id))
 
     changes: list[ProposedChange] = []
-    replies: list[dict[str, Any]] = []
+    replies: dict[str, dict[str, Any]] = {}
     for document_id, job_id in started:
         job = client.wait_for_job(job_id)
-        replies.append(job)
+        # Keyed by document rather than a list in send order: the caller that
+        # wants a reply wants *this document's* reply, and a document that
+        # proposed nothing is exactly the case where the words matter.
+        replies[document_id] = job
         turn = client.pending_changes(job)
         if turn:
             publication.jobs[document_id] = job_id
@@ -921,9 +925,13 @@ def refresh_diagrams(client: SuperDocs, publication: Publication, spec: Spec) ->
     return fresh
 
 
-def swap_diagrams(
-    client: SuperDocs, publication: Publication, spec: Spec
-) -> tuple[list[ProposedChange], dict[str, str], dict[str, dict[str, str]]]:
+def swap_diagrams(client: SuperDocs, publication: Publication, spec: Spec) -> tuple[
+    list[ProposedChange],
+    dict[str, str],
+    dict[str, dict[str, str]],
+    dict[str, dict[str, Any]],
+    dict[str, str],
+]:
     """Re-render, upload, and propose swapping each `<img src>` for the new URL.
 
     A document already on the service cannot be re-uploaded without becoming a
@@ -936,6 +944,15 @@ def swap_diagrams(
     compares each proposed chunk against the one it replaces with the image URLs
     masked out: if a single other character moved, the batch is refused whole.
     The model is allowed to propose the swap and is not trusted to have made it.
+
+    The instruction says, in as many words, that this is a text edit to an
+    attribute and not an image operation. Without that a turn reaches for the
+    service's image-replacement tool instead, which only accepts files attached
+    to that chat, and answers "that file isn't one of this session's
+    attachments" having changed nothing -- on the manual in one run and on the
+    card in the next, because which path it takes is not stable. The drawings
+    are uploaded and hosted before this is ever sent; there is nothing to
+    attach.
 
     It is also asked in a fresh conversation. A session remembers what was
     discussed in it, and a swap sent into the session that handled last week's
@@ -963,32 +980,58 @@ def swap_diagrams(
         publication.manual_id: pj.captions_in(pj.manual_blocks(spec)),
         publication.card_id: pj.captions_in(pj.quick_start_blocks(spec)),
     }
+    # Read each document back first, free, so the instruction can name the
+    # chunk that holds each figure rather than describing it.
+    current = {
+        document_id: client.document_html(publication.durable_for(document_id))
+        for document_id in asked
+    }
+    anchors = {document_id: image_chunks(html) for document_id, html in current.items()}
     instructions = {
-        document_id: _swap_instruction(captions, expected)
+        document_id: _swap_instruction(captions, expected, anchors[document_id])
         for document_id, captions in asked.items()
         if captions
     }
 
-    changes, _ = edit_each(client, publication, instructions)
-    return changes, expected, {document_id: asked[document_id] for document_id in instructions}
+    changes, replies = edit_each(client, publication, instructions)
+    return (
+        changes,
+        expected,
+        {document_id: asked[document_id] for document_id in instructions},
+        replies,
+        current,
+    )
 
 
-def _swap_instruction(captions: dict[str, str], expected: dict[str, str]) -> str:
+def _swap_instruction(
+    captions: dict[str, str], expected: dict[str, str], anchors: dict[str, str]
+) -> str:
     lines = "\n".join(
-        f'- the figure whose caption is "{caption}": set its <img src> to {expected[caption]}'
+        f'- in the block whose data-chunk-id is "{anchors[caption]}", set the '
+        f'<img> src to {expected[caption]}  (its alt is "{caption}")'
         for caption in captions
-        if caption in expected
+        if caption in expected and caption in anchors
     )
     return (
-        "Update the diagram image URLs. Make exactly these substitutions and "
-        "nothing else -- do not reword, reformat, or renumber anything, do not "
-        "change any caption or alt text, and do not touch a figure that is not "
-        "listed:\n" + lines
+        "Update the diagram image URLs. Each line names a block by its "
+        "data-chunk-id, and that block already contains one <img>. Change the "
+        "value of that img's src attribute to the URL given, and change nothing "
+        "else.\n\n"
+        "This is a text edit to an attribute, not an image operation: the "
+        "drawings are already hosted at these URLs, so do not attach or upload "
+        "anything and do not use an image-replacement tool -- there is nothing "
+        "to attach. Do not add an <img> anywhere. Do not put one into a block "
+        "that currently holds only text: a figure's caption is stored as its "
+        "own paragraph of the same words, and it is not the figure. Do not "
+        "change any alt text, caption or wording, and do not touch a block that "
+        "is not listed:\n" + lines
     )
 
 
 def assert_every_figure_swapped(
-    changes: list[ProposedChange], asked: dict[str, dict[str, str]]
+    changes: list[ProposedChange],
+    asked: dict[str, dict[str, str]],
+    name: Callable[[str], str] | None = None,
 ) -> None:
     """Refuse a refresh that left one of the figures pointing at the old drawing.
 
@@ -1000,6 +1043,11 @@ def assert_every_figure_swapped(
     which is exactly the manual and the card disagreeing, arrived at through the
     path built to keep them together.
     """
+    # `doc_9a9c4e4090` is a session-scoped id and means nothing to a reader --
+    # the same document has a different one in every session it is opened in.
+    # The caller passes `Publication.name_for` so the refusal can say "manual".
+    named = name or (lambda document_id: document_id)
+
     seen: dict[str, set[str]] = {}
     for change in changes:
         for caption, _ in images_in(change.new_html):
@@ -1009,7 +1057,7 @@ def assert_every_figure_swapped(
         missing = sorted(set(captions) - seen.get(document_id, set()))
         if missing:
             raise SuperDocsError(
-                f"{len(missing)} figure(s) in {document_id} were not swapped: "
+                f"{len(missing)} figure(s) in the {named(document_id)} were not swapped: "
                 + ", ".join(repr(caption) for caption in missing)
                 + ". They still point at the old drawing, so approving this "
                 "batch would leave the two documents showing different "
@@ -1020,6 +1068,7 @@ def assert_every_figure_swapped(
 _IMG_TAG = re.compile(r"<img\b[^>]*>", re.I)
 _SRC = re.compile(r'\bsrc="([^"]*)"', re.I)
 _ALT = re.compile(r'\balt="([^"]*)"', re.I)
+_CHUNK_ID = re.compile(r'\bdata-chunk-id="([^"]+)"', re.I)
 
 
 def _masked(html: str) -> str:
@@ -1044,6 +1093,34 @@ def _same_image(one: str, other: str) -> bool:
     service's signature on it.
     """
     return urlparse(one).path == urlparse(other).path
+
+
+def image_chunks(html: str) -> dict[str, str]:
+    """alt text -> the id of the chunk that holds that `<img>`.
+
+    The anchor a swap instruction should use, and the third one tried. Naming
+    the *caption* is ambiguous in the stored document: the service keeps a
+    figure as `<p><img alt="…"></p>` and its caption as a separate paragraph of
+    the same words, so "the figure whose caption is X" matches a block of plain
+    text as readily as the image, and a live turn duly replaced the caption
+    paragraph with an `<img>` -- caught by `assert_only_the_image_changed`,
+    which is the only reason it is a story about a refusal rather than about a
+    manual that lost a caption.
+
+    A chunk id is not ambiguous, it is in the document the turn is looking at,
+    and it is what the reply comes back keyed by.
+    """
+    out: dict[str, str] = {}
+    for match in _IMG_TAG.finditer(html):
+        alt = _ALT.search(match.group(0))
+        if not alt:
+            continue
+        # The nearest `data-chunk-id` before the tag is the block it sits in:
+        # chunks are top level and do not nest.
+        ids = _CHUNK_ID.findall(html[: match.start()])
+        if ids:
+            out[alt.group(1)] = ids[-1]
+    return out
 
 
 def images_in(html: str) -> list[tuple[str, str]]:
@@ -1117,6 +1194,7 @@ __all__ = [
     "edit_both",
     "edit_each",
     "excusably_empty",
+    "image_chunks",
     "images_in",
     "publish",
     "read_pair",

@@ -19,14 +19,15 @@ commands rather than by testing any one of them in isolation. Item 22 is from
 **2026-08-25**, found the same way — by watching that narrated run fail its own
 verification stage, on a pair of documents that turned out to be correct. Item
 23 is from that same run, one stage later: the pair really had come apart, on
-one passage, and nothing in this build noticed until `verify` did.
+one passage, and nothing in this build noticed until `verify` did. Item 24 is
+from **2026-08-27**, and cost three `sync` runs to see whole.
 
 They live next to the build that found them, so anyone reading the code can see
 what the service actually did while it was being written. The submission form
 collects the same list.
 
-**Every item says whose it is.** All twenty-three are SuperDocs, because this
-build talks to nothing else — but four of them are the *model's* behaviour reached
+**Every item says whose it is.** All twenty-four are SuperDocs, because this
+build talks to nothing else — but five of them are the *model's* behaviour reached
 through the API rather than a defect in the API itself, and calling those bugs
 would be unfair to the service. They are marked as such. The sibling build in
 `extensions/CulturalProfessor/runbook-reconciler` carries the Confluence Cloud
@@ -34,7 +35,7 @@ findings, and labels its items the same way.
 
 No key appears in this file. Every snippet uses `$SUPERDOCS_API_KEY`.
 
-Items 1–7 are ranked by how much they cost me; 8–23 are appended in the order
+Items 1–7 are ranked by how much they cost me; 8–24 are appended in the order
 they turned up rather than renumbering the list. Item 13 is an observation
 without a reproduction, and says so.
 
@@ -1134,6 +1135,65 @@ documents that actually edits all of them, so "the same edit in both" is one
 operation with one outcome instead of two turns that can disagree. Failing
 that, a reply that says which passages a turn considered and rejected would
 make the gap visible without a second read.
+
+---
+
+## 24. The only way to change an `<img src>` is a chat turn, and the turn reaches for a tool that cannot do it
+
+**Whose:** the model, through SuperDocs
+
+**Severity: medium — the diagram-refresh path fails on roughly half its runs,
+in two different ways, and one of them would have destroyed a caption.**
+
+**What I did.** Ran `sync`: eight drawings re-rendered and re-uploaded, then one
+turn per document asking for the `<img src>` substitutions, naming each figure
+by its caption. A document already on the service cannot be re-uploaded without
+becoming a different document, so a chat turn is the only surface there is for
+this.
+
+**What I expected.** A `src` attribute to change.
+
+**What happened — twice, differently.** The first run left one figure alone and
+said so only when asked: *"⚠️ That didn't work — that file isn't one of this
+session's attachments. Notes: I can only replace an image with one you've
+attached to this chat. Attach the new image first, then ask me to swap."* The
+turn had reached for an image-replacement tool that only accepts files attached
+to that chat, and the drawings are uploaded to the service's own image storage,
+not attached to a session. It hit the manual on one run and the card on the
+next, so which path a turn takes is not stable.
+
+Told in as many words that this was a text edit to an attribute and not an
+image operation, the next run did something worse: it put an `<img>` into the
+*caption paragraph*. The service stores a figure as `<p><img alt="X"></p>` and
+its caption as a **separate** paragraph containing the same words X — so "the
+figure whose caption is X" matches a block of plain text as readily as it
+matches the image. `assert_only_the_image_changed` refused the batch, which is
+the only reason this is a story about a refusal rather than about a manual that
+silently lost a caption.
+
+**Reproduce.** Upload an image with `POST /v1/documents/upload-image`, then ask
+a chat turn to point an existing figure at the returned URL, identifying the
+figure by its caption. Repeat: the failure is not deterministic.
+
+**Cost to me.** Three `sync` runs and about six operations, and it is the second
+time this build has paid for the fact that a turn which refused and a turn which
+had nothing to do come back identical (see #9).
+
+**Workaround.** Three changes, all on this side. The instruction now anchors on
+`data-chunk-id` — read free off the document first — rather than on the
+caption, which is the one identifier in the document that is *not* ambiguous.
+It says plainly that this is an attribute edit, that the drawings are already
+hosted, and that a block holding only text is a caption and not a figure. And
+when a refresh is refused, `sync` prints what each turn actually said, because
+that sentence about attachments was sitting in the reply the whole time with
+nothing printing it. First run with the chunk-id anchor: nine clean swaps, both
+guards passed, no retry.
+
+**Suggested fix.** An endpoint that sets an image URL on a block, or an image
+tool that accepts a URL already in the service's own storage. Everything about
+this operation is mechanical — a model is in the path only because there is no
+other way in, and the tool it reaches for cannot see the file the same API just
+stored.
 
 ---
 

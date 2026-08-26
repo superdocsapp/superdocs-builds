@@ -686,7 +686,7 @@ which is exactly how it stayed wrong through nine commits.
 
 ### What broke while building this
 
-[`BUGS.md`](BUGS.md) — twenty-three numbered findings against the live API, each
+[`BUGS.md`](BUGS.md) — twenty-four numbered findings against the live API, each
 with what was expected, what happened, how to reproduce it and what it cost.
 They sit next to the build that found them rather than in a notes file
 somewhere, because most of them are the reason a particular piece of this code
@@ -703,7 +703,11 @@ the read side agrees with it, and `verify` reported a correct pair as wrong. And
 `approve` compares the pair passage by passage once the batch lands, repairing
 the one document an edit left behind, because of #23 — the same instruction
 found three passages in the manual and two of the card's three, and every guard
-this build had passed that batch.
+this build had passed that batch. `sync` anchors each swap on the chunk id
+rather than on the figure's caption, and prints what a refused turn actually
+said, because of #24 — the caption is stored twice, once as the image's `alt`
+and once as its own paragraph, and a turn told to find "the figure whose
+caption is X" put an `<img>` into the paragraph.
 
 Item 13 is an observation without a reproduction, and says so. Items 14–19 came
 from a second pass made after reading `docs.superdocs.app` in full rather than

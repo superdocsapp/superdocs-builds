@@ -531,7 +531,7 @@ def cmd_ask(args) -> int:
     return 0
 
 
-def _save_proposal(published, changes) -> Path:
+def _save_proposal(published, changes, unchanged_text: dict[str, str] | None = None) -> Path:
     """Write the proposed batch down so a person can review it and come back.
 
     Change ids are minted per turn: re-running `edit` to reject one of them
@@ -546,6 +546,12 @@ def _save_proposal(published, changes) -> Path:
             {
                 "sessions": published.sessions,
                 "jobs": published.jobs,
+                # A diagram refresh has a post-condition an edit does not: not
+                # one word of either document may move. The text as it read
+                # before the batch travels with the batch, because `approve` is
+                # a separate command and cannot otherwise know what "unchanged"
+                # was supposed to mean.
+                "unchanged_text": unchanged_text or {},
                 "changes": [
                     {
                         "change_id": c.change_id,
@@ -633,6 +639,8 @@ def cmd_approve(args) -> int:
         _settle(client, published, [c for c in changes if c.change_id not in reject])
 
         path.unlink()  # a batch is applied once; a stale one is a trap
+        if not _nothing_else_moved(client, published, saved.get("unchanged_text") or {}):
+            return 1
         if not _realign(client, published, _spec_for(args), args.no_repair):
             return 1
 
@@ -685,6 +693,47 @@ def _settle(client, published, changes) -> bool:
         "Nothing is wrong with the batch -- this is the read side lagging the "
         "write (BUGS #22).\n`verify` run now would report those as an older "
         "drawing or an unedited step; run it again in a minute."
+    )
+    return False
+
+
+def _nothing_else_moved(client, published, before: dict[str, str]) -> bool:
+    """Prove a diagram refresh changed no words, now that it has been applied.
+
+    `sync` checks every proposed change is an image URL and nothing else, which
+    is a claim about the batch. This is the claim about the *documents*, made
+    after the write and against the service: read both back and require the
+    text to be the text `sync` saw before it proposed anything.
+
+    It exists because of one observation this could not otherwise explain. A
+    passage that two commands earlier read 1.6 N·m in both documents read 1.2
+    in both a few minutes later, with nothing but a diagram refresh in between
+    -- and every check this build had passed either way, because the pair
+    agreed with itself and the figures were the right figures. This does not
+    prevent that; nothing on this side of the API can. It makes it loud.
+    """
+    if not before:
+        return True
+    served = session.read_pair(client, published)
+    moved = []
+    for document_id, was in before.items():
+        name = published.name_for(document_id)
+        now = vf.text_of(served.get(name, ""))
+        if now != was:
+            moved.append((name, vf.difference(was, now)))
+    if not moved:
+        return True
+
+    print(
+        f"\n{_red('the wording moved')}: this batch was a diagram refresh, which "
+        f"must not change one word of either document -- and the text is not "
+        f"what it was before the batch:"
+    )
+    for name, difference in moved:
+        print(f"  {name:<18} {difference or 'reformatted, with no words added or removed'}")
+    _next(
+        "manualbuilder verify to see whether the pair still agrees with itself",
+        'manualbuilder edit "…" to put back whatever went missing',
     )
     return False
 
@@ -775,6 +824,7 @@ def cmd_sync(args) -> int:
     the document is checked to have been a swap and nothing else before anyone
     is asked to approve it.
     """
+    from manualbuilder import superdocs
     from manualbuilder.superdocs import SuperDocsError
 
     spec = _spec(args)
@@ -787,7 +837,7 @@ def cmd_sync(args) -> int:
 
     published = _load(args)
     with _client() as client:
-        changes, expected, asked = session.swap_diagrams(client, published, spec)
+        changes, expected, asked, replies, current = session.swap_diagrams(client, published, spec)
         # `swap_diagrams` moves each document into a fresh session, so the
         # record on disk has to follow or the next command talks to the old one.
         _save(published, args.language)
@@ -799,10 +849,26 @@ def cmd_sync(args) -> int:
             # that should have moved did. A turn that changed nothing passes the
             # first on its own.
             session.assert_only_the_image_changed(changes, expected)
-            session.assert_every_figure_swapped(changes, asked)
+            session.assert_every_figure_swapped(changes, asked, name=published.name_for)
         except SuperDocsError as exc:
             print(f"\n{_red('REFUSED')}: {exc}")
-            _next("manualbuilder approve --discard to free the session; nothing was applied")
+            # A turn that had nothing to do and a turn that asked a question
+            # come back identical (BUGS #9), and the difference is in words
+            # nothing was printing. On a refusal they are exactly what is
+            # missing, so whatever each turn said goes on screen with it.
+            for document_id, job in replies.items():
+                said = superdocs.reply_text(job)
+                if said:
+                    print(
+                        _dim(
+                            f"  the {published.name_for(document_id)}'s turn said: " f"{said[:300]}"
+                        )
+                    )
+            _next(
+                "manualbuilder approve --discard to free the session; nothing was applied",
+                "manualbuilder sync again after that -- the drawings are uploaded "
+                "and unchanged, and a turn that refused once often does not twice",
+            )
             return 1
 
         for change in changes:
@@ -812,7 +878,11 @@ def cmd_sync(args) -> int:
             )
         print(f"\n{len(changes)} change(s), each one an image URL and nothing else")
 
-        path = _save_proposal(published, changes)
+        path = _save_proposal(
+            published,
+            changes,
+            unchanged_text={document_id: vf.text_of(html) for document_id, html in current.items()},
+        )
         if not args.yes:
             print(f"nothing approved. {path} holds the batch.")
             _next("manualbuilder approve to apply it")

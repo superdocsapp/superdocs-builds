@@ -574,6 +574,41 @@ class SuperDocs:
         return listed if isinstance(listed, list) else []
 
 
+def reply_text(job: dict[str, Any]) -> str:
+    """Whatever the turn said in words, if it said anything at all.
+
+    A turn that had nothing to do and a turn that asked a clarifying question
+    come back the same shape -- `pending_changes` empty either way -- and the
+    difference between them is prose that nothing here was printing (BUGS #9).
+    So when a refresh refuses because a document did not move, this is what it
+    can show instead of leaving somebody to guess.
+
+    Which field carries it is not documented and differs between the polled job
+    and the streamed one, so several are tried in turn. An empty string means
+    none of them held anything, which is itself worth printing nothing about.
+    """
+    metadata = job.get("metadata") or {}
+    for candidate in (
+        job.get("response"),
+        metadata.get("response"),
+        metadata.get("final_response"),
+        job.get("result"),
+        job.get("output"),
+    ):
+        if isinstance(candidate, dict):
+            candidate = candidate.get("response")
+        if isinstance(candidate, str) and candidate.strip():
+            return " ".join(candidate.split())
+
+    for entry in reversed(job.get("intermediate_responses") or []):
+        content = entry.get("content")
+        if entry.get("type") == "proposed_change_batch" or not isinstance(content, str):
+            continue
+        if content.strip():
+            return " ".join(content.split())
+    return ""
+
+
 def _batch_items(content: Any) -> list[dict[str, Any]]:
     """A batch is either a list of changes or an object grouping them."""
     if isinstance(content, list):
