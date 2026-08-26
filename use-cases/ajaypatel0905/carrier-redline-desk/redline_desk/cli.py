@@ -109,16 +109,44 @@ def prompt_reviewer(payload: dict) -> dict:
         why = _why(change)
         if why:
             print(f"  WHY: {why}")
-        while True:
-            answer = input("  approve? [y]es / [n]o / n + feedback (e.g. `n keep the cap wording`): ").strip()
-            if answer.lower().startswith("y"):
-                decisions[change["change_id"]] = {"approved": True}
-                break
-            if answer.lower().startswith("n"):
-                feedback = answer[1:].strip() or None
-                decisions[change["change_id"]] = {"approved": False, "feedback": feedback}
-                break
+        decisions[change["change_id"]] = ask_decision()
     return decisions
+
+
+APPROVE_WORDS = {"y", "yes", "approve", "approved", "ok", "accept"}
+REJECT_WORDS = {"n", "no", "reject", "rejected", "deny", "skip"}
+
+
+def parse_answer(answer: str) -> dict | None:
+    """y/yes/approve → approve; n/no/reject → reject; `n <text>` or any other
+    text → reject with that text as feedback (the AI revises). Empty → ask again."""
+    a = answer.strip()
+    if not a:
+        return None
+    low = a.lower()
+    if low in APPROVE_WORDS:
+        return {"approved": True}
+    if low in REJECT_WORDS:
+        return {"approved": False, "feedback": None}
+    first, _, rest = a.partition(" ")
+    if first.lower() in REJECT_WORDS and rest.strip():
+        return {"approved": False, "feedback": rest.strip()}
+    return {"approved": False, "feedback": a}
+
+
+def ask_decision() -> dict:
+    while True:
+        decision = parse_answer(input("  approve? y = approve · n = reject · or type feedback and the AI will revise: "))
+        if decision is None:
+            print("  (type y, n, or your feedback)")
+            continue
+        if decision["approved"]:
+            print("  ✔ approved")
+        elif decision["feedback"]:
+            print(f"  ↩ rejected — sending your feedback for a revision: “{decision['feedback']}”")
+        else:
+            print("  ✘ rejected — the carrier's wording stands")
+        return decision
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -38,7 +38,7 @@ cp .env.example .env                      # put your real key in .env
 
 Outputs land in `runs/<run-name>/`: `redlined_contract.docx` (tracked changes), `negotiation_summary.docx`, `summary.json`, `VERIFICATION.md`.
 
-The demo playbook covers the three shapes of decision in three questions: a liability cap to replace, detention terms to rewrite, and a safety clause the carrier's paper lacks (inserted from the playbook, no AI involved). While the AI works you see live progress — what it is doing, how long it has taken, and its own interim messages as they arrive. At each clause you see the carrier's text and the proposed text and answer `y`, `n`, or `n <feedback>`; feedback goes back to the AI, which returns a revision in a follow-up round. Ctrl-C mid-review pauses; re-running the same command resumes at that exact clause.
+The demo playbook covers the three shapes of decision in three questions: a liability cap to replace, detention terms to rewrite, and a safety clause the carrier's paper lacks (inserted from the playbook, no AI involved). While the AI works you see live progress — what it is doing, how long it has taken, and its own interim messages as they arrive. At each clause you see the carrier's text and the proposed text and answer `y`, `n`, or simply type feedback; feedback goes back to the AI, which returns a revision in a follow-up round. Ctrl-C mid-review pauses; re-running the same command resumes at that exact clause.
 
 ```bash
 .venv/bin/python -m pytest tests/       # 9 tests: no key, no network

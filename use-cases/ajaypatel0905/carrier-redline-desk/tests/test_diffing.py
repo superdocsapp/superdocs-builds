@@ -36,3 +36,15 @@ def test_insertion_block():
 def test_identical_content_yields_no_marks():
     block = diffing.redline_block(OLD, OLD, "A", "D")
     assert "<ins" not in block and "<del" not in block
+
+
+def test_reviewer_answers_are_forgiving():
+    from redline_desk.cli import parse_answer
+
+    assert parse_answer("y") == {"approved": True}
+    assert parse_answer("Yes") == {"approved": True}
+    assert parse_answer("n") == {"approved": False, "feedback": None}
+    assert parse_answer("n keep the cap wording") == {"approved": False, "feedback": "keep the cap wording"}
+    # feedback typed without a leading n is still feedback, never silently ignored
+    assert parse_answer("keep the 400 daily cap but change free time to 3 hours") == {"approved": False, "feedback": "keep the 400 daily cap but change free time to 3 hours"}
+    assert parse_answer("   ") is None
