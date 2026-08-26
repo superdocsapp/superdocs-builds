@@ -1,0 +1,808 @@
+{
+  "cells": [
+    {
+      "tier": "large",
+      "concurrency": 1,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 4.430969500011997,
+          "p95_s": 4.677743680006825,
+          "p99_s": 4.708445616005919,
+          "min_s": 4.228916899999604,
+          "max_s": 4.716121100005694,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 7.665351100004045,
+          "p95_s": 9.114466779993382,
+          "p99_s": 9.197161995994392,
+          "min_s": 6.907064699975308,
+          "max_s": 9.217835799994646,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 3.715862700017169,
+          "p95_s": 4.55153598000179,
+          "p99_s": 4.713425995999714,
+          "min_s": 2.8773908000148367,
+          "max_s": 4.753898499999195,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.8916108999983408,
+          "p95_s": 1.1040390799986197,
+          "p99_s": 1.141544935996644,
+          "min_s": 0.7444485999876633,
+          "max_s": 1.1509213999961503,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 1,
+        "mean_dispatch_s": 1.339230080001289,
+        "max_dispatch_s": 1.4106258999963757,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "large",
+      "concurrency": 2,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 3,
+          "n_ok": 2,
+          "median_s": 6.781238950003171,
+          "p95_s": 7.2021427149942605,
+          "p99_s": 7.239556382993469,
+          "min_s": 6.313568100013072,
+          "max_s": 7.248909799993271,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 2,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 2,
+          "median_s": 12.166098450004938,
+          "p95_s": 15.458034074991883,
+          "p99_s": 15.750650574990722,
+          "min_s": 8.508392200019443,
+          "max_s": 15.823804699990433,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 2,
+          "n_rate_limited": 0,
+          "n_errored": 1,
+          "n_ok": 1,
+          "median_s": 4.214922499988461,
+          "p95_s": 4.214922499988461,
+          "p99_s": 4.214922499988461,
+          "min_s": 4.214922499988461,
+          "max_s": 4.214922499988461,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 1,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 1,
+          "median_s": 1.196486000000732,
+          "p95_s": 1.196486000000732,
+          "p99_s": 1.196486000000732,
+          "min_s": 1.196486000000732,
+          "max_s": 1.196486000000732,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 2,
+        "mean_dispatch_s": 1.7599670799972955,
+        "max_dispatch_s": 1.9706370999920182,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "large",
+      "concurrency": 4,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 5,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 0,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 0,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 0,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 4,
+        "mean_dispatch_s": 1.2115284400002566,
+        "max_dispatch_s": 1.3143532999965828,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "large",
+      "concurrency": 8,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 5,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 0,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 0,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 0,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 0,
+          "median_s": NaN,
+          "p95_s": NaN,
+          "p99_s": NaN,
+          "min_s": NaN,
+          "max_s": NaN,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 8,
+        "mean_dispatch_s": 1.354674439993687,
+        "max_dispatch_s": 1.367006800021045,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "medium",
+      "concurrency": 1,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.9199701999896206,
+          "p95_s": 2.5595533000014257,
+          "p99_s": 2.6424763400049414,
+          "min_s": 1.5247348000120837,
+          "max_s": 2.6632071000058204,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 4.145454700017581,
+          "p95_s": 5.968329419987276,
+          "p99_s": 6.303315083989873,
+          "min_s": 4.0909051000198815,
+          "max_s": 6.387061499990523,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.4153991999919526,
+          "p95_s": 2.3811111599789,
+          "p99_s": 2.4374381519737653,
+          "min_s": 1.340360200003488,
+          "max_s": 2.4515198999724817,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.6449102999758907,
+          "p95_s": 0.8487957400036975,
+          "p99_s": 0.8582325080083684,
+          "min_s": 0.6032201999914832,
+          "max_s": 0.860591700009536,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 1,
+        "mean_dispatch_s": 0.4598559200123418,
+        "max_dispatch_s": 0.5526280000049155,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "medium",
+      "concurrency": 2,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 2.1238897000148427,
+          "p95_s": 3.1561630600073842,
+          "p99_s": 3.2056122920045165,
+          "min_s": 1.5095457000134047,
+          "max_s": 3.2179746000037994,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 6.103989099996397,
+          "p95_s": 9.33774574000854,
+          "p99_s": 9.612498588007874,
+          "min_s": 4.96912130000419,
+          "max_s": 9.681186800007708,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 2.532213700003922,
+          "p95_s": 2.960371120000491,
+          "p99_s": 2.9617288639966866,
+          "min_s": 1.423954900004901,
+          "max_s": 2.9620682999957353,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.8311884999857284,
+          "p95_s": 0.9878007800027262,
+          "p99_s": 1.0167935960029717,
+          "min_s": 0.5790841999987606,
+          "max_s": 1.0240418000030331,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 2,
+        "mean_dispatch_s": 0.7171770999964793,
+        "max_dispatch_s": 1.2690854000102263,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "medium",
+      "concurrency": 4,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 2.854645499988692,
+          "p95_s": 3.4643367800163105,
+          "p99_s": 3.500511036021635,
+          "min_s": 1.8867406999925151,
+          "max_s": 3.509554600022966,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 8.841289900010452,
+          "p95_s": 17.628838779992655,
+          "p99_s": 18.547540955991717,
+          "min_s": 5.838320199982263,
+          "max_s": 18.777216499991482,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 3.066926199971931,
+          "p95_s": 4.085464459989453,
+          "p99_s": 4.178209611988859,
+          "min_s": 2.294304100010777,
+          "max_s": 4.201395899988711,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.7935645999968983,
+          "p95_s": 0.990298499999335,
+          "p99_s": 0.9951669799990486,
+          "min_s": 0.6191693000146188,
+          "max_s": 0.996384099998977,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 4,
+        "mean_dispatch_s": 2.149786539992783,
+        "max_dispatch_s": 2.4002895999874454,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "medium",
+      "concurrency": 8,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 4.178261299995938,
+          "p95_s": 5.000976819987408,
+          "p99_s": 5.05146568398457,
+          "min_s": 3.491534500004491,
+          "max_s": 5.0640878999838606,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 9.432249900011811,
+          "p95_s": 10.02280441999901,
+          "p99_s": 10.054848163998685,
+          "min_s": 5.176215499988757,
+          "max_s": 10.062859099998605,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 4.734156199992867,
+          "p95_s": 5.363410159992053,
+          "p99_s": 5.48703099199105,
+          "min_s": 4.574955499992939,
+          "max_s": 5.5179361999908,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.0161794000014197,
+          "p95_s": 1.53229826001334,
+          "p99_s": 1.6340543720161076,
+          "min_s": 0.6518931000027806,
+          "max_s": 1.6594934000167996,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 8,
+        "mean_dispatch_s": 2.5738914000045043,
+        "max_dispatch_s": 2.585257400001865,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "small",
+      "concurrency": 1,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.0010646999871824,
+          "p95_s": 2.045374020008603,
+          "p99_s": 2.253183284007245,
+          "min_s": 0.9640662999881897,
+          "max_s": 2.3051356000069063,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 4.436586499999976,
+          "p95_s": 12.118242179986554,
+          "p99_s": 13.55555443598656,
+          "min_s": 3.018892899999628,
+          "max_s": 13.914882499986561,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.5986460999993142,
+          "p95_s": 2.030909460008843,
+          "p99_s": 2.090160292008659,
+          "min_s": 1.3890570999938063,
+          "max_s": 2.104973000008613,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.7333090000029188,
+          "p95_s": 0.7920424399897457,
+          "p99_s": 0.8001480079861358,
+          "min_s": 0.5603227999818046,
+          "max_s": 0.8021743999852333,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 1,
+        "mean_dispatch_s": 0.6371029400033876,
+        "max_dispatch_s": 1.304768400004832,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "small",
+      "concurrency": 2,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.1032372000045143,
+          "p95_s": 1.3141590799903498,
+          "p99_s": 1.3141913359891622,
+          "min_s": 0.9896120999765117,
+          "max_s": 1.3141993999888655,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 5.318958300020313,
+          "p95_s": 10.898427760013146,
+          "p99_s": 11.910561232016189,
+          "min_s": 4.059109399997396,
+          "max_s": 12.16359460001695,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.3958075999980792,
+          "p95_s": 1.570518940000329,
+          "p99_s": 1.5999101080023683,
+          "min_s": 1.3213029000035021,
+          "max_s": 1.6072579000028782,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.7425713000120595,
+          "p95_s": 0.7548226199869532,
+          "p99_s": 0.755824523983756,
+          "min_s": 0.6416346000041813,
+          "max_s": 0.7560749999829568,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 2,
+        "mean_dispatch_s": 0.5248738599999342,
+        "max_dispatch_s": 0.644589100003941,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "small",
+      "concurrency": 4,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 5.059226899989881,
+          "p95_s": 5.133657800010406,
+          "p99_s": 5.1381504400121045,
+          "min_s": 0.953271299978951,
+          "max_s": 5.13927360001253,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 4.556597200018587,
+          "p95_s": 7.365415860008215,
+          "p99_s": 7.65594013201422,
+          "min_s": 4.401023999991594,
+          "max_s": 7.728571200015722,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 2.5427199999976438,
+          "p95_s": 2.5850197799853047,
+          "p99_s": 2.5875348359835333,
+          "min_s": 1.3161994999973103,
+          "max_s": 2.5881635999830905,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 1.3576249000034295,
+          "p95_s": 1.381824900000356,
+          "p99_s": 1.3866262599965558,
+          "min_s": 0.5865868000255432,
+          "max_s": 1.3878265999956056,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 4,
+        "mean_dispatch_s": 0.930549900000915,
+        "max_dispatch_s": 1.253715300001204,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    },
+    {
+      "tier": "small",
+      "concurrency": 8,
+      "phases": {
+        "upload": {
+          "phase": "upload",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 2.1460347000102047,
+          "p95_s": 2.161043500015512,
+          "p99_s": 2.1638124600192534,
+          "min_s": 2.089856599981431,
+          "max_s": 2.1645047000201885,
+          "rate_limit_fraction": 0.0
+        },
+        "processing": {
+          "phase": "processing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 5.920789499999955,
+          "p95_s": 7.10624401998939,
+          "p99_s": 7.148198163986671,
+          "min_s": 4.71895469998708,
+          "max_s": 7.158686699985992,
+          "rate_limit_fraction": 0.0
+        },
+        "editing": {
+          "phase": "editing",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 2.3822765999939293,
+          "p95_s": 2.4884063600038644,
+          "p99_s": 2.4902815920009744,
+          "min_s": 1.6950493999756873,
+          "max_s": 2.490750400000252,
+          "rate_limit_fraction": 0.0
+        },
+        "export": {
+          "phase": "export",
+          "n_total": 5,
+          "n_rate_limited": 0,
+          "n_errored": 0,
+          "n_ok": 5,
+          "median_s": 0.7545204999914858,
+          "p95_s": 1.0258134999894537,
+          "p99_s": 1.0430741399875842,
+          "min_s": 0.7359356000088155,
+          "max_s": 1.0473892999871168,
+          "rate_limit_fraction": 0.0
+        }
+      },
+      "dispatch_check": {
+        "checked": true,
+        "concurrency": 8,
+        "mean_dispatch_s": 0.979221540002618,
+        "max_dispatch_s": 0.9865891000081319,
+        "warn_threshold_s": 0.05,
+        "generator_is_bottleneck": true
+      },
+      "fatal_errors": []
+    }
+  ]
+}
