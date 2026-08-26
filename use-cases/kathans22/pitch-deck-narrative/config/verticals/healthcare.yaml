@@ -1,0 +1,45 @@
+vertical: healthcare
+display_name: Healthcare / clinical operations quality
+
+buyer_role: >
+  Clinical operations or Quality lead at a multi-site provider group who owns protocol
+  consistency, discharge-document quality, and the rule that patient-facing text never
+  moves without a named human gate.
+
+regulatory_trigger: >
+  HIPAA Privacy and Security Rule expectations for protected health information (PHI)
+  in the United States — minimum necessary, access control, and documentation of how
+  patient-related text is handled. Site accreditation and payer documentation standards
+  also pressure consistency across facilities. Exact OCR / state privacy overlays vary;
+  this file is pitch context, not legal advice. No claim that ClarityDocs is HIPAA
+  certified.
+
+document_pain: >
+  Care protocols and discharge instructions diverge across sites. The "current" version
+  of a pathway lives in a shared drive, a PDF email, and a printed binder. Quality
+  reviews find wording that implies clinical guarantees nobody approved, and there is
+  no item-by-item way to reject those lines without redoing the whole packet.
+
+typical_objection: >
+  Nothing that touches patient text ships without a human gate. We will not use a tool
+  that invents clinical language, blurs PHI into training folklore, or markets "guaranteed
+  removal" of personal data. Redaction and clinical wording must be human-reviewed and
+  said plainly as such.
+
+proof_point: >
+  Invented reference story — "Cedar Ward Quality Office": three hospital sites had
+  drifted discharge-instruction packets for post-op orthopedics. ClarityDocs ingested
+  the three packets, staged findings against the system checklist, and let quality
+  reject two over-strong recovery claims while keeping the rest. Export was the
+  approved packet DOCX with citations to each source page — no patient identifiers in
+  the demo corpus.
+
+terminology:
+  - PHI
+  - HIPAA
+  - care pathway
+  - discharge instructions
+  - clinical protocol
+  - quality review
+  - minimum necessary
+  - site packet

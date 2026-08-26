@@ -1,0 +1,71 @@
+.nar-pick {
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.nar-a {
+  color: var(--ink);
+}
+
+.nar-list tbody th {
+  text-align: left;
+}
+
+.nar-script {
+  margin-top: 3.5rem;
+}
+
+.nar-gallery {
+  display: grid;
+  gap: 1.5rem;
+  margin: 0 0 2.5rem;
+}
+
+.nar-figure {
+  margin: 0;
+  max-width: 40rem;
+}
+
+.nar-figure img {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+.nar-figure figcaption {
+  font-family: var(--meta);
+  font-size: 0.78rem;
+  color: var(--mute);
+  margin-top: 0.45rem;
+}
+
+.nar-sec {
+  border-top: 1px solid var(--rule);
+  padding: 1.4rem 0 1.6rem;
+}
+
+.nar-talk {
+  font-family: var(--sans);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  margin: 0 0 1rem;
+  max-width: 38rem;
+}
+
+.nar-notes {
+  font-family: var(--sans);
+  font-size: 1.02rem;
+  line-height: 1.5;
+  color: var(--ink);
+  margin: 0 0 1rem;
+  max-width: 40rem;
+  white-space: pre-wrap;
+}

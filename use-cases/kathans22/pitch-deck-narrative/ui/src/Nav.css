@@ -1,0 +1,30 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 1.15rem 1.5rem 0.9rem;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--meta);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nav-link {
+  color: var(--mute);
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+}
+
+.nav-link.is-current {
+  color: var(--ink);
+}

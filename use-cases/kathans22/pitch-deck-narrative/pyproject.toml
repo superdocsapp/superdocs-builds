@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pitch-deck-narrative"
+version = "0.1.0"
+description = "ClarityDocs vertical pitch-script generator built on SuperDocs MCP"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi",
+  "uvicorn",
+  "pyyaml",
+  "httpx",
+  "httpx2",
+  "mcp",
+  "pytest",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pytestasyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]

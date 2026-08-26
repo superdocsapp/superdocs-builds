@@ -1,0 +1,82 @@
+{
+  "product": "ClarityDocs",
+  "note": "Named data from config/verticals/*.yaml — not a shared skeleton with blanks.",
+  "packs": [
+    {
+      "code": "legal",
+      "display_name": "Legal / law firm operations",
+      "buyer_role": "Managing partner or Head of Knowledge Management at a mid-market firm who owns precedent quality, matter playbooks, and the risk that associates ship the wrong prior language into a live engagement.",
+      "regulatory_trigger": "Client confidentiality and ethical walls between matters (US firms commonly frame this under professional-conduct rules such as ABA Model Rule 1.6 and related screening duties). Exact state bar rules vary — ABA framing is orientation, not a certified compliance claim.",
+      "document_pain": "Clause libraries and matter playbooks drift across matters. Associates paste from the nearest prior without provenance. Partners re-review the same clause family with no register of what changed or which client form was authoritative.",
+      "typical_objection": "Our precedents and playbooks are the firm's moat. We will not put matter-bound language into a shared AI workspace where another matter — or another client — could see it, and we will not accept a tool that invents clause text we did not approve.",
+      "proof_point": "Invented reference — Northbridge LLP Knowledge Desk: after a force-majeure clause drifted across three client forms, KM used ClarityDocs to build a clause-drift register with every talking point cited to the source prior. Export was a DOCX brief, not a dashboard.",
+      "terminology": [
+        "engagement letter",
+        "matter wall",
+        "precedent",
+        "playbook clause",
+        "conflict check",
+        "outside counsel guidelines",
+        "redline",
+        "knowledge management"
+      ]
+    },
+    {
+      "code": "fintech",
+      "display_name": "Fintech / compliance operations",
+      "buyer_role": "Head of Risk or Compliance Operations at a growth-stage payments or lending company who owns policy packs, control evidence, and examiner-ready document trails when product and legal change faster than the binders.",
+      "regulatory_trigger": "Examiner and auditor document requests under BSA/AML programme expectations, and customer-facing disclosure / fair-lending document control where applicable. SOC 2 Type II evidence packs. Not a compliance opinion.",
+      "document_pain": "Policy packs and control narratives go stale the week after a product launch. Evidence for the same control lives in three folders with three dates. When an examiner asks what was in force on date X, the team rebuilds the answer from chat threads.",
+      "typical_objection": "A model that invents controls, invents attestations, or silently fixes policy wording is worse than no tool. We will not ship language into an evidence pack unless a named human approved that finding, and we need rejected items to stay rejected.",
+      "proof_point": "Invented reference — HarborPay Compliance Ops: ahead of a SOC 2 observation window, ops reconciled three versions of the incident-response policy against the control matrix. Twelve findings staged; four rejected as over-claims; eight committed with citations.",
+      "terminology": [
+        "BSA/AML",
+        "SOC 2",
+        "control narrative",
+        "evidence pack",
+        "examiner request",
+        "policy pack",
+        "observation window",
+        "attestation"
+      ]
+    },
+    {
+      "code": "healthcare",
+      "display_name": "Healthcare / clinical operations quality",
+      "buyer_role": "Clinical operations or Quality lead at a multi-site provider group who owns protocol consistency, discharge-document quality, and the rule that patient-facing text never moves without a named human gate.",
+      "regulatory_trigger": "HIPAA Privacy and Security Rule expectations for PHI in the United States — minimum necessary, access control, documentation of how patient-related text is handled. Pitch context, not legal advice. No claim that ClarityDocs is HIPAA certified.",
+      "document_pain": "Care protocols and discharge instructions diverge across sites. The current version of a pathway lives in a shared drive, a PDF email, and a printed binder. Quality reviews find wording that implies clinical guarantees nobody approved.",
+      "typical_objection": "Nothing that touches patient text ships without a human gate. We will not use a tool that invents clinical language, blurs PHI into training folklore, or markets guaranteed removal of personal data.",
+      "proof_point": "Invented reference — Cedar Ward Quality Office: three hospital sites had drifted discharge-instruction packets. Quality rejected two over-strong recovery claims while keeping the rest. Demo corpus had no patient identifiers.",
+      "terminology": [
+        "PHI",
+        "HIPAA",
+        "care pathway",
+        "discharge instructions",
+        "clinical protocol",
+        "quality review",
+        "minimum necessary",
+        "site packet"
+      ]
+    },
+    {
+      "code": "edtech",
+      "display_name": "Edtech / academic operations",
+      "buyer_role": "Registrar or Academic Operations lead at a multi-campus institution who owns catalogue language, policy handbooks, and the fear that student-facing documents contradict each other across campuses and terms.",
+      "regulatory_trigger": "FERPA constraints on education records in the United States. For products that touch under-13 users, COPPA may also apply. Not a compliance determination. No claim that ClarityDocs is FERPA or COPPA certified.",
+      "document_pain": "Course catalogues, student handbooks, and grievance procedures diverge by campus and term. A policy update lands in one PDF and never reaches the HTML handbook. Appeals committees argue from different current documents.",
+      "typical_objection": "We will not put student education records into an AI workspace for convenience. Any tool that rewrites handbook language must show exact provenance, keep humans approving each change, and must never imply automated decisions about student rights.",
+      "proof_point": "Invented reference — Lumen State Academic Ops: four campuses published conflicting grade-appeal timelines. Committee chairs rejected one proposed timeline that would have shortened a statutory notice window. Export was a DOCX speaking brief, not a slide file.",
+      "terminology": [
+        "FERPA",
+        "education record",
+        "course catalogue",
+        "student handbook",
+        "grade appeal",
+        "accreditation pack",
+        "term effective date",
+        "academic senate"
+      ]
+    }
+  ]
+}

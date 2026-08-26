@@ -1,0 +1,46 @@
+# One-command demo: API (:8000) + UI (:8080)
+# Prerequisite (documented once): cp .env.example .env  and set SUPERDOCS_API_KEY=sk_…
+# Then: docker compose up --build
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    # Compose fails early if .env is absent — entrypoint also names Cause/Fix.
+    env_file:
+      - path: .env
+        required: true
+    environment:
+      SUPERDOCS_CHAT_BATCH_CAP: ${SUPERDOCS_CHAT_BATCH_CAP:-2}
+      OPS_BUDGET_CAP: ${OPS_BUDGET_CAP:-200}
+      SUPERDOCS_MCP_URL: ${SUPERDOCS_MCP_URL:-https://api.superdocs.app/mcp/}
+    volumes:
+      - ./out:/app/out
+      - ./state:/app/state
+      - ./evidence:/app/evidence
+      - ./config:/app/config:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/verticals', timeout=5)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      api:
+        condition: service_healthy

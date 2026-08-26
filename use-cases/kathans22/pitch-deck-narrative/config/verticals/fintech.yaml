@@ -1,0 +1,43 @@
+vertical: fintech
+display_name: Fintech / compliance operations
+
+buyer_role: >
+  Head of Risk or Compliance Operations at a growth-stage payments or lending company
+  who owns policy packs, control evidence, and examiner-ready document trails when
+  product and legal change faster than the binders.
+
+regulatory_trigger: >
+  Examiner and auditor document requests under BSA/AML programme expectations, and
+  customer-facing disclosure / fair-lending document control where applicable. SOC 2
+  Type II evidence packs that must show what changed in policies between observation
+  windows. Exact supervisory manuals and chartering regime depend on product and
+  jurisdiction — do not treat this file as a compliance opinion.
+
+document_pain: >
+  Policy packs and control narratives go stale the week after a product launch.
+  Evidence for the same control lives in three folders with three dates. When an
+  examiner asks "show me what was in force on date X," the team rebuilds the answer
+  from chat threads instead of a provenance-backed register.
+
+typical_objection: >
+  A model that invents controls, invents attestations, or silently "fixes" policy
+  wording is worse than no tool. We will not ship language into an evidence pack
+  unless a named human approved that finding, and we need rejected items to stay
+  rejected without discarding the rest of the review.
+
+proof_point: >
+  Invented reference story — "HarborPay Compliance Ops": ahead of a SOC 2 observation
+  window, ops used ClarityDocs to reconcile three versions of the incident-response
+  policy against the control matrix. Twelve findings were staged; four were rejected
+  as over-claims; eight committed with citations to the source PDF pages. Export was
+  the evidence narrative DOCX the auditor already expected.
+
+terminology:
+  - BSA/AML
+  - SOC 2
+  - control narrative
+  - evidence pack
+  - examiner request
+  - policy pack
+  - observation window
+  - attestation

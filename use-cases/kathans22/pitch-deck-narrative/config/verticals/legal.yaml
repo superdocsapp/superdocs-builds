@@ -1,0 +1,43 @@
+vertical: legal
+display_name: Legal / law firm operations
+
+buyer_role: >
+  Managing partner or Head of Knowledge Management at a mid-market firm who owns
+  precedent quality, matter playbooks, and the risk that associates ship the wrong
+  prior language into a live engagement.
+
+regulatory_trigger: >
+  Client confidentiality and ethical walls between matters (US firms commonly frame
+  this under professional-conduct rules such as ABA Model Rule 1.6 and related
+  screening duties). Outside-counsel guidelines and engagement letters that demand
+  traceable edits when playbook language moves. Exact state bar rules vary by
+  jurisdiction — treat the ABA framing as orientation, not a certified compliance claim.
+
+document_pain: >
+  Clause libraries and matter playbooks drift across matters. Associates paste from
+  the nearest prior without provenance. Partners re-review the same clause family
+  repeatedly with no register of what changed, what was rejected, or which client
+  form was authoritative.
+
+typical_objection: >
+  Our precedents and playbooks are the firm's moat. We will not put matter-bound
+  language into a shared AI workspace where another matter — or another client —
+  could see it, and we will not accept a tool that invents clause text we did not
+  approve.
+
+proof_point: >
+  Invented reference story — "Northbridge LLP Knowledge Desk": after a force-majeure
+  clause drifted across three client forms on one energy matter, KM used ClarityDocs
+  to build a clause-drift register with every talking point cited to the source prior.
+  Partners rejected two proposed harmonisations item-by-item; the rest committed.
+  Export was a DOCX brief the engagement team already lived in — not a dashboard.
+
+terminology:
+  - engagement letter
+  - matter wall
+  - precedent
+  - playbook clause
+  - conflict check
+  - outside counsel guidelines
+  - redline
+  - knowledge management

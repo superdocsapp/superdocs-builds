@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="t d">
+  <title id="t">HarborPay staged vs rejected vs committed findings</title>
+  <desc id="d">Presenter visual (not a slide): 12 findings staged, 4 rejected as over-claims, 8 committed with citations.</desc>
+  <rect width="640" height="360" fill="#f6f1e8"/>
+  <text x="32" y="44" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" letter-spacing="2" fill="#5c574e">PRESENTER VISUAL · NOT A SLIDE</text>
+  <text x="32" y="78" font-family="Palatino Linotype, Palatino, serif" font-size="26" fill="#1c1915">HarborPay · SOC 2 window</text>
+  <g font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#5c574e">
+    <text x="32" y="300">Staged 12</text>
+    <text x="232" y="300">Rejected 4</text>
+    <text x="432" y="300">Committed 8</text>
+  </g>
+  <rect x="32" y="120" width="72" height="156" fill="#1c1915"/>
+  <rect x="232" y="224" width="72" height="52" fill="#1c1915" opacity="0.35"/>
+  <rect x="432" y="172" width="72" height="104" fill="#1c1915"/>
+  <text x="32" y="340" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#5c574e">Counts from the invented HarborPay proof  item-by-item review, not a dashboard screenshot.</text>
+</svg>

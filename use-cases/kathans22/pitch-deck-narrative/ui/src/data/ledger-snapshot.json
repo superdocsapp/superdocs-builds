@@ -1,0 +1,350 @@
+{
+  "source": "evidence/ledger-four-verticals.json",
+  "total_operations": 39,
+  "entries": [
+    {
+      "step": "upload",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 2.5761507999995956,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:upload:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "legal sections [1, 2]",
+      "operations": 2,
+      "wall_time": 58.08562580001308,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:batch:[1, 2]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "legal sections [3, 4]",
+      "operations": 2,
+      "wall_time": 83.09845010000572,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:batch:[3, 4]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "legal sections [5, 6]",
+      "operations": 1,
+      "wall_time": 58.61750520000351,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:batch:[5, 6]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "legal sections [7, 8]",
+      "operations": 3,
+      "wall_time": 56.15102520000073,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:batch:[7, 8]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "legal sections [9]",
+      "operations": 2,
+      "wall_time": 33.29923520000011,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:batch:[9]:v1"
+    },
+    {
+      "step": "export",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 1.9162879999930738,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:export:v1"
+    },
+    {
+      "step": "generate",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 295.1001976999978,
+      "status": "CHARGED",
+      "content_key": "narrative:legal:complete:v1"
+    },
+    {
+      "step": "guard",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 0.002127600004314445,
+      "status": "CHARGED",
+      "content_key": "guard:legal:v1"
+    },
+    {
+      "step": "score",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 0.014884499993058853,
+      "status": "CHARGED",
+      "content_key": "score:on-disk:v1"
+    },
+    {
+      "step": "generate",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 1.200009137392044e-06,
+      "status": "SKIPPED",
+      "content_key": "narrative:legal:complete:v1"
+    },
+    {
+      "step": "guard",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 0.007200499996542931,
+      "status": "CHARGED",
+      "content_key": "guard:legal:v1"
+    },
+    {
+      "step": "score",
+      "vertical": "legal",
+      "operations": 0,
+      "wall_time": 0.012081799999577925,
+      "status": "CHARGED",
+      "content_key": "score:on-disk:v1"
+    },
+    {
+      "step": "upload",
+      "vertical": "fintech",
+      "operations": 0,
+      "wall_time": 2.5835604000021704,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:upload:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "fintech sections [1, 2]",
+      "operations": 3,
+      "wall_time": 99.28961479999998,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:batch:[1, 2]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "fintech sections [3, 4]",
+      "operations": 3,
+      "wall_time": 78.2401058999967,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:batch:[3, 4]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "fintech sections [5, 6]",
+      "operations": 2,
+      "wall_time": 95.74859699999797,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:batch:[5, 6]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "fintech sections [7, 8]",
+      "operations": 3,
+      "wall_time": 51.51603840000462,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:batch:[7, 8]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "fintech sections [9]",
+      "operations": 1,
+      "wall_time": 23.888444700001855,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:batch:[9]:v1"
+    },
+    {
+      "step": "export",
+      "vertical": "fintech",
+      "operations": 0,
+      "wall_time": 2.692008600002737,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:export:v1"
+    },
+    {
+      "step": "generate",
+      "vertical": "fintech",
+      "operations": 0,
+      "wall_time": 355.2808614000096,
+      "status": "CHARGED",
+      "content_key": "narrative:fintech:complete:v1"
+    },
+    {
+      "step": "guard",
+      "vertical": "fintech",
+      "operations": 0,
+      "wall_time": 0.0031599999929312617,
+      "status": "CHARGED",
+      "content_key": "guard:fintech:v1"
+    },
+    {
+      "step": "score",
+      "vertical": "fintech",
+      "operations": 0,
+      "wall_time": 0.022199200000613928,
+      "status": "CHARGED",
+      "content_key": "score:on-disk:v1"
+    },
+    {
+      "step": "upload",
+      "vertical": "healthcare",
+      "operations": 0,
+      "wall_time": 4.482829200002016,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:upload:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "healthcare sections [1, 2]",
+      "operations": 1,
+      "wall_time": 18.572254200000316,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:batch:[1, 2]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "healthcare sections [3, 4]",
+      "operations": 3,
+      "wall_time": 71.49317099999462,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:batch:[3, 4]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "healthcare sections [5, 6]",
+      "operations": 1,
+      "wall_time": 22.95213170000352,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:batch:[5, 6]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "healthcare sections [7, 8]",
+      "operations": 3,
+      "wall_time": 64.63465720000386,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:batch:[7, 8]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "healthcare sections [9]",
+      "operations": 1,
+      "wall_time": 15.739702499995474,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:batch:[9]:v1"
+    },
+    {
+      "step": "export",
+      "vertical": "healthcare",
+      "operations": 0,
+      "wall_time": 1.693088699990767,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:export:v1"
+    },
+    {
+      "step": "generate",
+      "vertical": "healthcare",
+      "operations": 0,
+      "wall_time": 200.75376739999047,
+      "status": "CHARGED",
+      "content_key": "narrative:healthcare:complete:v1"
+    },
+    {
+      "step": "guard",
+      "vertical": "healthcare",
+      "operations": 0,
+      "wall_time": 0.0019080999918514863,
+      "status": "CHARGED",
+      "content_key": "guard:healthcare:v1"
+    },
+    {
+      "step": "score",
+      "vertical": "healthcare",
+      "operations": 0,
+      "wall_time": 0.02301080001052469,
+      "status": "CHARGED",
+      "content_key": "score:on-disk:v1"
+    },
+    {
+      "step": "upload",
+      "vertical": "edtech",
+      "operations": 0,
+      "wall_time": 3.139567000005627,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:upload:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "edtech sections [1, 2]",
+      "operations": 3,
+      "wall_time": 53.48878529999638,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:batch:[1, 2]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "edtech sections [3, 4]",
+      "operations": 1,
+      "wall_time": 33.11521960000391,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:batch:[3, 4]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "edtech sections [5, 6]",
+      "operations": 1,
+      "wall_time": 18.736301199998707,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:batch:[5, 6]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "edtech sections [7, 8]",
+      "operations": 1,
+      "wall_time": 55.17156909999903,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:batch:[7, 8]:v1"
+    },
+    {
+      "step": "chat",
+      "vertical": "edtech sections [9]",
+      "operations": 2,
+      "wall_time": 40.705985699998564,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:batch:[9]:v1"
+    },
+    {
+      "step": "export",
+      "vertical": "edtech",
+      "operations": 0,
+      "wall_time": 3.3457799999887357,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:export:v1"
+    },
+    {
+      "step": "generate",
+      "vertical": "edtech",
+      "operations": 0,
+      "wall_time": 209.0954136000073,
+      "status": "CHARGED",
+      "content_key": "narrative:edtech:complete:v1"
+    },
+    {
+      "step": "guard",
+      "vertical": "edtech",
+      "operations": 0,
+      "wall_time": 0.001751699994201772,
+      "status": "CHARGED",
+      "content_key": "guard:edtech:v1"
+    },
+    {
+      "step": "score",
+      "vertical": "edtech",
+      "operations": 0,
+      "wall_time": 0.031753199989907444,
+      "status": "CHARGED",
+      "content_key": "score:on-disk:v1"
+    }
+  ]
+}

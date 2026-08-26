@@ -1,0 +1,53 @@
+# Nine slide-equivalent sections for the ClarityDocs speaking script.
+# weight: shared = low expected variance across verticals
+#         vertical = high expected variance (substance must differ)
+# image_eligible: only these may receive a generated supporting image
+
+manifest_version: 1
+script_notice: "Speaking script — not a slide deck."
+
+sections:
+  - number: 1
+    title: "Opening / Hook"
+    weight: shared
+    image_eligible: false
+
+  - number: 2
+    title: "The Problem"
+    weight: vertical
+    image_eligible: false
+
+  - number: 3
+    title: "Why Now"
+    weight: vertical
+    image_eligible: false
+
+  - number: 4
+    title: "Product Overview"
+    weight: shared
+    image_eligible: false
+
+  - number: 5
+    title: "How ClarityDocs Solves It"
+    weight: vertical
+    image_eligible: false
+
+  - number: 6
+    title: "Proof / Case Study"
+    weight: vertical
+    image_eligible: true
+
+  - number: 7
+    title: "Objection Handling"
+    weight: vertical
+    image_eligible: false
+
+  - number: 8
+    title: "ROI / Business Case"
+    weight: vertical
+    image_eligible: true
+
+  - number: 9
+    title: "Call to Action"
+    weight: shared
+    image_eligible: false

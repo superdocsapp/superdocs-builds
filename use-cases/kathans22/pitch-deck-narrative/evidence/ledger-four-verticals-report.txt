@@ -1,0 +1,45 @@
+[upload]      legal                                      0 ops
+[chat]        legal sections [1, 2]                      2 ops
+[chat]        legal sections [3, 4]                      2 ops
+[chat]        legal sections [5, 6]                       1 op
+[chat]        legal sections [7, 8]                      3 ops
+[chat]        legal sections [9]                         2 ops
+[export]      legal                                      0 ops
+[generate]    legal                                      0 ops
+[guard]       legal                                      0 ops
+[score]       legal                                      0 ops
+[generate]    legal                            SKIPPED (0 ops)
+[guard]       legal                                      0 ops
+[score]       legal                                      0 ops
+[upload]      fintech                                    0 ops
+[chat]        fintech sections [1, 2]                    3 ops
+[chat]        fintech sections [3, 4]                    3 ops
+[chat]        fintech sections [5, 6]                    2 ops
+[chat]        fintech sections [7, 8]                    3 ops
+[chat]        fintech sections [9]                        1 op
+[export]      fintech                                    0 ops
+[generate]    fintech                                    0 ops
+[guard]       fintech                                    0 ops
+[score]       fintech                                    0 ops
+[upload]      healthcare                                 0 ops
+[chat]        healthcare sections [1, 2]                  1 op
+[chat]        healthcare sections [3, 4]                 3 ops
+[chat]        healthcare sections [5, 6]                  1 op
+[chat]        healthcare sections [7, 8]                 3 ops
+[chat]        healthcare sections [9]                     1 op
+[export]      healthcare                                 0 ops
+[generate]    healthcare                                 0 ops
+[guard]       healthcare                                 0 ops
+[score]       healthcare                                 0 ops
+[upload]      edtech                                     0 ops
+[chat]        edtech sections [1, 2]                     3 ops
+[chat]        edtech sections [3, 4]                      1 op
+[chat]        edtech sections [5, 6]                      1 op
+[chat]        edtech sections [7, 8]                      1 op
+[chat]        edtech sections [9]                        2 ops
+[export]      edtech                                     0 ops
+[generate]    edtech                                     0 ops
+[guard]       edtech                                     0 ops
+[score]       edtech                                     0 ops
+                                                       -------
+total                                                   39 ops

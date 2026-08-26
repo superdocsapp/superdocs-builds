@@ -1,0 +1,99 @@
+{
+  "billing": "chat_operation",
+  "billing_certain": true,
+  "live_generation_this_session": true,
+  "verticals": [
+    {
+      "vertical": "edtech",
+      "source_path": "evidence\\narratives\\pitch-script-edtech-claritydocs.md",
+      "manifest_version": 1,
+      "decided_at": "2026-08-18T16:48:33.178035+00:00",
+      "note": "Decisions recorded before image generation. warranted=false means no image will be requested.",
+      "sections": [
+        {
+          "section_number": 6,
+          "title": "Proof / Case Study",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "proof names comparative counts a figure would make scanable"
+        },
+        {
+          "section_number": 8,
+          "title": "ROI / Business Case",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "ROI names quantities or time/cost comparisons a chart would clarify"
+        }
+      ]
+    },
+    {
+      "vertical": "fintech",
+      "source_path": "evidence\\narratives\\pitch-script-fintech-claritydocs.md",
+      "manifest_version": 1,
+      "decided_at": "2026-08-18T16:48:33.183211+00:00",
+      "note": "Decisions recorded before image generation. warranted=false means no image will be requested.",
+      "sections": [
+        {
+          "section_number": 6,
+          "title": "Proof / Case Study",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "proof names comparative counts a figure would make scanable"
+        },
+        {
+          "section_number": 8,
+          "title": "ROI / Business Case",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "ROI names quantities or time/cost comparisons a chart would clarify"
+        }
+      ]
+    },
+    {
+      "vertical": "healthcare",
+      "source_path": "evidence\\narratives\\pitch-script-healthcare-claritydocs.md",
+      "manifest_version": 1,
+      "decided_at": "2026-08-18T16:48:33.189230+00:00",
+      "note": "Decisions recorded before image generation. warranted=false means no image will be requested.",
+      "sections": [
+        {
+          "section_number": 6,
+          "title": "Proof / Case Study",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "proof names comparative counts a figure would make scanable"
+        },
+        {
+          "section_number": 8,
+          "title": "ROI / Business Case",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "ROI names quantities or time/cost comparisons a chart would clarify"
+        }
+      ]
+    },
+    {
+      "vertical": "legal",
+      "source_path": "evidence\\narratives\\pitch-script-legal-claritydocs.md",
+      "manifest_version": 1,
+      "decided_at": "2026-08-18T16:48:33.195884+00:00",
+      "note": "Decisions recorded before image generation. warranted=false means no image will be requested.",
+      "sections": [
+        {
+          "section_number": 6,
+          "title": "Proof / Case Study",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "proof names comparative counts a figure would make scanable"
+        },
+        {
+          "section_number": 8,
+          "title": "ROI / Business Case",
+          "image_eligible": true,
+          "warranted": true,
+          "reason": "ROI names quantities or time/cost comparisons a chart would clarify"
+        }
+      ]
+    }
+  ]
+}

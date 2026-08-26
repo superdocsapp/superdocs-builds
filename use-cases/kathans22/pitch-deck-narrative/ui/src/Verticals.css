@@ -1,0 +1,43 @@
+.vert-list {
+  display: grid;
+  gap: 3.5rem;
+}
+
+.vert-card {
+  border-top: 1px solid var(--ink);
+  padding-top: 1.5rem;
+}
+
+.vert-name {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 1.7rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.5rem;
+}
+
+.vert-field {
+  margin: 0 0 1.15rem;
+}
+
+.vert-body {
+  font-family: var(--sans);
+  font-size: 1.02rem;
+  line-height: 1.45;
+  margin: 0;
+  max-width: 40rem;
+}
+
+.vert-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1.1rem;
+  font-family: var(--meta);
+  font-size: 0.82rem;
+  color: var(--mute);
+  margin: 0.2rem 0 0;
+}
+
+.vert-terms span {
+  letter-spacing: 0.02em;
+}

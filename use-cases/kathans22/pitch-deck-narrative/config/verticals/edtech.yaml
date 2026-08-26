@@ -1,0 +1,45 @@
+vertical: edtech
+display_name: Edtech / academic operations
+
+buyer_role: >
+  Registrar or Academic Operations lead at a multi-campus institution who owns catalogue
+  language, policy handbooks, and the fear that student-facing documents contradict each
+  other across campuses and terms.
+
+regulatory_trigger: >
+  FERPA constraints on education records in the United States — who may see student
+  information and under what conditions. For products that touch under-13 users, COPPA
+  consent and data-minimisation expectations may also apply. Accreditation and
+  state-authorisation document packs pressure consistent published policy language.
+  Exact applicability depends on institution type and product surface — not a compliance
+  determination. No claim that ClarityDocs is FERPA or COPPA certified.
+
+document_pain: >
+  Course catalogues, student handbooks, and grievance procedures diverge by campus and
+  term. A policy update lands in one PDF and never reaches the HTML handbook. Appeals
+  committees argue from different "current" documents, and there is no register showing
+  which source was authoritative when a decision was made.
+
+typical_objection: >
+  We will not put student education records or identifiable student narratives into an
+  AI workspace for convenience. Any tool that rewrites handbook language must show exact
+  provenance, keep humans approving each change, and must never imply automated decisions
+  about student rights or disciplinary outcomes.
+
+proof_point: >
+  Invented reference story — "Lumen State Academic Ops": four campuses published
+  conflicting grade-appeal timelines. Ops used ClarityDocs on synthetic handbook excerpts
+  (no real student records) to stage a conflict register. Committee chairs rejected one
+  proposed "harmonised" timeline that would have shortened a statutory notice window;
+  the rest exported as a speaking brief for the next academic senate — a DOCX script,
+  not a slide file.
+
+terminology:
+  - FERPA
+  - education record
+  - course catalogue
+  - student handbook
+  - grade appeal
+  - accreditation pack
+  - term effective date
+  - academic senate

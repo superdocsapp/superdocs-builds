@@ -1,0 +1,21 @@
+# ClarityDocs — held constant across every vertical. Do not edit after Prompt 2.
+
+product:
+  name: ClarityDocs
+  category: document-AI assistant
+
+  positioning: >
+    ClarityDocs turns messy operational documents into reviewable, exportable work
+    product — grounding every claim in the source text, staging human approval before
+    anything commits, and leaving teams in the documents they already use rather than
+    asking them to live inside a new archive or slide tool.
+
+  capabilities:
+    - "Ingest mixed-format source documents and extract the facts that matter, with every claim tied back to an exact place in the source."
+    - "Run staged checks against playbooks or checklists and surface findings for item-by-item human approval before they commit."
+    - "Export finished work as ordinary documents (DOCX/PDF) so the deliverable is the work product, not a demo screen."
+
+  differentiator: >
+    ClarityDocs is built for proof, not polish — untouched regions stay byte-checkable,
+    rejected findings do not discard the rest of a review, and the product never pretends
+    a success state it cannot demonstrate.

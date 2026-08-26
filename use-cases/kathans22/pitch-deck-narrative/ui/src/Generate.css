@@ -1,0 +1,75 @@
+.gen-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem 1.75rem;
+  margin: 0 0 3rem;
+}
+
+.gen-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--meta);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.gen-select {
+  font-family: var(--sans);
+  font-size: 1.05rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: 0.4rem 0.6rem;
+  min-width: 12rem;
+}
+
+.gen-check {
+  font-family: var(--meta);
+  font-size: 0.82rem;
+  color: var(--mute);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.gen-btn {
+  font-family: var(--meta);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+}
+
+.gen-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.gen-notice,
+.gen-run {
+  flex-basis: 100%;
+  font-family: var(--meta);
+  font-size: 0.82rem;
+  color: var(--mute);
+  margin: 0;
+  max-width: 40rem;
+}
+
+.gen-source {
+  font-family: var(--meta);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  word-break: break-all;
+  margin: 0 0 0.6rem;
+  max-width: 22rem;
+}

@@ -1,0 +1,23 @@
+{
+  "vertical": "edtech",
+  "source_path": "evidence\\narratives\\pitch-script-edtech-claritydocs.md",
+  "manifest_version": 1,
+  "decided_at": "2026-08-18T16:48:33.178035+00:00",
+  "note": "Decisions recorded before image generation. warranted=false means no image will be requested.",
+  "sections": [
+    {
+      "section_number": 6,
+      "title": "Proof / Case Study",
+      "image_eligible": true,
+      "warranted": true,
+      "reason": "proof names comparative counts a figure would make scanable"
+    },
+    {
+      "section_number": 8,
+      "title": "ROI / Business Case",
+      "image_eligible": true,
+      "warranted": true,
+      "reason": "ROI names quantities or time/cost comparisons a chart would clarify"
+    }
+  ]
+}
