@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-docdesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-docdesk}
+      POSTGRES_DB: ${POSTGRES_DB:-docdesk}
+    # Not published to the host on purpose: backend reaches it over the internal
+    # compose network as `db:5432`, avoiding a clash with any Postgres a stranger
+    # already has running locally.
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-docdesk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-docdesk}:${POSTGRES_PASSWORD:-docdesk}@db:5432/${POSTGRES_DB:-docdesk}
+    ports:
+      - "8010:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    # entrypoint.sh applies migrations then starts uvicorn
+
+volumes:
+  db_data:
