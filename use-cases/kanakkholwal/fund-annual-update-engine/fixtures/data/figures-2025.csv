@@ -1,0 +1,16 @@
+field_id,new_value,source_document,source_cell
+ocf,0.79%,2025 expense ledger,AR-2025 Charges B14
+sri,5,PRIIPs SRI calculation,RISK-2025 SRI C7
+fund_size_musd,"USD 1,402.3m",Dec-2025 valuation,NAV-2025 AUM D31
+nav_per_unit,USD 20.71,Dec-2025 valuation,NAV-2025 NAV E31
+as_of_date,31 December 2025,Reporting calendar,CAL-2025 A2
+perf_2021,18.4%,Performance book,PERF-2025 CY B2
+perf_2022,-14.2%,Performance book,PERF-2025 CY B3
+perf_2023,21.7%,Performance book,PERF-2025 CY B4
+perf_2024,11.9%,Performance book,PERF-2025 CY B5
+perf_2025,9.6%,Performance book,PERF-2025 CY B6
+holding_1,Aurora Semiconductor|5.2%,Dec-2025 holdings,HLD-2025 row 1
+holding_2,Vantage Software,Dec-2025 holdings,HLD-2025 row 2
+holding_3,Northwind Logistics|3.9%,Dec-2025 holdings,HLD-2025 row 3
+holding_4,Calder Pharmaceuticals|3.5%,Dec-2025 holdings,HLD-2025 row 4
+holding_5,Meridian Water Utilities|3.0%,Dec-2025 holdings,HLD-2025 row 5

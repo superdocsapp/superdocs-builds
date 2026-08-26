@@ -1,0 +1,136 @@
+# What may change in an annual refresh, and what may not.
+#
+# Adding a fund range, a document type or a new figure is a change to this file. It is never a code
+# change. Anything not listed here is legal wording, and the engine is required to leave it alone
+# and prove that it did.
+
+version: 1
+
+documents:
+  prospectus:
+    filename: prospectus.docx
+    page_budget: null          # grows with content; no hard limit
+    tables_must_not_reflow: [charges]
+  factsheet:
+    filename: factsheet.docx
+    page_budget: 2             # marketing sheet, printed two-up
+    tables_must_not_reflow: [performance, holdings]
+  kid:
+    filename: kid.docx
+    page_budget: 3             # regulatory ceiling; three pages is not a preference
+    tables_must_not_reflow: [costs, scenarios]
+
+# Every field names the exact text it replaces, so the edit is targeted rather than a rewrite.
+fields:
+  - id: ocf
+    label: Ongoing charges figure
+    kind: percentage
+    appears_in: [prospectus, factsheet, kid]
+    anchor: "Ongoing charges figure"
+    tolerance_bps: 0
+
+  - id: sri
+    label: Summary risk indicator
+    kind: integer
+    range: [1, 7]
+    appears_in: [kid]
+    anchor: "Summary risk indicator"
+    # The figure sits inside a sentence. Without this the edit would replace "4 out of 7"
+    # with a bare "5" and silently delete the scale.
+    render: "{value} out of 7"
+
+  - id: fund_size_musd
+    label: Fund size
+    kind: money_musd
+    appears_in: [factsheet]
+    anchor: "Fund size"
+
+  - id: nav_per_unit
+    label: NAV per unit
+    kind: money_usd
+    appears_in: [factsheet]
+    anchor: "NAV per unit"
+
+  - id: as_of_date
+    label: Data as at
+    kind: date
+    appears_in: [factsheet, kid]
+    anchor: "Data as at"
+
+  - id: perf_2021
+    label: Calendar year return 2021
+    kind: percentage
+    appears_in: [factsheet]
+    table: performance
+    row: "2021"
+  - id: perf_2022
+    label: Calendar year return 2022
+    kind: percentage
+    appears_in: [factsheet]
+    table: performance
+    row: "2022"
+  - id: perf_2023
+    label: Calendar year return 2023
+    kind: percentage
+    appears_in: [factsheet]
+    table: performance
+    row: "2023"
+  - id: perf_2024
+    label: Calendar year return 2024
+    kind: percentage
+    appears_in: [factsheet]
+    table: performance
+    row: "2024"
+  - id: perf_2025
+    label: Calendar year return 2025
+    kind: percentage
+    appears_in: [factsheet]
+    table: performance
+    row: "2025"
+
+  - id: holding_1
+    label: Top holding 1
+    kind: holding
+    appears_in: [factsheet]
+    table: holdings
+    row: 1
+  - id: holding_2
+    label: Top holding 2
+    kind: holding
+    appears_in: [factsheet]
+    table: holdings
+    row: 2
+  - id: holding_3
+    label: Top holding 3
+    kind: holding
+    appears_in: [factsheet]
+    table: holdings
+    row: 3
+  - id: holding_4
+    label: Top holding 4
+    kind: holding
+    appears_in: [factsheet]
+    table: holdings
+    row: 4
+  - id: holding_5
+    label: Top holding 5
+    kind: holding
+    appears_in: [factsheet]
+    table: holdings
+    row: 5
+
+# Paragraphs whose text must come through the refresh byte-identical. The engine hashes these
+# before and after and fails the run if any of them moved.
+protected_wording:
+  - document: prospectus
+    starts_with: "The Fund is a sub-fund of"
+  - document: prospectus
+    starts_with: "Investors should note that the value"
+  - document: prospectus
+    starts_with: "The Manager may, at its discretion"
+  - document: kid
+    starts_with: "You are about to purchase a product"
+  - document: kid
+    starts_with: "This product does not include any protection"
+  - document: factsheet
+    starts_with: "Past performance is not a reliable indicator"

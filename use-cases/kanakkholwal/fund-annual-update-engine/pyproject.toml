@@ -1,0 +1,43 @@
+[project]
+name = "fund-annual-update-engine"
+version = "0.1.0"
+description = "Annual refresh of fund documents on SuperDocs: update only what changed, prove the rest did not."
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28",
+    "typer>=0.15",
+    "rich>=13.9",
+    "pyyaml>=6.0",
+    "python-docx>=1.1",
+    "pydantic>=2.9",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "ruff>=0.8"]
+
+[project.scripts]
+fund-update = "fund_update.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fund_update = ["domain/*.yaml"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "DTZ", "ISC", "PYI"]
+# OperationBudgetExceeded reads better than OperationBudgetExceededError.
+ignore = ["N818"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
