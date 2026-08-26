@@ -120,6 +120,65 @@ def main():
     print("=== BENCHMARK SUMMARY ===")
     print(report_markdown)
 
+    # ------------------ CONSTRUCT STYLED HTML REPORT FOR PDF EXPORT ------------------
+    input_reduction = round(((tokens_in_a - tokens_in_b)/tokens_in_a)*100, 1)
+    output_reduction = round(((tokens_out_a - tokens_out_b)/tokens_out_a)*100, 1)
+    
+    report_html = f"""
+    <div style="font-family: 'Inter', sans-serif; color: #202940; background-color: #FBF9F6; padding: 30px; border-radius: 20px;">
+      <h1 style="font-family: 'Space Grotesk', sans-serif; color: #8B6240; border-bottom: 2px solid rgba(32,41,64,0.12); padding-bottom: 15px; margin-top: 0;">
+        SuperDocs Token & Latency Benchmark Report
+      </h1>
+      <p style="font-size: 14px; line-height: 1.6; color: #202940;">
+        This benchmark evaluates the performance of Scenario A (Whole-Document Regeneration) versus Scenario B (SuperDocs compact surgical edits with <code>response_mode='compact'</code>) on a 10-section document.
+      </p>
+      
+      <table style="width: 100%; border-collapse: collapse; margin-top: 25px; margin-bottom: 25px; font-size: 14px;">
+        <thead>
+          <tr style="background-color: #202940; color: #FBF9F6;">
+            <th style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; text-align: left;">Performance Metric</th>
+            <th style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; text-align: left;">Scenario A: Full Regeneration</th>
+            <th style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; text-align: left;">Scenario B: compact Surgical Edit</th>
+            <th style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; text-align: left;">Measured Improvement</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background-color: rgba(32,41,64,0.02);">
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold;">Input Tokens (est.)</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px;">{tokens_in_a} tokens</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px;">{tokens_in_b} tokens</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; color: #1DA851; font-weight: bold;">-{tokens_in_a - tokens_in_b} ({input_reduction}%)</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold;">Output Tokens (est.)</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px;">{tokens_out_a} tokens</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px;">{tokens_out_b} tokens</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; color: #1DA851; font-weight: bold;">-{tokens_out_a - tokens_out_b} ({output_reduction}%)</td>
+          </tr>
+          <tr style="background-color: rgba(141,98,64,0.08);">
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold;">Total Tokens / Turn</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold;">{total_tokens_a} tokens</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold;">{total_tokens_b} tokens</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; color: #1DA851; font-weight: bold;">-{total_tokens_a - total_tokens_b} ({token_savings}%)</td>
+          </tr>
+          <tr style="background-color: rgba(32,41,64,0.02);">
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold;">Latency (Wall-clock)</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px;">{time_a}s</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px;">{time_b}s</td>
+            <td style="border: 1px solid rgba(32,41,64,0.12); padding: 12px; font-weight: bold; color: #C94C3D;">{latency_diff}s difference</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="background-color: rgba(29,168,81,0.05); border-left: 4px solid #1DA851; padding: 18px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-top: 20px;">
+        <strong style="color: #1DA851;">Core Analysis:</strong> Compact surgical section editing via SuperDocs <code>response_mode='compact'</code> 
+        reduces overall token footprint by <strong>{token_savings}%</strong>. By transmitting only modified section deltas 
+        rather than regenerating the entire document, API clients eliminate redundant token consumption and remain 
+        safely under rate limit boundaries while accelerating edit operations.
+      </div>
+    </div>
+    """
+
     # Export report to PDF
     print("\nExporting Benchmark Report to PDF...")
     export_res = client.post(
@@ -127,6 +186,7 @@ def main():
         json={
             "session_id": session_id,
             "format": "pdf",
+            "html": report_html,
             "filename": "SuperDocs_Token_Cost_Benchmark.pdf"
         },
         headers=HEADERS
