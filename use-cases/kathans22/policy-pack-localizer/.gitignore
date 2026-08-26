@@ -1,0 +1,18 @@
+.env
+out/
+state/
+__pycache__/
+node_modules/
+dist/
+*.egg-info/
+scripts/reset-demo.sh
+scripts/amend-demo.sh
+DEMO-VIDEO-GUIDE.md
+
+# Live-run evidence — local only, not pushed
+evidence/ack-generation-report.md
+evidence/integrity-report.json
+evidence/run2-integrity-report.json
+evidence/run2-ledger.md
+evidence/ledger-summary.md
+evidence/notice-generation-report.md

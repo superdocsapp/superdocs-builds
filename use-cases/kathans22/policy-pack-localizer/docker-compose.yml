@@ -1,0 +1,20 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SUPERDOCS_API_KEY: "${SUPERDOCS_API_KEY}"
+    volumes:
+      - ./config:/app/config
+      - ./out:/app/out
+      - ./state:/app/state
+
+  ui:
+    build: ./ui
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_PROXY_TARGET: "http://api:8000"
+    depends_on:
+      - api

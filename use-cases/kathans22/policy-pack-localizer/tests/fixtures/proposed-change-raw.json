@@ -1,0 +1,64 @@
+{
+  "job_id": "206a39c6-2d21-4fbe-8738-9a7b76453989",
+  "organization_id": null,
+  "user_id": "ffca5940-a97b-4055-95e0-4d57465285d1",
+  "session_id": "ppl-fixture-capture-1",
+  "job_type": "chat",
+  "status": "awaiting_approval",
+  "created_at": "2026-08-15T08:31:51.997496",
+  "updated_at": "2026-08-15T08:31:59.144532",
+  "progress": 86,
+  "result": null,
+  "error": null,
+  "metadata": {
+    "filename": null,
+    "file_size": null,
+    "content_type": null,
+    "message": "In section 6 \"Reporting Channels\" only, replace the two generic placeholder lines with this India office content: internal contact is the Country Safeguarding Focal Point, Mumbai, reachable at safeguarding.in@meridian-relief.example or +91 22 0000 0000; external channels are Childline India (1098, toll-free 24-hour child helpline) and the Police Control Room (112). Do not touch any other section.",
+    "document_html_provided": false,
+    "pending_changes": [
+      {
+        "change_id": "d8a679fc-60cf-4134-8a2b-85f4ed18fc2e",
+        "operation": "edit",
+        "chunk_id": "a317bb6d-04c6-45bf-b388-06c32cd2d32c",
+        "document_id": "doc_primary",
+        "old_html": "<p data-chunk-id=\"a317bb6d-04c6-45bf-b388-06c32cd2d32c\">Concerns may be raised with a line manager, the office Safeguarding Focal Point, or the confidential reporting line.<br/>\nCountry-specific contact details, hotline numbers, and languages are listed in the annex for this office.</p>",
+        "new_html": "<p data-chunk-id=\"a317bb6d-04c6-45bf-b388-06c32cd2d32c\">Concerns may be raised with the Country Safeguarding Focal Point, Mumbai, reachable at safeguarding.in@meridian-relief.example or +91 22 0000 0000.<br/>External channels are Childline India (1098, toll-free 24-hour child helpline) and the Police Control Room (112).</p>",
+        "ai_explanation": "✅ I have updated Section 6 'Reporting Channels' with the India office contact details and external reporting channels (Childline India and the Police Control Room) as requested."
+      }
+    ],
+    "intermediate_responses": [
+      {
+        "type": "user_facing",
+        "content": "I am searching for the 'Reporting Channels' section to update the placeholder lines with the India office contact details.",
+        "context": "supervisor_decision",
+        "sequence": 1,
+        "timestamp": "2026-08-15T08:31:54.254100+00:00"
+      },
+      {
+        "type": "user_facing",
+        "content": "I've prepared a change for your review.",
+        "context": "supervisor_decision_hitl",
+        "sequence": 2,
+        "timestamp": "2026-08-15T08:31:56.625063+00:00"
+      },
+      {
+        "type": "proposed_change_batch",
+        "content": "{\"type\": \"single_approval\", \"batch_id\": \"d8a679fc-60cf-4134-8a2b-85f4ed18fc2e\", \"batch_total\": 1, \"changes\": [{\"change_id\": \"d8a679fc-60cf-4134-8a2b-85f4ed18fc2e\", \"operation\": \"edit\", \"chunk_id\": \"a317bb6d-04c6-45bf-b388-06c32cd2d32c\", \"old_html\": \"<p data-chunk-id=\\\"a317bb6d-04c6-45bf-b388-06c32cd2d32c\\\">Concerns may be raised with a line manager, the office Safeguarding Focal Point, or the confidential reporting line.<br/>\\nCountry-specific contact details, hotline numbers, and languages are listed in the annex for this office.</p>\", \"new_html\": \"<p data-chunk-id=\\\"a317bb6d-04c6-45bf-b388-06c32cd2d32c\\\">Concerns may be raised with the Country Safeguarding Focal Point, Mumbai, reachable at safeguarding.in@meridian-relief.example or +91 22 0000 0000.<br/>External channels are Childline India (1098, toll-free 24-hour child helpline) and the Police Control Room (112).</p>\", \"ai_explanation\": \"\\u2705 I have updated Section 6 'Reporting Channels' with the India office contact details and external reporting channels (Childline India and the Police Control Room) as requested.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+        "context": null,
+        "sequence": 3,
+        "timestamp": "2026-08-15T08:31:58.728400+00:00"
+      }
+    ],
+    "user_id": null,
+    "model_tier": "core",
+    "session_id": "ppl-fixture-capture-1",
+    "response_mode": "compact",
+    "thinking_depth": null,
+    "request_message": "In section 6 \"Reporting Channels\" only, replace the two generic placeholder lines with this India office content: internal contact is the Country Safeguarding Focal Point, Mumbai, reachable at safeguarding.in@meridian-relief.example or +91 22 0000 0000; external channels are Childline India (1098, toll-free 24-hour child helpline) and the Police Control Room (112). Do not touch any other section.",
+    "cumulative_tokens": 156093,
+    "initial_doc_version": null,
+    "last_real_progress_ts": "2026-08-15T08:31:58.728444+00:00",
+    "user_turn_index_pre_inserted": 0
+  }
+}

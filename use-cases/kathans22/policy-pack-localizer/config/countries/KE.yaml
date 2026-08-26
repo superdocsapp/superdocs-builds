@@ -1,0 +1,26 @@
+country: Kenya
+code: KE
+language: en
+office: "Nairobi Office"
+safeguarding_lead: "Wanjiru Kamau"
+
+reporting:
+  internal_email: "safeguarding.ke@meridian-relief.example"
+  internal_phone: "+254 20 000 0000"
+  external:
+    - name: "Childline Kenya"
+      detail: "116 — toll-free national child helpline"
+    - name: "Kenya Police Service"
+      detail: "999 / 112"
+
+legal:
+  - "Children Act, 2022"
+  - "Sexual Offences Act, 2006"
+  - "Employment Act, 2007, Part VI (sexual harassment)"
+  - "Constitution of Kenya, 2010, Article 53 (rights of the child)"
+
+escalation:
+  tier_1: "Country Safeguarding Focal Point, Nairobi — 24 hours"
+  tier_2: "Regional Director, East Africa — 72 hours"
+  tier_3: "Director of Safeguarding, headquarters — 7 days"
+  regulator_notification: "Directorate of Children's Services"

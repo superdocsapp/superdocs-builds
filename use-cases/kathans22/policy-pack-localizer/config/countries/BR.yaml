@@ -1,0 +1,25 @@
+country: Brazil
+code: BR
+language: pt
+office: "Escritório de Recife"
+safeguarding_lead: "Beatriz Oliveira"
+
+reporting:
+  internal_email: "denuncia.br@meridian-relief.example"
+  internal_phone: "+55 81 0000 0000"
+  external:
+    - name: "Disque 100"
+      detail: "100 — linha nacional de direitos humanos, 24h"
+    - name: "Polícia Militar"
+      detail: "190"
+
+legal:
+  - "Estatuto da Criança e do Adolescente (ECA), Lei nº 8.069/1990"
+  - "Lei Maria da Penha, Lei nº 11.340/2006"
+  - "Código Penal Brasileiro, Título VI (Crimes contra a Dignidade Sexual), artigos 213 a 234-C"
+
+escalation:
+  tier_1: "Ponto focal de proteção, Recife — 24 horas"
+  tier_2: "Coordenador regional América do Sul — 72 horas"
+  tier_3: "Diretor de proteção, sede — 7 dias"
+  regulator_notification: "Conselho Tutelar / Ministério dos Direitos Humanos e da Cidadania"

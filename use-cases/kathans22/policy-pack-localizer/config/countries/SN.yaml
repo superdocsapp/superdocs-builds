@@ -1,0 +1,25 @@
+country: Senegal
+code: SN
+language: fr
+office: "Bureau de Dakar"
+safeguarding_lead: "Awa Diallo"
+
+reporting:
+  internal_email: "signalement.sn@meridian-relief.example"
+  internal_phone: "+221 33 000 0000"
+  external:
+    - name: "Ligne Verte Enfance"
+      detail: "116 — toll-free national child helpline"
+    - name: "Police Nationale — Brigade des Mineurs"
+      detail: "17"
+
+legal:
+  - "Loi n° 2005-06 du 10 mai 2005 relative à la lutte contre la traite des personnes"
+  - "Code pénal sénégalais, articles 320 bis et suivants"
+  - "Convention relative aux droits de l'enfant (ratifiée 1990)"
+
+escalation:
+  tier_1: "Point focal protection du bureau de Dakar — 24 heures"
+  tier_2: "Coordinateur régional Afrique de l'Ouest — 72 heures"
+  tier_3: "Directeur de la protection, siège — 7 jours"
+  regulator_notification: "Ministère de la Femme, de la Famille et de la Protection des Enfants"

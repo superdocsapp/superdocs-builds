@@ -1,0 +1,6 @@
+# docker-entrypoint.sh runs inside a Linux container via #!/bin/sh. Git on
+# Windows already warned it would rewrite this file to CRLF on next touch —
+# a CRLF shebang line breaks the interpreter lookup inside the container
+# ("no such file or directory", not an obvious error). Force LF regardless
+# of the cloning machine's platform or core.autocrlf setting.
+*.sh text eol=lf

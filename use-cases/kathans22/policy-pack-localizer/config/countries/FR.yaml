@@ -1,0 +1,25 @@
+country: France
+code: FR
+language: fr
+office: "Bureau de Lyon"
+safeguarding_lead: "Camille Rousseau"
+
+reporting:
+  internal_email: "signalement.fr@meridian-relief.example"
+  internal_phone: "+33 4 00 00 00 00"
+  external:
+    - name: "119 — Allô Enfance en Danger"
+      detail: "119 — ligne nationale gratuite, 24h/24"
+    - name: "Police Nationale"
+      detail: "17"
+
+legal:
+  - "Code pénal, articles 222-22 et suivants (agressions sexuelles)"
+  - "Code de l'action sociale et des familles, article L226-1 (protection de l'enfance)"
+  - "Loi n° 2016-297 du 14 mars 2016 relative à la protection de l'enfant"
+
+escalation:
+  tier_1: "Référent protection du bureau de Lyon — 24 heures"
+  tier_2: "Coordinateur régional Europe — 72 heures"
+  tier_3: "Directeur de la protection, siège — 7 jours"
+  regulator_notification: "Défenseur des droits — pôle Défense des enfants"

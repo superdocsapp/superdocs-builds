@@ -1,0 +1,25 @@
+country: India
+code: IN
+language: en
+office: "Mumbai Office"
+safeguarding_lead: "Priya Nair"
+
+reporting:
+  internal_email: "safeguarding.in@meridian-relief.example"
+  internal_phone: "+91 22 0000 0000"
+  external:
+    - name: "Childline India"
+      detail: "1098 — toll-free 24-hour child helpline"
+    - name: "Police Control Room"
+      detail: "112"
+
+legal:
+  - "Protection of Children from Sexual Offences (POCSO) Act, 2012"
+  - "Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013"
+  - "Juvenile Justice (Care and Protection of Children) Act, 2015"
+
+escalation:
+  tier_1: "Country Safeguarding Focal Point, Mumbai — 24 hours"
+  tier_2: "Regional Director, South Asia — 72 hours"
+  tier_3: "Director of Safeguarding, headquarters — 7 days"
+  regulator_notification: "National Commission for Protection of Child Rights (NCPCR)"

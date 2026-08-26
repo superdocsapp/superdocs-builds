@@ -1,0 +1,40 @@
+{
+  "core_version": 1,
+  "packs": 5,
+  "languages": {
+    "en": 2,
+    "fr": 2,
+    "pt": 1
+  },
+  "core_identity": {
+    "en": {
+      "expected": "aa3a7460e6602b04e59acbe8ef73be464c3951624b50903a61b548ce64e186e8",
+      "packs": [
+        "IN",
+        "KE"
+      ],
+      "identical": true
+    },
+    "fr": {
+      "expected": "a240052d992b3f53af2332edd0ffe62172b87e6a963c3c8dd4dfef4d47dafa58",
+      "packs": [
+        "FR",
+        "SN"
+      ],
+      "identical": true
+    },
+    "pt": {
+      "expected": "4d339a737d5ea69c3bfd38ee983f779243c219ba869e1e9df443bb98ef7cf9b8",
+      "packs": [
+        "BR"
+      ],
+      "identical": true
+    }
+  },
+  "all_packs_pass": true,
+  "annex_divergence": {
+    "reporting": "5 distinct",
+    "legal": "5 distinct",
+    "escalation": "5 distinct"
+  }
+}
