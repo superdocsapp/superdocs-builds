@@ -1,0 +1,19 @@
+{
+  "job_id": "job_cont",
+  "session_id": "lab-note-1",
+  "job_type": "chat",
+  "status": "awaiting_approval",
+  "created_at": "2026-08-25T00:00:00Z",
+  "updated_at": "2026-08-25T00:00:01Z",
+  "progress": 50,
+  "metadata": {
+    "awaiting_kind": "continue_prompt",
+    "continue_prompt": {
+      "message": "Continue the remaining sections?",
+      "done": 12,
+      "total": 40,
+      "remaining": 28
+    },
+    "pending_changes": []
+  }
+}

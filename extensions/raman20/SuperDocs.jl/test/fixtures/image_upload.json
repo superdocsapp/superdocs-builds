@@ -1,0 +1,8 @@
+{
+  "url": "https://signed.example.invalid/expiring?token=abc",
+  "canonical_url": "https://cdn.superdocs.app/img/canonical-plot",
+  "view_url": "https://signed.example.invalid/view?token=abc",
+  "filename": "plot.png",
+  "content_type": "image/png",
+  "size": 2048
+}

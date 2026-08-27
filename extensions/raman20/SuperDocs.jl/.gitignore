@@ -1,0 +1,11 @@
+Manifest.toml
+.env
+.DS_Store
+*.docx
+*.pdf
+plot.png
+/tmp/
+notebooks/*.html
+notebooks/*.jl.bak
+!notebooks/lab_note.png
+

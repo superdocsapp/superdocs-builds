@@ -1,0 +1,4 @@
+{
+  "type": "proposed_change_batch",
+  "content": "{\"type\":\"single_approval\",\"batch_id\":\"ch_1\",\"batch_total\":1,\"changes\":[{\"change_id\":\"ch_1\",\"operation\":\"edit\",\"chunk_id\":\"c-abs\",\"old_html\":\"<p>old</p>\",\"new_html\":\"<p>new</p>\",\"ai_explanation\":\"tighten\"}]}"
+}
