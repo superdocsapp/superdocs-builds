@@ -1,31 +1,53 @@
 """
 Client abstraction over "a model that can edit a document".
 
-This benchmark's two arms both need to send a document (or a section of one)
-plus an instruction to a model and get edited content back, with token/cost
-accounting. Two implementations are provided:
+This benchmark's two arms both need to send content plus an instruction and
+get edited content back, with cost accounting. Two implementations:
 
-  - SuperDocsClient: talks to the real SuperDocs REST API (upload, chat,
-    approve, export — the four-call minimum contract described in the task
-    brief) using `requests`. Needs SUPERDOCS_API_KEY and network access.
+  - SuperDocsClient: talks to the REAL SuperDocs REST API, matching the
+    contract documented at docs.superdocs.app (verified directly against
+    docs.superdocs.app/llms-full.txt — NOT the four-call upload/chat/approve/
+    export summary in the task brief, which is a simplified description).
+    Needs SUPERDOCS_API_KEY and network access.
 
   - MockClient: a deterministic, offline stand-in with the same interface.
-    It does NOT call any network or model — it synthesizes a plausible
-    "edited" response and a token/cost estimate using a documented local
-    heuristic (see metrics.py). This is what tests and small-sample proving
-    runs use, per the brief's requirement that "real tests exist and run
-    without a live key."
+    Used by tests and small-sample proving runs, per the brief's requirement
+    that "real tests exist and run without a live key."
 
-IMPORTANT: the mock's cost numbers are for proving the harness's *mechanics*
-(does it track tokens/cost/time correctly, does the section-edit arm touch
-less text than the whole-doc arm, etc.) — they are not a substitute for a
-real-API run when reporting actual benchmark results. The README and runner
-are explicit about which mode produced which numbers.
+REAL API CONTRACT (verified, corrects earlier assumptions):
+  - Endpoint is POST /v1/chat, keyed by `session_id` (a string you choose),
+    NOT a document id in the URL path. There is no separate "create
+    document" endpoint for raw content — you load content by passing
+    `document_html` in the chat call itself.
+  - Documents are HTML, not raw markdown/text. `document_html` loads or
+    replaces the session's document; omit it on follow-up turns to let the
+    server keep working on what it already has.
+  - There is NO separate "approve" call needed for this benchmark. Approval
+    only applies to the async HITL flow (`chat_async` + `approval_mode=
+    'ask_every_time'`). Plain synchronous `/v1/chat` needs no approve step.
+  - Export is `POST /v1/documents/export` (POST, not GET), and returns a
+    BINARY file body, not JSON. Not needed per-edit for this benchmark —
+    only if you want a final exported artifact.
+  - The `usage` object in a chat response is about MONTHLY OPERATION
+    QUOTAS (monthly_used, ops_charged, monthly_remaining, ...) — it does
+    NOT contain per-edit input/output token counts. Real per-edit tokens
+    are not exposed by the API at all, so this client keeps the same
+    local char-based estimate the mock uses (see metrics.py), applied to
+    what was actually sent/received.
+  - What IS real and load-bearing: `ops_charged`. SuperDocs bills per
+    OPERATION, not per token, and "very large requests count one
+    operation per 25 sections edited." A whole-document regenerate on a
+    big document can burn many operations in one edit; a section edit
+    burns exactly one, regardless of document size. This is the strongest,
+    most honest number this benchmark can report for a real run — measured
+    straight from the API's own billing field, not estimated pricing.
 """
 from __future__ import annotations
 
 import os
+import re
 import time
+import uuid
 from dataclasses import dataclass
 from typing import Optional
 
@@ -40,6 +62,7 @@ class EditResult:
     wall_clock_s: float
     model: str
     source: str  # "mock" or "superdocs_api"
+    ops_charged: int = 0  # real, API-billed operation count (0 for mock)
 
 
 class ClientError(RuntimeError):
@@ -65,15 +88,9 @@ class MockClient(BaseClient):
         start = time.perf_counter()
         input_tokens = estimate_tokens(content) + estimate_tokens(instruction)
 
-        # Synthesize a plausible edited output: same content with a marker
-        # line appended, so downstream code can verify "something changed"
-        # without needing a real model. Output length approximates input
-        # length (edits mostly preserve length) plus a small delta.
         edited_text = content + f"\n\n[edited per: {instruction[:60]}]"
         output_tokens = estimate_tokens(edited_text)
 
-        # Simulate proportional latency instead of sleeping for real time
-        # in tests; callers that want realistic wall-clock can multiply.
         simulated_latency = (input_tokens / 1000) * self.latency_per_1k_tokens_s
         elapsed = time.perf_counter() - start + simulated_latency
 
@@ -84,28 +101,74 @@ class MockClient(BaseClient):
             wall_clock_s=elapsed,
             model="mock-v1",
             source="mock",
+            ops_charged=0,
         )
+
+
+def _markdown_to_minimal_html(text: str) -> str:
+    """
+    Light, dependency-free markdown -> HTML shim, just enough structure for
+    the API to treat the content as a real document (headings + paragraphs)
+    rather than one opaque blob. Not a full markdown renderer.
+
+    If you have the `markdown` package available, swap this for
+    `markdown.markdown(text)` for better fidelity — noted here rather than
+    hidden, per the "configuration over silent workaround" habit used
+    elsewhere in this repo.
+    """
+    lines = text.split("\n")
+    html_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        heading_match = re.match(r"^(#{1,6})\s+(.*)", stripped)
+        if heading_match:
+            level = len(heading_match.group(1))
+            html_lines.append(f"<h{level}>{heading_match.group(2)}</h{level}>")
+        else:
+            html_lines.append(f"<p>{stripped}</p>")
+    return "\n".join(html_lines) or "<p></p>"
+
+
+def _html_to_text(html: str) -> str:
+    """Crude HTML -> text for downstream char/token counting and for the
+    whole-doc arm to keep feeding plain-ish content into the next turn."""
+    text = re.sub(r"<[^>]+>", "\n", html)
+    text = re.sub(r"\n{2,}", "\n\n", text)
+    return text.strip()
 
 
 class SuperDocsClient(BaseClient):
     """
-    Real client against the SuperDocs REST API.
+    Real client against the SuperDocs REST API — corrected to match the
+    documented contract (docs.superdocs.app), not the earlier four-call
+    upload/chat/approve/export guess.
 
-    Implements the documented four-call minimum contract:
-      1. upload   -> POST /documents
-      2. chat     -> POST /documents/{id}/chat        (send edit instruction)
-      3. approve  -> POST /documents/{id}/changes/approve
-      4. export   -> GET  /documents/{id}/export
+    Each `edit()` call:
+      1. Opens a fresh session (uuid4 session_id) and sends `content` as
+         `document_html` alongside the instruction, in ONE POST /v1/chat
+         call. This mirrors exactly what each arm already does at the
+         `arms.py` level: whole_doc passes the full document text every
+         turn; section_edit passes only the target section's text every
+         turn. The client doesn't need to know which arm it's in — it
+         just measures what was sent and what came back, which is the
+         benchmark's actual question.
+      2. Reads `document_changes.updated_html` from the response as the
+         edited content.
+      3. Reads `usage.ops_charged` — the REAL, API-billed operation count
+         for this edit. This is recorded on EditResult and is the
+         strongest "real cost" number this benchmark can report.
 
-    Per the task brief's integration notes:
-      - proposed-change content arrives as a JSON-encoded string and needs a
-        second json.loads(); the final (post-approve) result is already an
-        object. This client performs that second parse.
-      - large-document / deep-model operations can take 30s-several minutes
-        with no visible progress; this client uses a generous read timeout
-        and treats a timeout as "still processing", not a crash — callers
-        should retry the status check, not resend the edit (resends cost
-        operations).
+    Known simplification, logged rather than hidden: a stronger version of
+    the section-edit arm would keep ONE persistent session per document
+    and send only natural-language instructions after the first turn
+    (relying on the server's persisted state + chunk targeting), sending
+    no document_html at all on later turns. This client instead treats
+    every edit as a fresh, self-contained exchange, which is a fair and
+    conservative approximation but doesn't fully exploit session
+    persistence. Worth revisiting if this benchmark's real-mode numbers
+    get cited externally.
     """
 
     name = "superdocs_api"
@@ -132,47 +195,53 @@ class SuperDocsClient(BaseClient):
 
     def _post(self, path: str, **kwargs):
         r = self._session.post(f"{self.BASE_URL}{path}", timeout=self.timeout_s, **kwargs)
-        r.raise_for_status()
-        return r.json()
-
-    def _get(self, path: str, **kwargs):
-        r = self._session.get(f"{self.BASE_URL}{path}", timeout=self.timeout_s, **kwargs)
+        if r.status_code == 429:
+            retry_after = r.headers.get("Retry-After", "unknown")
+            raise ClientError(
+                f"429 rate limited / quota exhausted. Retry-After={retry_after}s. "
+                f"Body: {r.text[:300]}"
+            )
         r.raise_for_status()
         return r.json()
 
     def edit(self, content: str, instruction: str) -> EditResult:
-        import json as _json
-
         start = time.perf_counter()
 
-        upload = self._post("/documents", json={"content": content, "format": "markdown"})
-        doc_id = upload["id"]
+        session_id = f"benchmark-{uuid.uuid4().hex[:12]}"
+        document_html = _markdown_to_minimal_html(content)
 
-        chat_resp = self._post(f"/documents/{doc_id}/chat", json={"message": instruction})
-        # Documented gotcha: proposed-change content is JSON-encoded twice.
-        raw_changes = chat_resp.get("proposed_changes")
-        proposed = _json.loads(raw_changes) if isinstance(raw_changes, str) else raw_changes
-
-        approve_resp = self._post(
-            f"/documents/{doc_id}/changes/approve",
-            json={"change_ids": [c["id"] for c in proposed.get("changes", [])]},
+        chat_resp = self._post(
+            "/chat",
+            json={
+                "message": instruction,
+                "session_id": session_id,
+                "document_html": document_html,
+            },
         )
 
-        exported = self._get(f"/documents/{doc_id}/export", params={"format": "markdown"})
-        edited_text = exported.get("content", "")
+        updated_html = chat_resp.get("document_changes", {}).get("updated_html", "")
+        edited_text = _html_to_text(updated_html) if updated_html else content
 
         elapsed = time.perf_counter() - start
+
+        # Real per-edit token counts are NOT exposed by the API — fall back
+        # to the same local estimate the mock uses, applied to what was
+        # actually sent/received. This is stated plainly in the README
+        # results section, same as the mock-mode caveat.
+        input_tokens = estimate_tokens(document_html) + estimate_tokens(instruction)
+        output_tokens = estimate_tokens(updated_html or edited_text)
+
         usage = chat_resp.get("usage", {})
-        input_tokens = usage.get("input_tokens") or estimate_tokens(content + instruction)
-        output_tokens = usage.get("output_tokens") or estimate_tokens(edited_text)
+        ops_charged = usage.get("ops_charged", 0)
 
         return EditResult(
             edited_text=edited_text,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             wall_clock_s=elapsed,
-            model=chat_resp.get("model", "unknown"),
+            model=chat_resp.get("model", "superdocs-default"),
             source="superdocs_api",
+            ops_charged=ops_charged,
         )
 
 

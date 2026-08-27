@@ -41,6 +41,7 @@ class EditRecord:
     cost_usd: float
     wall_clock_s: float
     client_source: str
+    ops_charged: int = 0  # real API-billed operations (0 for mock; the honest cost story)
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -60,6 +61,7 @@ def _record_from_edit(task: EditTask, arm: str, chars_sent: int, edit_result) ->
         cost_usd=cost_usd(edit_result.input_tokens, edit_result.output_tokens),
         wall_clock_s=edit_result.wall_clock_s,
         client_source=edit_result.source,
+        ops_charged=getattr(edit_result, "ops_charged", 0),
     )
 
 
