@@ -159,7 +159,7 @@ Pluto notebooks — open them **in Pluto**, do not `include` them as scripts:
 | Notebook | What it does |
 |---|---|
 | `notebooks/lab_note.jl` | Fixture math always. With a key: HITL lab note + figure. |
-| `notebooks/oscillator_flow.jl` | Julia integrates a synthetic forced oscillator, writes markdown, plots with gnuplot, uploads session `pluto-oscillator-011`. Needs `gnuplot` on PATH for the figure cell. |
+| `notebooks/oscillator_flow.jl` | Julia integrates a synthetic forced oscillator, writes markdown, plots with gnuplot, uploads to SuperDocs. Needs `gnuplot` on PATH for the figure cell. |
 
 Headless Pluto check (Pluto is **not** a package dependency):
 
@@ -169,16 +169,7 @@ export SUPERDOCS_API_KEY=your-key-here
 julia --project=/tmp/pluto-sd notebooks/run_in_pluto.jl notebooks/oscillator_flow.jl
 ```
 
-`notebooks/lab_note.png` is a screenshot of a live exported lab note after HITL.
-
-## Demo
-
-On the author’s SuperDocs account (same key as the REST client):
-
-- Session `pluto-oscillator-011` — Pluto-generated oscillator note with typeset math and a gnuplot figure.
-- Session `superdocs-julia-test011` — longer synthetic mechanics report (six figures).
-
-Open them at [use.superdocs.app](https://use.superdocs.app) while signed into that account.
+`notebooks/lab_note.png` is a screenshot of a live exported lab note after HITL. With your own API key, the notebooks write a new SuperDocs session you can open at [use.superdocs.app](https://use.superdocs.app).
 
 ## Limits
 
