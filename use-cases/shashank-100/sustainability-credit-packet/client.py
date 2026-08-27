@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -30,9 +31,21 @@ import requests
 
 BASE_URL = os.environ.get("SUPERDOCS_BASE_URL", "https://api.superdocs.app")
 
+# Set SUPERDOCS_TRACE=1 to see every call and poll as it happens. Operations
+# here can run for minutes with no visible progress, and without this a slow
+# run and a hung one look identical from the outside.
+TRACE = os.environ.get("SUPERDOCS_TRACE", "").lower() in ("1", "true", "yes")
+
+
+def _trace(message: str) -> None:
+    if TRACE:
+        print(f"  [{time.strftime('%H:%M:%S')}] {message}", file=sys.stderr, flush=True)
+
 # Long enough for the "thirty seconds to several minutes" case the task
 # document warns about, short enough to fail eventually.
 REQUEST_TIMEOUT = 300
+NETWORK_RETRIES = 4
+RETRY_BACKOFF = 2
 POLL_INTERVAL = 3
 POLL_CEILING = 600
 
@@ -144,16 +157,41 @@ class SuperDocs:
 
         url = f"{BASE_URL}{path}"
         started = time.monotonic()
-        try:
-            response = self._session.request(method, url, timeout=REQUEST_TIMEOUT, **kwargs)
-        except requests.Timeout as exc:
-            raise SuperDocsError(
-                f"{stage}: no response after {REQUEST_TIMEOUT}s. Large documents can take "
-                "several minutes; consider raising REQUEST_TIMEOUT rather than assuming a crash."
-            ) from exc
-        except requests.RequestException as exc:
-            raise SuperDocsError(f"{stage}: request failed: {exc}") from exc
+
+        # A dropped connection is not a failed operation. Runs here are long
+        # and every step has already been paid for, so a transient reset is
+        # retried with backoff rather than being allowed to end the run --
+        # losing an hour of approved work to one blip is the expensive
+        # failure, not the extra request. Timeouts are left alone: the server
+        # may still be working, and re-sending an edit would duplicate it.
+        attempt = 0
+        while True:
+            _trace(f"{stage}: {method} {path} ...")
+            try:
+                response = self._session.request(
+                    method, url, timeout=REQUEST_TIMEOUT, **kwargs
+                )
+                break
+            except requests.Timeout as exc:
+                raise SuperDocsError(
+                    f"{stage}: no response after {REQUEST_TIMEOUT}s. Large documents can take "
+                    "several minutes; consider raising REQUEST_TIMEOUT rather than assuming a crash."
+                ) from exc
+            except (requests.ConnectionError, requests.exceptions.ChunkedEncodingError) as exc:
+                attempt += 1
+                if attempt > NETWORK_RETRIES:
+                    raise SuperDocsError(
+                        f"{stage}: connection failed {attempt} times: {exc}"
+                    ) from exc
+                pause = RETRY_BACKOFF * attempt
+                _trace(f"{stage}: connection lost ({exc.__class__.__name__}), "
+                       f"retry {attempt}/{NETWORK_RETRIES} in {pause}s")
+                time.sleep(pause)
+            except requests.RequestException as exc:
+                raise SuperDocsError(f"{stage}: request failed: {exc}") from exc
+
         elapsed = time.monotonic() - started
+        _trace(f"{stage}: HTTP {response.status_code} in {elapsed:.1f}s")
 
         # Quota exhaustion arrives as a 402, and sometimes as a 429 or 400
         # whose body says so. Both must raise QuotaExhausted: packet_cli gives
@@ -263,16 +301,20 @@ class SuperDocs:
         this waits patiently rather than treating slowness as failure.
         """
         deadline = time.monotonic() + POLL_CEILING
+        waited = 0.0
         while True:
             payload = self.job(job_id, stage=f"{stage}:poll")
             status = payload.get("status")
             if status in until:
+                _trace(f"{stage}: job {job_id[:8]} -> {status} after {waited:.0f}s")
                 return payload
+            _trace(f"{stage}: job {job_id[:8]} still {status!r}, waited {waited:.0f}s")
             if time.monotonic() > deadline:
                 raise SuperDocsError(
                     f"{stage}: job {job_id} still {status!r} after {POLL_CEILING}s"
                 )
             time.sleep(POLL_INTERVAL)
+            waited += POLL_INTERVAL
 
     def wait_until_idle(self, session_id: str, *, stage: str = "settle") -> None:
         """Block until the session has no job still running.
@@ -319,12 +361,22 @@ class SuperDocs:
             body["feedback"] = feedback
         return self._call("POST", f"/v1/chat/{session_id}/approve", stage="approve", json=body)
 
-    def export(self, session_id: str, fmt: str = "docx", **options) -> bytes:
+    def export(self, session_id: str, fmt: str = "docx", *,
+               document_id: str | None = None, **options) -> bytes:
+        """Export one document. Without a document_id the session's own is sent.
+
+        document_id rides at the top of the body rather than inside options:
+        options is a formatting bag and a selector buried in it is ignored,
+        which is how a multi-document bundle silently exports the same bytes
+        under every filename.
+        """
+        body: dict[str, Any] = {
+            "session_id": session_id, "format": fmt, "options": options,
+        }
+        if document_id:
+            body["document_id"] = document_id
         payload = self._call(
-            "POST",
-            "/v1/documents/export",
-            stage="export",
-            json={"session_id": session_id, "format": fmt, "options": options},
+            "POST", "/v1/documents/export", stage="export", json=body,
         )
         if "_binary" not in payload:
             raise SuperDocsError(f"export returned JSON, not a file: {str(payload)[:300]}")

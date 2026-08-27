@@ -178,3 +178,55 @@ Exporting the session (`POST /v1/documents/export`, `format: txt`) returns the
 genuinely stored document, and confirms rejection is honoured correctly — 0 of
 3 trials leaked rejected content. Any verification of what a document actually
 contains should go through export, never through chat.
+
+---
+
+## 5. Approval returns before the edit is applied, and the jobs listing cannot tell you when it is
+
+`POST /v1/chat/{session}/approve` responds immediately with
+
+```json
+{"status": "ok", "message": "Approval processed", "batch_complete": true}
+```
+
+`batch_complete: true` reads as "the edit has landed". It has not. The job
+moves to `in_progress` and applies the change asynchronously, reaching
+`completed` roughly ten seconds later. Exporting before that returns the
+document without the approved content.
+
+Sending the next instruction inside that window returns
+
+```
+HTTP 409 session_busy -- "This conversation has changes waiting for your
+review, so it can't take a new instruction yet."
+```
+
+so a build that approves and moves on loses every section after the first, and
+the surviving document holds only its seed heading. The 409 message points at
+review, which sends you looking for an undecided gate that does not exist; the
+real cause is the still-applying edit.
+
+The obvious defence is to wait for the session to go quiet, but
+`GET /v1/jobs?session_id=...` returns `{"jobs": [], "total": 0}` even while a
+job for that session is `in_progress` — verified against a session whose job id
+returned `in_progress` from `/v1/jobs/{id}` at the same moment. The listing
+cannot be used to detect a busy session, in either direction: it shows nothing
+active when something is.
+
+Reproduction, six calls:
+
+```python
+sid = "probe-" + uuid.uuid4().hex[:8]
+sd.chat("Create a document containing only the heading: Water Test", sid)
+r  = sd.chat_async("Add a section titled Calculation with the sentence: "
+                   "The reduction is 41.69 percent.", sid)
+c  = sd.changes_from(r)[0]
+sd.approve(sid, [{"change_id": c.change_id, "approved": True}], job_id=r["job_id"])
+
+sd.export(sid, "txt")            # -> "Water Test"            (t+5s, in_progress)
+sd.export(sid, "txt")            # -> includes the sentence   (t+10s, completed)
+```
+
+Both `change_id` and `chunk_id` behave identically here; the id is not the
+issue. What works is polling `GET /v1/jobs/{job_id}` for the approved job until
+it reports `completed`, and only then sending the next instruction.

@@ -9,6 +9,7 @@ reaches a document was computed in calc.py first.
 
 from __future__ import annotations
 
+import hashlib
 import re
 import uuid
 from dataclasses import dataclass
@@ -51,6 +52,21 @@ class Pending:
             }
             for c in self.changes
         ]
+
+
+def _document_id_from(changes: list[client.Change]) -> str | None:
+    """The id of the document a batch of changes belongs to.
+
+    A create returns it on the change itself -- observed live as
+    `doc_created_...` on the seed change. Captured here because every later
+    targeted instruction and every per-document export needs it: without it
+    the API falls back to the session's own document and a multi-document
+    bundle silently becomes one document under several names.
+    """
+    for change in changes:
+        if change.document_id:
+            return change.document_id
+    return None
 
 
 def _marked_missing(html: str, filename: str) -> bool:
@@ -117,6 +133,9 @@ class Packet:
         self.documents: dict[str, Document] = {}
         self.unattached: list[str] = []
         self.pending: dict[str, Pending] = {}
+        # Set when a gate is left undecided: the session will refuse the next
+        # instruction with a 409 until a person decides the staged changes.
+        self.awaiting_review = False
         # Honesty counters: how many instructions genuinely waited for a human,
         # and which ones the API applied without asking.
         self.gated = 0
@@ -179,18 +198,35 @@ class Packet:
                 # discarding work under the appearance of approving it.
                 self.empty_sections.append(key)
             elif approve:
+                job_id = response.get("job_id")
                 self.sd.approve(
                     self.session_id,
                     [{"change_id": c.change_id, "approved": True} for c in changes],
-                    job_id=response.get("job_id"),
+                    job_id=job_id,
                 )
-                self.sd.wait_until_idle(self.session_id)
+                # Approving records the decision and returns; the edit is then
+                # applied asynchronously and the job runs on to `completed`.
+                # Sending the next instruction during that window earns a 409
+                # and the section is lost, so wait on this job specifically --
+                # the session-wide jobs listing comes back empty and cannot be
+                # used to tell whether the edit has landed.
+                if job_id:
+                    self.sd.wait_for_job(
+                        job_id, stage="settle", until=("completed", "failed"),
+                    )
+                else:
+                    self.sd.wait_until_idle(self.session_id)
             else:
                 self.pending[key] = Pending(
                     job_id=response.get("job_id") or "",
                     session_id=self.session_id,
                     changes=changes,
                 )
+                # A session holds one undecided batch at a time: sending the
+                # next instruction while this one waits earns a 409
+                # session_busy. Signal the caller to stop building here and
+                # let a person decide before the next section is proposed.
+                self.awaiting_review = True
         elif changes:
             # Content landed without the gate engaging. Recorded, not glossed
             # over. See docs/BUGS.md #1.
@@ -202,9 +238,13 @@ class Packet:
 
     def build_scorecard(self, *, approve: bool = False) -> Document:
         """Build the cover sheet, one gated section at a time."""
-        self.sd.chat(
+        seed = self.sd.chat(
             prompts.scorecard_seed(self.scorecard), self.session_id, stage="seed:scorecard"
         )
+        # The create carries the new document's id; hold it so later edits and
+        # the export can be aimed at this document rather than the session.
+        document_id = _document_id_from(self.sd.changes_from(seed))
+
         parts: list[str] = []
         for label, instruction in prompts.scorecard_sections(self.scorecard):
             changes = self._run_section(
@@ -212,12 +252,14 @@ class Packet:
                 key=f"scorecard:{label}",
             )
             parts.extend(c.new_html for c in changes if c.new_html)
+            document_id = document_id or _document_id_from(changes)
 
         doc = Document(
             key="scorecard",
             title="Scorecard cover",
             html="\n".join(parts),
             session_id=self.session_id,
+            document_id=document_id,
         )
         self.documents["scorecard"] = doc
         return doc
@@ -231,11 +273,12 @@ class Packet:
         which is what the non-interactive scripted run does; the review CLI
         passes approve=False and decides per change.
         """
-        self.sd.chat(
+        seed = self.sd.chat(
             prompts.narrative_seed(credit, self.scorecard.project),
             self.session_id,
             stage=f"seed:{credit.id}",
         )
+        document_id = _document_id_from(self.sd.changes_from(seed))
 
         html_parts: list[str] = []
         for label, instruction in prompts.narrative_sections(credit, self.scorecard.project):
@@ -244,12 +287,14 @@ class Packet:
                 key=f"{credit.id}:{label}",
             )
             html_parts.extend(c.new_html for c in changes if c.new_html)
+            document_id = document_id or _document_id_from(changes)
 
         doc = Document(
             key=credit.id,
             title=f"{credit.id} {credit.name}",
             html="\n".join(html_parts),
             session_id=self.session_id,
+            document_id=document_id,
         )
         self.documents[credit.id] = doc
         return doc
@@ -334,11 +379,32 @@ class Packet:
 
     # --------------------------------------------------------------- export
     def export(self, out_dir: Path, fmt: str = "docx") -> list[Path]:
+        """Write each document to its own file.
+
+        Each export is selected by document_id. Without one the endpoint
+        returns the session's own document, so every file would receive
+        identical bytes under a different name -- and pay an operation for the
+        privilege. Duplicates are reported rather than written quietly.
+        """
         out_dir = Path(out_dir)
         out_dir.mkdir(parents=True, exist_ok=True)
-        written = []
+        written: list[Path] = []
+        seen: dict[bytes, str] = {}
+        self.export_duplicates: list[str] = []
+
         for doc in self.documents.values():
-            data = self.sd.export(self.session_id, fmt, filename=doc.key)
+            data = self.sd.export(
+                self.session_id, fmt,
+                document_id=doc.document_id, filename=doc.key,
+            )
+            digest = hashlib.sha256(data).digest()
+            if digest in seen:
+                self.export_duplicates.append(
+                    f"{doc.key}: identical bytes to {seen[digest]} -- "
+                    "the export was not selected by document"
+                )
+            else:
+                seen[digest] = doc.key
             path = out_dir / f"{doc.key}.{fmt}"
             path.write_bytes(data)
             written.append(path)
@@ -408,6 +474,16 @@ class Packet:
                         f"{credit.id}: evidence index lists missing item "
                         f"{item.file} without marking it outstanding"
                     )
+
+        # A document with no id cannot be targeted or exported on its own, so
+        # the bundle would quietly collapse into one document under several
+        # names. Reported here rather than discovered in the exported files.
+        for doc in self.documents.values():
+            if not doc.document_id:
+                problems.append(
+                    f"{doc.key}: no document id was captured, so edits and "
+                    "exports would fall back to the session's own document"
+                )
 
         # Criterion 3: the cover must carry the computed total, not a guess.
         # Matched against the labelled figure, not the bare number: a cover

@@ -15,6 +15,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import calc
+import client
 import packet
 import prompts
 import registry
@@ -183,6 +184,49 @@ class TestAnAtRiskFlagCanBeLifted:
         credit = next(c for c in scorecard.credits if c.missing_evidence)
         with pytest.raises(ValueError, match="evidence is missing"):
             registry.set_status(scorecard, credit.id, registry.DOCUMENTED)
+
+
+class TestDocumentIdIsCapturedFromTheCreate:
+    """Without this the bundle is one document wearing several filenames.
+
+    The id shape here is the one the live API returned on a real create
+    (`doc_created_...`), not an invented placeholder.
+    """
+
+    def test_the_id_is_taken_off_the_seed_change(self):
+        changes = [
+            client.Change(chunk_id="k1", operation="create", old_html="",
+                          new_html="<h1>WEc1</h1>",
+                          document_id="doc_created_4d0aa2a048"),
+        ]
+        assert packet._document_id_from(changes) == "doc_created_4d0aa2a048"
+
+    def test_no_id_anywhere_returns_none(self):
+        changes = [client.Change(chunk_id="k1", operation="edit",
+                                 old_html="a", new_html="b")]
+        assert packet._document_id_from(changes) is None
+
+    def test_build_narrative_records_the_id_on_the_document(self, pk, bundle):
+        credit = pk.scorecard.credit("WEc1")
+        pk.sd.chat = lambda *a, **k: {
+            "proposed_change_batch": [
+                {"chunk_id": "k0", "operation": "create", "original": "",
+                 "replacement": "<h1>WEc1</h1>",
+                 "document_id": "doc_created_4d0aa2a048"}
+            ]
+        }
+        pk.sd.chat_async = lambda *a, **k: {"job_id": "j1", "proposed_change_batch": []}
+        pk.attach_sources = lambda c: None
+
+        doc = pk.build_narrative(credit, approve=False)
+        assert doc.document_id == "doc_created_4d0aa2a048"
+
+    def test_verify_reports_a_document_that_has_no_id(self, pk):
+        pk.documents["WEc1"] = packet.Document(
+            "WEc1", "WEc1", "<p>x</p>", "s-test", None
+        )
+        problems = pk.verify()
+        assert any("no document id was captured" in p for p in problems)
 
 
 class TestVerifyCatchesWhatItClaimsTo:
