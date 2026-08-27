@@ -1,0 +1,130 @@
+From marcus.vance@caldervance.example Mon Mar 03 09:12:00 2026
+From: Marcus Vance <marcus.vance@caldervance.example>
+To: Priya Raman <priya.raman@northwind.example>
+Cc: Devi Anand <devi.anand@northwind.example>
+Subject: Data migration - kickoff and timings
+Date: Mon, 3 Mar 2026 09:12:00 +0000
+Message-ID: <c1@caldervance.example>
+
+Priya,
+
+Good to speak on Friday. Sending this so we have the timings written down
+somewhere other than my notebook.
+
+We're clear on scope: the customer records migration, not the billing tables.
+Those stay where they are for now.
+
+Marcus
+
+From priya.raman@northwind.example Mon Mar 03 11:40:00 2026
+From: Priya Raman <priya.raman@northwind.example>
+To: Marcus Vance <marcus.vance@caldervance.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Mon, 3 Mar 2026 11:40:00 +0000
+Message-ID: <c2@northwind.example>
+In-Reply-To: <c1@caldervance.example>
+
+Thanks Marcus. When can we expect the schema mapping?
+
+Also - is Sam still leading on the test environment?
+
+Priya
+
+From marcus.vance@caldervance.example Mon Mar 03 14:05:00 2026
+From: Marcus Vance <marcus.vance@caldervance.example>
+To: Priya Raman <priya.raman@northwind.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Mon, 3 Mar 2026 14:05:00 +0000
+Message-ID: <c3@caldervance.example>
+In-Reply-To: <c2@northwind.example>
+
+We should be able to have the schema mapping done by the 14th, assuming the
+staging credentials come through this week.
+
+Sam mentioned they'd probably get the test environment up sometime next week
+but don't hold me to that, it's his call not mine.
+
+Marcus
+
+From priya.raman@northwind.example Tue Mar 04 08:20:00 2026
+From: Priya Raman <priya.raman@northwind.example>
+To: Marcus Vance <marcus.vance@caldervance.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Tue, 4 Mar 2026 08:20:00 +0000
+Message-ID: <c4@northwind.example>
+In-Reply-To: <c3@caldervance.example>
+
+Credentials went out this morning. Can you confirm the 14th as a firm date? I
+have to tell the steering group something on Thursday.
+
+Priya
+
+From marcus.vance@caldervance.example Tue Mar 04 09:55:00 2026
+From: Marcus Vance <marcus.vance@caldervance.example>
+To: Priya Raman <priya.raman@northwind.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Tue, 4 Mar 2026 09:55:00 +0000
+Message-ID: <c5@caldervance.example>
+In-Reply-To: <c4@northwind.example>
+
+Confirming: Calder and Vance will deliver the schema mapping document to
+Northwind by 14 March 2026.
+
+Tell the steering group that date.
+
+Marcus
+
+From devi.anand@northwind.example Tue Mar 04 16:30:00 2026
+From: Devi Anand <devi.anand@northwind.example>
+To: Marcus Vance <marcus.vance@caldervance.example>
+Cc: Priya Raman <priya.raman@northwind.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Tue, 4 Mar 2026 16:30:00 +0000
+Message-ID: <c6@northwind.example>
+In-Reply-To: <c5@caldervance.example>
+
+Adding myself for the commercial side.
+
+Northwind will pay the first invoice within 30 days of receipt, provided it
+references the purchase order number.
+
+I'd also like us to look at a fixed-fee arrangement for phase two, but that's a
+separate conversation and nothing is agreed there yet.
+
+Devi
+
+From marcus.vance@caldervance.example Wed Mar 12 17:48:00 2026
+From: Marcus Vance <marcus.vance@caldervance.example>
+To: Priya Raman <priya.raman@northwind.example>
+Cc: Devi Anand <devi.anand@northwind.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Wed, 12 Mar 2026 17:48:00 +0000
+Message-ID: <c7@caldervance.example>
+In-Reply-To: <c6@northwind.example>
+
+Bad news on the 14th. We've hit a dependency on the address normalisation
+library that we did not see coming.
+
+Revised commitment: we will deliver the schema mapping document by 21 March
+2026. That date is firm, we have the fix in hand and it is a matter of testing.
+
+Apologies for the move.
+
+Marcus
+
+From priya.raman@northwind.example Thu Mar 13 09:02:00 2026
+From: Priya Raman <priya.raman@northwind.example>
+To: Marcus Vance <marcus.vance@caldervance.example>
+Subject: Re: Data migration - kickoff and timings
+Date: Thu, 13 Mar 2026 09:02:00 +0000
+Message-ID: <c8@northwind.example>
+In-Reply-To: <c7@caldervance.example>
+
+Noted, I'll take the 21st back to the steering group.
+
+Separately, can you send the security questionnaire when you get a minute.
+No rush on that one.
+
+Lunch on me when this lands.
+
+Priya

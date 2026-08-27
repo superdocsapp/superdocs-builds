@@ -1,0 +1,74 @@
+[
+  {
+    "party": "Calder and Vance",
+    "owes_to": "Northwind",
+    "obligation": "schema mapping",
+    "due": "14 March 2026",
+    "status": "hedged",
+    "source": "3",
+    "quote": "We should be able to have the schema mapping done by the 14th",
+    "quote_found": true,
+    "quote_note": "",
+    "located_in": 3
+  },
+  {
+    "party": "Sam",
+    "owes_to": "Northwind",
+    "obligation": "test environment",
+    "due": "next week",
+    "status": "second-hand",
+    "source": "3",
+    "quote": "Sam mentioned they'd probably get the test environment up sometime next week",
+    "quote_found": true,
+    "quote_note": "",
+    "located_in": 3
+  },
+  {
+    "party": "Calder and Vance",
+    "owes_to": "Northwind",
+    "obligation": "schema mapping",
+    "due": "14 March 2026",
+    "status": "superseded",
+    "source": "5",
+    "quote": "Calder and Vance will deliver the schema mapping document to Northwind by 14 March 2026.",
+    "quote_found": true,
+    "quote_note": "",
+    "located_in": 5
+  },
+  {
+    "party": "Northwind",
+    "owes_to": "Calder and Vance",
+    "obligation": "pay first invoice",
+    "due": "30 days of receipt",
+    "status": "firm",
+    "source": "6",
+    "quote": "Northwind will pay the first invoice within 30 days of receipt, provided it references the purchase order number.",
+    "quote_found": true,
+    "quote_note": "",
+    "located_in": 6
+  },
+  {
+    "party": "Devi Anand",
+    "owes_to": "Calder and Vance",
+    "obligation": "fixed-fee arrangement",
+    "due": "",
+    "status": "proposed",
+    "source": "6",
+    "quote": "I'd also like us to look at a fixed-fee arrangement for phase two",
+    "quote_found": true,
+    "quote_note": "",
+    "located_in": 6
+  },
+  {
+    "party": "Calder and Vance",
+    "owes_to": "Northwind",
+    "obligation": "schema mapping",
+    "due": "21 March 2026",
+    "status": "firm",
+    "source": "7",
+    "quote": "we will deliver the schema mapping document by 21 March 2026.",
+    "quote_found": true,
+    "quote_note": "",
+    "located_in": 7
+  }
+]

@@ -1,0 +1,11 @@
+[SENDER BLOCK][SENDER ADDRESS][SENDER NAME/TITLE][SENDER COMPANY]
+27 August 2026
+[RECIPIENT BLOCK][RECIPIENT ADDRESS][RECIPIENT NAME/TITLE][RECIPIENT COMPANY]
+Subject: Data migration - kickoff and timings
+Dear [RECIPIENT NAME],
+This letter serves to put on record the commitments agreed upon during our discussion regarding data migration.
+Northwind will pay the first invoice within 30 days of receipt, provided it references the purchase order number. This obligation is owed to Calder and Vance.
+Calder and Vance will deliver the schema mapping document by 21 March 2026. This obligation is owed to Northwind.
+Please inform me if any aspect of these commitments is recorded incorrectly.
+Sincerely,
+[SIGNATURE BLOCK][SENDER NAME]
