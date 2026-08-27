@@ -1,0 +1,206 @@
+{
+  "title": "Repo Changelog",
+  "style": {
+    "heading_level": 2,
+    "title_format": "[{version}] - {date}",
+    "bullet_marker": "-",
+    "emoji_policy": "none",
+    "section_heading_level": 3,
+    "section_order": [
+      "Added",
+      "Changed",
+      "Fixed",
+      "Breaking",
+      "Deprecated",
+      "Removed",
+      "Security"
+    ],
+    "include_comparison_link": true,
+    "comparison_link_format": "https://github.com/{owner}/{repo}/compare/{previous}...{version}",
+    "trailing_blank_lines": 1
+  },
+  "owner": "org",
+  "repo": "repo",
+  "superdocs_document_id": "clm-1f2fe152710d",
+  "source_path": null,
+  "created_at": "2026-08-27",
+  "entries": [
+    {
+      "version": "1.6.0",
+      "date": "2026-08-28",
+      "sections": {
+        "Added": [
+          {
+            "text": "Full multi-language changelog generation",
+            "link": null
+          },
+          {
+            "text": "No-spend preview mode that never calls SuperDocs",
+            "link": null
+          },
+          {
+            "text": "Identity check that older releases stay byte-identical",
+            "link": null
+          }
+        ],
+        "Changed": [
+          {
+            "text": "House style is now enforced on every insert",
+            "link": null
+          },
+          {
+            "text": "Export always produces Markdown + PDF by default",
+            "link": null
+          }
+        ],
+        "Fixed": [
+          {
+            "text": "Duplicate compare links no longer appear",
+            "link": null
+          },
+          {
+            "text": "Section order is now consistent across all releases",
+            "link": null
+          }
+        ],
+        "Removed": [
+          {
+            "text": "Old experimental --force-rebuild flag",
+            "link": null
+          }
+        ]
+      },
+      "contributors": [
+        "@alice",
+        "@bob",
+        "@dave"
+      ],
+      "links": [
+        {
+          "label": "compare",
+          "url": "https://github.com/org/repo/compare/v1.5.0...v1.6.0"
+        },
+        {
+          "label": "release",
+          "url": "https://github.com/org/repo/releases/tag/v1.6.0"
+        }
+      ],
+      "summary": "Multi-language support and safer previews"
+    },
+    {
+      "version": "1.5.0",
+      "date": "2026-08-27",
+      "sections": {
+        "Added": [
+          {
+            "text": "New --dry-run flag for safe previews",
+            "link": null
+          },
+          {
+            "text": "Support for custom house-style templates",
+            "link": null
+          },
+          {
+            "text": "Automatic contributor detection from git",
+            "link": null
+          }
+        ],
+        "Changed": [
+          {
+            "text": "Faster surgical inserts (30% speed improvement)",
+            "link": null
+          },
+          {
+            "text": "Default export now includes both Markdown and PDF",
+            "link": null
+          }
+        ],
+        "Fixed": [
+          {
+            "text": "Incorrect ordering when releases share the same date",
+            "link": null
+          },
+          {
+            "text": "Missing blank line after the last section",
+            "link": null
+          }
+        ],
+        "Breaking": [
+          {
+            "text": "Removed support for the old v0 style format",
+            "link": null
+          }
+        ],
+        "Removed": [
+          {
+            "text": "Deprecated --legacy-export flag",
+            "link": null
+          }
+        ]
+      },
+      "contributors": [
+        "@alice",
+        "@bob",
+        "@carol"
+      ],
+      "links": [
+        {
+          "label": "compare",
+          "url": "https://github.com/org/repo/compare/v1.4.0...v1.5.0"
+        },
+        {
+          "label": "release",
+          "url": "https://github.com/org/repo/releases/tag/v1.5.0"
+        }
+      ],
+      "summary": "Performance improvements and new CLI flags"
+    },
+    {
+      "version": "1.4.0",
+      "date": "2026-08-27",
+      "sections": {
+        "Added": [
+          {
+            "text": "Native Windows binary",
+            "link": null
+          },
+          {
+            "text": "Optional Redis cache backend",
+            "link": null
+          }
+        ],
+        "Changed": [
+          {
+            "text": "Default timeout increased to 30s",
+            "link": null
+          }
+        ],
+        "Fixed": [
+          {
+            "text": "Crash when config file is missing",
+            "link": null
+          },
+          {
+            "text": "Incorrect version shown in --help",
+            "link": null
+          }
+        ]
+      },
+      "contributors": [
+        "@alice",
+        "@bob"
+      ],
+      "links": [
+        {
+          "label": "compare",
+          "url": "https://github.com/org/repo/compare/v1.3.0...v1.4.0"
+        },
+        {
+          "label": "release",
+          "url": "https://github.com/org/repo/releases/tag/v1.4.0"
+        }
+      ],
+      "summary": "Better caching and Windows support"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+.env
+opencode.json
+output/
+__pycache__/
