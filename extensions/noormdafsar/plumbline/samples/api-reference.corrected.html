@@ -1,0 +1,29 @@
+<h1 data-chunk-id="b7cfa8ac-f77a-4157-add5-ea1be0a055cc">Meridian SDK — API reference</h1>
+<p data-chunk-id="9c9e55fe-6012-40cd-a9be-754ebb5d2f63">The Meridian SDK is a small client for the Meridian ledger service. This page
+documents the public surface.</p>
+<h2 data-chunk-id="c7a5c347-9790-4205-901e-18ca83d91b0b">Configuration</h2>
+<p data-chunk-id="e00b45d1-bf9d-45e8-8caf-8936ce6dc7e9">The client accepts a number of module-level defaults. The default request
+timeout is 45 seconds, which is generous for most workloads. The maximum page
+size is 500 records. Requests are issued against the <code>eu-west-1</code>
+unless another is given.</p>
+<h2 data-chunk-id="d9a5b17b-7e13-4227-a1f9-c3127d09d577">Client</h2>
+<p data-chunk-id="a43a6e2b-b64f-4c18-a81b-895e8723a666">Construct a client with your API key. The constructor also accepts
+<code>region</code>, <code>timeout</code> and <code>max_retries</code>, which
+defaults to 3.</p>
+<h2 data-chunk-id="cff9281c-482d-4d55-b9af-7b03790a63eb">list_ledgers</h2>
+<p data-chunk-id="917eba19-2dcc-4e16-b5bd-a82fb303f3e0">Returns a list of dictionaries, newest first. Pass <code>page_size</code> to
+control how many come back; it defaults to 100. A <code>cursor</code> may be
+supplied to continue a previous page, and <code>include_archived</code> pulls in
+ledgers that have been archived.</p>
+<p data-chunk-id="50244482-f95f-4f10-918e-cd59553bf569">If <code>page_size</code> is larger than the maximum, the call raises
+<code>ValueError</code>.</p>
+<h2 data-chunk-id="1935b209-a0bb-4694-b1a9-3cea91637d9b">get_ledger</h2>
+<p data-chunk-id="c833c031-995f-49eb-89b7-d7525e34d8a4">Fetches a single ledger by id and returns a dictionary. Raises
+<code>NotFound</code> when no such ledger exists.</p>
+<h2 data-chunk-id="ce02ec99-4a75-45d1-b5d4-28d1a7aa77d7">post_entry</h2>
+<p data-chunk-id="ebed6c17-db3b-4918-bf8b-23d1b30fe0f6">Appends an entry to a ledger and returns the created entry as a dictionary.
+Amounts are given in minor units, so 1250 means 12.50. The
+<code>currency</code> argument defaults to EUR. Pass an
+<code>idempotency_key</code> to make retries safe.</p>
+<h2 data-chunk-id="e0195b84-b147-459c-a1fb-0de36ed480b0">close_ledger</h2>
+<p data-chunk-id="f7d5b7f5-95fd-4735-b3d2-0f2229e86082">Closes a ledger and returns a boolean. A <code>ledger_id</code> and <code>reason</code> are required.</p>
