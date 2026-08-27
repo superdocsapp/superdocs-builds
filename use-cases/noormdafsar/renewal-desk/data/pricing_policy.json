@@ -1,0 +1,48 @@
+{
+  "_comment": "Deterministic pricing policy. pricing.py computes every number from this file; the AI never invents or recomputes a figure. A new pricing rule is an edit here, not a code change.",
+  "policy_version": "2026.3",
+  "base_adjustment_pct": 3.0,
+  "base_adjustment_reason": "annual platform adjustment",
+  "seat_overage": {
+    "threshold_pct": 10.0,
+    "adjustment_pct": 4.0,
+    "reason": "sustained active-seat usage above the contracted seat count"
+  },
+  "usage_tier_crossing": {
+    "api_calls_tier": 1000000,
+    "adjustment_pct": 3.0,
+    "reason": "monthly API volume crossed and stayed above the 1M-call tier this year"
+  },
+  "usage_growth": {
+    "threshold_pct": 80.0,
+    "adjustment_pct": 4.0,
+    "reason": "year-over-year usage growth above 80%"
+  },
+  "promo_expiry": {
+    "reason": "expiry of first-year promotional pricing; the renewal price returns toward the standard list rate for the plan"
+  },
+  "volume_band": {
+    "min_committed_seats": 700,
+    "min_term_months": 36,
+    "price_per_seat": 36.0,
+    "reason": "volume band pricing for 700+ committed seats on a 36-month term"
+  },
+  "multi_year_lock": {
+    "reason": "price locked by the multi-year agreement; this renewal confirms the existing rate"
+  },
+  "caps": {
+    "max_total_increase_pct": 15.0,
+    "reason_when_capped": "total adjustment capped by policy at 15%"
+  },
+  "approval_gate": {
+    "increase_pct_above": 8.0,
+    "or_price_delta_annual_above_usd": 5000.0,
+    "or_flags": ["churn_risk"],
+    "rationale": "any increase above 8%, any price-driven annual delta above $5,000, or any priced change on a churn-risk account is reviewed by a human before it can leave the building"
+  },
+  "skip_rules": [
+    { "flag": "billing_dispute", "reason": "open billing dispute; renewal paperwork is held until the dispute closes" },
+    { "flag": "usage_data_missing", "reason": "usage data is missing, so an account-specific notice cannot be honestly written; held for data backfill" },
+    { "condition": "renewal_outside_window", "reason": "renewal date is outside the run window; the account belongs to a later batch" }
+  ]
+}

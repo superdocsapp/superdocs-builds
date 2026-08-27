@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Renewal Desk</title>
+<style>
+:root{
+  --paper:#F4F6F5; --surface:#fff; --surface-2:#EBEFEE;
+  --ink:#16211F; --ink-2:#4C5B58; --ink-3:#7B8A87;
+  --rule:#D6DEDC; --rule-2:#B9C5C2;
+  --accent:#0F5C57; --accent-soft:#E1EEEC;
+  --gold:#8A6A12; --gold-soft:#F7EEDA;
+  --crit:#98322A; --crit-soft:#F7E5E2;
+  --ok:#2C6B4A; --ok-soft:#E2EFE7;
+  --mono:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;
+  --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --paper:#0D1413; --surface:#141D1B; --surface-2:#1A2523;
+    --ink:#DEE7E5; --ink-2:#9DACA9; --ink-3:#7A8986;
+    --rule:#25322F; --rule-2:#35443F;
+    --accent:#5FB8AE; --accent-soft:#122A28;
+    --gold:#CBA45C; --gold-soft:#291F0F;
+    --crit:#E08C82; --crit-soft:#2A1513;
+    --ok:#79C39A; --ok-soft:#12261B;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+button{font:inherit;cursor:pointer;border-radius:0}
+.wrap{max-width:1460px;margin:0 auto;padding:0 24px 80px}
+
+/* ---------- masthead ---------- */
+header.top{border-bottom:2px solid var(--ink);padding:26px 0 18px;display:flex;
+  flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:flex-start}
+.stamp{width:44px;height:44px;border:2px solid var(--accent);color:var(--accent);
+  display:grid;place-items:center;font-family:var(--serif);font-size:22px;flex:none}
+h1{font-family:var(--serif);font-size:30px;margin:0;letter-spacing:-.015em;line-height:1.05}
+.tag{margin:4px 0 0;color:var(--ink-2);font-size:14px;max-width:60ch}
+.who{margin:6px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3)}
+.actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{padding:9px 15px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-weight:600;font-size:14px}
+@media (prefers-color-scheme:dark){.btn{color:#0D1413}}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.small{padding:5px 10px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* ---------- how it works ---------- */
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin:22px 0 0}
+.step{background:var(--surface);padding:14px 16px}
+.step .n{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--gold);
+  text-transform:uppercase;display:block;margin-bottom:5px}
+.step b{display:block;font-size:14.5px;margin-bottom:3px}
+.step p{margin:0;font-size:12.5px;color:var(--ink-2);line-height:1.5}
+.step.hi{background:var(--accent-soft)}
+
+/* ---------- summary tiles ---------- */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);margin:20px 0 0}
+.tile{background:var(--surface);padding:12px 14px}
+.tile dt{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 4px}
+.tile dd{margin:0;font-size:25px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile.gate dd{color:var(--gold)}
+.tile.rej dd{color:var(--crit)}
+.tile.ok dd{color:var(--ok)}
+
+.banner{margin:18px 0 0;padding:11px 15px;border:1px solid;font-size:14px;display:flex;
+  gap:12px;align-items:center;justify-content:space-between}
+.banner.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.banner.open{background:var(--gold-soft);border-color:var(--gold);color:var(--gold)}
+
+/* ---------- layout ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;margin-top:24px;align-items:start}
+@media(min-width:1120px){.cols{grid-template-columns:minmax(0,560px) minmax(0,1fr)}}
+h2.sec{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);margin:0 0 9px}
+
+/* ---------- account table ---------- */
+table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--rule);font-size:14px}
+th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink-3);background:var(--surface-2);padding:9px 11px;font-weight:600;white-space:nowrap}
+td{padding:9px 11px;border-top:1px solid var(--rule);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.sel{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.acct{font-family:var(--mono);font-size:12px}
+.co{font-weight:600}
+.sub{display:block;color:var(--ink-3);font-size:11.5px;font-weight:400}
+.pill{display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;white-space:nowrap}
+.p-awaiting_review{color:var(--gold)}
+.p-exported{color:var(--ok)}
+.p-rejected{color:var(--crit)}
+.p-failed{color:var(--crit)}
+.p-not_started{color:var(--ink-3)}
+.up{color:var(--crit)}
+.down{color:var(--ok)}
+.flat{color:var(--ink-3)}
+
+/* ---------- detail pane ---------- */
+.pane{background:var(--surface);border:1px solid var(--rule);padding:0}
+.pane .hd{padding:16px 18px;border-bottom:1px solid var(--rule)}
+.pane .hd h3{margin:0;font-family:var(--serif);font-size:22px;letter-spacing:-.01em}
+.pane .hd .meta{margin:3px 0 0;color:var(--ink-2);font-size:13px}
+.money{font-variant-numeric:tabular-nums;font-weight:650}
+.gatebox{margin:12px 18px;padding:11px 13px;background:var(--gold-soft);border:1px solid var(--gold)}
+.gatebox b{color:var(--gold);font-size:12px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.gatebox ul{margin:6px 0 0;padding-left:18px;font-size:13px;color:var(--ink-2)}
+.drivers{margin:0 18px 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.drivers li{font-size:13px;border-left:2px solid var(--rule-2);padding-left:10px;color:var(--ink-2)}
+.drivers .pc{font-family:var(--mono);color:var(--accent);font-weight:600;margin-right:6px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--rule);padding:0 18px;margin-top:6px}
+.tabs button{background:none;border:none;border-bottom:2px solid transparent;padding:8px 12px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--gold)}
+.body{padding:16px 18px}
+.letter{background:var(--paper);border:1px solid var(--rule);padding:18px 20px;
+  font-family:var(--serif);font-size:15px;line-height:1.7;max-height:520px;overflow:auto;white-space:pre-wrap}
+.letter h1,.letter h2{font-family:var(--serif)}
+.chg{border:1px solid var(--rule);margin-bottom:8px}
+.chg .ch-h{background:var(--surface-2);padding:7px 11px;font-family:var(--mono);font-size:11px;color:var(--ink-2)}
+.chg .ch-b{padding:11px;font-size:13.5px;line-height:1.65}
+ins{background:var(--ok-soft);color:var(--ok);text-decoration:none;padding:1px 2px}
+del{background:var(--crit-soft);color:var(--crit);padding:1px 2px}
+.decide{border-top:1px solid var(--rule);padding:14px 18px;background:var(--surface-2)}
+.decide textarea{width:100%;min-height:64px;padding:9px;font:inherit;font-size:13.5px;
+  background:var(--surface);color:var(--ink);border:1px solid var(--rule);resize:vertical}
+.decide .row{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+.btn.approve{border-color:var(--ok);background:var(--ok)}
+.btn.revise{border-color:var(--gold);background:transparent;color:var(--gold)}
+.btn.reject{border-color:var(--crit);background:transparent;color:var(--crit)}
+.empty{padding:40px 24px;color:var(--ink-2);text-align:center}
+.empty b{display:block;font-family:var(--serif);font-size:19px;color:var(--ink);margin-bottom:6px}
+
+/* ---------- skipped ---------- */
+.skips{margin-top:26px}
+.skip{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--ink-3);
+  padding:11px 14px;margin-bottom:6px;font-size:13.5px}
+.skip b{font-family:var(--mono);font-size:12px;margin-right:8px}
+.skip span{color:var(--ink-2)}
+
+/* ---------- log + toast ---------- */
+pre.log{background:var(--surface);border:1px solid var(--rule);padding:13px;font-family:var(--mono);
+  font-size:12px;max-height:230px;overflow:auto;margin:12px 0 0;white-space:pre-wrap}
+.toasts{position:fixed;top:16px;right:16px;z-index:50;display:flex;flex-direction:column;gap:8px;max-width:min(420px,92vw)}
+.toast{background:var(--surface);border:1px solid var(--rule);border-left:4px solid var(--accent);
+  padding:11px 13px;box-shadow:0 8px 24px rgba(0,0,0,.16);font-size:13.5px}
+.toast.err{border-left-color:var(--crit)}
+.toast.ok{border-left-color:var(--ok)}
+.toast b{display:block;margin-bottom:2px}
+.toast p{margin:0;color:var(--ink-2);font-size:12.5px;overflow-wrap:anywhere}
+footer{margin-top:40px;border-top:1px solid var(--rule);padding-top:14px;color:var(--ink-3);
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <span class="stamp" aria-hidden="true">₹</span>
+      <div>
+        <h1>Renewal Desk</h1>
+        <p class="tag">Renewal quotes and price-change notices for a book of accounts coming up for
+          renewal &mdash; drafted per account, priced by policy, and held at a human gate before
+          anything reaches a customer.</p>
+        <p class="who">For subscription businesses &middot; customer success &middot; revenue operations</p>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn ghost small" id="refresh">Refresh</button>
+      <button class="btn" id="run">Run batch</button>
+      <button class="btn ghost" id="runFresh">Run fresh</button>
+    </div>
+  </header>
+
+  <section class="how" aria-label="How it works">
+    <div class="step"><span class="n">Step 1 &middot; Python</span><b>Price it</b>
+      <p>Every figure is computed from a policy file. The model never does arithmetic.</p></div>
+    <div class="step"><span class="n">Step 2 &middot; SuperDocs</span><b>Draft it</b>
+      <p>The AI fills a template with prose about <em>this</em> account&rsquo;s usage &mdash; not a merge field.</p></div>
+    <div class="step"><span class="n">Step 3 &middot; Python</span><b>Verify it</b>
+      <p>Required figures present, no placeholders left, and no invented number anywhere.</p></div>
+    <div class="step hi"><span class="n">Step 4 &middot; You</span><b>Gate it</b>
+      <p>Anything above the increase threshold waits here for a person to approve or reject.</p></div>
+  </section>
+
+  <dl class="tiles" id="tiles"></dl>
+  <div id="completeness"></div>
+
+  <div class="cols">
+    <section>
+      <h2 class="sec">The book <span id="bookmeta" style="color:var(--ink-3)"></span></h2>
+      <table>
+        <thead><tr>
+          <th>Account</th><th>Renewal price</th><th class="num">Change</th><th>State</th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <div class="skips" id="skipwrap"></div>
+      <pre class="log" id="log" hidden></pre>
+    </section>
+
+    <section>
+      <h2 class="sec">Review</h2>
+      <div class="pane" id="pane">
+        <div class="empty"><b>Pick an account</b>
+          Accounts marked <span class="pill p-awaiting_review">awaiting review</span> are waiting on your decision.</div>
+      </div>
+    </section>
+  </div>
+
+  <footer>Renewal Desk &middot; built on the SuperDocs API &middot; all accounts, people and figures are fabricated</footer>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let DATA = null, SELECTED = null, TAB = "letter";
+
+function toast(kind, title, detail) {
+  const el = document.createElement("div");
+  el.className = "toast " + kind;
+  el.innerHTML = `<b></b><p></p>`;
+  el.querySelector("b").textContent = title;
+  el.querySelector("p").textContent = detail || "";
+  $("#toasts").appendChild(el);
+  if (kind !== "err") setTimeout(() => el.remove(), 6000);
+  else el.onclick = () => el.remove();
+}
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({ error: r.statusText }));
+  if (!r.ok || j.error) throw new Error(j.error || r.statusText);
+  return j;
+}
+
+/* ------------------------------------------------------------- rendering */
+function tiles(s) {
+  const t = [
+    ["accounts", s.total, ""],
+    ["to process", s.to_process, ""],
+    ["awaiting you", s.awaiting, "gate"],
+    ["exported", s.exported, "ok"],
+    ["rejected", s.rejected, "rej"],
+    ["skipped", s.skipped, ""],
+    ["operations", s.ops, ""],
+  ];
+  $("#tiles").innerHTML = t.map(([k, v, c]) =>
+    `<div class="tile ${c}"><dt>${k}</dt><dd>${v}</dd></div>`).join("");
+
+  $("#completeness").innerHTML = s.complete
+    ? `<div class="banner done"><span><b>Batch complete.</b> Every account was exported or explicitly rejected, and every skip has a stated reason.</span></div>`
+    : (s.awaiting
+      ? `<div class="banner open"><span><b>Batch incomplete.</b> ${s.awaiting} account(s) are waiting on a human decision. Nothing goes out until they are resolved.</span></div>`
+      : "");
+}
+
+function pctCell(r) {
+  const cls = r.direction === "increase" ? "up" : r.direction === "decrease" ? "down" : "flat";
+  const sign = r.pct > 0 ? "+" : "";
+  return `<span class="${cls}">${sign}${r.pct.toFixed(1)}%</span>`;
+}
+
+function rows(d) {
+  $("#bookmeta").textContent = `${d.batch.renewal_cycle} · policy ${d.policy.version}`;
+  $("#rows").innerHTML = d.rows.map(r => `
+    <tr data-id="${r.account_id}" class="${SELECTED === r.account_id ? "sel" : ""}">
+      <td><span class="co">${r.company}</span>
+          <span class="sub acct">${r.account_id} · ${r.seats} seats · renews ${r.renewal_date}</span></td>
+      <td><span class="money">${r.new_price}</span>
+          <span class="sub">was ${r.old_price} · ${r.annual}/yr</span></td>
+      <td class="num">${pctCell(r)}${r.gated ? '<span class="sub" style="color:var(--gold)">gated</span>' : ""}</td>
+      <td><span class="pill p-${r.status}">${r.status.replace(/_/g, " ")}</span>
+          ${r.revisions ? `<span class="sub">${r.revisions} revision(s)</span>` : ""}
+          ${r.files.length ? `<span class="sub">${r.files.length} file(s)</span>` : ""}
+          ${r.fail_reason ? `<span class="sub" style="color:var(--crit)">${r.fail_reason.slice(0, 60)}</span>` : ""}</td>
+    </tr>`).join("");
+  document.querySelectorAll("#rows tr").forEach(tr =>
+    tr.onclick = () => select(tr.dataset.id));
+
+  $("#skipwrap").innerHTML = d.skipped.length ? `
+    <h2 class="sec">Deliberately not processed &mdash; ${d.skipped.length}</h2>
+    ${d.skipped.map(s => `<div class="skip"><b>${s.account_id}</b>${s.company}
+      <span> &mdash; ${s.reason}</span></div>`).join("")}` : "";
+}
+
+/* word-level diff, enough to show what the reviewer is deciding on */
+function diff(a, b) {
+  const A = a.split(/(\s+)/), B = b.split(/(\s+)/);
+  const m = A.length, n = B.length;
+  const dp = Array.from({ length: m + 1 }, () => new Int32Array(n + 1));
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = A[i - 1] === B[j - 1] ? dp[i - 1][j - 1] + 1 : Math.max(dp[i - 1][j], dp[i][j - 1]);
+  const out = []; let i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && A[i - 1] === B[j - 1]) { out.unshift(esc(A[--i])); j--; }
+    else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) out.unshift(`<ins>${esc(B[--j])}</ins>`);
+    else out.unshift(`<del>${esc(A[--i])}</del>`);
+  }
+  return out.join("");
+}
+const esc = (s) => (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const strip = (h) => esc((h || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+const stripRaw = (h) => (h || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+async function select(id) {
+  SELECTED = id; TAB = "letter";
+  rows(DATA);
+  const r = DATA.rows.find(x => x.account_id === id);
+  $("#pane").innerHTML = `<div class="empty">Loading ${id}…</div>`;
+  let det;
+  try { det = await api("/api/account/" + encodeURIComponent(id)); }
+  catch (e) { toast("err", "Could not load " + id, e.message); return; }
+  paint(r, det);
+}
+
+function paint(r, det) {
+  const gated = r.gate_reasons.length ? `
+    <div class="gatebox"><b>Held for review</b>
+      <ul>${r.gate_reasons.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : "";
+  const drivers = `<ul class="drivers">${r.drivers.map(d =>
+    `<li>${d.pct ? `<span class="pc">+${d.pct}%</span>` : ""}${esc(d.reason)}${d.detail ? ` <span style="color:var(--ink-3)">— ${esc(d.detail)}</span>` : ""}</li>`).join("")}</ul>`;
+
+  const canDecide = det.status === "awaiting_review";
+  const changesHtml = det.changes.length
+    ? det.changes.map((c, n) => `
+        <div class="chg"><div class="ch-h">change ${n + 1} of ${det.changes.length} · ${esc(c.operation || "edit")}</div>
+        <div class="ch-b">${diff(stripRaw(c.old_html), stripRaw(c.new_html))}</div></div>`).join("")
+    : `<p style="color:var(--ink-2)">No proposed changes pending${det.note ? " — " + esc(det.note) : ""}.</p>`;
+
+  $("#pane").innerHTML = `
+    <div class="hd">
+      <h3>${esc(r.company)}</h3>
+      <p class="meta">${r.account_id} · ${esc(r.plan)} · ${esc(r.contact)} · ${r.seats} seats ·
+        <span class="money">${r.old_price} → ${r.new_price}</span> (${pctCell(r)}),
+        ${r.annual}/yr · delta ${r.delta_annual}</p>
+    </div>
+    ${gated}
+    ${drivers}
+    <div class="tabs">
+      <button data-t="letter" class="${TAB === "letter" ? "on" : ""}">The letter</button>
+      <button data-t="changes" class="${TAB === "changes" ? "on" : ""}">Proposed changes${det.changes.length ? ` (${det.changes.length})` : ""}</button>
+    </div>
+    <div class="body">
+      ${TAB === "letter"
+        ? `<div class="letter">${esc(det.document || "(nothing generated yet)")}</div>`
+        : changesHtml}
+    </div>
+    ${canDecide ? `
+      <div class="decide">
+        <textarea id="fb" placeholder="Reason — required to revise or reject, recorded against this account"></textarea>
+        <div class="row">
+          <button class="btn approve" data-v="approve">Approve &amp; export</button>
+          <button class="btn revise" data-v="revise">Send back for revision</button>
+          <button class="btn reject" data-v="reject">Reject</button>
+        </div>
+      </div>` : `
+      <div class="decide"><span style="color:var(--ink-2);font-size:13.5px">
+        ${det.status === "exported" ? "Approved and exported. Nothing further is needed."
+          : det.status === "rejected" ? "Rejected at the gate. No document was produced for this account."
+          : "Not waiting on a decision."}</span></div>`}
+  `;
+
+  $("#pane").querySelectorAll(".tabs button").forEach(b =>
+    b.onclick = () => { TAB = b.dataset.t; paint(r, det); });
+  $("#pane").querySelectorAll(".decide .btn").forEach(b =>
+    b.onclick = () => decide(r.account_id, b.dataset.v));
+}
+
+async function decide(id, verdict) {
+  const fb = ($("#fb") && $("#fb").value || "").trim();
+  if ((verdict === "revise" || verdict === "reject") && !fb) {
+    toast("err", "A reason is required", `Say why you are choosing to ${verdict}. It is recorded against the account and appears in the batch report.`);
+    return;
+  }
+  $("#pane").querySelectorAll(".btn").forEach(b => b.disabled = true);
+  toast("ok", `Working on ${id}…`, verdict === "revise"
+    ? "Re-drafting with your feedback, then back to this gate." : "Talking to SuperDocs.");
+  try {
+    const out = await api("/api/decide", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ account_id: id, verdict, feedback: fb, by: "review-console" }),
+    });
+    toast("ok", `${id} → ${out.status.replace(/_/g, " ")}`,
+      verdict === "approve" ? "Documents exported." :
+      verdict === "reject" ? "Nothing exported; the reason is on the record." :
+      "A revised draft is back at the gate.");
+    await load(); await select(id);
+  } catch (e) { toast("err", "Decision failed", e.message); await load(); }
+}
+
+/* ---------------------------------------------------------------- driving */
+async function load() {
+  try {
+    DATA = await api("/api/overview");
+    tiles(DATA.summary); rows(DATA);
+  } catch (e) { toast("err", "Cannot reach the desk", e.message); }
+}
+
+async function runBatch(fresh) {
+  $("#run").disabled = $("#runFresh").disabled = true;
+  $("#log").hidden = false; $("#log").textContent = "starting…\n";
+  try { await api("/api/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ fresh }) }); }
+  catch (e) { toast("err", "Could not start", e.message); }
+  const poll = setInterval(async () => {
+    try {
+      const j = await api("/api/job");
+      if (j.log.length) $("#log").textContent = j.log.join("\n");
+      if (!j.running && j.done) {
+        clearInterval(poll);
+        $("#run").disabled = $("#runFresh").disabled = false;
+        if (j.error) toast("err", "Run failed", j.error);
+        else toast("ok", "Run finished", "Gated accounts are waiting for you below.");
+        await load();
+      }
+    } catch (e) { clearInterval(poll); $("#run").disabled = $("#runFresh").disabled = false; }
+  }, 1500);
+}
+
+$("#refresh").onclick = load;
+$("#run").onclick = () => runBatch(false);
+$("#runFresh").onclick = () => { if (confirm("Discard existing batch state and start over?")) runBatch(true); };
+load();
+</script>
+</body>
+</html>

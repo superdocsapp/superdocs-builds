@@ -1,0 +1,44 @@
+<h1>Meridian SDK — API reference</h1>
+
+<p>The Meridian SDK is a small client for the Meridian ledger service. This page
+documents the public surface.</p>
+
+<h2>Configuration</h2>
+
+<p>The client accepts a number of module-level defaults. The default request
+timeout is 30 seconds, which is generous for most workloads. The maximum page
+size is 500 records. Requests are issued against the <code>eu-west-1</code>
+region unless another is given.</p>
+
+<h2>Client</h2>
+
+<p>Construct a client with your API key. The constructor also accepts
+<code>region</code>, <code>timeout</code> and <code>max_retries</code>, which
+defaults to 5.</p>
+
+<h2>list_ledgers</h2>
+
+<p>Returns a list of dictionaries, newest first. Pass <code>page_size</code> to
+control how many come back; it defaults to 50. A <code>cursor</code> may be
+supplied to continue a previous page, and <code>include_archived</code> pulls in
+ledgers that have been archived.</p>
+
+<p>If <code>page_size</code> is larger than the maximum, the call raises
+<code>ValueError</code>.</p>
+
+<h2>get_ledger</h2>
+
+<p>Fetches a single ledger by id and returns a dictionary. Raises
+<code>NotFound</code> when no such ledger exists.</p>
+
+<h2>post_entry</h2>
+
+<p>Appends an entry to a ledger and returns the created entry as a dictionary.
+Amounts are given in minor units, so 1250 means 12.50. The
+<code>currency</code> argument defaults to USD. Pass an
+<code>idempotency_key</code> to make retries safe.</p>
+
+<h2>close_ledger</h2>
+
+<p>Closes a ledger and returns a boolean. A <code>reason</code> is required, and
+an <code>effective_date</code> may be supplied to backdate the closure.</p>

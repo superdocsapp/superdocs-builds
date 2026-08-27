@@ -1,0 +1,225 @@
+{
+  "_comment": "Fabricated accounts for the renewal batch. Every company, person, email and number is invented. Prices are per seat per month in USD. usage_story carries the account-specific facts the notice must actually talk about.",
+  "batch": {
+    "renewal_cycle": "2026-Q4",
+    "run_window_days": 60,
+    "today": "2026-08-20"
+  },
+  "accounts": [
+    {
+      "account_id": "ACM-1042",
+      "company": "Acme Industrial Supply Ltd",
+      "contact": { "name": "Priya Raman", "title": "VP Procurement", "email": "priya.raman@example.invalid" },
+      "plan": "Platform Business",
+      "currency": "USD",
+      "renewal_date": "2026-10-01",
+      "term_months": 12,
+      "seats_contracted": 250,
+      "seats_active": 311,
+      "current_price_per_seat": 42.00,
+      "discounts": [],
+      "usage_story": {
+        "api_calls_month_avg": 1840000,
+        "api_calls_prior_year_avg": 910000,
+        "storage_gb": 940,
+        "top_feature_adoption": ["workflow automation (used daily by 214 people)", "audit exports (weekly)"],
+        "support": "3 tickets in 12 months, all resolved under SLA",
+        "notes": "Crossed the 1M monthly API call tier in March 2026 and stayed above it every month since. Active seats exceed the contracted count by 61."
+      },
+      "flags": []
+    },
+    {
+      "account_id": "NWL-2087",
+      "company": "Northwind Logistics plc",
+      "contact": { "name": "Erik Sandvik", "title": "Head of Operations", "email": "erik.sandvik@example.invalid" },
+      "plan": "Platform Standard",
+      "currency": "USD",
+      "renewal_date": "2026-09-15",
+      "term_months": 12,
+      "seats_contracted": 120,
+      "seats_active": 118,
+      "current_price_per_seat": 30.00,
+      "discounts": [],
+      "usage_story": {
+        "api_calls_month_avg": 410000,
+        "api_calls_prior_year_avg": 385000,
+        "storage_gb": 210,
+        "top_feature_adoption": ["route documentation packs (daily)", "customs form templates"],
+        "support": "1 ticket in 12 months",
+        "notes": "Stable, healthy usage well within plan limits. No tier changes this year."
+      },
+      "flags": []
+    },
+    {
+      "account_id": "BPA-3310",
+      "company": "BluePeak Analytics GmbH",
+      "contact": { "name": "Johanna Keller", "title": "COO", "email": "johanna.keller@example.invalid" },
+      "plan": "Platform Business",
+      "currency": "USD",
+      "renewal_date": "2026-10-10",
+      "term_months": 12,
+      "seats_contracted": 80,
+      "seats_active": 96,
+      "current_price_per_seat": 45.00,
+      "discounts": [],
+      "usage_story": {
+        "api_calls_month_avg": 2600000,
+        "api_calls_prior_year_avg": 1150000,
+        "storage_gb": 2200,
+        "top_feature_adoption": ["scheduled report generation (about 2,300 reports a month)", "data-room exports"],
+        "support": "5 tickets, 2 of them feature requests that have since shipped",
+        "notes": "Report generation volume grew 2.3x year over year; storage more than doubled to 2.2 TB. 16 active seats over the contracted count."
+      },
+      "flags": []
+    },
+    {
+      "account_id": "CHS-0771",
+      "company": "Cascade Health Systems Inc",
+      "contact": { "name": "Dana Whitfield", "title": "Director of IT", "email": "dana.whitfield@example.invalid" },
+      "plan": "Platform Business",
+      "currency": "USD",
+      "renewal_date": "2026-09-30",
+      "term_months": 12,
+      "seats_contracted": 400,
+      "seats_active": 372,
+      "current_price_per_seat": 38.00,
+      "discounts": [],
+      "usage_story": {
+        "api_calls_month_avg": 3100000,
+        "api_calls_prior_year_avg": 2900000,
+        "storage_gb": 4100,
+        "top_feature_adoption": ["clinical letter templates", "redaction workflow"],
+        "support": "Open dispute on the April 2026 invoice (INV-8841), escalated 2026-07-02",
+        "notes": "Commercially healthy, but invoice INV-8841 is in active dispute."
+      },
+      "flags": ["billing_dispute"]
+    },
+    {
+      "account_id": "DRM-5518",
+      "company": "Drift Media Collective",
+      "contact": { "name": "Sam Okafor", "title": "Managing Partner", "email": "sam.okafor@example.invalid" },
+      "plan": "Platform Standard",
+      "currency": "USD",
+      "renewal_date": "2026-10-20",
+      "term_months": 12,
+      "seats_contracted": 35,
+      "seats_active": null,
+      "current_price_per_seat": 32.00,
+      "discounts": [],
+      "usage_story": null,
+      "flags": ["usage_data_missing"]
+    },
+    {
+      "account_id": "EVR-6205",
+      "company": "Evergreen Retail Group",
+      "contact": { "name": "Mia Torres", "title": "CFO", "email": "mia.torres@example.invalid" },
+      "plan": "Platform Business",
+      "currency": "USD",
+      "renewal_date": "2027-02-01",
+      "term_months": 12,
+      "seats_contracted": 500,
+      "seats_active": 493,
+      "current_price_per_seat": 36.00,
+      "discounts": [],
+      "usage_story": {
+        "api_calls_month_avg": 1900000,
+        "api_calls_prior_year_avg": 1850000,
+        "storage_gb": 1600,
+        "top_feature_adoption": ["store operations manuals", "seasonal planogram documents"],
+        "support": "2 tickets",
+        "notes": "Renewal is more than 60 days out."
+      },
+      "flags": []
+    },
+    {
+      "account_id": "FMF-7742",
+      "company": "Ferrous Manufacturing Co",
+      "contact": { "name": "Walt Brenner", "title": "Plant Controller", "email": "walt.brenner@example.invalid" },
+      "plan": "Platform Business",
+      "currency": "USD",
+      "renewal_date": "2026-10-05",
+      "term_months": 36,
+      "seats_contracted": 600,
+      "seats_active": 588,
+      "current_price_per_seat": 40.00,
+      "committed_seats_next_term": 750,
+      "discounts": [{ "kind": "volume_commitment", "detail": "Committing to 750 seats on a 36-month term at renewal" }],
+      "usage_story": {
+        "api_calls_month_avg": 2200000,
+        "api_calls_prior_year_avg": 2050000,
+        "storage_gb": 3000,
+        "top_feature_adoption": ["work instruction documents (all three plants)", "safety procedure sign-off"],
+        "support": "4 tickets, all resolved",
+        "notes": "Expanding from 600 to 750 committed seats on a three-year term; qualifies for the volume band price."
+      },
+      "flags": []
+    },
+    {
+      "account_id": "GSC-8830",
+      "company": "Gulfstream Charter Partners",
+      "contact": { "name": "Renee Alcott", "title": "Owner", "email": "renee.alcott@example.invalid" },
+      "plan": "Platform Standard",
+      "currency": "USD",
+      "renewal_date": "2026-09-25",
+      "term_months": 12,
+      "seats_contracted": 18,
+      "seats_active": 9,
+      "current_price_per_seat": 32.00,
+      "discounts": [],
+      "usage_story": {
+        "api_calls_month_avg": 40000,
+        "api_calls_prior_year_avg": 95000,
+        "storage_gb": 55,
+        "top_feature_adoption": ["charter agreement templates (monthly)"],
+        "support": "6 tickets; 2 stayed unresolved for over 30 days in Q2 (both since closed)",
+        "notes": "Active seats fell from 17 to 9 over the year and usage roughly halved. Customer success has flagged renewal sentiment as at-risk."
+      },
+      "flags": ["churn_risk"]
+    },
+    {
+      "account_id": "HLB-9114",
+      "company": "Helix Biosciences Ltd",
+      "contact": { "name": "Dr. Anand Mehta", "title": "Head of Research Ops", "email": "anand.mehta@example.invalid" },
+      "plan": "Platform Business",
+      "currency": "USD",
+      "renewal_date": "2026-10-15",
+      "term_months": 12,
+      "seats_contracted": 150,
+      "seats_active": 149,
+      "current_price_per_seat": 35.00,
+      "discounts": [{ "kind": "first_year_promo", "detail": "20% first-year promotional discount, expires at this renewal", "expires_at_renewal": true, "undiscounted_price": 43.75 }],
+      "usage_story": {
+        "api_calls_month_avg": 1200000,
+        "api_calls_prior_year_avg": 700000,
+        "storage_gb": 1800,
+        "top_feature_adoption": ["lab protocol documents (daily)", "grant application assembly"],
+        "support": "2 tickets",
+        "notes": "First-year promotional pricing ends at this renewal; usage grew 71% over the year."
+      },
+      "flags": []
+    },
+    {
+      "account_id": "IWC-1201",
+      "company": "Ironwood Construction LLC",
+      "contact": { "name": "Grace Lindqvist", "title": "Office Manager", "email": "grace.lindqvist@example.invalid" },
+      "plan": "Platform Standard",
+      "currency": "USD",
+      "renewal_date": "2026-09-20",
+      "term_months": 24,
+      "seats_contracted": 45,
+      "seats_active": 44,
+      "current_price_per_seat": 30.00,
+      "price_locked_until": "2027-09-20",
+      "discounts": [{ "kind": "multi_year_lock", "detail": "Price locked for 24 months from 2025-09-20" }],
+      "usage_story": {
+        "api_calls_month_avg": 300000,
+        "api_calls_prior_year_avg": 280000,
+        "storage_gb": 300,
+        "top_feature_adoption": ["bid package assembly", "subcontractor agreements"],
+        "support": "0 tickets",
+        "notes": "Mid multi-year price lock; this renewal confirms the existing rate unchanged."
+      },
+      "flags": []
+    }
+  ]
+}
