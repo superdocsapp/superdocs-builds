@@ -118,6 +118,10 @@ six record sets  →  facts + figures (Python)  →  one instruction per section
 - **Three kinds of statement, kept apart** — Observed (traceable, carries its record), Assessed (judgement, marked as such), and what the records do not show. Enforced when the object is built, not asked for in a prompt.
 - **The executive summary is written last**, from the finished document rather than from a second copy of the facts.
 
+That sketch, drawn properly and on one page: **[docs/architecture.html](docs/architecture.html)**
+— records on disk, what Python decides, what SuperDocs edits, and where each check runs.
+Open it in a browser; it is a single self-contained file.
+
 Design reasoning and every decision that turned out wrong is in **[PLAN.md](PLAN.md)**.
 
 ---
@@ -283,6 +287,7 @@ Drop a folder into `data/` with an `event.json` and the six record files. Every 
 data/storm-a/  data/storm-b/     six record sets each, plus lessons and event.json
 state/lessons.json               the carry-forward register, committed so you can see it work
 docs/                            finished reports, to judge the output without running anything
+docs/architecture.html           the one-page architecture diagram
 
 src/afteraction/
   models.py corpus.py facts.py   records in, facts and figures out
