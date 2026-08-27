@@ -1,0 +1,19 @@
+{
+  "name": "@payment-security-self-assessment/evidence",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "@payment-security-self-assessment/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  }
+}
