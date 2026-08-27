@@ -2,8 +2,8 @@
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  color: #162019;
-  background: #f6f8f4;
+  color: #1a1a1a;
+  background: #fbfaf7;
   font-synthesis: none;
 }
 
@@ -62,22 +62,22 @@ button:disabled {
   font-size: 21px;
 }
 
-.mark {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  place-items: center;
-  border-radius: 12px;
-  color: white;
-  background: #1e673d;
-  font-weight: 800;
-  box-shadow: 0 7px 20px rgb(30 103 61 / 22%);
+/* The SuperDocs lockup sits on the page's cream ground, which the asset's own
+   background matches, so it needs no plate behind it. */
+.lockup {
+  display: block;
+  width: 132px;
+  height: auto;
+  margin-bottom: 2px;
+}
+
+.hero-text {
+  min-width: 0;
 }
 
 .eyebrow {
   margin: 0;
-  color: #617067;
+  color: #8a8177;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -85,7 +85,7 @@ button:disabled {
 
 .status-dot {
   margin-left: auto;
-  color: #7a6450;
+  color: #8a8177;
   font-size: 11px;
 }
 
@@ -95,22 +95,22 @@ button:disabled {
   height: 7px;
   margin-right: 5px;
   border-radius: 50%;
-  background: #d49a55;
+  background: #e0b070;
   content: "";
 }
 
 .status-dot.ready::before {
-  background: #36a668;
+  background: #34a06a;
 }
 
 .panel,
 .activity,
 .error,
 .change-card {
-  border: 1px solid #e1e7df;
+  border: 1px solid #e8e3dc;
   border-radius: 15px;
   background: white;
-  box-shadow: 0 4px 18px rgb(42 65 50 / 5%);
+  box-shadow: 0 4px 18px rgb(60 50 40 / 5%);
 }
 
 .panel,
@@ -125,34 +125,127 @@ label {
   font-weight: 750;
 }
 
-textarea {
+textarea,
+input.masked {
   width: 100%;
   resize: vertical;
-  border: 1px solid #cfd9d1;
+  border: 1px solid #ddd6cd;
   border-radius: 10px;
   padding: 11px;
-  color: #17241b;
-  background: #fbfcfa;
+  color: #1a1a1a;
+  background: #fdfcfa;
   line-height: 1.45;
   outline: none;
+  font: inherit;
 }
 
-textarea:focus {
-  border-color: #2f8050;
-  box-shadow: 0 0 0 3px rgb(47 128 80 / 11%);
+/* Masked with CSS rather than type="password": a real password input makes the
+   browser and macOS Keychain offer to save credentials on every submit. Applies
+   to the key field only — never the instruction textarea. */
+input.masked {
+  -webkit-text-security: disc;
+}
+
+/* Off-screen, not display:none: some browsers' password-manager heuristics
+   ignore fields that never render, which would defeat the decoy above. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+textarea:focus,
+input.masked:focus {
+  border-color: #ef6a4e;
+  box-shadow: 0 0 0 3px rgb(239 106 78 / 14%);
+}
+
+/* Collapsed by default: the connection is the intended path, so the key is a
+   fallback that should not crowd out the primary action in a narrow sidebar. */
+.credentials {
+  margin-bottom: 10px;
+  padding: 12px 15px;
+}
+
+.credentials summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 750;
+  list-style: none;
+  user-select: none;
+}
+
+.credentials summary::-webkit-details-marker {
+  display: none;
+}
+
+.credentials summary::before {
+  display: inline-block;
+  margin-right: 6px;
+  color: #a8a099;
+  content: "▸";
+}
+
+.credentials[open] summary::before {
+  content: "▾";
+}
+
+.credentials[open] summary {
+  margin-bottom: 10px;
+}
+
+.credentials .hint-inline {
+  font-size: 11px;
+}
+
+.prose {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.markup {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.markup summary {
+  color: #857c72;
+  cursor: pointer;
+  user-select: none;
+}
+
+.markup pre {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 10.5px;
+}
+
+.hint-inline {
+  color: #857c72;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .hint,
 .warning {
-  color: #68736c;
+  color: #857c72;
   font-size: 11px;
   line-height: 1.5;
 }
 
 .warning {
-  border-left: 3px solid #e0a75d;
+  border-left: 3px solid #e8a05a;
   padding-left: 9px;
-  color: #725432;
+  color: #8a5a34;
 }
 
 .primary,
@@ -166,18 +259,18 @@ textarea:focus {
 
 .primary {
   width: 100%;
-  border: 1px solid #1e673d;
+  border: 1px solid #171717;
   color: white;
-  background: #1e673d;
+  background: #171717;
 }
 
 .primary:hover:not(:disabled) {
-  background: #175631;
+  background: #000000;
 }
 
 .secondary {
-  border: 1px solid #cfd8d1;
-  color: #32453a;
+  border: 1px solid #ddd6cd;
+  color: #33302c;
   background: white;
 }
 
@@ -197,7 +290,7 @@ textarea:focus {
 .stages li {
   position: relative;
   padding-top: 15px;
-  color: #98a29b;
+  color: #a8a099;
   font-size: 9px;
   text-align: center;
 }
@@ -209,9 +302,9 @@ textarea:focus {
   left: calc(50% - 4px);
   width: 8px;
   height: 8px;
-  border: 2px solid #f6f8f4;
+  border: 2px solid #fbfaf7;
   border-radius: 50%;
-  background: #cbd3cd;
+  background: #ddd6cd;
   content: "";
 }
 
@@ -221,20 +314,20 @@ textarea:focus {
   left: 50%;
   width: 100%;
   height: 1px;
-  background: #dce2dd;
+  background: #e8e3dc;
   content: "";
 }
 
 .stages li.active,
 .stages li.done {
-  color: #1e673d;
+  color: #171717;
   font-weight: 700;
 }
 
 .stages li.active::before,
 .stages li.done::before,
 .stages li.done::after {
-  background: #2f8050;
+  background: #ef6a4e;
 }
 
 .activity {
@@ -249,8 +342,8 @@ textarea:focus {
 .spinner {
   width: 13px;
   height: 13px;
-  border: 2px solid #c5d5ca;
-  border-top-color: #267447;
+  border: 2px solid #e7dfd6;
+  border-top-color: #ef6a4e;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -263,19 +356,20 @@ textarea:focus {
 
 .usage {
   margin: 7px 0 0 21px;
-  color: #7b867e;
+  color: #938b82;
   font-size: 10px;
 }
 
 .error {
-  border-color: #f0c8c3;
-  color: #792d26;
-  background: #fff9f8;
+  border-color: #f2c9c1;
+  color: #8a3226;
+  background: #fffaf8;
 }
 
 .error p {
   font-size: 12px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .section-heading {
@@ -297,8 +391,8 @@ textarea:focus {
 }
 
 .counter {
-  color: #476050;
-  background: #eaf0eb;
+  color: #6b625a;
+  background: #f2ede6;
 }
 
 .change-card {
@@ -311,15 +405,15 @@ textarea:focus {
 }
 
 .change-type {
-  color: #246d42;
-  background: #e4f3e9;
+  color: #b4472f;
+  background: #fdeae5;
   text-transform: uppercase;
 }
 
 .change-id {
   max-width: 55%;
   overflow: hidden;
-  color: #879189;
+  color: #a09991;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 9px;
   text-overflow: ellipsis;
@@ -327,7 +421,7 @@ textarea:focus {
 }
 
 .explanation {
-  color: #435048;
+  color: #44403c;
   font-size: 12px;
   line-height: 1.45;
 }
@@ -341,7 +435,7 @@ textarea:focus {
   min-width: 0;
   border-radius: 8px;
   padding: 8px;
-  background: #f7f8f6;
+  background: #f8f5f1;
 }
 
 .diff-label {
@@ -351,18 +445,18 @@ textarea:focus {
 }
 
 .removed {
-  color: #a04b44;
+  color: #b4432f;
 }
 
 .added {
-  color: #267348;
+  color: #2f7d55;
 }
 
 pre {
   max-height: 108px;
   overflow: auto;
   margin: 5px 0 0;
-  color: #3f4c44;
+  color: #4a453f;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 9px;
   line-height: 1.45;
@@ -381,9 +475,9 @@ pre {
 }
 
 .accept.selected {
-  border-color: #2c7d4c;
-  color: #1e673d;
-  background: #e5f3e9;
+  border-color: #2f7d55;
+  color: #171717;
+  background: #e9f4ec;
 }
 
 .reject.selected {

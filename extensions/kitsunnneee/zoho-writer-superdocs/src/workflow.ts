@@ -3,6 +3,8 @@ import { MemoryRunStateStore, type RunStateStore } from "./state";
 import type {
   ApprovalDecision,
   ApprovalPayload,
+  ExportResult,
+  HostWriteResult,
   NormalizedJob,
   PendingChange,
   SuperDocsPort,
@@ -46,17 +48,21 @@ export const buildApprovalPayload = (
   })),
 });
 
-export const getHostWritebackBlock = (changes: PendingChange[]): string => {
+// Applying replaces the reviewed selection as a whole. That covers edits to the
+// wording, but not proposals that address a specific chunk or range, since no
+// verified chunk/range host API is available to a widget. Returns undefined when
+// nothing about this set needs qualifying.
+export const getStructuralApplyCaveat = (
+  changes: PendingChange[],
+): string | undefined => {
   const structural = changes.find(
     (change) =>
       change.operation === "create" ||
       change.operation === "delete" ||
       change.insertAfterChunkId !== undefined,
   );
-  if (structural) {
-    return `Host writeback is unavailable: structural change ${structural.id} (${structural.operation}) requires a verified chunk/range API.`;
-  }
-  return "Host writeback is disabled until live Sigma testing verifies a selection-replacement capability. SuperDocs structural HTML is review data and is never substring-mapped onto Zoho HTML.";
+  if (!structural) return undefined;
+  return `Change ${structural.id} (${structural.operation}) is structural. Applying targets the reviewed selection as a whole, not an individual chunk or range, because Writer exposes no verified chunk/range API to a widget. The export reflects every approved change.`;
 };
 
 const sleep = (milliseconds: number) =>
@@ -66,6 +72,9 @@ export class ReviewWorkflow {
   private activeSessionId?: string;
   private activeJobId?: string;
   private activeAwaitingKind?: string;
+  // Held in memory for the apply guard only, never persisted: browser storage
+  // must not contain document content.
+  private reviewedSelection?: string;
 
   constructor(
     private readonly writer: WriterPort,
@@ -102,6 +111,7 @@ export class ReviewWorkflow {
     }
 
     this.stateStore.clear();
+    this.reviewedSelection = originalHtml;
     const sessionId = `zoho_${crypto.randomUUID()}`;
     this.activeSessionId = sessionId;
     this.activeJobId = undefined;
@@ -180,8 +190,32 @@ export class ReviewWorkflow {
     return this.pollToGate(jobId);
   }
 
-  async export(sessionId: string): Promise<Blob> {
-    this.emit({ stage: "exporting", message: "Exporting the approved DOCX…" });
+  // Apply is only offered when the reviewed selection was captured in this page
+  // session; after a reload it is gone by design, so the guard cannot be checked
+  // and no write is attempted.
+  canApplyToHost(): boolean {
+    return Boolean(this.reviewedSelection);
+  }
+
+  async applyToHost(approvedHtml: string): Promise<HostWriteResult> {
+    const expected = this.reviewedSelection;
+    if (!expected) {
+      throw new Error(
+        "The reviewed selection is not held in this session, so the approved text cannot be verified against the document. Export it instead, or run a new review.",
+      );
+    }
+    if (!approvedHtml.trim()) {
+      throw new Error("SuperDocs returned no approved content to apply.");
+    }
+    this.emit({
+      stage: "exporting",
+      message: "Writing the approved wording into Writer…",
+    });
+    return this.writer.replaceSelection(approvedHtml, expected);
+  }
+
+  async export(sessionId: string): Promise<ExportResult> {
+    this.emit({ stage: "exporting", message: "Exporting the approved result…" });
     return this.api.exportDocument(sessionId);
   }
 

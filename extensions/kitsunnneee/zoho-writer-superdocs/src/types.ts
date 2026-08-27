@@ -56,9 +56,29 @@ export interface ApprovalPayload {
   }>;
 }
 
+// Which format actually crossed the host relay intact, so the UI can name the
+// file honestly instead of always claiming a .docx.
+export interface ExportResult {
+  blob: Blob;
+  filename: string;
+  format: "docx" | "html";
+  note?: string;
+}
+
+// "applied" means the document was observed to change. "unverified" means the
+// host accepted the call and cleared the selection, leaving nothing to compare —
+// it must not be reported as success. A host that changes nothing throws instead.
+export type HostWriteOutcome = "applied" | "unverified";
+
+export interface HostWriteResult {
+  event: string;
+  outcome: HostWriteOutcome;
+}
+
 export interface WriterPort {
   initialize(): Promise<void>;
   getSelectedHtml(): Promise<string>;
+  replaceSelection(html: string, expectedHtml: string): Promise<HostWriteResult>;
 }
 
 export interface SuperDocsPort {
@@ -71,5 +91,5 @@ export interface SuperDocsPort {
     jobId: string,
     shouldContinue: boolean,
   ): Promise<unknown>;
-  exportDocument(sessionId: string): Promise<Blob>;
+  exportDocument(sessionId: string): Promise<ExportResult>;
 }

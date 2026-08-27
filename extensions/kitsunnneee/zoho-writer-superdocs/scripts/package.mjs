@@ -69,9 +69,8 @@ if (workspaceMode) {
   manifest.connectors = overlay.connectors;
 }
 
-// Sigma's ZIP importer requires plugin-manifest.json at archive root, but Writer
-// resolves widget url/icon/logo relative to app/. Both constraints hold at once,
-// so manifest paths stay app-relative while assets ship under app/.
+// Sigma's ZIP importer requires plugin-manifest.json at archive root. Current
+// Sigma/ZET manifests address packaged widget files with absolute /app/... paths.
 mkdirSync(releasePath, { recursive: true });
 const zip = new AdmZip();
 zip.addFile(
@@ -88,7 +87,7 @@ const required = [
   "plugin-manifest.json",
   ...[widget?.url, widget?.icon, widget?.logo]
     .filter((value) => typeof value === "string")
-    .map((value) => `app/${value}`),
+    .map((value) => value.replace(/^\//, "")),
 ].filter((value) => typeof value === "string");
 
 for (const entry of required) {
@@ -110,9 +109,9 @@ const validatedManifest = JSON.parse(
 );
 for (const packagedWidget of validatedManifest.modules?.widgets ?? []) {
   for (const field of ["url", "icon", "logo"]) {
-    if (packagedWidget[field]?.startsWith("app/")) {
+    if (!packagedWidget[field]?.startsWith("/app/")) {
       throw new Error(
-        `Widget ${field} must be relative to app/, not prefixed with app/.`,
+        `Widget ${field} must use the canonical /app/... package path.`,
       );
     }
   }
