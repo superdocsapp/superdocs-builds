@@ -1,0 +1,24 @@
+[project]
+name = "word-doc-repair"
+version = "1.0.0"
+description = "Best-effort recovery for a Word document that will not open."
+requires-python = ">=3.10"
+dependencies = ["lxml", "python-docx", "requests"]
+
+[project.optional-dependencies]
+web = ["fastapi", "uvicorn", "python-multipart"]
+# `httpx` is what `starlette.testclient` drives the app with.
+dev = ["pytest", "httpx"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["docrepair*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend"]
+addopts = "-q"

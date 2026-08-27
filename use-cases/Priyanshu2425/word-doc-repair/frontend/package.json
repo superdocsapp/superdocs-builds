@@ -1,0 +1,33 @@
+{
+  "name": "salvage-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Salvage \u2014 the web page for the DOCX repair tool.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build && node scripts/manifest.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "axe-core": "^4.10.2",
+    "jsdom": "^25.0.1",
+    "msw": "^2.7.0",
+    "playwright": "^1.62.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vite-plugin-singlefile": "^2.1.0",
+    "vitest": "^3.0.0"
+  }
+}

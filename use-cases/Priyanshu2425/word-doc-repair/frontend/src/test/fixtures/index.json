@@ -1,0 +1,52 @@
+[
+  {
+    "name": "healthy",
+    "filename": "00-healthy.docx",
+    "ok": true
+  },
+  {
+    "name": "truncated",
+    "filename": "01-truncated-download.docx",
+    "ok": true
+  },
+  {
+    "name": "missing-content-types",
+    "filename": "02-missing-content-types.docx",
+    "ok": true
+  },
+  {
+    "name": "unclosed-tags",
+    "filename": "03-unclosed-tags.docx",
+    "ok": true
+  },
+  {
+    "name": "bad-characters",
+    "filename": "04-bad-characters.docx",
+    "ok": true
+  },
+  {
+    "name": "missing-document-part",
+    "filename": "05-missing-document-part.docx",
+    "ok": false
+  },
+  {
+    "name": "not-a-word-file",
+    "filename": "06-not-a-word-file.docx",
+    "ok": false
+  },
+  {
+    "name": "empty-body",
+    "filename": "07-empty-body.docx",
+    "ok": false
+  },
+  {
+    "name": "illustrated",
+    "filename": "08-illustrated.docx",
+    "ok": true
+  },
+  {
+    "name": "truncated-illustrated",
+    "filename": "09-truncated-illustrated.docx",
+    "ok": true
+  }
+]

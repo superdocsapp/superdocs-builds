@@ -1,0 +1,59 @@
+/* ============================================================================
+   Shared kit for the "style it yourself" variations.
+
+   Not a new design system. Every token below is copied from
+   frontend/src/styles.css so the mock-ups cannot drift from the product, and
+   the two signature devices — chevron tape and the rubber stamp — keep the
+   meanings DESIGN.md gives them:
+
+     tape  = this is in our custody   (edges the notice, and the panel holding
+                                       the file — nothing else)
+     stamp = one verdict, landed once
+
+   This file is a reference copy. Each variation inlines it so it opens on its
+   own with no server.
+   ========================================================================== */
+
+:root {
+  --stock: #e9ebe6;
+  --sheet: #fcfcfa;
+  --ink: #14171a;
+  --ink-2: #494f55;
+  --ink-3: #7b8188;
+  --rule: #ccd1cd;
+  --rule-firm: #a9b0aa;
+  --post-blue: #173f8a;
+  --post-red: #c2222c;
+  --kept: #16603c;
+  --focus: #173f8a;
+
+  --t1: 12px; --t2: 13px; --t3: 15px; --t4: 17px;
+  --t5: 21px; --t6: 28px; --t7: 38px;
+
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --stock: #101314; --sheet: #181b1d;
+    --ink: #eef1f0; --ink-2: #b3b9bc; --ink-3: #838a8e;
+    --rule: #2a2f31; --rule-firm: #3d4346;
+    --post-blue: #7aa0e8; --post-red: #ef7a72;
+    --kept: #6cc094; --focus: #7aa0e8;
+  }
+}
+
+.tape {
+  height: 9px;
+  flex: none;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--post-red) 0 12px,
+    var(--sheet) 12px 24px,
+    var(--post-blue) 24px 36px,
+    var(--sheet) 36px 48px
+  );
+}

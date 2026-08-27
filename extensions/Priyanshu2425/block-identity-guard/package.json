@@ -1,0 +1,43 @@
+{
+  "name": "superdocs-block-identity-guard",
+  "version": "1.0.0",
+  "description": "Validates a SuperDocs document round trip and reports precisely which blocks lost their data-chunk-id, where, and what the likely cause was.",
+  "keywords": [
+    "superdocs",
+    "data-chunk-id",
+    "editor",
+    "round-trip",
+    "sanitizer",
+    "ci"
+  ],
+  "license": "MIT",
+  "author": "Priyanshu Semwal",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./src/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./src/index.js"
+    }
+  },
+  "bin": {
+    "chunk-guard": "./src/cli.js"
+  },
+  "files": [
+    "src/",
+    "types/",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "fixtures:update": "node test/update-fixtures.js",
+    "check": "node src/cli.js check fixtures/01-clean-round-trip/before.html fixtures/01-clean-round-trip/after.html"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

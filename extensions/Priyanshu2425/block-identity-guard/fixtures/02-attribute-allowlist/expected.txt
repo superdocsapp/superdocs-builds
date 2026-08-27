@@ -1,0 +1,17 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 8 out  ·  intact 8  lost 1  duplicated 0  moved 0  new 0
+
+LOST      LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000004
+           where p · block 4 of the before document · line 4
+           text  "The Supplier shall indemnify the Customer against all losses…"
+           at    div > p[1]
+           cause the tag and text are unchanged and the node kept class but no data attributes,
+                 which is what a sanitiser or editor schema with an attribute allowlist does:
+                 known attributes through, unknown attributes dropped
+           after p at line 4 (class)
+           ·     nearest surviving ancestor c1a0e0a4-0000-4000-8000-000000000001
+           confidence high
+
+1 error(s)
+
+exit code: 1

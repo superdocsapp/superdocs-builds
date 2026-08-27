@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>V2 · Amendment Slips — style it yourself</title>
+<style>
+/* ── V2 · AMENDMENT SLIPS ───────────────────────────────────────────────────
+   Every instruction becomes a numbered slip, and the slips are the history.
+   The conversation is not a transcript you scroll back through — it is a stack
+   of amendments to a document, newest on top, each one a thing you can take
+   back on its own without undoing the four that came after it.
+
+   The document carries a blue tick in the margin wherever a slip landed, so
+   the record and the thing it describes are never more than one glance apart.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root{
+  --stock:#e9ebe6; --sheet:#fcfcfa;
+  --ink:#14171a; --ink-2:#494f55; --ink-3:#7b8188;
+  --rule:#ccd1cd; --rule-firm:#a9b0aa;
+  --post-blue:#173f8a; --post-red:#c2222c; --kept:#16603c; --focus:#173f8a;
+  --t1:12px; --t2:13px; --t3:15px; --t4:17px; --t5:21px; --t6:28px;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --s:1;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --stock:#101314; --sheet:#181b1d;
+  --ink:#eef1f0; --ink-2:#b3b9bc; --ink-3:#838a8e;
+  --rule:#2a2f31; --rule-firm:#3d4346;
+  --post-blue:#7aa0e8; --post-red:#ef7a72; --kept:#6cc094; --focus:#7aa0e8;
+}}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--stock);color:var(--ink);font:var(--t3)/1.6 var(--sans)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+.tape{height:9px;flex:none;background:repeating-linear-gradient(-45deg,var(--post-red) 0 12px,var(--sheet) 12px 24px,var(--post-blue) 24px 36px,var(--sheet) 36px 48px)}
+
+.doc-head{max-width:1240px;margin:0 auto;padding:34px 20px 0}
+.doc-head .kicker{font-family:var(--mono);font-size:var(--t1);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.doc-head h1{font-size:var(--t6);line-height:1.15;letter-spacing:-.025em;font-weight:680;margin:6px 0 8px}
+.doc-head p{color:var(--ink-2);max-width:66ch;margin:0}
+.board{max-width:1240px;margin:0 auto;padding:34px 20px 0}
+.board h2{font-family:var(--mono);font-size:var(--t1);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.stage{position:relative;overflow:hidden}
+.stage--desk{height:calc(840px * var(--s))}
+.desk{width:1320px;height:840px;transform:scale(var(--s));transform-origin:top left;
+      display:flex;flex-direction:column;background:var(--stock);border:1px solid var(--rule-firm);overflow:hidden}
+.stage--phone{display:flex;justify-content:center;padding:4px 0 0}
+.phone{width:390px;height:844px;display:flex;flex-direction:column;background:var(--stock);
+       border:1px solid var(--rule-firm);border-radius:22px;overflow:hidden;position:relative}
+@media (max-width:1400px){:root{--s:.86}}
+@media (max-width:1180px){:root{--s:.74}}
+@media (max-width:940px){:root{--s:.58}}
+@media (max-width:700px){:root{--s:.42}.phone{transform:scale(.86);transform-origin:top center}.stage--phone{height:726px}}
+.notes{max-width:1240px;margin:0 auto;padding:40px 20px 80px}
+.notes h2{font-family:var(--mono);font-size:var(--t1);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.notes dl{margin:0;display:grid;grid-template-columns:190px 1fr;gap:10px 24px}
+.notes dt{font-weight:640;font-size:var(--t2)}
+.notes dd{margin:0;color:var(--ink-2);font-size:var(--t2);max-width:78ch}
+@media (max-width:640px){.notes dl{grid-template-columns:1fr;gap:2px 0}.notes dd{margin-bottom:12px}}
+
+/* ── bars and buttons ────────────────────────────────────────────────────── */
+.bar{flex:none;display:flex;align-items:center;gap:20px;padding:12px 22px;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.mark{font-size:var(--t5);font-weight:700;letter-spacing:-.02em}
+.mark span{color:var(--post-blue)}
+.mark em{font-style:normal;font-size:var(--t1);font-weight:400;color:var(--ink-3);letter-spacing:.04em;margin-left:8px;text-transform:uppercase}
+.rec{font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;gap:18px}
+.rec b{color:var(--ink-2);font-weight:500}
+.bar__act{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn{font:inherit;font-size:var(--t3);font-weight:640;background:var(--post-blue);color:#fff;border:0;padding:10px 18px;cursor:pointer;text-decoration:none;display:inline-block;transition:filter 120ms var(--ease)}
+.btn:hover{filter:brightness(1.12)}
+.btn--quiet{background:none;color:var(--ink);border:1px solid var(--rule-firm);font-size:var(--t2);padding:9px 14px}
+.btn--quiet:hover{border-color:var(--ink-3);filter:none}
+
+.split{flex:1;display:grid;grid-template-columns:1fr 424px;min-height:0}
+
+/* left pane, with a margin gutter for the ticks */
+.pane{display:flex;flex-direction:column;min-height:0;min-width:0}
+.pane__head{flex:none;display:flex;align-items:baseline;gap:14px;padding:16px 26px 12px}
+.pane__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.pane__head p{margin:0;font-size:var(--t2);color:var(--ink-3)}
+.marks{margin-left:auto;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;align-items:center;gap:7px}
+.marks i{width:9px;height:9px;background:var(--post-blue);font-style:normal;display:inline-block}
+.pane__scroll{flex:1;overflow-y:auto;padding:0 26px 30px}
+.sheet{background:var(--sheet);border:1px solid var(--rule-firm);padding:38px 44px 46px 26px;max-width:760px;
+       display:grid;grid-template-columns:30px 1fr;column-gap:14px}
+.gutter{grid-column:1}
+.doc{grid-column:2;font-size:var(--t3);line-height:1.65;color:var(--ink)}
+.blk{position:relative}
+.blk[data-slip]::before{content:attr(data-slip);position:absolute;left:-44px;top:5px;width:30px;text-align:right;
+      font-family:var(--mono);font-size:10.5px;color:var(--post-blue);letter-spacing:.02em}
+.blk[data-slip]::after{content:"";position:absolute;left:-8px;top:6px;bottom:6px;width:2px;background:var(--post-blue);opacity:.5}
+.blk.is-lit::after{opacity:1}
+.blk.is-lit{background:color-mix(in srgb,var(--post-blue) 7%,transparent)}
+
+.doc>:first-child{margin-top:0}
+.doc h1{font-size:23px;line-height:1.25;margin:0 0 4px;font-weight:680;letter-spacing:-.015em}
+.doc .byline{font-size:var(--t2);color:var(--ink-3);margin:0 0 22px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.doc h2{font-size:16px;margin:24px 0 7px;font-weight:660}
+.doc p{margin:0 0 11px}
+.doc figure{margin:16px 0}
+.doc figcaption{font-size:var(--t2);color:var(--ink-3);margin-top:7px}
+.doc .plate{border:1px solid var(--rule);background:var(--stock);padding:14px 16px}
+.doc table{border-collapse:collapse;margin:12px 0;font-size:14px;width:100%}
+.doc td,.doc th{border:1px solid var(--rule-firm);padding:6px 10px;text-align:left}
+.doc th{font-weight:620;background:var(--stock)}
+.doc .stops{color:var(--ink-3);font-style:italic}
+
+/* right rail: the amendment book */
+.book{display:flex;flex-direction:column;min-height:0;background:var(--stock);border-left:1px solid var(--rule-firm)}
+.book__head{flex:none;background:var(--sheet);border-bottom:1px solid var(--rule-firm);padding:15px 20px 0}
+.book__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.book__head p{margin:5px 0 12px;font-size:var(--t2);color:var(--ink-2);max-width:46ch}
+.tabs{display:flex;gap:20px}
+.tab{font:inherit;font-size:var(--t2);font-weight:620;background:none;border:0;border-bottom:2px solid transparent;
+     color:var(--ink-3);padding:0 0 9px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--post-blue)}
+.tab b{font-family:var(--mono);font-weight:500;color:var(--ink-3);margin-left:5px}
+
+/* the composer sits at the TOP: what you write becomes the next slip, and the
+   next slip belongs on top of the stack. */
+.order{flex:none;padding:14px 20px 15px;border-bottom:1px solid var(--rule);background:var(--sheet)}
+.field{border:2px solid var(--ink);background:var(--sheet);display:flex;align-items:flex-end;gap:10px;padding:10px 10px 10px 13px}
+.field textarea{flex:1;border:0;background:none;resize:none;font:inherit;font-size:var(--t3);color:var(--ink);outline:none;height:44px;line-height:1.5}
+.field textarea::placeholder{color:var(--ink-3)}
+.send{font:inherit;font-size:var(--t2);font-weight:640;background:var(--post-blue);color:#fff;border:0;padding:9px 15px;cursor:pointer}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.chip{font:inherit;font-size:var(--t1);color:var(--ink-2);background:var(--stock);border:1px solid var(--rule);padding:5px 10px;cursor:pointer}
+.chip:hover{border-color:var(--ink-3);color:var(--ink)}
+.left-today{margin:11px 0 0;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;align-items:center;gap:7px}
+.left-today i{width:8px;height:8px;background:var(--kept);font-style:normal;display:inline-block}
+.left-today b{color:var(--ink-2);font-weight:500}
+
+.stack{flex:1;overflow-y:auto;padding:14px 20px 22px}
+.slip{background:var(--sheet);border:1px solid var(--rule-firm);border-left:3px solid var(--post-blue);
+      padding:12px 14px 11px;margin-bottom:12px;cursor:default}
+.slip:hover{border-color:var(--ink-3);border-left-color:var(--post-blue)}
+.slip__no{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+          display:flex;align-items:center;gap:9px}
+.slip__no b{color:var(--post-blue);font-weight:600}
+.slip__no span{margin-left:auto;text-transform:none;letter-spacing:0}
+.slip__said{font-size:var(--t3);font-weight:540;margin:8px 0 0;line-height:1.5}
+.slip__did{font-size:var(--t2);color:var(--ink-2);margin:7px 0 0;line-height:1.55}
+.slip__act{display:flex;gap:9px;margin-top:11px;padding-top:10px;border-top:1px solid var(--rule)}
+.mini{font:inherit;font-size:var(--t1);background:none;border:1px solid var(--rule);color:var(--ink-2);padding:5px 10px;cursor:pointer}
+.mini:hover{border-color:var(--ink-3);color:var(--ink)}
+.mini--undo:hover{border-color:var(--post-red);color:var(--post-red)}
+.slip--refused{border-left-color:var(--post-red)}
+.slip--refused .slip__no b{color:var(--post-red)}
+.slip--refused .slip__did{color:var(--ink)}
+.slip--refused .slip__did b{color:var(--post-red);font-weight:640}
+.slip--pending{border-left-color:var(--rule-firm)}
+.working{display:flex;align-items:center;gap:9px;font-size:var(--t2);color:var(--ink-3);margin-top:9px}
+.working__bar{flex:1;height:3px;background:var(--rule);position:relative;overflow:hidden}
+.working__bar::after{content:"";position:absolute;inset:0;width:38%;background:var(--post-blue);animation:sweep 1400ms var(--ease) infinite}
+@keyframes sweep{from{transform:translateX(-100%)}to{transform:translateX(320%)}}
+@media (prefers-reduced-motion:reduce){.working__bar::after{animation:none;width:100%;opacity:.5}}
+.fine{font-size:var(--t1);color:var(--ink-3);line-height:1.5;margin:4px 0 0}
+
+/* ── mobile ──────────────────────────────────────────────────────────────── */
+.mbar{flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.mbar .mark{font-size:var(--t4)}
+.mbar .btn{margin-left:auto;font-size:var(--t2);padding:8px 13px}
+.mscroll{flex:1;overflow-y:auto;padding:14px 14px 96px}
+.mhead{margin:0 0 10px;display:flex;align-items:baseline;gap:10px}
+.mhead h3{margin:0;font-size:var(--t4);font-weight:640}
+.mhead .marks{margin-left:auto}
+.phone .sheet{padding:20px 14px 26px 12px;max-width:none;grid-template-columns:20px 1fr;column-gap:10px}
+.phone .blk[data-slip]::before{left:-32px;width:22px;font-size:9.5px}
+.phone .blk[data-slip]::after{left:-6px}
+.phone .doc h1{font-size:20px}
+.phone .doc h2{font-size:15px}
+
+.dock{position:absolute;left:0;right:0;bottom:0;z-index:3;background:var(--sheet);border-top:1px solid var(--rule-firm);
+      padding:11px 14px calc(11px + env(safe-area-inset-bottom));display:flex;gap:10px}
+.dock__btn{flex:1;display:flex;align-items:center;gap:11px;font:inherit;font-size:var(--t3);text-align:left;color:var(--ink-3);
+           background:var(--stock);border:2px solid var(--ink);padding:12px 14px;cursor:pointer}
+.dock__btn b{margin-left:auto;font-family:var(--mono);font-size:var(--t1);color:var(--ink-2);font-weight:500}
+.dock__btn i{width:9px;height:9px;background:var(--post-blue);font-style:normal;display:inline-block}
+
+.scrim{position:absolute;inset:0;z-index:4;background:rgba(20,23,26,.42);opacity:0;pointer-events:none;transition:opacity 200ms var(--ease)}
+.drawer{position:absolute;left:0;right:0;bottom:0;z-index:5;height:88%;display:flex;flex-direction:column;background:var(--stock);
+        border-top:1px solid var(--rule-firm);transform:translateY(101%);transition:transform 320ms var(--ease)}
+.phone.is-open .scrim{opacity:1;pointer-events:auto}
+.phone.is-open .drawer{transform:translateY(0)}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
+.grab{flex:none;display:flex;justify-content:center;padding:9px 0 3px}
+.grab span{width:44px;height:4px;background:var(--rule-firm)}
+.drawer__head{flex:none;display:flex;align-items:flex-start;gap:12px;padding:6px 16px 0;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.drawer__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.drawer__head p{margin:4px 0 11px;font-size:var(--t2);color:var(--ink-2)}
+.shut{font:inherit;font-size:var(--t2);background:none;border:1px solid var(--rule-firm);color:var(--ink);padding:6px 11px;cursor:pointer}
+.drawer .order{padding:12px 16px 13px}
+.drawer .stack{padding:12px 16px 20px}
+.tabpanel[hidden]{display:none}
+</style>
+</head>
+<body>
+
+<div class="doc-head">
+  <p class="kicker">Style it yourself · variation 2 of 5</p>
+  <h1>Amendment Slips</h1>
+  <p>Each instruction becomes a numbered slip, and the slips <em>are</em> the history — newest on top,
+     each one revertible on its own without undoing the ones after it. The document carries a blue tick
+     in the margin wherever a slip landed, so the record and the thing it describes are one glance apart.
+     Written for the person who will try six things and want to keep four.</p>
+</div>
+
+<section class="board">
+  <h2>Desktop · 1320 × 840</h2>
+  <div class="stage stage--desk">
+    <div class="desk">
+      <div class="tape"></div>
+      <header class="bar">
+        <div class="mark">SAL<span>VAGE</span><em>amendments</em></div>
+        <div class="rec"><b>quarterly-review.docx</b><span>1.4 MB</span><span>docket SV-4471-QX</span></div>
+        <div class="bar__act">
+          <a class="btn btn--quiet" href="#">The unstyled copy</a>
+          <a class="btn" href="#">Download with 3 amendments</a>
+        </div>
+      </header>
+
+      <div class="split">
+        <section class="pane">
+          <div class="pane__head">
+            <h3>The repaired document</h3>
+            <p>The file itself, not a description of it.</p>
+            <span class="marks"><i></i>3 amendments showing</span>
+          </div>
+          <div class="pane__scroll">
+            <article class="sheet">
+              <div class="gutter"></div>
+              <div class="doc">
+                <h1 class="blk" data-slip="A1" data-lit="s1">Harbour Line — Third Quarter Operations Review</h1>
+                <p class="byline">Prepared for the operations committee · recovered 26 August</p>
+                <h2 class="blk" data-slip="A1" data-lit="s1">1 · Summary</h2>
+                <p>Volumes across the northern corridor rose eleven per cent against the same quarter last year, almost all of it carried by the two new Tuesday sailings. Turnaround at Berth 4 is still the constraint, and it is now the constraint by a wider margin than it was in the spring.</p>
+                <p>Nothing in this quarter changes the case for the second crane. It sharpens it.</p>
+                <figure class="blk" data-slip="A3" data-lit="s3">
+                  <div class="plate">
+                    <svg viewBox="0 0 520 150" width="100%" height="126" role="img" aria-label="Berth 4 turnaround by week">
+                      <g fill="#173f8a" opacity=".85">
+                        <rect x="8" y="72" width="34" height="62"></rect><rect x="54" y="58" width="34" height="76"></rect>
+                        <rect x="100" y="64" width="34" height="70"></rect><rect x="146" y="40" width="34" height="94"></rect>
+                        <rect x="192" y="46" width="34" height="88"></rect><rect x="238" y="28" width="34" height="106"></rect>
+                        <rect x="284" y="34" width="34" height="100"></rect><rect x="330" y="18" width="34" height="116"></rect>
+                        <rect x="376" y="24" width="34" height="110"></rect><rect x="422" y="12" width="34" height="122"></rect>
+                        <rect x="468" y="20" width="34" height="114"></rect>
+                      </g>
+                      <line x1="0" y1="134" x2="520" y2="134" stroke="#a9b0aa" stroke-width="1"></line>
+                    </svg>
+                  </div>
+                  <figcaption>Figure 1 — Berth 4 turnaround, by week. Recovered with the document.</figcaption>
+                </figure>
+                <h2 class="blk" data-slip="A1" data-lit="s1">2 · Where the time goes</h2>
+                <div class="blk" data-slip="A2" data-lit="s2">
+                  <table>
+                    <tr><th>Stage</th><th>Median</th><th>Worst week</th></tr>
+                    <tr><td>Alongside to first lift</td><td>41 min</td><td>1 h 12</td></tr>
+                    <tr><td>Discharge</td><td>3 h 06</td><td>4 h 40</td></tr>
+                    <tr><td>Load</td><td>2 h 48</td><td>3 h 55</td></tr>
+                    <tr><td>Last lift to lines off</td><td>34 min</td><td>58 min</td></tr>
+                  </table>
+                </div>
+                <p>The two ends of the call account for a little over a fifth of the time alongside, and neither of them is doing any work.</p>
+                <h2 class="blk" data-slip="A1" data-lit="s1">3 · What we are asking for</h2>
+                <p>A second crane at Berth 4 from the first week of the new year, and the authority to move the Tuesday sailing forward by ninety minutes while it is being installed.</p>
+                <p class="stops">The recovered text stops here, mid-sentence.</p>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <aside class="book">
+          <div class="book__head">
+            <h3>Your amendments</h3>
+            <p>Ask for a change and it is written up as a slip. Take any one back on its own — the rest stay.</p>
+            <div class="tabs" role="tablist">
+              <button class="tab" role="tab" aria-selected="true">Slips <b>4</b></button>
+              <button class="tab" role="tab" aria-selected="false">What was styled for you</button>
+            </div>
+          </div>
+
+          <div class="order">
+            <div class="field">
+              <textarea placeholder="Ask for the next change, in your own words."></textarea>
+              <button class="send" type="button">Write it up</button>
+            </div>
+            <div class="chips">
+              <button class="chip" type="button">Plainer headings</button>
+              <button class="chip" type="button">Hairline table rules</button>
+              <button class="chip" type="button">Tighter spacing</button>
+              <button class="chip" type="button">Figures full width</button>
+            </div>
+            <p class="left-today"><i></i><b>6 changes left today</b> · SuperDocs is on the line, holding this document</p>
+          </div>
+
+          <div class="stack">
+            <div class="slip slip--pending">
+              <div class="slip__no"><b>A4</b> · being set <span>just now</span></div>
+              <p class="slip__said">“Mark the line where the text stops so a reader can see it.”</p>
+              <div class="working"><span>Setting it</span><span class="working__bar"></span></div>
+            </div>
+
+            <div class="slip slip--refused">
+              <div class="slip__no"><b>—</b> · refused <span>a minute ago</span></div>
+              <p class="slip__said">“Finish that last paragraph, it stops mid-sentence.”</p>
+              <p class="slip__did"><b>No.</b> That would be writing words your document does not have. Nothing was changed and nothing was counted against your allowance.</p>
+            </div>
+
+            <div class="slip" data-slip="s3">
+              <div class="slip__no"><b>A3</b> · applied <span>3 minutes ago</span></div>
+              <p class="slip__said">“Let the chart run the full width of the page.”</p>
+              <p class="slip__did">Figure 1 now sits across the text column with its caption beneath. The picture itself is untouched — the same bytes that came out of your file.</p>
+              <div class="slip__act">
+                <button class="mini mini--undo" type="button">Take it back</button>
+                <button class="mini" type="button">Show me where</button>
+              </div>
+            </div>
+
+            <div class="slip" data-slip="s2">
+              <div class="slip__no"><b>A2</b> · applied <span>4 minutes ago</span></div>
+              <p class="slip__said">“The table lines are heavy. Make them hairlines.”</p>
+              <p class="slip__did">All four rules on the turnaround table are set to the thinnest weight, and the header row keeps its tint.</p>
+              <div class="slip__act">
+                <button class="mini mini--undo" type="button">Take it back</button>
+                <button class="mini" type="button">Show me where</button>
+              </div>
+            </div>
+
+            <div class="slip" data-slip="s1">
+              <div class="slip__no"><b>A1</b> · applied <span>6 minutes ago</span></div>
+              <p class="slip__said">“Headings a size smaller, more room above them.”</p>
+              <p class="slip__did">Four headings changed, including the title. Each sits further from the paragraph before it.</p>
+              <div class="slip__act">
+                <button class="mini mini--undo" type="button">Take it back</button>
+                <button class="mini" type="button">Show me where</button>
+              </div>
+            </div>
+
+            <p class="fine">Your words are never rewritten. Before any styled file is handed over it is checked against the rebuild, and one that no longer matches is thrown away rather than passed on.</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="board">
+  <h2>Mobile · 390 × 844</h2>
+  <div class="stage stage--phone">
+    <div class="phone" id="p2">
+      <div class="tape"></div>
+      <header class="mbar">
+        <div class="mark">SAL<span>VAGE</span></div>
+        <a class="btn" href="#">Download</a>
+      </header>
+
+      <div class="mscroll">
+        <div class="mhead">
+          <h3>The repaired document</h3>
+          <span class="marks"><i></i>3 marks</span>
+        </div>
+        <article class="sheet">
+          <div class="gutter"></div>
+          <div class="doc">
+            <h1 class="blk" data-slip="A1">Harbour Line — Third Quarter Operations Review</h1>
+            <p class="byline">Operations committee · recovered 26 August</p>
+            <h2 class="blk" data-slip="A1">1 · Summary</h2>
+            <p>Volumes across the northern corridor rose eleven per cent against the same quarter last year, almost all of it carried by the two new Tuesday sailings. Turnaround at Berth 4 is still the constraint.</p>
+            <figure class="blk" data-slip="A3">
+              <div class="plate">
+                <svg viewBox="0 0 520 150" width="100%" height="92" role="img" aria-label="Berth 4 turnaround by week">
+                  <g fill="#173f8a" opacity=".85">
+                    <rect x="8" y="72" width="34" height="62"></rect><rect x="54" y="58" width="34" height="76"></rect>
+                    <rect x="100" y="64" width="34" height="70"></rect><rect x="146" y="40" width="34" height="94"></rect>
+                    <rect x="192" y="46" width="34" height="88"></rect><rect x="238" y="28" width="34" height="106"></rect>
+                    <rect x="284" y="34" width="34" height="100"></rect><rect x="330" y="18" width="34" height="116"></rect>
+                    <rect x="376" y="24" width="34" height="110"></rect><rect x="422" y="12" width="34" height="122"></rect>
+                    <rect x="468" y="20" width="34" height="114"></rect>
+                  </g>
+                  <line x1="0" y1="134" x2="520" y2="134" stroke="#a9b0aa" stroke-width="1"></line>
+                </svg>
+              </div>
+              <figcaption>Figure 1 — Berth 4 turnaround, by week.</figcaption>
+            </figure>
+            <h2 class="blk" data-slip="A1">2 · Where the time goes</h2>
+            <div class="blk" data-slip="A2">
+              <table>
+                <tr><th>Stage</th><th>Median</th></tr>
+                <tr><td>Alongside to first lift</td><td>41 min</td></tr>
+                <tr><td>Discharge</td><td>3 h 06</td></tr>
+                <tr><td>Load</td><td>2 h 48</td></tr>
+              </table>
+            </div>
+            <p class="stops">The recovered text stops here, mid-sentence.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="dock">
+        <button class="dock__btn" type="button" data-open="p2"><i></i>Amendments<b>3 · 6 left</b></button>
+      </div>
+
+      <div class="scrim" data-shut="p2"></div>
+      <div class="drawer" role="dialog" aria-label="Your amendments">
+        <div class="grab"><span></span></div>
+        <div class="drawer__head">
+          <div style="flex:1">
+            <h3>Your amendments</h3>
+            <p>Newest on top. Take any one back on its own.</p>
+          </div>
+          <button class="shut" type="button" data-shut="p2">Close</button>
+        </div>
+        <div class="order">
+          <div class="field">
+            <textarea placeholder="Ask for the next change."></textarea>
+            <button class="send" type="button">Write it up</button>
+          </div>
+          <p class="left-today"><i></i><b>6 changes left today</b></p>
+        </div>
+        <div class="stack">
+          <div class="slip slip--refused">
+            <div class="slip__no"><b>—</b> · refused <span>a minute ago</span></div>
+            <p class="slip__said">“Finish that last paragraph.”</p>
+            <p class="slip__did"><b>No.</b> That would be writing words your document does not have.</p>
+          </div>
+          <div class="slip">
+            <div class="slip__no"><b>A3</b> · applied <span>3 min ago</span></div>
+            <p class="slip__said">“Chart full width.”</p>
+            <p class="slip__did">Figure 1 runs across the text column. The picture itself is untouched.</p>
+            <div class="slip__act">
+              <button class="mini mini--undo" type="button">Take it back</button>
+              <button class="mini" type="button">Show me where</button>
+            </div>
+          </div>
+          <div class="slip">
+            <div class="slip__no"><b>A2</b> · applied <span>4 min ago</span></div>
+            <p class="slip__said">“Hairline table rules.”</p>
+            <p class="slip__did">All four rules set to the thinnest weight.</p>
+            <div class="slip__act">
+              <button class="mini mini--undo" type="button">Take it back</button>
+              <button class="mini" type="button">Show me where</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="notes">
+  <h2>Notes</h2>
+  <dl>
+    <dt>What it optimises</dt>
+    <dd>Reversibility. Styling is taste, and taste is tried on. Six instructions in, a linear undo is useless — you want the third one gone and the other five kept.</dd>
+    <dt>Composer at the top</dt>
+    <dd>Because the stack runs newest-first. Writing at the bottom and reading at the top would put the newest slip furthest from the field that made it.</dd>
+    <dt>Margin ticks</dt>
+    <dd>Hover a slip, its blocks light in the sheet; hover a block, its slip lifts. The ticks use post-blue — the institution's mark — never red, because an amendment is not damage.</dd>
+    <dt>A refusal costs nothing</dt>
+    <dd>It gets a slip with no number and a red left rule, and says plainly that nothing was counted against the allowance. Being told no should never feel like being charged for it.</dd>
+    <dt>When the counter is shut</dt>
+    <dd>The rail still renders — the slips already applied are history and stay readable — but the order field is replaced by one sentence saying why nothing more can be asked for today.</dd>
+    <dt>Both files stay reachable</dt>
+    <dd>The download names its own state (“with 3 amendments”), and the unstyled rebuild sits beside it.</dd>
+  </dl>
+</div>
+
+<script>
+document.querySelectorAll("[data-open]").forEach(function (b) {
+  b.addEventListener("click", function () { document.getElementById(b.dataset.open).classList.add("is-open"); });
+});
+document.querySelectorAll("[data-shut]").forEach(function (b) {
+  b.addEventListener("click", function () { document.getElementById(b.dataset.shut).classList.remove("is-open"); });
+});
+/* hovering a slip lights the blocks it changed, and the other way round */
+function lit(key, on) {
+  document.querySelectorAll('.blk[data-lit="' + key + '"]').forEach(function (el) { el.classList.toggle("is-lit", on); });
+}
+document.querySelectorAll(".slip[data-slip]").forEach(function (s) {
+  s.addEventListener("mouseenter", function () { lit(s.dataset.slip, true); });
+  s.addEventListener("mouseleave", function () { lit(s.dataset.slip, false); });
+});
+document.querySelectorAll(".blk[data-lit]").forEach(function (b) {
+  b.addEventListener("mouseenter", function () { lit(b.dataset.lit, true); });
+  b.addEventListener("mouseleave", function () { lit(b.dataset.lit, false); });
+});
+document.querySelectorAll(".tabs .tab").forEach(function (t) {
+  t.addEventListener("click", function () {
+    t.parentElement.querySelectorAll(".tab").forEach(function (o) { o.setAttribute("aria-selected", String(o === t)); });
+  });
+});
+</script>
+</body>
+</html>

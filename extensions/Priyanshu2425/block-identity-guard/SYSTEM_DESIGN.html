@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build — block identity guard</title>
+<style>
+:root{
+  --ink:#131A26; --ink-2:#48545F; --ink-3:#7C8792;
+  --ground:#EEF0F2; --panel:#FFFFFF;
+  --rule:#CFD5DB; --rule-2:#E4E8EB;
+  --accent:#1F49E0; --accent-wash:#E8ECFB;
+  --red:#C0102A; --red-wash:#FBE9EB;
+  --amber:#9A5B00; --amber-wash:#FBF0DF;
+  --green:#0E6B45; --green-wash:#E6F2EC;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ink:#E9EDF2; --ink-2:#AAB4BF; --ink-3:#7C8792;
+    --ground:#0D1117; --panel:#141A22;
+    --rule:#2A333F; --rule-2:#1E2630;
+    --accent:#7C9BFF; --accent-wash:#1A2440;
+    --red:#FF7A8A; --red-wash:#341A20;
+    --amber:#E0A24A; --amber-wash:#332617;
+    --green:#5FD3A0; --green-wash:#122A22;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{
+  margin:0;background:var(--ground);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.55;
+  background-image:linear-gradient(var(--rule-2) 1px,transparent 1px),linear-gradient(90deg,var(--rule-2) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+a{color:var(--accent)}
+.mast{border-bottom:3px solid var(--ink);background:var(--panel)}
+.mast-in{max-width:1180px;margin:0 auto;padding:26px 24px 22px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+.mast h1{font-size:clamp(30px,5.2vw,52px);line-height:.98;margin:10px 0 0;font-weight:800;letter-spacing:-.035em;text-transform:uppercase}
+.mast h1 em{font-style:normal;color:var(--accent)}
+.mast-sub{font-family:var(--serif);font-size:16px;color:var(--ink-2);max-width:74ch;margin:14px 0 0}
+.mast-note{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-2)}
+.frame{border:2px solid var(--ink);background:var(--panel);margin-top:20px;padding:16px 18px}
+.frame b{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:6px}
+.frame p{margin:0;font-family:var(--serif);font-size:18px;line-height:1.45;max-width:72ch}
+.shell{max-width:1180px;margin:0 auto;padding:28px 24px 90px;display:grid;grid-template-columns:236px minmax(0,1fr);gap:36px;align-items:start}
+nav.rail{position:sticky;top:20px;border-left:2px solid var(--ink);padding-left:14px}
+.rail-title{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+.rail a{display:block;padding:6px 0;text-decoration:none;color:var(--ink-2);font-size:13px;border-bottom:1px solid var(--rule-2)}
+.rail a small{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.rail a:hover,.rail a:focus-visible{color:var(--accent)}
+.rail a.on{color:var(--accent);font-weight:700}
+.rail a.on small{color:var(--accent)}
+.rail-tools{margin-top:16px}
+.btn{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:var(--panel);border:1px solid var(--ink);color:var(--ink);padding:7px 11px;cursor:pointer;border-radius:0}
+.btn:hover{background:var(--ink);color:var(--panel)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+article.prob{background:var(--panel);border:1px solid var(--rule);margin-bottom:24px;scroll-margin-top:16px}
+article.prob.floor{border:2px solid var(--ink)}
+.prob-head{padding:18px 22px;border-bottom:1px solid var(--rule-2)}
+.prob-idx{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.prob-head h2{margin:6px 0 0;font-size:clamp(20px,2.6vw,27px);font-weight:800;letter-spacing:-.025em;text-transform:uppercase;line-height:1.06}
+.lede{font-family:var(--serif);font-size:15.5px;color:var(--ink-2);max-width:74ch;margin:9px 0 0}
+.meta{display:flex;flex-wrap:wrap;gap:0;margin:16px 0 0;border:1px solid var(--rule-2)}
+.meta div{flex:1 1 150px;padding:9px 12px;border-right:1px solid var(--rule-2)}
+.meta div:last-child{border-right:0}
+.meta dt{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.meta dd{margin:3px 0 0;font-size:13px;font-weight:600}
+.prob-body{padding:4px 22px 20px}
+h3.grp{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);margin:24px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--ink)}
+h3.grp:first-child{margin-top:16px}
+.prob-body p{font-family:var(--serif);font-size:15px;max-width:74ch}
+.prob-body p.plain{font-family:var(--sans);font-size:14.5px}
+ol.reqs{list-style:none;margin:0;padding:0;counter-reset:r}
+ol.reqs li{display:grid;grid-template-columns:30px minmax(0,1fr);gap:12px;padding:11px 0;border-bottom:1px dotted var(--rule)}
+ol.reqs li:last-child{border-bottom:0}
+ol.reqs li::before{counter-increment:r;content:counter(r,decimal-leading-zero);font-family:var(--mono);font-size:12px;color:var(--accent);padding-top:2px}
+ol.reqs b{display:block;font-size:14.5px;font-weight:700}
+ol.reqs span{display:block;margin-top:3px;font-family:var(--serif);font-size:14px;color:var(--ink-2)}
+.moves{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:0;border:1px solid var(--rule-2);margin:6px 0 0}
+.move{padding:14px 15px;border-right:1px solid var(--rule-2)}
+.move:last-child{border-right:0}
+.move h4{margin:0;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.move p{margin:7px 0 0;font-family:var(--serif);font-size:14px;max-width:none}
+.warn,.tip,.good{padding:12px 15px;margin:16px 0 0}
+.warn{border:1px solid var(--red);background:var(--red-wash)}
+.tip{border-left:3px solid var(--accent);background:var(--accent-wash)}
+.good{border-left:3px solid var(--green);background:var(--green-wash)}
+.warn b,.tip b,.good b{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:5px}
+.warn b{color:var(--red)} .tip b{color:var(--accent)} .good b{color:var(--green)}
+.warn p,.tip p,.good p{margin:0;font-family:var(--serif);font-size:14.5px;max-width:74ch}
+.warn p+p,.tip p+p,.good p+p{margin-top:7px}
+.split{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:0;border:1px solid var(--rule-2);margin-top:6px}
+.split>div{padding:14px 16px;border-right:1px solid var(--rule-2)}
+.split>div:last-child{border-right:0}
+.split h4{margin:0 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+.split .yes h4{color:var(--green)} .split .no h4{color:var(--red)}
+.split ul{margin:0;padding-left:17px}
+.split li{font-size:14px;margin-bottom:6px}
+ul.tight{margin:6px 0 0;padding-left:18px}
+ul.tight li{font-size:14.5px;margin-bottom:6px}
+ul.tight li span{font-family:var(--serif);color:var(--ink-2)}
+code{font-family:var(--mono);font-size:12.5px;background:var(--rule-2);padding:1px 5px;border:1px solid var(--rule)}
+pre{font-family:var(--mono);font-size:12px;line-height:1.5;background:var(--panel);border:1px solid var(--rule);padding:12px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:8px 0 0}
+pre code{background:none;border:0;padding:0;font-size:12px}
+pre.sh{border-left:3px solid var(--accent)}
+pre b{color:var(--accent);font-weight:700}
+pre i{color:var(--ink-3);font-style:normal}
+pre em{color:var(--red);font-style:normal;font-weight:700}
+pre u{color:var(--green);text-decoration:none;font-weight:700}
+table.grid{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:13.5px}
+table.grid th{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:8px 10px;border-bottom:1px solid var(--ink);vertical-align:bottom}
+table.grid td{padding:10px;border-bottom:1px dotted var(--rule);vertical-align:top}
+table.grid td:first-child{font-weight:700}
+table.grid code{font-size:11.5px}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.stack{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));border:1px solid var(--rule-2);margin-top:6px}
+.stack>div{padding:13px 14px;border-right:1px solid var(--rule-2)}
+.stack>div:last-child{border-right:0}
+.stack h4{margin:0 0 6px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.stack p{margin:0;font-family:var(--serif);font-size:14px}
+.big{font-family:var(--mono);font-size:26px;font-weight:700;letter-spacing:-.02em;display:block;color:var(--accent)}
+.sev{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;border:1px solid currentColor;padding:1px 5px;white-space:nowrap}
+.s-err{color:var(--red);background:var(--red-wash)}
+.s-warn{color:var(--amber);background:var(--amber-wash)}
+.s-info{color:var(--accent);background:var(--accent-wash)}
+.s-note{color:var(--ink-3)}
+.s-ok{color:var(--green);background:var(--green-wash)}
+figure.diagram{margin:10px 0 0;border:1px solid var(--rule-2);background:var(--panel);padding:14px}
+figure.diagram svg{display:block;width:100%;height:auto}
+figure.diagram figcaption{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-top:10px}
+.dg-box{fill:var(--panel);stroke:var(--ink);stroke-width:1.5}
+.dg-box-accent{fill:var(--accent-wash);stroke:var(--accent);stroke-width:1.5}
+.dg-t{font-family:var(--mono);font-size:11px;fill:var(--ink);font-weight:700}
+.dg-s{font-family:var(--mono);font-size:9px;fill:var(--ink-3);letter-spacing:.06em}
+.dg-l{stroke:var(--ink-3);stroke-width:1.5;fill:none}
+.dg-label{font-family:var(--mono);font-size:9px;fill:var(--ink-3)}
+footer.foot{max-width:1180px;margin:0 auto;padding:0 24px 60px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr;gap:18px;padding:20px 16px 70px}
+  nav.rail{position:static;border-left:0;border-top:2px solid var(--ink);padding:12px 0 0}
+  .mast-in{padding:20px 16px 18px}
+  footer.foot{padding:0 16px 40px}
+  .meta div{border-right:0;border-bottom:1px solid var(--rule-2)}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff;background-image:none}
+  nav.rail{display:none}
+  .shell{display:block;max-width:none}
+  article.prob{break-inside:avoid;border-color:#999}
+  pre{white-space:pre-wrap}
+}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="mast-in">
+    <div class="eyebrow">SuperDocs · open task list, band S1 · extensions folder · build note</div>
+    <h1>Block identity <em>guard</em></h1>
+    <p class="mast-sub">A round-trip check for SuperDocs documents. Give it the HTML SuperDocs sent and the HTML your integration sent back, and it names which blocks lost their <code>data-chunk-id</code>, where they are, and which transformation dropped them. Zero dependencies, no build step, no account, no network — the whole input is two strings.</p>
+    <div class="frame">
+      <b>The card, as printed on the open task list</b>
+      <p>Our editing model depends on each block carrying a stable identifier through a round trip. Integrations break this quietly by stripping attributes, and the failure shows up later as an edit landing in the wrong place. Build a small library that validates a document round trip and reports precisely which blocks lost identity, where, and what the likely cause was. Ship it as a package plus an optional check that can run in a build pipeline.</p>
+    </div>
+    <div class="mast-note">graded on one property: it names the specific block and the specific transformation that dropped it, rather than reporting that something went wrong</div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail">
+    <div class="rail-title">On this page</div>
+    <a href="#what"><small>01</small>What it is</a>
+    <a href="#decisions"><small>02</small>Technical decisions</a>
+    <a href="#design"><small>03</small>System design</a>
+    <a href="#rules"><small>04</small>The rule table</a>
+    <a href="#gaps"><small>05</small>Gaps closed</a>
+    <a href="#test"><small>06</small>Manual test runbook</a>
+    <a href="#git"><small>07</small>Where it goes on git</a>
+    <a href="#limits"><small>08</small>Limits</a>
+    <div class="rail-tools"><button class="btn" id="btn-print">Print</button></div>
+  </nav>
+
+  <main>
+
+  <!-- ===================== 01 ===================== -->
+  <article class="prob floor" id="what">
+    <div class="prob-head">
+      <div class="prob-idx">01 · what it is</div>
+      <h2>A report that names the transformation</h2>
+      <p class="lede">SuperDocs puts a <code>data-chunk-id</code> on every block-level element; those identifiers are how an instruction targets one section without touching the rest of the document. Most editor schemas and HTML sanitisers strip unknown attributes by default, so the identifier disappears quietly and the symptom — an edit landing in the wrong place — surfaces several steps later, in someone else's document. This tool closes the distance between cause and symptom.</p>
+      <div class="meta">
+        <div><dt>Surface</dt><dd>Library · CLI · test assertion</dd></div>
+        <div><dt>Input</dt><dd>Two HTML strings</dd></div>
+        <div><dt>Dependencies</dt><dd>None · no build step</dd></div>
+        <div><dt>Tests</dt><dd>95 passing · 11 fixtures</dd></div>
+      </div>
+    </div>
+    <div class="prob-body">
+
+      <h3 class="grp">The whole product is the sentence it prints</h3>
+      <div class="split">
+        <div class="no">
+          <h4>What a weak version prints</h4>
+          <ul>
+            <li><code>3 blocks lost identity</code></li>
+            <li><code>validation failed: id mismatch</code></li>
+            <li><code>87% of ids survived</code></li>
+          </ul>
+          <p class="plain" style="margin-top:10px;color:var(--ink-2)">Each is true, and none of them tells you which component to fix.</p>
+        </div>
+        <div class="yes">
+          <h4>What this one prints</h4>
+<pre><b>LOST</b>      LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-…-0004
+           <i>where</i> p · block 4 of the before document · line 4
+           <i>text</i>  "The Supplier shall indemnify the Customer against…"
+           <i>at</i>    div &gt; p[1]
+           <i>cause</i> the tag and text are unchanged and the node kept
+                 class but no data attributes, which is what a
+                 sanitiser or editor schema with an attribute
+                 allowlist does: known attributes through, unknown
+                 attributes dropped
+           <i>after</i> p at line 4 (class)
+           <i>·</i>     nearest surviving ancestor c1a0e0a4-…-0001
+           <i>confidence high</i></pre>
+        </div>
+      </div>
+
+      <h3 class="grp">Three ways to run it</h3>
+      <div class="moves">
+        <div class="move">
+          <h4>In your editor's test suite</h4>
+          <p><code>assertRoundTrip(incoming, editor.getHtml())</code> throws with the full report. This is the drop-in replacement for the three-line <code>console.assert</code> in the integration guide — same place in the test, an answer instead of a boolean.</p>
+        </div>
+        <div class="move">
+          <h4>As a library</h4>
+          <p><code>checkRoundTrip(before, after)</code> returns a report object: counts, findings, locators, causes, confidence. Pure function over two strings, so a corpus run is a <code>map</code>.</p>
+        </div>
+        <div class="move">
+          <h4>As a pipeline check</h4>
+          <p><code>chunk-guard check before.html after.html</code>. Exit 0 clean, 1 identity lost, 2 the check could not run. GitHub annotations point at the line of the captured HTML in the pull request.</p>
+        </div>
+      </div>
+
+      <div class="tip">
+        <b>The grounding, in their own docs</b>
+        <p>The integration guide's verification test is <code>console.assert(inIds.every(id =&gt; outIds.includes(id)))</code>. It is right about <em>when</em> to check and says nothing about <em>what broke</em>. Everything in this build is the answer to the second half of that sentence.</p>
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ===================== 02 ===================== -->
+  <article class="prob" id="decisions">
+    <div class="prob-head">
+      <div class="prob-idx">02 · technical decisions</div>
+      <h2>Every choice, and what it cost</h2>
+      <p class="lede">Thirteen decisions that shaped the build, each with the alternative that was rejected. Where a decision has a price, the price is named.</p>
+    </div>
+    <div class="prob-body">
+
+      <h3 class="grp">Language and runtime</h3>
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:22%">Decision</th><th style="width:24%">Alternative rejected</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>JavaScript, ES modules</td>
+            <td>Python, matching the round's other two builds</td>
+            <td>The consumers are editor integrations, and editor integrations are JavaScript. A Python package cannot run inside a TipTap, Slate, ProseMirror or Lexical test suite, which is the single highest-value place to put this check. The docs' own round-trip test is JavaScript too. <b>Price:</b> Node has no standard-library HTML parser, which forced the next decision.</td>
+          </tr>
+          <tr>
+            <td>Hand-written tolerant parser<br><code>src/parse.js</code>, 330 lines</td>
+            <td><code>jsdom</code>, <code>parse5</code>, or the browser's <code>DOMParser</code></td>
+            <td>A dependency-free package can be vendored into any repository and run in CI without an install. More importantly, <code>DOMParser</code> in a browser and JSDOM in Node normalise markup differently, which would make findings depend on the environment that computed them — the exact class of bug this tool exists to catch. <b>Price:</b> not spec-compliant. It handles what document HTML and editor serialisers actually emit: unclosed <code>&lt;p&gt;</code> and <code>&lt;li&gt;</code>, table cells, void and raw-text elements, comments, doctypes, every attribute quoting style, and a stray <code>&lt;</code> that is text.</td>
+          </tr>
+          <tr>
+            <td>Zero dependencies, no build</td>
+            <td>TypeScript source with a <code>tsc</code> build</td>
+            <td>A reviewer clones and runs <code>npm test</code> with no install and no network. Types still ship, hand-written, in <code>types/index.d.ts</code>. <b>Price:</b> no compiler checking the source; the test suite carries that weight instead.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="grp">Analysis</h3>
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:22%">Decision</th><th style="width:24%">Alternative rejected</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Match lost blocks by content</td>
+            <td>Match by document position</td>
+            <td>The diagnosis layer can only name a cause if it can point at what the block became, and position is the one property every one of these transformations destroys. Content is what a sanitiser, a schema and a serialiser all leave alone: the identifier is gone, the tag may have changed, the position has certainly shifted, but the sentence is still the sentence. Four passes: exact tag-and-text, text alone, similarity within the same tag (≥ 0.6), similarity across tags for text long enough to carry the match on its own (≥ 0.75, ≥ 3 tokens).</td>
+          </tr>
+          <tr>
+            <td>Prefer the most specific node, never reuse one</td>
+            <td>First match wins</td>
+            <td>A paragraph and the <code>div</code> wrapping it carry the same text. The paragraph is the block; the div is where it lives. Candidates are ranked by score, then by smallest subtree, and a matched node is consumed so two lost blocks cannot both claim it.</td>
+          </tr>
+          <tr>
+            <td>Movement measured by longest increasing subsequence</td>
+            <td>Compare block indices directly</td>
+            <td>Delete one block and every index after it shifts, so a literal comparison reports the whole tail of the document as moved. The longest run of blocks still in their original relative order <em>is</em> the document; everything outside it actually moved. One deletion now produces one finding instead of forty.</td>
+          </tr>
+          <tr>
+            <td>Normalise text before comparing</td>
+            <td>Byte comparison</td>
+            <td>No two serialisers emit identical HTML: attribute order changes, <code>&amp;</code> becomes <code>&amp;amp;</code>, a non-breaking space is re-encoded, whitespace is collapsed. Compared literally, every one of those is a difference and the report fills with findings about documents nobody touched. Entities are decoded, whitespace collapsed, NFC applied, and element boundaries are treated as word boundaries so two table cells are two words.</td>
+          </tr>
+          <tr>
+            <td>Token sets cached per node</td>
+            <td>Recompute on each comparison</td>
+            <td>The similarity fallback compares one lost block against every candidate, so recomputing tokens turns a linear scan into a quadratic one. Caching took the worst case — a 3,000-block document where every block was <em>also</em> edited — from 2.6 s to 0.75 s. Real documents hit the exact-match fast path.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="grp">Reporting</h3>
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:22%">Decision</th><th style="width:24%">Alternative rejected</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Four severities and three exit codes</td>
+            <td>"Exit non-zero on any loss"</td>
+            <td>The brief wanted moves reported separately <em>and</em> a non-zero exit on any loss; to a shell those are the same event. Severity separates them: a reorder is <code>info</code> and exits 0, a stripped identifier is <code>error</code> and exits 1, and a check that could not run exits 2 — so a missing file never reads as a pass.</td>
+          </tr>
+          <tr>
+            <td>Confidence and evidence on every finding</td>
+            <td>State the cause as fact</td>
+            <td>"Id absent, text present, tag unchanged → an attribute allowlist stripped it" is usually true and not always: an all-attribute strip and a markdown hop leave the same trace on a block whose neighbours are also bare. Findings carry <code>high</code>/<code>medium</code>/<code>low</code> plus the evidence, including evidence that argues against them ("this text is not unique in the after document, so the counterpart is the best match rather than the only one"). A tool that names a cause has to say how sure it is, or the next person debugs the wrong component.</td>
+          </tr>
+          <tr>
+            <td>Group by nearest surviving ancestor</td>
+            <td>One finding per lost block</td>
+            <td>One transformation usually takes a whole region. Reporting a markdown hop forty times buries the single fact worth knowing. Three or more losses sharing an ancestor collapse into one <code>LOST_SUBTREE</code> finding that still names every member with its own rule — so specificity survives the summarising. The group's headline rule is the one that explains most, not the most frequent: after a structural conversion the flattened containers all report as "removed", and "removed" says the least.</td>
+          </tr>
+          <tr>
+            <td>Baselines, with the findings still printed</td>
+            <td>No baseline; or a baseline that deletes findings</td>
+            <td>Run this against an integration that has shipped for a year and it finds real problems that cannot all be fixed today. Without a way to accept the known ones the check gets switched off, and a check that is switched off finds nothing. Accepted findings move out of the exit code and stay in the report, marked <code>BASELINED</code>. <b>Found while writing this page:</b> the first version printed "clean: every identifier survived" over a baselined loss. That is exactly the lie the tool exists to prevent; fixed, with a regression test.</td>
+          </tr>
+          <tr>
+            <td>Three output formats</td>
+            <td>Human output only</td>
+            <td><code>human</code> for a person, <code>json</code> for a machine (deterministic: no timestamps, no absolute paths, stable ordering, so two runs are byte-identical and diffable), <code>github</code> for workflow annotations with file, line and column — a pipeline check that only writes to a log is half a check.</td>
+          </tr>
+          <tr>
+            <td>Golden fixture reports, committed</td>
+            <td>Assertions on report fields only</td>
+            <td>The report <em>is</em> the product, so the exact text of eleven reports is pinned in <code>expected.txt</code>. If a change makes any report vaguer, a test fails and the diff shows the sentence that got worse.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ===================== 03 ===================== -->
+  <article class="prob" id="design">
+    <div class="prob-head">
+      <div class="prob-idx">03 · system design</div>
+      <h2>Six stages, one direction</h2>
+      <p class="lede">No state, no clock, no I/O below the CLI layer. <code>checkRoundTrip(before, after)</code> is a pure function: the same two strings always produce the same report, which is what makes the golden fixtures possible and the JSON output diffable.</p>
+    </div>
+    <div class="prob-body">
+
+      <figure class="diagram">
+        <svg viewBox="0 0 1020 300" role="img" aria-label="Pipeline: capture feeds parse, then index, difference, match, diagnose, group, and format.">
+          <!-- capture (optional, above) -->
+          <rect class="dg-box-accent" x="8" y="12" width="150" height="44"/>
+          <text class="dg-t" x="20" y="32">capture</text>
+          <text class="dg-s" x="20" y="46">SSE / JSON → HTML</text>
+          <path class="dg-l" d="M83 56 L83 96" marker-end="url(#ar)"/>
+          <text class="dg-label" x="90" y="80">optional</text>
+
+          <defs>
+            <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto">
+              <path d="M0,0 L7,3.2 L0,6.4 z" fill="currentColor" style="fill:var(--ink-3)"/>
+            </marker>
+          </defs>
+
+          <!-- row 1 -->
+          <rect class="dg-box" x="8" y="96" width="150" height="52"/>
+          <text class="dg-t" x="20" y="118">1 · parse</text>
+          <text class="dg-s" x="20" y="134">tolerant tokeniser</text>
+
+          <path class="dg-l" d="M158 122 L188 122" marker-end="url(#ar)"/>
+
+          <rect class="dg-box" x="190" y="96" width="150" height="52"/>
+          <text class="dg-t" x="202" y="118">2 · index</text>
+          <text class="dg-s" x="202" y="134">blocks + locators</text>
+
+          <path class="dg-l" d="M340 122 L370 122" marker-end="url(#ar)"/>
+
+          <rect class="dg-box" x="372" y="96" width="150" height="52"/>
+          <text class="dg-t" x="384" y="118">3 · difference</text>
+          <text class="dg-s" x="384" y="134">intact / lost / dup</text>
+
+          <path class="dg-l" d="M522 122 L552 122" marker-end="url(#ar)"/>
+
+          <rect class="dg-box" x="554" y="96" width="150" height="52"/>
+          <text class="dg-t" x="566" y="118">4 · match</text>
+          <text class="dg-s" x="566" y="134">what it became</text>
+
+          <path class="dg-l" d="M704 122 L734 122" marker-end="url(#ar)"/>
+
+          <rect class="dg-box-accent" x="736" y="96" width="150" height="52"/>
+          <text class="dg-t" x="748" y="118">5 · diagnose</text>
+          <text class="dg-s" x="748" y="134">the rule table</text>
+
+          <path class="dg-l" d="M886 122 L916 122" marker-end="url(#ar)"/>
+
+          <rect class="dg-box" x="918" y="96" width="94" height="52"/>
+          <text class="dg-t" x="930" y="118">6 · group</text>
+          <text class="dg-s" x="930" y="134">by ancestor</text>
+
+          <!-- down to report -->
+          <path class="dg-l" d="M965 148 L965 186 L512 186 L512 208" marker-end="url(#ar)"/>
+
+          <rect class="dg-box" x="372" y="208" width="280" height="52"/>
+          <text class="dg-t" x="384" y="230">report</text>
+          <text class="dg-s" x="384" y="246">counts · findings · summary · ok</text>
+
+          <path class="dg-l" d="M372 234 L312 234" marker-end="url(#ar)"/>
+          <rect class="dg-box" x="152" y="208" width="158" height="52"/>
+          <text class="dg-t" x="164" y="230">baseline</text>
+          <text class="dg-s" x="164" y="246">accept the known</text>
+
+          <path class="dg-l" d="M652 234 L712 234" marker-end="url(#ar)"/>
+          <rect class="dg-box" x="714" y="208" width="298" height="52"/>
+          <text class="dg-t" x="726" y="230">format</text>
+          <text class="dg-s" x="726" y="246">human · json · github → exit code</text>
+        </svg>
+        <figcaption>Stages 1–4 are mechanical. Stage 5 is the product.</figcaption>
+      </figure>
+
+      <h3 class="grp">What each module owns</h3>
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:18%">File</th><th style="width:8%">Lines</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td><code>parse.js</code></td><td>330</td><td>HTML → element tree. Tolerant tokeniser, entity decoding, text normalisation, offset → line/column lookup. Knows nothing about SuperDocs.</td></tr>
+          <tr><td><code>blocks.js</code></td><td>159</td><td>Tree → the blocks that carry an identifier, each with a locator: tag, block index, structural path, text preview, line, column, nearest ancestor that still has an identifier, and its <code>data-part-type</code>. Filters editor bookkeeping attributes.</td></tr>
+          <tr><td><code>match.js</code></td><td>147</td><td>Finds the after-side node a lost block became. Four passes, most-specific-node preference, token-set caching, no node matched twice.</td></tr>
+          <tr><td><code>diagnose.js</code></td><td>216</td><td>The rule table applied per lost block: which transformation, with what evidence, at what confidence. Also the document-level signals — tag-vocabulary collapse, attribute-free neighbourhoods, identifier shape.</td></tr>
+          <tr><td><code>rules.js</code></td><td>156</td><td>Every rule declared once: code, default severity, title, meaning. Plus the data attributes whose loss breaks something specific, and what it breaks.</td></tr>
+          <tr><td><code>analyse.js</code></td><td>611</td><td>The orchestrator: difference, duplicates, total-loss shortcuts, out-of-flow parts, movement by LIS, surviving-block attribute checks, new identifiers, grouping, ordering, and the stable key each finding carries.</td></tr>
+          <tr><td><code>baseline.js</code></td><td>73</td><td>Create and apply a baseline. Moves findings aside; never deletes them.</td></tr>
+          <tr><td><code>capture.js</code></td><td>136</td><td>Pulls the before-side HTML out of a saved SSE stream, one event, an array of events, or a response body. Handles <code>focused_document_id</code>; refuses to guess.</td></tr>
+          <tr><td><code>format/*.js</code></td><td>206</td><td>Human, JSON and GitHub-annotation renderings of the same report.</td></tr>
+          <tr><td><code>cli.js</code></td><td>292</td><td>Argument parsing, file and stdin I/O, exit codes. Injectable I/O, so the CLI tests drive it in memory instead of spawning processes.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="grp">The shape of a finding</h3>
+      <p class="plain">One object per finding, identical in the library and the JSON output. This is a real one, from fixture 02:</p>
+<pre>{
+  "rule": "LOST_ATTRIBUTE_STRIPPED",
+  "severity": "error",
+  "title": "Identifier stripped from a surviving block",
+  "meaning": "The block is still there, with the same tag and the same text…",
+  "id": "c1a0e0a4-0000-4000-8000-000000000004",
+  "idRole": "block",
+  "cause": "the tag and text are unchanged and the node kept class but no data
+            attributes, which is what a sanitiser or editor schema with an
+            attribute allowlist does: known attributes through, unknown dropped",
+  "confidence": "high",
+  "evidence": ["nearest surviving ancestor c1a0e0a4-0000-4000-8000-000000000001"],
+  "locator":     { "id": "…0004", "tag": "p", "blockIndex": 4, "path": "div &gt; p[1]",
+                   "preview": "The Supplier shall indemnify the Customer…",
+                   "line": 4, "column": 3, "parentId": "…0001", "partType": null },
+  "counterpart": { "tag": "p", "line": 4, "column": 3, "attributes": ["class"],
+                   "preview": "The Supplier shall indemnify the Customer…",
+                   "hasIdAttribute": false },
+  "members": [],
+  "key": "LOST_ATTRIBUTE_STRIPPED:cc354ed9"
+}</pre>
+      <ul class="tight">
+        <li><b>locator</b> <span>— where the block was, in four independent ways, so it stays findable after the file is reformatted.</span></li>
+        <li><b>counterpart</b> <span>— what the block became, or <code>null</code> when nothing in the after document carries its text.</span></li>
+        <li><b>members</b> <span>— populated on grouped findings; every block in the group with its own rule and locator.</span></li>
+        <li><b>key</b> <span>— stable across runs, derived from rule, identifier, path and text. This is what a baseline records.</span></li>
+      </ul>
+
+      <h3 class="grp">The contract at the edges</h3>
+      <div class="stack">
+        <div><h4>Exit 0</h4><p>Nothing at or above the failure threshold. Includes a document that was legally reordered, and a header your editor does not render.</p></div>
+        <div><h4>Exit 1</h4><p>The round trip lost identity. Default threshold is <code>error</code>; <code>--fail-on</code> moves it.</p></div>
+        <div><h4>Exit 2</h4><p>The check could not run: bad arguments, unreadable file, unusable capture. Never silent, never confusable with a pass.</p></div>
+      </div>
+
+    </div>
+  </article>
+
+  <!-- ===================== 04 ===================== -->
+  <article class="prob" id="rules">
+    <div class="prob-head">
+      <div class="prob-idx">04 · the rule table</div>
+      <h2>Fifteen rules, each naming a transformation</h2>
+      <p class="lede">The brief sketched six. Nine more came out of building it: three because the six had no mechanism behind them, and six because a checker that reports documented-legal behaviour as failure gets switched off. <code>chunk-guard rules</code> prints this table.</p>
+    </div>
+    <div class="prob-body">
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:24%">Rule</th><th style="width:10%">Severity</th><th>Trigger, and what it means</th></tr></thead>
+        <tbody>
+          <tr><td><code>LOST_ATTRIBUTE_STRIPPED</code></td><td><span class="sev s-err">error</span></td><td>Same tag, same text, identifier gone. The cause line distinguishes a filter that kept other <code>data-*</code> from one that kept only <code>class</code>/<code>style</code>.</td></tr>
+          <tr><td><code>LOST_NODE_REBUILT</code></td><td><span class="sev s-err">error</span></td><td>The text survived under a different tag. The node was reconstructed by a different document model — a serialisation round trip, not an edit.</td></tr>
+          <tr><td><code>LOST_MARKDOWN_HOP</code></td><td><span class="sev s-err">error</span></td><td>Came back with no attributes at all, among neighbours equally bare, with rich tags gone from the document. Something converted the HTML to text and back.</td></tr>
+          <tr><td><code>LOST_BLOCK_REMOVED</code></td><td><span class="sev s-err">error</span></td><td>Nothing in the after document carries this text or anything close to it. Deleted, replaced wholesale, or never rendered.</td></tr>
+          <tr><td><code>LOST_SUBTREE</code></td><td><span class="sev s-err">error</span></td><td>Three or more losses sharing one surviving ancestor. One transformation caused all of them; every member is still named.</td></tr>
+          <tr><td><code>IDS_REGENERATED</code></td><td><span class="sev s-err">error</span></td><td>Not one identifier survived and the after document has its own. The editor set its own content instead of applying <code>document_sync</code>.</td></tr>
+          <tr><td><code>ALL_IDS_STRIPPED</code></td><td><span class="sev s-err">error</span></td><td>Every identifier gone, none minted. Targeted editing is impossible; the next turn can only be a whole-document rewrite.</td></tr>
+          <tr><td><code>DUPLICATE_ID</code></td><td><span class="sev s-err">error</span></td><td>One identifier on two blocks after the trip. A change batch targeting it is ambiguous — the edit lands on whichever node the applier finds first.</td></tr>
+          <tr><td><code>DATA_ATTRIBUTE_DROPPED</code></td><td><span class="sev s-err">error</span> / <span class="sev s-warn">warn</span></td><td>Identifier kept, another <code>data-*</code> lost. Error when it is a diagram source, equation source, citation field or part marker — the report names what breaks.</td></tr>
+          <tr><td><code>DUPLICATE_ID_IN_SOURCE</code></td><td><span class="sev s-warn">warning</span></td><td>The input was already ambiguous. A warning about the capture, not the integration.</td></tr>
+          <tr><td><code>PART_OMITTED</code></td><td><span class="sev s-info">info</span></td><td>A header, footer, footnote or comment absent from the editor view. Documented as legal, and never destructive. <code>--strict-parts</code> makes it an error.</td></tr>
+          <tr><td><code>BLOCK_MOVED</code></td><td><span class="sev s-info">info</span></td><td>Identity intact, position changed relative to the blocks that did not move. Reported so a reorder is never mistaken for a loss.</td></tr>
+          <tr><td><code>NEW_IDS</code></td><td><span class="sev s-info">info</span></td><td>Identifiers not in the before document. Normal when the user typed; called out when they outnumber the carried-over ones.</td></tr>
+          <tr><td><code>CONTENT_CHANGED</code></td><td><span class="sev s-note">notice</span></td><td>Identifier kept, text changed. Ordinary editing; off unless <code>--include-content-changes</code>.</td></tr>
+          <tr><td><code>NO_IDS_IN_SOURCE</code></td><td><span class="sev s-err">error</span></td><td>Nothing to validate. Names any other identifier-shaped attribute it found, because this is almost always a capture taken at the wrong point.</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="warn">
+        <b>The failure mode this table is designed against</b>
+        <p>A checker that fails a build for behaviour the platform documents as correct — an omitted footer, a reordered paragraph, a re-encoded entity — gets switched off within a week, and then it finds nothing at all. Six of these fifteen rules exist to keep legal behaviour out of the exit code while keeping it visible in the report.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== 05 ===================== -->
+  <article class="prob" id="gaps">
+    <div class="prob-head">
+      <div class="prob-idx">05 · gaps closed</div>
+      <h2>Where the shipped tool differs from the brief</h2>
+      <p class="lede">The plan was a thirty-minute sketch: parse, difference, six rules, a library and a CLI. Building it surfaced problems that would have made the checker worse than useless — reporting clean when it should not, or failing a build for something documented as legal. Each is recorded in <code>docs/GAPS.md</code>; this is the index.</p>
+    </div>
+    <div class="prob-body">
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:38%">Gap in the brief</th><th>What shipped instead</th></tr></thead>
+        <tbody>
+          <tr><td>Out-of-flow parts (<code>data-part-type</code>) would be reported as loss — a red build for documented-legal behaviour</td><td><code>PART_OMITTED</code> at <code>info</code>, plus <code>--strict-parts</code>. A part that is present but stripped is still an ordinary loss.</td></tr>
+          <tr><td>The identifier is not the only attribute with this failure mode; diagram, equation and citation sources ride on <code>data-*</code> too</td><td><code>DATA_ATTRIBUTE_DROPPED</code>, checked on every surviving block, with the consequence named per attribute.</td></tr>
+          <tr><td>Comparing raw positions reports a single deletion as a document-wide reorder</td><td>Movement measured against the longest run of blocks still in relative order.</td></tr>
+          <tr><td>"Exit non-zero on any loss" contradicts reporting legal moves separately</td><td>Four severities, <code>--fail-on</code>, and a distinct exit 2 for a check that could not run.</td></tr>
+          <tr><td>Matching a lost block to what it became was assumed, and it is the hard half</td><td><code>src/match.js</code>: four passes, specificity preference, no double-matching; match quality feeds confidence.</td></tr>
+          <tr><td>No rule for "the block is simply gone" — a deletion would be blamed on whichever rule matched loosest</td><td><code>LOST_BLOCK_REMOVED</code>, reached only when nothing carries the text.</td></tr>
+          <tr><td>The input can already be broken, and every other finding then rests on it</td><td><code>DUPLICATE_ID_IN_SOURCE</code>, a warning about the capture.</td></tr>
+          <tr><td>"Regenerated wholesale" and "absent from a whole subtree" were listed as per-block rules; neither is one</td><td>Document-level signals computed once, and ancestor grouping for regions.</td></tr>
+          <tr><td>Causes stated as fact, with no way to express doubt</td><td>Confidence and evidence on every finding, including the evidence that argues against it.</td></tr>
+          <tr><td>Serialisation noise — entity re-encoding, whitespace, attribute order — would fill the report with false findings</td><td>Normalisation, pinned by the clean fixture.</td></tr>
+          <tr><td>The identifier attribute was assumed to be present and to be <code>data-chunk-id</code></td><td>Configurable, with <code>NO_IDS_IN_SOURCE</code> naming any alternative found.</td></tr>
+          <tr><td>Nothing lets an existing project adopt the check without fixing everything first</td><td>Baselines, with accepted findings still printed.</td></tr>
+          <tr><td>No way to obtain the two HTML strings, and capturing from the wrong place gives a clean report on a broken pipeline</td><td><code>chunk-guard capture</code>, plus <code>docs/CAPTURE.md</code> naming the two ways to capture wrongly.</td></tr>
+          <tr><td>A pipeline check that only prints to a log is half a check</td><td>GitHub annotations with file, line, column; deterministic JSON.</td></tr>
+          <tr><td>The plan assumed a standard-library HTML parser, in a language whose consumers do not use it</td><td>JavaScript, with a hand-written parser; identical answers on Node and in a browser.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </article>
+
+  <!-- ===================== 06 ===================== -->
+  <article class="prob floor" id="test">
+    <div class="prob-head">
+      <div class="prob-idx">06 · manual test runbook</div>
+      <h2>Twelve minutes, from a clean clone</h2>
+      <p class="lede">Every command below was run against the shipped build; the expected output is what it actually printed. Nothing here needs an API key, an account or a network connection.</p>
+      <div class="meta">
+        <div><dt>Requires</dt><dd>Node 18 or newer</dd></div>
+        <div><dt>Install step</dt><dd>None</dd></div>
+        <div><dt>Network</dt><dd>Not used</dd></div>
+        <div><dt>Working directory</dt><dd><code>block-identity-guard/</code></dd></div>
+      </div>
+    </div>
+    <div class="prob-body">
+
+      <h3 class="grp">Step 1 · the test suite</h3>
+      <p class="plain">No <code>npm install</code>: there are no dependencies to install.</p>
+<pre class="sh">$ <b>cd block-identity-guard</b>
+$ <b>npm test</b>
+
+<u># tests 95</u>
+<u># pass 95</u>
+<u># fail 0</u></pre>
+      <p class="plain">Ninety-five tests across the parser, the analysis, the rule outputs, the CLI's exit codes, the capture shapes, baselines, and the eleven pinned fixture reports.</p>
+
+      <h3 class="grp">Step 2 · a clean round trip, and a broken one</h3>
+<pre class="sh">$ <b>node src/cli.js check fixtures/01-clean-round-trip/before.html \
+                        fixtures/01-clean-round-trip/after.html</b>
+
+block identity check  data-chunk-id
+9 identified block(s) in, 9 out  ·  intact 9  lost 0  duplicated 0  moved 0  new 0
+
+<u>clean: every identifier survived the round trip, in order, with its attributes.</u>
+
+$ <b>echo $?</b>
+<u>0</u></pre>
+      <p class="plain">The two files differ in attribute order, whitespace and entity encoding. None of that is a finding, which is the point.</p>
+<pre class="sh">$ <b>node src/cli.js check fixtures/02-attribute-allowlist/before.html \
+                        fixtures/02-attribute-allowlist/after.html</b>
+
+<em>LOST</em>      LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000004
+           where p · block 4 of the before document · line 4
+           text  "The Supplier shall indemnify the Customer against all losses…"
+           at    div &gt; p[1]
+           cause the tag and text are unchanged and the node kept class but no data
+                 attributes, which is what a sanitiser or editor schema with an
+                 attribute allowlist does: known attributes through, unknown
+                 attributes dropped
+           after p at line 4 (class)
+           ·     nearest surviving ancestor c1a0e0a4-0000-4000-8000-000000000001
+           confidence high
+
+1 error(s)
+
+$ <b>echo $?</b>
+<em>1</em></pre>
+
+      <h3 class="grp">Step 3 · the whole fixture matrix</h3>
+      <p class="plain">Run all eleven and check the exit codes against this table.</p>
+<pre class="sh">$ <b>for d in fixtures/*/; do
+    node src/cli.js check "$d/before.html" "$d/after.html" --quiet --no-color &gt;/dev/null
+    code=$?
+    echo "$(basename "$d") exit=$code"
+  done</b>
+
+01-clean-round-trip <u>exit=0</u>          06-ids-regenerated <em>exit=1</em>
+02-attribute-allowlist <em>exit=1</em>       07-legal-reorder <u>exit=0</u>
+03-duplicate-id <em>exit=1</em>              08-subtree-loss <em>exit=1</em>
+04-serialiser-rebuild <em>exit=1</em>        09-out-of-flow-parts <u>exit=0</u>
+05-markdown-hop <em>exit=1</em>              10-diagram-attribute-dropped <em>exit=1</em>
+                                   11-block-removed <em>exit=1</em></pre>
+      <p class="plain">Two shell details worth copying rather than improvising: read <code>$?</code> into a variable <em>before</em> the <code>echo</code>, because a command substitution inside the echo overwrites it; and never take the exit code from the end of a pipeline, which reports the last command's status, not the check's.</p>
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:30%">Fixture</th><th style="width:34%">Expected finding</th><th style="width:10%">Exit</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td>01-clean-round-trip</td><td>none</td><td><span class="sev s-ok">0</span></td><td>Serialisation noise only</td></tr>
+          <tr><td>02-attribute-allowlist</td><td><code>LOST_ATTRIBUTE_STRIPPED</code></td><td><span class="sev s-err">1</span></td><td>A sanitiser kept <code>class</code>, dropped the identifier</td></tr>
+          <tr><td>03-duplicate-id</td><td><code>DUPLICATE_ID</code></td><td><span class="sev s-err">1</span></td><td>A split block took its identifier with it</td></tr>
+          <tr><td>04-serialiser-rebuild</td><td><code>LOST_NODE_REBUILT</code></td><td><span class="sev s-err">1</span></td><td><code>h2</code> came back as a styled <code>div</code></td></tr>
+          <tr><td>05-markdown-hop</td><td><code>LOST_SUBTREE</code> (7 members, mixed rules)</td><td><span class="sev s-err">1</span></td><td>A section round-tripped through markdown; the table became a list</td></tr>
+          <tr><td>06-ids-regenerated</td><td><code>IDS_REGENERATED</code></td><td><span class="sev s-err">1</span></td><td>The editor minted its own identifiers, in the same shape</td></tr>
+          <tr><td>07-legal-reorder</td><td><code>BLOCK_MOVED</code></td><td><span class="sev s-ok">0</span></td><td>Two clauses swapped; identity intact</td></tr>
+          <tr><td>08-subtree-loss</td><td><code>LOST_SUBTREE</code> (6 members)</td><td><span class="sev s-err">1</span></td><td>Table kept its identifier, every cell lost one</td></tr>
+          <tr><td>09-out-of-flow-parts</td><td><code>PART_OMITTED</code> ×3</td><td><span class="sev s-ok">0</span></td><td>Header, footnote and footer not rendered by the editor</td></tr>
+          <tr><td>10-diagram-attribute-dropped</td><td><code>DATA_ATTRIBUTE_DROPPED</code> ×2</td><td><span class="sev s-err">1</span></td><td>Identifier survived; diagram source and citation did not</td></tr>
+          <tr><td>11-block-removed</td><td><code>LOST_BLOCK_REMOVED</code></td><td><span class="sev s-err">1</span></td><td>A clause deleted outright</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="grp">Step 4 · the two that should not fail, and why</h3>
+      <p class="plain">These are the ones worth reading closely — they are what separates this from a set difference.</p>
+<pre class="sh">$ <b>node src/cli.js check fixtures/07-legal-reorder/{before,after}.html</b>
+9 identified block(s) in, 9 out · intact 9 lost 0 duplicated 0 <u>moved 1</u> new 0
+
+<i>MOVED</i>     BLOCK_MOVED · id c1a0e0a4-0000-4000-8000-000000000004
+           cause identity intact, position 4 to 5 relative to the blocks that did
+                 not move: a reorder, not a loss
+1 note(s)
+$ <b>echo $?</b>   <u>0</u>
+
+$ <b>node src/cli.js check fixtures/09-out-of-flow-parts/{before,after}.html</b>
+6 identified block(s) in, 3 out · intact 3 lost 0 … <u>parts omitted 3</u>
+3 note(s)
+$ <b>echo $?</b>   <u>0</u>
+
+$ <b>node src/cli.js check fixtures/09-out-of-flow-parts/{before,after}.html --strict-parts</b>
+3 error(s)
+$ <b>echo $?</b>   <em>1</em></pre>
+      <div class="good">
+        <b>What to look for</b>
+        <p>A reorder exits 0 and is still reported. An omitted footer exits 0 and is still reported. Both become failures only when you say they should. If either of these ever exits 1 by default, the tool has regressed into the thing it replaces.</p>
+      </div>
+
+      <h3 class="grp">Step 5 · break something yourself</h3>
+      <p class="plain">The fixtures are hand-written, so make your own case and confirm the diagnosis matches what you did.</p>
+<pre class="sh"><i># strip one identifier the way a sanitiser would</i>
+$ <b>sed 's/ data-chunk-id="c1a0e0a4-0000-4000-8000-000000000005"//' \
+      fixtures/01-clean-round-trip/before.html &gt; /tmp/after.html</b>
+$ <b>node src/cli.js check fixtures/01-clean-round-trip/before.html /tmp/after.html</b>
+<em>→ LOST_ATTRIBUTE_STRIPPED, block 5, confidence high</em>
+
+<i># now delete the block instead</i>
+$ <b>grep -v "capped at the fees" fixtures/01-clean-round-trip/before.html &gt; /tmp/after.html</b>
+$ <b>node src/cli.js check fixtures/01-clean-round-trip/before.html /tmp/after.html</b>
+<em>→ LOST_BLOCK_REMOVED — a different cause for a different act</em>
+
+<i># rename every tag: a document model rebuild</i>
+$ <b>sed 's/&lt;p /&lt;div /g; s/&lt;\/p&gt;/&lt;\/div&gt;/g' fixtures/01-clean-round-trip/before.html &gt; /tmp/after.html</b>
+$ <b>node src/cli.js check fixtures/01-clean-round-trip/before.html /tmp/after.html</b>
+<i>→ identifiers survive the rename, so this one is clean: the tags changed,
+   the identity did not, and identity is what the tool is about</i></pre>
+
+      <h3 class="grp">Step 6 · the machine outputs</h3>
+<pre class="sh">$ <b>node src/cli.js check fixtures/02-attribute-allowlist/{before,after}.html --format json | head -12</b>
+{
+  "schemaVersion": 1,
+  "idAttribute": "data-chunk-id",
+  "ok": false,
+  "counts": { "beforeBlocks": 9, "afterBlocks": 8, "intact": 8, "lost": 1, … }
+
+$ <b>node src/cli.js check fixtures/02-attribute-allowlist/{before,after}.html \
+       --format github --file fixtures/02-attribute-allowlist/before.html</b>
+::error file=fixtures/02-attribute-allowlist/before.html,line=4,col=3,\
+title=LOST_ATTRIBUTE_STRIPPED (c1a0e0a4-…-0004)::the tag and text are unchanged…</pre>
+      <p class="plain">Run the JSON twice and diff it: the output is byte-identical, because it carries no timestamps, no absolute paths and no hash-table ordering.</p>
+
+      <h3 class="grp">Step 7 · the baseline flow</h3>
+<pre class="sh">$ <b>node src/cli.js check fixtures/02-attribute-allowlist/{before,after}.html \
+       --baseline /tmp/base.json --update-baseline</b>
+<u>wrote 1 accepted finding(s) to /tmp/base.json</u>          <u>exit 0</u>
+
+$ <b>node src/cli.js check fixtures/02-attribute-allowlist/{before,after}.html \
+       --baseline /tmp/base.json</b>
+baseline: 1 accepted, 1 still present here, 0 stale
+
+<i>BASELINED</i> LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-…-0004
+           … the full finding, unchanged …
+
+<u>no new findings. 1 accepted by the baseline.</u>          <u>exit 0</u></pre>
+      <p class="plain">Then open <code>/tmp/base.json</code>: each entry carries the rule, the identifier, the structural path and the text, so a reviewer reading the diff can see what is being accepted rather than a bare hash. Delete the entry and the check fails again.</p>
+      <div class="tip">
+        <b>The bug this page found</b>
+        <p>Writing this runbook is what caught it: the first version of the baseline path printed <em>"clean: every identifier survived the round trip"</em> over a document that had demonstrably lost one. A baseline is allowed to take a finding out of the exit code and never out of the report. Fixed, and pinned by a test that fails if the word "clean" ever appears over a baselined finding.</p>
+      </div>
+
+      <h3 class="grp">Step 8 · capture, the way you would in a real session</h3>
+<pre class="sh">$ <b>cat &gt; /tmp/stream.log &lt;&lt;'EOF'
+event: intermediate
+data: {"type":"intermediate","status":"reading the document"}
+
+event: document_sync
+data: {"type":"document_sync","content":"&lt;h1 data-chunk-id=\"h-1\"&gt;Master Services Agreement&lt;/h1&gt;&lt;p data-chunk-id=\"p-1\" class=\"lead\"&gt;The Supplier shall indemnify the Customer.&lt;/p&gt;","focused_document_id":"d1"}
+
+event: final
+data: {"type":"final","updated_html":"&lt;h1 data-chunk-id=\"h-1\"&gt;Master Services Agreement&lt;/h1&gt;"}
+EOF</b>
+
+$ <b>node src/cli.js capture /tmp/stream.log --out /tmp/before.html</b>
+<u>wrote 136 characters from document_sync (document d1) to /tmp/before.html</u>
+
+$ <b>sed 's/ data-chunk-id="p-1"//' /tmp/before.html &gt; /tmp/after.html</b>
+$ <b>node src/cli.js check /tmp/before.html /tmp/after.html</b>
+<em>LOST_ATTRIBUTE_STRIPPED · id p-1 · confidence high</em>          <em>exit 1</em></pre>
+      <p class="plain">Note what capture did not do: it read the <code>document_sync</code> event and ignored the <code>final</code> event, which also carries HTML. <code>final</code> is the after side of the previous turn, not the before side of this one. Ask for it explicitly with <code>--event final</code>.</p>
+
+      <h3 class="grp">Step 9 · the failure paths</h3>
+<pre class="sh">$ <b>node src/cli.js check nope.html also-nope.html</b>
+could not read nope.html: ENOENT: no such file or directory        <em>exit 2</em>
+
+$ <b>echo "no events here" &gt; /tmp/junk.log &amp;&amp; node src/cli.js capture /tmp/junk.log</b>
+no document_sync HTML found in the payload…                        <em>exit 2</em>
+
+$ <b>node src/cli.js check fixtures/01-clean-round-trip/{before,after}.html --format yaml</b>
+unknown format: yaml                                               <em>exit 2</em></pre>
+      <div class="warn">
+        <b>Why exit 2 matters as much as exit 1</b>
+        <p>A pipeline that treats every non-zero as "the check failed" is fine. A pipeline that treats a crashed check as a pass is not. Everything that prevents the check from running exits 2 and says why on stderr, so the two cases are always distinguishable.</p>
+      </div>
+
+      <h3 class="grp">Step 10 · the editor assertion, the way you would actually adopt this</h3>
+<pre class="sh">$ <b>node --test examples/editor-roundtrip.test.js</b>
+<u># tests 11</u>
+<u># pass 11</u></pre>
+      <p class="plain">That file is the template to copy into your editor's own suite: replace <code>roundTripThroughEditor</code> with your <code>setHtml</code>/<code>getHtml</code> pair and it runs the check against headings, paragraphs, lists, list items, blockquotes, code blocks, horizontal rules, tables, diagrams and out-of-flow parts. A gap in any single block type is what shows up in production as occasional silent edit failures.</p>
+
+      <h3 class="grp">Step 11 · scale</h3>
+<pre class="sh">$ <b>node -e '
+const {checkRoundTrip} = await import("./src/index.js");
+let before = "&lt;div data-chunk-id=\"root\"&gt;";
+for (let i = 0; i &lt; 5000; i++) before += `&lt;p data-chunk-id="id-${i}" class="c"&gt;Clause ${i}.&lt;/p&gt;`;
+before += "&lt;/div&gt;";
+const after = before.replace(/ data-chunk-id="id-(1|2|3|4|5)"/g, "");
+const t = Date.now(); const r = checkRoundTrip(before, after);
+console.log(r.counts.beforeBlocks, "blocks,", r.findings.length, "finding,", Date.now()-t, "ms");
+' --input-type=module</b>
+
+<u>5001 blocks, 1 finding, ~300 ms</u></pre>
+      <p class="plain">Five thousand blocks, five losses, one grouped finding that still names all five. The pathological case — every block edited <em>as well as</em> stripped, forcing the similarity fallback on every one — is roughly 0.75 s at 3,000 blocks.</p>
+
+      <h3 class="grp">Step 12 · confirm the fixtures are the specification</h3>
+<pre class="sh"><i># inside the git checkout (extensions/Priyanshu2425/block-identity-guard):</i>
+$ <b>npm run fixtures:update &amp;&amp; git status --short</b>
+<u>updated 01-clean-round-trip/expected.txt … (11 files)</u>
+<i>nothing listed — the committed reports are exactly what the code produces</i>
+
+<i># anywhere else, without git:</i>
+$ <b>cp -r fixtures /tmp/fixtures-before &amp;&amp; npm run fixtures:update &gt;/dev/null \
+    &amp;&amp; diff -rq /tmp/fixtures-before fixtures &amp;&amp; echo "unchanged"</b>
+<u>unchanged</u></pre>
+      <p class="plain">A non-empty diff here means a report changed. That is the signal to read the diff sentence by sentence: this is the check that stops the output drifting back towards <code>3 blocks lost identity</code>.</p>
+
+    </div>
+  </article>
+
+  <!-- ===================== 07 ===================== -->
+  <article class="prob" id="git">
+    <div class="prob-head">
+      <div class="prob-idx">07 · submission</div>
+      <h2>Where it goes on git</h2>
+      <p class="lede">From the round brief and the repository's own <code>CONTRIBUTING.md</code>: one builder, one folder, one pull request.</p>
+    </div>
+    <div class="prob-body">
+      <div class="scroll">
+      <table class="grid">
+        <thead><tr><th style="width:22%">Field</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Repository</td><td><code>superdocsapp/superdocs-builds</code>, public</td></tr>
+          <tr><td>Fork</td><td><code>github.com/Priyanshu2425/superdocs-builds</code> — <code>origin</code>; <code>upstream</code> is superdocsapp</td></tr>
+          <tr><td>Section</td><td><code>extensions/</code> — the card routes here, and a package plus a pipeline check is developer tooling, not an end-user app</td></tr>
+          <tr><td>Path</td><td><code>extensions/Priyanshu2425/block-identity-guard/</code></td></tr>
+          <tr><td>Branch</td><td><code>priyanshu-semwal-builds</code> — already carrying the round's two assigned builds; committed as <code>25376cc</code>, not pushed</td></tr>
+          <tr><td>Pull request</td><td>One, covering the whole round, which <code>CONTRIBUTING.md</code> explicitly allows. Name in the description, no email address — the repository is public</td></tr>
+          <tr><td>Licence</td><td>MIT, per-project <code>LICENSE</code>, matching the two builds already in the fork</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3 class="grp">Where it deliberately does not go</h3>
+      <ol class="reqs">
+        <li><b>Not the private <code>doctask-&lt;name&gt;</code> repository</b><span>That one is the document-analysis system for Problem 01: private for fairness, and deliberately carrying no SuperDocs branding. This build is public, is built on the SuperDocs surface, and belongs in the public repository.</span></li>
+        <li><b>Not <code>use-cases/</code></b><span>That folder is for apps and end-to-end use cases. This has no user interface and its user is another developer.</span></li>
+        <li><b>Nothing outside the project folder is modified</b><span>The repository's own rule, and the reason the diff is 65 files in one directory.</span></li>
+      </ol>
+
+      <h3 class="grp">Pre-flight, all confirmed</h3>
+      <ul class="tight">
+        <li><b>No secrets, anywhere, including history.</b> <span>The only key referenced is the placeholder <code>SUPERDOCS_API_KEY</code> in <code>docs/CAPTURE.md</code>.</span></li>
+        <li><b>No real documents.</b> <span>Every fixture is synthetic contract text written for this build.</span></li>
+        <li><b>Runs from a clean clone with no install.</b> <span><code>npm test</code>, 95 tests, no dependencies.</span></li>
+        <li><b>README, LICENSE and docs inside the project folder.</b> <span>What it does, how to run it, which SuperDocs surfaces it touches.</span></li>
+        <li><b>Extra credit, not a replacement.</b> <span>A third card from the shared open task list; it adds to the two assigned builds and replaces neither.</span></li>
+      </ul>
+    </div>
+  </article>
+
+  <!-- ===================== 08 ===================== -->
+  <article class="prob" id="limits">
+    <div class="prob-head">
+      <div class="prob-idx">08 · limits</div>
+      <h2>What it does not do</h2>
+      <p class="lede">Stated plainly, because a diagnostic tool that overstates its reach causes the same class of harm it was built to prevent.</p>
+    </div>
+    <div class="prob-body">
+      <div class="moves">
+        <div class="move">
+          <h4>It does not talk to SuperDocs</h4>
+          <p>No API key, no network, no account. The input is two strings, and <code>capture</code> reads what you recorded rather than holding a connection open.</p>
+        </div>
+        <div class="move">
+          <h4>It does not fix anything</h4>
+          <p>It names the transformation. The fix lives in your editor schema, your sanitiser allowlist, or whichever component rebuilds nodes.</p>
+        </div>
+        <div class="move">
+          <h4>It does not name the library</h4>
+          <p>"An attribute allowlist", not "DOMPurify with the default config". Signature detection for named libraries was left out rather than guessed at.</p>
+        </div>
+        <div class="move">
+          <h4>Empty cells have no identity</h4>
+          <p>Table cells and nested lists get a structural path, a line and an ancestor, which beats a position index — but an unlabelled empty cell cannot be matched by content, and the report drops to low confidence rather than guessing.</p>
+        </div>
+        <div class="move">
+          <h4>One document at a time</h4>
+          <p><code>capture --document-id</code> picks the right tree out of a multi-document session; the check itself compares a single pair.</p>
+        </div>
+        <div class="move">
+          <h4>Not a spec-compliant parser</h4>
+          <p>It handles what document HTML and editor serialisers emit. Hand it a deliberately adversarial HTML5 conformance case and it will disagree with a browser.</p>
+        </div>
+      </div>
+
+      <div class="tip">
+        <b>The one number worth watching</b>
+        <p>Not the count of findings — the count of <em>rules that fired</em>. A pipeline losing identity in one way is a configuration fix. A pipeline losing it in four different ways is an architecture problem, and the grouped report is designed to make that visible in one screen.</p>
+      </div>
+    </div>
+  </article>
+
+  </main>
+</div>
+
+<footer class="foot">
+  block identity guard · 15 rules · 11 fixtures · 95 tests · zero dependencies · MIT · Priyanshu Semwal
+</footer>
+
+<script>
+document.getElementById('btn-print').addEventListener('click',function(){window.print()});
+var links=[].slice.call(document.querySelectorAll('nav.rail a'));
+var obs=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+e.target.id)})}})},{rootMargin:'-10% 0px -80% 0px'});
+[].slice.call(document.querySelectorAll('article.prob')).forEach(function(s){obs.observe(s)});
+</script>
+</body>
+</html>

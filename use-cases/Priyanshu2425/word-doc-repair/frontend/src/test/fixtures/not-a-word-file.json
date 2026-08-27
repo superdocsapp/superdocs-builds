@@ -1,0 +1,38 @@
+{
+  "name": "not-a-word-file",
+  "filename": "06-not-a-word-file.docx",
+  "events": [
+    {
+      "stage": "Scanning Headers",
+      "message": "Reading the parts out of the file…"
+    },
+    {
+      "stage": "Reading Body",
+      "message": "No document body could be found."
+    }
+  ],
+  "report": {
+    "ok": false,
+    "verdict": "refused",
+    "word_count": 0,
+    "method": "empty",
+    "asides_text": "",
+    "output_path": "",
+    "lost": [
+      "no readable parts could be found inside the file",
+      "the main document part was not found inside the file, so there is no text to recover"
+    ],
+    "preview_html": "",
+    "structure_preserved": false,
+    "images_recovered": 0,
+    "images_unplaced": 0,
+    "images_lost": [],
+    "tables_recovered": 0,
+    "download": null,
+    "style": null,
+    "styled": false,
+    "styling_note": "",
+    "styling_rejected": false,
+    "plain_download": null
+  }
+}

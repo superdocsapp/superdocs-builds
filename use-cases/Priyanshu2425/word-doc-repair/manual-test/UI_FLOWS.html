@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Salvage — UI Flows</title>
+<style>
+  :root {
+    --stock: #e9ebe6; --sheet: #fcfcfa;
+    --ink: #14171a; --ink-2: #494f55; --ink-3: #7b8188;
+    --post-blue: #173f8a; --post-red: #c2222c; --kept: #16603c;
+    --rule: #d2d5cf; --rule-firm: #b3b7b0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --stock: #14161a; --sheet: #1b1e23;
+      --ink: #eceee9; --ink-2: #b3b8be; --ink-3: #878d95;
+      --post-blue: #7ea2e8; --post-red: #ef7178; --kept: #67c397;
+      --rule: #2b3038; --rule-firm: #3c424c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 20px 80px; background: var(--stock); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 26px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-2); margin: 0; max-width: 70ch; }
+  .meta {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+    color: var(--ink-3); margin-top: 12px; display: flex; gap: 22px; flex-wrap: wrap;
+  }
+  h2 {
+    font-size: 21px; margin: 44px 0 4px; padding-top: 16px;
+    border-top: 1px solid var(--rule-firm);
+  }
+  h2 .n { color: var(--post-blue); font-family: ui-monospace, Menlo, monospace; font-size: 15px; }
+  .goal { color: var(--ink-2); margin: 0 0 18px; max-width: 74ch; font-size: 15px; }
+  .step {
+    background: var(--sheet); border: 1px solid var(--rule); border-left: 3px solid var(--post-blue);
+    padding: 13px 16px; margin: 0 0 10px;
+  }
+  .step h3 {
+    margin: 0 0 6px; font-size: 14px; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 700;
+  }
+  .step p { margin: 0 0 7px; font-size: 15px; color: var(--ink); }
+  .step p:last-child { margin-bottom: 0; }
+  .step .see { color: var(--ink-2); }
+  .step .see b { color: var(--ink); font-weight: 640; }
+  .step--stop { border-left-color: var(--post-red); }
+  .step--end { border-left-color: var(--kept); }
+  .screen {
+    background: var(--stock); border: 1px dashed var(--rule-firm); padding: 12px 14px;
+    margin: 9px 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px; line-height: 1.65; white-space: pre; overflow-x: auto; color: var(--ink-2);
+  }
+  .rule { font-size: 14.5px; color: var(--ink-2); margin: 6px 0 0; padding-left: 15px; border-left: 2px solid var(--rule-firm); }
+  .rule b { color: var(--ink); }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; min-width: 620px; background: var(--sheet); font-size: 14.5px; margin-top: 8px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 11px; border-bottom: 1px solid var(--rule); }
+  th { background: var(--stock); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+  footer { margin-top: 46px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Salvage — UI Flows</h1>
+  <p class="sub">Every path a person can take through the page, in the order they take it, with the
+  thing to check at each step. The screen sketches are transcribed from the component source and from
+  the engine's real output — every stage line, count, docket and message below was taken from an
+  actual run, not written to look plausible. What they are <em>not</em> is a screenshot: nobody
+  loaded this page in a browser as part of writing them, which is exactly why this document exists
+  as a walkthrough for a person to do. The API-level evidence is in
+  <code>MANUAL_QA_PLAN.html</code> beside this file.</p>
+  <div class="meta">
+    <span>build · word-doc-repair (assigned build B)</span>
+    <span>written · 2026-08-20</span>
+    <span>page · React, one committed bundle, no Node needed to run it</span>
+  </div>
+</header>
+
+<h2><span class="n">1</span> &nbsp;Arrive</h2>
+<p class="goal">Somebody whose only copy will not open lands here, probably frightened, probably from
+a search. The first screen has to answer <em>can you help me</em> and <em>will you make it worse</em>
+before it asks for anything.</p>
+
+<div class="step">
+  <h3>Step 1 · open the page</h3>
+  <p class="see">In the first viewport, without scrolling: the wordmark, one sentence saying what
+  this is, the panel that takes the file, and the four custody promises beneath it.</p>
+  <div class="screen">  Salvage.   document recovery
+  ┌─ ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨ ─┐
+    Your Word file will not open.
+    Hand it over and this page will read whatever is
+    still intact inside it, rebuild what it can, and
+    tell you plainly what it could not.
+
+    ┌──────────────────────────────────┐
+    │   Choose the damaged file        │
+    │   or drag it onto this panel     │
+    │   Word .docx · up to 20 MB       │
+    └──────────────────────────────────┘
+
+    ✓ Your original is never changed.
+    ✓ Your file is not kept.
+    ✓ No account, and nothing to install.
+    ✓ It is a best-effort recovery.
+  └─ ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨ ─┘</div>
+  <p class="rule"><b>Check.</b> No hero, no feature cards, no pricing. The fourth promise says
+  best-effort <em>before</em> anything is uploaded, not after.</p>
+</div>
+
+<div class="step step--stop">
+  <h3>Step 1a · hand it something it will not take</h3>
+  <p class="see">A <code>.doc</code>, a 25 MB file, or an empty one. Refused <b>before anything is
+  sent</b>, under the heading <b>That file was not taken.</b></p>
+  <p class="rule"><b>Check.</b> The <code>.doc</code> message tells you to re-save it in Word
+  <em>and</em> says what to do if Word will not open it either — which is the situation you are
+  actually in. Advice that assumes your Word works is advice for somebody else.</p>
+</div>
+
+<h2><span class="n">2</span> &nbsp;Watch it work</h2>
+<p class="goal">The stages are streamed from the engine as they happen. The one thing this screen may
+never do is animate a bar over work that already finished.</p>
+
+<div class="step">
+  <h3>Step 2 · the file is taken</h3>
+  <p class="see">The upload panel is replaced by a record line and a list of stations that grows one
+  line at a time.</p>
+  <div class="screen">  Reading your document
+  file 01-truncated-download.docx   size 4 KB   docket SLV-71981
+
+  ● Opening the file…
+  ● The file's internal index was damaged…
+  ● Found 4 sections inside the document.
+  ● Checking the document body for damage…
+  ○ Reading headings, paragraphs and tables…
+
+  Working ▓▓▓▓▓▓▓░░░░░░░░</div>
+  <p class="rule"><b>Check.</b> Lines appear one after another, not all at once at the end. The
+  record line carries a docket — a receipt, so the page has a name for what it is holding.</p>
+  <p class="rule"><b>Check.</b> A screen reader hears the latest stage: there is a polite live region
+  carrying it.</p>
+</div>
+
+<h2><span class="n">3</span> &nbsp;Read the verdict</h2>
+<p class="goal">Three outcomes, and they must not look alike. The stamp lands once; the working folds
+away behind a disclosure, because the answer outranks the working.</p>
+
+<div class="scroll">
+<table>
+<thead><tr><th>Outcome</th><th>Stamp</th><th>What is on screen</th><th>Try it with</th></tr></thead>
+<tbody>
+<tr><td><b>Everything read</b></td><td>Recovered</td>
+    <td>What came through · the sheet · download · the styling offer</td>
+    <td><code>00-healthy.docx</code>, and also <code>01-truncated-download.docx</code> — a badly
+        damaged container whose content came back whole, which is the point of the build</td></tr>
+<tr><td><b>Read, with losses</b></td><td>Recovered in part</td>
+    <td>Both lists, set at the same weight · the sheet · download · the styling offer</td>
+    <td><code>03-unclosed-tags.docx</code> — the run-by-run fallback, which loses the structure and says so</td></tr>
+<tr><td><b>Could not be read</b></td><td>Could not be repaired</td>
+    <td>What went wrong. <b>No</b> “what came through”, <b>no</b> sheet, <b>no</b> download,
+        <b>no</b> styling offer</td>
+    <td><code>05-missing-document-part.docx</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="step">
+  <h3>Step 3 · the report</h3>
+  <div class="screen">  Your document, as far as it could be read
+  file 01-truncated-download.docx   size 4 KB   docket SLV-71981
+
+   ╭──────────────────────╮
+   │     RECOVERED        │      ← lands once, small rotation
+   ╰──────────────────────╯
+
+  Recovered what could be read and rebuilt it as a valid
+  Word file. This is a best-effort recovery, not a complete
+  repair.
+
+  What came through
+   ✓ read your content out of a file whose internal index
+     was damaged — the damage Word refuses to open
+   ✓ kept 2 headings, 2 paragraphs and 1 table, with their
+     structure intact
+
+  (no "what did not come through" section: on this file
+   there were no losses, and a heading with nothing under
+   it is a claim)
+
+  ┌ the rebuilt document, rendered for reading ──────────┐
+  │  Quarterly Report                                    │
+  │  Revenue rose in Q3 — driven by renewals & upsell.   │
+  │  Regional breakdown                                  │
+  │  ┌────────┬──────────┐                               │
+  │  │ Region │ Revenue  │  …                            │
+  └──────────────────────────────────────────────────────┘
+
+  ┌─ ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨ ─┐
+    [ Download the repaired file ]
+    Saved as …-repaired.docx. You can download it more than
+    once. This page holds it for about thirty minutes…
+  └─ ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨ ─┘
+
+  ▸ What it did, step by step (10)</div>
+  <p class="rule"><b>Check.</b> On a file that <em>did</em> lose something — try
+  <code>03-unclosed-tags.docx</code> — losses are set at the same weight as recoveries. Styling
+  losses as a footnote would be the overclaim this build refuses, expressed in CSS.</p>
+  <p class="rule"><b>Check.</b> The rebuilt document is <em>on the page</em>, above the download.
+  “Was any of this worth it” is a question people ask before they act, not after.</p>
+  <p class="rule"><b>Check.</b> The stage log is behind a disclosure, still complete, still readable.</p>
+</div>
+
+<div class="step step--stop">
+  <h3>Step 3a · the total failure</h3>
+  <p class="see">Stamp reads <b>Could not be repaired</b>. There is no “what came through” heading at
+  all, no preview, and no download button.</p>
+  <p class="rule"><b>Check.</b> This was a real defect once (BUG-012): a failure that still rendered
+  the heading. A heading with nothing under it is a claim.</p>
+</div>
+
+<h2><span class="n">4</span> &nbsp;The styling pass — the SuperDocs path</h2>
+<p class="goal">The card this build answers is banded <em>API + export</em>, and the brief defines a
+strong result as a valid, <em>styled</em> file. So the pass is not an offer beside the recovery — it
+is part of it. The design question stopped being “how do we offer a second file without risking the
+first” and became “how do we hand over the better file without ever losing the other one”.</p>
+
+<p class="rule"><b>Changed 2026-08-26.</b> There used to be a panel here headed <em>“A styled copy,
+if you want one”</em> with a <em>Send it for styling</em> button, and a <code>GET
+/api/capabilities</code> probe deciding whether to draw it. Both are gone. Styling runs inside the
+recovery, so there is nothing left to ask — only something to report. See BUG-097.</p>
+
+<div class="step">
+  <h3>Step 4 · it just happens, on the same progress stream</h3>
+  <div class="screen">  ● Reading the parts out of the file…
+  ● Checking the document body for damage…
+  ● Looking for pictures…
+  ● Rebuilding a clean Word file…
+  ● Sending the recovered document to SuperDocs…
+  ● Restoring heading styles, tables and spacing…
+  ● Exporting the styled file…
+  ● Styled file ready.</div>
+  <p class="rule"><b>Check.</b> The local stages and the remote ones are one list, in order, pushed as
+  each happens. A person watching this is watching one recovery — not a recovery followed by a
+  decision nobody told them they had to make.</p>
+  <p class="rule"><b>Check.</b> Trap 2 from the docs, answered in the interface: a long silence is
+  still processing. The line naming the current step is what makes that true for the person rather
+  than only true in the code.</p>
+</div>
+
+<div class="step step--end">
+  <h3>Step 4a · it worked</h3>
+  <div class="screen">  ┌─ ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨ ─┐
+    [ Download the repaired file ]
+    Saved as local_rebuild.docx. You can download it more
+    than once. Your original was never changed.
+
+    Styled through SuperDocs, which changed how your words
+    are set and not what they say.
+    Download the unstyled copy instead
+  └─ ▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨▨ ─┘</div>
+  <p class="rule"><b>Check.</b> <em>One</em> download button, and it is the styled file. That is the
+  file this build promises.</p>
+  <p class="rule"><b>Check.</b> The unstyled rebuild is a link beside it, not a second button and not
+  a second run. Somebody who wants the plain file gets it in one click.</p>
+  <p class="rule"><b>Check.</b> “changed how your words are set and not what they say” — a styled file
+  looks better, and looking better is easy to mistake for having recovered more. It recovers nothing
+  extra, and the sentence has to say so.</p>
+  <p class="rule"><b>Check.</b> The pictures are in <em>both</em> files. The pass used to send HTML
+  with the images stripped out of it, so every styled file came back with none (BUG-094). It sends
+  the rebuilt <code>.docx</code> now, and the guard behind the call refuses anything that returns
+  with fewer.</p>
+</div>
+
+<div class="step">
+  <h3>Step 4b · with no key configured</h3>
+  <p class="see">The recovery runs to the end and the handover reads: <b>“This copy of the page has no
+  SuperDocs key set, so the file below is the plain rebuild. It is complete and it is yours; it just
+  has not been through the styling pass.”</b></p>
+  <p class="rule"><b>Check.</b> Nothing was sent and nothing failed. The sentence says what is
+  <em>not</em> affected, because a person reading about a missing feature needs to know their file is
+  not the thing that went wrong.</p>
+  <p class="rule"><b>Check.</b> No button appears and then fails. There is no button.</p>
+</div>
+
+<div class="step step--stop">
+  <h3>Step 4d · it came back rewritten</h3>
+  <div class="screen">  Thrown away. The styled version came back with the wording
+  changed, so it was thrown away rather than handed over.
+  Your document should say what you wrote. The rebuilt file
+  is unchanged and still yours.</div>
+  <p class="rule"><b>Check.</b> No styled download is offered. The plain one is still there.</p>
+  <p class="rule"><b>Why this exists.</b> On the first live run the styled file came back with three
+  invented paragraphs, a subtotal row, a disclaimer and a signature block. It opened cleanly and read
+  better than the plain rebuild — which is exactly why it is the worst thing this product could hand
+  somebody. The wording is <b>Thrown away</b>, not <b>Failed</b>, because nothing failed: a claim was
+  refused.</p>
+</div>
+
+<div class="step step--stop">
+  <h3>Step 4e · the other ways it can end</h3>
+  <p class="see">Each ends with the plain file still on the page and one sentence saying why.</p>
+  <div class="screen">  The SuperDocs styling allowance for this month is used up,
+  so nothing was sent and nothing was spent. The file below
+  is the plain rebuild and it is still yours.
+
+  No styled copy. Styling did not work. The rebuilt file
+  above is unchanged and still yours.
+
+  No styled copy. The connection dropped. The rebuilt file
+  above is unchanged and still yours.</div>
+  <p class="rule"><b>Check.</b> The exhausted-allowance case says <em>nothing was spent</em>. The
+  balance is read before the first billable call, so this is a refusal to start rather than a failure
+  halfway through.</p>
+  <p class="rule"><b>Check.</b> No exception class name, no <code>ZIP</code>, no <code>XML</code>
+  anywhere. Guarded over rendered output for every recorded repair — BUG-014 was fixed in the engine
+  and came straight back as BUG-020 in the page.</p>
+</div>
+
+<h2><span class="n">5</span> &nbsp;Leave, and come back</h2>
+<div class="step">
+  <h3>Step 5 · repair another document</h3>
+  <p class="see">The button at the bottom returns the page to its first screen, cleared.</p>
+  <p class="rule"><b>Check.</b> The file input is genuinely reset — choosing the same file again
+  starts a new run rather than doing nothing.</p>
+</div>
+<div class="step">
+  <h3>Step 5a · come back to a stale link</h3>
+  <p class="see">Downloads are held about thirty minutes. After that:
+  <b>“That repaired file is no longer being held. Repair the document again to get a fresh copy —
+  your original was never changed.”</b></p>
+  <p class="rule"><b>Check.</b> The reassurance is in the error, where it is needed, not only on the
+  first screen where it has been forgotten.</p>
+</div>
+
+<h2><span class="n">6</span> &nbsp;Cross-cutting</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>What</th><th>How to check it</th><th>Standing</th></tr></thead>
+<tbody>
+<tr><td>Keyboard only</td><td>Tab through: choose file → download → send for styling → styled download → repair another</td><td>Every control is reachable and shows focus</td></tr>
+<tr><td>Screen reader</td><td>The live region announces the current stage while working and the verdict when done</td><td>Automated axe pass, idle and reporting, no serious or critical violations</td></tr>
+<tr><td>400 px wide</td><td>One column throughout; the verdict and the download reachable without a horizontal thought</td><td>Designed mobile-first</td></tr>
+<tr><td>Dark mode</td><td>The same notice under a desk lamp</td><td>Palette defined for both</td></tr>
+<tr><td>Reduced motion</td><td>The working bar stops animating</td><td><code>prefers-reduced-motion</code> honoured</td></tr>
+<tr><td>No Node installed</td><td>The bundle is committed; a hash guard fails the build if it falls behind its source</td><td><code>bundle-manifest.json</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<footer>
+  Salvage · best-effort DOCX recovery · assigned build B, SuperDocs engineer round · MIT licensed.
+  Screen sketches transcribed from the rendered page on 2026-08-20; evidence for the API-level claims
+  is in <code>MANUAL_QA_PLAN.html</code>.
+</footer>
+
+</div>
+</body>
+</html>

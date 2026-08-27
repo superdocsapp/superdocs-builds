@@ -1,0 +1,47 @@
+{
+  "name": "truncated-illustrated",
+  "filename": "09-truncated-illustrated.docx",
+  "events": [
+    {
+      "stage": "Scanning Headers",
+      "message": "Reading the parts out of the file…"
+    },
+    {
+      "stage": "Repairing XML",
+      "message": "Checking the document body for damage…"
+    },
+    {
+      "stage": "Reading Body",
+      "message": "Looking for pictures…"
+    },
+    {
+      "stage": "Writing File",
+      "message": "Rebuilding a clean Word file…"
+    },
+    {
+      "stage": "Done",
+      "message": "The rebuilt file is ready to download."
+    }
+  ],
+  "report": {
+    "ok": true,
+    "verdict": "full",
+    "word_count": 17,
+    "method": "xml",
+    "asides_text": "Page 1 of 1\nMeasurements taken with a laser rangefinder.\nInspection report — draft",
+    "output_path": "",
+    "lost": [],
+    "preview_html": "<h1>Site inspection</h1>\n<p>The east elevation, photographed on arrival:</p>\n<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAGCAIAAABxZ0isAAAAEUlEQVR4nGM4oaGBFTEMpAQAgPc0gUXKIv0AAAAASUVORK5CYII=\" alt=\"A picture recovered from your document\">\n<p>No further defects were observed.</p>\n<p></p>\n<p>--- RECOVERED ASIDES ---</p>\n<p></p>\n<p>Page 1 of 1\nMeasurements taken with a laser rangefinder.\nInspection report — draft</p>",
+    "structure_preserved": true,
+    "images_recovered": 1,
+    "images_unplaced": 0,
+    "images_lost": [],
+    "tables_recovered": 0,
+    "download": "/api/download/truncated-illustrated-token",
+    "style": "/api/style/truncated-illustrated-token",
+    "styled": false,
+    "styling_note": "",
+    "styling_rejected": false,
+    "plain_download": "/api/download/truncated-illustrated-token"
+  }
+}

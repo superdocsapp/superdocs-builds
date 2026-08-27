@@ -1,0 +1,16 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 9 out  ·  intact 9  lost 0  duplicated 0  moved 1  new 0
+
+MOVED     BLOCK_MOVED · id c1a0e0a4-0000-4000-8000-000000000004
+           where p · block 4 of the before document · line 4
+           text  "The Supplier shall indemnify the Customer against all losses…"
+           at    div > p[1]
+           cause identity intact, position 4 to 5 relative to the blocks that did not move: a
+                 reorder, not a loss
+           after p at line 5 (data-chunk-id class)
+           ·     path div > p[1] to div > p[2]
+           confidence high
+
+1 note(s)
+
+exit code: 0

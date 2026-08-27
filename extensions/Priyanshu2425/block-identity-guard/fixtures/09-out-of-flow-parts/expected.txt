@@ -1,0 +1,39 @@
+block identity check  data-chunk-id
+6 identified block(s) in, 3 out  ·  intact 3  lost 0  duplicated 0  moved 0  new 0  parts omitted 3
+
+PART      PART_OMITTED · id c1a0e0a4-0000-4000-8000-000000000020
+           where p · block 2 of the before document · line 2
+           text  "Confidential - Draft for discussion"
+           at    div > p[1]
+           cause this block is an out-of-flow part (data-part-type="header") and is not in the
+                 after document. Omitting one is normal for an editor with no header/footer
+                 affordance, and never deletes it: the server treats absence as normal, and
+                 deletion needs deleted_part_chunk_ids
+           ·     run with strictParts if your integration is supposed to render and return parts
+           confidence high
+
+PART      PART_OMITTED · id c1a0e0a4-0000-4000-8000-000000000021
+           where p · block 5 of the before document · line 5
+           text  "Clause 3 is set out in Schedule 1."
+           at    div > p[3]
+           cause this block is an out-of-flow part (data-part-type="footnote") and is not in the
+                 after document. Omitting one is normal for an editor with no header/footer
+                 affordance, and never deletes it: the server treats absence as normal, and
+                 deletion needs deleted_part_chunk_ids
+           ·     run with strictParts if your integration is supposed to render and return parts
+           confidence high
+
+PART      PART_OMITTED · id c1a0e0a4-0000-4000-8000-000000000022
+           where p · block 6 of the before document · line 6
+           text  "Page 1 of 12"
+           at    div > p[4]
+           cause this block is an out-of-flow part (data-part-type="footer") and is not in the
+                 after document. Omitting one is normal for an editor with no header/footer
+                 affordance, and never deletes it: the server treats absence as normal, and
+                 deletion needs deleted_part_chunk_ids
+           ·     run with strictParts if your integration is supposed to render and return parts
+           confidence high
+
+3 note(s)
+
+exit code: 0

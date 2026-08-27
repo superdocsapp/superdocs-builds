@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Salvage — System Design</title>
+<style>
+  :root {
+    --stock: #e9ebe6; --sheet: #fcfcfa;
+    --ink: #14171a; --ink-2: #494f55; --ink-3: #7b8188;
+    --post-blue: #173f8a; --post-red: #c2222c; --kept: #16603c;
+    --rule: #d2d5cf; --rule-firm: #b3b7b0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --stock: #14161a; --sheet: #1b1e23;
+      --ink: #eceee9; --ink-2: #b3b8be; --ink-3: #878d95;
+      --post-blue: #7ea2e8; --post-red: #ef7178; --kept: #67c397;
+      --rule: #2b3038; --rule-firm: #3c424c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 20px 90px; background: var(--stock); color: var(--ink);
+    font: 16px/1.58 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 15px; margin-bottom: 26px; }
+  h1 { font-size: 31px; margin: 0 0 6px; letter-spacing: -0.015em; }
+  .sub { color: var(--ink-2); margin: 0; max-width: 70ch; }
+  .meta {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+    color: var(--ink-3); margin-top: 12px; display: flex; gap: 22px; flex-wrap: wrap;
+  }
+  nav {
+    background: var(--sheet); border: 1px solid var(--rule); padding: 12px 16px;
+    margin-bottom: 8px; font-size: 14px;
+  }
+  nav b { display: block; font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase;
+          color: var(--ink-3); margin-bottom: 7px; }
+  nav a { color: var(--post-blue); text-decoration: none; margin-right: 16px; display: inline-block; }
+  nav a:hover { text-decoration: underline; }
+  h2 {
+    font-size: 21px; margin: 46px 0 6px; padding-top: 18px;
+    border-top: 1px solid var(--rule-firm); scroll-margin-top: 12px;
+  }
+  h2 .n { color: var(--post-blue); font-family: ui-monospace, Menlo, monospace; font-size: 15px; }
+  h3 { font-size: 16px; margin: 26px 0 6px; }
+  p { max-width: 74ch; }
+  .lead { color: var(--ink-2); margin: 0 0 18px; max-width: 74ch; }
+  figure { margin: 18px 0; }
+  figcaption { font-size: 13.5px; color: var(--ink-3); margin-top: 8px; max-width: 74ch; }
+  .diagram {
+    background: var(--sheet); border: 1px solid var(--rule); padding: 16px;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+  }
+  .diagram svg { display: block; min-width: 620px; }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .box { fill: var(--stock); stroke: var(--rule-firm); }
+  .box-a { fill: var(--sheet); stroke: var(--post-blue); stroke-width: 1.5; }
+  .box-x { fill: var(--sheet); stroke: var(--post-red); stroke-width: 1.5; }
+  .lbl { fill: var(--ink); font-size: 12.5px; font-weight: 620; }
+  .lbl-s { fill: var(--ink-3); font-size: 10.5px; }
+  .arrow { stroke: var(--ink-3); stroke-width: 1.2; fill: none; }
+  .arrow-b { stroke: var(--post-blue); stroke-width: 1.4; fill: none; }
+  .arrow-r { stroke: var(--post-red); stroke-width: 1.4; fill: none; stroke-dasharray: 4 3; }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; background: var(--sheet); font-size: 14.5px; margin: 10px 0; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 11px; border-bottom: 1px solid var(--rule); }
+  th { background: var(--stock); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+  pre {
+    background: var(--sheet); border: 1px solid var(--rule); padding: 13px 15px;
+    overflow-x: auto; font-size: 12.5px; line-height: 1.6; margin: 12px 0;
+  }
+  .why {
+    border-left: 3px solid var(--post-blue); background: var(--sheet);
+    padding: 13px 16px; margin: 16px 0; max-width: 76ch;
+  }
+  .why b { display: block; font-size: 11.5px; letter-spacing: 0.07em; text-transform: uppercase;
+           color: var(--ink-3); margin-bottom: 5px; }
+  .why p { margin: 0 0 8px; font-size: 15px; color: var(--ink-2); }
+  .why p:last-child { margin-bottom: 0; }
+  .why--red { border-left-color: var(--post-red); }
+  ul { max-width: 74ch; color: var(--ink-2); }
+  li { margin-bottom: 5px; }
+  li b, td b { color: var(--ink); }
+  footer { margin-top: 50px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Salvage — System Design</h1>
+  <p class="sub">How the DOCX repair tool is built, and why each part is shaped the way it is.
+  Assigned build B of the SuperDocs engineer round, band S2 · API + export. Every trade-off below
+  cost something; what it cost is stated next to what it bought.</p>
+  <div class="meta">
+    <span>Python 3.10+ · FastAPI · React 19 · TypeScript</span>
+    <span>zero runtime dependencies in the engine</span>
+    <span>written · 2026-08-20</span>
+  </div>
+</header>
+
+<nav>
+  <b>Contents</b>
+  <a href="#shape">1 · The shape</a>
+  <a href="#engine">2 · The engine</a>
+  <a href="#stages">3 · Stages</a>
+  <a href="#superdocs">4 · The SuperDocs path</a>
+  <a href="#guard">5 · The content guard</a>
+  <a href="#failure">6 · Failure matrix</a>
+  <a href="#state">7 · State &amp; retention</a>
+  <a href="#tradeoffs">8 · Trade-offs</a>
+  <a href="#limits">9 · Limits</a>
+</nav>
+
+<h2 id="shape"><span class="n">1</span> &nbsp;The shape</h2>
+<p class="lead">One engine, two front doors, and a styling pass inside the recovery. The engine has no
+dependencies at all — not FastAPI, not an HTTP library, nothing. That is what lets the same code
+answer a web request, a terminal, and a test suite that runs with nothing installed.</p>
+
+<figure>
+<div class="diagram">
+<svg viewBox="0 0 880 400" width="880" height="400" role="img"
+     aria-label="Architecture: a browser and a CLI both call one engine; the engine optionally calls a styled-export module which talks to the SuperDocs API.">
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L7,3 L0,6 z" fill="currentColor" />
+    </marker>
+  </defs>
+
+  <!-- front doors -->
+  <rect class="box-a" x="20" y="24" width="180" height="58" rx="2" />
+  <text class="lbl" x="34" y="48">Browser — the product</text>
+  <text class="lbl-s" x="34" y="66">React · one committed bundle</text>
+
+  <rect class="box-a" x="20" y="104" width="180" height="58" rx="2" />
+  <text class="lbl" x="34" y="128">CLI — the back door</text>
+  <text class="lbl-s" x="34" y="146">backend/cli.py · a folder at a time</text>
+
+  <!-- web layer -->
+  <rect class="box" x="262" y="24" width="196" height="138" rx="2" />
+  <text class="lbl" x="276" y="48">web.py</text>
+  <text class="lbl-s" x="276" y="68">GET  /api/capabilities</text>
+  <text class="lbl-s" x="276" y="86">POST /api/repair      → ndjson</text>
+  <text class="lbl-s" x="276" y="104">POST /api/style/{tok} → ndjson</text>
+  <text class="lbl-s" x="276" y="122">GET  /api/download/{tok}</text>
+  <text class="lbl-s" x="276" y="146">holds results in memory, 30 min</text>
+
+  <!-- engine -->
+  <rect class="box-a" x="520" y="24" width="196" height="138" rx="2" />
+  <text class="lbl" x="534" y="48">engine.py</text>
+  <text class="lbl-s" x="534" y="68">salvage.py — get at the parts</text>
+  <text class="lbl-s" x="534" y="86">docx.py    — read &amp; write</text>
+  <text class="lbl-s" x="534" y="104">media.py   — pictures</text>
+  <text class="lbl-s" x="534" y="128">no dependencies · no network</text>
+  <text class="lbl-s" x="534" y="146">always runs first, always finishes</text>
+
+  <!-- second pass -->
+  <rect class="box" x="520" y="222" width="196" height="96" rx="2" />
+  <text class="lbl" x="534" y="246">superdocs_client.py</text>
+  <text class="lbl-s" x="534" y="266">allowance → upload → chat</text>
+  <text class="lbl-s" x="534" y="284">→ export → guard</text>
+  <text class="lbl-s" x="534" y="306">primary · runs every time</text>
+
+  <rect class="box" x="520" y="340" width="196" height="44" rx="2" />
+  <text class="lbl" x="534" y="360">superdocs_client.py</text>
+  <text class="lbl-s" x="534" y="376">transport injected · vendored</text>
+
+  <rect class="box-x" x="770" y="340" width="94" height="44" rx="2" />
+  <text class="lbl" x="784" y="360">SuperDocs</text>
+  <text class="lbl-s" x="784" y="376">the only network</text>
+
+  <!-- arrows -->
+  <g color="var(--post-blue)">
+    <path class="arrow-b" d="M200,53 L256,53" marker-end="url(#ah)" />
+    <path class="arrow-b" d="M200,133 C230,133 230,100 256,100" marker-end="url(#ah)" />
+    <path class="arrow-b" d="M458,93 L514,93" marker-end="url(#ah)" />
+  </g>
+  <g color="var(--ink-3)">
+    <path class="arrow" d="M618,162 L618,216" marker-end="url(#ah)" />
+    <path class="arrow" d="M618,318 L618,334" marker-end="url(#ah)" />
+    <path class="arrow" d="M716,362 L764,362" marker-end="url(#ah)" />
+  </g>
+  <g color="var(--post-red)">
+    <path class="arrow-r" d="M520,270 C420,270 400,200 400,168" marker-end="url(#ah)" />
+  </g>
+  <text class="lbl-s" x="300" y="200" style="fill: var(--post-red)">every failure here…</text>
+  <text class="lbl-s" x="300" y="216" style="fill: var(--post-red)">…degrades to the plain rebuild</text>
+  <text class="lbl-s" x="640" y="196">every time</text>
+</svg>
+</div>
+<figcaption>The blue path always runs and always produces a file. The grey path runs every time too and is
+where the delivered file comes from; it costs money and can fail in six ways — all six end with the
+person still holding what the blue path gave them.</figcaption>
+</figure>
+
+<div class="why">
+  <b>Why the engine has no dependencies</b>
+  <p>It buys three things. The test suite runs on a bare checkout, so a reviewer can check the claims
+  without installing anything or spending a cent. The CLI works where FastAPI is not installed. And
+  the failure surface of the thing that touches somebody's only copy of a document is as small as it
+  can be made.</p>
+  <p>It cost the multipart encoder in <code>superdocs_client.py</code>, which is thirty lines that
+  <code>requests</code> would have given away — and getting it wrong is invisible, because the
+  request still sends and the API answers 422 for a field it never received. That was BUG-015.</p>
+</div>
+
+<h2 id="engine"><span class="n">2</span> &nbsp;The engine — how a broken DOCX is opened</h2>
+<p class="lead">A <code>.docx</code> is a ZIP of XML parts, and it breaks in a handful of
+recognisable ways. The central insight is where the damage lands.</p>
+
+<figure>
+<div class="diagram">
+<svg viewBox="0 0 880 210" width="880" height="210" role="img"
+     aria-label="A DOCX file laid out as local headers followed by a central directory at the end; a truncated download loses the directory but keeps most content.">
+  <rect class="box" x="20" y="40" width="120" height="46" />
+  <text class="lbl-s" x="32" y="60">hdr + document</text>
+  <text class="lbl-s" x="32" y="76">.xml</text>
+  <rect class="box" x="146" y="40" width="112" height="46" />
+  <text class="lbl-s" x="158" y="60">hdr + styles</text>
+  <rect class="box" x="264" y="40" width="112" height="46" />
+  <text class="lbl-s" x="276" y="60">hdr + image1</text>
+  <rect class="box" x="382" y="40" width="112" height="46" />
+  <text class="lbl-s" x="394" y="60">hdr + rels</text>
+  <rect class="box-x" x="500" y="40" width="150" height="46" />
+  <text class="lbl" x="512" y="60" style="font-size:11.5px">central directory</text>
+  <text class="lbl-s" x="512" y="76">the index — at the END</text>
+
+  <path class="arrow-r" d="M500,110 L500,150" style="stroke-dasharray:0" />
+  <text class="lbl-s" x="510" y="118" style="fill: var(--post-red)">a truncated download cuts here</text>
+
+  <rect class="box-a" x="20" y="150" width="474" height="40" />
+  <text class="lbl" x="32" y="175" style="font-size:12px">still readable, header by header — this is what Word will not do</text>
+  <rect class="box-x" x="500" y="150" width="150" height="40" />
+  <text class="lbl-s" x="512" y="175" style="fill: var(--post-red)">gone</text>
+
+  <text class="lbl-s" x="676" y="60">Word reads the index first,</text>
+  <text class="lbl-s" x="676" y="78">finds it damaged,</text>
+  <text class="lbl-s" x="676" y="96">and refuses the whole file.</text>
+  <text class="lbl-s" x="676" y="168" style="fill: var(--kept)">Salvage reads the headers instead.</text>
+</svg>
+</div>
+<figcaption>The index lives at the end of the file, so it is the first thing a truncated download
+loses — while the content itself is usually still there. Word reads the index first and gives up.
+<code>salvage.py</code> walks the local headers and inflates each part by hand.</figcaption>
+</figure>
+
+<div class="scroll">
+<table>
+<thead><tr><th>Module</th><th>Its one job</th><th>The judgement in it</th></tr></thead>
+<tbody>
+<tr><td><code>salvage.py</code></td><td>Get at the parts, going around the index rather than through it</td>
+    <td>Repairs bare <code>&amp;</code>, invalid characters and tags left open by a cut. Never reorders and never invents.</td></tr>
+<tr><td><code>docx.py</code></td><td>Read blocks out of a body; write a valid document back</td>
+    <td>Headings, paragraphs, tables and images are the only shapes it knows. Everything else is text.</td></tr>
+<tr><td><code>media.py</code></td><td>Find the pictures and work out where they belonged</td>
+    <td>An image whose position did not survive goes <b>at the end under a heading</b>, never somewhere plausible and wrong.</td></tr>
+<tr><td><code>engine.py</code></td><td>The order of the decisions, and the report</td>
+    <td>Nothing is claimed as recovered before it has been read; nothing is written before everything that could refuse has had its chance.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="stages"><span class="n">3</span> &nbsp;Stages, and why they are branch points</h2>
+<p class="lead">Each stage is a real decision whose outcome changes the path, not a label painted on
+a fixed script. Two of them can refuse outright, and one falls back to a lesser result that the
+report is then required to disclose.</p>
+
+<pre>open       → salvage_members()          may refuse: no readable parts
+inventory  → what is here, what can be rebuilt
+                                        may refuse: the document part is gone
+xml        → repair_xml()               repairs faults, closes open tags
+read       → read_blocks()  ──┐         may refuse: no readable content
+                              └─ on failure ─→ text_runs()  ← the fallback
+                                 structure_preserved = False, and the report SAYS SO
+place      → pictures the body could not be shown to reference → end, under a heading
+asides     → footnotes, headers, footers → end, each under its own heading
+count      → what actually came through
+write      → write_docx() + preview_html
+done</pre>
+
+<div class="why">
+  <b>Why the fallback is disclosed rather than smoothed over</b>
+  <p>"We recovered your text but lost your tables" and "we recovered everything" must not look the
+  same to the person getting the file back. When <code>read_blocks</code> fails, the run-by-run
+  fallback still returns the words — and the report gains a line saying the headings, tables and
+  formatting are gone. Finding that out later is the failure this tool exists to prevent.</p>
+</div>
+
+<div class="why">
+  <b>Why footnotes go to the end rather than into the body</b>
+  <p>They live in their own parts, so they survive exactly the damage that destroys the index. But a
+  footnote read as a paragraph <em>changes what the document says</em>, and a page header repeated
+  inline reads as something the author wrote. They are set down at the end, labelled, and the report
+  states they are not where they were.</p>
+</div>
+
+<h2 id="superdocs"><span class="n">4</span> &nbsp;The SuperDocs path — the four calls</h2>
+<p class="lead">The card is banded <b>API + export</b>. The brief's minimum contract is upload · chat · approve ·
+export. This build makes three of them — upload · chat · export — with a balance read in front and a
+content check behind. The synchronous <code>/v1/chat</code> applies its edit inline, and the documented
+approve endpoint exists only on the asynchronous path; the check behind the call does the work approval
+before it would have done, on the file that actually ships. See D1 in BASELINE.md.</p>
+
+<figure>
+<div class="diagram">
+<svg viewBox="0 0 880 300" width="880" height="300" role="img"
+     aria-label="Sequence: allowance check, upload, chat, poll, approve, poll, export, then a content guard that can discard the result.">
+  <g color="var(--ink-3)">
+  <rect class="box" x="20" y="20" width="150" height="42" />
+  <text class="lbl-s" x="30" y="40">0 · whoami</text>
+  <text class="lbl-s" x="30" y="55">balance, before spending</text>
+  <path class="arrow" d="M170,41 L214,41" marker-end="url(#ah)" />
+
+  <rect class="box-a" x="220" y="20" width="150" height="42" />
+  <text class="lbl-s" x="230" y="40">1 · upload</text>
+  <text class="lbl-s" x="230" y="55">recovered structure as HTML</text>
+  <path class="arrow" d="M370,41 L414,41" marker-end="url(#ah)" />
+
+  <rect class="box-a" x="420" y="20" width="150" height="42" />
+  <text class="lbl-s" x="430" y="40">2 · chat/async</text>
+  <text class="lbl-s" x="430" y="55">formatting only, no words</text>
+  <path class="arrow" d="M570,41 L614,41" marker-end="url(#ah)" />
+
+  <rect class="box" x="620" y="20" width="150" height="42" />
+  <text class="lbl-s" x="630" y="40">poll_job</text>
+  <text class="lbl-s" x="630" y="55">silence = still processing</text>
+
+  <path class="arrow" d="M695,62 L695,96 L510,96 L510,116" marker-end="url(#ah)" />
+
+  <rect class="box-a" x="420" y="120" width="150" height="42" />
+  <text class="lbl-s" x="430" y="140">3 · approve</text>
+  <text class="lbl-s" x="430" y="155">batched, after 2nd parse</text>
+  <path class="arrow" d="M420,141 L376,141" marker-end="url(#ah)" />
+
+  <rect class="box" x="220" y="120" width="150" height="42" />
+  <text class="lbl-s" x="230" y="140">poll_job again</text>
+  <text class="lbl-s" x="230" y="155">approval is async — wait</text>
+  <path class="arrow" d="M295,162 L295,196 L510,196 L510,216" marker-end="url(#ah)" />
+
+  <rect class="box-a" x="420" y="220" width="150" height="42" />
+  <text class="lbl-s" x="430" y="240">4 · export docx</text>
+  <text class="lbl-s" x="430" y="255">free · warnings surfaced</text>
+  <path class="arrow" d="M570,241 L614,241" marker-end="url(#ah)" />
+
+  <rect class="box-x" x="620" y="220" width="230" height="42" />
+  <text class="lbl" x="630" y="240" style="font-size:12px">content_drift() — the guard</text>
+  <text class="lbl-s" x="630" y="255">words changed at all → thrown away</text>
+  </g>
+</svg>
+</div>
+<figcaption>Call 0 is not part of the contract — it is trap 3, asked before the work rather than
+discovered inside it. The second <code>poll_job</code> exists because approval is asynchronous:
+exporting before it settles returns the pre-edit document with a 200 and no warning.</figcaption>
+</figure>
+
+<h3>The three named traps, and where each is answered</h3>
+<div class="scroll">
+<table>
+<thead><tr><th>Trap</th><th>What it does</th><th>Answered in</th></tr></thead>
+<tbody>
+<tr><td><b>1 · the double parse</b></td>
+    <td>Proposed-change content arrives as a JSON-encoded string needing a second parse. Miss it and every field reads <code>undefined</code>.</td>
+    <td><code>parse_proposed_changes()</code>. And <code>pending_changes()</code> above it, because <em>two</em> shapes are real: <code>GET /v1/jobs/{id}</code> returns a plain list, the SSE event returns the envelope. The copy that handled only the envelope crashed on the shape polling actually returns.</td></tr>
+<tr><td><b>2 · silence is not a crash</b></td>
+    <td>Large documents can take minutes with nothing visible happening.</td>
+    <td><code>poll_job()</code> treats a long quiet run as still processing and gives up only at an explicit deadline, reporting how long it waited. The page says <em>"a quiet wait is normal"</em> — measured at 27 s on a four-paragraph document.</td></tr>
+<tr><td><b>3 · the allowance</b></td>
+    <td>Work started without checking the balance fails halfway.</td>
+    <td><code>allowance()</code>, before the first billable call. A balance that <em>cannot</em> be read is not treated as zero — <code>whoami</code> answers agent keys, and refusing on a number nobody read would be its own bluff.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="why">
+  <b>Why HTML goes up and not the rebuilt .docx bytes</b>
+  <p>The documentation is explicit that SuperDocs takes documents and HTML and that there is
+  <em>no endpoint for raw Word XML</em>. Clean HTML built from structure already parsed is both
+  supported and lossless in the directions that matter: headings stay headings, tables stay tables.</p>
+  <p><b>Corrected 2026-08-26.</b> This section used to record that pictures did not make the trip,
+  because the pass sent HTML and <code>blocks_to_html</code> dropped every image on the way out
+  (BUG-094). The rebuilt <code>.docx</code> is sent now instead: the documented upload extracts
+  images to cloud storage and the export preserves embedded images, so the pictures travel with the
+  file and no separate image call is needed. Verified live — the styled file comes back carrying
+  <code>word/media/image1.png</code> byte-for-byte. The guard behind the call counts them and
+  refuses a styled file that returns with fewer.</p>
+</div>
+
+<h2 id="guard"><span class="n">5</span> &nbsp;The content guard</h2>
+<p class="lead">The single most important thing in this build, and it exists because of what happened
+on the first live run.</p>
+
+<div class="why why--red">
+  <b>What went wrong</b>
+  <p>A four-line recovered report was sent up with the instruction <em>"do not add, remove or reword
+  any content — only restore its formatting"</em>. It came back with <b>199 words that were never
+  sent</b>: three paragraphs of invented commentary, a Subtotal / Tax / Total block, a "Remarks &amp;
+  Disclaimers" section, a signature block, an organisation field and a "Confidential — Internal Use
+  Only" footer.</p>
+  <p>It opens cleanly. It reads better than the plain rebuild. That is precisely why it is the worst
+  output this product can produce — its owner has no reason to doubt it, and may circulate it.</p>
+</div>
+
+<pre>content_drift(sent_html, got_docx) -> (added, removed)
+
+  _words(html)      strip tags, unescape entities, lowercase, [a-z0-9]+
+  docx_text(blob)   the &lt;w:t&gt; runs, joined
+  Counter(before) vs Counter(after)      multiset, not sequence
+
+  added + removed &gt; ALLOWED_WORD_DRIFT (= 0)   →   discard, and say so</pre>
+
+<div class="scroll">
+<table>
+<thead><tr><th>Decision</th><th>Rationale</th></tr></thead>
+<tbody>
+<tr><td><b>Threshold is zero, not a small tolerance</b></td>
+    <td>A formatting pass has no reason to change a single word. A tolerance would be a number chosen to let something through, and the thing it would let through is text its owner did not write.</td></tr>
+<tr><td><b>Multiset, not sequence</b></td>
+    <td>Reordering a table's cells is not this guard's business. Inventing a paragraph is.</td></tr>
+<tr><td><b>Both the instruction <em>and</em> the guard</b></td>
+    <td>The instruction was tightened at the same time and the re-run came back identical — but the instruction is the request and the guard is the promise, and only one of them is a test.</td></tr>
+<tr><td><b>Rejection is safe here</b></td>
+    <td>Discarding costs the person nothing: the plain rebuild is already downloaded and unaffected. That asymmetry is what makes a zero threshold reasonable rather than brittle.</td></tr>
+<tr><td><b>The page says "Thrown away", not "Failed"</b></td>
+    <td>Nothing failed. A claim was refused, and the difference is what the person needs to understand about their file's safety.</td></tr>
+</tbody>
+</table>
+</div>
+<p>Measured: the rewritten export scores <code>(199, 0)</code> and is rejected; an unchanged rebuild
+scores <code>(0, 0)</code> and is accepted. Both are tests — a guard that rejects everything is an
+off switch, so the accept case is guarded as carefully as the reject case.</p>
+
+<h2 id="failure"><span class="n">6</span> &nbsp;The failure matrix</h2>
+<p class="lead">Every way the optional pass can end. There is exactly one column, because there is
+exactly one rule: <b>the person keeps the file they already had.</b></p>
+<div class="scroll">
+<table>
+<thead><tr><th>What happens</th><th>Detected by</th><th>What the person gets</th><th>Told</th></tr></thead>
+<tbody>
+<tr><td>No key configured</td><td><code>/api/capabilities</code>, before anything is offered</td><td>Plain rebuild</td><td>One sentence. No button at all.</td></tr>
+<tr><td>Allowance is zero</td><td><code>allowance()</code>, before the first billable call</td><td>Plain rebuild</td><td>"nothing was sent and nothing was spent"</td></tr>
+<tr><td>Balance unreadable</td><td><code>allowance()</code> → <code>known=False</code></td><td>Work proceeds</td><td>Nothing — it is not a problem</td></tr>
+<tr><td>Network dead</td><td><code>TransportFailure</code></td><td>Plain rebuild</td><td>"Styling did not work…"</td></tr>
+<tr><td>No job id returned</td><td>Missing <code>job_id</code></td><td>Plain rebuild</td><td>"…did not start a job"</td></tr>
+<tr><td>Job never settles</td><td><code>poll_job</code> deadline</td><td>Plain rebuild</td><td>"…did not finish applying the changes in time"</td></tr>
+<tr><td>Export empty</td><td>No <code>raw</code> in the body</td><td>Plain rebuild</td><td>"…returned no file"</td></tr>
+<tr><td>Quota exhausted mid-run</td><td><code>QuotaExhausted</code> from the platform</td><td>Plain rebuild</td><td>"The SuperDocs allowance is exhausted"</td></tr>
+<tr><td><b>Wording changed</b></td><td><code>content_drift()</code></td><td>Plain rebuild</td><td><b>"Thrown away."</b> + why</td></tr>
+<tr><td>Anything unforeseen</td><td>Bare <code>except</code> in <code>web.py</code></td><td>Plain rebuild</td><td>Plain words. <b>No exception class name</b> — that was BUG-020.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="state"><span class="n">7</span> &nbsp;State, concurrency and retention</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>Concern</th><th>How it is handled</th><th>Why not otherwise</th></tr></thead>
+<tbody>
+<tr><td><b>Where results live</b></td>
+    <td>An <code>OrderedDict</code> in memory: 30 minutes, 32 most recent, evicted oldest-first.</td>
+    <td>The file someone uploads is their damaged document. Keeping it on disk is not ours to do — and a repair tool that leaks documents is a worse product than one that forgets them.</td></tr>
+<tr><td><b>Repeat downloads</b></td>
+    <td>Allowed. Entries are not one-shot.</td>
+    <td>The first version dropped the file on the first click, so the second attempt 404'd and their only copy was gone. Clicking twice is the most ordinary thing a person does.</td></tr>
+<tr><td><b>Concurrency</b></td>
+    <td>Each repair runs on its own worker thread with its own queue; nothing is shared but the results dict.</td>
+    <td>The engine is pure — bytes in, a <code>Repair</code> out — so two runs cannot interfere. There is no shared parse state to corrupt.</td></tr>
+<tr><td><b>Progress</b></td>
+    <td>Streamed as newline-delimited JSON, pushed from the engine as each stage happens.</td>
+    <td>A page that animates a bar after the work has already finished is lying to the person watching it.</td></tr>
+<tr><td><b>The styled copy's token</b></td>
+    <td>A second entry in the same store, with its own token and its own filename.</td>
+    <td>Overwriting the first would take away the one thing this product actually promised.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="tradeoffs"><span class="n">8</span> &nbsp;Trade-offs, with what each one cost</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>Decision</th><th>Bought</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td><b>Local rebuild is the default; SuperDocs is opt-in</b></td>
+    <td>Answers "did anything survive" in milliseconds, offline, with no account and no third party holding a private document.</td>
+    <td>The default file is plain. A user who wants styling has to ask for it and wait.</td></tr>
+<tr><td><b>Engine has zero dependencies</b></td>
+    <td>Tests run on a bare checkout; the CLI works anywhere; a small failure surface around somebody's only copy.</td>
+    <td>A hand-written multipart encoder, and the class of invisible bug that comes with one.</td></tr>
+<tr><td><b>The frontend bundle is committed</b></td>
+    <td>A reviewer with no Node still gets the product, in one command.</td>
+    <td>It can fall behind its source. Paid for with a hash manifest and a pytest that recomputes it — stale bundle, failed build.</td></tr>
+<tr><td><b>The client is vendored into both builds</b></td>
+    <td>Each build stands alone in the public repository, which is what the contribution rules ask for.</td>
+    <td>Real drift, twice. A fix landed in one copy and not the other (BUG-015), then an improvement did (BUG-056). Paid for with a guard that fails the build when the two diverge.</td></tr>
+<tr><td><b>Formatting changes are approved automatically</b></td>
+    <td>A consumer is not asked to adjudicate a diff they have no way to judge.</td>
+    <td>It is a gate that does not gate. Paid for by the content guard, which is the check that actually protects them — and by saying it plainly on the page rather than implying a human reviewed it.</td></tr>
+<tr><td><b>Progress is streamed, not polled</b></td>
+    <td>Stage lines appear as they happen, over one connection.</td>
+    <td>A dropped connection loses the run. Handled: the page says so, and says the original was never changed.</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="limits"><span class="n">9</span> &nbsp;Limits, stated rather than discovered</h2>
+<ul>
+  <li><b>The rebuilt file is deliberately plain.</b> Your theme, fonts and spacing cannot be recovered
+  from a broken file, so it rebuilds clean rather than guessing at a design you had.</li>
+  <li><b>Pictures come back; captions, wrapping and floating positions do not.</b></li>
+  <li><b>Footnotes, headers and footers come back as text, not as page furniture.</b></li>
+  <li><b>Comments and tracked changes are not recovered.</b></li>
+  <li><b><code>.doc</code> is not supported.</b> The pre-2007 binary format is not a ZIP at all, and
+  is reported as unrepairable rather than silently mangled.</li>
+  <li><b>Direct upload only</b>, so the practical ceiling is about 20 MB.</li>
+  <li><b>Single process, memory-backed.</b> Results do not survive a restart and do not span
+  replicas. For a tool someone uses once, in one sitting, that is the right size — and it is stated
+  here rather than left for somebody to find behind a load balancer.</li>
+</ul>
+
+<footer>
+  Salvage · best-effort DOCX recovery · assigned build B, SuperDocs engineer round · MIT licensed.
+  Companion documents: <code>manual-test/MANUAL_QA_PLAN.html</code> (what was actually run),
+  <code>manual-test/UI_FLOWS.html</code> (every path through the page),
+  <code>DESIGN.md</code> (the visual language and the rules that are not style).
+</footer>
+
+</div>
+</body>
+</html>

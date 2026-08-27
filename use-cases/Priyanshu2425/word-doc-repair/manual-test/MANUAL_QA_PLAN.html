@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Salvage — Manual QA Plan</title>
+<style>
+  :root {
+    --stock: #e9ebe6; --sheet: #fcfcfa;
+    --ink: #14171a; --ink-2: #494f55; --ink-3: #7b8188;
+    --post-blue: #173f8a; --post-red: #c2222c; --kept: #16603c;
+    --rule: #d2d5cf; --rule-firm: #b3b7b0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --stock: #14161a; --sheet: #1b1e23;
+      --ink: #eceee9; --ink-2: #b3b8be; --ink-3: #878d95;
+      --post-blue: #7ea2e8; --post-red: #ef7178; --kept: #67c397;
+      --rule: #2b3038; --rule-firm: #3c424c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 28px 20px 80px; background: var(--stock); color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; }
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 26px; }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-2); margin: 0; max-width: 68ch; }
+  .meta {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px;
+    color: var(--ink-3); margin-top: 12px; display: flex; gap: 22px; flex-wrap: wrap;
+  }
+  h2 {
+    font-size: 20px; margin: 40px 0 6px; padding-top: 16px;
+    border-top: 1px solid var(--rule-firm);
+  }
+  h2 .n { color: var(--post-blue); font-family: ui-monospace, Menlo, monospace; font-size: 15px; }
+  .lead { color: var(--ink-2); margin: 0 0 16px; max-width: 72ch; }
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; width: 100%; min-width: 660px; background: var(--sheet); font-size: 14.5px; }
+  th, td { text-align: left; vertical-align: top; padding: 9px 11px; border-bottom: 1px solid var(--rule); }
+  th { background: var(--stock); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  td code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+  .id { font-family: ui-monospace, Menlo, monospace; color: var(--post-blue); white-space: nowrap; font-size: 12.5px; }
+  .v { white-space: nowrap; font-weight: 640; font-size: 12.5px; }
+  .pass { color: var(--kept); }
+  .fail { color: var(--post-red); }
+  .notrun { color: var(--ink-3); }
+  .callout {
+    border-left: 3px solid var(--post-red); background: var(--sheet);
+    padding: 14px 16px; margin: 18px 0; max-width: 76ch;
+  }
+  .callout h3 { margin: 0 0 6px; font-size: 15px; }
+  .callout p { margin: 0 0 8px; color: var(--ink-2); font-size: 14.5px; }
+  .callout p:last-child { margin-bottom: 0; }
+  pre {
+    background: var(--sheet); border: 1px solid var(--rule); padding: 12px 14px;
+    overflow-x: auto; font-size: 12.5px; line-height: 1.5; margin: 12px 0;
+  }
+  footer { margin-top: 46px; padding-top: 14px; border-top: 1px solid var(--rule); color: var(--ink-3); font-size: 13px; }
+  ul { max-width: 72ch; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Salvage — Manual QA Plan</h1>
+  <p class="sub">Every check below was <strong>run</strong> on the date stamped here, against a live
+  server, not against the modules. Where a check could not be run, it says <em>not run</em> rather
+  than passed. Verdicts are transcribed from the actual output, which is why some of them are worded
+  awkwardly — that is what the machine said.</p>
+  <div class="meta">
+    <span>build · word-doc-repair (assigned build B)</span>
+    <span>run · 2026-08-20</span>
+    <span>server · 127.0.0.1:8123</span>
+    <span>key · live SuperDocs personal key</span>
+  </div>
+</header>
+
+<div class="why" style="border-left:3px solid var(--post-red); padding-left:14px; margin:22px 0">
+  <b>This run predates the current implementation. Re-run required.</b>
+  <p>Recorded <b>2026-08-20</b>. The results below are transcribed from a real run on that date and
+  are <em>left exactly as they were</em> — a dated test record is evidence, and editing it to match
+  later behaviour would make it worth nothing.</p>
+  <p>What has changed since, and which rows it invalidates:</p>
+  <ul>
+    <li><b>A1, A6</b> — “offers a … styling link”. There is no styling link. The pass runs inside the
+    recovery and the handover states what happened to it instead (BUG-097).</li>
+    <li><b>D1, D2, D3</b> — <code>/api/capabilities</code> still exists for machine callers, but its
+    note is reworded and the page no longer asks it; <code>POST /api/style/{token}</code> is now a
+    <em>retry</em> rather than the way styling is reached, and with no key it returns a stated
+    degradation rather than a refusal.</li>
+    <li><b>B5</b> — still the check that matters most, and still needs a human with Word. What is
+    downloaded is now the styled file, with the plain rebuild one link away.</li>
+    <li>Pictures now survive into the rebuild <em>and</em> through the styling pass. No row here
+    tested that, because at the time neither was true (BUG-088, BUG-094).</li>
+  </ul>
+  <p>Automated coverage today is <b>76 offline Python tests</b>. The frontend suite is red on a known
+  payload-contract divergence (BUG-095), not on anything this plan covers.</p>
+</div>
+
+<p class="lead">Automated coverage at the time of this run: <strong>63 offline</strong> Python tests,
+<strong>76</strong> with the web extra installed, <strong>46</strong> frontend tests. This page
+covers what those cannot: whether the downloaded file opens, whether the wait is bearable, and
+whether a person who is not an engineer understands what they were handed.</p>
+
+<h2><span class="n">A</span> &nbsp;The engine, through the HTTP surface</h2>
+<p class="lead">Each fixture in <code>manual-test/fixtures/</code> posted to <code>POST /api/repair</code>
+and the streamed report read line by line.</p>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>What was done</th><th>Expected</th><th>Actual</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="id">A1</td><td>Post <code>00-healthy.docx</code></td>
+    <td>Repairs, offers a download and a styling link, preview rendered</td>
+    <td>9 stages · ok · 2 headings, 2 paragraphs, 1 table · preview 277 chars</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A2</td><td>Post <code>01-truncated-download.docx</code></td>
+    <td>Reads past the damaged index, recovers the table intact</td>
+    <td>10 stages · ok · 2 headings, 2 paragraphs, 1 table</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A3</td><td>Post <code>02-missing-content-types.docx</code></td>
+    <td>Rebuilds the missing structural part, does not list it as lost content</td>
+    <td>10 stages · ok · same counts as the healthy original</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A4</td><td>Post <code>03-unclosed-tags.docx</code></td>
+    <td>Falls back to a run-by-run read <em>and says the structure is gone</em></td>
+    <td>10 stages · ok · 0 headings, 6 paragraphs, 0 tables — the fallback, reported</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A5</td><td>Post <code>04-bad-characters.docx</code></td>
+    <td>Repairs the faults, keeps the content</td>
+    <td>10 stages · ok · counts match the healthy original</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A6</td><td>Post <code>05-missing-document-part.docx</code></td>
+    <td>Refuses. No download, no styling link, no “what came through”</td>
+    <td>4 stages · not ok · <code>download</code> and <code>style</code> both null</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A7</td><td>Post <code>06-not-a-word-file.docx</code></td>
+    <td>Refuses without mangling</td><td>3 stages · not ok · both links null</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A8</td><td>Post <code>07-empty-body.docx</code></td>
+    <td>A valid-but-empty file is a <em>failure</em>, not a quiet success</td>
+    <td>7 stages · not ok · both links null</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">A9</td><td>Post this README renamed <code>fake.docx</code></td>
+    <td>Refuses in plain words</td>
+    <td>“This file could not be repaired. No readable parts could be found inside the file…”</td><td class="v pass">PASS</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2><span class="n">B</span> &nbsp;The file that comes back</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>What was done</th><th>Expected</th><th>Actual</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="id">B1</td><td>Download the repaired file and reopen it as an archive</td>
+    <td>Valid container, all required parts, body re-parses</td>
+    <td>5 parts present, integrity check clean, <code>word/document.xml</code> parses</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">B2</td><td>Check the response headers</td>
+    <td>Word media type and an attachment filename</td>
+    <td><code>…wordprocessingml.document</code> · <code>01-truncated-download-repaired.docx</code></td><td class="v pass">PASS</td></tr>
+<tr><td class="id">B3</td><td>Click the download twice</td>
+    <td>Both work — repeat downloads are the most ordinary thing a person does</td>
+    <td>200 and 200, byte-identical</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">B4</td><td>Request a token that was never issued</td>
+    <td>404 saying the original was never changed</td>
+    <td>404 · “…your original was never changed.”</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">B5</td><td>Open the downloaded file in Word / Pages</td>
+    <td>Opens without a repair prompt; headings and table are styled</td>
+    <td>—</td><td class="v notrun">JUDGEMENT — needs a human with Word</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2><span class="n">C</span> &nbsp;Refusals at the door</h2>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>What was done</th><th>Expected</th><th>Actual</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="id">C1</td><td>Post an empty file</td><td>400, said plainly</td><td>400 · “That file is empty.”</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">C2</td><td>Post 22 MB</td><td>413 before it is read</td><td>413 · “That file is larger than 20 MB.”</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">C3</td><td>Choose a <code>.doc</code> in the page</td>
+    <td>Refused before anything is sent, with advice that is true</td>
+    <td>Refused client-side; the copy now also says what to do when Word will not open it either</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">C4</td><td>Force an internal error while reading</td>
+    <td>No stack trace, no exception class name, no claim anything was saved</td>
+    <td>Covered by <code>test_no_engine_vocabulary_or_class_name_reaches_the_page…</code></td><td class="v pass">PASS (automated)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2><span class="n">D</span> &nbsp;The SuperDocs path — the four calls, live</h2>
+<p class="lead">Run against the real API with a live key, not a fake. Contract:
+<span class="mono">upload → chat → approve → export</span>, preceded by a balance read.</p>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>What was done</th><th>Expected</th><th>Actual</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="id">D1</td><td><code>GET /api/capabilities</code> with no key set</td>
+    <td>Styling off, and the page told why</td>
+    <td><code>{"styling": false, "note": "Styling is switched off on this copy of the page…"}</code></td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D2</td><td>Same with a key set</td><td>Styling on</td><td><code>{"styling": true, …}</code></td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D3</td><td><code>POST /api/style/{token}</code> with no key</td>
+    <td>Refused plainly, not a crash</td><td>409 · “…switched off on this copy of the page. The rebuilt file above is unchanged and still yours.”</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D4</td><td>Full styling run, live, on the truncated fixture</td>
+    <td>Four calls in order, a styled file back, plain rebuild untouched</td>
+    <td>27 s · stages streamed · <strong>“Approved 5 formatting change(s)”</strong> · styled file returned · plain download still 200</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D5</td><td>Reopen the styled file</td>
+    <td>A real, styled Word file</td>
+    <td>17 parts including <code>theme1.xml</code>, <code>styles.xml</code>, <code>fontTable.xml</code>; body parses</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D6</td><td>Compare the styled words against the words sent</td>
+    <td>Identical — a formatting pass changes no words</td>
+    <td>drift = (0 added, 0 removed)</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D7</td><td>Read the balance before spending</td>
+    <td>Read in advance, reported</td><td><code>allowance_known: true · remaining: 500</code>, read before the first billable call</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D8</td><td>Cost reported to the user</td>
+    <td>Never “0 operations” for a billable request; an unconfirmed number marked as an estimate</td>
+    <td><code>ops_charged: 1 · ops_confirmed: false</code> → the page reads “1 estimated operation”</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D9</td><td>Exhausted allowance</td>
+    <td>Refused before anything is sent</td>
+    <td>Covered by <code>test_it_does_not_spend_an_allowance_it_has_already_been_told_is_gone</code>; not reproducible live without burning 500 operations</td><td class="v pass">PASS (automated)</td></tr>
+<tr><td class="id">D10</td><td>Dead network, no job id, empty export, unexpected error</td>
+    <td>Each degrades to the plain rebuild</td>
+    <td>Covered by <code>tests/test_styled_export.py</code>, one test per failure</td><td class="v pass">PASS (automated)</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout">
+  <h3>The defect this run found — and what was done about it</h3>
+  <p>The <em>first</em> live styling run came back with the wording rewritten: a four-line recovered
+  report gained three invented paragraphs, a subtotal row, a “Remarks &amp; Disclaimers” section, a
+  signature block and a footer — none of it in the document that was sent. It opens cleanly and it
+  reads better than the plain rebuild, which is exactly why it is the worst output this product could
+  produce: its owner would not notice.</p>
+  <p>Two changes, in this order. The instruction was tightened to forbid additions by name. Then a
+  guard was added that does not depend on the instruction being obeyed: the words that come back are
+  compared against the words that went out, and any difference at all throws the styled file away
+  with the reason said plainly. On the re-run the same document came back word for word identical —
+  <strong>but the instruction is the request and the guard is the promise</strong>, and only one of
+  them is a test.</p>
+</div>
+
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>What was done</th><th>Expected</th><th>Actual</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="id">D11</td><td>Feed the guard the rewritten file from the first live run</td>
+    <td>Rejected</td><td>drift = (199 added, 0 removed) → thrown away</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D12</td><td>Feed the guard an unchanged rebuild</td>
+    <td>Accepted — a guard that rejects everything is an off switch</td><td>drift = (0, 0)</td><td class="v pass">PASS</td></tr>
+<tr><td class="id">D13</td><td>A rewritten export, end to end through the page</td>
+    <td>No styled download offered; the alert says <em>Thrown away</em></td>
+    <td>Covered at both layers: <code>test_a_styled_file_that_was_rewritten_never_reaches_the_download</code> and the page test</td><td class="v pass">PASS (automated)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2><span class="n">E</span> &nbsp;Judgement calls no test can make</h2>
+<p class="lead">These need a person. They are listed so that “we did not check” is on the record
+rather than implied.</p>
+<div class="scroll">
+<table>
+<thead><tr><th>#</th><th>The question</th><th>Why no test can answer it</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td class="id">E1</td><td>Does the repaired file open in Word without a repair prompt?</td>
+    <td>Needs Word</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E2</td><td>Does the styled file look styled to a person, not just to a parser?</td>
+    <td>Needs eyes on a rendered page</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E3</td><td>Is a 27-second wait bearable with the stage lines showing?</td>
+    <td>Perception, not timing</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E4</td><td>Does a non-technical person understand “Recovered in part”?</td>
+    <td>Comprehension</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E5</td><td>Does anyone read <em>what did not come through</em>, or only the stamp?</td>
+    <td>Attention</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E6</td><td>Is “Thrown away” frightening in the wrong way?</td>
+    <td>Tone. It is meant to be reassuring — their file is safe — and it may not read that way</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E0</td><td>Does the page load and behave in a real browser?</td>
+    <td>The 46 frontend tests render the whole page and drive it, and every endpoint was exercised
+        over real HTTP — but no browser was driven end to end in this session. Listed rather than
+        implied.</td><td class="v notrun">NOT RUN</td></tr>
+<tr><td class="id">E7</td><td>Would somebody send a confidential document to a third party after reading that button’s copy?</td>
+    <td>Consent. The copy says what is sent; whether it is understood is the question</td><td class="v notrun">NOT RUN</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2><span class="n">F</span> &nbsp;How to run this plan again</h2>
+<pre>cd use-cases/Priyanshu2425/word-doc-repair
+python3 -m venv .venv &amp;&amp; .venv/bin/pip install -e ".[web,dev]"
+
+.venv/bin/python -m pytest                      # 76 with the web extra, 63 without
+cd frontend &amp;&amp; npm install &amp;&amp; npm test          # 46
+
+# section A–C, with no key set:
+PORT=8123 .venv/bin/python -m docrepair.web
+curl -s -X POST -F "file=@manual-test/fixtures/01-truncated-download.docx" \
+     http://127.0.0.1:8123/api/repair
+
+# section D, with a key:
+SUPERDOCS_API_KEY=sk_... PORT=8123 .venv/bin/python -m docrepair.web
+curl -s http://127.0.0.1:8123/api/capabilities
+curl -s -N -X POST http://127.0.0.1:8123/api/style/&lt;token&gt;</pre>
+<ul>
+  <li><code>manual-test/index.html</code> is the interactive nineteen-item checklist for the
+  page itself, with verdicts that persist across reloads and export as Markdown. This plan is the
+  record of a run; that one is the instrument.</li>
+  <li><code>UI_FLOWS.html</code>, beside this file, is the same territory walked screen by screen.</li>
+</ul>
+
+<footer>
+  Salvage · best-effort DOCX recovery · assigned build B, SuperDocs engineer round · MIT licensed.
+  Nothing on this page claims a check that was not run.
+</footer>
+
+</div>
+</body>
+</html>

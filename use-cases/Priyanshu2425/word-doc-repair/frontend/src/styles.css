@@ -1,0 +1,612 @@
+/* ============================================================================
+   Salvage — a postal recovery notice.
+
+   The world: what an institution sends you when your item arrives damaged. A
+   printed wrapper, chevron edge tape, a docket number, a rubber-stamped verdict,
+   and language that takes responsibility in plain words. It is the opposite of
+   a SaaS uploader, and it is deliberately nothing like the author's other work —
+   different product, different person, different day.
+
+   The person reading this has already lost something once. Every decision below
+   is made for them: large type, short lines, one thing at a time, bad news in
+   the same voice as good news.
+   ========================================================================== */
+
+:root {
+  --stock: #e9ebe6;         /* cool form stock, not warm paper */
+  --sheet: #fcfcfa;
+  --ink: #14171a;
+  --ink-2: #494f55;
+  --ink-3: #7b8188;
+  --rule: #ccd1cd;
+  --rule-firm: #a9b0aa;
+  --post-blue: #173f8a;     /* the institution */
+  --post-red: #c2222c;      /* the damage */
+  --kept: #16603c;
+  --focus: #173f8a;
+
+  --t1: 12px;
+  --t2: 13px;
+  --t3: 15px;
+  --t4: 17px;
+  --t5: 21px;
+  --t6: 28px;
+  --t7: 38px;
+
+  --sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --stock: #101314;
+    --sheet: #181b1d;
+    --ink: #eef1f0;
+    --ink-2: #b3b9bc;
+    --ink-3: #838a8e;
+    --rule: #2a2f31;
+    --rule-firm: #3d4346;
+    --post-blue: #7aa0e8;
+    --post-red: #ef7a72;
+    --kept: #6cc094;
+    --focus: #7aa0e8;
+  }
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--stock);
+  color: var(--ink);
+  font: var(--t3) / 1.6 var(--sans);
+}
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: 2px; }
+
+/* The signature device: airmail chevron tape. It edges the notice and nothing
+   else, so it always reads as the boundary of the thing in our custody. */
+.tape {
+  height: 9px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--post-red) 0 12px,
+    var(--sheet) 12px 24px,
+    var(--post-blue) 24px 36px,
+    var(--sheet) 36px 48px
+  );
+}
+
+.page { max-width: 660px; margin: 0 auto; padding: 0 18px 72px; }
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 20px 0 0;
+}
+.brand__mark {
+  font-size: var(--t5);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.brand__mark span { color: var(--post-blue); }
+.brand__line { font-size: var(--t1); color: var(--ink-3); letter-spacing: 0.04em; }
+
+.notice {
+  background: var(--sheet);
+  border: 1px solid var(--rule-firm);
+  margin-top: 16px;
+}
+.notice__body { padding: 22px 20px 26px; }
+@media (min-width: 620px) { .notice__body { padding: 30px 34px 34px; } }
+
+h1 {
+  font-size: var(--t6);
+  line-height: 1.18;
+  letter-spacing: -0.025em;
+  margin: 0 0 10px;
+  font-weight: 680;
+  text-wrap: balance;
+}
+@media (min-width: 620px) { h1 { font-size: var(--t7); } }
+.sub { font-size: var(--t4); color: var(--ink-2); margin: 0 0 24px; max-width: 46ch; }
+
+/* ------------------------------------------------------------- the handover */
+.dropzone {
+  display: block;
+  width: 100%;
+  border: 2px solid var(--ink);
+  background: var(--sheet);
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease);
+}
+.dropzone:hover { background: var(--stock); }
+.dropzone.is-over { background: var(--stock); border-color: var(--post-blue); }
+.dropzone__title {
+  display: block;
+  font-size: var(--t5);
+  font-weight: 640;
+  letter-spacing: -0.015em;
+}
+.dropzone__hint { display: block; font-size: var(--t2); color: var(--ink-3); margin-top: 8px; }
+.dropzone input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+.custody {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+  font-size: var(--t2);
+  color: var(--ink-2);
+}
+.custody li { display: grid; grid-template-columns: 16px 1fr; gap: 9px; align-items: start; }
+.custody b { color: var(--ink); font-weight: 620; }
+.custody i {
+  width: 9px; height: 9px; margin-top: 6px;
+  background: var(--post-blue);
+  font-style: normal;
+}
+
+/* --------------------------------------------------------------- the record */
+.record {
+  margin: 22px 0 0;
+  border-top: 1px solid var(--rule);
+  padding-top: 12px;
+  font-family: var(--mono);
+  font-size: var(--t1);
+  color: var(--ink-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 20px;
+}
+.record b { color: var(--ink-2); font-weight: 500; }
+
+/* --------------------------------------------------------------- the stages */
+.stations { list-style: none; margin: 22px 0 0; padding: 0; }
+.steps { margin-top: 30px; border-top: 1px solid var(--rule); padding-top: 12px; }
+.steps summary {
+  font-size: var(--t2);
+  color: var(--ink-2);
+  cursor: pointer;
+  list-style-position: outside;
+}
+.steps summary:hover { color: var(--ink); }
+.steps .stations { margin-top: 10px; }
+.station {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--t3);
+  animation: arrive 320ms var(--ease);
+}
+@keyframes arrive { from { opacity: 0; transform: translateY(-3px); } }
+@media (prefers-reduced-motion: reduce) { .station { animation: none; } }
+.station__mark {
+  width: 15px; height: 15px; margin-top: 5px;
+  border: 1.5px solid var(--post-blue);
+  border-radius: 50%;
+}
+.station--done .station__mark { background: var(--post-blue); }
+.station__text { color: var(--ink-2); }
+.station:last-child .station__text { color: var(--ink); }
+
+.working {
+  font-size: var(--t2);
+  color: var(--ink-3);
+  margin: 16px 0 0;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.working__bar {
+  flex: 1;
+  height: 3px;
+  background: var(--rule);
+  overflow: hidden;
+  position: relative;
+}
+.working__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 38%;
+  background: var(--post-blue);
+  animation: sweep 1400ms var(--ease) infinite;
+}
+@keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(320%); } }
+@media (prefers-reduced-motion: reduce) { .working__bar::after { animation: none; width: 100%; opacity: 0.5; } }
+
+/* --------------------------------------------------------------- the verdict */
+.stamp {
+  display: inline-block;
+  border: 2.5px solid var(--post-blue);
+  color: var(--post-blue);
+  padding: 7px 14px 6px;
+  font-size: var(--t3);
+  font-weight: 760;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  transform: rotate(-2.2deg);
+  animation: land 420ms var(--ease);
+}
+.stamp--part { border-color: var(--post-blue); }
+.stamp--failed { border-color: var(--post-red); color: var(--post-red); transform: rotate(1.6deg); }
+@keyframes land {
+  from { opacity: 0; transform: rotate(-9deg) scale(1.14); }
+}
+@media (prefers-reduced-motion: reduce) { .stamp { animation: none; } }
+
+.verdict { font-size: var(--t4); line-height: 1.55; margin: 18px 0 0; max-width: 48ch; }
+
+.outcome { margin: 26px 0 0; }
+.outcome__head {
+  font-size: var(--t1);
+  font-weight: 720;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin: 0 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule-firm);
+}
+.outcome__list { list-style: none; margin: 0; padding: 0; }
+.outcome__list li {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--t3);
+}
+.outcome__list i { font-style: normal; margin-top: 2px; font-weight: 700; }
+.outcome--kept i { color: var(--kept); }
+.outcome--lost i { color: var(--post-red); }
+
+.handoff {
+  margin: 28px 0 0;
+  border: 1px solid var(--rule-firm);
+  background: var(--stock);
+}
+.handoff__body { padding: 18px 18px 20px; }
+.btn {
+  font: inherit;
+  font-size: var(--t4);
+  font-weight: 640;
+  background: var(--post-blue);
+  color: #fff;
+  border: 0;
+  padding: 13px 22px;
+  cursor: pointer;
+  display: inline-block;
+  text-decoration: none;
+  transition: filter 120ms var(--ease);
+}
+.btn:hover { filter: brightness(1.12); }
+.btn--quiet {
+  background: none;
+  color: var(--ink);
+  border: 1px solid var(--rule-firm);
+  font-size: var(--t3);
+  padding: 10px 16px;
+}
+.btn--quiet:hover { border-color: var(--ink-3); filter: none; }
+.keep { font-size: var(--t2); color: var(--ink-3); margin: 12px 0 0; }
+
+.problem {
+  margin: 18px 0 0;
+  border-left: 1px solid var(--post-red);
+  padding-left: 14px;
+  font-size: var(--t3);
+  color: var(--ink);
+}
+.problem b { color: var(--post-red); }
+
+.after { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+
+/* The styled copy. A second offer, set below the handover and quieter than it:
+   the plain file is the promise this page keeps, and this is the extra. Ruled
+   off rather than boxed, because a second panel in chevron tape would read as a
+   second custody and there is only one. */
+.styling {
+  margin: 30px 0 0;
+  border-top: 1px solid var(--rule);
+  padding-top: 20px;
+}
+.styling__lead {
+  font-size: var(--t3);
+  color: var(--ink-2);
+  margin: 10px 0 16px;
+  max-width: 60ch;
+}
+.styling .handoff { margin-top: 20px; }
+.styling__off {
+  margin: 30px 0 0;
+  border-top: 1px solid var(--rule);
+  padding-top: 16px;
+  font-size: var(--t2);
+  color: var(--ink-3);
+}
+
+.cli {
+  margin: 34px 0 0;
+  font-size: var(--t2);
+  color: var(--ink-3);
+  border-top: 1px solid var(--rule);
+  padding-top: 14px;
+}
+.cli code {
+  font-family: var(--mono);
+  font-size: var(--t1);
+  color: var(--ink-2);
+  background: var(--stock);
+  padding: 2px 5px;
+}
+.foot {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 18px;
+  font-size: var(--t1);
+  color: var(--ink-3);
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.foot a { color: inherit; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ── The preview ──────────────────────────────────────────────────────────
+   The rebuilt document itself, shown before the handover. No chevron tape:
+   tape means "in our custody" and edges only the notice and the panel holding
+   the file. This is the contents, so it is set as a sheet on the desk. */
+.preview { margin: 26px 0 0; }
+.preview__note { margin: 4px 0 12px; color: var(--ink-2); font-size: 15px; }
+.preview__sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule-firm);
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 22px 24px;
+}
+.preview__sheet:focus-visible { outline: 2px solid var(--post-blue); outline-offset: 2px; }
+.preview__doc { font-size: 15px; line-height: 1.6; color: var(--ink); }
+.preview__doc > :first-child { margin-top: 0; }
+.preview__doc h1 { font-size: 22px; margin: 20px 0 8px; }
+.preview__doc h2 { font-size: 18px; margin: 18px 0 6px; }
+.preview__doc h3 { font-size: 16px; margin: 16px 0 6px; }
+.preview__doc p { margin: 0 0 10px; }
+.preview__doc img {
+  display: block; max-width: 100%; height: auto; margin: 14px 0;
+  border: 1px solid var(--rule);
+}
+.preview__doc table { border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+.preview__doc td { border: 1px solid var(--rule-firm); padding: 5px 9px; }
+.preview__doc .image-omitted { color: var(--ink-3); font-style: italic; }
+@media (max-width: 520px) { .preview__sheet { padding: 16px; max-height: 300px; } }
+
+/* ── The counter ──────────────────────────────────────────────────────────
+   Where a person sets the repaired document their own way. The document holds
+   the left; the rail holds one field, one sentence back, and receipts — one
+   ruled line each, the way a statement lists what has happened to an account.
+
+   There is no transcript on screen. This page already folds the working away
+   once the verdict is known, and the same rule applies here: the reply to
+   "make the headings smaller" is smaller headings, not a paragraph claiming
+   they are smaller. The full exchange sits behind a disclosure for whoever
+   wants it, and the width a transcript would have taken goes to the sheet.
+
+   Design: docs/style-it-yourself/v5-quiet-counter.html. Logic: docs/PRD-SET-IT-YOUR-WAY.md. */
+
+/* The counter owns the viewport and nothing outside it scrolls. `min-height`
+   let the rail grow with its own content, which pushed the field -- the one
+   control this screen exists for -- below the fold, so you had to scroll past
+   an empty ledger to find it. The document scrolls inside its pane and the
+   receipts inside theirs; the field stays put. `dvh` rather than `vh` so a
+   phone's collapsing address bar does not hide it either. */
+.counter {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+.counter__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--sheet);
+  border-bottom: 1px solid var(--rule-firm);
+}
+.counter__bar .record { margin: 0; border: 0; padding: 0; }
+.counter__acts { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.counter__split { flex: 1; display: grid; grid-template-columns: 1fr 312px; min-height: 0; }
+@media (max-width: 900px) {
+  .counter__split { grid-template-columns: 1fr; }
+  /* One column: the document holds the screen and the rail follows underneath,
+     so the page scrolls as a page. Trapping two independent scrollers in one
+     narrow column is how a phone loses the thing it was reaching for. */
+  .counter { height: auto; min-height: 100dvh; overflow: visible; }
+  .counter__scroll, .ledger { overflow: visible; }
+}
+
+/* left: the document, and the toggle that shows what changed */
+.counter__pane { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.counter__head { flex: none; display: flex; align-items: center; gap: 16px; padding: 15px 24px 13px; }
+.counter__head h2 { margin: 0; font-size: var(--t4); font-weight: 640; }
+.counter__head p { margin: 0; font-size: var(--t2); color: var(--ink-3); }
+
+.two { margin-left: auto; display: flex; border: 1px solid var(--rule-firm); background: var(--sheet); }
+.two button {
+  font: inherit;
+  font-size: var(--t2);
+  background: none;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  color: var(--ink-2);
+  padding: 7px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.two button:last-child { border-right: 0; }
+.two button:hover { color: var(--ink); background: var(--stock); }
+.two button[aria-pressed="true"] { background: var(--post-blue); color: #fff; }
+
+.counter__scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 0 24px 36px; }
+.counter__sheet {
+  background: var(--sheet);
+  border: 1px solid var(--rule-firm);
+  padding: 34px 40px 42px;
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+/* right: the rail */
+.rail {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--stock);
+  border-left: 1px solid var(--rule-firm);
+}
+@media (max-width: 900px) { .rail { border-left: 0; border-top: 1px solid var(--rule-firm); } }
+.rail__head { flex: none; padding: 15px 18px 14px; background: var(--sheet); border-bottom: 1px solid var(--rule); }
+.rail__head h2 { margin: 0; font-size: var(--t4); font-weight: 640; }
+.rail__head p { margin: 5px 0 0; font-size: var(--t2); color: var(--ink-2); }
+
+/* the one sentence back */
+.said { flex: none; padding: 16px 18px 14px; border-bottom: 1px solid var(--rule); }
+.said__lead { font-size: var(--t4); line-height: 1.5; color: var(--ink); margin: 0; }
+.said__meta {
+  margin: 11px 0 0;
+  font-family: var(--mono);
+  font-size: var(--t1);
+  color: var(--ink-3);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.said__meta i { width: 9px; height: 9px; background: var(--post-blue); font-style: normal; display: inline-block; }
+.said--refused .said__meta i { background: var(--post-red); }
+
+/* receipts */
+.ledger { flex: 1; min-height: 0; overflow-y: auto; padding: 6px 18px 16px; }
+.ledger h3 {
+  margin: 12px 0 4px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.entry {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  gap: 9px;
+  align-items: start;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--t2);
+}
+.entry i { width: 9px; height: 9px; margin-top: 6px; background: var(--post-blue); font-style: normal; display: block; }
+.entry span { color: var(--ink-2); line-height: 1.5; }
+.entry time { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); padding-top: 2px; }
+/* A refusal is a loss of something asked for, so it takes the red mark. The
+   line says which kind it was: one made before anything was sent cost nothing,
+   one made on a file that came back wrong had already been charged for. */
+.entry--refused i { background: var(--post-red); }
+.entry--refused b { color: var(--post-red); font-weight: 640; }
+
+.full { margin: 14px 0 0; border-top: 1px solid var(--rule); padding-top: 12px; }
+.full summary { font-size: var(--t2); color: var(--ink-2); cursor: pointer; }
+.full summary:hover { color: var(--ink); }
+.full .turn { display: grid; grid-template-columns: 48px 1fr; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--rule); }
+.full .who {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding-top: 3px;
+}
+.full .says { font-size: var(--t2); line-height: 1.55; color: var(--ink-2); }
+.full .turn--you .says { color: var(--ink); font-weight: 520; }
+
+/* the field that spends the allowance, with what is left beside it */
+.ask { flex: none; border-top: 1px solid var(--rule-firm); background: var(--sheet); padding: 13px 18px 15px; }
+.field {
+  border: 2px solid var(--ink);
+  background: var(--sheet);
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  padding: 9px 9px 9px 12px;
+}
+.field textarea {
+  flex: 1;
+  border: 0;
+  background: none;
+  resize: none;
+  font: inherit;
+  font-size: var(--t3);
+  color: var(--ink);
+  outline: none;
+  height: 52px;
+  line-height: 1.5;
+}
+.field textarea::placeholder { color: var(--ink-3); }
+.field textarea:disabled { color: var(--ink-3); }
+.send {
+  font: inherit;
+  font-size: var(--t2);
+  font-weight: 640;
+  background: var(--post-blue);
+  color: #fff;
+  border: 0;
+  padding: 9px 14px;
+  cursor: pointer;
+}
+.send:disabled { background: var(--rule-firm); cursor: default; }
+.left-today {
+  margin: 10px 0 0;
+  font-family: var(--mono);
+  font-size: var(--t1);
+  color: var(--ink-3);
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  line-height: 1.5;
+}
+.left-today i { width: 8px; height: 8px; margin-top: 4px; background: var(--kept); font-style: normal; display: inline-block; flex: none; }
+.left-today b { color: var(--ink-2); font-weight: 500; }
+
+/* Where the counter cannot be opened, one sentence stands in place of the
+   field. A step this copy of the page cannot take is never drawn as a button. */
+.shut { margin: 0; font-size: var(--t2); color: var(--ink-2); line-height: 1.55; }
+
+/* the door, in the handover panel */
+.door { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+.door .keep { margin: 0; }
+
+/* The counter reuses <Preview> rather than a second renderer (Task 4). On the
+   report page Preview shares the page with the verdict below it, so its own
+   box is capped at 380px; inside the counter the document owns the whole
+   pane, so that cap (and its now-redundant border) are turned off here --
+   .counter__sheet already supplies the box. */
+.counter__sheet .preview { margin: 0; }
+.counter__sheet .preview__sheet { max-height: none; border: 0; padding: 0; }

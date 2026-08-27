@@ -1,0 +1,51 @@
+# Block identity check in a build pipeline.
+#
+# Copy into .github/workflows/ of the repository that owns your SuperDocs
+# integration. It runs on every pull request, annotates the exact line of the
+# captured HTML that lost identity, and fails the job on a real loss -- not on a
+# reorder, and not on an out-of-flow part your editor does not render.
+#
+# The fixtures it checks are committed HTML pairs, so the job needs no API key,
+# no network and no account. See docs/CAPTURE.md for how to record a pair.
+
+name: block identity
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  round-trip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Published package:
+      #   - run: npx superdocs-block-identity-guard check ...
+      # Vendored copy (what this repository does):
+      - name: Check every committed round-trip pair
+        run: |
+          status=0
+          for pair in fixtures/*/; do
+            echo "::group::${pair}"
+            node node_modules/superdocs-block-identity-guard/src/cli.js check \
+              "${pair}before.html" "${pair}after.html" \
+              --format github --file "${pair}before.html" || status=1
+            echo "::endgroup::"
+          done
+          exit $status
+
+      # A repository that already has known losses it cannot fix today keeps the
+      # check switched on with a baseline, so the pipeline fails only on new ones.
+      #
+      #     --baseline .chunkguard-baseline.json
+      #
+      # Regenerate deliberately, and review the diff:
+      #
+      #     npx chunk-guard check before.html after.html \
+      #       --baseline .chunkguard-baseline.json --update-baseline

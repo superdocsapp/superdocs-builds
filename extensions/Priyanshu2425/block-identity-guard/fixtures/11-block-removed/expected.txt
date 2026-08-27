@@ -1,0 +1,16 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 8 out  ·  intact 8  lost 1  duplicated 0  moved 0  new 0
+
+LOST      LOST_BLOCK_REMOVED · id c1a0e0a4-0000-4000-8000-000000000005
+           where p · block 5 of the before document · line 5
+           text  "Liability under this clause is capped at the fees paid in th…"
+           at    div > p[2]
+           cause the block is not in the after document at all: it was deleted, replaced
+                 wholesale, or the integration never rendered it
+           ·     no node in the after document carries this text, or anything close to it
+           ·     nearest surviving ancestor c1a0e0a4-0000-4000-8000-000000000001
+           confidence high
+
+1 error(s)
+
+exit code: 1

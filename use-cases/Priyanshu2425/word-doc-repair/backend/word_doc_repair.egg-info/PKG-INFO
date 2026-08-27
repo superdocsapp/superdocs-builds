@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: word-doc-repair
+Version: 1.0.0
+Summary: Best-effort recovery for a Word document that will not open.
+Requires-Python: >=3.10
+License-File: LICENSE
+Requires-Dist: lxml
+Requires-Dist: python-docx
+Requires-Dist: requests
+Requires-Dist: pydantic
+Provides-Extra: web
+Requires-Dist: fastapi; extra == "web"
+Requires-Dist: uvicorn; extra == "web"
+Requires-Dist: python-multipart; extra == "web"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: httpx2; extra == "dev"
+Provides-Extra: screenshot
+Requires-Dist: playwright; extra == "screenshot"
+Dynamic: license-file

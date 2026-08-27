@@ -1,0 +1,20 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 10 out  ·  intact 9  lost 0  duplicated 1  moved 0  new 0
+
+DUPLICATE DUPLICATE_ID · id c1a0e0a4-0000-4000-8000-000000000004
+           where p · block 4 of the before document · line 4
+           text  "The Supplier shall indemnify the Customer against all losses…"
+           at    div > p[1]
+           cause data-chunk-id="c1a0e0a4-0000-4000-8000-000000000004" is on 2 blocks after the
+                 round trip -- a copy-paste, a split block, or a node the editor cloned. A
+                 change batch targeting this identifier is ambiguous: the edit can land on
+                 either node
+           ·     the blocks carrying it are listed below; the edit lands on whichever one your
+                 applier finds first, which is not stable between runs
+           -     p block 4, line 4 · id c1a0e0a4-0000-4000-8000-000000000004 · "The Supplier shall indemnify the Customer against all losses…"
+           -     p block 5, line 5 · id c1a0e0a4-0000-4000-8000-000000000004 · "The Supplier shall maintain insurance sufficient to meet tha…"
+           confidence high
+
+1 error(s)
+
+exit code: 1

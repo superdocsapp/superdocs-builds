@@ -1,0 +1,12 @@
+# The relay credentials in .env.example are meant to be committed. A .env is
+# not: the moment somebody uncomments SUPERDOCS_API_KEY it holds their own key.
+# This build is published standalone, so it carries its own rule rather than
+# relying on one from a repository it will not travel with.
+.env
+.env.local
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/

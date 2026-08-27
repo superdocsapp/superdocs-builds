@@ -1,0 +1,23 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 9 out  ·  intact 0  lost 9  duplicated 0  moved 0  new 9
+
+LOST      IDS_REGENERATED
+           cause none of the 9 identifiers survived, and the after document carries 9
+                 identifiers of its own: the editor set its own content instead of applying the
+                 document_sync HTML, so every subsequent change batch will miss
+           ·     before: c1a0e0a4-0000-4000-8000-000000000001,
+                 c1a0e0a4-0000-4000-8000-000000000002, c1a0e0a4-0000-4000-8000-000000000003
+           ·     after: 7f3d51b2-1111-4000-8000-000000000001,
+                 7f3d51b2-1111-4000-8000-000000000002, 7f3d51b2-1111-4000-8000-000000000003
+           ·     the after identifiers have the same shape as SuperDocs identifiers, which is
+                 why this failure is easy to miss on inspection
+           -     div block 1, line 1 · id c1a0e0a4-0000-4000-8000-000000000001 · "Master Services Agreement 4. Liability and indemnity The Sup…"
+           -     h1 block 2, line 2 · id c1a0e0a4-0000-4000-8000-000000000002 · "Master Services Agreement"
+           -     h2 block 3, line 3 · id c1a0e0a4-0000-4000-8000-000000000003 · "4. Liability and indemnity"
+           -     p block 4, line 4 · id c1a0e0a4-0000-4000-8000-000000000004 · "The Supplier shall indemnify the Customer against all losses…"
+           -     p block 5, line 5 · id c1a0e0a4-0000-4000-8000-000000000005 · "Liability under this clause is capped at the fees paid in th…"
+           confidence high
+
+1 error(s)
+
+exit code: 1

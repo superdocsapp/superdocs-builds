@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Style it yourself — five variations</title>
+<style>
+:root{
+  --stock:#e9ebe6; --sheet:#fcfcfa;
+  --ink:#14171a; --ink-2:#494f55; --ink-3:#7b8188;
+  --rule:#ccd1cd; --rule-firm:#a9b0aa;
+  --post-blue:#173f8a; --post-red:#c2222c; --kept:#16603c; --focus:#173f8a;
+  --t1:12px; --t2:13px; --t3:15px; --t4:17px; --t5:21px; --t6:28px; --t7:38px;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --stock:#101314; --sheet:#181b1d;
+  --ink:#eef1f0; --ink-2:#b3b9bc; --ink-3:#838a8e;
+  --rule:#2a2f31; --rule-firm:#3d4346;
+  --post-blue:#7aa0e8; --post-red:#ef7a72; --kept:#6cc094; --focus:#7aa0e8;
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--stock);color:var(--ink);font:var(--t3)/1.6 var(--sans)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+.tape{height:9px;background:repeating-linear-gradient(-45deg,var(--post-red) 0 12px,var(--sheet) 12px 24px,var(--post-blue) 24px 36px,var(--sheet) 36px 48px)}
+
+.page{max-width:760px;margin:0 auto;padding:0 20px 80px}
+.brand{display:flex;align-items:baseline;gap:10px;padding:22px 0 0}
+.brand__mark{margin:0;font-size:var(--t5);font-weight:700;letter-spacing:-.02em}
+.brand__mark span{color:var(--post-blue)}
+.brand__line{font-size:var(--t1);color:var(--ink-3);letter-spacing:.04em;text-transform:uppercase}
+
+.notice{background:var(--sheet);border:1px solid var(--rule-firm);margin-top:16px}
+.notice__body{padding:26px 24px 30px}
+@media (min-width:620px){.notice__body{padding:34px 38px 38px}}
+h1{font-size:var(--t6);line-height:1.16;letter-spacing:-.025em;margin:0 0 10px;font-weight:680;text-wrap:balance}
+@media (min-width:620px){h1{font-size:var(--t7)}}
+.sub{font-size:var(--t4);color:var(--ink-2);margin:0 0 8px;max-width:52ch}
+.record{margin:22px 0 0;border-top:1px solid var(--rule);padding-top:12px;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;flex-wrap:wrap;gap:4px 20px}
+.record b{color:var(--ink-2);font-weight:500}
+
+h2{font-size:var(--t1);font-weight:720;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2);margin:34px 0 10px;padding-bottom:7px;border-bottom:1px solid var(--rule-firm)}
+p{max-width:64ch}
+
+.list{list-style:none;margin:0;padding:0}
+.card{display:block;text-decoration:none;color:inherit;border-bottom:1px solid var(--rule);padding:18px 0 19px;
+      display:grid;grid-template-columns:42px 1fr;gap:16px;transition:background 120ms var(--ease)}
+.card:hover{background:color-mix(in srgb,var(--post-blue) 6%,transparent)}
+.card__no{font-family:var(--mono);font-size:var(--t2);color:var(--post-blue);padding-top:3px}
+.card h3{margin:0 0 5px;font-size:var(--t5);font-weight:640;letter-spacing:-.015em}
+.card p{margin:0;font-size:var(--t3);color:var(--ink-2);max-width:62ch}
+.card .why{display:inline-block;margin-top:9px;font-size:var(--t1);letter-spacing:.06em;text-transform:uppercase;
+           color:var(--ink-3);border:1px solid var(--rule);padding:3px 9px}
+.card--pick .why{color:var(--post-blue);border-color:var(--post-blue)}
+
+.shared{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:var(--t3);color:var(--ink-2)}
+.shared li{display:grid;grid-template-columns:16px 1fr;gap:10px;align-items:start}
+.shared b{color:var(--ink);font-weight:620}
+.shared i{width:9px;height:9px;margin-top:7px;background:var(--post-blue);font-style:normal}
+.shared i.red{background:var(--post-red)}
+.shared i.green{background:var(--kept)}
+
+.door{border:1px solid var(--rule-firm);background:var(--stock);margin-top:14px}
+.door__tape{height:9px;background:repeating-linear-gradient(-45deg,var(--post-red) 0 12px,var(--sheet) 12px 24px,var(--post-blue) 24px 36px,var(--sheet) 36px 48px)}
+.door__body{padding:18px 18px 20px}
+.btn{font:inherit;font-size:var(--t4);font-weight:640;background:var(--post-blue);color:#fff;border:0;padding:13px 22px;
+     cursor:pointer;display:inline-block;text-decoration:none}
+.keep{font-size:var(--t2);color:var(--ink-3);margin:12px 0 0;max-width:60ch}
+.keep a{color:var(--post-blue)}
+.door__after{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn--quiet{background:none;color:var(--ink);border:1px solid var(--rule-firm);font-size:var(--t3);padding:10px 16px}
+
+.check{border-left:1px solid var(--post-blue);padding-left:16px;margin-top:14px}
+.check p{margin:0 0 10px}
+.check p:last-child{margin-bottom:0}
+.check b{font-weight:640}
+.foot{max-width:760px;margin:0 auto;padding:20px;font-size:var(--t1);color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="tape"></div>
+<div class="page">
+  <div class="brand">
+    <p class="brand__mark">SAL<span>VAGE</span></p>
+    <span class="brand__line">design · style it yourself</span>
+  </div>
+
+  <div class="notice">
+    <div class="notice__body">
+      <h1>Style it yourself</h1>
+      <p class="sub">Five ways to put the person at the controls once the repaired document is ready —
+        the file on one side, a line to SuperDocs on the other.</p>
+      <p class="record"><b>5 variations</b><span>desktop 1320 × 840 and mobile 390 × 844 in each file</span><span>26 August 2026</span></p>
+
+      <h2>What is being designed</h2>
+      <p>The recovery already styles the file on the way through, and hands the styled copy over
+        with the plain rebuild still one link away. This adds a door <em>after</em> that: a person who
+        does not like how their document has been set can say so, in their own words, and watch it
+        change. Desktop is a split — the document on the left, the conversation on the right. On a
+        phone the document holds the screen and the conversation is a drawer.</p>
+
+      <h2>Where the door is</h2>
+      <p>Beside the download, inside the panel that hands the file over — not on the report above it.
+        The sentence has to say plainly that styling already happened, or the door reads as the opt-in
+        button this build removed on 26 August.</p>
+
+      <div class="door">
+        <div class="door__tape"></div>
+        <div class="door__body">
+          <a class="btn" href="#">Download the repaired file</a>
+          <p class="keep">Saved as <b>quarterly-review-recovered.docx</b>. You can download it more than
+            once. Your original was never changed.</p>
+          <p class="keep">Styled through SuperDocs, which changed how your words are set and not what
+            they say. <a href="#">Download the unstyled copy instead</a></p>
+          <div class="door__after">
+            <a class="btn btn--quiet" href="#">Set it your way →</a>
+            <span class="keep" style="margin:0">Not how you would have set it? Say so, and watch it change.</span>
+          </div>
+        </div>
+      </div>
+
+      <h2>The five</h2>
+      <ul class="list">
+        <li>
+          <a class="card card--pick" href="v1-the-counter.html">
+            <span class="card__no">V1</span>
+            <div>
+              <h3>The Counter</h3>
+              <p>A clerk at the counter beside the desk. Ruled ledger lines rather than speech bubbles,
+                every change numbered and stamped, and an offer to put each one back before it is asked
+                for. Quick instruction chips under the field for the person with no vocabulary for what
+                they want.</p>
+              <span class="why">Closest to today's page</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="v2-amendment-slips.html">
+            <span class="card__no">V2</span>
+            <div>
+              <h3>Amendment Slips</h3>
+              <p>Every instruction becomes a numbered slip, newest on top, each revertible on its own
+                without undoing the ones after it. Blue ticks in the document's margin show where each
+                slip landed; hovering either one lights the other.</p>
+              <span class="why">Best when taste is being tried on</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="v3-margin-notes.html">
+            <span class="card__no">V3</span>
+            <div>
+              <h3>Margin Notes</h3>
+              <p>Point at the thing instead of describing it. Select a passage and the conversation
+                attaches to it, so “smaller” is a complete instruction. Threads pinned to places rather
+                than one transcript, and a rail that folds to a hairline for reading.</p>
+              <span class="why">Best for long documents</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="v4-proof-sheet.html">
+            <span class="card__no">V4</span>
+            <div>
+              <h3>Proof Sheet</h3>
+              <p>The print shop: real pages in order with a thumbnail column, because styling changes
+                where things fall. The rail is an order form that talks — each control writes a plain
+                sentence into the field so you can see it, reword it, or ignore it and type your own.</p>
+              <span class="why">Best for people who know the result, not the words</span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a class="card" href="v5-quiet-counter.html">
+            <span class="card__no">V5</span>
+            <div>
+              <h3>Quiet Counter</h3>
+              <p>The least chat-like. One field, one sentence back, receipts one line each, and the full
+                exchange behind a disclosure. The width a transcript would have taken goes to the sheet
+                and to a toggle between how the file came back and how you have set it.</p>
+              <span class="why">Best for the document itself</span>
+            </div>
+          </a>
+        </li>
+      </ul>
+
+      <h2>True in all five</h2>
+      <ul class="shared">
+        <li><i></i><b>The document is never smaller than the claim about it.</b> The sheet takes at least
+          two thirds of the desktop width and the whole of the phone. The conversation is a rail, never a peer.</li>
+        <li><i></i><b>One strip of chevron tape, at the top of the shell.</b> Tape means <em>in our custody</em>;
+          the sheet itself carries none, because it is the contents rather than the custody.</li>
+        <li><i></i><b>The unstyled rebuild stays one click away</b> for as long as the screen is open, so
+          preferring it never costs a second run.</li>
+        <li><i class="red"></i><b>A refusal is said out loud, in red, and the page says what it cost.</b> Asking for
+          words the document does not have is refused before anything is sent, in the same voice a yes is given, and
+          the allowance is untouched. A file thrown away because it came back wrong had already been charged for, and
+          that line says so rather than claiming otherwise.</li>
+        <li><i class="green"></i><b>What is left is stated before it is spent</b> — how many changes remain, on
+          screen, next to the field that spends them.</li>
+        <li><i></i><b>Nothing renders as a button that cannot be pressed.</b> No key, no allowance, or SuperDocs
+          unreachable: the field is not drawn at all and one sentence says why. What already happened stays readable.</li>
+      </ul>
+
+      <h2>Against the baseline</h2>
+      <div class="check">
+        <p><b>B1, B2 and B4 hold.</b> The styled file is still the deliverable, the plain rebuild is still
+          reachable from the same panel, and nothing here runs during the recovery, so no failure in it can
+          cost the recovery.</p>
+        <p><b>B3 needs the owner's eye.</b> B3 says styling runs inside the recovery, with no opt-in button
+          and no second request a person must know to make. This door opens <em>after</em> the automatic pass
+          has already run and been handed over, so the invariant reads as still true — but the wording of the
+          entry point is what keeps it true. “Style my document” would reintroduce the opt-in this build
+          removed on 26 August. “Set it your way”, sitting under a sentence that says the file has already
+          been styled, does not. That is a judgement about copy, and it is the owner's to make.</p>
+        <p><b>B5 extends rather than changes.</b> Each change a person asks for is a stage like any other and
+          belongs on the same progress line, as it happens, not summarised afterwards.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="foot">Mock-ups. Every token is copied from <code>frontend/src/styles.css</code>; nothing here is a new palette.</div>
+</body>
+</html>

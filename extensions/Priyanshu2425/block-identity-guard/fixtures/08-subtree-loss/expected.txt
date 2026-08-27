@@ -1,0 +1,28 @@
+block identity check  data-chunk-id
+10 identified block(s) in, 4 out  ·  intact 4  lost 6  duplicated 0  moved 0  new 0
+
+LOST      LOST_SUBTREE · under id c1a0e0a4-0000-4000-8000-000000000011 · 6 blocks
+           from  tr · block 4 of the before document · line 4
+           text  "Service Rate"
+           at    div > table > tr[1]
+           cause 6 blocks under c1a0e0a4-0000-4000-8000-000000000011 lost identity. The loss
+                 starts at tr "Service Rate" and the dominant transformation is
+                 LOST_ATTRIBUTE_STRIPPED: the tag and text are unchanged and every attribute is
+                 gone, which is a sanitiser or editor schema stripping all unknown attributes
+                 rather than one filtered attribute
+           after tr at line 4 (no attributes)
+           ·     every block in this group failed the same way (LOST_ATTRIBUTE_STRIPPED)
+           ·     c1a0e0a4-0000-4000-8000-000000000011 kept its own identifier, so the loss stops
+                 there: fix the transformation that takes its children and the whole group is
+                 fixed
+           -     tr block 4, line 4 LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000012 · "Service Rate"
+           -     th block 5, line 5 LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000013 · "Service"
+           -     th block 6, line 6 LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000014 · "Rate"
+           -     tr block 7, line 8 LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000015 · "Implementation GBP 1,200 per day"
+           -     td block 8, line 9 LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000016 · "Implementation"
+           -     td block 9, line 10 LOST_ATTRIBUTE_STRIPPED · id c1a0e0a4-0000-4000-8000-000000000017 · "GBP 1,200 per day"
+           confidence medium
+
+1 error(s)
+
+exit code: 1

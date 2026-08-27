@@ -1,0 +1,2623 @@
+{
+  "method": {
+    "corpus": {
+      "base_documents": [
+        {
+          "name": "synthetic-report",
+          "written_by": "this package",
+          "source": "generated at run time"
+        },
+        {
+          "name": "synthetic-illustrated",
+          "written_by": "this package",
+          "source": "generated at run time"
+        },
+        {
+          "name": "apple-textutil",
+          "written_by": "Apple textutil (macOS)",
+          "source": "corpus/originals/apple-textutil.docx"
+        },
+        {
+          "name": "opf-lorem-ipsum",
+          "written_by": "the OPF variations converter",
+          "source": "corpus/originals/opf-lorem-ipsum.docx"
+        },
+        {
+          "name": "gdocs-fully-featured",
+          "written_by": "Google Docs",
+          "source": "corpus/originals/gdocs-fully-featured.docx"
+        }
+      ],
+      "damage_modes": [
+        {
+          "name": "missing-content-types",
+          "kind": "lossless",
+          "what_happened": "the part that tells Word what the other parts are is gone"
+        },
+        {
+          "name": "missing-rels",
+          "kind": "lossless",
+          "what_happened": "the part that says where each picture belonged is gone"
+        },
+        {
+          "name": "bad-characters",
+          "kind": "lossless",
+          "what_happened": "a bare ampersand and two control characters in the body"
+        },
+        {
+          "name": "mangled-xml-declaration",
+          "kind": "lossless",
+          "what_happened": "the body declares an encoding that does not exist"
+        },
+        {
+          "name": "garbage-prefix",
+          "kind": "lossless",
+          "what_happened": "an HTTP response header left in front of the file"
+        },
+        {
+          "name": "zeroed-eocd",
+          "kind": "lossless",
+          "what_happened": "the archive's index signature is destroyed; the content is untouched"
+        },
+        {
+          "name": "duplicate-entry",
+          "kind": "lossless",
+          "what_happened": "a second, empty copy of the body under the same name"
+        },
+        {
+          "name": "bad-crc",
+          "kind": "lossless",
+          "what_happened": "the stored checksum for the body no longer matches its bytes"
+        },
+        {
+          "name": "truncated-90",
+          "kind": "lossy",
+          "what_happened": "the download stopped at 90%"
+        },
+        {
+          "name": "truncated-60",
+          "kind": "lossy",
+          "what_happened": "the download stopped at 60%"
+        },
+        {
+          "name": "truncated-30",
+          "kind": "lossy",
+          "what_happened": "the download stopped at 30%"
+        },
+        {
+          "name": "unclosed-tags",
+          "kind": "lossy",
+          "what_happened": "the body is cut off mid-element"
+        },
+        {
+          "name": "body-bitrot",
+          "kind": "lossy",
+          "what_happened": "bit flips inside the compressed body"
+        },
+        {
+          "name": "media-truncated",
+          "kind": "lossy",
+          "what_happened": "a picture's bytes are cut in half"
+        },
+        {
+          "name": "missing-document-part",
+          "kind": "fatal",
+          "what_happened": "the body part is gone entirely"
+        },
+        {
+          "name": "zero-length-body",
+          "kind": "fatal",
+          "what_happened": "the body part is present and zero bytes long"
+        },
+        {
+          "name": "not-a-zip",
+          "kind": "fatal",
+          "what_happened": "the file was never a Word document"
+        },
+        {
+          "name": "empty-body",
+          "kind": "fatal",
+          "what_happened": "a valid, empty document"
+        }
+      ],
+      "note": "Every base document is damaged every way that applies to it. Media damage is skipped on a document with no pictures."
+    },
+    "ground_truth": "The words of the intact original, scraped out of word/document.xml by corpus.text_of -- regex over <w:t> runs, standard library only, no code shared with the repair path. The same function reads the rebuilt file, so both sides of every ratio are measured the same way.",
+    "word_recall": "The share of the original's words present in the recovered text, as multisets: a word said four times and recovered once counts as one quarter of four.",
+    "damage_kinds": {
+      "lossless": "No content was destroyed -- every word is still in the bytes. Full recovery is owed, and anything less is this tool's defect.",
+      "lossy": "Bytes were physically removed. Partial recovery is the honest answer; full recovery is not available at any price, so no rate over these fixtures is a score out of 100.",
+      "fatal": "The words are not in the file at all. Refusing is the only correct answer."
+    },
+    "not_measured": [
+      "Formatting fidelity. The rebuild is deliberately plain -- theme, fonts and spacing are not carried, so no figure here is about how the document looks.",
+      "Real-world damage. Every fixture was damaged by this module in a named way. No public corpus of genuinely corrupt DOCX with known originals was found to measure against; see RECOVERY.md.",
+      "Word's own verdict. Outputs are re-opened and re-read by Python, not by Microsoft Word. Eight of them are opened in Word by hand -- manual-test/MANUAL_QA_PLAN.html records that separately."
+    ]
+  },
+  "fixtures": [
+    {
+      "fixture": "synthetic-report/missing-content-types",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "missing-content-types",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/missing-rels",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "missing-rels",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/bad-characters",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "bad-characters",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/mangled-xml-declaration",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "mangled-xml-declaration",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/garbage-prefix",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "garbage-prefix",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/zeroed-eocd",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "zeroed-eocd",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/duplicate-entry",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "duplicate-entry",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/bad-crc",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "bad-crc",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/truncated-90",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "truncated-90",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/truncated-60",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "truncated-60",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 25,
+      "recovered_words": 25,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/truncated-30",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "truncated-30",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 25,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "tables: 1 -> 0",
+        "rows: 3 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) was cut short by the damage and was recovered only up to the break",
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered",
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "synthetic-report/unclosed-tags",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "unclosed-tags",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.6,
+      "truth_words": 25,
+      "recovered_words": 15,
+      "structure_preserved": true,
+      "structure_lost": [
+        "rows: 3 -> 2"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 2,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-report/body-bitrot",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "body-bitrot",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 25,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "tables: 1 -> 0",
+        "rows: 3 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) is present but its data is unreadable",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "synthetic-report/missing-document-part",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "missing-document-part",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 25,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "tables: 1 -> 0",
+        "rows: 3 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "synthetic-report/zero-length-body",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "zero-length-body",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 25,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "tables: 1 -> 0",
+        "rows: 3 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered",
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "synthetic-report/not-a-zip",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "not-a-zip",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 25,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "tables: 1 -> 0",
+        "rows: 3 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable parts could be found inside the file",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "synthetic-report/empty-body",
+      "base": "synthetic-report",
+      "written_by": "this package",
+      "damage": "empty-body",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 25,
+      "recovered_words": 0,
+      "structure_preserved": true,
+      "structure_lost": [
+        "tables: 1 -> 0",
+        "rows: 3 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 1,
+        "rows": 3,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "synthetic-illustrated/missing-content-types",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "missing-content-types",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/missing-rels",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "missing-rels",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 18,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 1 picture that was destroyed by the damage \u2014 the reference survived but the image data did not, so it could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/bad-characters",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "bad-characters",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/mangled-xml-declaration",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "mangled-xml-declaration",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/garbage-prefix",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "garbage-prefix",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/zeroed-eocd",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "zeroed-eocd",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/duplicate-entry",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "duplicate-entry",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/bad-crc",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "bad-crc",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/truncated-90",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "truncated-90",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/truncated-60",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "truncated-60",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [
+        "the document refers to 1 picture that was destroyed by the damage \u2014 the reference survived but the image data did not, so it could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/truncated-30",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "truncated-30",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 13,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) was cut short by the damage and was recovered only up to the break",
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered",
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "synthetic-illustrated/unclosed-tags",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "unclosed-tags",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.6154,
+      "truth_words": 13,
+      "recovered_words": 8,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/body-bitrot",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "body-bitrot",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 13,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) is present but its data is unreadable",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "synthetic-illustrated/media-truncated",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "media-truncated",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 13,
+      "recovered_words": 13,
+      "structure_preserved": true,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [
+        "one picture could not be put back because it was cut short by the damage and only part of it could be read"
+      ],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "synthetic-illustrated/missing-document-part",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "missing-document-part",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 13,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "synthetic-illustrated/zero-length-body",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "zero-length-body",
+      "kind": "fatal",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.0,
+      "truth_words": 13,
+      "recovered_words": 5,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": [
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered"
+      ]
+    },
+    {
+      "fixture": "synthetic-illustrated/not-a-zip",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "not-a-zip",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 13,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable parts could be found inside the file",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "synthetic-illustrated/empty-body",
+      "base": "synthetic-illustrated",
+      "written_by": "this package",
+      "damage": "empty-body",
+      "kind": "fatal",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.0,
+      "truth_words": 13,
+      "recovered_words": 5,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/missing-content-types",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "missing-content-types",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/missing-rels",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "missing-rels",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/bad-characters",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "bad-characters",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/mangled-xml-declaration",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "mangled-xml-declaration",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/garbage-prefix",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "garbage-prefix",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/zeroed-eocd",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "zeroed-eocd",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/duplicate-entry",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "duplicate-entry",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/bad-crc",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "bad-crc",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/truncated-90",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "truncated-90",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/truncated-60",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "truncated-60",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 52,
+      "recovered_words": 52,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/theme/theme1.xml) was cut short by the damage and was recovered only up to the break"
+      ]
+    },
+    {
+      "fixture": "apple-textutil/truncated-30",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "truncated-30",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 52,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) was cut short by the damage and was recovered only up to the break",
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered",
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "apple-textutil/unclosed-tags",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "unclosed-tags",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.5577,
+      "truth_words": 52,
+      "recovered_words": 29,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "apple-textutil/body-bitrot",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "body-bitrot",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 52,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) is present but its data is unreadable",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "apple-textutil/missing-document-part",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "missing-document-part",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 52,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "apple-textutil/zero-length-body",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "zero-length-body",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 52,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered",
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "apple-textutil/not-a-zip",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "not-a-zip",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 52,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable parts could be found inside the file",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "apple-textutil/empty-body",
+      "base": "apple-textutil",
+      "written_by": "Apple textutil (macOS)",
+      "damage": "empty-body",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 52,
+      "recovered_words": 0,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/missing-content-types",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "missing-content-types",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/missing-rels",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "missing-rels",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/bad-characters",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "bad-characters",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/mangled-xml-declaration",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "mangled-xml-declaration",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/garbage-prefix",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "garbage-prefix",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/zeroed-eocd",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "zeroed-eocd",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/duplicate-entry",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "duplicate-entry",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/bad-crc",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "bad-crc",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/truncated-90",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "truncated-90",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (docProps/thumbnail.jpeg) was cut short by the damage and was recovered only up to the break"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/truncated-60",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "truncated-60",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (docProps/thumbnail.jpeg) was cut short by the damage and was recovered only up to the break"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/truncated-30",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "truncated-30",
+      "kind": "lossy",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 660,
+      "recovered_words": 660,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (docProps/thumbnail.jpeg) was cut short by the damage and was recovered only up to the break"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/unclosed-tags",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "unclosed-tags",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.7348,
+      "truth_words": 660,
+      "recovered_words": 485,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "opf-lorem-ipsum/body-bitrot",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "body-bitrot",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.1394,
+      "truth_words": 660,
+      "recovered_words": 117,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) was cut short by the damage and was recovered only up to the break",
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/missing-document-part",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "missing-document-part",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 660,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/zero-length-body",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "zero-length-body",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 660,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered",
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/not-a-zip",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "not-a-zip",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 660,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable parts could be found inside the file",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "opf-lorem-ipsum/empty-body",
+      "base": "opf-lorem-ipsum",
+      "written_by": "the OPF variations converter",
+      "damage": "empty-body",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 660,
+      "recovered_words": 0,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable text was found in the document body"
+      ]
+    },
+    {
+      "fixture": "gdocs-fully-featured/missing-content-types",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "missing-content-types",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/missing-rels",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "missing-rels",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 407,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 3 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/bad-characters",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "bad-characters",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/mangled-xml-declaration",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "mangled-xml-declaration",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/garbage-prefix",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "garbage-prefix",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/zeroed-eocd",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "zeroed-eocd",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/duplicate-entry",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "duplicate-entry",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/bad-crc",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "bad-crc",
+      "kind": "lossless",
+      "verdict": "full",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/truncated-90",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "truncated-90",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered",
+        "one picture could not be put back because it was cut short by the damage and only part of it could be read"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/truncated-60",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "truncated-60",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered",
+        "one picture could not be put back because it was cut short by the damage and only part of it could be read"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/truncated-30",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "truncated-30",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered",
+        "one picture could not be put back because it was cut short by the damage and only part of it could be read"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/unclosed-tags",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "unclosed-tags",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.7493,
+      "truth_words": 363,
+      "recovered_words": 306,
+      "structure_preserved": true,
+      "structure_lost": [
+        "tables: 2 -> 1",
+        "rows: 8 -> 5"
+      ],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 1,
+        "rows": 5,
+        "images": 1
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/body-bitrot",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "body-bitrot",
+      "kind": "lossy",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 363,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0",
+        "tables: 2 -> 0",
+        "rows: 8 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "one section of the file (word/document.xml) is present but its data is unreadable",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "gdocs-fully-featured/media-truncated",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "media-truncated",
+      "kind": "lossy",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 1.0,
+      "truth_words": 363,
+      "recovered_words": 402,
+      "structure_preserved": true,
+      "structure_lost": [
+        "images: 1 -> 0"
+      ],
+      "images_lost": [
+        "the document refers to 2 pictures that were destroyed by the damage \u2014 the reference survived but the image data did not, so they could not be recovered",
+        "one picture could not be put back because it was cut short by the damage and only part of it could be read"
+      ],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 0
+      },
+      "lost": []
+    },
+    {
+      "fixture": "gdocs-fully-featured/missing-document-part",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "missing-document-part",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 363,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0",
+        "tables: 2 -> 0",
+        "rows: 8 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "gdocs-fully-featured/zero-length-body",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "zero-length-body",
+      "kind": "fatal",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.0331,
+      "truth_words": 363,
+      "recovered_words": 44,
+      "structure_preserved": false,
+      "structure_lost": [
+        "tables: 2 -> 0",
+        "rows: 8 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": [
+        "the document structure was unreadable, so headings, tables and formatting could not be preserved \u2014 only the text was recovered"
+      ]
+    },
+    {
+      "fixture": "gdocs-fully-featured/not-a-zip",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "not-a-zip",
+      "kind": "fatal",
+      "verdict": "refused",
+      "ok": false,
+      "word_recall": 0.0,
+      "truth_words": 363,
+      "recovered_words": 0,
+      "structure_preserved": false,
+      "structure_lost": [
+        "images: 1 -> 0",
+        "tables: 2 -> 0",
+        "rows: 8 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 0
+      },
+      "lost": [
+        "no readable parts could be found inside the file",
+        "the main document part was not found inside the file, so there is no text to recover"
+      ]
+    },
+    {
+      "fixture": "gdocs-fully-featured/empty-body",
+      "base": "gdocs-fully-featured",
+      "written_by": "Google Docs",
+      "damage": "empty-body",
+      "kind": "fatal",
+      "verdict": "partial",
+      "ok": true,
+      "word_recall": 0.0331,
+      "truth_words": 363,
+      "recovered_words": 44,
+      "structure_preserved": true,
+      "structure_lost": [
+        "tables: 2 -> 0",
+        "rows: 8 -> 0"
+      ],
+      "images_lost": [],
+      "truth_counts": {
+        "tables": 2,
+        "rows": 8,
+        "images": 1
+      },
+      "recovered_counts": {
+        "tables": 0,
+        "rows": 0,
+        "images": 1
+      },
+      "lost": []
+    }
+  ],
+  "summary": {
+    "unexpected": [],
+    "fatal_returned_furniture": [
+      "synthetic-illustrated/zero-length-body",
+      "synthetic-illustrated/empty-body",
+      "gdocs-fully-featured/zero-length-body",
+      "gdocs-fully-featured/empty-body"
+    ],
+    "fixtures": 87,
+    "by_kind": {
+      "lossless": {
+        "fixtures": 40,
+        "verdicts": {
+          "full": 40
+        },
+        "mean_word_recall": 1.0,
+        "min_word_recall": 1.0
+      },
+      "lossy": {
+        "fixtures": 27,
+        "verdicts": {
+          "full": 8,
+          "partial": 12,
+          "refused": 7
+        },
+        "mean_word_recall": 0.6443,
+        "min_word_recall": 0.0
+      },
+      "fatal": {
+        "fixtures": 20,
+        "verdicts": {
+          "partial": 4,
+          "refused": 16
+        },
+        "mean_word_recall": 0.0033,
+        "min_word_recall": 0.0
+      }
+    },
+    "headline": {
+      "lossless_full_recovery": "40/40",
+      "fatal_correctly_refused": "16/20",
+      "empty_successes": 0,
+      "crashes": 0
+    }
+  }
+}

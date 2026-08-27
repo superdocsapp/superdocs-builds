@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual test · Repair my broken Word doc</title>
+<style>
+  :root{
+    --bg:#f7f7f5; --panel:#fff; --ink:#16181d; --muted:#63676f; --line:#e2e2dd;
+    --accent:#2f6fed; --good:#0f7b52; --warn:#a8600b; --bad:#b3261e; --radius:14px;
+    --code-bg:#f0f0ec;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#101216; --panel:#171a20; --ink:#e8e9ec; --muted:#9aa0aa;
+           --line:#262a32; --accent:#6f9bff; --good:#4ec08d; --warn:#e0a34a; --bad:#f27c72;
+           --code-bg:#0c0e12; }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden;
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .wrap{max-width:820px;margin:0 auto;padding:48px 20px 96px}
+  h1{font-size:31px;line-height:1.2;margin:0 0 10px;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin:0 0 28px;font-size:17px}
+  h2{font-size:19px;margin:0 0 10px;letter-spacing:-.01em}
+  h3{font-size:17px;margin:0 0 4px;letter-spacing:-.01em}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;margin-bottom:18px}
+  .label{font-size:12.5px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--muted);margin:20px 0 7px;font-weight:600}
+  .label:first-child{margin-top:0}
+  p{margin:0 0 12px}
+  ul,ol{margin:0 0 12px;padding-left:20px}
+  li{margin:5px 0}
+  code,kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;
+    background:var(--code-bg);border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px;overflow-x:auto;margin:0 0 12px;max-width:100%}
+  pre code{background:none;border:0;padding:0;font-size:13.5px;line-height:1.7}
+  a{color:var(--accent)}
+  .quote{border:1px solid var(--rule);padding:2px 0 2px 13px;margin:0 0 12px;
+    color:var(--ink);font-size:15px}
+  .muted{color:var(--muted)}
+  .small{font-size:13.5px}
+  .warnbox{border:1px solid var(--warn);border-radius:10px;padding:12px 14px;margin:0 0 14px;
+    color:var(--warn);font-size:14.5px;background:color-mix(in srgb,var(--warn) 8%,var(--panel))}
+
+  /* sticky progress bar */
+  .bar{position:sticky;top:0;z-index:5;background:var(--panel);border:1px solid var(--line);
+    border-radius:var(--radius);padding:13px 16px;margin:0 0 22px;display:flex;gap:12px;
+    align-items:center;flex-wrap:wrap;
+    box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 6%,transparent)}
+  .bar .count{font-weight:600;font-size:15px;flex:1 1 160px;min-width:0}
+  .bar .count small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+  .btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;
+    padding:10px 16px;border-radius:10px;font-weight:600;border:0;font-size:14.5px;cursor:pointer;
+    font-family:inherit}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.ghost{background:none;color:var(--accent);border:1px solid var(--line);font-weight:500}
+  .meter{height:5px;border-radius:99px;background:var(--line);width:100%;overflow:hidden;
+    flex:1 1 100%}
+  .meter i{display:block;height:100%;width:100%;background:var(--accent);border-radius:99px;
+    transform:scaleX(0);transform-origin:left center;transition:transform .2s ease-out}
+
+  /* case cards */
+  .case{border:1px solid var(--rule)}
+  .case[data-verdict="pass"]{border-left-color:var(--good)}
+  .case[data-verdict="fail"]{border-left-color:var(--bad)}
+  .case-head{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px}
+  .num{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;
+    color:var(--muted);flex:none}
+  .tag{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;
+    border-radius:99px;padding:3px 9px;border:1px solid var(--line);color:var(--muted);flex:none}
+  .tag.ok{color:var(--good);border-color:color-mix(in srgb,var(--good) 45%,var(--line))}
+  .tag.no{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+  .file{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);
+    border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--bg);
+    font-size:14.5px;max-width:100%;overflow-wrap:anywhere}
+  .file:hover{border-color:var(--accent)}
+  .file b{font-weight:600}
+  .file .sz{color:var(--muted);font-size:13px;flex:none}
+
+  /* verdict controls */
+  .verdict{border-top:1px solid var(--line);margin-top:20px;padding-top:16px}
+  .choices{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+  .choice{position:relative}
+  .choice input{position:absolute;opacity:0;width:0;height:0}
+  .choice span{display:inline-block;border:1px solid var(--line);border-radius:99px;
+    padding:7px 16px;font-size:14px;cursor:pointer;user-select:none;background:var(--bg)}
+  .choice input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+  .choice input:checked + span.p{background:var(--good);border-color:var(--good);color:#fff;font-weight:600}
+  .choice input:checked + span.f{background:var(--bad);border-color:var(--bad);color:#fff;font-weight:600}
+  .choice input:checked + span.s{background:var(--muted);border-color:var(--muted);color:#fff;font-weight:600}
+  textarea{width:100%;min-height:62px;resize:vertical;border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;background:var(--bg);color:var(--ink);
+    font:14.5px/1.5 inherit;font-family:inherit}
+  textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+
+  .judge .verdict{margin-top:14px;padding-top:12px}
+  .judge h3{margin-bottom:6px}
+  .sechead{margin:38px 0 14px}
+  .sechead h2{margin-bottom:4px;font-size:22px}
+  .sechead p{color:var(--muted);margin:0;font-size:15px}
+  #copied{color:var(--good);font-size:13.5px;font-weight:600}
+  footer{color:var(--muted);font-size:13.5px;text-align:center;margin-top:40px}
+  @media (max-width:520px){
+    .wrap{padding:32px 14px 80px}
+    h1{font-size:26px}
+    .card{padding:18px}
+    .bar{padding:11px 13px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Manual test · Repair my broken Word doc</h1>
+  <p class="sub">Fifteen minutes with a browser, a Word-ish app, and eight deliberately broken
+  files. The automated suite already proves the engine does the right thing — this sheet is for
+  the things only a person can judge: whether the page communicates, whether the file it hands
+  back actually opens, and whether the copy is honest.</p>
+
+  <noscript>
+    <div class="warnbox">This sheet needs JavaScript for the pass/fail tracking and the
+    Markdown export. The test cases below are still readable without it.</div>
+  </noscript>
+  <div id="nostorage" class="warnbox" hidden>Your browser is blocking local storage, so your
+  answers will <b>not</b> survive a reload. Copy the Markdown before you close the tab.</div>
+
+  <!-- ── progress bar ─────────────────────────────────────────────── -->
+  <div class="bar">
+    <div class="count"><span id="count">0 of 19 checked</span>
+      <small id="tally">no verdicts yet</small></div>
+    <button class="btn" id="copy" type="button">Copy results as Markdown</button>
+    <button class="btn ghost" id="reset" type="button">Clear</button>
+    <span id="copied" hidden>Copied</span>
+    <div class="meter"><i id="meterFill"></i></div>
+  </div>
+
+  <!-- ── setup ────────────────────────────────────────────────────── -->
+  <div class="card">
+    <h2>Before you start</h2>
+    <p>From the build root
+    (<code>builds/use-cases/word-doc-repair/</code>), in a terminal:</p>
+<pre><code>pip install -e ".[web]"
+PORT=8077 python3 -m docrepair.web</code></pre>
+    <p>Then open <a href="http://127.0.0.1:8077" target="_blank" rel="noopener">http://127.0.0.1:8077</a>
+    and keep this sheet open in a second tab.</p>
+    <p class="small muted"><b>Why 8077 and not 8000:</b> the default is
+    <code>python3 -m docrepair.web</code> on port 8000, but port 8000 is already taken on this
+    machine — so pass <code>PORT</code>. If 8077 is busy too, pick anything free and adjust the
+    URL. If the page does not load, check the terminal: <code>uvicorn</code> prints the address
+    it actually bound to.</p>
+    <p class="small muted"><b>You will also need</b> Microsoft Word, Apple Pages, LibreOffice or
+    Google Docs to open the repaired files — checking that the download opens is half of this
+    test, and no automated test can do it.</p>
+    <p class="small muted"><b>The eight test files</b> are in
+    <code>manual-test/fixtures/</code>, generated by
+    <code>python3 manual-test/make_fixtures.py</code> from <code>tests/broken.py</code> — the
+    same generators the pytest suite uses, so what you test by hand is byte-for-byte what CI
+    tests. If a download link below 404s, run that script. If your browser opens a fixture
+    instead of saving it, right-click the link and choose <i>Save Link As</i>.</p>
+    <p class="small muted"><b>Your answers save automatically</b> to this browser and survive a
+    reload. When you are done, hit <i>Copy results as Markdown</i> and paste the result back.</p>
+  </div>
+
+  <!-- ── section 1 ────────────────────────────────────────────────── -->
+  <div class="sechead">
+    <h2>The eight files</h2>
+    <p>Work top to bottom. Each expected result below was read out of
+    <code>backend/docrepair/engine.py</code> and confirmed against a real run, so the wording quoted is
+    the wording the page should show — near enough, not to the letter.</p>
+  </div>
+
+  <!-- CASE 0 -->
+  <div class="card case" data-id="c0">
+    <div class="case-head">
+      <span class="num">00</span><h3>The healthy control</h3><span class="tag ok">should succeed</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/00-healthy.docx" download>
+      <b>00-healthy.docx</b> <span class="sz">2.0 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>Nothing — this is an intact Word file, and it is here so you can tell a real failure
+    apart from a fixture that was broken on purpose.</p>
+    <p class="label">What to do</p>
+    <ol>
+      <li>Download it, then drop it on the page.</li>
+      <li>Download the repaired file and open it in Word / Pages / Google Docs.</li>
+    </ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li>Stages, in order: <i>Opening the file…</i> → <i>The container opened cleanly.</i> →
+        <i>Found 5 sections inside the document.</i> → <i>Checking the document body for
+        damage…</i> → <i>The document body was well-formed.</i> → <i>Reading headings,
+        paragraphs and tables…</i> → <i>Recovered 2 headings, 2 paragraphs and 1 table.</i> →
+        <i>Rebuilding a clean Word file…</i> → <i>Done.</i></li>
+      <li>Verdict heading <b>“Your file is ready”</b>. Counts row shows
+        <b>2 headings, 2 paragraphs, 1 table</b>.</li>
+      <li>Summary still says <b>“best-effort recovery, not a complete repair”</b> — it does not
+        upgrade its language just because the file was fine. That is deliberate; judge whether
+        it reads as over-cautious.</li>
+      <li>“What came through”: one line, <i>“Kept 2 headings, 2 paragraphs and 1 table, with
+        their structure intact.”</i> <b>“What did not” must not appear at all.</b></li>
+      <li>The downloaded file is named <code>00-healthy-repaired.docx</code>, opens without a
+        repair prompt, and contains: <i>Quarterly Report</i> as a heading, <i>Regional
+        breakdown</i> as a heading, and a real 3-row × 2-column table
+        (Region/Revenue, EMEA/1.2M, APAC/0.8M) — a table you can click into, not text with
+        spaces.</li>
+    </ul>
+  </div>
+
+  <!-- CASE 1 -->
+  <div class="card case" data-id="c1">
+    <div class="case-head">
+      <span class="num">01</span><h3>Truncated download</h3><span class="tag ok">should succeed</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/01-truncated-download.docx" download>
+      <b>01-truncated-download.docx</b> <span class="sz">1.2 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>The download was cut off at 60%, so the index Word needs to find anything is gone — this
+    is the classic “Word says the file is corrupt” case.</p>
+    <p class="label">What to do</p>
+    <ol>
+      <li>Try opening it in Word <i>first</i>, so you have seen the failure this tool exists to
+        undo. Word should refuse it.</li>
+      <li>Drop it on the page. Download and open the result.</li>
+    </ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li>Second stage line reads <i>“The file's internal index was damaged — this is what Word
+        reports as a corrupt document — so the content was read directly from inside it.”</i>
+        then <i>“Found and read 4 sections of the file this way.”</i></li>
+      <li>Succeeds. Counts: <b>2 headings, 2 paragraphs, 1 table</b> — the same as the healthy
+        control, because the cut took the index, not the content.</li>
+      <li>“What came through” has <b>two</b> lines: the one about reading content out of a file
+        whose internal index was damaged, and the one about keeping the headings, paragraphs and
+        table with their structure intact.</li>
+      <li><b>“What did not” must not appear.</b> The cut did destroy one of the file's internal
+        parts (the style sheet), but that part is regenerated and carries none of your writing —
+        listing it would tell you that you lost something you did not.</li>
+      <li>Nowhere in anything you can see should the words <i>ZIP</i>, <i>XML</i>,
+        <i>central directory</i> or a filename like <code>document.xml.rels</code> appear.</li>
+      <li>The downloaded file opens with headings as headings and the table as a table.</li>
+    </ul>
+  </div>
+
+  <!-- CASE 2 -->
+  <div class="card case" data-id="c2">
+    <div class="case-head">
+      <span class="num">02</span><h3>Missing content-types part</h3><span class="tag ok">should succeed</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/02-missing-content-types.docx" download>
+      <b>02-missing-content-types.docx</b> <span class="sz">1.7 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>The internal manifest that tells Word what the pieces are has been deleted — the content
+    is all still there, but nothing can read it.</p>
+    <p class="label">What to do</p>
+    <ol><li>Drop it on the page. Download and open the result.</li></ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li>Opens cleanly (no “internal index was damaged” line here — the container itself is
+        fine). Inventory says <i>“Found 4 sections inside the document.”</i> then
+        <i>“Rebuilding 1 missing structural part…”</i> — singular, not “1 part(s)”.</li>
+      <li>Succeeds. Counts: <b>2 headings, 2 paragraphs, 1 table</b>.</li>
+      <li>“What came through” leads with <i>“Rebuilt the file's internal structure, which was
+        missing or damaged — this is standard plumbing and carries none of your content.”</i>
+        The second half of that sentence is the point: judge whether it actually reassures you
+        rather than alarming you.</li>
+      <li><b>“What did not” must not appear.</b></li>
+      <li>Downloaded file opens with the heading and table structure intact.</li>
+    </ul>
+  </div>
+
+  <!-- CASE 3 -->
+  <div class="card case" data-id="c3">
+    <div class="case-head">
+      <span class="num">03</span><h3>Unclosed tags</h3><span class="tag ok">should succeed — with a stated loss</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/03-unclosed-tags.docx" download>
+      <b>03-unclosed-tags.docx</b> <span class="sz">1.9 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>The document body itself is chopped off mid-sentence, leaving tags hanging open.</p>
+    <p class="label">What to do</p>
+    <ol>
+      <li>Drop it on the page. <b>Read the summary paragraph slowly</b> — this is the case where
+        the tool has to admit a real loss.</li>
+      <li>Download and open the result.</li>
+    </ol>
+    <p class="label">What should happen</p>
+    <p><b>This is the most important card on the sheet.</b> It succeeds, but it succeeds
+    <i>worse</i> than the ones above, and the whole product rests on whether you can tell.</p>
+    <ul>
+      <li>Stage line <i>“Closed 7 elements that the damage had left open.”</i> then
+        <i>“The document's structure was too damaged to read. Recovering the text on its own
+        instead.”</i> then <i>“Recovered 6 paragraphs.”</i> No exception name should appear —
+        it used to read <i>“(ParseError)”</i> here, which this sheet caught and is now
+        fixed and tested.</li>
+      <li>Verdict heading is still <b>“Your file is ready”</b>, but the summary must carry a
+        second sentence:</li>
+      <li class="quote">“The document's structure was too damaged to read, so the text was
+        extracted run by run — you are getting the words back, but the headings, tables and
+        formatting are gone.”</li>
+      <li>Counts row shows <b>0 headings, 6 paragraphs, 0 tables</b>. Two of those numbers are
+        zero — check they do not read as a bug or a broken layout.</li>
+      <li>“What came through”: <i>closed 7 elements…</i> and <i>recovered the text of 6
+        paragraphs</i>. <b>“What did not” must appear here</b>, saying headings, tables and
+        formatting could not be preserved.</li>
+      <li>The downloaded file opens and contains the words <i>Quarterly Report</i>,
+        <i>Regional breakdown</i>, <i>EMEA</i>, <i>APAC</i> — but as <b>plain paragraphs</b>.
+        No heading styles, no table. That is correct behaviour, not a failure: the test is
+        whether the page warned you before you opened it.</li>
+      <li><b>Judgement:</b> would a non-technical person, seeing this screen, understand they
+        must not treat the result as their document back? Or does “Your file is ready” plus a
+        green tick swamp the warning?</li>
+    </ul>
+  </div>
+
+  <!-- CASE 4 -->
+  <div class="card case" data-id="c4">
+    <div class="case-head">
+      <span class="num">04</span><h3>Bare ampersand and control characters</h3><span class="tag ok">should succeed</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/04-bad-characters.docx" download>
+      <b>04-bad-characters.docx</b> <span class="sz">2.0 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>A raw <code>&amp;</code> and two invisible control characters have got into the text —
+    one bad byte is enough to make a strict reader reject the whole document.</p>
+    <p class="label">What to do</p>
+    <ol>
+      <li>Drop it on the page. Download and open the result.</li>
+      <li>Find the line beginning <i>“Revenue rose in Q3”</i> and read it carefully.</li>
+    </ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li>Stages: <i>“Removed 2 invalid characters that were breaking the document.”</i> then
+        <i>“Repaired 1 stray ampersand.”</i> — note <b>“1 stray ampersand”</b>, singular.</li>
+      <li>Succeeds. Counts: <b>2 headings, 2 paragraphs, 1 table</b>. Structure intact.</li>
+      <li>“What came through” has three lines (invalid characters, ampersand, kept structure).
+        <b>“What did not” must not appear.</b></li>
+      <li>In the downloaded file, that sentence reads exactly
+        <b>“Revenue rose in Q3 — driven by renewals &amp; upsell.”</b> — the ampersand is
+        <b>still there as an ampersand</b>. Losing it, or seeing <code>&amp;amp;</code> printed
+        literally, is a fail.</li>
+      <li>The control characters are gone with no visible box or question-mark glyph left
+        behind.</li>
+    </ul>
+  </div>
+
+  <!-- CASE 5 -->
+  <div class="card case" data-id="c5">
+    <div class="case-head">
+      <span class="num">05</span><h3>Missing document part</h3><span class="tag no">must fail honestly</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/05-missing-document-part-SHOULD-FAIL.docx" download>
+      <b>05-missing-document-part-SHOULD-FAIL.docx</b> <span class="sz">1.4 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>The part that holds all the actual writing has been deleted — the wrapper survived, the
+    document did not.</p>
+    <p class="label">What to do</p>
+    <ol><li>Drop it on the page and read the whole result screen.</li></ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li><b>It must fail.</b> Heading <b>“This one could not be repaired”</b>, in red.</li>
+      <li>Only four stage lines, stopping at
+        <i>“The main document part is missing and cannot be rebuilt.”</i> — the run halts there
+        rather than pretending to carry on.</li>
+      <li>Summary reads: <i>“This file could not be repaired. The main document part is missing
+        entirely, so there is no text to recover. Nothing was invented to fill the gap — if
+        there is another copy, even an older one, that is the better starting point.”</i></li>
+      <li><b>No download button.</b> If you can download anything here, that is a serious fail —
+        an empty file that opens fine is the worst possible outcome.</li>
+      <li>“What came through” should be absent. “What did not” has one line about the main
+        document part being missing.</li>
+      <li>No counts row, no zeros, no stack trace, no error code.</li>
+      <li><b>Judgement:</b> the advice to go find an older copy is the only useful thing left to
+        say. Does it land as help, or as a brush-off?</li>
+    </ul>
+  </div>
+
+  <!-- CASE 6 -->
+  <div class="card case" data-id="c6">
+    <div class="case-head">
+      <span class="num">06</span><h3>Not a Word file at all</h3><span class="tag no">must fail honestly</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/06-not-a-word-file-SHOULD-FAIL.docx" download>
+      <b>06-not-a-word-file-SHOULD-FAIL.docx</b> <span class="sz">1.2 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>It is plain text with a <code>.docx</code> name stuck on it — the realistic case of
+    someone who saved, exported or renamed the wrong thing.</p>
+    <p class="label">What to do</p>
+    <ol><li>Drop it on the page. Read “What came through” especially closely.</li></ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li><b>It must fail.</b> <i>“This one could not be repaired”</i>, no download button.</li>
+      <li>Summary: <i>“This file could not be repaired. No readable parts could be found inside
+        the file. Nothing was invented to fill the gap — …”</i></li>
+      <li><b>There must be no “What came through” section at all.</b> Nothing came through —
+        the repair failed. Writing this sheet surfaced a real defect here: the failure screen
+        used to show <i>“Read your content out of a file whose internal index was damaged”</i>
+        on a screen that recovered nothing, which is exactly the overclaim this build says it
+        does not make. It is fixed, and a test now pins it. If that line is back, mark
+        this <b>fail</b>.</li>
+      <li><b>“What did not” should name the problem once.</b> It previously said both
+        <i>“No readable parts could be found inside the file”</i> and <i>“The file contained no
+        readable parts”</i> — one problem stated twice reads as two. Also fixed and tested.</li>
+      <li>Nothing anywhere should mention the file not being a valid archive, or use the word
+        <i>ZIP</i>.</li>
+    </ul>
+  </div>
+
+  <!-- CASE 7 -->
+  <div class="card case" data-id="c7">
+    <div class="case-head">
+      <span class="num">07</span><h3>Empty body</h3><span class="tag no">must fail honestly</span>
+    </div>
+    <p class="label">The file</p>
+    <a class="file" href="fixtures/07-empty-body-SHOULD-FAIL.docx" download>
+      <b>07-empty-body-SHOULD-FAIL.docx</b> <span class="sz">1.6 KB</span></a>
+    <p class="label">What is wrong with it</p>
+    <p>A structurally perfect Word file with nothing written in it — every part valid, the body
+    empty.</p>
+    <p class="label">What to do</p>
+    <ol><li>Drop it on the page. This one is the trap: everything about it looks healthy.</li></ol>
+    <p class="label">What should happen</p>
+    <ul>
+      <li><b>It must fail</b>, even though nothing about the file is technically broken. An
+        empty valid document is the most dangerous output there is: it opens cleanly, so its
+        owner may not notice their content is gone for weeks.</li>
+      <li>The stages run further than the other two failures — through <i>“The document body was
+        well-formed.”</i> and <i>“Reading headings, paragraphs and tables…”</i> — before
+        <i>“No readable content was found in the document body.”</i></li>
+      <li>Summary: <i>“This file could not be repaired. The document body contained no readable
+        text. Nothing was invented to fill the gap — …”</i></li>
+      <li><b>No download button.</b> A downloadable, valid, empty <code>.docx</code> here is the
+        single worst failure on this whole sheet.</li>
+      <li><b>Judgement:</b> the earlier stages all pass with ticks before it fails at the end.
+        Does that read as confusing — a run that looks like it is going well and then is not?</li>
+    </ul>
+  </div>
+
+  <!-- ── section 2 ────────────────────────────────────────────────── -->
+  <div class="sechead">
+    <h2>Edge cases</h2>
+    <p>Things a real person does that the fixtures do not cover.</p>
+  </div>
+
+  <div class="card case judge" data-id="e0">
+    <h3>Download the same repaired file twice</h3>
+    <p class="small">Repair <code>00-healthy.docx</code>, click the download button, then click
+    it again (or press Back and re-download).</p>
+    <p class="small"><b>Expected:</b> the file is held for exactly one download and then dropped,
+    so the second attempt fails. It should fail as a readable sentence —
+    <i>“That file is no longer available. Please repair it again.”</i> — not as a raw JSON blob,
+    a FastAPI error page or a browser 404. Note exactly what you saw; this is a plausible thing
+    for a worried person to do, and a raw error here undoes the whole tone of the product.</p>
+  </div>
+
+  <div class="card case judge" data-id="e1">
+    <h3>Drag and drop, not just the file picker</h3>
+    <p class="small">Drag a fixture onto the drop zone from Finder / Explorer.</p>
+    <p class="small"><b>Expected:</b> the zone visibly highlights while the file is over it, and
+    the repair starts on drop. Then check the click path works too, and that
+    <i>“Repair another file”</i> returns you to a clean drop zone that accepts a second file
+    without a page reload.</p>
+  </div>
+
+  <div class="card case judge" data-id="e2">
+    <h3>A completely empty file</h3>
+    <p class="small">Create one — <code>touch empty.docx</code> — and upload it.</p>
+    <p class="small"><b>Expected:</b> the server rejects it with <i>“That file is empty.”</i> and
+    the page shows that sentence on the failure screen rather than a generic
+    <i>“That file could not be read.”</i> or a console error.</p>
+  </div>
+
+  <div class="card case judge" data-id="e3">
+    <h3>Refresh mid-repair, and repair something large-ish</h3>
+    <p class="small">Reload the page while a repair is running; then try any real
+    <code>.docx</code> you have lying around (a CV, a report) to see the tool meet a document it
+    was not built against.</p>
+    <p class="small"><b>Expected:</b> reloading leaves no stuck spinner and no error. A real
+    document either repairs with sensible counts, or fails with a sentence you can understand —
+    never a stack trace, and never a summary that mentions something you did not upload.</p>
+  </div>
+
+  <!-- ── section 3 ────────────────────────────────────────────────── -->
+  <div class="sechead">
+    <h2>Judgement checks</h2>
+    <p>No test can make these calls. Answer them after you have run all eight files.</p>
+  </div>
+
+  <div class="card case judge" data-id="j0">
+    <h3>Does the downloaded file actually open?</h3>
+    <p class="small">Open every repaired file you got (cases 00–04) in <b>at least two</b> of
+    Word, Pages, Google Docs, LibreOffice.</p>
+    <p class="small"><b>Pass means:</b> no “Word found unreadable content” prompt, no recovery
+    dialog. Headings are real heading styles (they show up in the navigation pane / outline, not
+    just bigger text), and the table is a real table you can click into a cell of — not
+    tab-separated text. Cases 00, 01, 02 and 04 must all clear this bar. Case 03 must not — it
+    told you the structure was gone.</p>
+  </div>
+
+  <div class="card case judge" data-id="j1">
+    <h3>Is the progress genuinely visible, or does it flash past?</h3>
+    <p class="small">These files are tiny, so the whole repair takes milliseconds. Watch the
+    stage list closely on case 01.</p>
+    <p class="small"><b>The question:</b> can you actually read the stages as they land, or does
+    the result screen replace them before your eyes get there? Progress you cannot perceive is
+    the same as no progress — and worse, it makes the stage log look decorative. Does anything
+    remain visible afterwards to tell you what was done?</p>
+  </div>
+
+  <div class="card case judge" data-id="j2">
+    <h3>Does any wording overclaim?</h3>
+    <p class="small">Read every screen you saw for anything that promises more than was
+    delivered: “fixed”, “restored”, “recovered your document”, a green tick next to a partial
+    result, a success heading over a real loss.</p>
+    <p class="small"><b>Specifically:</b> case 03 succeeded while losing every heading and the
+    table, and case 06 failed while showing a “what came through” line. Does the language hold
+    up in both, or does the happy-path framing leak into the sad paths?</p>
+  </div>
+
+  <div class="card case judge" data-id="j3">
+    <h3>Would a non-technical person understand what they got back?</h3>
+    <p class="small">Read the case 03 result screen as if you had just lost the only copy of
+    your dissertation.</p>
+    <p class="small"><b>The question:</b> do you know, without asking anyone, (a) whether you
+    got your document back, (b) what specifically is missing, (c) what to do next? Flag any
+    phrase you had to read twice, and any word you would not say out loud to a worried
+    friend.</p>
+  </div>
+
+  <div class="card case judge" data-id="j4">
+    <h3>Does it read as a consumer product, not an engineering tool?</h3>
+    <p class="small"><b>Look for:</b> jargon leaking through (<i>ZIP</i>, <i>XML</i>,
+    <i>ParseError</i>, part filenames, byte counts), log-style phrasing where a sentence should
+    be, counts labelled in lowercase plural like a debug dump. Three such leaks were found and
+    fixed while this sheet was written, and the automated suite now guards the stage log as
+    well as the summary — so anything you still find here is new.</p>
+    <p class="small"><b>Also:</b> does the page look finished — spacing, alignment, the drop
+    zone, the download button — or does it look like a test harness for the engine?</p>
+  </div>
+
+  <div class="card case judge" data-id="j5">
+    <h3>Legible in both dark mode and light mode?</h3>
+    <p class="small">Switch your OS appearance and reload the product page (not just this
+    sheet). Check every state: drop zone, drop-zone hover, the stage list mid-run, a success
+    screen, a failure screen.</p>
+    <p class="small"><b>Look for:</b> the red failure heading against the dark panel, the green
+    ticks, the muted caveat text at the bottom, the blue download button — anything that goes
+    low-contrast or muddy in one theme. Check this sheet too.</p>
+  </div>
+
+  <div class="card case judge" data-id="j6">
+    <h3>Does it work at phone width?</h3>
+    <p class="small">Narrow the window to about 360px, or open it on a phone on the same
+    network.</p>
+    <p class="small"><b>Look for:</b> no horizontal scrolling anywhere, the counts row wrapping
+    rather than squashing, long stage sentences not overflowing their row, the download button
+    and “Repair another file” not colliding, and the drop zone still tappable.</p>
+  </div>
+
+  <footer>Manual test sheet for <b>Build B — Repair my broken Word doc</b>.
+  Fixtures generated from <code>tests/broken.py</code>. Nothing here is automated on purpose.</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var KEY = "docrepair-manual-test-v1";
+  var cases = Array.prototype.slice.call(document.querySelectorAll(".case"));
+
+  var store = {};
+  var canStore = true;
+  try {
+    store = JSON.parse(localStorage.getItem(KEY) || "{}") || {};
+  } catch (e) { store = {}; }
+  try {
+    localStorage.setItem(KEY + "-probe", "1");
+    localStorage.removeItem(KEY + "-probe");
+  } catch (e) {
+    canStore = false;
+    document.getElementById("nostorage").hidden = false;
+  }
+
+  function save(){
+    if(!canStore) return;
+    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
+  }
+
+  // Build the verdict control for every case, and restore saved state.
+  cases.forEach(function(card){
+    var id = card.dataset.id;
+    var title = card.querySelector("h3").textContent.trim();
+    card.dataset.title = title;
+
+    var box = document.createElement("div");
+    box.className = "verdict";
+
+    var choices = document.createElement("div");
+    choices.className = "choices";
+    [["pass","Pass","p"],["fail","Fail","f"],["skip","Skipped","s"]].forEach(function(o){
+      var lab = document.createElement("label");
+      lab.className = "choice";
+      var input = document.createElement("input");
+      input.type = "radio";
+      input.name = "v-" + id;
+      input.value = o[0];
+      var span = document.createElement("span");
+      span.className = o[2];
+      span.textContent = o[1];
+      lab.appendChild(input); lab.appendChild(span);
+      choices.appendChild(lab);
+      input.addEventListener("change", function(){
+        store[id] = store[id] || {};
+        store[id].verdict = o[0];
+        card.dataset.verdict = o[0];
+        save(); refresh();
+      });
+    });
+
+    var notes = document.createElement("textarea");
+    notes.placeholder = "What actually happened? (exact wording, anything odd, screenshots taken)";
+    notes.setAttribute("aria-label", "Notes for " + title);
+    notes.addEventListener("input", function(){
+      store[id] = store[id] || {};
+      store[id].notes = notes.value;
+      save();
+    });
+
+    box.appendChild(choices);
+    box.appendChild(notes);
+    card.appendChild(box);
+
+    var saved = store[id];
+    if (saved) {
+      if (saved.verdict) {
+        var sel = card.querySelector('input[value="' + saved.verdict + '"]');
+        if (sel) { sel.checked = true; card.dataset.verdict = saved.verdict; }
+      }
+      if (saved.notes) notes.value = saved.notes;
+    }
+  });
+
+  var countEl  = document.getElementById("count");
+  var tallyEl  = document.getElementById("tally");
+  var meterEl  = document.getElementById("meterFill");
+
+  function refresh(){
+    var total = cases.length, done = 0, pass = 0, fail = 0, skip = 0;
+    cases.forEach(function(c){
+      var v = (store[c.dataset.id] || {}).verdict;
+      if (!v) return;
+      done++;
+      if (v === "pass") pass++; else if (v === "fail") fail++; else skip++;
+    });
+    countEl.textContent = done + " of " + total + " checked";
+    tallyEl.textContent = done
+      ? pass + " pass · " + fail + " fail" + (skip ? " · " + skip + " skipped" : "")
+      : "no verdicts yet";
+    meterEl.style.transform = "scaleX(" + (total ? done / total : 0) + ")";
+  }
+  refresh();
+
+  // ── Markdown export ───────────────────────────────────────────────
+  function markdown(){
+    var sections = [
+      { title: "The eight files", ids: ["c0","c1","c2","c3","c4","c5","c6","c7"] },
+      { title: "Edge cases",      ids: ["e0","e1","e2","e3"] },
+      { title: "Judgement checks",ids: ["j0","j1","j2","j3","j4","j5","j6"] }
+    ];
+    var byId = {};
+    cases.forEach(function(c){ byId[c.dataset.id] = c; });
+
+    var pass = 0, fail = 0, skip = 0, none = 0;
+    cases.forEach(function(c){
+      var v = (store[c.dataset.id] || {}).verdict;
+      if (v === "pass") pass++;
+      else if (v === "fail") fail++;
+      else if (v === "skip") skip++;
+      else none++;
+    });
+
+    var out = [];
+    out.push("# Manual test — Repair my broken Word doc");
+    out.push("");
+    out.push("Run " + new Date().toLocaleString() + " · " +
+             pass + " pass, " + fail + " fail, " + skip + " skipped, " +
+             none + " not checked (of " + cases.length + ").");
+    out.push("");
+
+    var mark = { pass: "PASS", fail: "FAIL", skip: "skipped" };
+
+    sections.forEach(function(sec){
+      out.push("## " + sec.title);
+      out.push("");
+      sec.ids.forEach(function(id){
+        var card = byId[id];
+        if (!card) return;
+        var rec = store[id] || {};
+        var verdict = rec.verdict ? mark[rec.verdict] : "not checked";
+        out.push("- **" + card.dataset.title + "** — " + verdict);
+        var n = (rec.notes || "").trim();
+        if (n) {
+          n.split("\n").forEach(function(line){
+            out.push("  - " + line.trim());
+          });
+        }
+      });
+      out.push("");
+    });
+
+    return out.join("\n");
+  }
+
+  var copyBtn = document.getElementById("copy");
+  var copied  = document.getElementById("copied");
+
+  function flash(){
+    copied.hidden = false;
+    setTimeout(function(){ copied.hidden = true; }, 1800);
+  }
+
+  copyBtn.addEventListener("click", function(){
+    var text = markdown();
+    var done = function(){ flash(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(text); });
+    } else {
+      fallback(text);
+    }
+  });
+
+  function fallback(text){
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.body.removeChild(ta);
+    if (ok) { flash(); return; }
+    // Last resort: show it so the tester can copy it by hand.
+    var pre = document.createElement("pre");
+    pre.textContent = text;
+    var card = document.createElement("div");
+    card.className = "card";
+    card.appendChild(Object.assign(document.createElement("p"), {
+      className: "label",
+      textContent: "Copy this by hand — the browser blocked the clipboard"
+    }));
+    card.appendChild(pre);
+    copyBtn.parentNode.parentNode.insertBefore(card, copyBtn.parentNode.nextSibling);
+  }
+
+  document.getElementById("reset").addEventListener("click", function(){
+    if (!confirm("Clear every verdict and note on this sheet?")) return;
+    store = {};
+    save();
+    cases.forEach(function(c){
+      delete c.dataset.verdict;
+      c.querySelectorAll("input[type=radio]").forEach(function(i){ i.checked = false; });
+      var t = c.querySelector("textarea");
+      if (t) t.value = "";
+    });
+    refresh();
+  });
+})();
+</script>
+</body>
+</html>

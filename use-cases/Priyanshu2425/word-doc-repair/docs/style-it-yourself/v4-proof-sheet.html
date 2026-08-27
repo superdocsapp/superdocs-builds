@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>V4 · Proof Sheet — style it yourself</title>
+<style>
+/* ── V4 · PROOF SHEET ───────────────────────────────────────────────────────
+   The print shop. The document is shown as a proof — real pages, in order,
+   with a thumbnail column beside them — because styling is a question about
+   pages, and a continuous scroll hides the answer.
+
+   The rail is an order form that talks. Every control writes a plain English
+   sentence into the field before it is sent, so the person can see exactly
+   what is being asked for, change the wording, or type their own instead.
+   Direct manipulation and conversation, with one honest seam between them.
+   ────────────────────────────────────────────────────────────────────────── */
+
+:root{
+  --stock:#e9ebe6; --sheet:#fcfcfa;
+  --ink:#14171a; --ink-2:#494f55; --ink-3:#7b8188;
+  --rule:#ccd1cd; --rule-firm:#a9b0aa;
+  --post-blue:#173f8a; --post-red:#c2222c; --kept:#16603c; --focus:#173f8a;
+  --t1:12px; --t2:13px; --t3:15px; --t4:17px; --t5:21px; --t6:28px;
+  --sans:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --s:1;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --stock:#101314; --sheet:#181b1d;
+  --ink:#eef1f0; --ink-2:#b3b9bc; --ink-3:#838a8e;
+  --rule:#2a2f31; --rule-firm:#3d4346;
+  --post-blue:#7aa0e8; --post-red:#ef7a72; --kept:#6cc094; --focus:#7aa0e8;
+}}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--stock);color:var(--ink);font:var(--t3)/1.6 var(--sans)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:2px}
+.tape{height:9px;flex:none;background:repeating-linear-gradient(-45deg,var(--post-red) 0 12px,var(--sheet) 12px 24px,var(--post-blue) 24px 36px,var(--sheet) 36px 48px)}
+
+.doc-head{max-width:1240px;margin:0 auto;padding:34px 20px 0}
+.doc-head .kicker{font-family:var(--mono);font-size:var(--t1);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.doc-head h1{font-size:var(--t6);line-height:1.15;letter-spacing:-.025em;font-weight:680;margin:6px 0 8px}
+.doc-head p{color:var(--ink-2);max-width:66ch;margin:0}
+.board{max-width:1240px;margin:0 auto;padding:34px 20px 0}
+.board h2{font-family:var(--mono);font-size:var(--t1);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.board .hint{font-family:var(--sans);font-size:var(--t2);color:var(--ink-3);text-transform:none;letter-spacing:0;float:right;font-weight:400}
+.stage{position:relative;overflow:hidden}
+.stage--desk{height:calc(840px * var(--s))}
+.desk{width:1320px;height:840px;transform:scale(var(--s));transform-origin:top left;
+      display:flex;flex-direction:column;background:var(--stock);border:1px solid var(--rule-firm);overflow:hidden}
+.stage--phone{display:flex;justify-content:center;padding:4px 0 0}
+.phone{width:390px;height:844px;display:flex;flex-direction:column;background:var(--stock);
+       border:1px solid var(--rule-firm);border-radius:22px;overflow:hidden;position:relative}
+@media (max-width:1400px){:root{--s:.86}}
+@media (max-width:1180px){:root{--s:.74}}
+@media (max-width:940px){:root{--s:.58}}
+@media (max-width:700px){:root{--s:.42}.phone{transform:scale(.86);transform-origin:top center}.stage--phone{height:726px}}
+.notes{max-width:1240px;margin:0 auto;padding:40px 20px 80px}
+.notes h2{font-family:var(--mono);font-size:var(--t1);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.notes dl{margin:0;display:grid;grid-template-columns:190px 1fr;gap:10px 24px}
+.notes dt{font-weight:640;font-size:var(--t2)}
+.notes dd{margin:0;color:var(--ink-2);font-size:var(--t2);max-width:78ch}
+@media (max-width:640px){.notes dl{grid-template-columns:1fr;gap:2px 0}.notes dd{margin-bottom:12px}}
+
+.bar{flex:none;display:flex;align-items:center;gap:20px;padding:12px 22px;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.mark{font-size:var(--t5);font-weight:700;letter-spacing:-.02em}
+.mark span{color:var(--post-blue)}
+.mark em{font-style:normal;font-size:var(--t1);font-weight:400;color:var(--ink-3);letter-spacing:.04em;margin-left:8px;text-transform:uppercase}
+.rec{font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;gap:18px}
+.rec b{color:var(--ink-2);font-weight:500}
+.bar__act{margin-left:auto;display:flex;align-items:center;gap:10px}
+.btn{font:inherit;font-size:var(--t3);font-weight:640;background:var(--post-blue);color:#fff;border:0;padding:10px 18px;cursor:pointer;text-decoration:none;display:inline-block;transition:filter 120ms var(--ease)}
+.btn:hover{filter:brightness(1.12)}
+.btn--quiet{background:none;color:var(--ink);border:1px solid var(--rule-firm);font-size:var(--t2);padding:9px 14px}
+.btn--quiet:hover{border-color:var(--ink-3);filter:none}
+
+/* three columns: thumbnails · proof · order */
+.split{flex:1;display:grid;grid-template-columns:86px 1fr 404px;min-height:0}
+
+.thumbs{border-right:1px solid var(--rule);background:var(--stock);overflow-y:auto;padding:14px 0 20px}
+.thumbs h4{margin:0 0 10px;text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.thumb{display:block;width:56px;margin:0 auto 12px;cursor:pointer;border:0;background:none;padding:0}
+.thumb .card{height:74px;background:var(--sheet);border:1px solid var(--rule-firm);position:relative;overflow:hidden}
+.thumb .card::before{content:"";position:absolute;left:7px;right:7px;top:9px;height:3px;background:var(--ink-3);opacity:.5}
+.thumb .card::after{content:"";position:absolute;left:7px;right:7px;top:18px;bottom:9px;
+  background:repeating-linear-gradient(var(--ink-3) 0 1.5px,transparent 1.5px 6px);opacity:.32}
+.thumb.is-on .card{border-color:var(--post-blue);box-shadow:0 0 0 1px var(--post-blue)}
+.thumb span{display:block;font-family:var(--mono);font-size:10px;color:var(--ink-3);text-align:center;margin-top:5px}
+.thumb.is-on span{color:var(--post-blue)}
+
+.proof{display:flex;flex-direction:column;min-height:0;min-width:0}
+.proof__head{flex:none;display:flex;align-items:baseline;gap:14px;padding:14px 26px 12px}
+.proof__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.proof__head p{margin:0;font-size:var(--t2);color:var(--ink-3)}
+.proof__nav{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3)}
+.proof__nav button{font:inherit;background:none;border:1px solid var(--rule-firm);color:var(--ink-2);padding:3px 9px;cursor:pointer}
+.proof__nav button:hover{border-color:var(--ink-3);color:var(--ink)}
+.proof__scroll{flex:1;overflow-y:auto;padding:0 26px 34px;display:flex;justify-content:center}
+.page{width:566px;flex:none;background:var(--sheet);border:1px solid var(--rule-firm);
+      box-shadow:0 10px 30px rgba(20,23,26,.10);padding:52px 58px 60px;position:relative}
+.page__no{position:absolute;left:0;right:0;bottom:18px;text-align:center;font-family:var(--mono);font-size:10.5px;color:var(--ink-3)}
+
+.doc{font-size:14.5px;line-height:1.62;color:var(--ink)}
+.doc>:first-child{margin-top:0}
+.doc h1{font-size:22px;line-height:1.25;margin:0 0 4px;font-weight:680;letter-spacing:-.015em}
+.doc .byline{font-size:var(--t2);color:var(--ink-3);margin:0 0 22px;padding-bottom:13px;border-bottom:1px solid var(--rule)}
+.doc h2{font-size:15.5px;margin:22px 0 6px;font-weight:660}
+.doc p{margin:0 0 10px}
+.doc figure{margin:16px 0}
+.doc figcaption{font-size:var(--t2);color:var(--ink-3);margin-top:6px}
+.doc .plate{border:1px solid var(--rule);background:var(--stock);padding:12px 14px}
+.doc table{border-collapse:collapse;margin:11px 0;font-size:13.5px;width:100%}
+.doc td,.doc th{border:1px solid var(--rule-firm);padding:5px 9px;text-align:left}
+.doc th{font-weight:620;background:var(--stock)}
+.doc .stops{color:var(--ink-3);font-style:italic}
+
+/* the order form that talks */
+.order{display:flex;flex-direction:column;min-height:0;background:var(--stock);border-left:1px solid var(--rule-firm)}
+.order__head{flex:none;padding:14px 20px 13px;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.order__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.order__head p{margin:5px 0 0;font-size:var(--t2);color:var(--ink-2);max-width:46ch}
+
+.controls{flex:none;padding:14px 20px 4px;overflow-y:auto;max-height:326px}
+.set{margin-bottom:15px}
+.set__name{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 7px}
+.opts{display:flex;gap:0;border:1px solid var(--rule-firm);background:var(--sheet)}
+.opt{flex:1;font:inherit;font-size:var(--t2);background:none;border:0;border-right:1px solid var(--rule);
+     color:var(--ink-2);padding:8px 4px;cursor:pointer;white-space:nowrap}
+.opt:last-child{border-right:0}
+.opt:hover{color:var(--ink);background:var(--stock)}
+.opt.is-on{background:var(--post-blue);color:#fff}
+
+.talk{flex:1;overflow-y:auto;padding:4px 20px 14px;border-top:1px solid var(--rule)}
+.line{display:grid;grid-template-columns:54px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--rule)}
+.who{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.says{font-size:var(--t3);line-height:1.55;color:var(--ink-2)}
+.line--you .says{color:var(--ink);font-weight:520}
+.line--you .who{color:var(--ink-2)}
+.done{margin-top:8px;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;align-items:center;gap:8px}
+.done i{width:9px;height:9px;background:var(--post-blue);font-style:normal;display:inline-block}
+.done a{color:var(--post-blue)}
+.refused{border-left:1px solid var(--post-red);padding-left:12px;color:var(--ink);display:block}
+.refused b{color:var(--post-red);font-weight:640}
+
+.compose{flex:none;border-top:1px solid var(--rule-firm);background:var(--sheet);padding:12px 20px 15px}
+.compose__why{font-size:var(--t1);color:var(--ink-3);margin:0 0 8px}
+.compose__why b{color:var(--ink-2);font-weight:600}
+.field{border:2px solid var(--ink);background:var(--sheet);display:flex;align-items:flex-end;gap:10px;padding:9px 9px 9px 12px}
+.field textarea{flex:1;border:0;background:none;resize:none;font:inherit;font-size:var(--t3);color:var(--ink);outline:none;height:42px;line-height:1.5}
+.field textarea::placeholder{color:var(--ink-3)}
+.send{font:inherit;font-size:var(--t2);font-weight:640;background:var(--post-blue);color:#fff;border:0;padding:9px 14px;cursor:pointer}
+.left-today{margin:10px 0 0;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);display:flex;align-items:center;gap:7px}
+.left-today i{width:8px;height:8px;background:var(--kept);font-style:normal;display:inline-block}
+.left-today b{color:var(--ink-2);font-weight:500}
+
+/* ── mobile ──────────────────────────────────────────────────────────────── */
+.mbar{flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.mbar .mark{font-size:var(--t4)}
+.mbar .btn{margin-left:auto;font-size:var(--t2);padding:8px 13px}
+.mproof{flex:1;min-height:0;display:flex;flex-direction:column;padding:12px 0 96px}
+.mproof__head{flex:none;display:flex;align-items:baseline;gap:10px;padding:0 16px 10px}
+.mproof__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.mproof__head .of{margin-left:auto;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3)}
+.reel{flex:1;display:flex;gap:14px;overflow-x:auto;overflow-y:hidden;padding:2px 16px 8px;scroll-snap-type:x mandatory}
+.reel .page{width:302px;scroll-snap-align:center;padding:26px 24px 34px;overflow:hidden}
+.reel .doc{font-size:12px;line-height:1.55}
+.reel .doc h1{font-size:16px}
+.reel .doc h2{font-size:12.5px;margin:14px 0 5px}
+.reel .doc table{font-size:11px}
+.reel .doc td,.reel .doc th{padding:3px 6px}
+.dots{flex:none;display:flex;justify-content:center;gap:7px;padding:8px 0 0}
+.dots i{width:6px;height:6px;background:var(--rule-firm);font-style:normal;display:block}
+.dots i.is-on{background:var(--post-blue)}
+
+.dock{position:absolute;left:0;right:0;bottom:0;z-index:3;background:var(--sheet);border-top:1px solid var(--rule-firm);
+      padding:11px 14px calc(11px + env(safe-area-inset-bottom))}
+.dock__btn{width:100%;display:flex;align-items:center;gap:11px;font:inherit;font-size:var(--t3);text-align:left;color:var(--ink);
+           background:var(--stock);border:2px solid var(--ink);padding:12px 14px;cursor:pointer}
+.dock__btn i{width:9px;height:9px;background:var(--post-blue);font-style:normal;display:inline-block}
+.dock__btn b{margin-left:auto;font-family:var(--mono);font-size:var(--t1);color:var(--ink-3);font-weight:500}
+
+.scrim{position:absolute;inset:0;z-index:4;background:rgba(20,23,26,.42);opacity:0;pointer-events:none;transition:opacity 200ms var(--ease)}
+.drawer{position:absolute;left:0;right:0;bottom:0;z-index:5;height:88%;display:flex;flex-direction:column;background:var(--stock);
+        border-top:1px solid var(--rule-firm);transform:translateY(101%);transition:transform 320ms var(--ease)}
+.phone.is-open .scrim{opacity:1;pointer-events:auto}
+.phone.is-open .drawer{transform:translateY(0)}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
+.grab{flex:none;display:flex;justify-content:center;padding:9px 0 3px}
+.grab span{width:44px;height:4px;background:var(--rule-firm)}
+.drawer__head{flex:none;display:flex;align-items:flex-start;gap:12px;padding:6px 16px 12px;background:var(--sheet);border-bottom:1px solid var(--rule-firm)}
+.drawer__head h3{margin:0;font-size:var(--t4);font-weight:640}
+.drawer__head p{margin:4px 0 0;font-size:var(--t2);color:var(--ink-2)}
+.shut{margin-left:auto;font:inherit;font-size:var(--t2);background:none;border:1px solid var(--rule-firm);color:var(--ink);padding:6px 11px;cursor:pointer}
+.drawer .controls{padding:13px 16px 4px;max-height:none;flex:none}
+.drawer .talk{padding:4px 16px 12px}
+.drawer .compose{padding:12px 16px calc(14px + env(safe-area-inset-bottom))}
+</style>
+</head>
+<body>
+
+<div class="doc-head">
+  <p class="kicker">Style it yourself · variation 4 of 5</p>
+  <h1>Proof Sheet</h1>
+  <p>The print shop. The document is shown as a proof — real pages, in order, with a thumbnail column
+     beside them — because styling is a question about pages and a continuous scroll hides the answer.
+     The rail is an order form that talks: every control writes a plain sentence into the field before
+     it is sent, so you can see what is being asked, reword it, or ignore the controls and type your own.</p>
+</div>
+
+<section class="board">
+  <h2>Desktop · 1320 × 840 <span class="hint">Controls compose the sentence below them</span></h2>
+  <div class="stage stage--desk">
+    <div class="desk">
+      <div class="tape"></div>
+      <header class="bar">
+        <div class="mark">SAL<span>VAGE</span><em>proof sheet</em></div>
+        <div class="rec"><b>quarterly-review.docx</b><span>1.4 MB</span><span>docket SV-4471-QX</span><span>4 pages</span></div>
+        <div class="bar__act">
+          <a class="btn btn--quiet" href="#">The unstyled copy</a>
+          <a class="btn" href="#">Download this proof</a>
+        </div>
+      </header>
+
+      <div class="split">
+        <nav class="thumbs">
+          <h4>Pages</h4>
+          <button class="thumb is-on" type="button"><div class="card"></div><span>1</span></button>
+          <button class="thumb" type="button"><div class="card"></div><span>2</span></button>
+          <button class="thumb" type="button"><div class="card"></div><span>3</span></button>
+          <button class="thumb" type="button"><div class="card"></div><span>4</span></button>
+        </nav>
+
+        <section class="proof">
+          <div class="proof__head">
+            <h3>The repaired document, as it will print</h3>
+            <p>The file itself, not a description of it.</p>
+            <div class="proof__nav"><button type="button">‹</button><span>Page 1 of 4</span><button type="button">›</button></div>
+          </div>
+          <div class="proof__scroll">
+            <article class="page">
+              <div class="doc">
+                <h1>Harbour Line — Third Quarter Operations Review</h1>
+                <p class="byline">Prepared for the operations committee · recovered 26 August</p>
+                <h2>1 · Summary</h2>
+                <p>Volumes across the northern corridor rose eleven per cent against the same quarter last year, almost all of it carried by the two new Tuesday sailings. Turnaround at Berth 4 is still the constraint, and it is now the constraint by a wider margin than it was in the spring.</p>
+                <p>Nothing in this quarter changes the case for the second crane. It sharpens it.</p>
+                <figure>
+                  <div class="plate">
+                    <svg viewBox="0 0 520 150" width="100%" height="120" role="img" aria-label="Berth 4 turnaround by week">
+                      <g fill="#173f8a" opacity=".85">
+                        <rect x="8" y="72" width="34" height="62"></rect><rect x="54" y="58" width="34" height="76"></rect>
+                        <rect x="100" y="64" width="34" height="70"></rect><rect x="146" y="40" width="34" height="94"></rect>
+                        <rect x="192" y="46" width="34" height="88"></rect><rect x="238" y="28" width="34" height="106"></rect>
+                        <rect x="284" y="34" width="34" height="100"></rect><rect x="330" y="18" width="34" height="116"></rect>
+                        <rect x="376" y="24" width="34" height="110"></rect><rect x="422" y="12" width="34" height="122"></rect>
+                        <rect x="468" y="20" width="34" height="114"></rect>
+                      </g>
+                      <line x1="0" y1="134" x2="520" y2="134" stroke="#a9b0aa" stroke-width="1"></line>
+                    </svg>
+                  </div>
+                  <figcaption>Figure 1 — Berth 4 turnaround, by week. Recovered with the document.</figcaption>
+                </figure>
+                <h2>2 · Where the time goes</h2>
+                <table>
+                  <tr><th>Stage</th><th>Median</th><th>Worst week</th></tr>
+                  <tr><td>Alongside to first lift</td><td>41 min</td><td>1 h 12</td></tr>
+                  <tr><td>Discharge</td><td>3 h 06</td><td>4 h 40</td></tr>
+                  <tr><td>Load</td><td>2 h 48</td><td>3 h 55</td></tr>
+                  <tr><td>Last lift to lines off</td><td>34 min</td><td>58 min</td></tr>
+                </table>
+                <p>The two ends of the call account for a little over a fifth of the time alongside, and neither of them is doing any work.</p>
+                <p class="stops">The recovered text stops here, mid-sentence.</p>
+              </div>
+              <div class="page__no">1 of 4</div>
+            </article>
+          </div>
+        </section>
+
+        <aside class="order">
+          <div class="order__head">
+            <h3>Mark up the proof</h3>
+            <p>Set a control and it writes the instruction below. Change the words if they are not yours, then send.</p>
+          </div>
+
+          <div class="controls">
+            <div class="set">
+              <p class="set__name">Headings</p>
+              <div class="opts" data-set="Headings">
+                <button class="opt" type="button" data-say="Set the headings one step quieter than they are now.">Quieter</button>
+                <button class="opt is-on" type="button" data-say="Leave the headings as they are.">As set</button>
+                <button class="opt" type="button" data-say="Set the headings one step bolder than they are now.">Bolder</button>
+              </div>
+            </div>
+            <div class="set">
+              <p class="set__name">Space between things</p>
+              <div class="opts" data-set="Spacing">
+                <button class="opt" type="button" data-say="Tighten the space between paragraphs and headings.">Tight</button>
+                <button class="opt is-on" type="button" data-say="Leave the spacing as it is.">As set</button>
+                <button class="opt" type="button" data-say="Open up the space between paragraphs and headings.">Open</button>
+              </div>
+            </div>
+            <div class="set">
+              <p class="set__name">Table rules</p>
+              <div class="opts" data-set="Table rules">
+                <button class="opt" type="button" data-say="Set every table rule to the thinnest hairline weight.">Hairline</button>
+                <button class="opt is-on" type="button" data-say="Leave the table rules as they are.">As set</button>
+                <button class="opt" type="button" data-say="Remove the vertical rules from the tables and keep the horizontal ones.">Rows only</button>
+              </div>
+            </div>
+            <div class="set">
+              <p class="set__name">Pictures</p>
+              <div class="opts" data-set="Pictures">
+                <button class="opt is-on" type="button" data-say="Leave the pictures in the text column.">In column</button>
+                <button class="opt" type="button" data-say="Let the pictures run the full width of the page, captions beneath.">Full width</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="talk">
+            <div class="line line--you"><span class="who">You</span><div class="says">Hairline table rules, and open the spacing up a little.</div></div>
+            <div class="line"><span class="who">Reply</span><div class="says">Both done. The turnaround table is on hairlines and there is more air above each heading. Page 1 is the only page with a table, so nothing further along moved.
+              <span class="done"><i></i>Applied to the proof · <a href="#">put it back</a></span></div></div>
+            <div class="line line--you"><span class="who">You</span><div class="says">Add a title page with the date and our logo.</div></div>
+            <div class="line"><span class="who">Reply</span><div class="says"><span class="refused"><b>Not that.</b> A title page would be a page your document does not have, and the logo did not survive in the file. I can put the recovered title on a page of its own, using only what is already here.</span></div></div>
+          </div>
+
+          <div class="compose">
+            <p class="compose__why">From your controls: <b>Headings · Quieter</b></p>
+            <div class="field">
+              <textarea>Set the headings one step quieter than they are now.</textarea>
+              <button class="send" type="button">Send</button>
+            </div>
+            <p class="left-today"><i></i><b>6 changes left today</b> · SuperDocs is on the line, holding this document</p>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="board">
+  <h2>Mobile · 390 × 844 <span class="hint">The proof swipes; the order form is the drawer</span></h2>
+  <div class="stage stage--phone">
+    <div class="phone" id="p4">
+      <div class="tape"></div>
+      <header class="mbar">
+        <div class="mark">SAL<span>VAGE</span></div>
+        <a class="btn" href="#">Download</a>
+      </header>
+
+      <div class="mproof">
+        <div class="mproof__head">
+          <h3>The proof</h3>
+          <span class="of">Page 1 of 4</span>
+        </div>
+        <div class="reel">
+          <article class="page">
+            <div class="doc">
+              <h1>Harbour Line — Third Quarter Operations Review</h1>
+              <p class="byline">Operations committee · recovered 26 August</p>
+              <h2>1 · Summary</h2>
+              <p>Volumes across the northern corridor rose eleven per cent against the same quarter last year, almost all of it carried by the two new Tuesday sailings. Turnaround at Berth 4 is still the constraint, and it is now the constraint by a wider margin than it was in the spring.</p>
+              <p>Nothing in this quarter changes the case for the second crane. It sharpens it.</p>
+              <figure>
+                <div class="plate">
+                  <svg viewBox="0 0 520 150" width="100%" height="70" role="img" aria-label="Berth 4 turnaround by week">
+                    <g fill="#173f8a" opacity=".85">
+                      <rect x="8" y="72" width="34" height="62"></rect><rect x="54" y="58" width="34" height="76"></rect>
+                      <rect x="100" y="64" width="34" height="70"></rect><rect x="146" y="40" width="34" height="94"></rect>
+                      <rect x="192" y="46" width="34" height="88"></rect><rect x="238" y="28" width="34" height="106"></rect>
+                      <rect x="284" y="34" width="34" height="100"></rect><rect x="330" y="18" width="34" height="116"></rect>
+                      <rect x="376" y="24" width="34" height="110"></rect><rect x="422" y="12" width="34" height="122"></rect>
+                      <rect x="468" y="20" width="34" height="114"></rect>
+                    </g>
+                    <line x1="0" y1="134" x2="520" y2="134" stroke="#a9b0aa" stroke-width="1"></line>
+                  </svg>
+                </div>
+                <figcaption>Figure 1 — Berth 4 turnaround, by week.</figcaption>
+              </figure>
+              <h2>2 · Where the time goes</h2>
+              <table>
+                <tr><th>Stage</th><th>Median</th><th>Worst</th></tr>
+                <tr><td>Alongside to first lift</td><td>41 min</td><td>1 h 12</td></tr>
+                <tr><td>Discharge</td><td>3 h 06</td><td>4 h 40</td></tr>
+                <tr><td>Load</td><td>2 h 48</td><td>3 h 55</td></tr>
+              </table>
+            </div>
+            <div class="page__no">1 of 4</div>
+          </article>
+          <article class="page">
+            <div class="doc">
+              <h2>3 · What we are asking for</h2>
+              <p>A second crane at Berth 4 from the first week of the new year, and the authority to move the Tuesday sailing forward by ninety minutes while it is being installed.</p>
+              <p>The case does not rest on the volume growth alone. Two of the three worst weeks in the quarter had no unusual volume at all.</p>
+              <p class="stops">The recovered text stops here, mid-sentence.</p>
+            </div>
+            <div class="page__no">2 of 4</div>
+          </article>
+        </div>
+        <div class="dots"><i class="is-on"></i><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="dock">
+        <button class="dock__btn" type="button" data-open="p4"><i></i>Mark up the proof<b>6 left</b></button>
+      </div>
+
+      <div class="scrim" data-shut="p4"></div>
+      <div class="drawer" role="dialog" aria-label="Mark up the proof">
+        <div class="grab"><span></span></div>
+        <div class="drawer__head">
+          <div>
+            <h3>Mark up the proof</h3>
+            <p>A control writes the words. Change them if they are not yours.</p>
+          </div>
+          <button class="shut" type="button" data-shut="p4">Close</button>
+        </div>
+        <div class="controls">
+          <div class="set">
+            <p class="set__name">Headings</p>
+            <div class="opts" data-set="Headings">
+              <button class="opt" type="button" data-say="Set the headings one step quieter than they are now.">Quieter</button>
+              <button class="opt is-on" type="button" data-say="Leave the headings as they are.">As set</button>
+              <button class="opt" type="button" data-say="Set the headings one step bolder than they are now.">Bolder</button>
+            </div>
+          </div>
+          <div class="set">
+            <p class="set__name">Table rules</p>
+            <div class="opts" data-set="Table rules">
+              <button class="opt" type="button" data-say="Set every table rule to the thinnest hairline weight.">Hairline</button>
+              <button class="opt is-on" type="button" data-say="Leave the table rules as they are.">As set</button>
+              <button class="opt" type="button" data-say="Remove the vertical rules and keep the horizontal ones.">Rows only</button>
+            </div>
+          </div>
+        </div>
+        <div class="talk">
+          <div class="line line--you"><span class="who">You</span><div class="says">Hairline table rules, and open the spacing up.</div></div>
+          <div class="line"><span class="who">Reply</span><div class="says">Both done. Page 1 is the only page with a table, so nothing further along moved.
+            <span class="done"><i></i>Applied · <a href="#">put it back</a></span></div></div>
+        </div>
+        <div class="compose">
+          <p class="compose__why">From your controls: <b>Headings · Quieter</b></p>
+          <div class="field">
+            <textarea>Set the headings one step quieter than they are now.</textarea>
+            <button class="send" type="button">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="notes">
+  <h2>Notes</h2>
+  <dl>
+    <dt>What it optimises</dt>
+    <dd>People who know the result they want but not the words for it. The controls hand them the sentence; the field lets them disagree with it before it is sent.</dd>
+    <dt>The seam is visible on purpose</dt>
+    <dd>A control that silently issued an instruction would be a second, hidden conversation. Writing it into the field keeps one record of everything asked for, whether it was typed or clicked.</dd>
+    <dt>Pages, not a scroll</dt>
+    <dd>Styling changes where things fall. A proof shows that; a continuous column hides it until the file is opened in Word, which is the worst moment to find out.</dd>
+    <dt>Refusals name the alternative</dt>
+    <dd>“Not that — but here is the nearest thing I can do with what is already here.” A no that ends the conversation is a no the person will work around badly.</dd>
+    <dt>When the counter is shut</dt>
+    <dd>The controls do not render at all — every one of them is a request that cannot be made — and the rail carries the proof, the history, and one sentence saying why nothing more can be asked today.</dd>
+    <dt>Both files stay reachable</dt>
+    <dd>“Download this proof” names what you are looking at; the unstyled rebuild sits beside it.</dd>
+  </dl>
+</div>
+
+<script>
+document.querySelectorAll("[data-open]").forEach(function (b) {
+  b.addEventListener("click", function () { document.getElementById(b.dataset.open).classList.add("is-open"); });
+});
+document.querySelectorAll("[data-shut]").forEach(function (b) {
+  b.addEventListener("click", function () { document.getElementById(b.dataset.shut).classList.remove("is-open"); });
+});
+/* a control writes its sentence into the field it belongs to, and says so */
+document.querySelectorAll(".opts").forEach(function (group) {
+  group.querySelectorAll(".opt").forEach(function (opt) {
+    opt.addEventListener("click", function () {
+      group.querySelectorAll(".opt").forEach(function (o) { o.classList.toggle("is-on", o === opt); });
+      var root = group.closest(".order, .drawer");
+      if (!root) return;
+      var box = root.querySelector(".field textarea");
+      var why = root.querySelector(".compose__why b");
+      if (box) box.value = opt.dataset.say;
+      if (why) why.textContent = group.dataset.set + " · " + opt.textContent.trim();
+    });
+  });
+});
+document.querySelectorAll(".thumb").forEach(function (t) {
+  t.addEventListener("click", function () {
+    t.parentElement.querySelectorAll(".thumb").forEach(function (o) { o.classList.toggle("is-on", o === t); });
+  });
+});
+</script>
+</body>
+</html>

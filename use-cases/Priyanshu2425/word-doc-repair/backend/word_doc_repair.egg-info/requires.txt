@@ -1,0 +1,16 @@
+lxml
+python-docx
+requests
+pydantic
+
+[dev]
+pytest
+httpx2
+
+[screenshot]
+playwright
+
+[web]
+fastapi
+uvicorn
+python-multipart

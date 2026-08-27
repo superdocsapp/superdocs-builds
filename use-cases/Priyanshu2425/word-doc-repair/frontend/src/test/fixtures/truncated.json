@@ -1,0 +1,47 @@
+{
+  "name": "truncated",
+  "filename": "01-truncated-download.docx",
+  "events": [
+    {
+      "stage": "Scanning Headers",
+      "message": "Reading the parts out of the file…"
+    },
+    {
+      "stage": "Repairing XML",
+      "message": "Checking the document body for damage…"
+    },
+    {
+      "stage": "Reading Body",
+      "message": "Looking for pictures…"
+    },
+    {
+      "stage": "Writing File",
+      "message": "Rebuilding a clean Word file…"
+    },
+    {
+      "stage": "Done",
+      "message": "The rebuilt file is ready to download."
+    }
+  ],
+  "report": {
+    "ok": true,
+    "verdict": "full",
+    "word_count": 25,
+    "method": "xml",
+    "asides_text": "",
+    "output_path": "",
+    "lost": [],
+    "preview_html": "<h1>Quarterly Report</h1>\n<p>Revenue rose in Q3 — driven by renewals &amp; upsell.</p>\n<h2>Regional breakdown</h2>\n<table><tr><td>Region</td><td>Revenue</td></tr><tr><td>EMEA</td><td>1.2M</td></tr><tr><td>APAC</td><td>0.8M</td></tr></table>\n<p>Prepared by the finance team.</p>",
+    "structure_preserved": true,
+    "images_recovered": 0,
+    "images_unplaced": 0,
+    "images_lost": [],
+    "tables_recovered": 1,
+    "download": "/api/download/truncated-token",
+    "style": "/api/style/truncated-token",
+    "styled": false,
+    "styling_note": "",
+    "styling_rejected": false,
+    "plain_download": "/api/download/truncated-token"
+  }
+}

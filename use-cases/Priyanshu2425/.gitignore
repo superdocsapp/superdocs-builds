@@ -1,0 +1,21 @@
+# Build artefacts from running the two projects in this folder. Kept here
+# rather than at the repository root, because CONTRIBUTING.md asks each builder
+# to change nothing outside their own folder.
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+*.tsbuildinfo
+.DS_Store
+
+# Secrets, never. This folder is destined for a public pull request, and on
+# 2026-08-27 a .env holding two live API keys was sitting here untracked and
+# unignored — one `git add .` away from being published. Untracked is not the
+# same as safe.
+.env
+.env.*
+!.env.example
+
+# Local run artefacts: the rebuilt and styled documents the tool writes.
+local_rebuild.docx
+final_recovered.docx

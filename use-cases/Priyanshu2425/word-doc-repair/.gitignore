@@ -1,0 +1,15 @@
+.env
+.venv/
+local_rebuild.docx
+final_recovered.docx
+
+# Never the build's own machinery. A vitest cache file reached a commit on
+# 2026-08-27 because `git add <the whole build>` does not know the difference
+# between work and residue.
+node_modules/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+tsconfig.tsbuildinfo
+.DS_Store

@@ -1,0 +1,6 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 9 out  ·  intact 9  lost 0  duplicated 0  moved 0  new 0
+
+clean: every identifier survived the round trip, in order, with its attributes.
+
+exit code: 0

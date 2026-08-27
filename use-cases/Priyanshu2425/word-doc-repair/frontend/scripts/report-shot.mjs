@@ -1,0 +1,11 @@
+import { chromium } from "playwright";
+const [, , url, fixture, out, w = "900", h = "1200"] = process.argv;
+const browser = await chromium.launch();
+const page = await browser.newPage({ viewport: { width: +w, height: +h }, deviceScaleFactor: 2 });
+await page.goto(url, { waitUntil: "networkidle" });
+await page.setInputFiles('input[type="file"]', fixture);
+await page.waitForSelector(".stamp", { timeout: 15000 });
+await page.waitForTimeout(700);
+await page.screenshot({ path: out, fullPage: true });
+await browser.close();
+console.log("wrote", out);

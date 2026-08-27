@@ -1,0 +1,30 @@
+block identity check  data-chunk-id
+4 identified block(s) in, 4 out  ·  intact 4  lost 0  duplicated 0  moved 0  new 0
+
+ATTR      DATA_ATTRIBUTE_DROPPED · id c1a0e0a4-0000-4000-8000-000000000030
+           where figure · block 3 of the before document · line 3
+           at    div > figure
+           cause the block kept data-chunk-id but lost data-diagram-type, data-diagram-source:
+                 the same attribute filter that drops identifiers drops every other data
+                 attribute, and these carry content that cannot be recovered from the rendered
+                 output
+           after figure at line 3 (data-chunk-id)
+           ·     data-diagram-type: the diagram can no longer be re-rendered from its source
+           ·     data-diagram-source: the diagram degrades to an empty block on the next edit
+                 cycle
+           confidence high
+
+ATTR      DATA_ATTRIBUTE_DROPPED · id c1a0e0a4-0000-4000-8000-000000000031
+           where p · block 4 of the before document · line 6
+           text  "Escalation follows the path in the diagram above."
+           at    div > p
+           cause the block kept data-chunk-id but lost data-citation-id: the same attribute
+                 filter that drops identifiers drops every other data attribute, and these carry
+                 content that cannot be recovered from the rendered output
+           after p at line 6 (data-chunk-id)
+           ·     data-citation-id: the citation stops resolving and will not survive export
+           confidence high
+
+2 error(s)
+
+exit code: 1

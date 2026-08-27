@@ -1,0 +1,28 @@
+[project]
+name = "quota-aware-agent"
+version = "1.0.0"
+description = "An agent that checks its SuperDocs allowance before planning, sizes the work to fit, and degrades in plain language."
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+# The MCP surface is optional: the agent, the library and the CLI demo all work
+# without it, and the tests skip the protocol check when it is absent.
+mcp = ["mcp>=1.0"]
+dev = ["pytest"]
+
+[project.scripts]
+quota-aware-agent-mcp = "quota_aware_agent.mcp_server:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["quota_aware_agent*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend"]
+addopts = "-q"

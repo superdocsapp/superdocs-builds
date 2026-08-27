@@ -1,0 +1,18 @@
+block identity check  data-chunk-id
+9 identified block(s) in, 8 out  ·  intact 8  lost 1  duplicated 0  moved 0  new 0
+
+LOST      LOST_NODE_REBUILT · id c1a0e0a4-0000-4000-8000-000000000003
+           where h2 · block 3 of the before document · line 3
+           text  "4. Liability and indemnity"
+           at    div > h2
+           cause the node was rebuilt as from h2 to div by a different document model -- a
+                 serialisation round trip, not an edit, and the identifier was not carried
+                 across
+           after div at line 3 (class)
+           ·     nearest surviving ancestor c1a0e0a4-0000-4000-8000-000000000001
+           ·     the rebuilt node carries no data attributes
+           confidence high
+
+1 error(s)
+
+exit code: 1

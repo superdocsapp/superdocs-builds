@@ -1,0 +1,45 @@
+{
+  "name": "empty-body",
+  "filename": "07-empty-body.docx",
+  "events": [
+    {
+      "stage": "Scanning Headers",
+      "message": "Reading the parts out of the file…"
+    },
+    {
+      "stage": "Repairing XML",
+      "message": "Checking the document body for damage…"
+    },
+    {
+      "stage": "Reading Body",
+      "message": "Looking for pictures…"
+    },
+    {
+      "stage": "Reading Body",
+      "message": "No readable text was found."
+    }
+  ],
+  "report": {
+    "ok": false,
+    "verdict": "refused",
+    "word_count": 0,
+    "method": "xml",
+    "asides_text": "",
+    "output_path": "",
+    "lost": [
+      "no readable text was found in the document body"
+    ],
+    "preview_html": "",
+    "structure_preserved": true,
+    "images_recovered": 0,
+    "images_unplaced": 0,
+    "images_lost": [],
+    "tables_recovered": 0,
+    "download": null,
+    "style": null,
+    "styled": false,
+    "styling_note": "",
+    "styling_rejected": false,
+    "plain_download": null
+  }
+}

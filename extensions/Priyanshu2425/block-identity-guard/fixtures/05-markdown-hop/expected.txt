@@ -1,0 +1,31 @@
+block identity check  data-chunk-id
+10 identified block(s) in, 3 out  ·  intact 3  lost 7  duplicated 0  moved 0  new 0
+
+LOST      LOST_SUBTREE · under id c1a0e0a4-0000-4000-8000-000000000001 · 7 blocks
+           from  section · block 3 of the before document · line 3
+           text  "4. Liability and indemnity The Supplier shall indemnify the…"
+           at    div > section
+           cause 7 blocks under c1a0e0a4-0000-4000-8000-000000000001 lost identity. The loss
+                 starts at section "4. Liability and indemnity The Supplier shall indemnify
+                 the…" and the dominant transformation is LOST_MARKDOWN_HOP: the node kept its
+                 tag and text but came back with no attributes at all, and tags that only a rich
+                 document model can express are gone from the whole document (section, span): a
+                 markdown or plain-text hop in the middle of the pipeline
+           after h2 at line 3 (no attributes)
+           ·     rules in this group: LOST_BLOCK_REMOVED x3, LOST_MARKDOWN_HOP x2,
+                 LOST_NODE_REBUILT x2
+           ·     c1a0e0a4-0000-4000-8000-000000000001 kept its own identifier, so the loss stops
+                 there: fix the transformation that takes its children and the whole group is
+                 fixed
+           -     section block 3, line 3 LOST_BLOCK_REMOVED · id c1a0e0a4-0000-4000-8000-000000000010 · "4. Liability and indemnity The Supplier shall indemnify the…"
+           -     h2 block 4, line 4 LOST_MARKDOWN_HOP · id c1a0e0a4-0000-4000-8000-000000000003 · "4. Liability and indemnity"
+           -     p block 5, line 5 LOST_MARKDOWN_HOP · id c1a0e0a4-0000-4000-8000-000000000004 · "The Supplier shall indemnify the Customer against all losses…"
+           -     table block 6, line 6 LOST_NODE_REBUILT · id c1a0e0a4-0000-4000-8000-000000000011 · "Direct losses Recoverable in full"
+           -     tr block 7, line 7 LOST_NODE_REBUILT · id c1a0e0a4-0000-4000-8000-000000000012 · "Direct losses Recoverable in full"
+           -     td block 8, line 7 LOST_BLOCK_REMOVED · id c1a0e0a4-0000-4000-8000-000000000013 · "Direct losses"
+           -     td block 9, line 7 LOST_BLOCK_REMOVED · id c1a0e0a4-0000-4000-8000-000000000014 · "Recoverable in full"
+           confidence medium
+
+1 error(s)
+
+exit code: 1
