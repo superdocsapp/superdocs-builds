@@ -133,10 +133,18 @@
 **Implemented:** Polished `README.md` to highlight key features (Safe Editing, Durable Sessions, Resilience, Pipe-friendly, Secure). Created `CHANGELOG.md` detailing all initial v0.1.0 capabilities and security constraints. Prepared final release notes and demonstration commands in `docs/SUBMISSION.md`.
 
 **Validation:**
-- Re-ran `npm test` successfully (128 passed, 0 failed).
+- Earlier Stage 5 baseline run was 128 passed, 0 failed; the final post-audit run is recorded below as 132 passed, 0 failed, 1 conditional skip.
 - Re-ran `npm run test:replay` successfully (5 passed, 0 failed).
-- Verified `npm pack --dry-run` properly excludes test evidence, temporary credentials, and live artifacts, producing exactly `93.7 kB` packed footprint.
+- Verified `npm pack --dry-run` properly excludes test evidence, temporary credentials, and live artifacts, producing 96.7 kB packed footprint in the final post-audit dry-run.
 - Executed whole-project secret scans proving zero leakage of API keys, bearer tokens, or signature parameters in the project structure.
 - Validated compiled binary `sdx --help`, `sdx --version`, and `sdx completions bash` rendering correctly.
 
 **Stage 5 status:** Complete. All Stage 5 release checks passed. Submission materials generated. No further live edits or potentially billable actions were taken. No commits were pushed or PRs opened as per constraints.
+
+## 2026-08-07 — Audit gap: verified PDF/DOCX export artifacts
+
+**Implemented:** Added streaming-safe structural export verification before atomic finalization. PDF exports must contain a valid PDF header, page and font objects, and a trailing EOF marker. DOCX exports must be valid ZIP/OOXML containers with [Content_Types].xml, word/document.xml, and word/styles.xml. Invalid or truncated PDF/DOCX downloads fail with the existing export-write exit code and cannot leave a final output file. The deterministic fixture server now emits genuine styled PDF and DOCX artifacts instead of placeholder bytes, and existing fixture assertions verify their structure.
+
+**Validation:** Added unit tests for valid and invalid artifact verification plus compiled integration tests for PDF/DOCX output and invalid-export cleanup. Build, strict type-check, ESLint, unit tests, fixture tests, and the complete offline npm test suite passed: 132 passed, 0 failed, 1 conditional jq skip (133 tests total). No live API operation was run.
+
+**Audit limitation:** The authoritative task PDF at /workspace/scratch/8042836ad78a/upload/SuperDocs-Task-Engineer.pdf was not present in the local filesystem, so no claims were inferred from its unavailable contents. Historical live proof and renderer limitations remain documented separately above.

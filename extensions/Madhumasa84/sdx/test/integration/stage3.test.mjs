@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 
+import { assertValidFixtureExport } from '../fixtures/export-artifacts.mjs';
 import { startFixtureServer } from '../fixtures/server.mjs';
 
 const cliPath = new URL('../../dist/cli.js', import.meta.url).pathname;
@@ -89,7 +90,7 @@ test('programmatic mixed approval validates live state, completes, and exports s
     assert.equal((await runCli(editArgs(files.source, 'edit', ['--json']), { baseUrl: fixture.baseUrl, home: files.home })).status, 3);
     const result = await runCli(['approve', 'job-1', '--accept', 'change-1', '--reject', 'change-2', '--json', '--poll-interval', '1', '--timeout', '2'], { baseUrl: fixture.baseUrl, home: files.home });
     assert.equal(result.status, 0, result.stderr); assert.equal(JSON.parse(result.stdout).status, 'completed');
-    assert.equal(await readFile(files.output, 'utf8'), 'fixture-export-bytes');
+    await assertValidFixtureExport(await readFile(files.output), 'docx');
     assert.deepEqual(fixture.observations.approvalRequest.changes.map((item) => item.approved), [true, false]);
   } finally { await fixture.close(); await files.cleanup(); }
 });
@@ -162,15 +163,34 @@ test('stdin and file new flows preserve title, format, safe naming, and cleanup'
     const pdf = join(files.directory, 'q3-review.pdf');
     const stdinResult = await runCli(['new', '--title', 'Q3 Review', '--export', 'pdf', '--json'], { baseUrl: fixture.baseUrl, home: files.home, input: '# Notes\n\nSynthetic.\n', cwd: files.directory, env: { TMPDIR: files.directory } });
     assert.equal(stdinResult.status, 0, stdinResult.stderr); assert.equal(JSON.parse(stdinResult.stdout).document.name, 'Q3 Review');
-    assert.equal(await readFile(pdf, 'utf8'), 'fixture-export-bytes');
+    await assertValidFixtureExport(await readFile(pdf), 'pdf');
     assert.equal(fixture.observations.uploadRequest.filename, 'Q3 Review.md'); assert.equal(fixture.observations.downloadRequest.format, 'pdf');
     assert.equal((await readdir(files.directory)).some((name) => name.startsWith('sdx-new-')), false);
     const html = join(files.directory, 'notes.html'); await writeFile(html, '<h1>Notes</h1>');
     const docx = join(files.directory, 'notes.docx');
     const fileResult = await runCli(['new', html, '--title', '../Safe Title', '--output', docx], { baseUrl: fixture.baseUrl, home: files.home });
-    assert.equal(fileResult.status, 0, fileResult.stderr); assert.equal(await readFile(docx, 'utf8'), 'fixture-export-bytes');
+    assert.equal(fileResult.status, 0, fileResult.stderr); await assertValidFixtureExport(await readFile(docx), 'docx');
   } finally { await fixture.close(); await files.cleanup(); }
 });
+
+for (const format of ['pdf', 'docx']) {
+  test('new rejects structurally invalid ' + format + ' exports without leaving a final file', async () => {
+    const fixture = await startFixtureServer({ downloadBytes: Buffer.from('invalid ' + format + ' bytes') });
+    const files = await workspace();
+    const output = join(files.directory, 'invalid.' + format);
+    try {
+      const result = await runCli(['new', files.source, '--title', 'Invalid', '--export', format, '--output', output], {
+        baseUrl: fixture.baseUrl,
+        home: files.home,
+      });
+      assert.equal(result.status, 24, result.stderr);
+      await assert.rejects(() => stat(output));
+    } finally {
+      await fixture.close();
+      await files.cleanup();
+    }
+  });
+}
 
 test('new rejects empty stdin and protects existing output unless overwrite is explicit', async () => {
   const fixture = await startFixtureServer(); const files = await workspace();
@@ -181,7 +201,7 @@ test('new rejects empty stdin and protects existing output unless overwrite is e
     const blocked = await runCli(['new', files.source, '--title', 'Protected', '--output', output], { baseUrl: fixture.baseUrl, home: files.home });
     assert.equal(blocked.status, 24); assert.equal(await readFile(output, 'utf8'), 'keep');
     const replaced = await runCli(['new', files.source, '--title', 'Protected', '--output', output, '--overwrite'], { baseUrl: fixture.baseUrl, home: files.home });
-    assert.equal(replaced.status, 0, replaced.stderr); assert.equal(await readFile(output, 'utf8'), 'fixture-export-bytes');
+    assert.equal(replaced.status, 0, replaced.stderr); await assertValidFixtureExport(await readFile(output), 'docx');
   } finally { await fixture.close(); await files.cleanup(); }
 });
 

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: release_readiness
+      POSTGRES_USER: analyst
+      POSTGRES_PASSWORD: change-me-local-only
+    ports: ["5432:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://analyst:change-me-local-only@postgres:5432/release_readiness
+    ports: ["8000:8000"]
+    depends_on: [postgres]
+  ui:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on: [api]
+volumes:
+  postgres-data:

@@ -14,6 +14,7 @@
 | Credentials | Hidden/piped input does not echo; env precedence; redacted status; 0600 file | 3 | No |
 | Session removal | Compiled test proves no remote DELETE/archive call | 3 | No |
 | New stdin/file | Streamed temp input, empty/TTY rejection, cleanup, safe title/output, overwrite guard | 3 | No |
+| Export artifact validation | Compiled workflow verifies valid PDF signature/page/font/EOF and DOCX ZIP OOXML parts before atomic finalization; invalid output leaves no final file | 3 | No |
 | Completions | Non-empty deterministic bash/zsh/fish scripts with commands/options | 3 | No |
 | Doctor | Human/JSON local diagnostics including ledger/state permissions; no fixture API request | 3/4 | No |
 | JSON pipeline | Compiled JSON parsed through `jq` when installed | 3 | No |
@@ -31,7 +32,7 @@
 | Transfer faults | Interrupted upload one PUT/no chat; truncated/expired download no final/temp; orphan dead-PID temp cleanup | 4 | No |
 | 120-page stress | Deterministic styled OOXML, 119 page breaks/120 markers/media, five compiled signed-stream workflows, hashes/time/RSS | 4 | No |
 | Record/replay | Dual opt-in guard, one-edit cap, sanitizer/validator/0600 write, contract-derived local replay | 4 | No |
-| Live Stage 4 large file | Generated disposable 120-page edit and export | 4 | Optional; pending (0 operations) |
+| Live Stage 4 large file | Generated disposable 120-page edit and export; sanitized historical evidence in PROGRESS.md | 4 | Optional; verified historically (not rerun in this audit) |
 | Live cassette | Sanitized opt-in one-edit recording | 4 | Optional; pending; checked-in replay is contract-derived |
 
-The fixture is deterministic, strict about API versus signed-storage authentication, and never contains real credentials or live responses. Every retry/recovery test asserts remote call counts. The stress method and raw sanitized observations are in `docs/stress-method.md` and `docs/evidence/stage4-stress.json`. Rendered page count is pending because no trustworthy renderer was installed; structural OOXML validation passed. A skipped optional tool/live check is recorded as pending, never as passed.
+The fixture is deterministic, strict about API versus signed-storage authentication, and never contains real credentials or live responses. Every retry/recovery test asserts remote call counts. The stress method and raw sanitized observations are in `docs/stress-method.md` and `docs/evidence/stage4-stress.json`. Rendered page count is pending because no trustworthy renderer was installed; structural OOXML validation passed. A skipped optional tool/live check is recorded as pending, never as passed; historical live Stage 4 large-file evidence is retained separately in PROGRESS.md.

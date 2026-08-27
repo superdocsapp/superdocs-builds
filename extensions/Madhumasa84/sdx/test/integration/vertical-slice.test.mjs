@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 
+import { assertValidFixtureExport } from '../fixtures/export-artifacts.mjs';
 import { startFixtureServer } from '../fixtures/server.mjs';
 
 const cliPath = new URL('../../dist/cli.js', import.meta.url).pathname;
@@ -134,7 +135,7 @@ test('compiled CLI completes the full local fixture vertical slice', async (t) =
       assert.equal(observed.signedDownloadAuthorization, undefined);
     });
     await t.test('export is non-empty and atomically finalized', async () => {
-      assert.equal((await readFile(files.output, 'utf8')), 'fixture-export-bytes');
+      await assertValidFixtureExport(await readFile(files.output), 'docx');
       const names = await readdir(files.directory);
       assert.equal(names.some((name) => name.endsWith('.tmp')), false);
     });

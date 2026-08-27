@@ -31,7 +31,7 @@
 - [x] Prove a deterministic styled 120-logical-page DOCX through the complete offline signed streaming workflow across five measured runs.
 - [x] Add opt-in sanitized recording plus credential-free contract-derived replay and secret validation.
 - [x] Cover the Stage 4 deterministic resilience fault matrix with exact remote call assertions.
-- [ ] Run live 120-page proof (key absent; zero operations).
+- [x] Run live 120-page proof (historical sanitized evidence recorded in PROGRESS.md; not rerun in offline verification).
 - [ ] Capture a genuinely live sanitized cassette (key absent; contract-derived cassette retained honestly).
 - [ ] Measure rendered 120-page count (trustworthy renderer unavailable; structural OOXML count passed).
 - [ ] Prove broader OS/environment locking and permission behavior (deferred to Stage 5 matrix).
@@ -39,5 +39,5 @@
 ## Stage 5 — Release and submission (complete)
 
 - [x] Finalize versioning/changelog/release evidence.
-- [x] Run authorized production smoke and publish submission materials.
-- [x] Verify a clean published install.
+- [x] Prepare submission materials and retain sanitized smoke evidence; public production publication is not performed by this private package.
+- [x] Verify a clean local packed/install smoke (public registry publication remains outside this private package).

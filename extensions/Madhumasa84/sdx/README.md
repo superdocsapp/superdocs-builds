@@ -96,6 +96,7 @@ sdx new notes.md --title "Q3 Review" --export docx
 ```
 
 `new` streams stdin to a restrictive temporary file, refuses empty or terminal stdin, uses the pre-signed document load path, and exports exact supplied content. Defaults are predictable: `Q3 Review` plus PDF becomes `q3-review.pdf`; `report.docx` edited to DOCX becomes `report.sdx.docx`.
+PDF and DOCX downloads are verified before the temporary file is atomically finalized. PDF verification checks the header, page/font objects, and EOF marker; DOCX verification checks the ZIP container and required OOXML content, document, and styles parts. A structurally invalid or truncated export returns exit code 24 and leaves no final output.
 
 Existing outputs and the source itself are protected. Use `--overwrite` only when atomic replacement is intentional.
 
@@ -197,4 +198,4 @@ It also requires `SUPERDOCS_API_KEY` already in the environment, generates only 
 
 ## Current limitations
 
-The public API offers no documented idempotency mechanism for the used chat endpoint, so an accepted request whose response is lost requires manual reconciliation. Pre-chat ledger checkpoints are diagnosable but cannot recreate the intentionally unpersisted private instruction. Recovery is explicit (`sdx resume`), not automatic. Ctrl+C never cancels remote work. Remote cancellation/deletion/archive, OS keychain integration, rendered 120-page verification (no renderer was installed), live large-file proof, a genuinely live-recorded cassette, and broader cross-platform permission/locking proof remain pending. Release/submission work belongs to Stage 5.
+The public API offers no documented idempotency mechanism for the used chat endpoint, so an accepted request whose response is lost requires manual reconciliation. Pre-chat ledger checkpoints are diagnosable but cannot recreate the intentionally unpersisted private instruction. Recovery is explicit (`sdx resume`), not automatic. Ctrl+C never cancels remote work. Remote cancellation/deletion/archive, OS keychain integration, rendered 120-page verification (no renderer was installed), a genuinely live-recorded cassette, and broader cross-platform permission/locking proof remain pending. The live Stage 4 large-file proof is recorded in PROGRESS.md; it is not rerun by normal offline tests. Release/submission work belongs to Stage 5.

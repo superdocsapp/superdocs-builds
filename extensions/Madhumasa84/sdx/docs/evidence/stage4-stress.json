@@ -3,7 +3,7 @@
   "provenance": "offline deterministic contract-derived fixture; no live API operation",
   "measurementMethod": "docs/stress-method.md",
   "runtime": {
-    "node": "v20.20.2",
+    "node": "v24.18.0",
     "platform": "linux",
     "architecture": "x64",
     "peakRssTool": "/usr/bin/time -v"
@@ -18,8 +18,8 @@
       "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
       "outputBytes": 202611,
       "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
-      "wallClockMs": 263.448,
-      "peakRssKiB": 93140,
+      "wallClockMs": 428.328,
+      "peakRssKiB": 97620,
       "uploadChunkCount": 4,
       "maximumUploadChunkBytes": 65536,
       "chatSubmissions": 1,
@@ -31,8 +31,8 @@
       "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
       "outputBytes": 202611,
       "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
-      "wallClockMs": 237.444,
-      "peakRssKiB": 93284,
+      "wallClockMs": 418.012,
+      "peakRssKiB": 98008,
       "uploadChunkCount": 5,
       "maximumUploadChunkBytes": 65536,
       "chatSubmissions": 1,
@@ -44,9 +44,9 @@
       "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
       "outputBytes": 202611,
       "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
-      "wallClockMs": 262.156,
-      "peakRssKiB": 93036,
-      "uploadChunkCount": 4,
+      "wallClockMs": 504.745,
+      "peakRssKiB": 98168,
+      "uploadChunkCount": 5,
       "maximumUploadChunkBytes": 65536,
       "chatSubmissions": 1,
       "failures": []
@@ -57,8 +57,8 @@
       "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
       "outputBytes": 202611,
       "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
-      "wallClockMs": 271.661,
-      "peakRssKiB": 92608,
+      "wallClockMs": 477.979,
+      "peakRssKiB": 98212,
       "uploadChunkCount": 5,
       "maximumUploadChunkBytes": 65536,
       "chatSubmissions": 1,
@@ -70,9 +70,9 @@
       "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
       "outputBytes": 202611,
       "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
-      "wallClockMs": 255.591,
-      "peakRssKiB": 93052,
-      "uploadChunkCount": 4,
+      "wallClockMs": 404.73,
+      "peakRssKiB": 97980,
+      "uploadChunkCount": 5,
       "maximumUploadChunkBytes": 65536,
       "chatSubmissions": 1,
       "failures": []
@@ -80,62 +80,23 @@
   ],
   "statistics": {
     "wallClockMs": {
-      "minimum": 237.444,
-      "median": 262.156,
-      "p95": 271.661,
-      "maximum": 271.661,
-      "mean": 258.06,
-      "populationVariance": 132.382,
-      "populationStandardDeviation": 11.506
+      "minimum": 404.73,
+      "median": 428.328,
+      "p95": 504.745,
+      "maximum": 504.745,
+      "mean": 446.759,
+      "populationVariance": 1453.919,
+      "populationStandardDeviation": 38.13
     },
     "peakRssKiB": {
-      "minimum": 92608,
-      "median": 93052,
-      "p95": 93284,
-      "maximum": 93284,
-      "mean": 93024,
-      "populationVariance": 51008,
-      "populationStandardDeviation": 225.85
+      "minimum": 97620,
+      "median": 98008,
+      "p95": 98212,
+      "maximum": 98212,
+      "mean": 97997.6,
+      "populationVariance": 43600.64,
+      "populationStandardDeviation": 208.808
     }
   },
-  "failures": [],
-  "liveVerification": {
-    "performedAt": "2026-08-07T16:47:44Z",
-    "stage2Prerequisite": {
-      "description": "npm run test:live \u2014 Stage 2 live smoke",
-      "result": "awaiting_approval",
-      "exitCode": 3,
-      "potentiallyBillableEdits": 1,
-      "approvalOrExportPerformed": false,
-      "passed": true
-    },
-    "stage4LargeDocumentProof": {
-      "jobId": "74c1257e-82ae-438b-a356-460b210ce111",
-      "sessionId": "sdx-live-stage4-06c42e8e-ecb5-4db8-8dae-8de06a0eb552",
-      "changeId": "56daf0c4-8c7c-4978-bbf5-2fd4b708ba1f",
-      "changeOperation": "edit",
-      "oldMarker": "SDX_TARGET_PAGE_120_ORIGINAL",
-      "newMarker": "SDX_TARGET_PAGE_120_EDITED",
-      "approvalDecision": "explicitly approved by human operator",
-      "jobStatus": "completed",
-      "progress": 100,
-      "potentiallyBillableEdits": 1,
-      "outputBytes": 228906,
-      "outputSha256": "18fb807cedd4db429153accd5b11b7c4cbff4750fe6fe1a8cf44c483dcf51779",
-      "outputFile": "docs/evidence/live-stage4-output.docx",
-      "ooxml": {
-        "validZip": true,
-        "contentTypesPresent": true,
-        "explicitPageBreaks": 119,
-        "editedMarkerPresent": true,
-        "editedMarkerCount": 1,
-        "originalMarkerAbsent": true
-      },
-      "temporaryFilesRemain": false,
-      "resubmitted": false,
-      "cancelled": false
-    },
-    "totalPotentiallyBillableEdits": 2,
-    "liveCassetteRecorded": false
-  }
+  "failures": []
 }

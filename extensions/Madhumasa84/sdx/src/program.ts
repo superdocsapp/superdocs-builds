@@ -276,7 +276,7 @@ export function createProgram(): Command {
       } finally { prompts?.close(); process.removeListener('SIGINT', interrupt); }
     }, (envelope) => renderEditHuman(envelope, false, 4000)));
 
-  program.command('new').description('Create a document from a text file or streamed stdin')
+  program.command('new').description('Create a document from a text file or streamed stdin with verified PDF/DOCX exports')
     .argument('[file]', 'Markdown, TXT, or HTML source').option('--title <title>', 'document title')
     .option('--overwrite', 'atomically replace an existing output', false)
     .action(async (filePath: string | undefined, _local: CliOptions, command: Command) => guarded(command, 'new', async (options) => {

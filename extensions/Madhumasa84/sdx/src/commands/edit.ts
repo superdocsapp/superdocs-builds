@@ -4,6 +4,7 @@ import { basename, extname, resolve } from 'node:path';
 
 import type { ApprovalDecision, SuperDocsClient } from '../api/client.js';
 import { SdxError, asSdxError, schemaMismatch } from '../api/errors.js';
+import { verifyExportFile } from '../api/export-validation.js';
 import type { ApiJob, ExportFormat } from '../api/schemas.js';
 import type { OutputEnvelope } from '../core/output.js';
 import { EXIT_CODES, type ExitCode } from '../core/exit-codes.js';
@@ -410,6 +411,8 @@ export async function editDocument(
       download.download_url,
       desiredOutput,
       options.signal,
+      false,
+      (temporaryPath) => verifyExportFile(temporaryPath, options.format),
     );
     warnings.push(...downloaded.warnings);
     const finishedAt = now();

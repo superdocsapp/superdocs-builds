@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
 import { once } from 'node:events';
 
+import { createFixtureExport } from './export-artifacts.mjs';
+
 const NOW = '2026-08-06T08:00:00.000Z';
 
 async function readBody(request) {
@@ -466,10 +468,20 @@ export async function startFixtureServer(options = {}) {
           response.writeHead(200, { 'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
           response.write('partial-export-'); return;
         }
+        const format = observations.downloadRequest?.format ?? 'docx';
+        const bytes = downloadBytes ?? await createFixtureExport(format);
+        const contentType = format === 'pdf'
+          ? 'application/pdf'
+          : format === 'html'
+            ? 'text/html'
+            : format === 'markdown'
+              ? 'text/markdown'
+              : format === 'txt'
+                ? 'text/plain'
+                : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
         if (state.scenario === 'truncated-download') {
-          const bytes = downloadBytes ?? Buffer.from('fixture-export-bytes');
           response.writeHead(200, {
-            'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'Content-Type': contentType,
             'Content-Length': String(bytes.length + 100),
           });
           response.write(bytes.subarray(0, Math.max(1, Math.floor(bytes.length / 2))));
@@ -479,16 +491,11 @@ export async function startFixtureServer(options = {}) {
           JSON.stringify([{ code: 'fixture_warning', message: 'Fixture export warning' }]),
         ).toString('base64');
         response.writeHead(200, {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'Content-Type': contentType,
           'X-Export-Warnings': warning,
         });
-        if (downloadBytes) {
-          for (let offset = 0; offset < downloadBytes.length; offset += 16 * 1024) response.write(downloadBytes.subarray(offset, offset + 16 * 1024));
-          response.end();
-          return;
-        }
-        response.write('fixture-');
-        response.end('export-bytes');
+        for (let offset = 0; offset < bytes.length; offset += 16 * 1024) response.write(bytes.subarray(offset, offset + 16 * 1024));
+        response.end();
         return;
       }
 

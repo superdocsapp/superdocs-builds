@@ -4,6 +4,7 @@ import { basename, dirname, extname, resolve } from 'node:path';
 
 import type { SuperDocsClient } from '../api/client.js';
 import { SdxError, asSdxError, schemaMismatch } from '../api/errors.js';
+import { verifyExportFile } from '../api/export-validation.js';
 import type { ExportFormat, ProcessDocumentResponse } from '../api/schemas.js';
 import type { ProposedChange } from '../core/changes.js';
 import { EXIT_CODES } from '../core/exit-codes.js';
@@ -108,7 +109,13 @@ export async function exportSession(
   diagnostic('Requesting signed export download URL...');
   const download = await client.requestDownloadUrl(sessionId, format, basename(outputPath, extname(outputPath)), signal);
   diagnostic('Streaming and verifying exported document...');
-  const result = await client.streamDownloadAtomically(download.download_url, outputPath, signal, overwrite);
+  const result = await client.streamDownloadAtomically(
+    download.download_url,
+    outputPath,
+    signal,
+    overwrite,
+    (temporaryPath) => verifyExportFile(temporaryPath, format),
+  );
   return { outputPath, warnings: result.warnings };
 }
 

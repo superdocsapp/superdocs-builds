@@ -53,7 +53,7 @@ Diffs show ordinal, section/heading, change ID, operation, explanation, document
 
 `schemas/output-v1.schema.json` remains version `1.0`. Optional `data`, `diagnostics`, and `documentId` are backward-compatible additions; the top-level stays closed. JSON mode writes exactly one object to stdout and never prompts. Progress/diagnostics remain on stderr. Human final results use stdout.
 
-Uploads/downloads and stdin use native streams with backpressure. Document bytes are never whole-file-read or Base64 encoded. Exports land in a same-directory temporary file and use exclusive hard-link finalization by default; explicit overwrite uses atomic rename.
+Uploads/downloads and stdin use native streams with backpressure. Document bytes are never whole-file-read or Base64 encoded. Exports land in a same-directory temporary file, are structurally validated for PDF/DOCX, and use exclusive hard-link finalization by default; explicit overwrite uses atomic rename. Invalid or truncated exports never become final files.
 
 ## 8. Profiles and precedence
 
@@ -91,4 +91,4 @@ The recorder is opt-in behind both a flag and environment credential, excludes s
 
 ## 16. Deferred Stage 5 work
 
-Release/version/changelog/submission work, authorized live large-file proof and live cassette capture, rendered page-count/environment-matrix verification, OS keychain integration, and broader cross-platform locking/permissions remain Stage 5 or external verification work. Remote cancellation and destructive remote document operations remain unsupported.
+Release/version/changelog/submission work, live cassette capture, rendered page-count/environment-matrix verification, OS keychain integration, and broader cross-platform locking/permissions remain Stage 5 or external verification work; historical live large-file evidence is retained in PROGRESS.md. Remote cancellation and destructive remote document operations remain unsupported.

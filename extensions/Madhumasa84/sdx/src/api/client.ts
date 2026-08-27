@@ -338,6 +338,7 @@ export class SuperDocsClient {
     destination: string,
     signal?: AbortSignal,
     overwrite = false,
+    verifyTemporary?: (temporaryPath: string) => Promise<void>,
   ): Promise<DownloadResult> {
     await cleanupDeadDownloadTemporaries(destination);
     const attempted = await this.fetchWithRetry(downloadUrl, {
@@ -377,6 +378,7 @@ export class SuperDocsClient {
           EXIT_CODES.exportWriteFailure,
         );
       }
+      await verifyTemporary?.(temporary);
       if (overwrite) {
         await rename(temporary, destination);
       } else {

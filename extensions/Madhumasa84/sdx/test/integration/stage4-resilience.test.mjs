@@ -4,6 +4,7 @@ import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promis
 import { join } from 'node:path';
 import test from 'node:test';
 
+import { assertValidFixtureExport } from '../fixtures/export-artifacts.mjs';
 import { startFixtureServer } from '../fixtures/server.mjs';
 
 const cliPath = new URL('../../dist/cli.js', import.meta.url).pathname;
@@ -304,7 +305,7 @@ test('termination after completion but before export resumes export without anot
     assert.equal(fixture.observations.editCalls, 1);
     assert.equal(fixture.observations.downloadCalls, 2);
     assert.equal(fixture.observations.signedDownloadCalls, 2);
-    assert.equal((await readFile(output, 'utf8')), 'fixture-export-bytes');
+    await assertValidFixtureExport(await readFile(output), 'docx');
     const names = await readdir(files.directory);
     assert.equal(names.some((name) => name.startsWith('.completed-before-export.docx.') && name.endsWith('.tmp')), false);
   } finally { await fixture.close(); await rm(files.directory, { recursive: true, force: true }); }
