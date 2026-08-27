@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 72" role="img" aria-label="SuperDocs Review for Zoho Writer">
+  <rect width="72" height="72" rx="20" fill="#ef6a4e"/>
+  <path d="M24 18h16l10 10v26a2 2 0 0 1-2 2H24a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2z" fill="#fff"/>
+  <path d="M40 18l10 10H41a1 1 0 0 1-1-1z" fill="#f7c9bd"/>
+  <path d="M28.5 42.5l4 4 8.5-9.5" fill="none" stroke="#ef6a4e" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="88" y="44" fill="#1a1a1a" font-family="Inter, Helvetica, Arial, sans-serif" font-size="25" font-weight="700">SuperDocs Review</text>
+</svg>

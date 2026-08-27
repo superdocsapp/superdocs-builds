@@ -1,0 +1,495 @@
+:root {
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #1a1a1a;
+  background: #fbfaf7;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+#app {
+  max-width: 460px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 22px 16px 40px;
+}
+
+.hero,
+.section-heading,
+.change-top,
+.activity-line,
+.decision {
+  display: flex;
+  align-items: center;
+}
+
+.hero {
+  gap: 11px;
+  margin-bottom: 18px;
+}
+
+.hero h1,
+.section-heading h2,
+.panel h2 {
+  margin: 2px 0 0;
+  letter-spacing: -0.025em;
+}
+
+.hero h1 {
+  font-size: 21px;
+}
+
+/* The SuperDocs lockup sits on the page's cream ground, which the asset's own
+   background matches, so it needs no plate behind it. */
+.lockup {
+  display: block;
+  width: 132px;
+  height: auto;
+  margin-bottom: 2px;
+}
+
+.hero-text {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #8a8177;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.status-dot {
+  margin-left: auto;
+  color: #8a8177;
+  font-size: 11px;
+}
+
+.status-dot::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #e0b070;
+  content: "";
+}
+
+.status-dot.ready::before {
+  background: #34a06a;
+}
+
+.panel,
+.activity,
+.error,
+.change-card {
+  border: 1px solid #e8e3dc;
+  border-radius: 15px;
+  background: white;
+  box-shadow: 0 4px 18px rgb(60 50 40 / 5%);
+}
+
+.panel,
+.error {
+  padding: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+textarea,
+input.masked {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid #ddd6cd;
+  border-radius: 10px;
+  padding: 11px;
+  color: #1a1a1a;
+  background: #fdfcfa;
+  line-height: 1.45;
+  outline: none;
+  font: inherit;
+}
+
+/* Masked with CSS rather than type="password": a real password input makes the
+   browser and macOS Keychain offer to save credentials on every submit. Applies
+   to the key field only — never the instruction textarea. */
+input.masked {
+  -webkit-text-security: disc;
+}
+
+/* Off-screen, not display:none: some browsers' password-manager heuristics
+   ignore fields that never render, which would defeat the decoy above. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+textarea:focus,
+input.masked:focus {
+  border-color: #ef6a4e;
+  box-shadow: 0 0 0 3px rgb(239 106 78 / 14%);
+}
+
+/* Collapsed by default: the connection is the intended path, so the key is a
+   fallback that should not crowd out the primary action in a narrow sidebar. */
+.credentials {
+  margin-bottom: 10px;
+  padding: 12px 15px;
+}
+
+.credentials summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 750;
+  list-style: none;
+  user-select: none;
+}
+
+.credentials summary::-webkit-details-marker {
+  display: none;
+}
+
+.credentials summary::before {
+  display: inline-block;
+  margin-right: 6px;
+  color: #a8a099;
+  content: "▸";
+}
+
+.credentials[open] summary::before {
+  content: "▾";
+}
+
+.credentials[open] summary {
+  margin-bottom: 10px;
+}
+
+.credentials .hint-inline {
+  font-size: 11px;
+}
+
+.prose {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: #1a1a1a;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.markup {
+  margin-top: 8px;
+  font-size: 11px;
+}
+
+.markup summary {
+  color: #857c72;
+  cursor: pointer;
+  user-select: none;
+}
+
+.markup pre {
+  margin: 6px 0 0;
+  white-space: pre-wrap;
+  word-break: break-all;
+  font-size: 10.5px;
+}
+
+.hint-inline {
+  color: #857c72;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.hint,
+.warning {
+  color: #857c72;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.warning {
+  border-left: 3px solid #e8a05a;
+  padding-left: 9px;
+  color: #8a5a34;
+}
+
+.primary,
+.secondary {
+  min-height: 38px;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.primary {
+  width: 100%;
+  border: 1px solid #171717;
+  color: white;
+  background: #171717;
+}
+
+.primary:hover:not(:disabled) {
+  background: #000000;
+}
+
+.secondary {
+  border: 1px solid #ddd6cd;
+  color: #33302c;
+  background: white;
+}
+
+#finish .secondary {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.stages {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin: 20px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stages li {
+  position: relative;
+  padding-top: 15px;
+  color: #a8a099;
+  font-size: 9px;
+  text-align: center;
+}
+
+.stages li::before {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: calc(50% - 4px);
+  width: 8px;
+  height: 8px;
+  border: 2px solid #fbfaf7;
+  border-radius: 50%;
+  background: #ddd6cd;
+  content: "";
+}
+
+.stages li:not(:last-child)::after {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 100%;
+  height: 1px;
+  background: #e8e3dc;
+  content: "";
+}
+
+.stages li.active,
+.stages li.done {
+  color: #171717;
+  font-weight: 700;
+}
+
+.stages li.active::before,
+.stages li.done::before,
+.stages li.done::after {
+  background: #ef6a4e;
+}
+
+.activity {
+  padding: 12px 14px;
+  font-size: 12px;
+}
+
+.activity-line {
+  gap: 8px;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid #e7dfd6;
+  border-top-color: #ef6a4e;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.usage {
+  margin: 7px 0 0 21px;
+  color: #938b82;
+  font-size: 10px;
+}
+
+.error {
+  border-color: #f2c9c1;
+  color: #8a3226;
+  background: #fffaf8;
+}
+
+.error p {
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.section-heading {
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-heading h2,
+.panel h2 {
+  font-size: 17px;
+}
+
+.counter,
+.change-type {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.counter {
+  color: #6b625a;
+  background: #f2ede6;
+}
+
+.change-card {
+  margin-bottom: 10px;
+  padding: 13px;
+}
+
+.change-top {
+  justify-content: space-between;
+}
+
+.change-type {
+  color: #b4472f;
+  background: #fdeae5;
+  text-transform: uppercase;
+}
+
+.change-id {
+  max-width: 55%;
+  overflow: hidden;
+  color: #a09991;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explanation {
+  color: #44403c;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.diff {
+  display: grid;
+  gap: 7px;
+}
+
+.diff > div {
+  min-width: 0;
+  border-radius: 8px;
+  padding: 8px;
+  background: #f8f5f1;
+}
+
+.diff-label {
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+}
+
+.removed {
+  color: #b4432f;
+}
+
+.added {
+  color: #2f7d55;
+}
+
+pre {
+  max-height: 108px;
+  overflow: auto;
+  margin: 5px 0 0;
+  color: #4a453f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.decision {
+  gap: 7px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.decision .secondary {
+  min-width: 74px;
+}
+
+.accept.selected {
+  border-color: #2f7d55;
+  color: #171717;
+  background: #e9f4ec;
+}
+
+.reject.selected {
+  border-color: #b85c54;
+  color: #8e3932;
+  background: #fbe9e7;
+}
+
+.hidden {
+  display: none !important;
+}
+
+code {
+  font-size: 10px;
+}

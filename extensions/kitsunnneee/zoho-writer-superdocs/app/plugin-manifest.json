@@ -1,0 +1,23 @@
+{
+  "service": "WRITER",
+  "storage": false,
+  "whiteListedDomains": [
+    "https://api.superdocs.app"
+  ],
+  "cspDomains": {
+    "connect-src": [
+      "https://api.superdocs.app"
+    ]
+  },
+  "modules": {
+    "widgets": [
+      {
+        "name": "superdocs_review",
+        "location": "writer.extensions",
+        "url": "/app/index.html",
+        "logo": "/app/img/logo.svg",
+        "icon": "/app/img/icon.svg"
+      }
+    ]
+  }
+}
