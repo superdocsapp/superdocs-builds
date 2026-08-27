@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TokenScope Word add-in manifest.
+
+  Sideload this to run TokenScope as a task pane inside Word. Every URL points at
+  the local dev server; publishing means replacing https://localhost:5173 with
+  wherever the built `dist/` is hosted. Office requires HTTPS for add-in content,
+  including on localhost - see README, "Running inside Word".
+-->
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+
+  <Id>7f1c9d54-3c2e-4b18-9d4a-6f0a1c2b8e31</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>TokenScope</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="TokenScope" />
+  <Description DefaultValue="Rewrite the selected paragraph and see what it cost, next to what regenerating the whole document would have cost." />
+  <IconUrl DefaultValue="https://localhost:5173/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://localhost:5173/icon-80.png" />
+  <SupportUrl DefaultValue="https://github.com/AbhinayYendoti/TokenScope" />
+
+  <AppDomains>
+    <AppDomain>https://localhost:5173</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+
+  <Requirements>
+    <Sets DefaultMinVersion="1.3">
+      <Set Name="WordApi" MinVersion="1.3" />
+    </Sets>
+  </Requirements>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:5173/" />
+  </DefaultSettings>
+
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title" />
+            <Description resid="GetStarted.Description" />
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl" />
+          </GetStarted>
+
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="TokenScope.Group">
+                <Label resid="Group.Label" />
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16" />
+                  <bt:Image size="32" resid="Icon.32" />
+                  <bt:Image size="80" resid="Icon.80" />
+                </Icon>
+                <Control xsi:type="Button" id="TokenScope.TaskpaneButton">
+                  <Label resid="Taskpane.Label" />
+                  <Supertip>
+                    <Title resid="Taskpane.Label" />
+                    <Description resid="Taskpane.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16" />
+                    <bt:Image size="32" resid="Icon.32" />
+                    <bt:Image size="80" resid="Icon.80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>TokenScope.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://localhost:5173/icon-16.png" />
+        <bt:Image id="Icon.32" DefaultValue="https://localhost:5173/icon-32.png" />
+        <bt:Image id="Icon.80" DefaultValue="https://localhost:5173/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:5173/" />
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://github.com/AbhinayYendoti/TokenScope" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Group.Label" DefaultValue="TokenScope" />
+        <bt:String id="Taskpane.Label" DefaultValue="Token counter" />
+        <bt:String id="GetStarted.Title" DefaultValue="TokenScope is installed" />
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Taskpane.Tooltip" DefaultValue="Rewrite the selected paragraph and compare what it cost with a whole-document regeneration." />
+        <bt:String id="GetStarted.Description" DefaultValue="Select a paragraph, open TokenScope from the Home tab, and rewrite it." />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

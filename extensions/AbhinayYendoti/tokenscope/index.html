@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TokenScope</title>
+    <!--
+      Office.js is loaded from Microsoft's CDN because that is the only supported
+      way to load it; an add-in that bundles its own copy is not a supported
+      add-in. Outside Word the script simply does not define Office, and
+      TokenScope falls back to its own document surface.
+    -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
