@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.03",
+  "title": "March 2026",
+  "date": "2026-03-15",
+  "items": [
+    {"id": "resume", "category": "Added", "title": "Durable resume", "body": "Continue an interrupted update from its persisted checkpoint."}
+  ]
+}

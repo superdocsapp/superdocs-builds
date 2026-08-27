@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "provenance": "offline deterministic contract-derived fixture; no live API operation",
+  "measurementMethod": "docs/stress-method.md",
+  "runtime": {
+    "node": "v24.18.0",
+    "platform": "linux",
+    "architecture": "x64",
+    "peakRssTool": "/usr/bin/time -v"
+  },
+  "renderedPageCountMeasured": false,
+  "structuralPageCount": 120,
+  "explicitPageBreaks": 119,
+  "iterations": [
+    {
+      "iteration": 1,
+      "inputBytes": 202611,
+      "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
+      "outputBytes": 202611,
+      "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
+      "wallClockMs": 428.328,
+      "peakRssKiB": 97620,
+      "uploadChunkCount": 4,
+      "maximumUploadChunkBytes": 65536,
+      "chatSubmissions": 1,
+      "failures": []
+    },
+    {
+      "iteration": 2,
+      "inputBytes": 202611,
+      "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
+      "outputBytes": 202611,
+      "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
+      "wallClockMs": 418.012,
+      "peakRssKiB": 98008,
+      "uploadChunkCount": 5,
+      "maximumUploadChunkBytes": 65536,
+      "chatSubmissions": 1,
+      "failures": []
+    },
+    {
+      "iteration": 3,
+      "inputBytes": 202611,
+      "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
+      "outputBytes": 202611,
+      "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
+      "wallClockMs": 504.745,
+      "peakRssKiB": 98168,
+      "uploadChunkCount": 5,
+      "maximumUploadChunkBytes": 65536,
+      "chatSubmissions": 1,
+      "failures": []
+    },
+    {
+      "iteration": 4,
+      "inputBytes": 202611,
+      "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
+      "outputBytes": 202611,
+      "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
+      "wallClockMs": 477.979,
+      "peakRssKiB": 98212,
+      "uploadChunkCount": 5,
+      "maximumUploadChunkBytes": 65536,
+      "chatSubmissions": 1,
+      "failures": []
+    },
+    {
+      "iteration": 5,
+      "inputBytes": 202611,
+      "inputSha256": "84c608877844eb4d83c6cd1e3e283ea400390990ac5a87e781b2b0c2d70b5780",
+      "outputBytes": 202611,
+      "outputSha256": "8e0cdb54357b3a9f46237f17a50738827df422fd5986b30428dddc16b7375b9c",
+      "wallClockMs": 404.73,
+      "peakRssKiB": 97980,
+      "uploadChunkCount": 5,
+      "maximumUploadChunkBytes": 65536,
+      "chatSubmissions": 1,
+      "failures": []
+    }
+  ],
+  "statistics": {
+    "wallClockMs": {
+      "minimum": 404.73,
+      "median": 428.328,
+      "p95": 504.745,
+      "maximum": 504.745,
+      "mean": 446.759,
+      "populationVariance": 1453.919,
+      "populationStandardDeviation": 38.13
+    },
+    "peakRssKiB": {
+      "minimum": 97620,
+      "median": 98008,
+      "p95": 98212,
+      "maximum": 98212,
+      "mean": 97997.6,
+      "populationVariance": 43600.64,
+      "populationStandardDeviation": 208.808
+    }
+  },
+  "failures": []
+}

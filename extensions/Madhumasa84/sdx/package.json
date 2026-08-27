@@ -1,0 +1,49 @@
+{
+  "name": "sdx-superdocs-cli",
+  "version": "0.1.0",
+  "description": "A pipe-friendly SuperDocs document CLI foundation",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "sdx": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "docs/api-contract.md",
+    "docs/exit-codes.md",
+    "docs/retry-recovery.md",
+    "docs/stress-method.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src --max-warnings 0",
+    "test": "npm run build && node --test test/unit/*.test.mjs test/integration/*.test.mjs",
+    "test:unit": "npm run build && node --test test/unit/*.test.mjs",
+    "test:integration": "npm run build && node --test test/integration/*.test.mjs",
+    "test:fixture": "npm run build && node --test test/integration/vertical-slice.test.mjs test/integration/stage3.test.mjs",
+    "test:stress": "npm run build && node --test test/stress/stress.test.mjs",
+    "test:replay": "node --test test/integration/record-replay.test.mjs",
+    "record:live": "npm run test:live && node test/recording/record-live.mjs",
+    "test:live": "npm run build && node --test test/live/live-smoke.test.mjs"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/node": "^22.10.2",
+    "ajv": "^8.17.1",
+    "docx": "9.7.1",
+    "eslint": "^9.17.0",
+    "jszip": "3.10.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.18.0"
+  }
+}

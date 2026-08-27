@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.superdocs.example/sdx/output-v1.schema.json",
+  "$comment": "Stage 4 retains schemaVersion 1.0. Retry, rate-limit, and unknown-remote-state fields are backward-compatible content inside error.details.",
+  "title": "sdx output envelope v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "command",
+    "status",
+    "ok",
+    "session",
+    "job",
+    "document",
+    "changes",
+    "usage",
+    "timing",
+    "warnings",
+    "error"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "command": { "type": "string", "minLength": 1 },
+    "status": { "$ref": "#/$defs/status" },
+    "ok": { "type": "boolean" },
+    "session": {
+      "anyOf": [{ "$ref": "#/$defs/reference" }, { "type": "null" }]
+    },
+    "job": {
+      "anyOf": [{ "$ref": "#/$defs/reference" }, { "type": "null" }]
+    },
+    "document": {
+      "anyOf": [{ "$ref": "#/$defs/document" }, { "type": "null" }]
+    },
+    "changes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/change" }
+    },
+    "usage": {
+      "anyOf": [{ "$ref": "#/$defs/usage" }, { "type": "null" }]
+    },
+    "timing": { "$ref": "#/$defs/timing" },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "error": {
+      "anyOf": [{ "$ref": "#/$defs/error" }, { "type": "null" }]
+    },
+    "data": {
+      "type": ["object", "null"],
+      "additionalProperties": true
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status", "message"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["pass", "warn", "fail"] },
+          "message": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "unchanged",
+        "awaiting_approval",
+        "rejected",
+        "failed"
+      ]
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": {
+          "type": ["string", "null"],
+          "minLength": 1
+        }
+      }
+    },
+    "document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "format", "path", "outputPath"],
+      "properties": {
+        "id": { "type": ["string", "null"], "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "format": { "type": ["string", "null"], "minLength": 1 },
+        "path": { "type": ["string", "null"], "minLength": 1 },
+        "outputPath": { "type": ["string", "null"], "minLength": 1 }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "section",
+        "summary",
+        "before",
+        "after",
+        "decision"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "operation": {
+          "type": "string",
+          "enum": ["edit", "create", "delete"]
+        },
+        "chunkId": { "type": ["string", "null"] },
+        "explanation": { "type": ["string", "null"] },
+        "documentId": { "type": ["string", "null"] },
+        "section": { "type": ["string", "null"], "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 },
+        "before": { "type": ["string", "null"] },
+        "after": { "type": ["string", "null"] },
+        "decision": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"]
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["apiCalls", "uploadedBytes", "downloadedBytes"],
+      "properties": {
+        "apiCalls": { "type": "integer", "minimum": 0 },
+        "uploadedBytes": { "type": "integer", "minimum": 0 },
+        "downloadedBytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startedAt", "finishedAt", "durationMs"],
+      "properties": {
+        "startedAt": { "type": "string", "format": "date-time" },
+        "finishedAt": { "type": "string", "format": "date-time" },
+        "durationMs": { "type": "number", "minimum": 0 }
+      }
+    },
+    "error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "details": {
+          "description": "Optional command-specific safe details. Stage 4 may include retryable, retryAfterSeconds, attemptCount, retryKind, remoteState, operationId, and safe usage/header metadata.",
+          "default": null
+        }
+      }
+    }
+  }
+}

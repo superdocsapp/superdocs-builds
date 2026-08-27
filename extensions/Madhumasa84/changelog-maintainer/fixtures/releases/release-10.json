@@ -1,0 +1,8 @@
+{
+  "release_id": "2026.10",
+  "title": "October 2026",
+  "date": "2026-10-15",
+  "items": [
+    {"id": "stop", "category": "Added", "title": "Stopping rule", "body": "Stop after the configured sequential-release limit instead of retriggering forever."}
+  ]
+}

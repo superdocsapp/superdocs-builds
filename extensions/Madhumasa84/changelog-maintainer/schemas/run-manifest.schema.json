@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/superdocs/changelog/run-manifest.schema.json",
+  "type": "object",
+  "required": ["version", "run_id", "status", "release_id", "input_sha256", "historical_prefix_sha256", "candidate_block_sha256", "decisions", "checkpoints"],
+  "properties": {
+    "version": {"const": 1},
+    "run_id": {"type": "string"},
+    "status": {"type": "string"},
+    "release_id": {"type": "string"},
+    "input_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "historical_prefix_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "candidate_block_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "decisions": {"type": "object"},
+    "checkpoints": {"type": "array", "items": {"type": "string"}}
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "release_id": "2026.01",
+  "title": "January 2026",
+  "date": "2026-01-15",
+  "items": [
+    {"id": "preview", "category": "Added", "title": "No-spend previews", "body": "Review the next release before any document operation."},
+    {"id": "hashes", "category": "Fixed", "title": "Stable hashes", "body": "Record source and historical-prefix hashes for every update."}
+  ]
+}
