@@ -1,9 +1,10 @@
-.PHONY: help console demo live test sync clean
+.PHONY: help console demo live addon test sync clean
 
 help:
 	@echo "make console — the review console in a browser (needs .env)"
 	@echo "make live  — the same pipeline on the terminal (needs .env, 2 ops)"
 	@echo "make demo  — the same pipeline against a local stand-in (no key, no cost)"
+	@echo "make addon — run the Gmail add-on's own code against the live API (2 ops)"
 	@echo "make test  — the full suite, no key needed"
 	@echo "make sync  — regenerate the add-on's prompts from the Python source"
 	@echo "make clean — remove local output"
@@ -22,6 +23,10 @@ live:
 	@uv run thread2letter doctor
 	@echo ""
 	@uv run thread2letter run threads/migration-project.mbox --from "you@example.com"
+
+addon:
+	@test -f .env || { echo "No .env — copy .env.example and add your key."; exit 2; }
+	@node gmail-addon/simulate.js threads/migration-project.mbox
 
 test:
 	@uv run pytest

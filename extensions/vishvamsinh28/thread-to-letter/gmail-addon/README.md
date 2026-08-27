@@ -3,14 +3,24 @@
 Reads the open thread, pulls out what people actually committed to, lets you tick the
 real ones, and attaches the resulting letter to a draft reply — all inside Gmail.
 
-> **Status: written, not verified against live Gmail.**
+> **Status: the code runs and is exercised against the live API. Google's own binding
+> is not verified.**
 >
-> I could not sideload this into a real mailbox during the round, so the CardService
-> rendering and the Gmail read/write calls have never been exercised. Everything it
-> calls — the prompts, quote verification, the superseded check — *is* exercised against
-> the live SuperDocs API and covered by tests in the parent folder, and `Prompts.gs` is
-> generated from the Python source with a test that fails on drift. So the logic is
-> tested; this wrapper is not. Expect to fix small things on first install.
+> Apps Script is ordinary JavaScript against a handful of Google globals, so `Code.gs`
+> and `Prompts.gs` can be run outside Google by stubbing them:
+>
+> ```bash
+> make addon        # from the parent folder — 2 operations
+> ```
+>
+> That executes these files **unmodified** against `api.superdocs.app`: it reads a real
+> thread, builds the real cards, extracts and verifies commitments, drafts the letter and
+> creates the draft reply with the attachment. See `simulate.js`.
+>
+> What that leaves unproven is only whether Google's runtime renders these cards and
+> delivers these events — I could not sideload into a real mailbox during the round.
+> Expect to fix small rendering things on first install; the logic is not where it will
+> break.
 
 ## What it does, screen by screen
 

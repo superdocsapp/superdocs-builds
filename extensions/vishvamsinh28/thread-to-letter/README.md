@@ -117,12 +117,16 @@ non-billable.
 shows the commitments as checkboxes, and attaches the letter to a draft reply through
 Gmail's own API.
 
-**It is written and not verified against live Gmail.** I could not sideload it into a
-real mailbox during this round, so the CardService rendering and the Gmail read/write
-calls have not been exercised. The pipeline it calls — the same prompts, the same quote
-verification, the same superseded check — *is* exercised against the live SuperDocs API
-and covered by tests. `Prompts.gs` is generated from the Python source and a test fails
-if the two drift, so the sideloaded path cannot quietly diverge from the tested one.
+**The code runs; Google's binding is unverified.** `make addon` executes `Code.gs` and
+`Prompts.gs` **unmodified** against the live API — stubbing `GmailApp`, `CardService` and
+`UrlFetchApp` is enough, because Apps Script is ordinary JavaScript against a few Google
+globals. It reads a real thread, builds the real cards, extracts and verifies, drafts the
+letter, and creates the draft reply with its attachment.
+
+What is unproven is only whether Google's runtime renders those cards and delivers those
+events; I could not sideload into a real mailbox during the round. `Prompts.gs` is
+generated from the Python source with a test that fails on drift, so the sideloaded path
+cannot quietly diverge from the tested one.
 
 Treat it as a reference implementation to sideload, not as a shipped feature.
 [`gmail-addon/README.md`](gmail-addon/README.md) has the install steps — browser-only
