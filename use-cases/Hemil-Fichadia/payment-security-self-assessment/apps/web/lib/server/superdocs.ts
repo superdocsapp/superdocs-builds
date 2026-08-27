@@ -292,10 +292,7 @@ export function validateGeneratedDraft(
     );
   const hasUnknownEvidence = facts.some((fact) => fact.status === "UNKNOWN");
   const unknownEvidenceIsQualified =
-    !hasUnknownEvidence ||
-    /(supplied|available) evidence (?:does not establish|is insufficient to confirm|does not confirm|cannot establish|cannot confirm)/.test(
-      text,
-    );
+    !hasUnknownEvidence || UNKNOWN_EVIDENCE_LIMITATION.test(text);
   const sentences = text.split(/[.!?]/).filter(Boolean);
   const unknownEvidenceIsNotConvertedToNegativeClaim = facts
     .filter((fact) => fact.status === "UNKNOWN")
@@ -337,6 +334,8 @@ const UNKNOWN_REFERENCE_STOP_WORDS = new Set([
   "automatically",
   "independently",
 ]);
+const UNKNOWN_EVIDENCE_LIMITATION =
+  /(?:(?:supplied|available) evidence (?:does not establish|is insufficient to confirm|does not confirm|cannot establish|cannot confirm|is insufficient to determine) whether|(?:the )?evidence is insufficient to determine whether|cannot(?: be)? established from (?:the )?(?:supplied|available) evidence|remains unconfirmed based on (?:the )?available evidence)/;
 const UNKNOWN_NEGATIVE_CLAIM =
   /\b(?:is|are|was|were|has|have|does|do)\s+not\s+(?:currently\s+)?(?:implemented|established|exist|exists|in place|present|available|enabled|performed|verified)\b/;
 

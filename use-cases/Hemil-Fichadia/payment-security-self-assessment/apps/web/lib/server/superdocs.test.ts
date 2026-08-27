@@ -80,6 +80,13 @@ test("draft validation accepts an unknown control narrated as an evidence limita
   );
 });
 
+test("draft validation accepts an unknown control when evidence is insufficient to determine it", () => {
+  const draft =
+    "<p>The supplied evidence is insufficient to determine whether database backup encryption is independently verified.</p>";
+
+  assert.equal(validateGeneratedDraft(draft, unknownBackupEncryptionEvidence), draft);
+});
+
 test("draft validation rejects an unknown control converted into an unsupported negative claim", () => {
   for (const unsupportedClaim of [
     "<p>The supplied evidence does not establish whether database backup encryption is independently verified. Database backup encryption verification is not implemented.</p>",
