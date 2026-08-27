@@ -26,7 +26,7 @@ from src.drafting_agent import draft_section
 from src.verifier import verify_section
 from src.revision_agent import revise_and_reverify_section
 from src.export_agent import export_paper
-
+from src.models import Source, Paper, RunLog, RunAction, SectionStatus
 
 MAX_REVISION_ROUNDS = 3
 
@@ -134,11 +134,15 @@ def run_pipeline(topic: str, sources: list[Source]) -> Iterator[dict]:
         while findings and round_num < MAX_REVISION_ROUNDS:
             round_num += 1
             before = paper.snapshot_all_hashes()
-            findings = revise_and_reverify_section(
-                section, findings, topic, retrieval_index, embed_fn,
-                llm_fn, llm_fn, mcp_client, session_id=paper.session_id,
-                chunk_id_to_source_id=chunk_id_to_source_id,
-            )
+            try:
+                findings = revise_and_reverify_section(
+                    section, findings, topic, retrieval_index, embed_fn,
+                    llm_fn, llm_fn, mcp_client, session_id=paper.session_id,
+                    chunk_id_to_source_id=chunk_id_to_source_id,
+                )
+            except ValueError as e:
+                yield {"event": "revision_failed", "section": section.title, "error": str(e)}
+                break  # leave this section FLAGGED rather than crashing the whole run
             changed = paper.diff_against(before)
             run_logs.append(RunLog(
                 run_id=str(uuid.uuid4()), action=RunAction.REVISE,
@@ -193,10 +197,13 @@ def save_combined_draft(paper: Paper, edited_text: str) -> list[str]:
 
 def apply_manual_edit(paper: Paper, section_id: str, new_text: str) -> None:
     """User edited a section directly in the UI. Push it to SuperDocs
-    verbatim (no re-drafting) and update our local model + hash."""
+    verbatim (no re-drafting), update our local model + hash, and mark
+    it VERIFIED — a human directly approving the content is the export
+    gate's strongest possible signal, stronger than the automated check."""
     mcp_client = get_mcp_client()
     section = paper.get_section(section_id)
     section.set_content(new_text)
+    section.status = SectionStatus.VERIFIED
     mcp_client.edit_section(session_id=paper.session_id, section_title=section.title, new_content=new_text)
 
 

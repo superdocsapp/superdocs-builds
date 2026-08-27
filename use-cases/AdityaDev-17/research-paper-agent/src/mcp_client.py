@@ -191,10 +191,19 @@ class SuperDocsMCPClient:
         return self._resolve_html(response, session_id)
 
     def export_document(self, session_id: str, format: str = "docx") -> str:
-        response = self._call("request_download_url", {
-            "session_id": session_id,
-            "format": format,
-        })
+        try:
+            response = self._call("request_download_url", {
+                "session_id": session_id,
+                "format": format,
+            })
+        except RuntimeError as e:
+            if "No document loaded in this session" in str(e):
+                raise RuntimeError(
+                    "The SuperDocs session for this paper appears to have expired "
+                    "(likely due to inactivity). Please regenerate the paper and export "
+                    "again without a long delay in between."
+                ) from e
+            raise
         download_url = response["download_url"]
         filename = response.get("filename", f"{session_id}.{format}")
 

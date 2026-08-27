@@ -77,6 +77,8 @@ with st.sidebar:
                 render_checklist()
             elif event["event"] == "draft_failed":
                 st.warning(f"Could not draft '{event['section']}': {event['error']}")
+            elif event["event"] == "revision_failed":
+                st.warning(f"Could not fully revise '{event['section']}': {event['error']}")
             elif event["event"] == "done":
                 completed.update(checklist_steps)
                 render_checklist()
@@ -189,8 +191,13 @@ with tab_export:
                 if st.button(f"Export {label}", key=f"export_{fmt}"):
                     try:
                         path = export_current(paper, fmt)
-                        st.success(f"Exported to {path}")
-                        with open(path, "rb") as f:
-                            st.download_button(f"Download {label}", f, file_name=Path(path).name, key=f"dl_{fmt}")
-                    except ValueError as e:
+                    except (ValueError, RuntimeError) as e:
                         st.error(str(e))
+                    else:
+                        st.session_state[f"export_path_{fmt}"] = path
+                        st.success(f"Exported to {path}")
+
+                export_path = st.session_state.get(f"export_path_{fmt}")
+                if export_path and Path(export_path).exists():
+                    with open(export_path, "rb") as f:
+                        st.download_button(f"Download {label}", f, file_name=Path(export_path).name, key=f"dl_{fmt}")
