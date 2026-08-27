@@ -14,6 +14,9 @@
     --line:#2f3339;--sel:#1f3350;--accent:#8ab4f8;--ok:#81c995;--warn:#fdd663;--bad:#f28b82;
   }}
   *{box-sizing:border-box}
+  /* An explicit display: wins over the hidden attribute's default display:none, which is
+     how a dialog ends up on screen before anything opened it. */
+  [hidden]{display:none !important}
   body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;
     height:100vh;display:flex;flex-direction:column;overflow:hidden}
   /* demo banner */
@@ -137,6 +140,20 @@
   .call .nn{grid-column:2/-1;color:var(--faint);font-size:10px}
   .call .nn b{color:var(--warn)}
   .empty{color:var(--dim);font-size:12.5px}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;
+    z-index:200;animation:fade .12s ease-out}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .dialog{background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    width:min(430px,calc(100vw - 40px));padding:22px 24px 18px;
+    box-shadow:0 12px 40px rgba(0,0,0,.35);animation:rise .14s ease-out}
+  @keyframes rise{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+  .dialog h3{margin:0 0 8px;font-size:16px;font-weight:600}
+  .dialog p{margin:0 0 18px;color:var(--dim);font-size:13.5px;white-space:pre-line}
+  .dialog-actions{display:flex;gap:9px;justify-content:flex-end}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:210;
+    background:var(--surface);border:1px solid var(--bad);color:var(--bad);
+    border-radius:9px;padding:11px 17px;font-size:13px;max-width:min(620px,90vw);
+    box-shadow:0 6px 24px rgba(0,0,0,.3);animation:rise .14s ease-out}
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:20px;overflow:hidden}
   .segb{background:transparent;color:var(--dim);border:0;border-radius:0;padding:5px 15px;
     font-size:12.5px;font-weight:500}
@@ -183,6 +200,17 @@
 </div>
 
 <div id="compose"></div>
+<div id="toast" class="toast" hidden></div>
+<div id="modal" class="scrim" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <h3 id="modal-title"></h3>
+    <p id="modal-body"></p>
+    <div class="dialog-actions">
+      <button class="ghost" id="modal-no">Cancel</button>
+      <button id="modal-yes"></button>
+    </div>
+  </div>
+</div>
 
 <script>
   const $ = id => document.getElementById(id);
@@ -215,22 +243,29 @@
     else if(act === "extract"){ post("/api/extract"); }
     else if(act === "write"){ post("/api/letter", {shape}); }
     else if(act === "nothing"){
-      if(confirm("Write a " + shape + " recording that nothing was agreed in this "
-                 + "thread?\n\nThis costs one operation.")) {
-        post("/api/letter", {shape, record_nothing: true});
-      }
+      ask({title: `Record that nothing was agreed?`,
+           body: `The ${shape} will say the discussion took place and nobody committed `
+               + `to anything.\n\nThis costs one operation.`,
+           yes: `Write the ${shape}`})
+        .then(ok => ok && post("/api/letter", {shape, record_nothing: true}));
     }
     else if(act === "discard"){
-      if(confirm("Discard this draft?\n\nThe review stays; you can write another.")) {
-        post("/api/discard");
-      }
+      ask({title: "Discard this draft?",
+           body: "The review stays, so you can write another without paying for the "
+               + "extraction again.",
+           yes: "Discard"})
+        .then(ok => ok && post("/api/discard"));
     }
     else if(act === "reset"){
-      if(confirm("Reset the demo?\n\nClears the open thread, the review, the draft and "
-                 + "the call log. Costs nothing.")) {
-        view = "inbox"; query = ""; $("q").value = ""; shape = "letter";
-        post("/api/reset");
-      }
+      ask({title: "Reset the demo?",
+           body: "Clears the open thread, the review, the draft and the call log.\n"
+               + "Costs nothing.",
+           yes: "Reset"})
+        .then(ok => {
+          if(!ok) return;
+          view = "inbox"; query = ""; $("q").value = ""; shape = "letter";
+          post("/api/reset");
+        });
     }
     else if(act === "shape"){ shape = arg; drawn.addon = null; poll(); }
     else if(act === "toggle"){ toggle(Number(arg)); }
@@ -243,6 +278,43 @@
     if(e.key !== "Escape") return;
     e.target.value = ""; query = ""; drawn.inbox = null; if(last) render(last);
   });
+
+  /* An in-app dialog. Native confirm() blocks the page, cannot be styled, and announces
+     the port number to whoever is watching a demo. */
+  let closeAsk = null;
+  function ask({title, body, yes = "Confirm"}){
+    return new Promise(resolve => {
+      $("modal-title").textContent = title;
+      $("modal-body").textContent = body;
+      $("modal-yes").textContent = yes;
+      $("modal").hidden = false;
+      $("modal-yes").focus();
+      closeAsk = answer => {
+        $("modal").hidden = true;
+        closeAsk = null;
+        resolve(answer);
+      };
+    });
+  }
+  document.addEventListener("click", e => {
+    if(!closeAsk) return;
+    if(e.target.id === "modal-yes") closeAsk(true);
+    else if(e.target.id === "modal-no" || e.target.id === "modal") closeAsk(false);
+  });
+  document.addEventListener("keydown", e => {
+    if(!closeAsk) return;
+    if(e.key === "Escape") closeAsk(false);
+    else if(e.key === "Enter") closeAsk(true);
+  });
+
+  let toastTimer = null;
+  function toast(message){
+    const el = $("toast");
+    el.textContent = message;
+    el.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.hidden = true; }, 6000);
+  }
 
   async function poll(){
     try{ last = await (await fetch(`/api/state?since=${callSeq}`)).json(); render(last); }
@@ -460,8 +532,8 @@
     try{
       const r = await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify(body||{})});
-      if(!r.ok){ const j = await r.json(); alert(j.detail); }
-    }catch(e){ alert(String(e)); }
+      if(!r.ok){ const j = await r.json(); toast(j.detail); }
+    }catch(e){ toast(String(e)); }
     poll();
   }
 

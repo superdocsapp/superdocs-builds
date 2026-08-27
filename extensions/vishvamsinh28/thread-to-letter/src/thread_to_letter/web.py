@@ -324,17 +324,22 @@ def create_app(threads_dir: str = "threads") -> FastAPI:
     @app.post("/api/extract")
     def extract(payload: dict[str, Any] = Body(default={})) -> dict[str, Any]:
         if service.state.busy:
-            raise HTTPException(409, detail="already working")
+            raise HTTPException(409, detail="Already working.")
+        if service.state.thread is None:
+            raise HTTPException(400, detail="Open a thread first.")
         _run(service.extract)
         return {"started": True}
 
     @app.post("/api/letter")
     def letter(payload: dict[str, Any] = Body(default={})) -> dict[str, Any]:
         if service.state.busy:
-            raise HTTPException(409, detail="already working")
+            raise HTTPException(409, detail="Already working.")
         record_nothing = bool(payload.get("record_nothing"))
-        # Checked here, before the worker starts, so the refusal reaches the caller
-        # instead of surfacing as an error after an operation has already been spent.
+        # Everything that can be refused is refused here, before a worker starts, so the
+        # caller gets an answer instead of having to poll for an error — and so nothing
+        # is spent discovering what could have been checked for free.
+        if service.state.thread is None:
+            raise HTTPException(400, detail="Open a thread first.")
         if service.state.commitments and not service.state.chosen and not record_nothing:
             raise HTTPException(400, detail=(
                 "Nothing is ticked. Tick what you want recorded, or choose "
