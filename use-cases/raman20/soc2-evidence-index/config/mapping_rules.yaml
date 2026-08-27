@@ -1,0 +1,58 @@
+ignore_globs:
+  - README.md
+  - ".git/**"
+  - "expected/**"
+rules:
+  - id: access-review
+    match: { filename_contains: ["ACC-REV", "access-review"] }
+    maps_to: [CC6.1, CC6.2, CC6.3]
+    evidence_type: access_review
+    multi: true
+  - id: rbac
+    match: { filename_contains: ["RBAC-"] }
+    maps_to: [CC6.4]
+    evidence_type: rbac
+  - id: physical
+    match: { filename_contains: ["PHYS-"] }
+    maps_to: [CC6.5]
+    evidence_type: physical_access
+  - id: tls
+    match: { filename_contains: ["TLS-", "ENC-"] }
+    maps_to: [CC6.6]
+    evidence_type: encryption
+  - id: secrets
+    match: { filename_contains: ["SECRETS-"] }
+    maps_to: [CC6.7]
+    evidence_type: secrets
+  - id: edr
+    match: { filename_contains: ["EDR-", "MALWARE-"] }
+    maps_to: [CC6.8]
+    evidence_type: malware_prevention
+  - id: vuln
+    match: { filename_contains: ["VULN-"] }
+    maps_to: [CC7.1]
+    evidence_type: vuln_scan
+  - id: monitoring
+    match: { filename_contains: ["MON-", "siem"] }
+    maps_to: [CC7.2]
+    evidence_type: monitoring_export
+  - id: sec-eval
+    match: { filename_contains: ["SEC-EVAL"] }
+    maps_to: [CC7.3]
+    evidence_type: security_eval
+  - id: incident
+    match: { filename_contains: ["INC-"] }
+    maps_to: [CC7.4]
+    evidence_type: incident
+  - id: backup
+    match: { filename_contains: ["BAK-"] }
+    maps_to: [CC7.5]
+    evidence_type: backup_log
+  - id: policy
+    match: { filename_contains: ["POL-"] }
+    maps_to: [CC5.3]
+    evidence_type: policy
+  - id: change
+    match: { filename_contains: ["CHG-"] }
+    maps_to: [CC8.1]
+    evidence_type: change_ticket

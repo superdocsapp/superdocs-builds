@@ -1,0 +1,8 @@
+id: tsc-pi
+name: Trust Services Criteria — Processing Integrity (data-only)
+controls:
+  - { id: PI1.1, name: Processing specifications }
+  - { id: PI1.2, name: Complete and accurate processing }
+  - { id: PI1.3, name: Processing errors }
+  - { id: PI1.4, name: Data inputs }
+  - { id: PI1.5, name: Output completeness }

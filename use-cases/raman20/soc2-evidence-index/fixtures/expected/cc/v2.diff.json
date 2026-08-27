@@ -1,0 +1,15 @@
+{
+  "added": ["CC7.2::present::ops/MON-2025-04.md"],
+  "removed": ["CC7.2::gap::none"],
+  "changed_ids": [
+    "CC6.1::present::access/ACC-REV-2025-Q1.md",
+    "CC6.2::present::access/ACC-REV-2025-Q1.md",
+    "CC6.3::present::access/ACC-REV-2025-Q1.md"
+  ],
+  "unchanged_count": 29,
+  "unchanged_includes": [
+    "CC8.1::present::change/CHG-1042.md",
+    "CC5.3::present::policy/POL-ISMS-001.md"
+  ],
+  "summary": {"added": 1, "removed": 1, "changed": 3, "renamed": 0, "unchanged": 29}
+}

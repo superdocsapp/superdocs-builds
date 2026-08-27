@@ -1,0 +1,36 @@
+id: tsc-cc
+name: Trust Services Criteria — Common Criteria (CC1–CC9)
+controls:
+  - { id: CC1.1, name: Integrity and ethical values }
+  - { id: CC1.2, name: Board independence and oversight }
+  - { id: CC1.3, name: Organizational structure and reporting }
+  - { id: CC1.4, name: Commitment to competence }
+  - { id: CC1.5, name: Accountability }
+  - { id: CC2.1, name: Quality information }
+  - { id: CC2.2, name: Internal communication }
+  - { id: CC2.3, name: External communication }
+  - { id: CC3.1, name: Specified objectives }
+  - { id: CC3.2, name: Risk identification }
+  - { id: CC3.3, name: Fraud risk }
+  - { id: CC3.4, name: Change assessment }
+  - { id: CC4.1, name: Ongoing and separate evaluations }
+  - { id: CC4.2, name: Deficiency communication }
+  - { id: CC5.1, name: Control activities }
+  - { id: CC5.2, name: Technology controls }
+  - { id: CC5.3, name: Policies and procedures }
+  - { id: CC6.1, name: Logical access security software }
+  - { id: CC6.2, name: User registration and authorization }
+  - { id: CC6.3, name: Role-based access }
+  - { id: CC6.4, name: Restriction of access to authorized users }
+  - { id: CC6.5, name: Physical access }
+  - { id: CC6.6, name: Encryption and transmission }
+  - { id: CC6.7, name: Credentials and secrets }
+  - { id: CC6.8, name: Prevention of unauthorized software }
+  - { id: CC7.1, name: Detection of configuration changes and vulnerabilities }
+  - { id: CC7.2, name: Monitor system components }
+  - { id: CC7.3, name: Evaluate security events }
+  - { id: CC7.4, name: Incident response }
+  - { id: CC7.5, name: Recovery and restore }
+  - { id: CC8.1, name: Change management }
+  - { id: CC9.1, name: Vendor and business-disruption risk }
+  - { id: CC9.2, name: Vendor risk assessment }

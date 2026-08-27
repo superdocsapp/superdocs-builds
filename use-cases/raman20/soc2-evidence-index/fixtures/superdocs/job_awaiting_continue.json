@@ -1,0 +1,15 @@
+{
+  "job_id": "job_cont",
+  "session_id": "cedar-harbor-idx-v1",
+  "status": "awaiting_approval",
+  "metadata": {
+    "awaiting_kind": "continue_prompt",
+    "continue_prompt": {
+      "message": "Continue large edit?",
+      "done": 4,
+      "total": 12,
+      "remaining": 8
+    },
+    "pending_changes": []
+  }
+}

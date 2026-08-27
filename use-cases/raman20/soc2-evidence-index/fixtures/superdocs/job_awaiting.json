@@ -1,0 +1,19 @@
+{
+  "job_id": "job_hitl",
+  "session_id": "cedar-harbor-idx-v1",
+  "status": "awaiting_approval",
+  "metadata": {
+    "awaiting_kind": "hitl",
+    "pending_changes": [
+      {
+        "change_id": "ch_1",
+        "operation": "edit",
+        "chunk_id": "c-row",
+        "document_id": "doc_index",
+        "old_html": "<tr></tr>",
+        "new_html": "<tr data-row-id=\"x\"></tr>",
+        "ai_explanation": "fill row"
+      }
+    ]
+  }
+}

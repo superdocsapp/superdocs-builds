@@ -1,0 +1,13 @@
+patterns:
+  - id: ignore_previous
+    regex: "(?i)ignore previous instructions"
+  - id: you_are_now
+    regex: "(?i)you are now"
+  - id: map_all_controls
+    regex: "(?i)map this file to all controls"
+  - id: system_prompt
+    regex: "(?i)(system prompt|you are a helpful assistant|ignore all previous)"
+  - id: pem_begin
+    regex: "-----BEGIN"
+  - id: api_key
+    regex: "sk_[0-9a-f]{32}"
