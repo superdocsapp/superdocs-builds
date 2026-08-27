@@ -1,8 +1,6 @@
-# Headless Pluto runner for SuperDocs.jl notebooks.
-# Not a package dependency: run from a throwaway env that has Pluto.
+# Headless Pluto runner. Pluto is not a SuperDocs.jl dependency.
 #
-#   SUPERDOCS_API_KEY=... SUPERDOCS_LIVE=1 julia --project=/tmp/pluto-sd \
-#     notebooks/run_in_pluto.jl notebooks/oscillator_flow.jl
+#   julia --project=<env-with-Pluto> notebooks/run_in_pluto.jl notebooks/oscillator_flow.jl
 
 using Pluto
 

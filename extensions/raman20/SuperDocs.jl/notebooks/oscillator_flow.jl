@@ -21,16 +21,15 @@ A **Julia** notebook computes a synthetic forced oscillator, writes a lab note w
 
 All numbers are simulated. Not a physical experiment.
 
-Open this file in Pluto, set `SUPERDOCS_API_KEY`, and run. Session id: `pluto-oscillator-011`.
+Open this file in Pluto, set `SUPERDOCS_API_KEY`, and run.
 """
 
 # ╔═╡ a1000001-0000-4000-8000-000000000003
 begin
-    PKG = joinpath(@__DIR__, "..")
     LIVE = haskey(ENV, "SUPERDOCS_API_KEY") && !isempty(ENV["SUPERDOCS_API_KEY"])
-    SESSION = "pluto-oscillator-011"
+    SESSION = "oscillator-" * string(abs(rand(Int32)))
     WORK = mktempdir(prefix="pluto-osc-")
-    (PKG, LIVE, SESSION, WORK)
+    (LIVE, SESSION, WORK)
 end
 
 # ╔═╡ a1000001-0000-4000-8000-000000000004
@@ -75,7 +74,7 @@ paths = let
     csv = joinpath(WORK, "series.csv")
     png = joinpath(WORK, "fig_timeseries.png")
     gp = joinpath(WORK, "fig.gp")
-    mdpath = joinpath(WORK, "pluto-oscillator-011.md")
+    mdpath = joinpath(WORK, "oscillator.md")
     open(csv, "w") do io
         println(io, "t x y xhat")
         for i in 1:sim.n
@@ -95,10 +94,9 @@ plot "$(csv)" using 1:2 with lines lw 2 title "latent x", \\
     run(`gnuplot $gp`)
     isfile(png) || error("gnuplot did not write $png")
     write(mdpath, """
-# pluto-oscillator-011
+# Forced damped oscillator (synthetic)
 
-**A synthetic oscillator note produced from a Pluto notebook via SuperDocs.jl.**
-Computed in Julia; typeset and stored by SuperDocs. Not a physical experiment.
+Computed in Julia. Not a physical experiment.
 
 ## Abstract
 
@@ -133,10 +131,6 @@ A particular solution of the drive frequency is \$x_p(t)=X_p\\cos(\\Omega t-\\ph
 ### Figure 1. Displacement
 
 Latent \$x(t)\$, noisy \$y_n\$, and the fit \$\\hat x(t)\$. RMSE is expected a little above \$\\sigma\$ because the homogeneous amplitude is set by hand, not estimated.
-
-## 4. What SuperDocs.jl must preserve
-
-Display math must land as native `data-latex` nodes, not visible `\$\$` source. The figure is a real PNG upload, not a chat-fetched URL.
 """)
     (; png, mdpath)
 end
@@ -183,12 +177,12 @@ begin
             "Keep the document exactly as provided. Do not rewrite any equation.";
             session_id=SESSION, document_html=html_fig, approval_mode="approve_all")
         html2 = SuperDocs.session_html(client, SESSION)
-        dest_docx = joinpath(PKG, "notebooks", "pluto-oscillator-011.docx")
-        dest_pdf = joinpath(PKG, "notebooks", "pluto-oscillator-011.pdf")
+        dest_docx = joinpath(WORK, "oscillator.docx")
+        dest_pdf = joinpath(WORK, "oscillator.pdf")
         b1, w1 = SuperDocs.export_document(client; session_id=SESSION, format=:docx,
-            options=SuperDocs.ExportOptions(filename="pluto-oscillator-011"), dest=dest_docx)
+            options=SuperDocs.ExportOptions(filename="oscillator"), dest=dest_docx)
         b2, w2 = SuperDocs.export_document(client; session_id=SESSION, format=:pdf,
-            options=SuperDocs.ExportOptions(filename="pluto-oscillator-011", paper_size="Letter"), dest=dest_pdf)
+            options=SuperDocs.ExportOptions(filename="oscillator", paper_size="Letter"), dest=dest_pdf)
         (; session=SESSION, verify=SuperDocs.verify_key(client),
          chunks=up.chunks_count, status=job.status, n_pending=length(pending),
          math_ok=report.ok, missing=report.missing,

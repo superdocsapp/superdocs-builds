@@ -75,8 +75,6 @@ end
 dest = joinpath(outdir, "lab-note.docx")
 bytes, warnings = SuperDocs.export_document(client; session_id=session, format=:docx,
     options=SuperDocs.ExportOptions(filename="lab-note"), dest=dest)
-# keep a copy for the README screenshot pipeline
-cp(dest, joinpath(pkg, "notebooks", "lab-note-live.docx"); force=true)
 println("exported ", dest, " bytes=", length(bytes), " warnings=", [w.code for w in warnings])
 if SuperDocs.has_math_partial_fidelity(warnings)
     println("math_partial_fidelity surfaced (export still succeeded)")

@@ -91,7 +91,7 @@ begin
         SuperDocs.chat(client, "Keep the document exactly as provided. Do not rewrite any equation.";
                        session_id=session, document_html=html, approval_mode="approve_all")
         html2 = SuperDocs.session_html(client, session)
-        dest = joinpath(PKG, "notebooks", "lab-note-live.docx")
+        dest = joinpath(tempdir(), "lab-note.docx")
         bytes, warnings = SuperDocs.export_document(client; session_id=session, format=:docx, dest=dest)
         (; session, pending, report, embed=SuperDocs.embed_url(img), dest, nbytes=length(bytes),
          native=SuperDocs.has_native_math(html2), leftover=SuperDocs.has_dollar_math(html2),

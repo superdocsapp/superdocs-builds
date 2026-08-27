@@ -1,9 +1,6 @@
-# Markdown `$` / `$$` is what chat and `.md` files use. SuperDocs' markdown
-# upload leaves those dollars as visible text (often with `<br/>` inside).
-# The editor KaTeX-renders only native nodes captured from a live .tex upload
-# (2026-08-25):
+# Markdown `$` / `$$` is source. SuperDocs KaTeX-renders native nodes:
 #   <span data-latex="E=mc^2" data-type="inline-math">E=mc^2</span>
-#   <span data-latex="\\omega_0=\\sqrt{k/m}" data-type="block-math">...</span>
+#   <span data-latex="..." data-type="block-math">...</span>
 
 const _NATIVE_MATH_RE = r"<span\b[^>]*data-type=\"(?:inline-math|block-math)\"[^>]*>.*?</span>"s
 const _CODE_RE = r"<code\b[^>]*>.*?</code>"si
