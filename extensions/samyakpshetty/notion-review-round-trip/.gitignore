@@ -1,0 +1,35 @@
+# Secrets — never commit. Real keys live here; only .env.example is tracked.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local review artifacts (exported docx, incoming markup, sqlite state).
+# inbox/ holds documents real reviewers sent back — never commit someone's content.
+*.db
+*.sqlite3
+*.docx
+artifacts/
+scratch/
+# Runtime directories. Docker creates them on first run, so they are not tracked: data/ holds
+# the round store and the graph checkpoint, and inbox/ + outbox/ are the folder channel.
+inbox/
+outbox/
+data/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

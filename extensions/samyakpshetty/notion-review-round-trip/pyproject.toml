@@ -1,0 +1,93 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "notion-review-round-trip"
+version = "0.1.0"
+description = "Send a Notion page out for formal review in Word, then apply the marked-up changes back onto the Notion blocks one approval at a time — built on SuperDocs."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Samyak Shetty" }]
+
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "python-docx>=1.1",
+    "lxml>=5.2",
+    "click>=8.1",
+    "langgraph>=0.2.28",
+    "langgraph-checkpoint-sqlite>=2.0",
+    "langgraph-checkpoint-postgres>=2.0",
+    "psycopg[binary]>=3.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.16.1",
+    "mypy==2.3.0",
+    "pytest==9.1.1",
+    "lxml-stubs>=0.5",
+]
+web = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+]
+
+[project.scripts]
+notion-review = "notion_review.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/notion_review"]
+
+# ----------------------------------------------------------------------------
+# ruff — lint + format, the same bar held in Task 1
+# ----------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pyflakes / pycodestyle
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "SIM",           # flake8-simplify
+    "RUF",           # ruff-specific
+    "TID",           # tidy imports
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+
+# ----------------------------------------------------------------------------
+# mypy — a real gate (no continue-on-error), strict
+# ----------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+no_implicit_reexport = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# langgraph ships partial types; don't let its internals fail our gate
+module = ["langgraph.*", "langgraph_checkpoint.*"]
+follow_imports = "skip"
+
+# ----------------------------------------------------------------------------
+# pytest
+# ----------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "postgres: test requires a live Postgres (run in docker compose, skipped otherwise)",
+    "live: test hits the real SuperDocs / Notion APIs (needs keys; never in the keyless suite)",
+]

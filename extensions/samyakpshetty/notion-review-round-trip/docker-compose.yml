@@ -1,0 +1,50 @@
+# Two services:
+#   db  — Postgres, the durable substrate (LangGraph checkpointer + round/outbox store)
+#   app — the integration; source bind-mounted for a fast dev loop
+#
+# The keyless test suite and `make demo` do NOT need db — they use the SQLite store and the
+# deterministic FAKE providers (no API keys, no ops), so both run with --no-deps. The Postgres
+# backend is a real, separately proven substrate: `make test-postgres` runs the store's suite
+# against this db service.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: review
+      POSTGRES_PASSWORD: review
+      POSTGRES_DB: review
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U review -d review"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    tmpfs:
+      - /var/lib/postgresql/data  # ephemeral: a clean DB every run, nothing to wipe
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://review:review@db:5432/review
+      # Providers default to the deterministic fakes; real keys only for `make demo-live`.
+      PROVIDER: ${PROVIDER:-fake}
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-}
+      NOTION_TOKEN: ${NOTION_TOKEN:-}
+      LOG_FORMAT: ${LOG_FORMAT:-json}
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      # Everything a running review needs to outlive its container. `make watch` runs with
+      # --rm, so without these the round store and the graph checkpoint would be destroyed on
+      # exit — and a review that survives a crash or a days-long pause is the whole point of
+      # checkpointing it. The two folder-channel directories are here for the same reason.
+      - ./data:/app/data
+      - ./inbox:/app/inbox
+      - ./outbox:/app/outbox
+    working_dir: /app
+    command: ["python", "-c", "import notion_review; print('notion_review', notion_review.__version__)"]
