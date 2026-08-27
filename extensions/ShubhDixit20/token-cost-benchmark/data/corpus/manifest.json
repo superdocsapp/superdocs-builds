@@ -1,0 +1,76 @@
+{
+  "generated_by": "benchmark/corpus.py",
+  "words_per_page_assumption": 500,
+  "docs": [
+    {
+      "doc_id": "tiny-00",
+      "domain": "vendor_contract",
+      "word_count": 500,
+      "page_estimate": 1.0,
+      "num_sections": 2
+    },
+    {
+      "doc_id": "tiny-01",
+      "domain": "insurance_claim",
+      "word_count": 516,
+      "page_estimate": 1.03,
+      "num_sections": 2
+    },
+    {
+      "doc_id": "small-00",
+      "domain": "insurance_claim",
+      "word_count": 2543,
+      "page_estimate": 5.09,
+      "num_sections": 12
+    },
+    {
+      "doc_id": "small-01",
+      "domain": "project_status_report",
+      "word_count": 2538,
+      "page_estimate": 5.08,
+      "num_sections": 9
+    },
+    {
+      "doc_id": "medium-00",
+      "domain": "project_status_report",
+      "word_count": 12710,
+      "page_estimate": 25.42,
+      "num_sections": 47
+    },
+    {
+      "doc_id": "medium-01",
+      "domain": "vendor_contract",
+      "word_count": 12748,
+      "page_estimate": 25.5,
+      "num_sections": 48
+    },
+    {
+      "doc_id": "large-00",
+      "domain": "vendor_contract",
+      "word_count": 50863,
+      "page_estimate": 101.73,
+      "num_sections": 182
+    },
+    {
+      "doc_id": "large-01",
+      "domain": "insurance_claim",
+      "word_count": 50848,
+      "page_estimate": 101.7,
+      "num_sections": 181
+    },
+    {
+      "doc_id": "xlarge-00",
+      "domain": "insurance_claim",
+      "word_count": 111278,
+      "page_estimate": 222.56,
+      "num_sections": 401
+    },
+    {
+      "doc_id": "xlarge-01",
+      "domain": "project_status_report",
+      "word_count": 113524,
+      "page_estimate": 227.05,
+      "num_sections": 401
+    }
+  ]
+}
