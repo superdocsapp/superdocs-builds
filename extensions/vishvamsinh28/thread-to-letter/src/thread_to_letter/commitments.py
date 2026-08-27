@@ -35,6 +35,15 @@ ALL_STATUSES = (FIRM, SUPERSEDED, HEDGED, SECOND_HAND, PROPOSED)
 
 _COLUMNS = ("party", "owes_to", "obligation", "due", "status", "source", "quote")
 
+#: Quote marks a model wraps around the thing it is quoting. Stripped on the way in, so
+#: the stored quote is the words themselves — otherwise every display adds another pair
+#: and verification has to keep re-stripping them.
+_WRAPPERS = "\"'`\u00ab\u00bb\u201e\u201c\u201d\u2018\u2019 \t"
+
+
+def strip_wrappers(quote: str) -> str:
+    return (quote or "").strip().strip(_WRAPPERS).strip()
+
 
 @dataclass
 class Commitment:
@@ -154,7 +163,8 @@ def parse(document_html: str) -> list[Commitment]:
             party=values["party"], owes_to=values["owes_to"],
             obligation=values["obligation"], due=values["due"],
             status=_normalise_status(values["status"]),
-            source=_source_index(values["source"]), quote=values["quote"],
+            source=_source_index(values["source"]),
+            quote=strip_wrappers(values["quote"]),
         ))
     return out
 

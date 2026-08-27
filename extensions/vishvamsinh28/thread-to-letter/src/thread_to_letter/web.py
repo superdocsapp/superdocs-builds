@@ -150,12 +150,25 @@ class ConsoleService:
         finally:
             state.busy = ""
 
-    def write_letter(self, shape: str) -> None:
+    def write_letter(self, shape: str, record_nothing: bool = False) -> None:
+        """Draft the letter from the ticked commitments.
+
+        Refuses when candidates were found and none are ticked. "Nothing is ticked" and
+        "nothing was agreed" are different statements, and only a person can turn the
+        first into the second — so that case needs an explicit ``record_nothing``. A turn
+        costs an operation, and spending one on a decision nobody made is exactly the
+        surprise this build exists to avoid.
+        """
         import datetime as _dt
 
         state = self.state
         if state.thread is None:
             raise ValueError("open a thread first")
+        if state.commitments and not state.chosen and not record_nothing:
+            raise ValueError(
+                "Nothing is ticked. Tick what you want recorded, or choose "
+                "\u201crecord that nothing was agreed\u201d if that is what you mean."
+            )
         state.busy = "Writing the letter…"
         state.error = None
         try:
@@ -171,6 +184,18 @@ class ConsoleService:
             state.error = str(exc)
         finally:
             state.busy = ""
+
+    def discard_draft(self) -> None:
+        """Throw the letter away and keep the review. Costs nothing."""
+        self.state.letter_html = ""
+        self.state.letter_session = ""
+
+    def reset(self) -> None:
+        """Back to a blank demo: no thread, no review, no draft, no call log."""
+        self.state = State()
+        with self._lock:
+            self._calls.clear()
+            self._seq = 0
 
     def toggle(self, quote: str, on: bool) -> None:
         if on:
@@ -307,13 +332,31 @@ def create_app(threads_dir: str = "threads") -> FastAPI:
     def letter(payload: dict[str, Any] = Body(default={})) -> dict[str, Any]:
         if service.state.busy:
             raise HTTPException(409, detail="already working")
-        _run(service.write_letter, payload.get("shape", "letter"))
+        record_nothing = bool(payload.get("record_nothing"))
+        # Checked here, before the worker starts, so the refusal reaches the caller
+        # instead of surfacing as an error after an operation has already been spent.
+        if service.state.commitments and not service.state.chosen and not record_nothing:
+            raise HTTPException(400, detail=(
+                "Nothing is ticked. Tick what you want recorded, or choose "
+                "\u201crecord that nothing was agreed\u201d if that is what you mean."
+            ))
+        _run(service.write_letter, payload.get("shape", "letter"), record_nothing)
         return {"started": True}
 
     @app.post("/api/close")
     def close() -> dict[str, Any]:
         """Back to the inbox. Keeps the call log; clears the open thread."""
         service.state = State()
+        return {"ok": True}
+
+    @app.post("/api/discard")
+    def discard() -> dict[str, Any]:
+        service.discard_draft()
+        return {"ok": True}
+
+    @app.post("/api/reset")
+    def reset() -> dict[str, Any]:
+        service.reset()
         return {"ok": True}
 
     @app.post("/api/toggle")

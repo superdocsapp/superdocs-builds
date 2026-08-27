@@ -81,7 +81,8 @@
   .lede{color:var(--dim);font-size:12.5px;margin:0 0 13px}
   button{font:inherit;font-size:13.5px;padding:8px 17px;border-radius:20px;cursor:pointer;
     border:1px solid transparent;background:var(--accent);color:#fff;font-weight:600}
-  button.ghost{background:transparent;border-color:var(--line);color:var(--accent)}
+  button.ghost{background:transparent;border-color:var(--line);color:var(--accent);
+    font-weight:500}
   button:hover:not(:disabled){filter:brightness(1.06)}
   button:disabled{opacity:.45;cursor:default}
   button.small{padding:5px 12px;font-size:12.5px}
@@ -111,8 +112,8 @@
   .compose{position:fixed;right:18px;bottom:0;width:520px;max-width:calc(100vw - 36px);
     background:var(--surface);border:1px solid var(--line);border-radius:9px 9px 0 0;
     box-shadow:0 -2px 18px rgba(0,0,0,.18);z-index:50;overflow:hidden}
-  .compose header{background:var(--sunk);padding:9px 15px;font-size:13px;font-weight:600;
-    display:flex;align-items:center;gap:10px}
+  .compose header{background:var(--sunk);padding:7px 9px 7px 15px;font-size:13px;
+    font-weight:600;display:flex;align-items:center;gap:10px}
   .compose .f{padding:7px 15px;border-bottom:1px solid var(--line);font-size:13px;
     color:var(--dim)}
   .compose .f b{color:var(--ink);font-weight:400}
@@ -156,6 +157,7 @@
   <span class="pill" id="conn"><span class="dot"></span><span id="conn-label">…</span></span>
   <span class="pill" id="key"></span>
   <span class="pill" id="ops"></span>
+  <button class="ghost small" data-act="reset" title="Clear the thread, the review, the draft and the call log">Reset demo</button>
 </div>
 
 <div class="app">
@@ -212,6 +214,24 @@
                                if(last) render(last); poll(); }
     else if(act === "extract"){ post("/api/extract"); }
     else if(act === "write"){ post("/api/letter", {shape}); }
+    else if(act === "nothing"){
+      if(confirm("Write a " + shape + " recording that nothing was agreed in this "
+                 + "thread?\n\nThis costs one operation.")) {
+        post("/api/letter", {shape, record_nothing: true});
+      }
+    }
+    else if(act === "discard"){
+      if(confirm("Discard this draft?\n\nThe review stays; you can write another.")) {
+        post("/api/discard");
+      }
+    }
+    else if(act === "reset"){
+      if(confirm("Reset the demo?\n\nClears the open thread, the review, the draft and "
+                 + "the call log. Costs nothing.")) {
+        view = "inbox"; query = ""; $("q").value = ""; shape = "letter";
+        post("/api/reset");
+      }
+    }
     else if(act === "shape"){ shape = arg; drawn.addon = null; poll(); }
     else if(act === "toggle"){ toggle(Number(arg)); }
     else if(act === "fold") { el.classList.toggle("fold"); }
@@ -373,10 +393,21 @@
     html += `<div class="seg" style="margin:2px 0 11px">
         <button class="segb ${shape==="letter"?"on":""}" data-act="shape" data-arg="letter">Letter</button>
         <button class="segb ${shape==="memo"?"on":""}" data-act="shape" data-arg="memo">Memo</button>
-      </div>
-      <button data-act="write" ${busy?"disabled":""}>
-        ${busy?"Writing…":`Write ${noun} &amp; attach to reply`}</button>
-      <p class="sm" style="margin:9px 0 0">${n} selected · ${c_live(s)}</p>`;
+      </div>`;
+    if(n === 0){
+      // "Nothing ticked" and "nothing was agreed" are different statements, and only a
+      // person turns the first into the second. The button will not spend an operation
+      // on a decision that has not been made.
+      html += `<button disabled>Write ${noun} &amp; attach to reply</button>
+        <p class="sm" style="margin:9px 0 6px">Tick what you want recorded.</p>
+        <button class="ghost small" data-act="nothing">
+          Or record that nothing was agreed</button>
+        <p class="sm" style="margin:7px 0 0">${c_live(s)}</p>`;
+    } else {
+      html += `<button data-act="write" ${busy?"disabled":""}>
+          ${busy?"Writing…":`Write ${noun} &amp; attach to reply`}</button>
+        <p class="sm" style="margin:9px 0 0">${n} selected · ${c_live(s)}</p>`;
+    }
     $("addon").innerHTML = html;
   }
 
@@ -389,7 +420,9 @@
     drawn.compose = sig;
     if(!s.draft){ $("compose").innerHTML = ""; return; }
     $("compose").innerHTML = `<div class="compose">
-      <header>New message</header>
+      <header>Draft reply
+        <button class="ghost small" data-act="discard" style="margin-left:auto">Discard</button>
+      </header>
       <div class="f">To <b>${esc(s.draft.to)}</b></div>
       <div class="f">Subject <b>${esc(s.draft.subject)}</b></div>
       <div class="b">${esc(s.draft.body)}</div>

@@ -126,3 +126,17 @@ def test_dedupe_keeps_the_first_wording() -> None:
     ))
     (kept,) = dedupe(rows)
     assert kept.quote == "the fuller quote as written"
+
+
+def test_quote_marks_the_model_added_are_stripped() -> None:
+    """A model wraps its quote in quote marks. Storing them means every display adds
+    another pair, and the reader sees ""like this""."""
+    for wrapped in ('"we will deliver"', "'we will deliver'", "“we will deliver”"):
+        (c,) = parse(_table(("A", "B", "thing", "", "firm", "1", wrapped)))
+        assert c.quote == "we will deliver", f"{wrapped!r} -> {c.quote!r}"
+
+
+def test_quotes_inside_the_sentence_are_left_alone() -> None:
+    (c,) = parse(_table(("A", "B", "thing", "", "firm", "1",
+                         'he said "by Friday" and meant it')))
+    assert c.quote == 'he said "by Friday" and meant it'

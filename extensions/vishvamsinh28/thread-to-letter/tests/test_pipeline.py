@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import email
 import email.policy
+import time
 
 from thread_to_letter import extract as extract_mod
 from thread_to_letter import letter as letter_mod
@@ -120,3 +121,79 @@ def test_the_letter_is_drafted_in_its_own_session(client: Client, thread: Thread
 
     memo = letter_mod.draft(client, thread, extracted.usable, "sess-x", shape="memo")
     assert memo.session_id != drafted.session_id, "a memo is not the same document as a letter"
+
+
+def test_the_console_refuses_to_draft_a_decision_nobody_made(
+    fake_server, tmp_path, monkeypatch
+) -> None:
+    """Candidates found and none ticked is not the same statement as "nothing was agreed",
+    and only a person turns the first into the second. Spending an operation on the
+    difference is exactly the surprise this build exists to avoid."""
+    from fastapi.testclient import TestClient
+
+    from thread_to_letter.web import create_app
+    from tests.conftest import FAKE_KEY, ROOT
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", FAKE_KEY)
+    monkeypatch.setenv("SUPERDOCS_BASE_URL", fake_server.base_url)
+    client = TestClient(create_app(str(ROOT / "threads")))
+
+    client.post("/api/open", json={"name": "migration-project.mbox"})
+    client.post("/api/extract")
+    for _ in range(80):
+        state = client.get("/api/state").json()
+        if not state["busy"]:
+            break
+        time.sleep(0.2)
+    assert state["commitments"], "the stand-in returns candidates"
+
+    for c in state["commitments"]:
+        client.post("/api/toggle", json={"quote": c["quote"], "on": False})
+
+    refused = client.post("/api/letter", json={"shape": "letter"})
+    assert refused.status_code == 400
+    assert "Nothing is ticked" in refused.json()["detail"]
+    assert not client.get("/api/state").json()["letter_html"]
+
+    # Saying it explicitly is allowed, because now somebody has said it.
+    allowed = client.post("/api/letter", json={"shape": "letter", "record_nothing": True})
+    assert allowed.status_code == 200
+
+
+def test_a_draft_can_be_discarded_and_the_demo_reset(
+    fake_server, tmp_path, monkeypatch
+) -> None:
+    from fastapi.testclient import TestClient
+
+    from thread_to_letter.web import create_app
+    from tests.conftest import FAKE_KEY, ROOT
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", FAKE_KEY)
+    monkeypatch.setenv("SUPERDOCS_BASE_URL", fake_server.base_url)
+    client = TestClient(create_app(str(ROOT / "threads")))
+
+    client.post("/api/open", json={"name": "migration-project.mbox"})
+    client.post("/api/extract")
+    for _ in range(80):
+        if not client.get("/api/state").json()["busy"]:
+            break
+        time.sleep(0.2)
+    client.post("/api/letter", json={"shape": "letter"})
+    for _ in range(80):
+        if not client.get("/api/state").json()["busy"]:
+            break
+        time.sleep(0.2)
+    assert client.get("/api/state").json()["draft"]
+
+    # Discard keeps the review, so another letter can be written without paying again.
+    client.post("/api/discard")
+    after = client.get("/api/state").json()
+    assert not after["draft"] and not after["letter_html"]
+    assert after["commitments"], "the review survives a discarded draft"
+
+    # Reset clears everything, including the record of what was called.
+    client.post("/api/reset")
+    blank = client.get("/api/state").json()
+    assert blank["thread"] is None
+    assert blank["commitments"] == []
+    assert blank["call_seq"] == 0
