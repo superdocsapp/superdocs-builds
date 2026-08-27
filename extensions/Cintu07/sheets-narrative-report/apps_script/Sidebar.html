@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <style>
+      :root { --ink:#1a1a1a; --muted:#666; --line:#e0e0e0; --brand:#1f4e79;
+              --add:#e6f4ea; --add-line:#34a853; --del:#fce8e6; --del-line:#d93025;
+              --warn:#fef7e0; --warn-line:#f9ab00; }
+      body { font-family: -apple-system, Roboto, Arial, sans-serif; font-size: 13px;
+             color: var(--ink); margin: 0; padding: 12px; }
+      h1 { font-size: 14px; margin: 0 0 2px; color: var(--brand); }
+      .sub { color: var(--muted); font-size: 11px; margin-bottom: 12px; }
+      button { font: inherit; border-radius: 4px; border: 1px solid var(--line);
+               background: #fff; padding: 7px 12px; cursor: pointer; }
+      button.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+      button:disabled { opacity: .5; cursor: default; }
+      .row { display: flex; gap: 6px; align-items: center; }
+      .card { border: 1px solid var(--line); border-radius: 6px; padding: 10px;
+              margin-bottom: 10px; }
+      .card h2 { font-size: 12px; margin: 0 0 2px; }
+      .tag { font-size: 10px; text-transform: uppercase; letter-spacing: .5px;
+             padding: 2px 6px; border-radius: 3px; background: #f1f3f4; color: var(--muted); }
+      .tag.create.tag.regenerate { background: var(--add); color: #137333; }
+      .tag.resubstitute { background: #e8f0fe; color: #1967d2; }
+      .tag.keep { background: #f1f3f4; }
+      .reason { color: var(--muted); font-size: 11px; margin: 4px 0 8px; }
+      .preview { border-left: 3px solid var(--add-line); background: var(--add);
+                 padding: 8px; border-radius: 3px; }
+      .preview.was { border-left-color: var(--del-line); background: var(--del);
+                     opacity: .8; margin-bottom: 6px; }
+      .preview p.preview ul { margin: 0 0 6px; }
+      .preview :last-child { margin-bottom: 0; }
+      .label { font-size: 10px; text-transform: uppercase; color: var(--muted);
+               letter-spacing: .5px; margin-bottom: 3px; }
+      .problem { background: var(--del); border-left: 3px solid var(--del-line);
+                 padding: 7px; border-radius: 3px; font-size: 11px; margin-top: 8px; }
+      .finding { background: var(--warn); border-left: 3px solid var(--warn-line);
+                 padding: 7px; border-radius: 3px; font-size: 11px; margin-bottom: 8px; }
+      .decide { display: flex; gap: 6px; margin-top: 8px; }
+      .decide button { flex: 1; padding: 5px; font-size: 12px; }
+      .decide button.on.yes { background: var(--add); border-color: var(--add-line); }
+      .decide button.on.no { background: var(--del); border-color: var(--del-line); }
+      .meta { border-top: 1px solid var(--line); margin-top: 12px; padding-top: 8px;
+              color: var(--muted); font-size: 11px; }
+      .meta code { background: #f1f3f4; padding: 1px 4px; border-radius: 3px; }
+      .err { background: var(--del); border-left: 3px solid var(--del-line);
+             padding: 9px; border-radius: 3px; white-space: pre-wrap; }
+      .spin { color: var(--muted); font-style: italic; }
+      a { color: var(--brand); }
+    </style>
+  </head>
+  <body>
+    <h1>Narrative report</h1>
+    <div class="sub" id="sub">Select a range including its header row, then build.</div>
+
+    <div class="row">
+      <button class="primary" id="build" onclick="build()">Build from selection</button>
+      <select id="format">
+        <option value="docx">Word (.docx)</option>
+        <option value="pdf">PDF</option>
+        <option value="html">HTML</option>
+      </select>
+    </div>
+
+    <div id="status" style="margin-top:12px"></div>
+    <div id="out"></div>
+
+    <script>
+      var state = { report: null, decisions: {} };
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      }
+      function setStatus(html, cls) {
+        document.getElementById('status').innerHTML = cls
+          ? '<div class="' + cls + '">' + html + '</div>'
+          : html;
+      }
+      function busy(on) {
+        document.getElementById('build').disabled = on;
+      }
+
+      function build() {
+        busy(true);
+        document.getElementById('out').innerHTML = '';
+        setStatus('<span class="spin">Reading the range and drafting… this can take a minute.</span>');
+        google.script.run
+          .withSuccessHandler(onProposal)
+          .withFailureHandler(onError)
+          .proposeReport();
+      }
+
+      function onError(err) {
+        busy(false);
+        setStatus(esc(err && err.message ? err.message : err), 'err');
+      }
+
+      function onProposal(report) {
+        busy(false);
+        state.report = report;
+        state.decisions = {};
+        report.sections.forEach(function (s) {
+          // Anything with an unresolved problem starts as "no", so a reviewer has
+          // to opt in to shipping something the checker flagged.
+          state.decisions[s.id] = s.problems.length === 0;
+        });
+
+        var changes = report.sections.filter(function (s) { return s.action !== 'keep'; });
+        setStatus(
+          changes.length
+            ? '<b>' + changes.length + '</b> section(s) to review.'
+            : 'Nothing changed, the report already matches the sheet.'
+        );
+        render();
+      }
+
+      function render() {
+        var r = state.report;
+        var html = '';
+
+        r.findings.forEach(function (f) {
+          html += '<div class="finding">' + esc(f) + '</div>';
+        });
+
+        r.sections.forEach(function (s) {
+          if (s.action === 'keep') return;
+          html += '<div class="card">';
+          html += '<div class="row" style="justify-content:space-between">';
+          html += '<h2>' + esc(s.heading) + '</h2>';
+          html += '<span class="tag ' + s.action + '">' + esc(s.action) + '</span></div>';
+          html += '<div class="reason">' + esc(s.reason) + '</div>';
+
+          if (s.previous_html) {
+            html += '<div class="label">Was</div>';
+            html += '<div class="preview was">' + s.previous_html + '</div>';
+          }
+          html += '<div class="label">' + (s.previous_html ? 'Becomes' : 'New') + '</div>';
+          html += '<div class="preview">' + s.html + '</div>';
+
+          if (s.problems.length) {
+            html += '<div class="problem"><b>Held back, figure could not be traced:</b><ul>';
+            s.problems.forEach(function (p) { html += '<li>' + esc(p) + '</li>'; });
+            html += '</ul></div>';
+          }
+
+          var yes = state.decisions[s.id];
+          html += '<div class="decide">';
+          html += '<button class="yes ' + (yes ? 'on' : '') + '" onclick="decide(\'' + s.id + '\',true)">Accept</button>';
+          html += '<button class="no ' + (!yes ? 'on' : '') + '" onclick="decide(\'' + s.id + '\',false)">Reject</button>';
+          html += '</div></div>';
+        });
+
+        var kept = r.sections.filter(function (s) { return s.action === 'keep'; }).length;
+        html += '<div class="meta">';
+        html += 'Revision ' + esc(r.revision) + ' &middot; ' + esc(r.plan_summary) + '<br>';
+        html += kept + ' section(s) untouched and byte-identical.<br>';
+        html += 'Operations spent: <code>' + esc(r.operations_spent) + '</code>';
+        if (r.narrative_source === 'fallback') {
+          html += ' &middot; <b>prose written without the model</b>';
+        }
+        html += '</div>';
+
+        if (r.sections.some(function (s) { return s.action !== 'keep'; })) {
+          html += '<div class="row" style="margin-top:10px">';
+          html += '<button class="primary" onclick="apply()">Apply accepted &amp; export</button>';
+          html += '</div>';
+        }
+
+        document.getElementById('out').innerHTML = html;
+      }
+
+      function decide(id, yes) {
+        state.decisions[id] = yes;
+        render();
+      }
+
+      function apply() {
+        busy(true);
+        setStatus('<span class="spin">Applying and exporting…</span>');
+        google.script.run
+          .withSuccessHandler(onCommitted)
+          .withFailureHandler(onError)
+          .commitReport(
+            state.report.report_id,
+            state.decisions,
+            document.getElementById('format').value
+          );
+      }
+
+      function onCommitted(result) {
+        busy(false);
+        var msg = 'Committed revision ' + esc(result.revision) + '.';
+        if (result.exported_bytes) {
+          msg += ' Export is ' + Math.round(result.exported_bytes / 1024) + ' KB.';
+        }
+        (result.findings || []).forEach(function (f) { msg += '<br>' + esc(f); });
+        setStatus(msg);
+        document.getElementById('out').innerHTML =
+          '<button onclick="toDrive()">Save to Drive</button>';
+        state.lastFormat = document.getElementById('format').value;
+      }
+
+      function toDrive() {
+        setStatus('<span class="spin">Saving to Drive…</span>');
+        google.script.run
+          .withSuccessHandler(function (file) {
+            setStatus('Saved as <a href="' + file.url + '" target="_blank">' + esc(file.name) + '</a>.');
+          })
+          .withFailureHandler(onError)
+          .saveExportToDrive(state.report.report_id, state.lastFormat || 'docx');
+      }
+    </script>
+  </body>
+</html>
