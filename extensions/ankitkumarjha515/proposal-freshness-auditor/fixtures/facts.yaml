@@ -1,0 +1,72 @@
+# Canonical fact ledger for Northwind Relief Alliance (fictional, synthetic).
+#
+# Each fact's value lives here ONCE. Adding a fifth fact is a data-only
+# change: add an entry below (and fixture documents / manifest cases to
+# exercise it) — no Python change is required.
+
+facts:
+  - id: headcount
+    subject: permanent staff
+    subject_synonyms:
+      - staff headcount
+      - employees
+      - team members
+      - workforce
+    value: 1450
+    kind: integer
+    unit: people
+    source: "HR headcount report (Workday export)"
+    as_of: 2026-01-15
+    prior_values:
+      - value: 1200
+        as_of: 2023-06-01
+        retired_on: 2026-01-15
+
+  - id: country_count
+    subject: countries of operation
+    subject_synonyms:
+      - countries served
+      - countries we operate in
+      - operating countries
+      - nations
+    value: 17
+    kind: integer
+    unit: countries
+    source: "Country operations register"
+    as_of: 2026-02-01
+    prior_values:
+      - value: 14
+        as_of: 2023-09-01
+        retired_on: 2026-02-01
+
+  - id: beneficiaries_2025
+    subject: beneficiaries reached
+    subject_synonyms:
+      - people reached
+      - beneficiaries served
+      - individuals assisted
+    value: 4.1
+    kind: decimal
+    unit: million people
+    source: "Audited impact statement FY2025"
+    as_of: 2026-01-31
+    prior_values:
+      - value: 3.2
+        as_of: 2024-01-31
+        retired_on: 2026-01-31
+
+  - id: iso_9001_renewal
+    subject: ISO 9001 certification renewal
+    subject_synonyms:
+      - ISO certification
+      - ISO 9001 renewal date
+      - quality certification renewal
+    value: "March 2026"
+    kind: text
+    unit: null
+    source: "Certification registry"
+    as_of: 2026-03-01
+    prior_values:
+      - value: "March 2023"
+        as_of: 2023-03-01
+        retired_on: 2026-03-01
