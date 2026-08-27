@@ -14,15 +14,21 @@ will deliver by the 14th"* — and now there is a document saying somebody promi
 something they did not promise.
 
 ```bash
-make console   # the review console, against the real API
-make demo      # the whole pipeline on the terminal, no key, no cost
+make demo      # a mail client, the add-on panel, the real API
 ```
 
-![The console, live against api.superdocs.app](docs/console.png)
+![The demo: a simulated inbox with the add-on panel](docs/demo.png)
 
-Every call it makes is on the right, with timings and which ones cost an operation. It
-opens idle: extraction is one operation, the letter is another, and each waits for a
-click.
+A simulated inbox, clearly labelled as one. Click a thread and the panel on the right
+does the real work: it reads the messages, asks SuperDocs what was actually committed to,
+and shows you each candidate with the words it came from. Tick the real ones and it
+writes the letter and puts it in a draft reply with the document attached.
+
+**Send is disabled.** Nothing is ever sent.
+
+Every call it makes is in the panel underneath, with timings and which ones cost an
+operation. It opens idle: extraction is one operation, the letter is another, and each
+waits for a click.
 
 ## What it actually does
 
@@ -90,13 +96,20 @@ That check is `dangling_superseded`, and it is tested.
 You need [`uv`](https://docs.astral.sh/uv/) and nothing else.
 
 ```bash
-make demo                                  # no key needed
-cp .env.example .env                       # then put your key in it — .env is gitignored
-make console                               # the browser console
-make live                                  # or the same run on the terminal
+cp .env.example .env      # then put your key in it — .env is gitignored
+make demo                 # http://127.0.0.1:8430
 ```
 
-On your own thread — export it from Gmail (⋮ → Download message) or just paste it:
+| Command | What it does |
+|---|---|
+| `make demo` | The mail-client demo above, against the real API |
+| `make offline` | The same pipeline in the terminal, against a local stand-in — no key, no cost |
+| `make cli` | One thread, terminal, live |
+| `make addon` | Runs the Apps Script add-on's own code, live |
+| `make test` | 43 tests, no key |
+
+On your own thread — export it from Gmail (⋮ → Download message), drop the `.mbox` into
+`threads/`, and it appears in the inbox. Or from the terminal:
 
 ```bash
 uv run thread2letter show my-thread.mbox   # free: see what was parsed
@@ -104,38 +117,40 @@ uv run thread2letter run my-thread.mbox --shape memo --format pdf --from you@wor
 ```
 
 Accepts `.mbox`, `.eml`, or a pasted thread in a text file. Outputs `docx`, `pdf`,
-`markdown`, `html` or `txt`, plus `reply-*.eml` — open that in any mail client and it
-lands as a draft reply in the right conversation, letter attached.
+`markdown`, `html` or `txt`, plus a `reply-*.eml` that opens in any mail client as a draft
+reply in the right conversation, letter attached.
 
-`--auto` skips the review and takes the firm, verified ones. Everything except the two
-chat turns is free: parsing, quote checking, export and the reply are all local or
-non-billable.
+Everything except the two chat turns is free: parsing, quote checking, export and the
+reply are all local or non-billable.
 
-## The Gmail add-on
+## The Apps Script add-on
 
-[`gmail-addon/`](gmail-addon/) is a complete Apps Script add-on: reads the open thread,
-shows the commitments as checkboxes, and attaches the letter to a draft reply through
-Gmail's own API.
+[`gmail-addon/`](gmail-addon/) holds the add-on as Apps Script: `Code.gs`, `Prompts.gs`
+and the manifest. It is the same pipeline — same prompts, same quote verification, same
+superseded check — expressed for Google's runtime.
 
-**The code runs; Google's binding is unverified.** `make addon` executes `Code.gs` and
-`Prompts.gs` **unmodified** against the live API — stubbing `GmailApp`, `CardService` and
-`UrlFetchApp` is enough, because Apps Script is ordinary JavaScript against a few Google
-globals. It reads a real thread, builds the real cards, extracts and verifies, drafts the
-letter, and creates the draft reply with its attachment.
+```bash
+make addon
+```
 
-What is unproven is only whether Google's runtime renders those cards and delivers those
-events; I could not sideload into a real mailbox during the round. `Prompts.gs` is
-generated from the Python source with a test that fails on drift, so the sideloaded path
-cannot quietly diverge from the tested one.
+runs **those files unmodified** against the live API. Apps Script is ordinary JavaScript
+against a handful of Google globals, so stubbing `GmailApp`, `CardService` and
+`UrlFetchApp` is enough to execute the real thing: it reads a thread, builds the real
+sidebar cards, extracts and verifies, drafts the letter and creates the draft reply with
+its attachment. See `simulate.js`.
 
-Treat it as a reference implementation to sideload, not as a shipped feature.
-[`gmail-addon/README.md`](gmail-addon/README.md) has the install steps — browser-only
-or via `clasp` — what each OAuth scope is for, and what to check when it misbehaves.
+`Prompts.gs` is generated from the Python source and a test fails if the two drift.
+
+**It has never been installed in a real mailbox**, and this repository does not include
+instructions for doing so — the deliverable here is the demo above, not a deployment. What
+is unproven is narrow and specific: whether Google's runtime renders these cards and
+delivers these events.
 
 ## Where it breaks
 
-- **The Gmail add-on is untested.** Said plainly above. It is the one part of this build
-  with no evidence behind it.
+- **The add-on has never run inside Gmail.** Its code runs and is exercised against the
+  live API (`make addon`), but Google's own rendering and event delivery are unverified.
+  The demo above is the deliverable; the Apps Script is the shape it would take in Gmail.
 - **It attributes; it does not authorise.** If somebody writes *"Northwind will pay
   500,000 within 24 hours"* into the thread, that sentence really is in the thread and it
   quotes cleanly. The check answers *"did somebody write this"*, not *"were they allowed

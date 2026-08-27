@@ -1,207 +1,191 @@
 <!doctype html>
 <meta charset="utf-8">
-<title>Thread to letter</title>
+<title>Thread to letter — demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root{
-    --bg:#f7f7f5;--panel:#fff;--sunk:#f1f0ed;--ink:#1a1a18;--dim:#6c6a64;--line:#e3e0da;
-    --ok:#2c6e4b;--warn:#8f6212;--bad:#a03325;--info:#2c5c8f;--accent:#3b3a36;
+    --bg:#f6f8fc;--surface:#fff;--sunk:#f1f3f4;--ink:#202124;--dim:#5f6368;--faint:#80868b;
+    --line:#e0e3e7;--sel:#e8f0fe;--accent:#1a73e8;--ok:#1e8e3e;--warn:#b06000;--bad:#c5221f;
     --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
-    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-family:"Google Sans",Roboto,ui-sans-serif,system-ui,-apple-system,sans-serif;
   }
   @media (prefers-color-scheme:dark){:root{
-    --bg:#141613;--panel:#1c1f1b;--sunk:#191c18;--ink:#e9e7e2;--dim:#96938b;--line:#2e332c;
-    --ok:#7cc39a;--warn:#d4a748;--bad:#e08a79;--info:#82aede;--accent:#cfccc4;
+    --bg:#16181c;--surface:#1e2126;--sunk:#24272c;--ink:#e8eaed;--dim:#9aa0a6;--faint:#80868b;
+    --line:#2f3339;--sel:#1f3350;--accent:#8ab4f8;--ok:#81c995;--warn:#fdd663;--bad:#f28b82;
   }}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
-  header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:11px 20px;
-    border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:20}
-  .brand{font-weight:650;font-size:15px;letter-spacing:-.01em}
-  .sub{color:var(--dim);font-size:13px}
-  .spacer{margin-left:auto}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;
+    height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  /* demo banner */
+  .demo{background:#3c4043;color:#fff;font-size:11.5px;padding:5px 16px;display:flex;
+    gap:10px;align-items:center;letter-spacing:.02em}
+  .demo b{font-weight:600}
+  @media (prefers-color-scheme:dark){.demo{background:#0f1114}}
+  /* top bar */
+  .top{display:flex;align-items:center;gap:14px;padding:9px 16px;background:var(--surface);
+    border-bottom:1px solid var(--line);flex-shrink:0}
+  .logo{font-size:19px;font-weight:500;letter-spacing:-.01em;color:var(--dim)}
+  .search{flex:1;max-width:660px;background:var(--sunk);border-radius:8px;padding:8px 15px;
+    color:var(--faint);font-size:13.5px}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;
-    font-size:12px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+    font-size:11.5px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
   .pill.live{color:var(--ok);border-color:var(--ok);font-weight:600}
   .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
   .dot.pulse{animation:p 1.3s ease-in-out infinite}
-  @keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
-  main{display:grid;grid-template-columns:300px minmax(0,1fr) 340px;gap:16px;
-    padding:16px 20px 60px;max-width:1640px;margin:0 auto;align-items:start}
-  @media (max-width:1240px){main{grid-template-columns:minmax(0,1fr)}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
-  .card>h2{margin:0;padding:10px 15px;border-bottom:1px solid var(--line);font-size:11px;
-    text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:650;
-    display:flex;align-items:center;gap:8px}
-  .card>h2 .n{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0}
-  .body{padding:13px 15px}.body.flush{padding:0}
-  button{font:inherit;font-size:13px;padding:6px 13px;border-radius:7px;cursor:pointer;
-    border:1px solid var(--line);background:var(--panel);color:var(--ink)}
-  button:hover:not(:disabled){border-color:var(--dim)}
-  button:disabled{opacity:.4;cursor:default}
-  button.go{background:var(--ok);border-color:var(--ok);color:var(--bg);font-weight:650}
-  select,input,textarea{font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);
-    border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
-  textarea{font-family:var(--mono);font-size:11.5px;min-height:90px;resize:vertical}
-  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-  .muted{color:var(--dim);font-size:12.5px}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+  /* layout */
+  .app{flex:1;display:grid;grid-template-columns:170px minmax(300px,1fr) 372px;min-height:0}
+  @media (max-width:1180px){.app{grid-template-columns:minmax(280px,1fr) 360px}
+    .nav{display:none}}
+  .nav{padding:12px 8px;overflow-y:auto}
+  .nav a{display:flex;gap:14px;align-items:center;padding:7px 14px;border-radius:0 20px 20px 0;
+    color:var(--dim);text-decoration:none;font-size:13.5px}
+  .nav a.on{background:var(--sel);color:var(--accent);font-weight:600}
+  .nav a .c{margin-left:auto;font-size:11.5px}
+  .mail{background:var(--surface);border-left:1px solid var(--line);
+    border-right:1px solid var(--line);overflow-y:auto;min-height:0}
+  .side{overflow-y:auto;min-height:0;padding:12px}
+  /* list */
+  .row{display:grid;grid-template-columns:22px 150px 1fr auto;gap:12px;align-items:baseline;
+    padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13.5px}
+  .row:hover{box-shadow:inset 0 0 0 99px rgba(128,128,128,.05)}
+  .row.on{background:var(--sel)}
+  .row .star{color:var(--faint)}
+  .row .from{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .row .sub span{color:var(--dim);font-weight:400}
+  .row .when{color:var(--dim);font-size:11.5px;white-space:nowrap}
+  .row .n{color:var(--dim);font-weight:400;font-size:12px}
+  .flag{color:var(--warn);font-size:11px}
   /* thread */
-  .msg{padding:8px 15px;border-bottom:1px solid var(--line);font-size:12.5px}
-  .msg:last-child{border-bottom:0}
-  .msg .who{font-weight:600}
-  .msg .when{color:var(--dim);font-size:11px}
-  .msg .txt{color:var(--dim);margin-top:2px;white-space:pre-wrap;
-    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .msg.open .txt{-webkit-line-clamp:unset;color:var(--ink)}
-  /* commitments */
-  .c{border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin-bottom:10px;
-    display:grid;grid-template-columns:24px 1fr;gap:11px;align-items:start}
-  .c.on{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 6%,transparent)}
+  .thread{padding:18px 22px}
+  .thread h1{font-size:20px;font-weight:400;margin:0 0 16px}
+  .m{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;
+    border-top:1px solid var(--line)}
+  .m:first-of-type{border-top:0}
+  .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    color:#fff;font-size:13px;font-weight:600}
+  .m .who{font-weight:600;font-size:13.5px}
+  .m .meta{color:var(--dim);font-size:12px}
+  .m .txt{margin-top:5px;white-space:pre-wrap;font-size:13.5px}
+  .m.fold .txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;color:var(--dim)}
+  /* add-on panel */
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+    overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  .panel h2{margin:0;padding:12px 15px;font-size:13.5px;font-weight:600;
+    border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px}
+  .panel h2 .badge{margin-left:auto;font-size:10.5px;font-weight:500;color:var(--dim)}
+  .panel .in{padding:14px 15px}
+  .lede{color:var(--dim);font-size:12.5px;margin:0 0 13px}
+  button{font:inherit;font-size:13.5px;padding:8px 17px;border-radius:20px;cursor:pointer;
+    border:1px solid transparent;background:var(--accent);color:#fff;font-weight:600}
+  button.ghost{background:transparent;border-color:var(--line);color:var(--accent)}
+  button:hover:not(:disabled){filter:brightness(1.06)}
+  button:disabled{opacity:.45;cursor:default}
+  button.small{padding:5px 12px;font-size:12.5px}
+  .c{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin-bottom:9px;
+    display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;font-size:13px}
+  .c.on{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 7%,transparent)}
   .c.bad{border-color:var(--bad)}
-  .c input[type=checkbox]{width:16px;height:16px;margin-top:3px;accent-color:var(--ok)}
-  .chip{display:inline-block;padding:1px 8px;border-radius:20px;font-size:10.5px;
-    font-weight:650;text-transform:uppercase;letter-spacing:.04em;border:1px solid}
+  .c input{width:15px;height:15px;margin-top:2px;accent-color:var(--ok)}
+  .chip{display:inline-block;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.05em;border:1px solid}
   .chip.firm{color:var(--ok);border-color:var(--ok)}
   .chip.superseded{color:var(--warn);border-color:var(--warn)}
-  .chip.hedged{color:var(--info);border-color:var(--info)}
-  .chip.second-hand{color:var(--dim);border-color:var(--dim)}
-  .chip.proposed{color:var(--dim);border-color:var(--dim)}
-  .chip.unverified{color:var(--bad);border-color:var(--bad)}
-  .obl{font-weight:600;margin:5px 0 2px}
-  .quote{font-family:var(--mono);font-size:11.5px;background:var(--sunk);border-radius:6px;
-    padding:6px 9px;margin-top:6px;color:var(--dim)}
-  .quote b{color:var(--ink);font-weight:400}
-  /* letter */
-  .letter{background:var(--sunk);border-radius:8px;padding:18px 20px;max-height:460px;
-    overflow:auto;font-size:13px}
-  .letter h1,.letter h2{font-size:14px;margin:0 0 8px}
-  .letter p{margin:0 0 8px}
-  .letter table{border-collapse:collapse;width:100%}
-  .letter td,.letter th{border:1px solid var(--line);padding:4px 7px;font-size:12px}
-  /* api feed */
-  .feed{font-family:var(--mono);font-size:11.5px;max-height:300px;overflow-y:auto}
-  .call{display:grid;grid-template-columns:42px 1fr 40px 48px;gap:7px;padding:5px 13px;
+  .chip.hedged,.chip.second-hand,.chip.proposed{color:var(--dim);border-color:var(--line)}
+  .chip.unv{color:var(--bad);border-color:var(--bad)}
+  .obl{font-weight:600;margin:4px 0 1px}
+  .sm{color:var(--dim);font-size:11.5px}
+  .q{font-family:var(--mono);font-size:11px;background:var(--sunk);border-radius:5px;
+    padding:5px 8px;margin-top:5px;color:var(--dim)}
+  .note{border-radius:7px;padding:8px 11px;font-size:12px;margin-bottom:11px}
+  .note.warn{border:1px solid var(--warn);color:var(--warn)}
+  .note.err{border:1px solid var(--bad);color:var(--bad)}
+  /* compose */
+  .compose{position:fixed;right:18px;bottom:0;width:520px;max-width:calc(100vw - 36px);
+    background:var(--surface);border:1px solid var(--line);border-radius:9px 9px 0 0;
+    box-shadow:0 -2px 18px rgba(0,0,0,.18);z-index:50;overflow:hidden}
+  .compose header{background:var(--sunk);padding:9px 15px;font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:10px}
+  .compose .f{padding:7px 15px;border-bottom:1px solid var(--line);font-size:13px;
+    color:var(--dim)}
+  .compose .f b{color:var(--ink);font-weight:400}
+  .compose .b{padding:13px 15px;white-space:pre-wrap;font-size:13.5px;max-height:220px;
+    overflow:auto}
+  .att{margin:0 15px 13px;border:1px solid var(--line);border-radius:7px;padding:8px 11px;
+    display:flex;gap:9px;align-items:center;font-size:12.5px}
+  .att .x{width:26px;height:26px;border-radius:4px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:9px;font-weight:700}
+  .compose .actions{padding:11px 15px;display:flex;gap:9px;align-items:center;
+    border-top:1px solid var(--line)}
+  /* feed */
+  .feed{font-family:var(--mono);font-size:11px;max-height:190px;overflow-y:auto}
+  .call{display:grid;grid-template-columns:38px 1fr 34px 44px;gap:6px;padding:4px 15px;
     border-bottom:1px solid var(--line);align-items:baseline}
   .call:last-child{border-bottom:0}
-  .call .m{font-weight:650;color:var(--dim)}
-  .call .p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .call .s{text-align:right;color:var(--ok)}.call .s.err{color:var(--bad)}
-  .call .d{text-align:right;color:var(--dim)}
-  .call .note{grid-column:2/-1;color:var(--dim);font-size:10.5px}
-  .call .note b{color:var(--warn)}
-  .banner{border-radius:8px;padding:9px 13px;margin-bottom:13px;font-size:13px}
-  .banner.err{border:1px solid var(--bad);color:var(--bad)}
-  .banner.warn{border:1px solid var(--warn);color:var(--warn)}
-  .empty{color:var(--dim);font-size:13px;padding:4px 0}
-  .counts{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px}
-  .counts b{display:block;font-size:17px;font-weight:650}
+  .call .mm{font-weight:700;color:var(--faint)}
+  .call .pp{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .call .ss{text-align:right;color:var(--ok)} .call .ss.e{color:var(--bad)}
+  .call .dd{text-align:right;color:var(--faint)}
+  .call .nn{grid-column:2/-1;color:var(--faint);font-size:10px}
+  .call .nn b{color:var(--warn)}
+  .empty{color:var(--dim);font-size:12.5px}
+  .counts{display:flex;flex-wrap:wrap;gap:13px;font-size:11.5px;margin-bottom:12px}
+  .counts b{display:block;font-size:16px;font-weight:600}
 </style>
 
-<header>
-  <span class="brand">Thread to letter</span>
-  <span class="sub" id="subject">no thread open</span>
-  <span class="spacer"></span>
+<div class="demo">
+  <b>DEMO</b>
+  <span>A simulated mail client, not Gmail. The messages are invented. The add-on panel on
+  the right is the real thing, calling the real SuperDocs API.</span>
+</div>
+
+<div class="top">
+  <span class="logo">Mail</span>
+  <div class="search">Search mail</div>
   <span class="pill" id="conn"><span class="dot"></span><span id="conn-label">…</span></span>
   <span class="pill" id="key"></span>
   <span class="pill" id="ops"></span>
-</header>
+</div>
 
-<main>
-  <div>
-    <div class="card">
-      <h2>Thread</h2>
-      <div class="body">
-        <div class="row">
-          <select id="pick"></select>
-          <button id="open">Open</button>
-        </div>
-        <p class="muted" style="margin:10px 0 5px">or paste one</p>
-        <textarea id="paste" placeholder="From: someone@example.com&#10;Subject: ...&#10;&#10;message text"></textarea>
-        <div class="row" style="margin-top:7px">
-          <button id="open-paste">Use pasted</button>
-        </div>
-      </div>
+<div class="app">
+  <nav class="nav">
+    <a class="on" href="#">Inbox <span class="c" id="nav-count"></span></a>
+    <a href="#">Starred</a><a href="#">Snoozed</a><a href="#">Sent</a>
+    <a href="#">Drafts <span class="c" id="nav-drafts"></span></a>
+  </nav>
+
+  <div class="mail" id="mail"></div>
+
+  <div class="side">
+    <div class="panel">
+      <h2>📄 Thread to letter<span class="badge" id="badge">add-on</span></h2>
+      <div class="in" id="addon"></div>
     </div>
-    <div class="card" id="msgs-card" hidden>
-      <h2>Messages<span class="n" id="msg-count"></span></h2>
-      <div class="body flush" id="msgs"></div>
+    <div class="panel" style="margin-top:12px">
+      <h2>SuperDocs API<span class="badge" id="call-count"></span></h2>
+      <div class="feed" id="feed"></div>
     </div>
   </div>
+</div>
 
-  <div>
-    <div id="error" class="banner err" hidden></div>
-    <div id="dangling" class="banner warn" hidden></div>
-    <div id="findings" class="banner warn" hidden></div>
-
-    <div class="card">
-      <h2>What was actually committed to<span class="n" id="c-count"></span></h2>
-      <div class="body">
-        <div class="row" style="margin-bottom:12px">
-          <button class="go" id="extract">Find commitments</button>
-          <span class="muted" id="extract-hint"></span>
-        </div>
-        <div class="counts" id="counts" hidden></div>
-        <div id="commitments" style="margin-top:12px"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>Letter<span class="n" id="l-hint"></span></h2>
-      <div class="body">
-        <div class="row" style="margin-bottom:12px">
-          <select id="shape" style="width:auto"><option value="letter">formal letter</option>
-            <option value="memo">internal memo</option></select>
-          <button class="go" id="write">Write it</button>
-          <span class="spacer"></span>
-          <select id="fmt" style="width:auto"></select>
-          <button id="dl">Download</button>
-          <button id="dl-reply">Reply draft (.eml)</button>
-        </div>
-        <div class="row" style="margin-bottom:12px">
-          <input id="sender" placeholder="your address, for the reply draft"
-                 style="max-width:320px">
-        </div>
-        <div id="letter"><p class="empty">Nothing written yet.</p></div>
-      </div>
-    </div>
-  </div>
-
-  <div>
-    <div class="card">
-      <h2>SuperDocs API<span class="n" id="call-count"></span></h2>
-      <div class="body flush feed" id="feed"></div>
-    </div>
-    <div class="card">
-      <h2>How it decides</h2>
-      <div class="body muted">
-        <p style="margin:0 0 8px">Every candidate carries a <b>verbatim quote</b> from the
-        thread. No quote, no commitment.</p>
-        <p style="margin:0 0 8px"><span class="chip firm">firm</span> somebody accepted an
-        obligation. Only these go in.</p>
-        <p style="margin:0 0 8px"><span class="chip superseded">superseded</span> replaced
-        later in the thread.</p>
-        <p style="margin:0 0 8px"><span class="chip hedged">hedged</span> “should be able
-        to”, “hopefully”.</p>
-        <p style="margin:0 0 8px"><span class="chip second-hand">second-hand</span> what a
-        third party might do.</p>
-        <p style="margin:0"><span class="chip proposed">proposed</span> floated, never
-        agreed.</p>
-      </div>
-    </div>
-  </div>
-</main>
+<div id="compose"></div>
 
 <script>
   const $ = id => document.getElementById(id);
-  let callSeq = 0, sig = null, threadsLoaded = false;
   const esc = s => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
   const ms = n => n >= 1000 ? (n/1000).toFixed(1)+"s" : n+"ms";
+  let callSeq = 0, open = null, sig = null, drafted = false;
+
+  const HUES = [210, 145, 25, 280, 340, 190];
+  const hue = s => HUES[[...(s||"x")].reduce((a,c)=>a+c.charCodeAt(0),0) % HUES.length];
+  const initials = s => (s||"?").split(/[\s<]/)[0].slice(0,1).toUpperCase()
+    + ((s||"").split(/\s+/)[1]||"").slice(0,1).toUpperCase();
 
   async function poll(){
-    try{
-      const s = await (await fetch(`/api/state?since=${callSeq}`)).json();
-      render(s);
-    }catch(e){ $("conn-label").textContent = "console unreachable"; }
+    try{ render(await (await fetch(`/api/state?since=${callSeq}`)).json()); }
+    catch(e){ $("conn-label").textContent = "console unreachable"; }
   }
 
   function render(s){
@@ -210,133 +194,162 @@
     $("conn-label").textContent = (c.live ? "LIVE · " : "local · ") + c.label;
     $("key").textContent = "key " + c.key;
     $("ops").textContent = `${c.operations} operation${c.operations===1?"":"s"}`;
+    $("nav-count").textContent = s.inbox.length;
+    $("nav-drafts").textContent = drafted ? "1" : "";
 
-    if(!threadsLoaded && s.threads.length){
-      $("pick").innerHTML = s.threads.map(t=>`<option>${esc(t)}</option>`).join("");
-      threadsLoaded = true;
-    }
-    if(!$("fmt").children.length)
-      $("fmt").innerHTML = s.formats.map(f=>`<option>${f}</option>`).join("");
-
-    $("error").hidden = !s.error;
-    if(s.error) $("error").textContent = s.error;
-
-    const busy = !!s.busy;
-    $("extract").disabled = busy || !s.thread;
-    $("write").disabled = busy || !s.commitments.length && !s.thread;
-    $("extract").textContent = busy && s.busy.includes("commitments") ? "Working…" : "Find commitments";
-    $("write").textContent = busy && s.busy.includes("letter") ? "Working…" : "Write it";
-    $("extract-hint").textContent = s.thread
-      ? (c.live ? "one operation against your account" : "one operation")
-      : "open a thread first";
-
-    // thread
-    if(s.thread){
-      $("subject").textContent = s.thread.subject;
-      $("msgs-card").hidden = false;
-      $("msg-count").textContent = `${s.thread.messages.length} messages`;
-      $("msgs").innerHTML = s.thread.messages.map(m=>`
-        <div class="msg" onclick="this.classList.toggle('open')">
-          <div><span class="who">${esc(m.sender)}</span>
-            <span class="when"> · ${esc((m.date||"").slice(0,22))}</span></div>
-          <div class="txt">${esc(m.body)}</div>
-        </div>`).join("");
-      $("findings").hidden = !s.thread.findings.length;
-      if(s.thread.findings.length)
-        $("findings").innerHTML = "<b>This thread contains text addressed to an automated "
-          + "reader.</b> It is reported, never followed — but check who sent it before "
-          + "ticking anything from that message.<br>"
-          + s.thread.findings.map(f=>`<span class="muted">${esc(f.where)}: ${esc(f.excerpt)}</span>`).join("<br>");
-    }
-
-    // commitments
-    $("c-count").textContent = s.commitments.length ? `${s.commitments.length} candidates` : "";
-    const nextSig = JSON.stringify(s.commitments.map(c=>[c.quote,c.chosen]));
-    if(nextSig !== sig){
-      sig = nextSig;
-      $("commitments").innerHTML = s.commitments.length ? s.commitments.map((c,i)=>`
-        <div class="c ${c.chosen?"on":""} ${c.quote_found?"":"bad"}">
-          <input type="checkbox" ${c.chosen?"checked":""}
-                 onchange="toggle(${i}, this.checked)">
-          <div>
-            <span class="chip ${esc(c.status)}">${esc(c.status)}</span>
-            ${c.quote_found?"":'<span class="chip unverified">not in the thread</span>'}
-            <div class="obl">${esc(c.party)} — ${esc(c.obligation)}</div>
-            <div class="muted">${c.due?"due "+esc(c.due):"no date given"}
-              · owed to ${esc(c.owes_to||"—")}
-              ${c.located_in?`· message ${c.located_in}`:""}</div>
-            <div class="quote">“<b>${esc(c.quote)}</b>”</div>
-            ${c.quote_note?`<div class="muted" style="color:var(--bad);margin-top:5px">${esc(c.quote_note)}</div>`:""}
-          </div>
-        </div>`).join("") : '<p class="empty">Press “Find commitments”.</p>';
-      window.__quotes = s.commitments.map(c=>c.quote);
-    }
-
-    if(s.counts && s.counts.usable !== undefined){
-      $("counts").hidden = false;
-      $("counts").innerHTML = [
-        ["going in the letter", s.counts.usable], ["superseded", s.counts.superseded],
-        ["hedged", s.counts.hedged], ["second-hand", s.counts["second-hand"]],
-        ["could not be quoted", s.counts.unverified],
-      ].map(([k,v])=>`<div><b>${v||0}</b><span class="muted">${k}</span></div>`).join("");
-    }
-
-    $("dangling").hidden = !s.dangling.length;
-    if(s.dangling.length)
-      $("dangling").innerHTML = "<b>A commitment was replaced but the replacement is "
-        + "missing.</b> The letter would omit the obligation that actually stands.<br>"
-        + s.dangling.map(d=>`<span class="muted">${esc(d.party)}: ${esc(d.obligation)} (${esc(d.due||"no date")})</span>`).join("<br>");
-
-    // letter
-    const chosen = s.commitments.filter(c=>c.chosen).length;
-    $("l-hint").textContent = s.commitments.length
-      ? `${chosen} commitment${chosen===1?"":"s"} selected` : "";
-    const hasLetter = !!s.letter_html;
-    $("dl").disabled = !hasLetter; $("dl-reply").disabled = !hasLetter;
-    if(hasLetter) $("letter").innerHTML = `<div class="letter">${s.letter_html}</div>`;
-
+    if(!s.thread) renderInbox(s); else renderThread(s);
+    renderAddon(s);
     renderFeed(s);
+    renderCompose(s);
+  }
+
+  function renderInbox(s){
+    open = null;
+    $("mail").innerHTML = s.inbox.map(t => `
+      <div class="row" onclick="openThread('${esc(t.name)}')">
+        <span class="star">☆</span>
+        <span class="from">${esc(t.senders.slice(0,2).join(", "))}
+          <span class="n">${t.count>1?" "+t.count:""}</span></span>
+        <span class="sub">${esc(t.subject)}
+          ${t.hostile?'<span class="flag">⚠</span>':""}
+          <span>— ${esc(t.snippet)}</span></span>
+        <span class="when">${esc(t.date.slice(4,11))}</span>
+      </div>`).join("");
+  }
+
+  function renderThread(s){
+    const t = s.thread;
+    if(open === t.name) return;
+    open = t.name;
+    $("mail").innerHTML = `<div class="thread">
+      <button class="ghost small" onclick="back()">← Inbox</button>
+      <h1 style="margin-top:14px">${esc(t.subject)}</h1>
+      ${t.messages.map((m,i) => `
+        <div class="m ${i < t.messages.length-2 ? "fold" : ""}"
+             onclick="this.classList.toggle('fold')">
+          <div class="av" style="background:hsl(${hue(m.sender)} 52% 45%)">${esc(initials(m.sender))}</div>
+          <div>
+            <div class="who">${esc(m.sender)}</div>
+            <div class="meta">${esc((m.date||"").slice(0,22))}</div>
+            <div class="txt">${esc(m.body)}</div>
+          </div>
+        </div>`).join("")}
+    </div>`;
+  }
+
+  function renderAddon(s){
+    if(!s.thread){
+      $("addon").innerHTML = '<p class="lede">Open a message. This panel is where the '
+        + 'add-on lives in Gmail.</p>';
+      $("badge").textContent = "add-on"; sig = null; return;
+    }
+    const busy = !!s.busy;
+    let html = "";
+    if(s.error) html += `<div class="note err">${esc(s.error)}</div>`;
+    if(s.thread.findings.length)
+      html += `<div class="note warn"><b>This thread contains text aimed at an automated
+        reader.</b> Reported, never followed — check who sent it before ticking anything
+        from that message.</div>`;
+
+    if(!s.commitments.length){
+      html += `<p class="lede">Pull out what people actually committed to in this thread —
+        not a polite summary. You review each one before anything is written.</p>
+        <button id="go" ${busy?"disabled":""}>${busy?"Reading…":"Find commitments"}</button>
+        <p class="sm" style="margin:9px 0 0">${c_live(s)}</p>`;
+      $("addon").innerHTML = html;
+      if($("go")) $("go").onclick = () => post("/api/extract");
+      sig = null;
+      return;
+    }
+
+    $("badge").textContent = `${s.commitments.length} found`;
+    const k = s.counts || {};
+    html += `<div class="counts">
+      <div><b>${k.usable||0}</b>going in</div>
+      <div><b>${k.superseded||0}</b>superseded</div>
+      <div><b>${k.hedged||0}</b>hedged</div>
+      <div><b>${k["second-hand"]||0}</b>second-hand</div>
+      <div><b>${k.unverified||0}</b>unquotable</div></div>`;
+    if(s.dangling.length)
+      html += `<div class="note warn"><b>A commitment was replaced and the replacement is
+        missing.</b> The letter would omit the obligation that actually stands.</div>`;
+
+    html += s.commitments.map((c,i) => `
+      <label class="c ${c.chosen?"on":""} ${c.quote_found?"":"bad"}">
+        <input type="checkbox" ${c.chosen?"checked":""} onchange="toggle(${i},this.checked)">
+        <div>
+          <span class="chip ${esc(c.status)}">${esc(c.status)}</span>
+          ${c.quote_found?"":'<span class="chip unv">not in thread</span>'}
+          <div class="obl">${esc(c.party)} — ${esc(c.obligation)}</div>
+          <div class="sm">${c.due?"due "+esc(c.due):"no date"}${c.located_in?" · message "+c.located_in:""}</div>
+          <div class="q">“${esc(c.quote)}”</div>
+        </div>
+      </label>`).join("");
+
+    const n = s.commitments.filter(x=>x.chosen).length;
+    html += `<button id="write" ${busy?"disabled":""} style="margin-top:4px">
+      ${busy?"Writing…":`Write letter &amp; attach to reply`}</button>
+      <p class="sm" style="margin:9px 0 0">${n} selected · ${c_live(s)}</p>`;
+    const next = JSON.stringify([s.commitments.map(c=>[c.quote,c.chosen]), busy, s.error]);
+    if(next !== sig){ sig = next; $("addon").innerHTML = html; }
+    if($("write")) $("write").onclick = () => post("/api/letter",{shape:"letter"});
+  }
+
+  const c_live = s => s.connection.live
+    ? "one operation against your account" : "one operation";
+
+  function renderCompose(s){
+    if(!s.draft){ $("compose").innerHTML = ""; return; }
+    drafted = true;
+    $("compose").innerHTML = `<div class="compose">
+      <header>New message <span style="margin-left:auto;color:var(--dim);font-weight:400">— ✕</span></header>
+      <div class="f">To <b>${esc(s.draft.to)}</b></div>
+      <div class="f">Subject <b>${esc(s.draft.subject)}</b></div>
+      <div class="b">${esc(s.draft.body)}</div>
+      <div class="att"><span class="x">DOCX</span>
+        <span>${esc(s.draft.attachment)}</span>
+        <a class="sm" style="margin-left:auto;color:var(--accent)"
+           href="/api/export?fmt=docx">Download</a></div>
+      <div class="actions">
+        <button disabled title="This demo never sends mail">Send</button>
+        <a class="sm" style="color:var(--accent)" href="/api/reply?fmt=docx">Save .eml</a>
+        <span class="sm" style="margin-left:auto">nothing is ever sent</span>
+      </div></div>`;
   }
 
   function renderFeed(s){
     if(s.calls && s.calls.length){
-      const feed = $("feed");
-      const ph = feed.querySelector(".empty"); if(ph) ph.remove();
-      feed.insertAdjacentHTML("afterbegin", s.calls.slice().reverse().map(c=>`
-        <div class="call">
-          <span class="m">${esc(c.method)}</span>
-          <span class="p" title="${esc(c.path)}">${esc(c.path)}</span>
-          <span class="s ${(c.status||0)>=400?"err":""}">${c.status??"—"}</span>
-          <span class="d">${ms(c.ms)}</span>
-          ${c.note?`<span class="note">${c.billable?"<b>billable</b> · ":""}${esc(c.note)}</span>`:""}
+      const f = $("feed");
+      const ph = f.querySelector(".empty"); if(ph) ph.parentElement.remove();
+      f.insertAdjacentHTML("afterbegin", s.calls.slice().reverse().map(c=>`
+        <div class="call"><span class="mm">${esc(c.method)}</span>
+          <span class="pp" title="${esc(c.path)}">${esc(c.path)}</span>
+          <span class="ss ${(c.status||0)>=400?"e":""}">${c.status??"—"}</span>
+          <span class="dd">${ms(c.ms)}</span>
+          ${c.note?`<span class="nn">${c.billable?"<b>billable</b> · ":""}${esc(c.note)}</span>`:""}
         </div>`).join(""));
       callSeq = s.call_seq;
     }
     $("call-count").textContent = `${s.call_seq} calls`;
     if(!s.call_seq && !$("feed").children.length)
-      $("feed").innerHTML = '<div class="empty" style="padding:11px 13px">No calls yet.</div>';
+      $("feed").innerHTML = '<div style="padding:11px 15px"><span class="empty">No calls yet.</span></div>';
   }
-
-  window.toggle = async (i, on) => {
-    await fetch("/api/toggle",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({quote: window.__quotes[i], on})});
-    sig = null; poll();
-  };
 
   async function post(path, body){
     const r = await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify(body||{})});
-    if(!r.ok){ const j = await r.json(); $("error").hidden=false; $("error").textContent=j.detail; }
-    poll();
+    if(!r.ok){ const j = await r.json(); alert(j.detail); }
+    sig = null; poll();
   }
-
-  $("open").onclick = () => { sig=null; post("/api/open",{name:$("pick").value}); };
-  $("open-paste").onclick = () => { sig=null; post("/api/open",{pasted:$("paste").value}); };
-  $("extract").onclick = () => post("/api/extract");
-  $("write").onclick = () => post("/api/letter",{shape:$("shape").value});
-  $("dl").onclick = () => window.location = `/api/export?fmt=${$("fmt").value}`;
-  $("dl-reply").onclick = () =>
-    window.location = `/api/reply?fmt=${$("fmt").value}&sender=${encodeURIComponent($("sender").value)}`;
+  window.openThread = name => { drafted=false; sig=null; post("/api/open",{name}); };
+  window.back = () => { open=null; sig=null; drafted=false;
+    fetch("/api/close",{method:"POST"}).then(poll); };
+  window.toggle = async (i,on) => {
+    const s = await (await fetch("/api/state")).json();
+    await fetch("/api/toggle",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({quote:s.commitments[i].quote,on})});
+    sig=null; poll();
+  };
 
   poll(); setInterval(poll, 900);
 </script>

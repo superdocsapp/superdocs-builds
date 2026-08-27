@@ -1,0 +1,32 @@
+From ravi.menon@northwind.example Wed Mar 11 07:20:00 2026
+From: Ravi Menon <ravi.menon@northwind.example>
+To: Marcus Vance <marcus.vance@caldervance.example>
+Subject: Tuesday outage - actions
+Date: Wed, 11 Mar 2026 07:20:00 +0000
+Message-ID: <o1@northwind.example>
+
+Marcus,
+
+Writing up yesterday. Four hours of degraded search, root cause was the index
+rebuild running against production.
+
+Can we agree the actions so I can close the review?
+
+Ravi
+
+From marcus.vance@caldervance.example Wed Mar 11 09:45:00 2026
+From: Marcus Vance <marcus.vance@caldervance.example>
+To: Ravi Menon <ravi.menon@northwind.example>
+Subject: Re: Tuesday outage - actions
+Date: Wed, 11 Mar 2026 09:45:00 +0000
+Message-ID: <o2@caldervance.example>
+In-Reply-To: <o1@northwind.example>
+
+Calder and Vance will move the index rebuild to the staging cluster by
+17 March 2026.
+
+We might also add a guard rail on the job scheduler, I'll see what the team
+thinks. And someone said the alerting was slow but I'd want to check that
+before committing to anything.
+
+Marcus

@@ -90,6 +90,32 @@ class ConsoleService:
         return sorted(p.name for p in self.threads_dir.iterdir()
                       if p.suffix.lower() in (".mbox", ".eml", ".txt"))
 
+    def inbox(self) -> list[dict[str, Any]]:
+        """One row per thread, as a mail client would list them. Local and free."""
+        rows: list[dict[str, Any]] = []
+        for name in self.available_threads():
+            try:
+                thread = load(self.threads_dir / name)
+            except (OSError, ValueError):
+                continue
+            if not thread.messages:
+                continue
+            last = thread.messages[-1]
+            senders: list[str] = []
+            for m in thread.messages:
+                if m.sender not in senders:
+                    senders.append(m.sender)
+            rows.append({
+                "name": name,
+                "subject": thread.subject,
+                "senders": senders,
+                "count": len(thread.messages),
+                "date": (last.date or "")[:16],
+                "snippet": " ".join(last.body.split())[:110],
+                "hostile": bool(scan_thread(thread)),
+            })
+        return rows
+
     def open_thread(self, name: str = "", pasted: str = "") -> None:
         thread = (
             parse_plain(pasted, source="pasted") if pasted.strip()
@@ -177,6 +203,24 @@ class ConsoleService:
 
     # --- reads -------------------------------------------------------------
 
+    def _draft_preview(self) -> dict[str, Any] | None:
+        """What the reply draft will say, rendered before anything is downloaded."""
+        state = self.state
+        if state.thread is None or not state.letter_html:
+            return None
+        confirmed = [c for c in state.commitments if c.quote in state.chosen]
+        last = state.thread.messages[-1]
+        stem = draft_mod._slug(state.thread.subject)
+        subject = last.subject or state.thread.subject
+        if not subject.lower().startswith("re:"):
+            subject = f"Re: {subject}"
+        return {
+            "to": f"{last.sender} <{last.sender_email}>" if last.sender_email else last.to,
+            "subject": subject,
+            "body": draft_mod._body(state.thread, confirmed, f"{stem}.docx"),
+            "attachment": f"{stem}.docx",
+        }
+
     def snapshot(self, since: int = 0) -> dict[str, Any]:
         state = self.state
         with self._lock:
@@ -193,7 +237,7 @@ class ConsoleService:
                 "key": self.settings.redacted(),
                 "operations": billable,
             },
-            "threads": self.available_threads(),
+            "inbox": self.inbox(),
             "thread": None if thread is None else {
                 "name": state.thread_name,
                 "subject": thread.subject,
@@ -218,6 +262,7 @@ class ConsoleService:
                 for c in dangling_superseded(state.commitments)
             ],
             "letter_html": state.letter_html,
+            "draft": self._draft_preview(),
             "busy": state.busy,
             "error": state.error,
             "calls": calls,
@@ -262,6 +307,12 @@ def create_app(threads_dir: str = "threads") -> FastAPI:
             raise HTTPException(409, detail="already working")
         _run(service.write_letter, payload.get("shape", "letter"))
         return {"started": True}
+
+    @app.post("/api/close")
+    def close() -> dict[str, Any]:
+        """Back to the inbox. Keeps the call log; clears the open thread."""
+        service.state = State()
+        return {"ok": True}
 
     @app.post("/api/toggle")
     def toggle(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
