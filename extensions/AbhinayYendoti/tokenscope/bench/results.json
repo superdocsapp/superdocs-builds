@@ -1,0 +1,123 @@
+{
+  "generatedAt": "2026-08-27T09:42:46Z",
+  "modelTier": "core",
+  "wordsPerPage": 500,
+  "instruction": "Make this more concise.",
+  "rows": [
+    {
+      "pages": 3,
+      "words": 1665,
+      "documentTextTokens": 1882,
+      "selectionTextTokens": 85,
+      "surgical": {
+        "reportedTokens": 90711,
+        "writtenTokens": 26,
+        "sectionsChanged": 1,
+        "elapsedMs": 13350,
+        "jobId": "e3a58e45-1a71-4147-b2a9-8ab2322d60db",
+        "changesInScope": 1,
+        "changesOutOfScope": 0
+      },
+      "wholeDocument": {
+        "reportedTokens": 138184,
+        "writtenTokens": 1124,
+        "sectionsChanged": 20,
+        "elapsedMs": 18283,
+        "jobId": "e3919136-274b-4288-85dc-277122bc37b6"
+      },
+      "estimatedWholeDocument": 94305,
+      "measuredAt": "2026-08-27T08:06:32Z"
+    },
+    {
+      "pages": 10,
+      "words": 5097,
+      "documentTextTokens": 5756,
+      "selectionTextTokens": 85,
+      "surgical": {
+        "reportedTokens": 94201,
+        "writtenTokens": 18,
+        "sectionsChanged": 1,
+        "elapsedMs": 10952,
+        "jobId": "f79b7ae8-0d3b-4a4a-aa53-17d21f0e7ffd",
+        "changesInScope": 1,
+        "changesOutOfScope": 0
+      },
+      "wholeDocument": {
+        "reportedTokens": 261585,
+        "writtenTokens": 4589,
+        "sectionsChanged": 61,
+        "elapsedMs": 24580,
+        "jobId": "3b05403f-89e2-415a-9fb6-9bcc765e0235"
+      },
+      "estimatedWholeDocument": 105543,
+      "measuredAt": "2026-08-27T08:07:03Z"
+    },
+    {
+      "pages": 50,
+      "words": 25155,
+      "documentTextTokens": 28218,
+      "selectionTextTokens": 85,
+      "surgical": {
+        "reportedTokens": 345779,
+        "writtenTokens": 37,
+        "sectionsChanged": 1,
+        "elapsedMs": 55448,
+        "jobId": "8c27e15e-7ee3-4b01-8d36-71cb5e026707",
+        "changesInScope": 1,
+        "changesOutOfScope": 0
+      },
+      "wholeDocument": {
+        "reportedTokens": 1090563,
+        "writtenTokens": 19822,
+        "sectionsChanged": 300,
+        "elapsedMs": 181906,
+        "jobId": "36295bfa-5495-4ad4-aacd-647b6d4df7de"
+      },
+      "estimatedWholeDocument": 402045,
+      "measuredAt": "2026-08-27T08:07:39Z"
+    },
+    {
+      "pages": 100,
+      "words": 50114,
+      "documentTextTokens": 56155,
+      "selectionTextTokens": 85,
+      "surgical": {
+        "reportedTokens": 269278,
+        "writtenTokens": 32,
+        "sectionsChanged": 1,
+        "elapsedMs": 111472,
+        "jobId": "ae0b0028-1ee1-4b47-a044-b51b1b8e7dac",
+        "changesInScope": 1,
+        "changesOutOfScope": 0
+      },
+      "wholeDocument": {
+        "reportedTokens": 1911742,
+        "writtenTokens": 43344,
+        "sectionsChanged": 599,
+        "elapsedMs": 128675,
+        "jobId": "7ceb2785-e7ac-41e8-a8fa-364577141d97"
+      },
+      "estimatedWholeDocument": 381418,
+      "measuredAt": "2026-08-27T08:11:36Z"
+    },
+    {
+      "pages": 300,
+      "words": 150153,
+      "documentTextTokens": 168219,
+      "selectionTextTokens": 85,
+      "surgical": {
+        "reportedTokens": 464621,
+        "writtenTokens": 30,
+        "sectionsChanged": 1,
+        "elapsedMs": 340279,
+        "jobId": "6cc0c0d2-1a59-4333-a8f4-c1fe0d4ccb7b",
+        "changesInScope": 1,
+        "changesOutOfScope": 0
+      },
+      "wholeDocument": null,
+      "estimatedWholeDocument": 800889,
+      "measuredAt": "2026-08-27T08:45:18Z",
+      "wholeDocumentError": "SuperDocs job failed."
+    }
+  ]
+}
