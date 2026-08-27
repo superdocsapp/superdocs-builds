@@ -1,0 +1,31 @@
+{
+  "version": "1.5.0",
+  "date": "2026-08-27",
+  "title": "Performance improvements and new CLI flags",
+  "sections": {
+    "Added": [
+      "New --dry-run flag for safe previews",
+      "Support for custom house-style templates",
+      "Automatic contributor detection from git"
+    ],
+    "Changed": [
+      "Faster surgical inserts (30% speed improvement)",
+      "Default export now includes both Markdown and PDF"
+    ],
+    "Fixed": [
+      "Incorrect ordering when releases share the same date",
+      "Missing blank line after the last section"
+    ],
+    "Breaking": [
+      "Removed support for the old v0 style format"
+    ],
+    "Removed": [
+      "Deprecated --legacy-export flag"
+    ]
+  },
+  "contributors": ["@alice", "@bob", "@carol"],
+  "links": {
+    "compare": "https://github.com/org/repo/compare/v1.4.0...v1.5.0",
+    "release": "https://github.com/org/repo/releases/tag/v1.5.0"
+  }
+}

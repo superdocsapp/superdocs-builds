@@ -1,0 +1,25 @@
+{
+  "version": "1.4.0",
+  "date": "2026-08-27",
+  "title": "Better caching and Windows support",
+  "sections": {
+    "Added": [
+      "Native Windows binary",
+      "Optional Redis cache backend"
+    ],
+    "Changed": [
+      "Default timeout increased to 30s"
+    ],
+    "Fixed": [
+      "Crash when config file is missing",
+      "Incorrect version shown in --help"
+    ],
+    "Breaking": [],
+    "Removed": []
+  },
+  "contributors": ["@alice", "@bob"],
+  "links": {
+    "compare": "https://github.com/org/repo/compare/v1.3.0...v1.4.0",
+    "release": "https://github.com/org/repo/releases/tag/v1.4.0"
+  }
+}

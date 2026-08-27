@@ -1,0 +1,661 @@
+{
+  "blk-appliances-standard": {
+    "content": {
+      "intro": {
+        "$i18n": {
+          "en": "Everything here works the way you'd hope. Short guides for the few things that like being asked nicely.",
+          "es": "Todo funciona como esperas. Guías breves para las pocas cosas que piden un poco de mimo.",
+          "fr": "Tout fonctionne simplement. Petits guides pour les quelques appareils qui méritent qu'on les chérisse."
+        }
+      },
+      "items": [
+        {
+          "name": {
+            "$i18n": {
+              "en": "Espresso machine",
+              "es": "Cafetera espresso",
+              "fr": "Machine à espresso"
+            }
+          },
+          "steps": [
+            {
+              "$i18n": {
+                "en": "Fill the tank at the back with fresh water.",
+                "es": "Llene el depósito trasero con agua fresca.",
+                "fr": "Remplissez le réservoir arrière d'eau fraîche."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Drop a capsule in the top slot, lever down.",
+                "es": "Inserte una cápsula arriba y baje la palanca.",
+                "fr": "Insérez une capsule dessus et abaissez le levier."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Press the small cup button; ready in 25 seconds.",
+                "es": "Pulse el botón de taza pequeña; lista en 25 segundos.",
+                "fr": "Appuyez sur le petit bouton tasse ; prête en 25 secondes."
+              }
+            }
+          ]
+        },
+        {
+          "name": {
+            "$i18n": {
+              "en": "Dishwasher",
+              "es": "Lavavajillas",
+              "fr": "Lave-vaisselle"
+            }
+          },
+          "steps": [
+            {
+              "$i18n": {
+                "en": "Twist the salt cap under the sink once a month.",
+                "es": "Rellene la sal bajo el fregadero una vez al mes.",
+                "fr": "Vérifiez le sel sous l'évier une fois par mois."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Tablets go in the little door inside.",
+                "es": "La pastilla va en la compuerta interior.",
+                "fr": "La pastille se place dans le compartiment intérieur."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Choose Eco, press Start, close the door twice.",
+                "es": "Elija Eco, pulse Inicio y cierre la puerta dos veces.",
+                "fr": "Choisissez Eco, appuyez sur Start, fermez la porte deux fois."
+              }
+            }
+          ]
+        },
+        {
+          "name": {
+            "$i18n": {
+              "en": "Washing machine",
+              "es": "Lavadora",
+              "fr": "Lave-linge"
+            }
+          },
+          "steps": [
+            {
+              "$i18n": {
+                "en": "Detergent drawer: left = wash, middle = softener.",
+                "es": "Cajetín: izquierda = detergente, centro = suavizante.",
+                "fr": "Tiroir : gauche = lessive, centre = adoucissant."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Pick 40° Cottons for everyday loads.",
+                "es": "Para el día a día, elija Algodones 40°.",
+                "fr": "Pour l'usage courant : Coton 40°."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Drying rack is on the terrace.",
+                "es": "El tendedero está en la terraza.",
+                "fr": "L'étendoir est sur la terrasse."
+              }
+            }
+          ]
+        },
+        {
+          "name": {
+            "$i18n": {
+              "en": "Induction hob",
+              "es": "Placa de inducción",
+              "fr": "Plaque à induction"
+            }
+          },
+          "steps": [
+            {
+              "$i18n": {
+                "en": "Touch the power key, then a zone within 5 seconds.",
+                "es": "Toque la tecla de encendido y luego una zona en 5 segundos.",
+                "fr": "Touchez la touche marche puis une zone sous 5 secondes."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Only pans that attract a magnet will heat.",
+                "es": "Solo calientan los recipientes que atraigan un imán.",
+                "fr": "Seuls les ustensiles attirés par un aimant chauffent."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Hold power to lock when little chefs are around.",
+                "es": "Mantenga pulsado el botón para bloquear si hay niños.",
+                "fr": "Maintenez la touche pour verrouiller en présence d'enfants."
+              }
+            }
+          ]
+        },
+        {
+          "name": {
+            "$i18n": {
+              "en": "Air conditioning",
+              "es": "Aire acondicionado",
+              "fr": "Climatisation"
+            }
+          },
+          "steps": [
+            {
+              "$i18n": {
+                "en": "Remote ON, then pick Snowflake for cooling.",
+                "es": "ON en el mando y elija el copo de nieve para frío.",
+                "fr": "ON sur la télécommande, puis choisissez le flocon."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "24°C keeps rooms cool without freezing anyone.",
+                "es": "24 °C refresca sin helar a nadie.",
+                "fr": "24 °C rafraîchit sans glacer personne."
+              }
+            },
+            {
+              "$i18n": {
+                "en": "Please switch it off when you head to the beach.",
+                "es": "Apáguelo cuando salga a la playa. Gracias.",
+                "fr": "Éteignez-le en partant à la plage. Merci."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Numbered how-tos for the standard amenity set.",
+    "id": "blk-appliances-standard",
+    "kind": "appliances",
+    "name": "Appliance Basics",
+    "updated_at": "2026-08-26T13:13:03Z",
+    "version": 1
+  },
+  "blk-arrival-standard": {
+    "content": {
+      "checkin_time": "16:00",
+      "checkout_time": "11:00",
+      "greeting": {
+        "$i18n": {
+          "de": "Willkommen! Wir freuen uns sehr, dass Sie da sind.",
+          "en": "Welcome! We are thrilled you are here.",
+          "es": "¡Bienvenido! Estamos encantados de tenerte aquí.",
+          "fr": "Bienvenue ! Nous sommes ravis de vous recevoir.",
+          "it": "Benvenuto! Siamo felici di averti qui.",
+          "nl": "Welkom! Wat leuk dat u er bent.",
+          "pt": "Bem-vindo! Estamos muito contentes por ter consigo."
+        }
+      },
+      "key_location": {
+        "$i18n": {
+          "en": "Your key is in the brass lock box by the entrance. The code is set per stay — see your check-in message.",
+          "es": "La llave está en la caja fuerte dorada junto a la entrada. El código cambia con cada reserva — mira tu mensaje de check-in.",
+          "fr": "La clé se trouve dans la boîte à clés laiton près de l'entrée. Le code change à chaque séjour — voir votre message d'arrivée."
+        }
+      },
+      "parking": {
+        "$i18n": {
+          "en": "Free parking inside the gated driveway; additional visitor parking available on the lane.",
+          "es": "Aparcamiento gratuito en la entrada cerrada; aparcamiento adicional para visitantes disponible en la calle.",
+          "fr": "Stationnement gratuit dans l'allée fermée ; stationnement supplémentaire pour les visiteurs dans la rue."
+        }
+      },
+      "steps": [
+        {
+          "$i18n": {
+            "en": "Walk through the carved wooden gate into the central courtyard.",
+            "es": "Cruce la puerta de madera tallada hacia el patio central.",
+            "fr": "Passez la porte en bois sculpté menant à la cour centrale."
+          }
+        },
+        {
+          "$i18n": {
+            "en": "Take the key from the brass lock box and keep it with you.",
+            "es": "Tome la llave de la caja de latón y llévela consigo.",
+            "fr": "Prenez la clé dans la boîte en laiton et gardez-la avec vous."
+          }
+        },
+        {
+          "$i18n": {
+            "en": "Head to the main suite on the first floor.",
+            "es": "Diríjase a la suite principal en el primer piso.",
+            "fr": "Rendez-vous à la suite principale au premier étage."
+          }
+        },
+        {
+          "$i18n": {
+            "en": "Make yourself a fresh masala chai or coffee; the machine is ready.",
+            "es": "Prepárese un té chai o café recién hecho; la máquina está lista.",
+            "fr": "Préparez-vous un thé chai ou un café frais ; la machine est prête."
+          }
+        }
+      ]
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Warm welcome, generic access steps (codes live on each property).",
+    "id": "blk-arrival-standard",
+    "kind": "arrival",
+    "name": "Standard Arrival",
+    "updated_at": "2026-08-26T13:13:03Z",
+    "version": 1
+  },
+  "blk-brand-haveli-stays": {
+    "content": {
+      "accent": "#C2703D",
+      "ink": "#232A31",
+      "logo_path": "assets/art/operator-logo.jpg",
+      "logo_url": "https://storage.googleapis.com/superdocs-document-images/img/0e942b1f9d464b0e9004c8888cc45eb9.jpeg",
+      "muted": "#68717A",
+      "operator_name": "Haveli Stays · Rajasthan",
+      "primary": "#0F766E",
+      "sand": "#F7F2EA"
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Operator brand kit used by every manual.",
+    "id": "blk-brand-haveli-stays",
+    "kind": "brand",
+    "name": "Haveli Stays Brand",
+    "updated_at": "2026-08-27T03:42:30Z",
+    "version": 3
+  },
+  "blk-emergency-jaipur": {
+    "content": {
+      "contacts": [
+        {
+          "label": {
+            "$i18n": {
+              "en": "Police (control room)",
+              "es": "Policía",
+              "fr": "Police"
+            }
+          },
+          "value": "100"
+        },
+        {
+          "label": {
+            "$i18n": {
+              "en": "Fire brigade",
+              "es": "Bomberos",
+              "fr": "Pompiers"
+            }
+          },
+          "value": "101"
+        },
+        {
+          "label": {
+            "$i18n": {
+              "en": "Ambulance / Medical",
+              "es": "Ambulancia",
+              "fr": "Ambulance"
+            }
+          },
+          "value": "108"
+        },
+        {
+          "label": {
+            "$i18n": {
+              "en": "Out-of-hours host assistance",
+              "es": "Asistencia al huésped 24 h",
+              "fr": "Assistance hôte 24h"
+            }
+          },
+          "value": "+91 98765 43210"
+        }
+      ],
+      "number": "112",
+      "shutoffs": {
+        "electrics": {
+          "$i18n": {
+            "en": "Main breaker panel behind the foyer door; trip the main black switch.",
+            "es": "Cuadro eléctrico tras la puerta de entrada; baje el interruptor principal negro.",
+            "fr": "Tableau électrique principal derrière la porte d'entrée ; abaissez le disjoncteur noir."
+          }
+        },
+        "gas": {
+          "$i18n": {
+            "en": "Turn the knob on the LPG cylinder in the kitchen cabinet fully clockwise.",
+            "es": "Gire el regulador de la bombona de gas en el mueble de la cocina a la derecha.",
+            "fr": "Tournez le détendeur de la bouteille de gaz dans le placard de cuisine à fond à droite."
+          }
+        },
+        "water": {
+          "$i18n": {
+            "en": "Main valve in the courtyard utility shaft; rotate blue lever 90 degrees.",
+            "es": "Válvula principal en la trampilla del patio; gire la palanca azul 90 grados.",
+            "fr": "Vanne principale dans le regard de la cour ; tournez le levier bleu à 90 degrés."
+          }
+        }
+      }
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Regional emergency contacts + shut-off guidance.",
+    "id": "blk-emergency-jaipur",
+    "kind": "emergency",
+    "name": "Emergency — Jaipur",
+    "updated_at": "2026-08-26T13:13:03Z",
+    "version": 1
+  },
+  "blk-recs-jaipur-centre": {
+    "content": {
+      "categories": [
+        {
+          "icon": "",
+          "name": {
+            "$i18n": {
+              "en": "Eat & drink",
+              "es": "Comer y beber",
+              "fr": "Table & boissons"
+            }
+          },
+          "places": [
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Legendary Johari Bazaar eatery; must-try pyaaz kachori and ghewar.",
+                  "es": "Emblemático local de Johari Bazaar; pruebe el pyaaz kachori y el ghewar.",
+                  "fr": "Restaurant légendaire du Johari Bazaar ; goûtez au pyaaz kachori et au ghewar."
+                }
+              },
+              "name": "Laxmi Mishthan Bhandar (LMB)",
+              "walk": "12 min drive"
+            },
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Contemporary fine dining inside City Palace with stunning courtyards.",
+                  "es": "Alta cocina contemporánea dentro del City Palace en un hermoso patio.",
+                  "fr": "Cuisine raffinée au sein du City Palace dans une superbe cour."
+                }
+              },
+              "name": "Baradari Restaurant",
+              "walk": "15 min drive"
+            },
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Renowned North Indian and Mughlai grills on MI Road.",
+                  "es": "Famosas parrilladas del norte de la India y mogol en MI Road.",
+                  "fr": "Grillades réputées du nord de l'Inde et mogholes sur MI Road."
+                }
+              },
+              "name": "Handi Restaurant",
+              "walk": "8 min drive"
+            },
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Speciality coffee, artisan brews, and fresh breakfast.",
+                  "es": "Café de especialidad, bebidas artesanales y desayuno fresco.",
+                  "fr": "Café de spécialité, boissons artisanales et petit-déjeuner frais."
+                }
+              },
+              "name": "Curious Life Coffee Roasters",
+              "walk": "5 min drive"
+            }
+          ]
+        },
+        {
+          "icon": "",
+          "name": {
+            "$i18n": {
+              "en": "Essentials",
+              "es": "Lo básico",
+              "fr": "Essentiels"
+            }
+          },
+          "places": [
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Full grocery store open until 22:00.",
+                  "es": "Supermercado completo abierto hasta las 22:00.",
+                  "fr": "Supermarché complet ouvert jusqu'à 22h00."
+                }
+              },
+              "name": "Krishna Supermarket",
+              "walk": "4 min"
+            },
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "24-hour pharmacy with home delivery.",
+                  "es": "Farmacia abierta 24 h con servicio a domicilio.",
+                  "fr": "Pharmacie 24h/24 avec livraison à domicile."
+                }
+              },
+              "name": "Apollo Pharmacy",
+              "walk": "5 min"
+            }
+          ]
+        },
+        {
+          "icon": "",
+          "name": {
+            "$i18n": {
+              "en": "Hidden gems",
+              "es": "Rincones secretos",
+              "fr": "Trésors cachés"
+            }
+          },
+          "places": [
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Heritage textile museum inside a restored haveli.",
+                  "es": "Museo textil patrimonial dentro de una haveli restaurada.",
+                  "fr": "Musée du textile dans un haveli restauré."
+                }
+              },
+              "name": "Anokhi Museum of Hand Printing",
+              "walk": "25 min drive"
+            },
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Breathtaking panoramic sunset views over Jaipur city.",
+                  "es": "Vistas panorámicas impresionantes del atardecer sobre Jaipur.",
+                  "fr": "Vue panoramique imprenable sur le coucher de soleil à Jaipur."
+                }
+              },
+              "name": "Nahargarh Sunset Point",
+              "walk": "20 min drive"
+            }
+          ]
+        },
+        {
+          "icon": "",
+          "name": {
+            "$i18n": {
+              "en": "Getting around",
+              "es": "Transporte",
+              "fr": "Transports"
+            }
+          },
+          "places": [
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Fast air-conditioned transit across Jaipur.",
+                  "es": "Metro rápido con aire acondicionado por todo Jaipur.",
+                  "fr": "Métro rapide et climatisé à travers Jaipur."
+                }
+              },
+              "name": "Civil Lines Metro Station",
+              "walk": "6 min"
+            },
+            {
+              "desc": {
+                "$i18n": {
+                  "en": "Uber, Ola and e-rickshaws readily available 24/7.",
+                  "es": "Uber, Ola y rickshaws electrónicos disponibles 24/7.",
+                  "fr": "Uber, Ola et e-rickshaws disponibles 24h/24."
+                }
+              },
+              "name": "Auto & Cab Stand",
+              "walk": "2 min"
+            }
+          ]
+        }
+      ],
+      "note": {
+        "$i18n": {
+          "en": "All of these are a short ride or stroll away. Book dinners at heritage venues in advance — popular spots fill up fast.",
+          "es": "Todo está a poca distancia en coche o a pie. Reserve cenas en locales patrimoniales con antelación: los lugares populares se llenan rápido.",
+          "fr": "Tous ces lieux sont à une courte distance en voiture ou à pied. Réservez à l'avance dans les lieux historiques."
+        }
+      }
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Operator-curated neighbourhood guide (Jaipur Civil Lines & Pink City).",
+    "id": "blk-recs-jaipur-centre",
+    "kind": "recommendations",
+    "name": "Jaipur Pink City & Civil Lines Picks",
+    "updated_at": "2026-08-26T13:13:03Z",
+    "version": 1
+  },
+  "blk-rules-warm-firm": {
+    "content": {
+      "note": {
+        "$i18n": {
+          "en": "A handful of simple things keep this place lovely for you and the guests after you.",
+          "es": "Unas pocas cosas sencillas mantienen esta casa preciosa para usted y para los próximos huéspedes.",
+          "fr": "Quelques gestes simples gardent cette maison adorable pour vous comme pour les voyageurs suivants."
+        }
+      },
+      "rules": [
+        {
+          "detail": {
+            "$i18n": {
+              "en": "The walls are old and the neighbours are friends.",
+              "es": "Los muros son antiguos y los vecinos, amigos.",
+              "fr": "Les murs sont anciens et les voisins sont des amis."
+            }
+          },
+          "title": {
+            "$i18n": {
+              "en": "Respect the quiet hours",
+              "es": "Respete el descanso del vecindario",
+              "fr": "Respectez le calme du quartier"
+            }
+          }
+        },
+        {
+          "detail": {
+            "$i18n": {
+              "en": "The terrace ashtray is your friend.",
+              "es": "El cenicero de la terraza es su amigo.",
+              "fr": "Le cendrier de la terrasse est votre ami."
+            }
+          },
+          "title": {
+            "$i18n": {
+              "en": "No smoking indoors",
+              "es": "No fumar dentro",
+              "fr": "Ne pas fumer à l'intérieur"
+            }
+          }
+        },
+        {
+          "detail": {
+            "$i18n": {
+              "en": "Registered guests only, please.",
+              "es": "Solo los huéspedes registrados, por favor.",
+              "fr": "Uniquement les voyageurs inscrits, merci."
+            }
+          },
+          "title": {
+            "$i18n": {
+              "en": "No parties or extra visitors",
+              "es": "Sin fiestas ni visitas adicionales",
+              "fr": "Pas de fêtes ni de visiteurs supplémentaires"
+            }
+          }
+        },
+        {
+          "detail": {
+            "$i18n": {
+              "en": "Colour-coded bins are in the courtyard.",
+              "es": "Contenedores por colores en el patio.",
+              "fr": "Bacs colorés dans la cour."
+            }
+          },
+          "title": {
+            "$i18n": {
+              "en": "Sort your recycling",
+              "es": "Separe el reciclaje",
+              "fr": "Triez vos déchets"
+            }
+          }
+        },
+        {
+          "detail": {
+            "$i18n": {
+              "en": "Dishes in the machine and we handle the rest.",
+              "es": "Vajilla en el lavavajillas y nosotros nos ocupamos del resto.",
+              "fr": "La vaisselle au lave-vaisselle, on s'occupe du reste."
+            }
+          },
+          "title": {
+            "$i18n": {
+              "en": "Leave it roughly as you found it",
+              "es": "Déjela más o menos como la encontró",
+              "fr": "Rendez le lieu à peu près comme vous l'avez trouvé"
+            }
+          }
+        }
+      ]
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Friendly rules shared across the portfolio.",
+    "id": "blk-rules-warm-firm",
+    "kind": "rules",
+    "name": "House Rules — Warm but Firm",
+    "updated_at": "2026-08-26T13:13:03Z",
+    "version": 1
+  },
+  "blk-wifi-fibre": {
+    "content": {
+      "instructions": {
+        "$i18n": {
+          "de": "Unser Glasfaseranschluss erreicht jeden Raum. Verbinden Sie sich mit dem unten angezeigten Gastnetzwerk – kein Login, nur das Passwort.",
+          "en": "Our fibre line reaches every room. Join the guest network shown below — no login page, just the password.",
+          "es": "Nuestra fibra llega a todas las habitaciones. Únase a la red de invitados indicada abajo: sin página de inicio de sesión, solo la contraseña.",
+          "fr": "Notre fibre couvre toutes les pièces. Rejoignez le réseau invité indiqué ci-dessous — pas de portail, juste le mot de passe.",
+          "nl": "Ons glasvezelnetwerk bereikt elke kamer. Maak verbinding met het gastennetwerk hieronder – geen inlogpagina, alleen het wachtwoord."
+        }
+      },
+      "qr": true,
+      "tips": [
+        {
+          "$i18n": {
+            "en": "The router lives in the living-room shelf. A quick reboot fixes almost everything.",
+            "es": "El router está en la estantería del salón. Un reinicio rápido casi siempre lo soluciona.",
+            "fr": "La box se trouve sur l'étagère du salon. Un redémarrage suffit presque toujours."
+          }
+        },
+        {
+          "$i18n": {
+            "en": "Streaming, video calls and remote work are all comfortably supported.",
+            "es": "Streaming, videollamadas y teletrabajo funcionan sin problemas.",
+            "fr": "Streaming, appels vidéo et télétravail fonctionnent parfaitement."
+          }
+        }
+      ]
+    },
+    "created_at": "2026-08-26T13:13:03Z",
+    "description": "Connection instructions shared by all properties (SSID/password are property overrides).",
+    "id": "blk-wifi-fibre",
+    "kind": "wifi",
+    "name": "Fibre WiFi Guide",
+    "updated_at": "2026-08-26T13:13:03Z",
+    "version": 1
+  }
+}

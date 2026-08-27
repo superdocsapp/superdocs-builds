@@ -1,0 +1,29 @@
+{
+  "version": "1.6.0",
+  "date": "2026-08-28",
+  "title": "Multi-language support and safer previews",
+  "sections": {
+    "Added": [
+      "Full multi-language changelog generation",
+      "No-spend preview mode that never calls SuperDocs",
+      "Identity check that older releases stay byte-identical"
+    ],
+    "Changed": [
+      "House style is now enforced on every insert",
+      "Export always produces Markdown + PDF by default"
+    ],
+    "Fixed": [
+      "Duplicate compare links no longer appear",
+      "Section order is now consistent across all releases"
+    ],
+    "Breaking": [],
+    "Removed": [
+      "Old experimental --force-rebuild flag"
+    ]
+  },
+  "contributors": ["@alice", "@bob", "@dave"],
+  "links": {
+    "compare": "https://github.com/org/repo/compare/v1.5.0...v1.6.0",
+    "release": "https://github.com/org/repo/releases/tag/v1.6.0"
+  }
+}

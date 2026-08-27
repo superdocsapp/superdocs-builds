@@ -1,55 +1,152 @@
-# Task 2B: Living Changelog Maintainer
-
-## Overview
-This project demonstrates maintaining a public-facing changelog document across software releases. It leverages the SuperDocs MCP integration to implement a "living document" workflow, intelligently inserting new release updates at the correct section without blindly regenerating the entire historical document.
-
-## Why a Living Changelog is Useful
-A living changelog allows multiple contributors, AI assistants, and integration tools to continually refine a document while preserving its structure and legacy context. Blindly regenerating documents is risky, loses manual edits, and costs more tokens/time. A smart AI editor acting on a living document ensures stability.
-
-## Architecture
-- **Targeted Release Updates:** The script leverages targeted updates for incoming releases, inserting new releases right under the main document header. This ensures that historical releases (Releases 1 through N-1) are preserved **byte-identical**, minimizing drift and preserving manual edits.
-- **Offline Generator** (`changelog_generator.py`): Generates a deterministic markdown changelog from mock release data, complete with duplicate detection.
-- **Data Models** (`models.py`): Dataclasses mapping standard software release schemas (version, date, added, improved, fixed).
-- **Mock Data** (`mock_data.py`): Contains historical release chunks.
-- **Tests** (`tests/test_changelog.py`): Validates ordering, duplication protection, targeted byte-identical insertions, and stopping rules.
-- **Live Workflow**: Uses SuperDocs MCP to ingest the generated markdown, start a session, propose an update (with human-in-the-loop approval), and export the updated file.
-
-## Execution Rules & Protections
-
-### Preview / No-Spend Mode
-The script has an explicit preview mode (run with `python changelog_generator.py --preview`). In preview mode, the maintainer:
-- Uses only local/mock data.
-- Shows the proposed changelog operation diff.
-- Performs **ZERO** SuperDocs MCP operations and **ZERO** remote model calls.
-- Never uploads, chats, approves, or exports data.
-
-### Stopping Condition
-The maintainer strictly implements an explicit stopping rule: it will only process **one release per invocation** and then stop. It does not implement an infinite polling loop.
-
-### Self-Trigger Protection
-To prevent infinite loops, the exported/published changelog is strictly separated from the source changelog.
-- Source data resides in `source/changelog.md`
-- Exported artifacts reside in `export/changelog.md`
-This prevents the updated changelog from automatically becoming a new input release on the next run.
-
-### SuperDocs MCP Workflow (Live)
-When run without `--preview`, the script natively executes the SuperDocs MCP orchestration over the HTTP REST API endpoints using Python `requests`:
-1. **Upload**: Base64 encodes the `export/changelog.md` and initializes a session.
-2. **Chat**: Prompts the AI model via `chat_async` to insert the new release chunk.
-3. **Approve**: Polls the job status and issues `approve_change` to commit the AI's byte-identical insertion.
-4. **Export**: Polls for completion and runs `export_document` to fetch the DOCX/PDF download URL.
-
-## Human Approval (HITL)
-By supplying `approval_mode="ask_every_time"`, the AI does not immediately apply changes. A human operator reviews the `proposed_change_batch` block, confirming that the new version `v2.4.0` is properly categorized (Added, Improved, Fixed) and inserted before the older versions. Only upon an explicit `approve_change` call does the document version advance.
-
-## Export Workflow
-The final artifact is retrieved using `export_document`, obtaining a short-lived signed URL to download the finished document (e.g. `Product Changelog.docx`).
+# Living Changelog Maintainer
 
 
+A production-grade, pure-Python CLI and engine for maintaining a **single, living changelog document** release after release. 
 
-## Environment Variables
-- Standard SuperDocs environment variables (`SUPERDOCS_API_KEY`, etc.) as required by the MCP server running in the background.
+Built specifically for open-source maintainers and DevRel teams who want immutable release history, strict house style consistency, zero-spend previewing, and automated exports to **Markdown**, **Word (`.docx`)**, and **PDF** via [SuperDocs](https://api.superdocs.app).
 
-## Known Limitations
-- The current offline generator relies on strict version string sorting. Advanced semantic versioning libraries may be required for complex edge cases (e.g. `v2.10.0` vs `v2.2.0`).
-- The `export_document` currently defaults to DOCX; if Markdown is preferred, the `format` parameter needs to be specified when calling the tool.
+---
+
+## ⚡ Core Guarantees & Architectural Highlights
+
+1. **Byte-Identical Historical Invariance ($1 \dots N-1$)**:
+   - Updating for release $N$ guarantees that releases $1 \dots N-1$ remain **100% byte-identical**.
+   - Every historical release is verified using SHA-256 canonical hashing and live DOM/HTML anchor analysis. Prior release notes never get modified, reformatted, or drifted.
+
+2. **AI Surgical Section Inserts**:
+   - Powered by SuperDocs AI, new releases are inserted surgically at the top anchor heading without rewriting or touching surrounding document chunks.
+
+3. **Zero-Spend Preview & Safety**:
+   - `preview` and `update --dry-run` perform local rendering and canonical hash verification with **zero API calls and zero quota consumption**.
+
+4. **Strict House-Style Consistency**:
+   - Standardized Keep-a-Changelog section order: `Added` → `Changed` → `Fixed` → `Breaking` → `Deprecated` → `Removed` → `Security`.
+   - Automatic comparison link formatting (e.g. `[Compare v1.4.0...v1.5.0](...)`) with duplicate link protection.
+   - Clean italicized subtitle blockquotes (`> *Summary*`) and contributor credits.
+
+5. **Zero External Runtime Dependencies**:
+   - 100% Python standard library (`urllib`, `dataclasses`, `argparse`, `json`, `re`, `hashlib`). No heavy frameworks, ORMs, or database servers required.
+
+---
+
+## 🚀 Quickstart
+
+### 1. Prerequisites
+- Python 3.11 or higher
+- SuperDocs API Key (set in `.env` or as an environment variable)
+
+Create a `.env` file in the root directory:
+```bash
+SUPERDOCS_API_KEY=your_superdocs_api_key_here
+```
+
+### 2. Update the Changelog (One-Command Flow)
+You can update your changelog with a single command:
+
+```powershell
+python changelog.py update release-1.6.0.json --format md,docx
+```
+
+*(If the changelog hasn't been initialized yet, it will automatically register and initialize the living document on SuperDocs for you!)*
+
+---
+
+## 📖 CLI Workflow & Commands
+
+### `update` — Apply a New Release Surgically
+Performs the targeted SuperDocs insert, verifies prior entries, and exports the requested formats:
+```powershell
+# Update and export to Markdown + Word DOCX
+python changelog.py update release-1.6.0.json --format md,docx
+
+# Safe dry-run (0 spend, verifies hashes locally)
+python changelog.py update release-1.6.0.json --dry-run
+```
+
+### `preview` — Zero-Spend Local Review
+Renders the candidate release entry and computes SHA-256 stability without making any network calls:
+```powershell
+python changelog.py preview release-1.6.0.json
+```
+
+### `init` — Initialize a New Standing Changelog
+Explicitly create a new living document state:
+```powershell
+python changelog.py init --title "Awesome Project Changelog" --owner my-org --repo awesome-project
+```
+*Flags:*
+- `--force`: Overwrite existing state file if starting over.
+- `--local-only`: Skip SuperDocs remote creation (local state only).
+
+### `verify` — Verify Document Integrity
+Validates that every historical entry in the local state matches its canonical SHA-256 hash:
+```powershell
+python changelog.py verify
+```
+
+### `export` — Export Document Formats
+Re-exports the current document to one or more formats:
+```powershell
+python changelog.py export --format md,docx,pdf
+```
+
+### `publish` — Open a GitHub Pull Request
+Creates a new branch and opens a PR with the updated changelog:
+```powershell
+python changelog.py publish --repo my-org/awesome-project --title "Release 1.6.0" --github-token ghp_...
+```
+
+---
+
+## 📝 Release Payload Format (`release.json`)
+
+Payloads can be provided with simple string lists or structured link objects:
+
+```json
+{
+  "version": "1.6.0",
+  "date": "2026-08-28",
+  "title": "Multi-language support and safer previews",
+  "sections": {
+    "Added": [
+      "Full multi-language changelog generation",
+      "No-spend preview mode that never calls SuperDocs",
+      "Identity check that older releases stay byte-identical"
+    ],
+    "Changed": [
+      "House style is now enforced on every insert",
+      "Export always produces Markdown + PDF by default"
+    ],
+    "Fixed": [
+      "Duplicate compare links no longer appear",
+      "Section order is now consistent across all releases"
+    ],
+    "Breaking": [],
+    "Removed": [
+      "Old experimental --force-rebuild flag"
+    ]
+  },
+  "contributors": ["@alice", "@bob", "@dave"],
+  "links": {
+    "compare": "https://github.com/org/repo/compare/v1.5.0...v1.6.0",
+    "release": "https://github.com/org/repo/releases/tag/v1.6.0"
+  }
+}
+```
+
+---
+
+## 📂 Output Artifacts
+
+All exports and standing state files are written to the `output/` directory and root:
+- **`output/CHANGELOG.md`**: Clean, standard-compliant Markdown changelog.
+- **`output/CHANGELOG.docx`**: High-fidelity Word document for DevRel / stakeholder distribution.
+- **`changelog.state.json`**: Source of truth tracking the SuperDocs document ID and historical release hashes.
+
+---
+
+
+
+
+---
+
