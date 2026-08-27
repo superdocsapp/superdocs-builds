@@ -1,0 +1,31 @@
+{
+  "report_title": "Annual Report 2026",
+  "session_id": "annual-report-multidoc-test",
+  "documents": {
+    "Chair Statement": {
+      "filename": "chair-statement.html",
+      "document_id": "doc_primary",
+      "stage": "draft"
+    },
+    "Strategy": {
+      "filename": "strategy.html",
+      "document_id": "doc_0bf9096a34",
+      "stage": "editorial_review"
+    },
+    "Business Review": {
+      "filename": "business-review.html",
+      "document_id": "doc_8547437129",
+      "stage": "finance_review"
+    },
+    "Governance": {
+      "filename": "governance.html",
+      "document_id": "doc_a67db7f637",
+      "stage": "legal_review"
+    },
+    "Financial Statements": {
+      "filename": "financial-statements.html",
+      "document_id": "doc_2b79b3b153",
+      "stage": "approved"
+    }
+  }
+}
