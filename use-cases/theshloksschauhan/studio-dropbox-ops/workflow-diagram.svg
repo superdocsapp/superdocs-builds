@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="SuperDocs Dropbox Watcher workflow">
+  <defs>
+    <pattern id="grain" width="80" height="80" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="18" r="0.6" fill="#e8dcc8" opacity="0.06"/>
+      <circle cx="47" cy="41" r="0.5" fill="#e8dcc8" opacity="0.05"/>
+      <circle cx="71" cy="9" r="0.4" fill="#e8dcc8" opacity="0.04"/>
+    </pattern>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="0.2"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="#12141a"/>
+  <rect width="1600" height="900" fill="url(#grain)"/>
+  <rect x="48" y="36" width="1504" height="828" fill="none" stroke="#2a2e38" stroke-width="1"/>
+  <line x1="48" y1="132" x2="1552" y2="132" stroke="#2a2e38" stroke-width="1"/>
+
+  <text x="72" y="78" font-family="Georgia, 'Times New Roman', serif" font-size="34" fill="#f3eadb">SuperDocs Dropbox Watcher</text>
+  <text x="72" y="108" font-family="Segoe UI, Helvetica, sans-serif" font-size="15" letter-spacing="3" fill="#8a8376">FROM CLIENT DROP TO SIBLING FILE</text>
+  <text x="1288" y="78" font-family="Segoe UI, Helvetica, sans-serif" font-size="12" letter-spacing="2" fill="#6e7a88" text-anchor="end">LIVE PATH  /  PREVIEW OFF</text>
+  <text x="1488" y="108" font-family="Georgia, serif" font-size="13" fill="#e8b86d" text-anchor="end">studio loop</text>
+
+  <!-- path spine -->
+  <path d="M140 280 H980" fill="none" stroke="#3d9eff" stroke-width="3"/>
+  <path d="M1080 280 C1180 280 1220 200 1320 200" fill="none" stroke="#5a5f6a" stroke-width="2.5"/>
+  <path d="M1080 280 C1180 280 1220 430 1340 430" fill="none" stroke="#e8b86d" stroke-width="3"/>
+
+  <!-- 01 DROP -->
+  <circle cx="180" cy="280" r="54" fill="#1a2230" stroke="#3d9eff" stroke-width="2"/>
+  <rect x="156" y="258" width="48" height="36" rx="4" fill="none" stroke="#3d9eff" stroke-width="2"/>
+  <path d="M164 258 l8-8 h16 l8 8" fill="none" stroke="#3d9eff" stroke-width="2"/>
+  <text x="180" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#f3eadb">01  Drop</text>
+  <text x="180" y="384" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#9aa3b0">Client file lands in</text>
+  <text x="180" y="402" text-anchor="middle" font-family="Consolas, monospace" font-size="11" fill="#3d9eff">/Clients/Acme/Inbox</text>
+
+  <!-- 02 WATCH -->
+  <circle cx="430" cy="280" r="54" fill="#1a2230" stroke="#3d9eff" stroke-width="2"/>
+  <circle cx="430" cy="276" r="18" fill="none" stroke="#3d9eff" stroke-width="2"/>
+  <circle cx="430" cy="276" r="8" fill="none" stroke="#3d9eff" stroke-width="2"/>
+  <line x1="430" y1="276" x2="444" y2="262" stroke="#3d9eff" stroke-width="2"/>
+  <text x="430" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#f3eadb">02  Watch</text>
+  <text x="430" y="384" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#9aa3b0">Hash must stay still</text>
+  <text x="430" y="402" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#9aa3b0">Skip own output  /  budget</text>
+
+  <!-- 03 BUILD -->
+  <circle cx="680" cy="280" r="54" fill="#1a2230" stroke="#3d9eff" stroke-width="2"/>
+  <text x="680" y="288" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#3d9eff">S</text>
+  <text x="680" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#f3eadb">03  SuperDocs</text>
+  <text x="680" y="384" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#9aa3b0">Upload + chat, then stop</text>
+  <text x="680" y="402" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#9aa3b0">Nothing written back yet</text>
+
+  <!-- 04 GATE hero -->
+  <polygon points="980,214 1048,248 1048,312 980,346 912,312 912,248" fill="#241c12" stroke="#e8b86d" stroke-width="2.5"/>
+  <circle cx="980" cy="278" r="16" fill="none" stroke="#e8b86d" stroke-width="2"/>
+  <circle cx="980" cy="270" r="6" fill="none" stroke="#e8b86d" stroke-width="2"/>
+  <path d="M968 292 q12 10 24 0" fill="none" stroke="#e8b86d" stroke-width="2"/>
+  <text x="980" y="378" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#e8b86d">04  Human gate</text>
+  <text x="980" y="400" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" letter-spacing="1.5" fill="#e8b86d">REVIEW_PENDING</text>
+  <text x="980" y="418" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#9aa3b0">You decide in the console</text>
+
+  <!-- REJECT -->
+  <rect x="1288" y="164" width="220" height="88" rx="8" fill="#1c1e24" stroke="#4a4f58" stroke-width="1.5"/>
+  <text x="1398" y="198" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#c8c2b6">Reject</text>
+  <text x="1398" y="222" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#8a8376">Dropbox stays as it was</text>
+  <text x="1398" y="240" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#8a8376">No sibling file</text>
+
+  <!-- APPROVE -->
+  <rect x="1288" y="384" width="220" height="108" rx="8" fill="#241c12" stroke="#e8b86d" stroke-width="2"/>
+  <text x="1398" y="418" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#e8b86d">Approve</text>
+  <text x="1398" y="442" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="12" fill="#c8c2b6">Approve + export</text>
+  <text x="1398" y="462" text-anchor="middle" font-family="Consolas, monospace" font-size="10" fill="#e8b86d">brief-1.superdocs.normalize.docx</text>
+  <text x="1398" y="478" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" fill="#8a8376">beside the original</text>
+
+  <!-- skip note -->
+  <text x="430" y="196" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="11" letter-spacing="1.5" fill="#5a5f6a">UNSTABLE FILE LOOPS HERE UNTIL THE HASH HOLDS</text>
+
+  <!-- job state ribbon -->
+  <text x="72" y="560" font-family="Segoe UI, sans-serif" font-size="12" letter-spacing="3" fill="#6e7a88">JOB STATES</text>
+
+  <g font-family="Segoe UI, sans-serif" font-size="12">
+    <rect x="72" y="584" width="128" height="36" rx="18" fill="#1a2230" stroke="#3d9eff"/>
+    <text x="136" y="607" text-anchor="middle" fill="#d7e6f7">DISCOVERED</text>
+
+    <rect x="228" y="584" width="132" height="36" rx="18" fill="#1a2230" stroke="#3d9eff"/>
+    <text x="294" y="607" text-anchor="middle" fill="#d7e6f7">STABILIZING</text>
+
+    <rect x="388" y="584" width="108" height="36" rx="18" fill="#1a2230" stroke="#3d9eff"/>
+    <text x="442" y="607" text-anchor="middle" fill="#d7e6f7">QUEUED</text>
+
+    <rect x="524" y="584" width="128" height="36" rx="18" fill="#1a2230" stroke="#3d9eff"/>
+    <text x="588" y="607" text-anchor="middle" fill="#d7e6f7">PROCESSING</text>
+
+    <rect x="680" y="584" width="168" height="36" rx="18" fill="#241c12" stroke="#e8b86d"/>
+    <text x="764" y="607" text-anchor="middle" fill="#e8b86d">REVIEW_PENDING</text>
+
+    <rect x="876" y="564" width="128" height="36" rx="18" fill="#142018" stroke="#6fbf86"/>
+    <text x="940" y="587" text-anchor="middle" fill="#8fd4a4">COMPLETED</text>
+
+    <rect x="876" y="608" width="128" height="36" rx="18" fill="#201818" stroke="#c07070"/>
+    <text x="940" y="631" text-anchor="middle" fill="#e8a0a0">REJECTED</text>
+  </g>
+
+  <path d="M200 602 H228 M360 602 H388 M496 602 H524 M652 602 H680 M848 602 H876" fill="none" stroke="#3a4050" stroke-width="1.5" stroke-dasharray="4 6"/>
+  <path d="M848 602 C860 602 868 582 876 582" fill="none" stroke="#6fbf86" stroke-width="1.5"/>
+  <path d="M848 602 C860 602 868 626 876 626" fill="none" stroke="#c07070" stroke-width="1.5"/>
+
+  <!-- anti-loop strip -->
+  <rect x="72" y="700" width="1456" height="120" fill="#181b22" stroke="#2a2e38"/>
+  <text x="96" y="744" font-family="Georgia, serif" font-size="22" fill="#f3eadb">Anti-loop</text>
+  <text x="96" y="772" font-family="Segoe UI, sans-serif" font-size="14" fill="#9aa3b0">Touching our own output does not start a new job.</text>
+  <text x="96" y="794" font-family="Segoe UI, sans-serif" font-size="13" fill="#6e7a88">.superdocs. in the name  /  path registry  /  content-hash registry</text>
+
+  <text x="1180" y="744" font-family="Georgia, serif" font-size="18" fill="#e8b86d">Example</text>
+  <text x="1180" y="772" font-family="Consolas, monospace" font-size="13" fill="#c8c2b6">brief-1.docx</text>
+  <text x="1180" y="794" font-family="Consolas, monospace" font-size="13" fill="#e8b86d">brief-1.superdocs.normalize.docx</text>
+</svg>
