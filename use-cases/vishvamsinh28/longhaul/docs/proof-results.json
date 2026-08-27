@@ -1,0 +1,618 @@
+{
+  "checkpoints_traced": 119,
+  "commit_log_entries": 9,
+  "documents": [
+    "oncall-rotation",
+    "security-incident",
+    "status-page"
+  ],
+  "kill_points_passed": 119,
+  "kill_points_total": 119,
+  "results": [
+    {
+      "checkpoint": "upload.oncall-rotation.before",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.oncall-rotation.sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.oncall-rotation.bound",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.security-incident.before",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.security-incident.sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.security-incident.bound",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.status-page.before",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.status-page.sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "upload.status-page.bound",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step000.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step001.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step002.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step003.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step004.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step005.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.gated.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.before_commit.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.committing_recorded.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.approve_sent.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.commits_recorded.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.committed.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.commit_settled.r2",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step006.done",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.before_issue",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.issuing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.request_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.issued",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.proposed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.gated",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.before_commit",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.committing_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.approve_sent",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.commits_recorded",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.committed",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.commit_settled",
+      "identical": true,
+      "notes": []
+    },
+    {
+      "checkpoint": "step007.done",
+      "identical": true,
+      "notes": []
+    }
+  ],
+  "turn_counts": {
+    "[longhaul:0000:e6569956728a]": 1,
+    "[longhaul:0001:e2755760b328]": 1,
+    "[longhaul:0002:f45bec29a028]": 1,
+    "[longhaul:0003:e48ff28515da]": 1,
+    "[longhaul:0004:6a0022a3fc73]": 1,
+    "[longhaul:0005:8f4176a9a3d6]": 1,
+    "[longhaul:0006:79800f2394fb]": 1,
+    "[longhaul:0007:f80de4a988ee]": 1
+  }
+}

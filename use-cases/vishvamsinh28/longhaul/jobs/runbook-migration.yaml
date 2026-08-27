@@ -1,0 +1,82 @@
+# A long-running edit job, expressed as data.
+#
+# Adding a document, a step, or a gate rule is a change to this file. It is never a
+# change to the code — that is the point. A different migration is a different YAML.
+
+name: runbook-migration
+description: >
+  Northwind Systems is moving off PagerDuty onto Rootly, renaming the incident channel,
+  and retiring the "Ops Lead" role in favour of "Incident Commander". Every runbook has
+  to say the same thing afterwards, and the wording Legal owns must not move without a
+  named human approving it.
+
+# Sessions are addressed by an id you choose. Keeping it derived from the run means a
+# resumed run reattaches to the same server-side conversation and document set.
+session_prefix: longhaul-runbooks
+
+model_tier: core
+
+gate:
+  # policy = deterministic decisions, so the proof suite has a fixed oracle.
+  # manual = a human decides, at the terminal or in the web review UI.
+  mode: policy
+  default: approve
+  reject_when:
+    - description: >
+        Wording owned by Legal does not change without a named approver. The runner
+        rejects these and keeps going; rejecting one change never discards the others.
+      old_html_contains: "Legal"
+
+documents:
+  - slug: oncall-rotation
+    path: ../corpus/runbooks/oncall-rotation.md
+    title: On-Call Rotation Runbook
+  - slug: incident-response
+    path: ../corpus/runbooks/incident-response.md
+    title: Incident Response Runbook
+  - slug: database-failover
+    path: ../corpus/runbooks/database-failover.md
+    title: Database Failover Runbook
+  - slug: deploy-rollback
+    path: ../corpus/runbooks/deploy-rollback.md
+    title: Deploy Rollback Runbook
+  - slug: security-incident
+    path: ../corpus/runbooks/security-incident.md
+    title: Security Incident Runbook
+  - slug: status-page
+    path: ../corpus/runbooks/status-page.md
+    title: Status Page and Customer Comms Runbook
+
+steps:
+  - id: paging-tool-rename
+    for_each_document: true
+    instruction: >
+      We have migrated our paging from PagerDuty to Rootly. Throughout this runbook,
+      replace "PagerDuty" with "Rootly", keeping the surrounding sentence intact and
+      leaving every other detail untouched.
+
+  - id: incident-channel-rename
+    for_each_document: true
+    instruction: >
+      Our incident channel has been renamed. Throughout this runbook, replace
+      "#incident-war-room" with "#inc-bridge" wherever it appears.
+
+  - id: role-rename
+    for_each_document: true
+    instruction: >
+      The "Ops Lead" role has been retired and its duties now sit with the Incident
+      Commander. Throughout this runbook, replace "Ops Lead" with "Incident Commander".
+
+  - id: add-tool-verification
+    documents: [oncall-rotation]
+    instruction: >
+      At the end of this runbook, add a section titled "Verifying the paging migration"
+      containing "Before your first rotation on the new tooling, send yourself a test
+      page from Rootly and confirm it arrives on your phone. A rotation that starts with
+      an unverified pager is an outage waiting for an audience."
+
+  - id: retire-stale-section
+    documents: [status-page]
+    instruction: >
+      The handover guidance in this runbook is now covered by the on-call rotation
+      runbook and is duplicated here. Remove the section titled "After resolution".

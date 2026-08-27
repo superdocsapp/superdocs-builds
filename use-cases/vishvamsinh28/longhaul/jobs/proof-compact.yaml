@@ -1,0 +1,52 @@
+# A compact version of the runbook migration, used by the kill-point proof.
+#
+# Smaller than the demo job so the proof can afford to kill and resume at every single
+# checkpoint a real run reaches, rather than sampling. It still spans multiple documents
+# and still exercises edit, create, delete, partial approval and rejection.
+
+name: proof-job
+description: Compact multi-document migration used to prove restart-invisibility.
+session_prefix: longhaul-proof
+model_tier: core
+
+gate:
+  mode: policy
+  default: approve
+  reject_when:
+    - description: Wording owned by Legal needs a named approver.
+      old_html_contains: "Legal"
+
+documents:
+  - slug: oncall-rotation
+    path: ../corpus/runbooks/oncall-rotation.md
+    title: On-Call Rotation Runbook
+  - slug: security-incident
+    path: ../corpus/runbooks/security-incident.md
+    title: Security Incident Runbook
+  - slug: status-page
+    path: ../corpus/runbooks/status-page.md
+    title: Status Page and Customer Comms Runbook
+
+steps:
+  - id: paging-tool-rename
+    for_each_document: true
+    instruction: >
+      We have migrated our paging from PagerDuty to Rootly. Throughout this runbook,
+      replace "PagerDuty" with "Rootly".
+
+  - id: role-rename
+    for_each_document: true
+    instruction: >
+      The "Ops Lead" role has been retired. Throughout this runbook, replace
+      "Ops Lead" with "Incident Commander".
+
+  - id: add-tool-verification
+    documents: [oncall-rotation]
+    instruction: >
+      At the end of this runbook, add a section titled "Verifying the paging migration"
+      containing "Send yourself a test page from Rootly before your first rotation."
+
+  - id: retire-stale-section
+    documents: [status-page]
+    instruction: >
+      Remove the section titled "After resolution".

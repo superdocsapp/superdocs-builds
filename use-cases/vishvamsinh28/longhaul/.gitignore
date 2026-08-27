@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+state/
+out/
+.smoke/
+.capture/
+docs/*.tmp
+live/

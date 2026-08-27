@@ -1,0 +1,266 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>longhaul review</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #fbfbfa; --panel: #fff; --ink: #1c1b19; --dim: #6b6862;
+    --line: #e4e1db; --accent: #2f6f4f; --warn: #9a6b12; --bad: #a33a2a;
+    --add-bg: #e8f3ec; --del-bg: #fbeae7;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171916; --panel: #1e211d; --ink: #e8e6e1; --dim: #9a978f;
+      --line: #30342d; --accent: #7fc39b; --warn: #d8a949; --bad: #e08575;
+      --add-bg: #1d2c23; --del-bg: #2e211e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.5; }
+  header {
+    padding: 22px 28px; border-bottom: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: baseline;
+    position: sticky; top: 0; background: var(--bg); z-index: 5;
+  }
+  h1 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
+  .muted { color: var(--dim); font-size: 13px; }
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 28px 80px; }
+  section { margin-bottom: 34px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.07em;
+       color: var(--dim); margin: 0 0 12px; font-weight: 600; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 20px;
+          font-size: 11px; border: 1px solid var(--line); color: var(--dim); }
+  .chip.done { color: var(--accent); border-color: var(--accent); }
+  .chip.rejected { color: var(--warn); border-color: var(--warn); }
+  .chip.adjudicate, .chip.failed { color: var(--bad); border-color: var(--bad); }
+  .steps { display: grid; gap: 4px; }
+  .step { display: grid; grid-template-columns: 28px 1fr auto; gap: 12px;
+          align-items: center; padding: 7px 12px; background: var(--panel);
+          border: 1px solid var(--line); border-radius: 7px; font-size: 13px; }
+  .step .n { color: var(--dim); font-variant-numeric: tabular-nums; }
+  .step .doc { color: var(--dim); }
+  .card { background: var(--panel); border: 1px solid var(--line);
+          border-radius: 10px; padding: 16px 18px; margin-bottom: 14px; }
+  .card h3 { margin: 0 0 4px; font-size: 14px; }
+  .why { color: var(--dim); font-size: 13px; margin-bottom: 12px; }
+  .diff { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 12.5px; border-radius: 7px; overflow-x: auto; }
+  .diff div { padding: 7px 10px; white-space: pre-wrap; word-break: break-word; }
+  .del { background: var(--del-bg); }
+  .add { background: var(--add-bg); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+  button { font: inherit; font-size: 13px; padding: 5px 14px; border-radius: 6px;
+           border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+           cursor: pointer; }
+  button:hover { border-color: var(--dim); }
+  button.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+  button.off { border-color: var(--bad); color: var(--bad); font-weight: 600; }
+  button.primary { background: var(--accent); color: var(--bg); border-color: var(--accent);
+                   font-weight: 600; }
+  button:disabled { opacity: 0.45; cursor: default; }
+  input[type=text] { font: inherit; font-size: 13px; padding: 5px 10px; flex: 1;
+                     min-width: 200px; border: 1px solid var(--line);
+                     border-radius: 6px; background: var(--bg); color: var(--ink); }
+  .totals { display: flex; flex-wrap: wrap; gap: 22px; font-size: 13px; }
+  .totals b { display: block; font-size: 20px; font-weight: 600;
+              font-variant-numeric: tabular-nums; }
+  .finding { border-left: 3px solid var(--warn); padding: 6px 0 6px 12px;
+             margin-bottom: 8px; font-size: 13px; }
+  .finding .kind { color: var(--warn); font-weight: 600; }
+  .banner { border: 1px solid var(--bad); color: var(--bad); border-radius: 8px;
+            padding: 10px 14px; margin-bottom: 20px; font-size: 13px; }
+  .empty { color: var(--dim); font-size: 13px; }
+</style>
+
+<header>
+  <h1 id="job">longhaul</h1>
+  <span class="chip" id="status">loading</span>
+  <span class="muted" id="runid"></span>
+  <span class="muted" style="margin-left:auto" id="tick"></span>
+</header>
+
+<main>
+  <div id="error" class="banner" hidden></div>
+
+  <section id="review-section">
+    <h2>Waiting on you</h2>
+    <div id="review"></div>
+  </section>
+
+  <section>
+    <h2>Steps</h2>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <section id="totals-section" hidden>
+    <h2>This run</h2>
+    <div class="totals" id="totals"></div>
+  </section>
+
+  <section id="findings-section" hidden>
+    <h2>Documents that tried to give orders</h2>
+    <p class="muted">Reported as data. None of it was executed.</p>
+    <div id="findings"></div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const decisions = new Map();   // change_id -> {approved, feedback}
+  let inFlight = false;
+
+  const esc = (s) => (s || "").replace(/[&<>]/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const strip = (html) => esc((html || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+
+  async function poll() {
+    try {
+      const state = await (await fetch("/api/state")).json();
+      render(state);
+      $("tick").textContent = state.busy ? "working…" : "";
+    } catch (e) {
+      $("error").hidden = false;
+      $("error").textContent = "Cannot reach the runner: " + e;
+    }
+  }
+
+  function render(s) {
+    $("job").textContent = s.job || "longhaul";
+    $("runid").textContent = s.run_id;
+    const chip = $("status");
+    chip.textContent = s.status;
+    chip.className = "chip " + (s.status === "completed" ? "done"
+      : s.status === "blocked" ? "rejected" : "");
+    $("error").hidden = !s.error;
+    if (s.error) $("error").textContent = s.error;
+
+    $("steps").innerHTML = s.steps.map((st) => `
+      <div class="step">
+        <span class="n">${st.index}</span>
+        <span>${esc(st.id)} <span class="doc">· ${esc(st.document)}</span></span>
+        <span class="chip ${esc(st.state)}">${esc(st.state)}</span>
+      </div>`).join("");
+
+    renderReview(s.pending);
+
+    const t = s.totals || {};
+    if (t.steps) {
+      $("totals-section").hidden = false;
+      $("totals").innerHTML = [
+        ["executed", t.executed], ["skipped as already-done", t.skipped_already_done],
+        ["approved", t.changes_approved], ["rejected", t.changes_rejected],
+        ["billable ops", t.billable_operations], ["ms", t.wall_ms],
+      ].map(([k, v]) => `<div><b>${v ?? 0}</b>${k}</div>`).join("");
+    }
+
+    if (s.findings && s.findings.length) {
+      $("findings-section").hidden = false;
+      $("findings").innerHTML = s.findings.map((f) => `
+        <div class="finding"><span class="kind">${esc(f.kind)}</span>
+        in <b>${esc(f.where)}</b><br>${esc(f.excerpt)}</div>`).join("");
+    }
+  }
+
+  let renderedSignature = null;
+
+  function renderReview(pending) {
+    if (!pending || !pending.length) {
+      renderedSignature = null;
+      $("review").innerHTML = `<p class="empty">Nothing is waiting on a decision.</p>`;
+      return;
+    }
+    const group = pending[0];
+    // Polling must never yank the cursor out of a reason the reviewer is mid-sentence
+    // on. Re-render only when the set of changes on offer has actually moved.
+    const signature = group.step_index + ":" + group.changes.map((c) => c.change_id).join(",");
+    const typing = $("review").contains(document.activeElement)
+      && document.activeElement.tagName === "INPUT";
+    if (signature === renderedSignature && typing) {
+      updateCount(group);
+      return;
+    }
+    renderedSignature = signature;
+    $("review").innerHTML = group.changes.map((c) => {
+      const d = decisions.get(c.change_id);
+      return `
+      <div class="card">
+        <h3>${esc(c.operation)} · <span class="muted">${esc(group.document)}</span></h3>
+        <div class="why">${esc(c.ai_explanation)}</div>
+        <div class="diff">
+          ${c.old_html ? `<div class="del">- ${strip(c.old_html)}</div>` : ""}
+          ${c.new_html ? `<div class="add">+ ${strip(c.new_html)}</div>` : ""}
+        </div>
+        <div class="row">
+          <button class="${d && d.approved === true ? "on" : ""}"
+                  onclick="mark('${c.change_id}', true)">Approve</button>
+          <button class="${d && d.approved === false ? "off" : ""}"
+                  onclick="mark('${c.change_id}', false)">Reject</button>
+          <input type="text" placeholder="reason (sent back to the model on a reject)"
+                 id="fb-${c.change_id}"
+                 oninput="note('${c.change_id}', this.value)"
+                 value="${esc(d ? d.feedback : "")}">
+        </div>
+      </div>`;
+    }).join("") + `
+      <div class="row">
+        <button class="primary" id="submit" onclick="submit(${group.step_index})">
+          Commit these decisions
+        </button>
+        <span class="muted" id="count"></span>
+      </div>`;
+    updateCount(group);
+  }
+
+  function mark(id, approved) {
+    const prev = decisions.get(id) || { feedback: "" };
+    // Clicking the active verdict again clears it, so a misclick is undoable.
+    decisions.set(id, {
+      approved: prev.approved === approved ? undefined : approved,
+      feedback: prev.feedback,
+    });
+    renderedSignature = null;
+    poll();
+  }
+
+  function note(id, feedback) {
+    const prev = decisions.get(id) || {};
+    decisions.set(id, { approved: prev.approved, feedback });
+  }
+
+  function updateCount(group) {
+    const decided = group.changes.filter(
+      (c) => decisions.get(c.change_id)?.approved !== undefined
+    ).length;
+    $("count").textContent = `${decided} of ${group.changes.length} decided`;
+    $("submit").disabled = decided === 0 || inFlight;
+  }
+
+  async function submit(stepIndex) {
+    if (inFlight) return;
+    inFlight = true;
+    $("submit").disabled = true;
+    const changes = [...decisions.entries()]
+      .filter(([, d]) => d.approved !== undefined)
+      .map(([change_id, d]) => ({ change_id, approved: d.approved, feedback: d.feedback }));
+    try {
+      const r = await fetch("/api/decide", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ step_index: stepIndex, changes }),
+      });
+      if (!r.ok) throw new Error((await r.json()).detail);
+      decisions.clear();
+      renderedSignature = null;
+    } catch (e) {
+      $("error").hidden = false;
+      $("error").textContent = String(e);
+    } finally {
+      inFlight = false;
+      poll();
+    }
+  }
+
+  poll();
+  setInterval(poll, 1200);
+</script>
