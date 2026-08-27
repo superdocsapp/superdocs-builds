@@ -1,0 +1,14 @@
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [job_id: 0569a3c4-c336-4458-9df4-5021b5a8ec9a]
+✓ Flow diagram inserted and approved.
+    [job_id: e6c9ce40-0033-4974-bb4b-60c78fecc934]
+✓ Search strategy appendix inserted and approved.
+    [job_id: f3d92c7b-b2e8-4aca-be8c-a885cfa5d43c]
+✓ Evidence table inserted and approved.
+    [job_id: 26f3cc3e-f4b0-44b5-8363-5dd622d57e5d]
+✓ Risk-of-bias summary inserted and approved.
+Export verified on attempt 1 (1 image(s), 26 paragraphs).
+
+✓ Full package assembled, exported, AND data-fidelity verified: ../output/final_review_package.docx

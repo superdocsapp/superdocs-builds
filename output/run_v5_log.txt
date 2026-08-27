@@ -1,0 +1,12 @@
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [job_id: ac2a0176-1f80-414f-921e-32bbb78f7bda]
+✓ Flow diagram inserted and approved.
+    [job_id: b7560371-bd20-46d1-934f-75315d5f472d]
+✓ Evidence table inserted and approved.
+    [job_id: b8f478d3-77a2-4849-bdba-7017615ab927]
+✓ Search strategy appendix inserted and approved.
+    [job_id: faf82df8-a7ca-4eef-8ab2-e5c642110c7f]
+✓ Risk-of-bias summary inserted and approved.
+⚠️  ABORTING: risk-of-bias step produced unexpected/fabricated content.

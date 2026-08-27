@@ -1,0 +1,14 @@
+Session: review-package-a0927e29
+✓ Screening counts validated.
+✓ Flow diagram rendered: ../output/flow_diagram.png
+✓ Manuscript uploaded (9 sections).
+    [attempt 1, job_id: 09cf6147-7cf5-4d26-8e23-029ea35da95f]
+✓ Flow diagram inserted and approved.
+  ✓ Checkpoint passed after diagram.
+    [attempt 1, job_id: 79e48d07-b460-4b09-aefe-5b03331abd64]
+✓ Evidence table inserted and approved.
+  ✓ Checkpoint passed after evidence table.
+    [attempt 1, job_id: 47035dcb-0b43-43d4-be21-f76d9c76ed14]
+✓ Search strategy appendix inserted and approved.
+    Checkpoint: MISSING expected text: ['PubMed', 'Embase']
+⚠️  ABORTING: checkpoint failed after search appendix step. See /tmp/verify_review-package-a0927e29.docx.
