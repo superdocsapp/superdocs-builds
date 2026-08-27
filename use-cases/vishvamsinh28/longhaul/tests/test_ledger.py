@@ -143,3 +143,38 @@ def test_run_is_written_whole_or_not_at_all(tmp_path: Path) -> None:
         ledger.create_run(run, [Document("r2", "doc", "/p", "sha", "T")], steps)
     assert ledger.get_run("r2") is None
     assert ledger.get_steps("r2") == []
+
+
+def test_a_hostname_containing_colons_does_not_break_liveness(tmp_path: Path) -> None:
+    """Found the hard way: this machine started reporting its hostname as
+    "Unknown_86:ae:73:f8:f0:67" after a network change. Splitting the owner id from the
+    left made every owner unparseable, so every dead lease looked alive and no crashed
+    run could be resumed — nine tests failed at once for one reason."""
+    from longhaul.ledger import _owner_is_alive
+
+    dead = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    dead.kill()
+    dead.wait()
+
+    import os
+
+    host = os.uname().nodename
+    assert _owner_is_alive(f"{host}:{dead.pid}:cafebabe") is False
+    assert _owner_is_alive(f"Unknown_86:ae:73:f8:f0:67:{dead.pid}:cafebabe") in (False, None)
+    assert _owner_is_alive(f"{host}:{os.getpid()}:cafebabe") is True
+    # A remote host is never guessed dead, whatever its name looks like.
+    assert _owner_is_alive(f"some:other:box:{dead.pid}:cafebabe") is None
+    assert _owner_is_alive("nonsense") is None
+
+
+def test_the_lease_is_reclaimed_whatever_this_host_is_called(tmp_path: Path) -> None:
+    """The end-to-end consequence: a crashed runner's lease must be reclaimable on the
+    machine it crashed on, regardless of what that machine calls itself today."""
+    ledger = _seed(tmp_path / "l.db")
+    import os
+
+    dead = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(30)"])
+    dead.kill()
+    dead.wait()
+    ledger.acquire_lease("r1", f"{os.uname().nodename}:{dead.pid}:cafebabe", ttl=600)
+    assert ledger.acquire_lease("r1", new_owner_id(), ttl=60) == 2

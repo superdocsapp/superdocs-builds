@@ -627,8 +627,12 @@ def _owner_is_alive(owner: str) -> bool | None:
     else is unknown, and unknown is treated as alive so the TTL decides — never guessing
     a remote holder is dead is what keeps two hosts from running the same run at once.
     """
+    # Parsed from the right: a hostname may itself contain colons. This machine started
+    # reporting "Unknown_86:ae:73:f8:f0:67" after a network change, and splitting from the
+    # left made every owner unparseable — so every dead lease looked alive and no crashed
+    # run could ever be resumed. The pid and the nonce are always the last two fields.
     try:
-        host, pid_text, _nonce = owner.split(":", 2)
+        host, pid_text, _nonce = owner.rsplit(":", 2)
         pid = int(pid_text)
     except ValueError:
         return None
@@ -647,5 +651,10 @@ def _owner_is_alive(owner: str) -> bool | None:
 
 
 def new_owner_id() -> str:
-    """Identify one runner process: host, pid, and a nonce so a recycled pid is distinct."""
+    """Identify one runner process: host, pid, and a nonce so a recycled pid is distinct.
+
+    The host is written verbatim, colons and all, and :func:`_owner_is_alive` parses from
+    the right. Sanitising it here would not help: leases written by an older version are
+    still in the ledger, and they have to stay readable.
+    """
     return f"{os.uname().nodename}:{os.getpid()}:{uuid.uuid4().hex[:8]}"

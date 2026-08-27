@@ -141,7 +141,7 @@ Six seconds, no key: it runs the job twice, kills one partway, and diffs them. T
 | `make offline` | The same console against a local stand-in. No key, no cost. |
 | `make proof` | Kill a run, resume it, diff the result. ~6s, offline. |
 | `make proof-all` | The headline: the same at **every** checkpoint. ~95s, offline. |
-| `make test` | The whole suite, 24 kill points, ~40s. Offline. |
+| `make test` | The whole suite — 77 tests, 24 kill points, ~45s. Offline. |
 | `make mcp` | Prints the MCP client config to paste into your agent. |
 
 `live` and `offline` mean the same thing in both of this repository's builds: `live`
@@ -389,6 +389,10 @@ does not.
   Document scale limits (25,000 sections per document) are far above anything exercised.
 - **Review rounds are bounded at twelve.** A turn that keeps proposing past that stops with
   an error rather than looping. The bound is a guess: the live runs here needed two.
+- **Host identity is parsed, not assumed.** A machine reporting its hostname with colons
+  in it broke lease liveness once — every dead lease looked alive and no crashed run could
+  be resumed. Fixed and tested, but it is a reminder that the owner id is a string with
+  structure, and strings with structure break.
 - **Live evidence is one run.** Eight steps, eight jobs, zero duplicates is a real result,
   not a large sample. Everything broader is proven offline.
 
