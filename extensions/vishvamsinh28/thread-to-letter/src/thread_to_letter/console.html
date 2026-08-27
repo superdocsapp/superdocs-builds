@@ -25,8 +25,10 @@
   .top{display:flex;align-items:center;gap:14px;padding:9px 16px;background:var(--surface);
     border-bottom:1px solid var(--line);flex-shrink:0}
   .logo{font-size:19px;font-weight:500;letter-spacing:-.01em;color:var(--dim)}
-  .search{flex:1;max-width:660px;background:var(--sunk);border-radius:8px;padding:8px 15px;
-    color:var(--faint);font-size:13.5px}
+  .search{flex:1;max-width:660px;background:var(--sunk);border:1px solid transparent;
+    border-radius:8px;padding:8px 15px;color:var(--ink);font-size:13.5px;outline:none}
+  .search:focus{border-color:var(--accent);background:var(--surface)}
+  .search::placeholder{color:var(--faint)}
   .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;
     font-size:11.5px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
   .pill.live{color:var(--ok);border-color:var(--ok);font-weight:600}
@@ -46,11 +48,10 @@
     border-right:1px solid var(--line);overflow-y:auto;min-height:0}
   .side{overflow-y:auto;min-height:0;padding:12px}
   /* list */
-  .row{display:grid;grid-template-columns:22px 150px 1fr auto;gap:12px;align-items:baseline;
+  .row{display:grid;grid-template-columns:170px 1fr auto;gap:14px;align-items:baseline;
     padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer;font-size:13.5px}
   .row:hover{box-shadow:inset 0 0 0 99px rgba(128,128,128,.05)}
   .row.on{background:var(--sel)}
-  .row .star{color:var(--faint)}
   .row .from{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .row .sub{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .row .sub span{color:var(--dim);font-weight:400}
@@ -88,7 +89,8 @@
     display:grid;grid-template-columns:20px 1fr;gap:10px;align-items:start;font-size:13px}
   .c.on{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 7%,transparent)}
   .c.bad{border-color:var(--bad)}
-  .c input{width:15px;height:15px;margin-top:2px;accent-color:var(--ok)}
+  .c{cursor:pointer}
+  .c input{width:15px;height:15px;margin-top:2px;accent-color:var(--ok);pointer-events:none}
   .chip{display:inline-block;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700;
     text-transform:uppercase;letter-spacing:.05em;border:1px solid}
   .chip.firm{color:var(--ok);border-color:var(--ok)}
@@ -102,6 +104,9 @@
   .note{border-radius:7px;padding:8px 11px;font-size:12px;margin-bottom:11px}
   .note.warn{border:1px solid var(--warn);color:var(--warn)}
   .note.err{border:1px solid var(--bad);color:var(--bad)}
+  .note.run{border:1px solid var(--accent);color:var(--accent);display:flex;gap:9px;
+    align-items:flex-start}
+  .note.run .dot{margin-top:5px;flex-shrink:0}
   /* compose */
   .compose{position:fixed;right:18px;bottom:0;width:520px;max-width:calc(100vw - 36px);
     background:var(--surface);border:1px solid var(--line);border-radius:9px 9px 0 0;
@@ -147,7 +152,7 @@
 
 <div class="top">
   <span class="logo">Mail</span>
-  <div class="search">Search mail</div>
+  <input class="search" id="q" placeholder="Search mail — Esc to clear" autocomplete="off">
   <span class="pill" id="conn"><span class="dot"></span><span id="conn-label">…</span></span>
   <span class="pill" id="key"></span>
   <span class="pill" id="ops"></span>
@@ -155,9 +160,10 @@
 
 <div class="app">
   <nav class="nav">
-    <a class="on" href="#">Inbox <span class="c" id="nav-count"></span></a>
-    <a href="#">Starred</a><a href="#">Snoozed</a><a href="#">Sent</a>
-    <a href="#">Drafts <span class="c" id="nav-drafts"></span></a>
+    <a id="nav-inbox" class="on" data-act="inbox" href="#">Inbox
+      <span class="c" id="nav-count"></span></a>
+    <a id="nav-draft" data-act="drafts" href="#">Drafts
+      <span class="c" id="nav-drafts"></span></a>
   </nav>
 
   <div class="mail" id="mail"></div>
@@ -180,16 +186,46 @@
   const $ = id => document.getElementById(id);
   const esc = s => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
   const ms = n => n >= 1000 ? (n/1000).toFixed(1)+"s" : n+"ms";
-  let callSeq = 0, open = null, sig = null, drafted = false, shape = "letter";
-  window.setShape = v => { shape = v; sig = null; poll(); };
+
+  let callSeq = 0, shape = "letter", query = "", view = "inbox", last = null;
+  // Signatures, so a region is only rebuilt when what it shows has changed. Rebuilding
+  // on every poll destroys the element under the pointer, and a click that straddles a
+  // rebuild is simply lost — which is exactly how "Find commitments" did nothing.
+  const drawn = {inbox:null, thread:null, addon:null, compose:null};
 
   const HUES = [210, 145, 25, 280, 340, 190];
   const hue = s => HUES[[...(s||"x")].reduce((a,c)=>a+c.charCodeAt(0),0) % HUES.length];
   const initials = s => (s||"?").split(/[\s<]/)[0].slice(0,1).toUpperCase()
     + ((s||"").split(/\s+/)[1]||"").slice(0,1).toUpperCase();
 
+  /* One delegated listener, bound once. Re-rendering can never unbind it. */
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-act]");
+    if(!el) return;
+    e.preventDefault();
+    const act = el.dataset.act, arg = el.dataset.arg;
+    // Views switch from state we already have, so the pane changes on the click rather
+    // than after a round-trip. Only the two that need the server wait for it.
+    if(act === "open")      { view = "thread"; post("/api/open", {name: arg}); }
+    else if(act === "back" || act === "inbox") { view = "inbox"; post("/api/close"); }
+    else if(act === "drafts"){ view = "drafts"; drawn.thread = null;
+                               if(last) render(last); poll(); }
+    else if(act === "extract"){ post("/api/extract"); }
+    else if(act === "write"){ post("/api/letter", {shape}); }
+    else if(act === "shape"){ shape = arg; drawn.addon = null; poll(); }
+    else if(act === "toggle"){ toggle(Number(arg)); }
+    else if(act === "fold") { el.classList.toggle("fold"); }
+  });
+
+  $("q").addEventListener("input", e => { query = e.target.value.toLowerCase();
+    drawn.inbox = null; if(last) render(last); });
+  $("q").addEventListener("keydown", e => {
+    if(e.key !== "Escape") return;
+    e.target.value = ""; query = ""; drawn.inbox = null; if(last) render(last);
+  });
+
   async function poll(){
-    try{ render(await (await fetch(`/api/state?since=${callSeq}`)).json()); }
+    try{ last = await (await fetch(`/api/state?since=${callSeq}`)).json(); render(last); }
     catch(e){ $("conn-label").textContent = "console unreachable"; }
   }
 
@@ -200,38 +236,51 @@
     $("key").textContent = "key " + c.key;
     $("ops").textContent = `${c.operations} operation${c.operations===1?"":"s"}`;
     $("nav-count").textContent = s.inbox.length;
-    $("nav-drafts").textContent = drafted ? "1" : "";
+    $("nav-drafts").textContent = s.draft ? "1" : "";
+    $("nav-inbox").className = view === "drafts" ? "" : "on";
+    $("nav-draft").className = view === "drafts" ? "on" : "";
 
-    if(!s.thread) renderInbox(s); else renderThread(s);
+    if(view === "drafts") renderDrafts(s);
+    else if(!s.thread) renderInbox(s);
+    else renderThread(s);
+
     renderAddon(s);
     renderFeed(s);
     renderCompose(s);
   }
 
+  function match(t){
+    if(!query) return true;
+    return (t.subject + " " + t.senders.join(" ") + " " + t.snippet).toLowerCase()
+      .includes(query);
+  }
+
   function renderInbox(s){
-    open = null;
-    $("mail").innerHTML = s.inbox.map(t => `
-      <div class="row" onclick="openThread('${esc(t.name)}')">
-        <span class="star">☆</span>
+    const rows = s.inbox.filter(match);
+    const sig = query + "|" + rows.map(t=>t.name).join(",");
+    if(drawn.inbox === sig) return;
+    drawn.inbox = sig; drawn.thread = null;
+    $("mail").innerHTML = rows.length ? rows.map(t => `
+      <div class="row" data-act="open" data-arg="${esc(t.name)}">
         <span class="from">${esc(t.senders.slice(0,2).join(", "))}
           <span class="n">${t.count>1?" "+t.count:""}</span></span>
         <span class="sub">${esc(t.subject)}
-          ${t.hostile?'<span class="flag">⚠</span>':""}
+          ${t.hostile?'<span class="flag" title="contains text aimed at an automated reader">⚠</span>':""}
           <span>— ${esc(t.snippet)}</span></span>
         <span class="when">${esc(t.date.slice(4,11))}</span>
-      </div>`).join("");
+      </div>`).join("")
+      : `<div style="padding:34px 20px" class="empty">No messages match “${esc(query)}”.</div>`;
   }
 
   function renderThread(s){
     const t = s.thread;
-    if(open === t.name) return;
-    open = t.name;
+    if(drawn.thread === t.name) return;
+    drawn.thread = t.name; drawn.inbox = null;
     $("mail").innerHTML = `<div class="thread">
-      <button class="ghost small" onclick="back()">← Inbox</button>
+      <button class="ghost small" data-act="back">← Inbox</button>
       <h1 style="margin-top:14px">${esc(t.subject)}</h1>
       ${t.messages.map((m,i) => `
-        <div class="m ${i < t.messages.length-2 ? "fold" : ""}"
-             onclick="this.classList.toggle('fold')">
+        <div class="m ${i < t.messages.length-2 ? "fold" : ""}" data-act="fold">
           <div class="av" style="background:hsl(${hue(m.sender)} 52% 45%)">${esc(initials(m.sender))}</div>
           <div>
             <div class="who">${esc(m.sender)}</div>
@@ -242,28 +291,55 @@
     </div>`;
   }
 
+  function renderDrafts(s){
+    const sig = "drafts:" + (s.draft ? s.draft.subject : "");
+    if(drawn.thread === sig) return;
+    drawn.thread = sig; drawn.inbox = null;
+    $("mail").innerHTML = s.draft ? `<div class="thread">
+        <button class="ghost small" data-act="inbox">← Inbox</button>
+        <h1 style="margin-top:14px">${esc(s.draft.subject)}</h1>
+        <div class="m"><div class="av" style="background:hsl(210 52% 45%)">✉</div>
+          <div><div class="who">Draft — to ${esc(s.draft.to)}</div>
+          <div class="txt">${esc(s.draft.body)}</div></div></div>
+      </div>`
+      : `<div style="padding:34px 20px" class="empty">No drafts yet. Open a thread and
+         write a letter.</div>`;
+  }
+
   function renderAddon(s){
+    const busy = !!s.busy;
+    const sig = JSON.stringify([
+      s.thread && s.thread.name, busy, s.error, shape,
+      s.commitments.map(c=>[c.quote, c.chosen, c.quote_found]),
+      (s.thread||{}).findings ? s.thread.findings.length : 0,
+      s.dangling.length,
+    ]);
+    if(drawn.addon === sig) return;
+    drawn.addon = sig;
+
     if(!s.thread){
       $("addon").innerHTML = '<p class="lede">Open a message. This panel is where the '
         + 'add-on lives in Gmail.</p>';
-      $("badge").textContent = "add-on"; sig = null; return;
+      $("badge").textContent = "add-on"; return;
     }
-    const busy = !!s.busy;
+
     let html = "";
     if(s.error) html += `<div class="note err">${esc(s.error)}</div>`;
     if(s.thread.findings.length)
       html += `<div class="note warn"><b>This thread contains text aimed at an automated
         reader.</b> Reported, never followed — check who sent it before ticking anything
         from that message.</div>`;
+    if(busy) html += `<div class="note run"><span class="dot pulse"></span>
+      ${esc(s.busy)}<br><span class="sm">A turn takes 15–45 seconds.</span></div>`;
 
     if(!s.commitments.length){
+      $("badge").textContent = "add-on";
       html += `<p class="lede">Pull out what people actually committed to in this thread —
         not a polite summary. You review each one before anything is written.</p>
-        <button id="go" ${busy?"disabled":""}>${busy?"Reading…":"Find commitments"}</button>
+        <button data-act="extract" ${busy?"disabled":""}>
+          ${busy?"Reading…":"Find commitments"}</button>
         <p class="sm" style="margin:9px 0 0">${c_live(s)}</p>`;
       $("addon").innerHTML = html;
-      if($("go")) $("go").onclick = () => post("/api/extract");
-      sig = null;
       return;
     }
 
@@ -280,8 +356,9 @@
         missing.</b> The letter would omit the obligation that actually stands.</div>`;
 
     html += s.commitments.map((c,i) => `
-      <label class="c ${c.chosen?"on":""} ${c.quote_found?"":"bad"}">
-        <input type="checkbox" ${c.chosen?"checked":""} onchange="toggle(${i},this.checked)">
+      <div class="c ${c.chosen?"on":""} ${c.quote_found?"":"bad"}"
+           data-act="toggle" data-arg="${i}">
+        <input type="checkbox" ${c.chosen?"checked":""} tabindex="-1">
         <div>
           <span class="chip ${esc(c.status)}">${esc(c.status)}</span>
           ${c.quote_found?"":'<span class="chip unv">not in thread</span>'}
@@ -289,30 +366,30 @@
           <div class="sm">${c.due?"due "+esc(c.due):"no date"}${c.located_in?" · message "+c.located_in:""}</div>
           <div class="q">“${esc(c.quote)}”</div>
         </div>
-      </label>`).join("");
+      </div>`).join("");
 
     const n = s.commitments.filter(x=>x.chosen).length;
     const noun = shape === "memo" ? "memo" : "letter";
     html += `<div class="seg" style="margin:2px 0 11px">
-        <button class="segb ${shape==="letter"?"on":""}" onclick="setShape('letter')">Letter</button>
-        <button class="segb ${shape==="memo"?"on":""}" onclick="setShape('memo')">Memo</button>
+        <button class="segb ${shape==="letter"?"on":""}" data-act="shape" data-arg="letter">Letter</button>
+        <button class="segb ${shape==="memo"?"on":""}" data-act="shape" data-arg="memo">Memo</button>
       </div>
-      <button id="write" ${busy?"disabled":""}>
-      ${busy?"Writing…":`Write ${noun} &amp; attach to reply`}</button>
+      <button data-act="write" ${busy?"disabled":""}>
+        ${busy?"Writing…":`Write ${noun} &amp; attach to reply`}</button>
       <p class="sm" style="margin:9px 0 0">${n} selected · ${c_live(s)}</p>`;
-    const next = JSON.stringify([s.commitments.map(c=>[c.quote,c.chosen]), busy, s.error, shape]);
-    if(next !== sig){ sig = next; $("addon").innerHTML = html; }
-    if($("write")) $("write").onclick = () => post("/api/letter",{shape});
+    $("addon").innerHTML = html;
   }
 
   const c_live = s => s.connection.live
     ? "one operation against your account" : "one operation";
 
   function renderCompose(s){
+    const sig = s.draft ? s.draft.subject + s.draft.body.length : "";
+    if(drawn.compose === sig) return;
+    drawn.compose = sig;
     if(!s.draft){ $("compose").innerHTML = ""; return; }
-    drafted = true;
     $("compose").innerHTML = `<div class="compose">
-      <header>New message <span style="margin-left:auto;color:var(--dim);font-weight:400">— ✕</span></header>
+      <header>New message</header>
       <div class="f">To <b>${esc(s.draft.to)}</b></div>
       <div class="f">Subject <b>${esc(s.draft.subject)}</b></div>
       <div class="b">${esc(s.draft.body)}</div>
@@ -321,7 +398,7 @@
         <a class="sm" style="margin-left:auto;color:var(--accent)"
            href="/api/export?fmt=docx">Download</a></div>
       <div class="actions">
-        <button disabled title="This demo never sends mail">Send</button>
+        <button disabled title="This is a demo. It never sends mail.">Send</button>
         <a class="sm" style="color:var(--accent)" href="/api/reply?fmt=docx">Save .eml</a>
         <span class="sm" style="margin-left:auto">nothing is ever sent</span>
       </div></div>`;
@@ -346,20 +423,24 @@
   }
 
   async function post(path, body){
-    const r = await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify(body||{})});
-    if(!r.ok){ const j = await r.json(); alert(j.detail); }
-    sig = null; poll();
+    Object.keys(drawn).forEach(k => drawn[k] = null);
+    try{
+      const r = await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(body||{})});
+      if(!r.ok){ const j = await r.json(); alert(j.detail); }
+    }catch(e){ alert(String(e)); }
+    poll();
   }
-  window.openThread = name => { drafted=false; sig=null; post("/api/open",{name}); };
-  window.back = () => { open=null; sig=null; drafted=false;
-    fetch("/api/close",{method:"POST"}).then(poll); };
-  window.toggle = async (i,on) => {
-    const s = await (await fetch("/api/state")).json();
+
+  async function toggle(i){
+    const s = last || await (await fetch("/api/state")).json();
+    const c = s.commitments[i]; if(!c) return;
+    c.chosen = !c.chosen;                 // optimistic, so the tick is instant
+    drawn.addon = null; render(s);
     await fetch("/api/toggle",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({quote:s.commitments[i].quote,on})});
-    sig=null; poll();
-  };
+      body:JSON.stringify({quote:c.quote,on:c.chosen})});
+    poll();
+  }
 
   poll(); setInterval(poll, 900);
 </script>
