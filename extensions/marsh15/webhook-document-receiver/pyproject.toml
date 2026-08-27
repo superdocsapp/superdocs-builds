@@ -1,0 +1,30 @@
+[project]
+name = "webhook-document-receiver"
+version = "1.0.0"
+description = "Secure, deployable webhooks-to-documents receiver for SuperDocs"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.141.1",
+  "httpx==0.28.1",
+  "psycopg[binary,pool]==3.3.4",
+  "pydantic-settings==2.10.1",
+  "PyYAML==6.0.3",
+  "uvicorn[standard]==0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.4.1",
+  "pytest-asyncio==1.1.0",
+  "ruff==0.12.12",
+  "respx==0.22.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
