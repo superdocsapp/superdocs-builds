@@ -2,6 +2,8 @@
 `file_shared` event listener rather than a custom Slack message shortcut — it fires for
 any file shared in a channel the bot is in, which is a plainer match for the card's
 "a file shared in a channel" than requiring the user to invoke a shortcut manually."""
+import uuid
+
 import httpx
 
 from app.config import settings
@@ -9,7 +11,6 @@ from app.db.models import DocumentLink
 from app.db.session import SessionLocal
 from app.services.event_dedup import claim_event
 from app.services.superdocs_client import SuperDocsClient
-from app.services.user_session import get_or_create_session_id
 from app.slack.app import bolt_app
 
 
@@ -36,18 +37,23 @@ def handle_file_shared(event, body, client, logger):
     resp.raise_for_status()
     content = resp.content
 
+    # A fresh session PER shared file. Uploading into a session that already holds
+    # a document overwrites it in place (SuperDocs keeps the same durable id and
+    # replaces the content) rather than opening a new document — so a per-user
+    # session glued every share onto the first document. A unique session per
+    # share makes each upload a genuinely distinct, correctly-tracked document.
+    session_id = f"slack-user-{user_id}-{uuid.uuid4().hex[:12]}"
+
+    sd = SuperDocsClient()
+    try:
+        doc = sd.upload_document(session_id, filename, content)
+    finally:
+        sd.close()
+
+    document_id = doc["durable_document_id"] or doc["document_id"]
+
     db = SessionLocal()
     try:
-        session_id = get_or_create_session_id(db, user_id)
-
-        sd = SuperDocsClient()
-        try:
-            doc = sd.upload_document(session_id, filename, content)
-        finally:
-            sd.close()
-
-        document_id = doc["durable_document_id"] or doc["document_id"]
-
         db.query(DocumentLink).filter_by(slack_user_id=user_id).update({"is_focused": False})
         link = db.query(DocumentLink).filter_by(
             slack_user_id=user_id, superdocs_document_id=document_id
@@ -57,12 +63,14 @@ def handle_file_shared(event, body, client, logger):
                 DocumentLink(
                     slack_user_id=user_id,
                     superdocs_document_id=document_id,
+                    superdocs_session_id=session_id,
                     title=doc["title"],
                     is_focused=True,
                 )
             )
         else:
             link.title = doc["title"]
+            link.superdocs_session_id = session_id
             link.is_focused = True
         db.commit()
     finally:

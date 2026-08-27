@@ -34,7 +34,6 @@ def handle_app_mention(event, body, client, logger):
 
     db = SessionLocal()
     try:
-        session_id = get_or_create_session_id(db, user_id)
         focused = db.query(DocumentLink).filter_by(slack_user_id=user_id, is_focused=True).one_or_none()
         if focused is None:
             client.chat_postMessage(
@@ -43,6 +42,11 @@ def handle_app_mention(event, body, client, logger):
                 text="You don't have a document open yet — share a file in a channel first.",
             )
             return
+
+        # Edit the focused document in ITS OWN session — each shared file has its
+        # own session (see upload_shortcut). Fall back to the legacy per-user
+        # session only for links created before per-document sessions existed.
+        session_id = focused.superdocs_session_id or get_or_create_session_id(db, user_id)
 
         sd = SuperDocsClient()
         try:

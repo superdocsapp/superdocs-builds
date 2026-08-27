@@ -30,6 +30,11 @@ class DocumentLink(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     slack_user_id: Mapped[str] = mapped_column(String(64), nullable=False)
     superdocs_document_id: Mapped[str] = mapped_column(String(256), nullable=False)
+    # Each shared file gets its OWN SuperDocs session — uploading into a session
+    # that already holds a document overwrites it in place (SuperDocs behavior),
+    # so a per-document session is what keeps shares from clobbering each other.
+    # Nullable only for links created before this column existed.
+    superdocs_session_id: Mapped[str | None] = mapped_column(String(256), nullable=True)
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     is_focused: Mapped[bool] = mapped_column(default=False)
     last_synced_at: Mapped[datetime.datetime] = mapped_column(
