@@ -2,8 +2,9 @@ import { evidenceFactsMatchDeterministicClassification } from "@payment-security
 import { parseEvidenceFacts } from "@payment-security-self-assessment/shared";
 import {
   AssessmentGenerationError,
-  generateAssessmentDraft,
+  startAssessmentReview,
 } from "@/lib/server/superdocs";
+import { createAssessmentWorkflow } from "@/lib/server/assessment-workflow";
 
 export const runtime = "nodejs";
 
@@ -22,8 +23,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const draftHtml = await generateAssessmentDraft(facts);
-    return Response.json({ draftHtml });
+    const started = await startAssessmentReview(facts);
+    const workflow = createAssessmentWorkflow(started.sessionId, started.jobId, facts);
+    return Response.json({ workflowId: workflow.id, state: workflow.state });
   } catch (error) {
     if (error instanceof AssessmentGenerationError) {
       return Response.json(

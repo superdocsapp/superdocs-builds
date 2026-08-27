@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { syntheticFintechEvidence } from "@payment-security-self-assessment/evidence";
 import {
+  buildApprovalRequest,
+  buildExportRequest,
   buildAssessmentInstruction,
   extractGeneratedHtml,
   mapSuperdocsHttpError,
+  parseAsyncChatResponse,
+  parseJobResponse,
   parseProposedChangeContent,
+  parseUploadedDocument,
   validateGeneratedDraft,
 } from "./superdocs.ts";
 
@@ -143,4 +148,62 @@ test("authentication errors never expose authorization data", () => {
 
   assert.equal(error.code, "AUTHENTICATION");
   assert.doesNotMatch(error.message, /bearer|authorization|sk_/i);
+});
+
+test("parses the documented uploaded-document response and carries its session into async chat", () => {
+  assert.deepEqual(
+    parseUploadedDocument({
+      html: '<h1 data-chunk-id="title">Assessment</h1>',
+      session_id: "assessment-session-1",
+      filename: "assessment-template.html",
+    }),
+    {
+      html: '<h1 data-chunk-id="title">Assessment</h1>',
+      sessionId: "assessment-session-1",
+    },
+  );
+  assert.deepEqual(
+    parseAsyncChatResponse({ job_id: "job-1", session_id: "assessment-session-1", status: "pending" }),
+    { jobId: "job-1", sessionId: "assessment-session-1" },
+  );
+});
+
+test("parses pending review changes without treating them as approved HTML", () => {
+  const job = parseJobResponse({
+    job_id: "job-1",
+    session_id: "assessment-session-1",
+    status: "awaiting_approval",
+    metadata: {
+      pending_changes: [{
+        change_id: "change-1",
+        operation: "edit",
+        chunk_id: "authentication-content",
+        old_html: "<p>Draft pending.</p>",
+        new_html: "<p>Administrator MFA is required.</p>",
+      }],
+    },
+  });
+
+  assert.equal(job.status, "awaiting_approval");
+  assert.equal(job.pendingChanges?.[0]?.change_id, "change-1");
+  assert.equal(job.updatedHtml, undefined);
+});
+
+test("approval explicitly approves the pending change batch", () => {
+  assert.deepEqual(buildApprovalRequest("job-1", ["change-1", "change-2"]), {
+    job_id: "job-1",
+    approved: true,
+    changes: [
+      { change_id: "change-1", approved: true },
+      { change_id: "change-2", approved: true },
+    ],
+  });
+});
+
+test("export is a DOCX session export and can only be requested by an approved workflow", () => {
+  assert.deepEqual(buildExportRequest("assessment-session-1"), {
+    session_id: "assessment-session-1",
+    format: "docx",
+    options: { filename: "payment-security-self-assessment.docx" },
+  });
 });

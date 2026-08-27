@@ -4,7 +4,9 @@ const workflow = [
   "Add evidence",
   "Inspect extracted facts",
   "Generate a grounded assessment",
-  "Review the assessment draft",
+  "Review proposed changes",
+  "Approve changes",
+  "Export the assessment",
 ];
 
 export default function Home() {

@@ -12,10 +12,11 @@ Built as a SuperDocs Task 2 use case.
 Upload supported .txt evidence (or select fictional demo evidence)
 → process evidence in memory
 → inspect classified facts and provenance
-→ generate assessment
-→ local /api/assessment calls SuperDocs POST /v1/chat
-→ application validates grounding safeguards
-→ review the generated HTML draft in the application
+→ upload a temporary HTML assessment template to SuperDocs
+→ local /api/assessment calls SuperDocs POST /v1/chat/async
+→ review proposed changes
+→ explicitly approve changes
+→ validate the completed draft and export DOCX
 ```
 
 The application creates a small in-memory HTML template for each generation. It does not persist uploaded files, evidence facts, templates, or generated drafts.
@@ -79,25 +80,25 @@ Uploaded text is treated as untrusted evidence data. The application extracts it
 
 This is a current input-handling safeguard, not a claim of comprehensive prompt-injection immunity.
 
-## SuperDocs integration
+## SuperDocs integration and approval
 
 The browser calls local Next.js routes only. `SUPERDOCS_API_KEY` is loaded and used only in the server-side SuperDocs client; it is not sent to the browser.
 
-For generation, `/api/assessment` constructs grounded instructions and calls the synchronous endpoint:
+For generation, `/api/assessment` uploads a minimal HTML template to `POST /v1/documents/upload`, then starts an asynchronous human-in-the-loop edit:
 
 ```text
-POST https://api.superdocs.app/v1/chat
+POST https://api.superdocs.app/v1/chat/async
 ```
 
-It sends an ephemeral assessment HTML template and reads generated HTML from the synchronous response's `document_changes.updated_html` field (with the supported nested response variant handled as well). The request has a 60-second timeout, and live generation can take tens of seconds. Errors returned to the browser are sanitized; raw upstream payloads and credentials are not exposed.
+The server sends `approval_mode: "ask_every_time"`, polls `GET /v1/jobs/{job_id}` for proposed changes, and never auto-approves them. The browser receives an opaque, in-memory workflow ID; the server retains the SuperDocs session and job IDs only for the lifetime of the running server.
 
-The current flow uses `approval_mode: "approve_all"` for edits to that temporary in-memory template. This is not explicit SuperDocs approval of a real user document.
+The human approval action calls `POST /v1/chat/{session_id}/approve` server-side. Once that job completes and the grounded draft passes validation, `GET /api/assessment/{workflowId}/export` proxies SuperDocs `POST /v1/documents/export` as a downloadable DOCX file. SuperDocs may retain its uploaded document/session according to its API lifecycle; this application itself has no database or restart-safe workflow persistence.
 
 ## Review flow
 
-Users can inspect extracted evidence facts, grouped by category and status, before generation. After generation they can inspect the generated draft in a sandboxed iframe.
+Users can inspect extracted evidence facts, grouped by category and status, before generation. Proposed changes are shown in sandboxed previews and are clearly marked as awaiting human approval. The completed draft is shown only after approval succeeds.
 
-There is no explicit SuperDocs approval flow, document persistence, editing workflow, or export flow in this application.
+Export remains disabled until approval succeeds.
 
 ## Architecture
 
@@ -111,7 +112,7 @@ packages/evidence → deterministic classification
        ↓
 packages/shared → EvidenceFact types and request validation
        ↓
-server-side SuperDocs client → POST /v1/chat
+server-side SuperDocs client → upload → async chat → approve → export
        ↓
 grounded generated HTML → sandboxed draft review
 ```
@@ -127,7 +128,7 @@ The test suites run offline and do not require a SuperDocs API key. They cover:
 - the 15-line mixed evidence regression corpus
 - supported and unsupported uploads, including file-count and file-size limits
 - prompt-like uploaded text remaining data rather than instructions
-- SuperDocs synchronous response parsing and sanitized authentication errors
+- SuperDocs upload, async job, approval, and export request/response parsing
 - generated-draft grounding checks, including UNKNOWN evidence-limitation wording and negative-claim rejection
 
 ## Setup
@@ -171,9 +172,6 @@ pnpm --filter @payment-security-self-assessment/web start
 
 ## Known limitations
 
-- No SuperDocs document-upload integration
-- No explicit SuperDocs approval integration
-- No final document export
 - No dedicated SuperDocs search integration
 - `.txt` / `text/plain` ingestion only; no PDF or DOCX ingestion
 - Deterministic phrase-based classification only; it is not semantic AI classification

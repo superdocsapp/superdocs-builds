@@ -39,8 +39,93 @@ export interface ProposedChange {
   new_html?: string;
 }
 
+export interface UploadedDocument {
+  html: string;
+  sessionId: string;
+}
+
+export interface AsyncChatStart {
+  jobId: string;
+  sessionId: string;
+}
+
+export interface SuperdocsJob {
+  status: "pending" | "in_progress" | "awaiting_approval" | "completed" | "failed" | "cancelled";
+  pendingChanges?: ProposedChange[];
+  updatedHtml?: string;
+  error?: string;
+}
+
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function parseUploadedDocument(response: unknown): UploadedDocument {
+  if (!isRecord(response) || typeof response.html !== "string" || typeof response.session_id !== "string") {
+    throw new AssessmentGenerationError(502, "MALFORMED_RESPONSE", "SuperDocs returned an invalid uploaded document.");
+  }
+
+  return { html: response.html, sessionId: response.session_id };
+}
+
+export function parseAsyncChatResponse(response: unknown): AsyncChatStart {
+  if (!isRecord(response) || typeof response.job_id !== "string" || typeof response.session_id !== "string") {
+    throw new AssessmentGenerationError(502, "MALFORMED_RESPONSE", "SuperDocs did not return an async assessment job.");
+  }
+
+  return { jobId: response.job_id, sessionId: response.session_id };
+}
+
+export function parseJobResponse(response: unknown): SuperdocsJob {
+  if (!isRecord(response) || typeof response.status !== "string") {
+    throw new AssessmentGenerationError(502, "MALFORMED_RESPONSE", "SuperDocs returned an invalid assessment job.");
+  }
+  const statuses = ["pending", "in_progress", "awaiting_approval", "completed", "failed", "cancelled"] as const;
+  if (!statuses.includes(response.status as (typeof statuses)[number])) {
+    throw new AssessmentGenerationError(502, "MALFORMED_RESPONSE", "SuperDocs returned an unknown assessment job status.");
+  }
+
+  const metadata = isRecord(response.metadata) ? response.metadata : undefined;
+  const pending = metadata?.pending_changes;
+  const pendingChanges = Array.isArray(pending) ? pending.map(parseProposedChangeRecord) : undefined;
+  const result = isRecord(response.result) ? response.result : undefined;
+  const updatedHtml = result ? extractGeneratedHtml(result) : undefined;
+  return {
+    status: response.status as SuperdocsJob["status"],
+    ...(pendingChanges ? { pendingChanges } : {}),
+    ...(updatedHtml ? { updatedHtml } : {}),
+    ...(typeof response.error === "string" ? { error: response.error } : {}),
+  };
+}
+
+function parseProposedChangeRecord(value: unknown): ProposedChange {
+  if (!isRecord(value) || typeof value.change_id !== "string" ||
+    (value.operation !== "edit" && value.operation !== "create" && value.operation !== "delete")) {
+    throw new AssessmentGenerationError(502, "MALFORMED_RESPONSE", "SuperDocs returned an invalid proposed change.");
+  }
+  return {
+    change_id: value.change_id,
+    operation: value.operation,
+    ...(typeof value.chunk_id === "string" ? { chunk_id: value.chunk_id } : {}),
+    ...(typeof value.old_html === "string" ? { old_html: value.old_html } : {}),
+    ...(typeof value.new_html === "string" ? { new_html: value.new_html } : {}),
+  };
+}
+
+export function buildApprovalRequest(jobId: string, changeIds: readonly string[]) {
+  return {
+    job_id: jobId,
+    approved: true,
+    changes: changeIds.map((change_id) => ({ change_id, approved: true })),
+  };
+}
+
+export function buildExportRequest(sessionId: string) {
+  return {
+    session_id: sessionId,
+    format: "docx",
+    options: { filename: "payment-security-self-assessment.docx" },
+  };
 }
 
 function getSuperdocsApiKey(): string | undefined {
@@ -279,72 +364,113 @@ export function mapSuperdocsHttpError(status: number): AssessmentGenerationError
   );
 }
 
-export async function generateAssessmentDraft(
-  facts: readonly EvidenceFact[],
-): Promise<string> {
+export async function startAssessmentReview(facts: readonly EvidenceFact[]): Promise<AsyncChatStart> {
   const apiKey = getSuperdocsApiKey();
   if (!apiKey) {
-    throw new AssessmentGenerationError(
-      503,
-      "CONFIGURATION",
-      "Assessment generation is unavailable because the server is not configured.",
-    );
+    throw new AssessmentGenerationError(503, "CONFIGURATION", "Assessment generation is unavailable because the server is not configured.");
   }
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const requestedSessionId = `payment-security-self-assessment-${crypto.randomUUID()}`;
 
   try {
-    const response = await fetch(`${SUPERDOCS_BASE_URL}/v1/chat`, {
+    const uploadForm = new FormData();
+    uploadForm.set("file", new Blob([createAssessmentTemplate()], { type: "text/html" }), "assessment-template.html");
+    uploadForm.set("session_id", requestedSessionId);
+    const uploadResponse = await fetchWithTimeout(`${SUPERDOCS_BASE_URL}/v1/documents/upload`, {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${apiKey}` },
+      body: uploadForm,
+    });
+    if (!uploadResponse.ok) throw mapSuperdocsHttpError(uploadResponse.status);
+    const uploaded = parseUploadedDocument(await readJson(uploadResponse, "uploaded document"));
+
+    const chatResponse = await fetchWithTimeout(`${SUPERDOCS_BASE_URL}/v1/chat/async`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         message: buildAssessmentInstruction(facts),
-        session_id: `payment-security-self-assessment-${crypto.randomUUID()}`,
-        document_html: createAssessmentTemplate(),
-        approval_mode: "approve_all",
+        session_id: uploaded.sessionId,
+        approval_mode: "ask_every_time",
+        response_mode: "full",
       }),
-      signal: controller.signal,
     });
-
-    if (!response.ok) {
-      throw mapSuperdocsHttpError(response.status);
-    }
-
-    let payload: unknown;
-    try {
-      payload = (await response.json()) as unknown;
-    } catch {
-      throw new AssessmentGenerationError(
-        502,
-        "MALFORMED_RESPONSE",
-        "SuperDocs returned an unreadable assessment response.",
-      );
-    }
-
-    return validateGeneratedDraft(extractGeneratedHtml(payload), facts);
+    if (!chatResponse.ok) throw mapSuperdocsHttpError(chatResponse.status);
+    return parseAsyncChatResponse(await readJson(chatResponse, "async assessment job"));
   } catch (error) {
-    if (error instanceof AssessmentGenerationError) {
-      throw error;
-    }
+    throw normalizeNetworkError(error);
+  }
+}
 
-    if (error instanceof DOMException && error.name === "AbortError") {
-      throw new AssessmentGenerationError(
-        504,
-        "TIMEOUT",
-        "Assessment generation timed out. Please try again.",
-      );
-    }
+export async function getAssessmentJob(jobId: string): Promise<SuperdocsJob> {
+  const apiKey = getSuperdocsApiKey();
+  if (!apiKey) throw new AssessmentGenerationError(503, "CONFIGURATION", "Assessment generation is unavailable because the server is not configured.");
+  try {
+    const response = await fetch(`${SUPERDOCS_BASE_URL}/v1/jobs/${encodeURIComponent(jobId)}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    if (!response.ok) throw mapSuperdocsHttpError(response.status);
+    return parseJobResponse(await readJson(response, "assessment job"));
+  } catch (error) {
+    throw normalizeNetworkError(error);
+  }
+}
 
-    throw new AssessmentGenerationError(
-      502,
-      "NETWORK",
-      "Unable to reach SuperDocs for assessment generation. Please try again.",
-    );
+export async function approveAssessmentChanges(sessionId: string, jobId: string, changes: readonly ProposedChange[]): Promise<void> {
+  const apiKey = getSuperdocsApiKey();
+  if (!apiKey) throw new AssessmentGenerationError(503, "CONFIGURATION", "Assessment generation is unavailable because the server is not configured.");
+  try {
+    const response = await fetch(`${SUPERDOCS_BASE_URL}/v1/chat/${encodeURIComponent(sessionId)}/approve`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(buildApprovalRequest(jobId, changes.map((change) => change.change_id))),
+    });
+    if (!response.ok) throw mapSuperdocsHttpError(response.status);
+  } catch (error) {
+    throw normalizeNetworkError(error);
+  }
+}
+
+export async function exportApprovedAssessment(sessionId: string): Promise<{ bytes: ArrayBuffer; contentType: string; filename: string }> {
+  const apiKey = getSuperdocsApiKey();
+  if (!apiKey) throw new AssessmentGenerationError(503, "CONFIGURATION", "Assessment export is unavailable because the server is not configured.");
+  try {
+    const response = await fetch(`${SUPERDOCS_BASE_URL}/v1/documents/export`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(buildExportRequest(sessionId)),
+    });
+    if (!response.ok) throw mapSuperdocsHttpError(response.status);
+    return {
+      bytes: await response.arrayBuffer(),
+      contentType: response.headers.get("content-type") || "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      filename: "payment-security-self-assessment.docx",
+    };
+  } catch (error) {
+    throw normalizeNetworkError(error);
+  }
+}
+
+async function readJson(response: Response, description: string): Promise<unknown> {
+  try {
+    return (await response.json()) as unknown;
+  } catch {
+    throw new AssessmentGenerationError(502, "MALFORMED_RESPONSE", `SuperDocs returned an unreadable ${description} response.`);
+  }
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function normalizeNetworkError(error: unknown): AssessmentGenerationError {
+  if (error instanceof AssessmentGenerationError) return error;
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return new AssessmentGenerationError(504, "TIMEOUT", "Assessment generation timed out. Please try again.");
+  }
+  return new AssessmentGenerationError(502, "NETWORK", "Unable to reach SuperDocs for assessment generation. Please try again.");
 }
