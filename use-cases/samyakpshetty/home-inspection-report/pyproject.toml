@@ -1,0 +1,104 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "home-inspection-report"
+version = "0.1.0"
+description = "A structured home-inspection report builder: findings and photo evidence per inspection system, assembled into a formatted field report a first-time buyer can actually read — built on SuperDocs."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Samyak P Shetty" }]
+
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "psycopg[binary]>=3.1",
+    "Pillow>=10.3",
+    "pillow-heif>=0.16",   # HEIC: the iPhone camera default since iOS 11
+    "PyYAML>=6.0",
+    "python-docx>=1.1",
+    "pymupdf>=1.24",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.16.1",
+    "mypy==2.3.0",
+    "pytest==9.1.1",
+    "types-PyYAML>=6.0",
+]
+
+[project.scripts]
+inspection-report = "inspection_report.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspection_report"]
+
+# ----------------------------------------------------------------------------
+# ruff — lint + format, the same bar held in the Notion build
+# ----------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pyflakes / pycodestyle
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "SIM",           # flake8-simplify
+    "RUF",           # ruff-specific
+    "TID",           # tidy imports
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
+# FastAPI's dependency injection is expressed as calls in argument defaults (Depends, File,
+# Query). That is the framework's idiom, not an accident, so it is allowed in the routing
+# layer only rather than silenced line by line.
+"src/inspection_report/api/*" = ["B008"]
+
+# ----------------------------------------------------------------------------
+# mypy — a real gate, strict
+# ----------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+no_implicit_reexport = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# pymupdf and python-docx ship partial or absent types; don't let their internals fail our
+# gate. Our own code stays fully typed — this only stops third-party gaps leaking in.
+module = ["pymupdf.*", "fitz.*", "docx.*", "pillow_heif.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
+disallow_untyped_calls = false
+
+# ----------------------------------------------------------------------------
+# pytest
+# ----------------------------------------------------------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `not live` is deselection, not decoration. The live test's own docstring said it never runs
+# in the keyless suite, and nothing enforced that — it merely skipped itself when no key was
+# present, so the claim held right up until someone ran `make check` from the terminal they
+# had just set up for a live run, at which point the suite quietly spent an operation. Asked
+# for by name (`pytest -m live`) it still runs: a command-line `-m` overrides this one.
+addopts = "-q --strict-markers -m 'not live'"
+markers = [
+    "postgres: test requires a live Postgres (run in docker compose, skipped otherwise)",
+    "live: test hits the real SuperDocs API (needs a key; deselected unless asked for by name)",
+]

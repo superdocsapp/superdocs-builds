@@ -1,0 +1,41 @@
+# The inspection systems, in the order they appear in every report.
+#
+# This file is the catalogue. Adding a system, renaming one, or changing report order is a
+# change here and nowhere else — no code, no migration, no redeploy of logic. The exported
+# report is grouped and ordered by this list, and the export verifier checks the finished
+# file against it.
+
+systems:
+  - key: roof
+    name: Roof
+    blurb: >-
+      The roof covering, flashings, gutters and anything that sheds water away from the
+      building.
+
+  - key: electrical
+    name: Electrical
+    blurb: >-
+      The service entry, panel, branch wiring, and the outlets, switches and fixtures a
+      buyer will use every day.
+
+  - key: plumbing
+    name: Plumbing
+    blurb: >-
+      Supply and waste piping, fixtures, the water heater, and anywhere water enters or
+      leaves the building.
+
+  - key: hvac
+    name: Heating & Cooling
+    blurb: >-
+      The heating and cooling equipment, its distribution, and the controls that run it.
+
+  - key: structure
+    name: Structure
+    blurb: >-
+      Foundation, framing, and the parts of the building that carry load.
+
+  - key: exterior
+    name: Exterior & Grounds
+    blurb: >-
+      Siding, windows, doors, walkways, and how the ground around the building directs
+      water.

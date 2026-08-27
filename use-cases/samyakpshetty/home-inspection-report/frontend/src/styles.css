@@ -1,0 +1,610 @@
+/*
+ * The design system.
+ *
+ * The premise: **this tool makes a printed document, so it is set like one.** An inspection
+ * report has a title page, standing text, numbered sections and a severity legend. Building
+ * the interface to look like the artefact it produces is not decoration — it is the fastest
+ * way for an inspector to understand what they are assembling, and it is the reason this
+ * does not look like every other admin panel.
+ *
+ * Five decisions follow from that.
+ *
+ * 1. COLOUR MEANS SEVERITY AND NOTHING ELSE. The only saturated colours in the product are
+ *    the severity levels, straight out of config/severity.yaml. On a report where a buyer
+ *    has to spot "recommend prompt evaluation" at a glance, a decorative accent competing
+ *    with the one that carries meaning is not a style choice, it is a hazard. It also rules
+ *    out the usual way of making an interface look designed, which is why this one is built
+ *    from type, rule and grid instead.
+ *
+ * 2. THREE VOICES, EACH WITH A JOB.
+ *      serif — the document: the property, section headings, the buyer-facing prose.
+ *      sans  — the interface: buttons, fields, anything you operate rather than read.
+ *      mono  — the field: what the inspector typed, severity codes, counts, labels.
+ *    You can tell what kind of thing you are looking at before you read it. All three are
+ *    system stacks: an inspector loads this in a basement on one bar of signal, and a
+ *    webfont is a render-blocking round trip for a typeface nobody would notice.
+ *
+ * 3. AN ASYMMETRIC EDITORIAL GRID. A narrow left rail carries section numbers and labels;
+ *    the content sits in a wider column beside it. Sections are numbered, because a report's
+ *    sections are numbered. This is what a centred column cannot do.
+ *
+ * 4. RULES HAVE WEIGHT. A heavy rule closes the masthead, a medium rule opens a section, a
+ *    hairline separates items within one. Three weights, used consistently, do the work that
+ *    boxes and shadows do elsewhere.
+ *
+ * 5. TOUCH TARGETS AT 44px. This is operated one-handed, outdoors, sometimes with a glove on.
+ *
+ * Light and dark are both real: an attic at midday and a crawlspace both happen. Dark is not
+ * an inversion — the severity hues are re-picked for a dark ground, because a print-weight
+ * red on near-black is muddy, and that is the one colour that must stay legible.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --ink: #16161a;
+  --ink-soft: #4a4f57;
+  /* Darkened from #83878e, which measured 3.34:1 on --surface and failed AA for the small
+     text it is used on. Muted is not the same as unreadable, and this is read outdoors. */
+  --ink-faint: #6a707a;
+  --paper: #fffefb;
+  --surface: #f4f2ec;
+  --surface-2: #e9e6dd;
+  --line: #ddd9cf;
+  --line-mid: #b9b4a7;
+  --rule: #16161a;
+
+  /* Severity — the only saturated colour in the product. */
+  --sev-safety_concern: #a8321f;
+  --sev-repair: #b8601c;
+  --sev-maintenance: #856313;
+  --sev-monitor: #35637f;
+  --sev-observation: #585d66;
+
+  --ok: #2b6440;
+  --bad: #a8321f;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --radius: 3px;
+  --tap: 44px;
+
+  --step--2: 0.6875rem;
+  --step--1: 0.8125rem;
+  --step-0: 0.9375rem;
+  --step-1: 1.125rem;
+  --step-2: 1.5rem;
+  --step-3: 2.5rem;
+
+  /* The editorial grid: a rail for numbers and labels, then the column you read. */
+  --rail: 9rem;
+  --gutter: 2rem;
+  --measure: 64ch;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #ecebe7;
+    --ink-soft: #a8aab0;
+    /* Same check in dark: #7c8188 measured 4.20:1 on --surface. */
+    --ink-faint: #888d95;
+    --paper: #17181a;
+    --surface: #0f1011;
+    --surface-2: #212327;
+    --line: #2c2f34;
+    --line-mid: #4a4e55;
+    --rule: #ecebe7;
+
+    --sev-safety_concern: #e5776a;
+    --sev-repair: #e0975f;
+    --sev-maintenance: #c9a750;
+    --sev-monitor: #7cadcb;
+    --sev-observation: #9ba1a9;
+
+    --ok: #6fbf8e;
+    --bad: #e5776a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font: var(--step-0) / 1.6 var(--sans);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings are the document's voice, not the interface's. */
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+h1 { font-size: var(--step-3); letter-spacing: -0.03em; }
+h2 { font-size: var(--step-2); }
+h3 { font-size: var(--step-1); letter-spacing: -0.01em; }
+p { margin: 0; }
+
+/* The label voice: mono, small, letterspaced. Does the work a coloured chip would do in a
+   product that could afford to spend colour on decoration. */
+.diff__label, .shape__head, .section-num {
+  font-family: var(--mono);
+  font-size: var(--step--2);
+  text-transform: uppercase;
+  letter-spacing: 0.11em;
+  font-weight: 500;
+  color: var(--ink-faint);
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.shell { min-height: 100dvh; display: flex; flex-direction: column; background: var(--paper); }
+
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; gap: 1rem;
+  padding: 0 clamp(1rem, 5vw, 2.5rem);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  min-height: 54px;
+}
+.topbar__title {
+  font-family: var(--mono); font-size: var(--step--1);
+  text-transform: uppercase; letter-spacing: 0.14em; font-weight: 500;
+  white-space: nowrap;
+}
+.topbar__meta {
+  margin-left: auto; color: var(--ink-faint);
+  font-family: var(--mono); font-size: var(--step--2); letter-spacing: 0.06em;
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 62rem;
+  margin-inline: auto;
+  padding: clamp(1.75rem, 4vw, 3.5rem) clamp(1rem, 5vw, 2.5rem) 6rem;
+  display: grid;
+  gap: 2.5rem;
+  /* `flex: 1` makes this taller than its content on a short page, and a grid's default
+     align-content stretches auto-sized rows to absorb the slack — which silently inflated
+     every section. Rows keep their content height; the slack stays at the end. */
+  align-content: start;
+}
+
+.stack { display: grid; gap: 0.85rem; }
+.stack--sections { gap: 2.75rem; }
+.row { display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+
+/* The editorial grid. Left rail for the number and the label, content beside it. Collapses
+   to a single column on a phone, where a rail would eat a third of the width. */
+.ruled {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  gap: 0 var(--gutter);
+  border-top: 2px solid var(--rule);
+  padding-top: 0.75rem;
+}
+.ruled__rail { display: grid; gap: 0.3rem; align-content: start; padding-top: 0.2rem; }
+.ruled__body { display: grid; gap: 0.85rem; min-width: 0; }
+@media (max-width: 720px) {
+  .ruled { grid-template-columns: 1fr; gap: 0.5rem; }
+  .ruled__rail { display: flex; gap: 0.7rem; align-items: baseline; }
+}
+
+/* --------------------------------------------------------------- masthead */
+
+.masthead {
+  display: grid; gap: 0.5rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 3px solid var(--rule);
+}
+.masthead h1 { max-width: 18ch; }
+.masthead__meta {
+  display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: baseline;
+  font-family: var(--mono); font-size: var(--step--1); color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+.masthead__meta > * + *::before { content: "/"; margin-right: 0.6rem; color: var(--line-mid); }
+
+/* ----------------------------------------------------------------- blocks */
+
+/* A "card" is no longer a box — it is a block of the page, separated from the next by a
+   rule and a gap. Kept as a class because it still marks a block in the markup. */
+.card { background: transparent; border: 0; border-radius: 0; padding: 0; }
+
+/* The one place a real container earns itself: something being edited. */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(0.9rem, 2.5vw, 1.3rem);
+}
+
+.section-head {
+  display: flex; align-items: baseline; gap: 0.8rem; flex-wrap: wrap;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--line-mid);
+  margin-bottom: 1rem;
+}
+.section-head__count {
+  color: var(--ink-faint); font-family: var(--mono); font-size: var(--step--2);
+  text-transform: uppercase; letter-spacing: 0.09em;
+}
+.section-head__actions { margin-left: auto; align-self: center; display: flex; gap: 0.5rem; }
+
+.row--controls { align-items: end; }
+.row--controls > .hint { align-self: center; }
+
+/* -------------------------------------------------------------- severity */
+
+.sev {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  font-family: var(--mono);
+  font-size: var(--step--2); font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 0.2rem 0.5rem 0.2rem 0.42rem;
+  border-radius: var(--radius);
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+.sev::before {
+  content: ""; width: 0.42rem; height: 0.42rem; background: currentColor; flex: none;
+}
+/* The label carries the meaning; the colour only reinforces it. Anyone who cannot
+   distinguish these still reads the words, which is why the text is never dropped. */
+.sev--safety_concern { color: var(--sev-safety_concern); }
+.sev--repair { color: var(--sev-repair); }
+.sev--maintenance { color: var(--sev-maintenance); }
+.sev--monitor { color: var(--sev-monitor); }
+.sev--observation { color: var(--sev-observation); }
+
+/* --------------------------------------------------------------- controls */
+
+button, .btn {
+  font: 500 var(--step--1)/1 var(--sans);
+  letter-spacing: 0.01em;
+  min-height: var(--tap);
+  padding: 0 0.95rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--line-mid);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+  transition: background-color 150ms ease, border-color 150ms ease, opacity 150ms ease;
+}
+button:hover:not(:disabled) { background: var(--surface-2); border-color: var(--ink-faint); }
+button:active:not(:disabled) { transform: translateY(1px); }
+button:disabled { opacity: 0.42; cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Inverted, so the label is always the paper colour against the ink colour — the one
+   combination that cannot fail a contrast check in either theme. */
+.btn--primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn--primary:hover:not(:disabled) {
+  background: var(--ink); border-color: var(--ink); opacity: 0.86;
+}
+.btn--quiet { border-color: transparent; background: transparent; }
+.btn--quiet:hover:not(:disabled) { border-color: transparent; background: var(--surface-2); }
+.btn--small { min-height: 34px; padding: 0 0.65rem; font-size: var(--step--2); }
+
+label {
+  display: grid; gap: 0.35rem;
+  font-family: var(--mono); font-size: var(--step--2);
+  text-transform: uppercase; letter-spacing: 0.09em;
+  color: var(--ink-faint);
+}
+input, select, textarea {
+  font: var(--step-0)/1.5 var(--sans);
+  min-height: var(--tap);
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line-mid);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  width: 100%;
+}
+textarea { min-height: 90px; resize: vertical; }
+.field-grid { display: grid; gap: 0.85rem; grid-template-columns: 1fr; }
+@media (min-width: 620px) { .field-grid--2 { grid-template-columns: 1fr 1fr; } }
+
+/* `ch` is relative to the element's own size, so reusing the body measure on smaller text
+   wraps it a third too early. Small print gets its own count. */
+.hint { font-size: var(--step--1); color: var(--ink-faint); max-width: 78ch; line-height: 1.6; }
+
+/* ------------------------------------------------------------ rail notice */
+
+.notice {
+  border: 0; border-left: 3px solid var(--line-mid);
+  border-radius: 0;
+  padding: 0.5rem 0 0.5rem 0.9rem;
+  display: grid; gap: 0.4rem;
+  font-size: var(--step--1);
+  background: transparent;
+}
+.notice--refused { border-left-color: var(--bad); }
+.notice--ok { border-left-color: var(--ok); }
+.notice__head {
+  font-family: var(--mono); font-size: var(--step--2);
+  text-transform: uppercase; letter-spacing: 0.09em; font-weight: 500;
+  display: flex; gap: 0.4rem; align-items: center;
+}
+.notice--refused .notice__head { color: var(--bad); }
+.notice--ok .notice__head { color: var(--ok); }
+.notice code {
+  font-family: var(--mono); font-size: 0.92em;
+  background: var(--surface-2); padding: 0.05rem 0.3rem; border-radius: 2px;
+}
+
+/* ------------------------------------------------------------------ diff */
+
+.diff { display: grid; gap: 1rem; }
+@media (min-width: 780px) { .diff { grid-template-columns: 5fr 7fr; gap: var(--gutter); } }
+.diff__side { display: grid; gap: 0.4rem; align-content: start; min-width: 0; }
+.diff__text { border: 0; border-radius: 0; padding: 0; line-height: 1.6; }
+
+/* What the inspector typed is field shorthand, not prose — the mono voice says so before
+   you read it. What is proposed for the buyer is the document's voice, so it is set in the
+   serif the report itself uses. The two sides stop looking like alternatives of the same
+   kind of writing, which is the whole point of showing them side by side. */
+.diff__side--original .diff__text {
+  font-family: var(--mono); font-size: 0.84em; color: var(--ink-soft);
+  border-left: 2px solid var(--line); padding-left: 0.85rem;
+}
+.diff__side--proposed .diff__text {
+  font-family: var(--serif); font-size: 1.08em;
+  border-left: 2px solid var(--line-mid); padding-left: 0.85rem;
+}
+.diff__text--flagged { border-left-color: var(--bad) !important; }
+
+/* --------------------------------------------------------------- confirm
+ *
+ * A destructive action asks in place rather than in a dialog. Not red: colour means severity
+ * in this product and nowhere else, so the weight comes from the sentence and from having to
+ * say it twice.
+ */
+
+.confirm {
+  display: inline-flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
+  padding: 0.3rem 0 0.3rem 0.7rem;
+  border-left: 2px solid var(--ink);
+}
+.confirm__ask { font-size: var(--step--1); color: var(--ink); max-width: 46ch; }
+
+/* ---------------------------------------------------------------- photos */
+
+.thumbs { display: flex; gap: 0.9rem; flex-wrap: wrap; align-items: flex-start; }
+.thumb-wrap { margin: 0; display: grid; gap: 0.3rem; justify-items: start; }
+.thumb {
+  width: 96px; height: 72px; object-fit: cover;
+  border-radius: var(--radius); border: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+/* ---------------------------------------------------------------- states */
+
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius);
+  height: 1rem;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+  button:active:not(:disabled) { transform: none; }
+  * { transition-duration: 0.01ms !important; }
+}
+
+.empty { display: grid; gap: 0.6rem; justify-items: start; color: var(--ink-soft); padding: 1.5rem 0; }
+.error {
+  border: 0; border-left: 3px solid var(--bad);
+  border-radius: 0; padding: 0.5rem 0 0.5rem 0.9rem;
+  font-size: var(--step--1); background: transparent; color: var(--ink);
+}
+
+.checklist { display: grid; gap: 0.45rem; }
+.check { display: flex; gap: 0.6rem; align-items: baseline; font-size: var(--step--1); }
+.check__mark { font-family: var(--mono); font-weight: 700; flex: none; }
+.check--pass .check__mark { color: var(--ok); }
+.check--fail .check__mark { color: var(--bad); }
+.check__detail { color: var(--ink-faint); font-family: var(--mono); font-size: 0.92em; }
+
+/* ---------------------------------------------------------------- stages */
+
+.tabs {
+  display: flex; gap: 0; flex-wrap: wrap;
+  border-bottom: 1px solid var(--line-mid);
+}
+.tab {
+  min-height: 42px; padding: 0 0 0 0; margin-right: 1.75rem;
+  font-family: var(--mono); font-size: var(--step--2);
+  text-transform: uppercase; letter-spacing: 0.11em; font-weight: 500;
+  border: 0; border-bottom: 2px solid transparent; border-radius: 0;
+  background: transparent; color: var(--ink-faint); cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.tab:hover:not(:disabled) { background: transparent; border-color: transparent; color: var(--ink); }
+/* The hover rule on `button` is (0,2,1) and would out-specify a bare `.tab[aria-selected]`
+   at (0,2,0), repainting the background while leaving the inverted text colour — which is
+   how an inverted control becomes invisible under a pointer, the one contrast failure that
+   never shows up in a screenshot. Selected states are stated for both. */
+.tab[aria-selected="true"],
+.tab[aria-selected="true"]:hover:not(:disabled) {
+  background: transparent; color: var(--ink); border-bottom-color: var(--rule);
+}
+
+/* ----------------------------------------------------------------- lists */
+
+.list { display: grid; gap: 0; border-top: 2px solid var(--rule); }
+.list__item {
+  display: grid; grid-template-columns: var(--rail) minmax(0, 1fr) auto;
+  gap: 0 var(--gutter); align-items: baseline;
+  padding: 1rem 0.4rem 1rem 0; background: transparent;
+  border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  text-align: left; width: 100%; min-height: var(--tap); cursor: pointer;
+}
+.list__item:hover { background: var(--surface); }
+.list__index {
+  font-family: var(--mono); font-size: var(--step--2);
+  letter-spacing: 0.09em; color: var(--ink-faint);
+}
+.list__main { display: grid; gap: 0.25rem; min-width: 0; }
+.list__main > :first-child {
+  font-family: var(--serif); font-size: var(--step-1); font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.list__meta {
+  color: var(--ink-faint); font-family: var(--mono); font-size: var(--step--2);
+  letter-spacing: 0.04em;
+}
+@media (max-width: 720px) {
+  .list__item { grid-template-columns: minmax(0, 1fr) auto; }
+  .list__index { display: none; }
+}
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ------------------------------------------------------- the report's shape
+ *
+ * The one view that answers the question everybody asks first — where are the problems, and
+ * how bad. Systems down the side, severity across, count in the cell.
+ */
+
+.shape {
+  display: grid; gap: 1px; overflow-x: auto;
+  background: var(--line); border: 1px solid var(--line-mid);
+}
+.shape__row {
+  display: grid; grid-template-columns: minmax(9rem, 1fr) repeat(5, 2.75rem);
+  gap: 1px; align-items: stretch;
+}
+.shape__head .shape__cell {
+  background: var(--surface); display: flex; align-items: end; justify-content: center;
+  padding-bottom: 0.4rem;
+}
+.shape__label {
+  font-family: var(--serif); font-size: var(--step--1); font-weight: 600;
+  display: flex; align-items: center; padding: 0.6rem 0.7rem; background: var(--paper);
+}
+.shape__head .shape__label {
+  background: var(--surface); font-family: var(--mono); font-weight: 500;
+  font-size: var(--step--2); text-transform: uppercase; letter-spacing: 0.11em;
+  color: var(--ink-faint);
+}
+.shape__cell {
+  min-height: 2.6rem; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: var(--step--1); font-weight: 500;
+  background: var(--paper); color: var(--ink-faint);
+}
+.shape__cell--has { color: #fff; }
+.shape__cell--safety_concern.shape__cell--has { background: var(--sev-safety_concern); }
+.shape__cell--repair.shape__cell--has { background: var(--sev-repair); }
+.shape__cell--maintenance.shape__cell--has { background: var(--sev-maintenance); }
+.shape__cell--monitor.shape__cell--has { background: var(--sev-monitor); }
+.shape__cell--observation.shape__cell--has { background: var(--sev-observation); }
+.shape__cell--clear { background: var(--paper); }
+
+/* --------------------------------------------------- the phrase in context */
+
+/* The rail's objection marked where it happens. A list of quoted phrases underneath makes
+   the reader find them; marking them in the sentence shows them. */
+mark.flag {
+  background: color-mix(in srgb, var(--bad) 15%, transparent);
+  color: inherit;
+  border-bottom: 2px solid var(--bad);
+  border-radius: 1px;
+  padding: 0 0.08em;
+}
+.wdiff ins {
+  background: color-mix(in srgb, var(--ok) 17%, transparent);
+  text-decoration: none; border-radius: 1px; padding: 0 0.08em;
+}
+.wdiff del {
+  background: color-mix(in srgb, var(--ink-faint) 16%, transparent);
+  text-decoration: line-through; opacity: 0.65; border-radius: 1px; padding: 0 0.08em;
+}
+
+/* ---------------------------------------------------------------- finding */
+
+.finding { display: grid; gap: 0.55rem; padding: 1rem 0 1.1rem; border-top: 1px solid var(--line); }
+.finding:first-of-type { border-top: 0; padding-top: 0.25rem; }
+.finding__head { display: flex; gap: 0.7rem; align-items: baseline; flex-wrap: wrap; }
+/* Pushed to the end of the line so removing a finding is never next to reading one. */
+.finding__actions { margin-left: auto; }
+.finding__where {
+  font-family: var(--serif); font-size: var(--step-1); font-weight: 600; letter-spacing: -0.01em;
+}
+/* The inspector's own shorthand, in the field voice. */
+.finding__note { font-family: var(--mono); font-size: 0.86em; color: var(--ink-soft); max-width: 72ch; }
+
+/* One rewrite awaiting a decision. Ruled off rather than boxed, because a gate with eight
+   decisions on it should read as a list of eight, not eight competing panels. */
+.proposal { display: grid; gap: 0.9rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.proposal:first-of-type { border-top: 0; padding-top: 0; }
+
+/* What is about to be produced. Figures tabular so the column reads as a column. */
+.tally { margin: 0.4rem 0 0.6rem; display: grid; gap: 0; border-top: 1px solid var(--line-mid); max-width: 34rem; }
+.tally > div {
+  display: flex; align-items: baseline; gap: 1rem;
+  padding: 0.5rem 0; border-bottom: 1px solid var(--line);
+}
+.tally dt {
+  font-family: var(--mono); font-size: var(--step--2);
+  text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-faint);
+}
+.tally dd {
+  margin: 0 0 0 auto; font-family: var(--mono); font-weight: 500;
+  font-variant-numeric: tabular-nums; text-align: right;
+}
+
+/* ------------------------------------------------------------------ toast */
+
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 50; max-width: min(92vw, 30rem);
+  background: var(--ink); color: var(--paper);
+  border-radius: var(--radius); padding: 0.75rem 1.1rem;
+  font-family: var(--mono); font-size: var(--step--2); letter-spacing: 0.04em;
+  display: flex; gap: 0.6rem; align-items: center;
+  animation: toast-in 160ms ease-out;
+}
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 0.5rem); } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+/* ---------------------------------------------------------------- mobile
+ *
+ * Last in the file on purpose. These override component rules of equal specificity declared
+ * above, and cascade order is what decides — an earlier media query simply loses.
+ */
+@media (max-width: 640px) {
+  .topbar { gap: 0.6rem; }
+  .topbar__meta { display: none; }
+
+  :root { --step-3: 1.875rem; --step-2: 1.25rem; --gutter: 1rem; }
+  .main { gap: 1.75rem; }
+
+  /* Compact controls are a desktop affordance. On the device this is actually operated on
+     — one hand, outdoors, sometimes gloved — everything tappable goes back to full size. */
+  .tab, .btn--small { min-height: var(--tap); }
+  .tab { margin-right: 1.1rem; }
+}

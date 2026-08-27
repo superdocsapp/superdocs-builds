@@ -1,0 +1,45 @@
+# The severity scale.
+#
+# Deliberately worded as what the *reader should do next*, never as a verdict on the
+# property. There is no "pass", "fail", "safe" or "defective" level here, and that is the
+# point: a home inspection reports observations and recommends next steps. The scale is
+# data, so a firm that uses four levels instead of five changes this file only.
+#
+# `rank` orders findings within a system — lower rank first, so the most urgent thing a
+# buyer needs to see appears at the top of that system's section.
+
+severities:
+  - key: safety_concern
+    rank: 1
+    label: Recommend prompt evaluation
+    description: >-
+      An observation a qualified specialist should look at before closing.
+    colour: "#B23A2E"
+
+  - key: repair
+    rank: 2
+    label: Recommend evaluation
+    description: >-
+      An observation that warrants evaluation and likely repair.
+    colour: "#C4682B"
+
+  - key: maintenance
+    rank: 3
+    label: Recommend maintenance
+    description: >-
+      Routine upkeep, the kind of thing an owner schedules rather than reacts to.
+    colour: "#B08A2E"
+
+  - key: monitor
+    rank: 4
+    label: Monitor
+    description: >-
+      Worth keeping an eye on, with no action recommended today.
+    colour: "#4A7A9B"
+
+  - key: observation
+    rank: 5
+    label: Noted for the record
+    description: >-
+      Recorded so the file is complete. No action recommended.
+    colour: "#6B7280"

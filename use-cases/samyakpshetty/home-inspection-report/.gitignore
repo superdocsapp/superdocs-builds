@@ -1,0 +1,30 @@
+# Secrets — never committed. Only .env.example is tracked.
+.env
+
+# Working directories, created at runtime
+artifacts/
+data/
+scratch/
+exports/
+
+# Python
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+
+# Frontend
+node_modules/
+frontend/dist/
+frontend/tsconfig.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# Design-skill tooling installed locally, not part of the project
+.agents/
+.claude/
+skills-lock.json
+skills-lock.json

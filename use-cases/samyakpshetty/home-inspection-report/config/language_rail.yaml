@@ -1,0 +1,158 @@
+# The observational-language rail.
+#
+# A home inspection reports what was observed and recommends what to do next. It is not a
+# certification of the property's condition, and it must never read like one. This file is
+# the rail, and it is data: a firm operating under different wording rules edits this file,
+# not the code.
+#
+# Three mechanisms, applied in this order:
+#
+#   1. `allow`        — real inspection vocabulary that must never be flagged. Checked first,
+#                       because a rail that refuses valid work is worse than no rail.
+#   2. `banned`       — language that certifies, guarantees, or declares a verdict. Always a
+#                       breach, no exceptions.
+#   3. `scoped_terms` — words that are fine when tied to the moment of observation and a
+#                       problem when left as a general claim. "Operated when tested" is an
+#                       observation; "operational" is a verdict about the future.
+#
+# Every entry carries `why` and `suggest`, because the reviewer is shown the reason a
+# sentence was refused and what to write instead — a rail nobody understands gets switched
+# off.
+
+allow:
+  # Real terms of art. These contain banned substrings but are not claims.
+  - '\bsafety glazing\b'
+  - '\bsafety switch\b'
+  - '\bsafety cable\b'
+  - '\bsafety valve\b'
+  - '\bpressure relief valve\b'
+  - '\bgas safety\b'
+  # Our own severity labels must never trip our own rail.
+  - '\brecommend prompt evaluation\b'
+  - '\brecommend evaluation\b'
+  - '\brecommend maintenance\b'
+  # Honest statements of limit are the opposite of over-claiming.
+  - '\bnot accessible\b'
+  - '\bno access\b'
+  - '\bcould not be inspected\b'
+  - '\bnot inspected\b'
+  # Disclaiming a certification is the opposite of making one. The report's standing
+  # preamble says so in as many words, and the rail must not refuse the sentence whose
+  # whole job is to deny the claim.
+  - '\bis not a certification, warranty or guarantee\b'
+  - '\bnot a certification\b'
+  # "Warrants evaluation", "warrant the soonest attention" — the ordinary English verb
+  # meaning "deserves", not a warranty. Recognised by what it governs anywhere in the same
+  # sentence, rather than by listing the phrasings, so a new one does not reopen the hole.
+  # "The seller warrants the water heater" has no such object and still breaches.
+  - '\bwarrants?\b(?=[^.]{0,48}\b(evaluation|further|review|attention|investigation|monitoring|repair|replacement|inspection|scrutiny)\b)'
+
+banned:
+  - id: certification
+    pattern: '\bcertif(y|ies|ied|ication|icate)\b'
+    category: certification
+    why: >-
+      A home inspection is not a certification, and this build holds no certification to
+      offer.
+    suggest: 'Describe what was observed, and recommend evaluation by a qualified specialist.'
+
+  - id: guarantee
+    pattern: '\b(guarantee(s|d)?|warrant(s|y|ies|ed)?)\b'
+    category: guarantee
+    why: An inspection reports observations; it promises nothing about future performance.
+    suggest: 'State the observation, then the recommended next step.'
+
+  - id: code_compliance
+    # Matches the claim, not one phrasing of it. The first version listed noun forms in a
+    # single word order — "code compliant", "meets code" — and sailed past "the wiring is
+    # fully compliant with current code", which is the same claim with the words the other
+    # way round. Compliance is an authority's determination however it is worded, so the
+    # rule now recognises the vocabulary rather than the arrangement.
+    pattern: '\b(up to code|code[- ]compliant|meets? (the )?code|to code|building code|complian(t|ce)|complies with|conform(s|ed|ing)? (to|with))\b'
+    category: code
+    why: >-
+      Code compliance is determined by an authority having jurisdiction, not by an
+      inspection.
+    suggest: 'Describe the condition observed and recommend review by the local authority.'
+
+  - id: pass_fail
+    pattern: '\b(passed|passes|failed|fails) (inspection|the inspection|testing|the test)\b'
+    category: verdict
+    why: An inspection has no pass or fail outcome.
+    suggest: 'Report what was observed when the item was operated or examined.'
+
+  - id: condition_verdict
+    pattern: '\b(in (good|excellent|perfect|sound) condition|structurally sound|like new)\b'
+    category: verdict
+    why: A summary verdict on condition is a certification in everything but name.
+    suggest: 'Describe the specific things observed that led to that impression.'
+
+  - id: absolute_negative
+    pattern: '\b(defect[- ]free|free of defects|nothing wrong|no issues whatsoever)\b'
+    category: absolute
+    why: >-
+      These forms claim the absence of anything wrong with the building itself, which no
+      visual inspection can establish however it is qualified.
+    suggest: '"No deficiencies were observed in the areas inspected."'
+
+  - id: safety_assurance
+    pattern: '\b(is safe|are safe|perfectly safe|safe to use|safe for occupancy|for safety)\b'
+    category: safety
+    why: >-
+      Declaring something safe is the strongest condition claim there is, and it is exactly
+      what an inspection cannot support.
+    suggest: 'Describe the observation and recommend evaluation by a qualified specialist.'
+
+  - id: lifespan_prediction
+    pattern: '\b(will last|will fail|remaining (useful )?life|expected life|should last)\b'
+    category: prediction
+    why: An inspection observes present condition; it does not forecast.
+    suggest: 'Note the age or condition observed, without projecting forward.'
+
+  - id: cost_estimate
+    pattern: '(\$\s?\d|\b(cost|costs|priced) (about|approximately|around)\b)'
+    category: cost
+    why: >-
+      Repair pricing belongs to a contractor's quote. A number in the report reads as an
+      estimate the inspector is standing behind.
+    suggest: 'Recommend a quote from a qualified contractor.'
+
+  - id: reassurance
+    pattern: '(\b(nothing to worry about|no cause for concern|perfectly normal|harmless)\b|\b(typical|normal|common|expected) for [^.]{0,30}\bage\b)'
+    category: reassurance
+    why: >-
+      Reassurance is a judgement about significance that the buyer's own specialist should
+      make.
+    suggest: 'Report the observation and let the recommendation carry the weight.'
+
+scoped_terms:
+  # Allowed when tied to the moment of observation; a breach when left as a general claim.
+  - id: functional_claim
+    pattern: '\b(operational|functioning (normally|correctly|properly)|works (properly|correctly)|in working order)\b'
+    requires_any:
+      - '\bat the time of (the )?inspection\b'
+      - '\bwhen tested\b'
+      - '\bon the day of (the )?inspection\b'
+      - '\bat time of test\b'
+    category: scoped
+    why: >-
+      Without a time scope this reads as a promise the item will keep working. Scoped to the
+      inspection it is an honest observation.
+    suggest: '"Operated normally when tested at the time of inspection."'
+
+  # One rule for the whole class of negative findings, rather than a list of nouns that
+  # would go stale the first time an inspector wrote about something not on it.
+  - id: unscoped_negative
+    pattern: '\bno (defects|problems|issues|deficiencies|leaks|damage|deterioration|corrosion|movement|concerns)\b'
+    requires_any:
+      - '\bobserved\b'
+      - '\bvisible\b'
+      - '\bnoted\b'
+      - '\bat the time of (the )?inspection\b'
+      - '\bin the areas inspected\b'
+      - '\bwhere (visible|accessible)\b'
+    category: scoped
+    why: >-
+      "No leaks" is a claim about the building. "No leaks observed" is a claim about the
+      inspection, and that is the only one an inspector is in a position to make.
+    suggest: '"No leaks were observed in the areas inspected."'
