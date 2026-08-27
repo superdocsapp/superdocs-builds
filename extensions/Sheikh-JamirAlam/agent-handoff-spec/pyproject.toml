@@ -1,0 +1,19 @@
+[project]
+name = "agent-handoff-spec"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [{ name = "Sheikh-JamirAlam", email = "alamjamir15@gmail.com" }]
+requires-python = ">=3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "langchain-google-genai>=4.3.5",
+    "pydantic>=2.13.4",
+    "python-dotenv>=1.2.3",
+]
+
+[dependency-groups]
+dev = ["pytest>=9.1.1"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

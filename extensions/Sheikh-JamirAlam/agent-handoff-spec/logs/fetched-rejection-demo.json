@@ -1,0 +1,26 @@
+[
+  {
+    "document_id": "f470f1de-5ca0-49cf-bfcb-b9f398d4ca31",
+    "envelope_version": "1.0",
+    "issued_by": "orchestrator",
+    "received_by": "spelling-agent",
+    "review_state": "draft",
+    "changed_sections": [
+      "payment-terms"
+    ],
+    "accepted": true,
+    "reason": "action respected envelope scope and restrictions"
+  },
+  {
+    "document_id": "f470f1de-5ca0-49cf-bfcb-b9f398d4ca31",
+    "envelope_version": "1.0",
+    "issued_by": "spelling-agent",
+    "received_by": "math-check-agent",
+    "review_state": "pending_review",
+    "changed_sections": [
+      "notes"
+    ],
+    "accepted": false,
+    "reason": "action changed sections outside scope: notes"
+  }
+]
