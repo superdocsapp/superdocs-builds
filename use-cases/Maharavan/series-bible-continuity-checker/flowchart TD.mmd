@@ -1,0 +1,11 @@
+flowchart TD
+    UI[React TypeScript UI] --> API[FastAPI v1 API]
+    API --> APP[Application services]
+    APP --> CONT[Continuity engine]
+    APP --> SD[SuperDocsService]
+    CONT --> DB[(PostgreSQL and pgvector)]
+    SD --> MCP[Connected SuperDocs MCP]
+    MCP --> UP[Upload]
+    MCP --> ED[Edit instruction]
+    MCP --> AP[Human-approved change]
+    MCP --> EX[Export]
