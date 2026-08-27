@@ -13,10 +13,12 @@ Upload supported .txt evidence (or select fictional demo evidence)
 → process evidence in memory
 → inspect classified facts and provenance
 → upload a temporary HTML assessment template to SuperDocs
-→ local /api/assessment calls SuperDocs POST /v1/chat/async
-→ review proposed changes
+→ start an asynchronous grounded SuperDocs edit with `approval_mode: "ask_every_time"`
+→ poll for proposed changes
+→ human review of proposed changes
 → explicitly approve changes
-→ validate the completed draft and export DOCX
+→ obtain and validate the completed draft
+→ export a real DOCX
 ```
 
 The application creates a small in-memory HTML template for each generation. It does not persist uploaded files, evidence facts, templates, or generated drafts.
