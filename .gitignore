@@ -1,0 +1,4 @@
+.cursor/
+.env
+.mcp.json
+__pycache__/
