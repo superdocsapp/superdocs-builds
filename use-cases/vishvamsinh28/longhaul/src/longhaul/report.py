@@ -21,6 +21,7 @@ from rich.table import Table
 
 from .ledger import Ledger
 from .model import ADJUDICATE, RUN_COMPLETED, RUN_FAILED
+from .verify import is_alarming
 from .runner import RunOutcome
 
 _STATE_STYLE = {
@@ -51,6 +52,8 @@ def build(ledger: Ledger, outcome: RunOutcome) -> dict[str, Any]:
             "executed": outcome.executed,
             "skipped_already_done": outcome.skipped,
             "adjudicate": sum(1 for s in steps if s.state == ADJUDICATE),
+            "unmet_expectations": sum(1 for s in steps if is_alarming(s.verification)),
+            "verified": sum(1 for s in steps if s.verification == "verified"),
             "changes_approved": sum(1 for c in commits if c.approved),
             "changes_rejected": sum(1 for c in commits if not c.approved),
             "billable_operations": sum(s.billable_ops for s in steps),
@@ -139,7 +142,8 @@ def render(report: dict[str, Any], console: Console | None = None) -> None:
     console.print(
         f"\n[bold]{totals['executed']}[/bold] executed · "
         f"[bold]{totals['skipped_already_done']}[/bold] skipped as already-done · "
-        f"[bold]{totals['adjudicate']}[/bold] awaiting adjudication"
+        f"[bold]{totals['adjudicate']}[/bold] awaiting adjudication · "
+        f"[bold]{totals['verified']}[/bold] verified against the document"
     )
     console.print(
         f"[bold]{totals['changes_approved']}[/bold] changes approved · "
@@ -160,6 +164,18 @@ def render(report: dict[str, Any], console: Console | None = None) -> None:
             console.print(
                 f"[dim]{remaining} operations left on the account[/dim]"
             )
+
+    unmet = [s for s in report["steps"] if is_alarming(s.get("verification"))]
+    if unmet:
+        console.print(Panel(
+            "\n".join(
+                f"[bold]step {s['step_index']}[/bold] {s['step_id']} · {s['doc_slug']}\n"
+                f"  {s['verification_detail']}"
+                for s in unmet
+            ),
+            title="[bold red]Steps that did not do what they said[/bold red]",
+            subtitle="the document was checked afterwards and does not match",
+        ))
 
     if report["findings"]:
         console.print(Panel(

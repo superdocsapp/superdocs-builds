@@ -270,9 +270,17 @@ def document_hash(
     client: SuperDocsClient, session_id: str, document_id: str | None
 ) -> str:
     """Content hash of one open document, read back from the server."""
+    return document_state(client, session_id, document_id)[0]
+
+
+def document_state(
+    client: SuperDocsClient, session_id: str, document_id: str | None
+) -> tuple[str, str]:
+    """``(hash, html)`` for one open document, in a single read."""
     for doc in client.session_documents(session_id, include_html=True):
         if doc.get("document_id") == document_id:
-            return sha256_text(doc.get("html") or "")
+            html = doc.get("html") or ""
+            return sha256_text(html), html
     raise SuperDocsError(
         f"document {document_id} is not open in session {session_id}",
         fix="the run's documents must stay open in its session for the whole job",

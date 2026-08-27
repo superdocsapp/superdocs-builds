@@ -1,13 +1,14 @@
 # Longhaul. Everything below runs offline: no API key, no network, no cost.
-.PHONY: help demo test proof lint review mcp clean
+.PHONY: help live console demo test proof lint mcp clean
 
 help:
-	@echo "make demo   — run the job, kill it, resume it, diff the result (start here)"
-	@echo "make test   — the full suite, 20+ kill points included"
-	@echo "make proof  — kill and resume at EVERY checkpoint a run reaches"
-	@echo "make review — the browser review UI, against the local stand-in"
-	@echo "make mcp    — how to wire the MCP server into an agent"
-	@echo "make clean  — remove local state and exports"
+	@echo "make live    — the console, against the real SuperDocs API (needs .env)"
+	@echo "make console — the same console, against the local stand-in (no key, no cost)"
+	@echo "make demo    — run a job, kill it, resume it, diff the result"
+	@echo "make test    — the full suite, 20+ kill points included"
+	@echo "make proof   — kill and resume at EVERY checkpoint a run reaches"
+	@echo "make mcp     — how to wire the MCP server into an agent"
+	@echo "make clean   — remove local state and exports"
 
 demo:
 	@./scripts/demo.sh
@@ -22,8 +23,11 @@ proof:
 lint:
 	@uv run python -m compileall -q src tests && echo "ok"
 
-review:
-	@./scripts/review.sh
+live:
+	@./scripts/live.sh
+
+console:
+	@./scripts/console.sh
 
 mcp:
 	@echo 'Add this to your MCP client config:'

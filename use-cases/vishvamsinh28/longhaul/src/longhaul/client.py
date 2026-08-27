@@ -14,7 +14,10 @@ create an edit that did not already exist as a proposal. See CONTRACT.md, window
 from __future__ import annotations
 
 import json
+import threading
 import time
+from collections import deque
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -25,6 +28,60 @@ DEFAULT_BASE_URL = "https://api.superdocs.app"
 
 #: Job states from which a job will not move on its own.
 SETTLED_JOB_STATES = frozenset({"completed", "failed", "cancelled"})
+
+
+@dataclass(frozen=True)
+class ApiCall:
+    """One request that actually went to SuperDocs.
+
+    Recorded so an operator can see the integration working rather than take it on
+    trust: method, path, status, duration, and what it cost.
+    """
+
+    seq: int
+    method: str
+    path: str
+    status: int | None
+    ms: int
+    at: float
+    note: str = ""
+    billable: bool = False
+    error: str | None = None
+
+    def to_public(self) -> dict[str, Any]:
+        return {
+            "seq": self.seq, "method": self.method, "path": self.path,
+            "status": self.status, "ms": self.ms, "at": self.at,
+            "note": self.note, "billable": self.billable, "error": self.error,
+        }
+
+
+class CallLog:
+    """A bounded, thread-safe record of recent API calls."""
+
+    def __init__(self, limit: int = 400) -> None:
+        self._calls: deque[ApiCall] = deque(maxlen=limit)
+        self._lock = threading.Lock()
+        self._seq = 0
+
+    def record(
+        self, method: str, path: str, status: int | None, ms: int,
+        *, note: str = "", billable: bool = False, error: str | None = None,
+    ) -> None:
+        with self._lock:
+            self._seq += 1
+            self._calls.append(ApiCall(
+                seq=self._seq, method=method, path=path, status=status, ms=ms,
+                at=time.time(), note=note, billable=billable, error=error,
+            ))
+
+    def since(self, seq: int = 0) -> list[dict[str, Any]]:
+        with self._lock:
+            return [c.to_public() for c in self._calls if c.seq > seq]
+
+    def total(self) -> int:
+        with self._lock:
+            return self._seq
 
 
 class SuperDocsError(RuntimeError):
@@ -128,7 +185,10 @@ class SuperDocsClient:
         *,
         timeout: float = 120.0,
         transport: httpx.BaseTransport | None = None,
+        call_log: CallLog | None = None,
     ) -> None:
+        self.call_log = call_log
+        self.api_key = api_key
         if not api_key:
             raise SuperDocsError(
                 "no API key",
@@ -153,6 +213,33 @@ class SuperDocsClient:
         self.close()
 
     # --- plumbing ---------------------------------------------------------
+
+    @contextmanager
+    def _timed(self, method: str, path: str, note: str = "", billable: bool = False):
+        """Time one call and record it, whether it succeeds or not."""
+        started = time.monotonic()
+        holder: dict[str, Any] = {"status": None}
+        try:
+            yield holder
+        except SuperDocsError as exc:
+            if self.call_log:
+                self.call_log.record(
+                    method, path, exc.status, int((time.monotonic() - started) * 1000),
+                    note=note, error=str(exc).split("\n")[0],
+                )
+            raise
+        except Exception as exc:  # noqa: BLE001 - recorded, then re-raised unchanged
+            if self.call_log:
+                self.call_log.record(
+                    method, path, None, int((time.monotonic() - started) * 1000),
+                    note=note, error=f"{type(exc).__name__}: {exc}",
+                )
+            raise
+        if self.call_log:
+            self.call_log.record(
+                method, path, holder.get("status"),
+                int((time.monotonic() - started) * 1000), note=note, billable=billable,
+            )
 
     def _check(self, r: httpx.Response) -> httpx.Response:
         if r.status_code < 400:
@@ -191,7 +278,10 @@ class SuperDocsClient:
         last: Exception | None = None
         for attempt in range(4):
             try:
-                return self._check(self._client.get(path, **kwargs))
+                with self._timed("GET", path, note="read (free)") as t:
+                    r = self._check(self._client.get(path, **kwargs))
+                    t["status"] = r.status_code
+                return r
             except RateLimited as exc:
                 last = exc
                 time.sleep(min(exc.retry_after, 30.0))
@@ -215,12 +305,15 @@ class SuperDocsClient:
         """
         p = Path(path)
         try:
-            with p.open("rb") as fh:
+            with p.open("rb") as fh, self._timed(
+                "POST", "/v1/documents/upload", note=f"upload {p.name} (free)"
+            ) as t:
                 r = self._check(self._client.post(
                     "/v1/documents/upload",
                     files={"file": (p.name, fh, _mime_for(p))},
                     data={"session_id": session_id, "open_mode": open_mode},
                 ))
+                t["status"] = r.status_code
         except httpx.TransportError as exc:
             # Not retried here. The caller checks the session roster before uploading, so
             # a document that did land is adopted on the next attempt rather than opened
@@ -267,7 +360,11 @@ class SuperDocsClient:
         if model_tier:
             payload["model_tier"] = model_tier
         try:
-            r = self._check(self._client.post("/v1/chat/async", json=payload))
+            with self._timed(
+                "POST", "/v1/chat/async", note="edit turn", billable=True
+            ) as t:
+                r = self._check(self._client.post("/v1/chat/async", json=payload))
+                t["status"] = r.status_code
         except httpx.TransportError as exc:
             raise AmbiguousRequest(
                 f"chat request may or may not have reached the server: {exc}",
@@ -308,6 +405,7 @@ class SuperDocsClient:
         visible progress. That is still processing, not a crash.
         """
         deadline = time.monotonic() + max_wait
+        interval = poll_interval
         while True:
             job = self.get_job(job_id)
             if job is None:
@@ -325,7 +423,10 @@ class SuperDocsClient:
                 )
             if on_wait:
                 on_wait(job)
-            time.sleep(poll_interval)
+            time.sleep(interval)
+            # Back off toward a few seconds. A turn runs for tens of seconds, so asking
+            # every second is a lot of requests to learn nothing.
+            interval = min(interval * 1.4, 4.0)
 
     # --- 3. approve -------------------------------------------------------
 
@@ -352,12 +453,18 @@ class SuperDocsClient:
             "approved": any(ok for _, ok, _ in decisions),
             "changes": changes,
         }
+        approved_n = sum(1 for _, ok, _ in decisions if ok)
         last: Exception | None = None
         for attempt in range(3):
             try:
-                r = self._check(
-                    self._client.post(f"/v1/chat/{session_id}/approve", json=payload)
-                )
+                with self._timed(
+                    "POST", f"/v1/chat/{session_id}/approve",
+                    note=f"commit {approved_n}/{len(decisions)} changes",
+                ) as t:
+                    r = self._check(
+                        self._client.post(f"/v1/chat/{session_id}/approve", json=payload)
+                    )
+                    t["status"] = r.status_code
                 return r.json()
             except (httpx.TransportError, RateLimited) as exc:
                 last = exc
@@ -388,7 +495,11 @@ class SuperDocsClient:
             payload["html"] = html
         if options:
             payload["options"] = options
-        r = self._check(self._client.post("/v1/documents/export", json=payload))
+        with self._timed(
+            "POST", "/v1/documents/export", note=f"export {fmt} (free)"
+        ) as t:
+            r = self._check(self._client.post("/v1/documents/export", json=payload))
+            t["status"] = r.status_code
         return r.content
 
     def export_document(

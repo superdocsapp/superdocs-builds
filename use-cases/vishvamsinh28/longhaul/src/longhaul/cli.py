@@ -373,12 +373,12 @@ def serve(
     host: str = typer.Option("127.0.0.1", "--host"),
     port: int = typer.Option(8420, "--port"),
 ) -> None:
-    """Open the review UI: approve and reject changes in a browser."""
+    """Open the operator console: run the job, review changes, export the result."""
     import uvicorn
 
     from .web import create_app
 
-    console.print(f"[green]Review UI[/green] http://{host}:{port}")
+    console.print(f"[green]Console[/green] http://{host}:{port}")
     uvicorn.run(
         create_app(spec, run_id, state_dir), host=host, port=port, log_level="warning"
     )

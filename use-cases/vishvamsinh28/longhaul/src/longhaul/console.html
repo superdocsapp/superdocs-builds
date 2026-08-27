@@ -1,0 +1,421 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Longhaul console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg:#f7f7f5; --panel:#fff; --sunk:#f0efec; --ink:#1a1a18; --dim:#6c6a64;
+    --line:#e2dfd9; --ok:#2c6e4b; --warn:#8f6212; --bad:#a03325; --live:#2c6e4b;
+    --add:#e7f2eb; --del:#fbeae7; --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#141613; --panel:#1c1f1b; --sunk:#191c18; --ink:#e9e7e2; --dim:#96938b;
+    --line:#2e332c; --ok:#7cc39a; --warn:#d4a748; --bad:#e08a79; --live:#7cc39a;
+    --add:#1b2a21; --del:#2c201d;
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.5;font-size:14px}
+  a{color:inherit}
+  header{
+    display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+    padding:12px 20px;border-bottom:1px solid var(--line);
+    background:var(--panel);position:sticky;top:0;z-index:20
+  }
+  .brand{font-weight:650;letter-spacing:-.01em;font-size:15px}
+  .job{color:var(--dim);font-size:13px}
+  .spacer{margin-left:auto}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;
+    font-size:12px;border:1px solid var(--line);color:var(--dim);white-space:nowrap
+  }
+  .pill.live{color:var(--live);border-color:var(--live);font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .dot.pulse{animation:p 1.4s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+  main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:18px;padding:18px 20px 40px;
+       max-width:1500px;margin:0 auto;align-items:start}
+  @media (max-width:1080px){main{grid-template-columns:minmax(0,1fr)}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:18px}
+  .card>h2{
+    margin:0;padding:11px 16px;border-bottom:1px solid var(--line);
+    font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:650;
+    display:flex;align-items:center;gap:8px
+  }
+  .card>h2 .count{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0}
+  .body{padding:14px 16px}
+  .body.flush{padding:0}
+  button{
+    font:inherit;font-size:13px;padding:6px 14px;border-radius:7px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink)
+  }
+  button:hover:not(:disabled){border-color:var(--dim)}
+  button:disabled{opacity:.4;cursor:default}
+  button.go{background:var(--ok);border-color:var(--ok);color:var(--bg);font-weight:650}
+  button.on{border-color:var(--ok);color:var(--ok);font-weight:650}
+  button.off{border-color:var(--bad);color:var(--bad);font-weight:650}
+  input,select{
+    font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);
+    border-radius:7px;background:var(--bg);color:var(--ink)
+  }
+  input[type=number]{width:78px}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .muted{color:var(--dim);font-size:12.5px}
+  /* steps */
+  .step{display:grid;grid-template-columns:26px 1fr auto auto;gap:10px;align-items:center;
+        padding:7px 16px;border-bottom:1px solid var(--line);font-size:13px}
+  .step:last-child{border-bottom:0}
+  .step .n{color:var(--dim);font-variant-numeric:tabular-nums;font-size:12px}
+  .step .doc{color:var(--dim)}
+  .step .t{color:var(--dim);font-size:11.5px;font-variant-numeric:tabular-nums}
+  .chip{padding:1px 8px;border-radius:20px;font-size:11px;border:1px solid var(--line);color:var(--dim)}
+  .chip.done{color:var(--ok);border-color:var(--ok)}
+  .chip.rejected{color:var(--warn);border-color:var(--warn)}
+  .chip.adjudicate,.chip.failed{color:var(--bad);border-color:var(--bad)}
+  .chip.issuing,.chip.issued,.chip.proposed,.chip.gated,.chip.committing,.chip.committed{
+    color:var(--ink);border-color:var(--dim)}
+  /* review */
+  .change{border:1px solid var(--line);border-radius:9px;padding:13px 15px;margin-bottom:12px}
+  .change h3{margin:0 0 3px;font-size:13.5px}
+  .why{color:var(--dim);font-size:12.5px;margin-bottom:10px}
+  .diff{font-family:var(--mono);font-size:12px;border-radius:7px;overflow:hidden}
+  .diff div{padding:7px 10px;white-space:pre-wrap;word-break:break-word}
+  .del{background:var(--del)} .add{background:var(--add)}
+  /* api feed */
+  .feed{font-family:var(--mono);font-size:11.5px;max-height:340px;overflow-y:auto}
+  .call{display:grid;grid-template-columns:44px 1fr 52px 46px;gap:8px;padding:5px 14px;
+        border-bottom:1px solid var(--line);align-items:baseline}
+  .call:last-child{border-bottom:0}
+  .call .m{font-weight:650;color:var(--dim)}
+  .call .p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .call .s{text-align:right;font-variant-numeric:tabular-nums;color:var(--ok)}
+  .call .s.err{color:var(--bad)}
+  .call .d{text-align:right;font-variant-numeric:tabular-nums;color:var(--dim)}
+  .call .note{grid-column:2/-1;color:var(--dim);font-size:11px}
+  .call .note b{color:var(--warn);font-weight:650}
+  /* docs */
+  .doc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 16px;
+       border-bottom:1px solid var(--line)}
+  .doc:last-child{border-bottom:0}
+  .doc .name{flex:1;min-width:150px;font-size:13px}
+  .stats{display:flex;flex-wrap:wrap;gap:20px}
+  .stats div b{display:block;font-size:19px;font-weight:650;font-variant-numeric:tabular-nums}
+  .stats div span{font-size:11.5px;color:var(--dim)}
+  .banner{border:1px solid var(--bad);color:var(--bad);border-radius:9px;padding:10px 14px;
+          margin-bottom:16px;font-size:13px}
+  .finding{border-left:3px solid var(--warn);padding:5px 0 5px 11px;margin-bottom:7px;font-size:12.5px}
+  .finding b{color:var(--warn)}
+  .empty{color:var(--dim);font-size:13px;padding:2px 0}
+  pre.preview{background:var(--sunk);border-radius:7px;padding:12px;max-height:320px;
+              overflow:auto;font-family:var(--mono);font-size:11.5px;white-space:pre-wrap}
+</style>
+
+<header>
+  <span class="brand">Longhaul</span>
+  <span class="job" id="job"></span>
+  <span class="spacer"></span>
+  <span class="pill" id="conn"><span class="dot"></span><span id="conn-label">connecting…</span></span>
+  <span class="pill" id="key"></span>
+  <span class="pill" id="ops"></span>
+  <span class="pill" id="runstate"></span>
+</header>
+
+<main>
+  <div>
+    <div id="error" class="banner" hidden></div>
+
+    <div class="card">
+      <h2>Run<span class="count muted" id="runid"></span></h2>
+      <div class="body">
+        <p class="muted" id="desc" style="margin:0 0 12px"></p>
+        <div class="row">
+          <button class="go" id="go">Run</button>
+          <label class="muted">stop after
+            <input type="number" id="maxops" min="1" value="8"> operations</label>
+          <label class="muted">keep
+            <input type="number" id="reserve" min="0" value="400"> in reserve</label>
+          <span class="muted" id="hint"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Needs your decision<span class="count" id="pending-count"></span></h2>
+      <div class="body" id="review"></div>
+    </div>
+
+    <div class="card">
+      <h2>Steps<span class="count" id="step-count"></span></h2>
+      <div class="body flush" id="steps"></div>
+    </div>
+
+    <div class="card" id="stats-card" hidden>
+      <h2>This run</h2>
+      <div class="body"><div class="stats" id="stats"></div>
+        <p class="muted" id="latency" style="margin:12px 0 0"></p></div>
+    </div>
+
+    <div class="card" id="findings-card" hidden>
+      <h2>Documents that tried to give orders</h2>
+      <div class="body">
+        <p class="muted" style="margin:0 0 10px">Reported as data. None of it was executed.</p>
+        <div id="findings"></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>SuperDocs API<span class="count" id="call-count"></span></h2>
+      <div class="body flush feed" id="feed"></div>
+    </div>
+
+    <div class="card">
+      <h2>Documents</h2>
+      <div class="body flush" id="docs"></div>
+    </div>
+
+    <div class="card" id="preview-card" hidden>
+      <h2>Preview<span class="count muted" id="preview-name"></span></h2>
+      <div class="body"><pre class="preview" id="preview"></pre></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const decisions = new Map();
+  let callSeq = 0, sig = null, sending = false, previewSlug = null;
+
+  const esc = (s) => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const strip = (h) => esc((h||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim());
+  const ms = (n) => n >= 1000 ? (n/1000).toFixed(1)+"s" : n+"ms";
+
+  async function poll(){
+    try{
+      const s = await (await fetch(`/api/state?since=${callSeq}`)).json();
+      render(s);
+    }catch(e){
+      $("conn-label").textContent = "runner unreachable";
+      $("conn").className = "pill";
+    }
+  }
+
+  function render(s){
+    const c = s.connection, r = s.run;
+    $("job").textContent = r.job;
+    $("runid").textContent = r.run_id;
+    $("desc").textContent = r.description || "";
+
+    $("conn").className = "pill" + (c.live ? " live" : "");
+    $("conn-label").textContent = (c.live ? "LIVE · " : "local stand-in · ") + c.label;
+    $("key").textContent = "key " + c.key;
+    const bits = [`${c.operations_issued} turn${c.operations_issued===1?"":"s"} issued`];
+    if(c.operations_confirmed !== c.operations_issued)
+      bits.push(`${c.operations_confirmed} billed`);
+    if(c.operations_remaining != null) bits.push(`${c.operations_remaining} left`);
+    $("ops").textContent = bits.join(" · ");
+
+    const busy = r.busy;
+    $("runstate").innerHTML = busy
+      ? '<span class="dot pulse"></span> working'
+      : esc(r.status);
+    $("go").disabled = busy;
+    $("go").textContent = busy ? "Working…" : (r.status === "completed" ? "Run again" : "Run");
+    $("hint").textContent = c.live
+      ? "Each edit turn costs one operation against your account."
+      : "Pointed at the local stand-in — costs nothing.";
+
+    $("error").hidden = !r.error;
+    if(r.error) $("error").textContent = r.error;
+
+    // steps
+    $("step-count").textContent =
+      `${s.steps.filter(x=>x.terminal).length}/${s.steps.length} done`;
+    $("steps").innerHTML = s.steps.map(st => `
+      <div class="step">
+        <span class="n">${st.index}</span>
+        <span>${esc(st.id)} <span class="doc">· ${esc(st.document)}</span></span>
+        <span class="t">${st.ms ? ms(st.ms) : ""}${st.ops ? " · "+st.ops+" op" : ""}</span>
+        <span class="chip ${st.unmet?"failed":esc(st.state)}">${st.unmet?"unmet":esc(st.state)}</span>
+      </div>${st.unmet?`<div class="step" style="grid-template-columns:26px 1fr"><span></span>
+        <span class="muted" style="color:var(--bad)">${esc(st.verification_detail||"")}</span></div>`:""}`)
+      .join("");
+
+    renderReview(s.pending);
+    renderFeed(s);
+
+    // documents
+    $("docs").innerHTML = s.documents.map(d => `
+      <div class="doc">
+        <span class="name">${esc(d.title)}
+          ${d.open ? "" : '<span class="muted"> · not opened yet</span>'}</span>
+        <select id="fmt-${esc(d.slug)}" ${d.open?"":"disabled"}>
+          ${s.formats.map(f=>`<option value="${f}">${f}</option>`).join("")}
+        </select>
+        <button ${d.open?"":"disabled"} onclick="dl('${esc(d.slug)}')">Download</button>
+        <button ${d.open?"":"disabled"} onclick="preview('${esc(d.slug)}')">View</button>
+      </div>`).join("") || '<div class="empty" style="padding:12px 16px">No documents yet.</div>';
+
+    // totals
+    const t = s.totals || {};
+    if(t.steps){
+      $("stats-card").hidden = false;
+      $("stats").innerHTML = [
+        ["executed", t.executed], ["skipped as already-done", t.skipped_already_done],
+        ["verified", t.verified],
+        ["approved", t.changes_approved], ["rejected", t.changes_rejected],
+        ["operations", t.billable_operations],
+      ].map(([k,v])=>`<div><b>${v??0}</b><span>${k}</span></div>`).join("");
+      const L = s.latency || {};
+      $("latency").textContent = L.count
+        ? `step latency over ${L.count} steps — median ${ms(L.p50_ms)} · p95 ${ms(L.p95_ms)} · slowest ${ms(L.max_ms)} · fastest ${ms(L.min_ms)}`
+        : "";
+    }
+
+    if(s.findings && s.findings.length){
+      $("findings-card").hidden = false;
+      $("findings").innerHTML = s.findings.map(f =>
+        `<div class="finding"><b>${esc(f.kind)}</b> in ${esc(f.where)}<br>${esc(f.excerpt)}</div>`
+      ).join("");
+    }
+  }
+
+  function renderFeed(s){
+    if(s.calls && s.calls.length){
+      const feed = $("feed");
+      const placeholder = feed.querySelector(".empty");
+      if(placeholder) placeholder.remove();
+      const atTop = feed.scrollTop < 12;
+      // Waiting on one job produces a run of identical polls. Collapse them into a
+      // single row with a count, so the feed shows what happened rather than how often
+      // it was asked.
+      const rows = [];
+      for(const c of s.calls){
+        const prev = rows[rows.length-1];
+        if(prev && prev.method===c.method && prev.path===c.path && !c.error
+           && !c.billable && prev.status===c.status){
+          prev.n = (prev.n||1)+1; prev.ms += c.ms; prev.seq = c.seq;
+        } else rows.push({...c, n:1});
+      }
+      feed.insertAdjacentHTML("afterbegin", rows.slice().reverse().map(c => `
+        <div class="call">
+          <span class="m">${esc(c.method)}</span>
+          <span class="p" title="${esc(c.path)}">${esc(c.path)}</span>
+          <span class="s ${c.error||((c.status||0)>=400)?"err":""}">${c.status ?? "—"}</span>
+          <span class="d">${ms(c.ms)}</span>
+          ${c.note||c.error ? `<span class="note">${c.billable?"<b>billable</b> · ":""}${esc(c.error||c.note)}${c.n>1?` · polled ${c.n}×`:""}</span>`:""}
+        </div>`).join(""));
+      if(atTop) feed.scrollTop = 0;
+      callSeq = s.call_seq;
+    }
+    $("call-count").textContent = `${s.call_seq} calls`;
+    if(!s.call_seq && !$("feed").children.length) $("feed").innerHTML =
+      '<div class="empty" style="padding:12px 14px">No calls yet. Press Run.</div>';
+  }
+
+  function renderReview(pending){
+    $("pending-count").textContent = pending.length ? `step ${pending[0].step_index}` : "";
+    if(!pending.length){
+      sig = null;
+      $("review").innerHTML = '<div class="empty">Nothing is waiting on you.</div>';
+      return;
+    }
+    const g = pending[0];
+    const next = g.step_index + ":" + g.changes.map(c=>c.change_id).join(",");
+    const typing = $("review").contains(document.activeElement)
+      && document.activeElement.tagName === "INPUT";
+    if(next === sig && typing){ count(g); return; }
+    sig = next;
+
+    $("review").innerHTML = g.changes.map(c => {
+      const d = decisions.get(c.change_id);
+      return `<div class="change">
+        <h3>${esc(c.operation)} <span class="muted">· ${esc(g.document)}</span></h3>
+        <div class="why">${esc(c.ai_explanation)}</div>
+        <div class="diff">
+          ${c.old_html?`<div class="del">− ${strip(c.old_html)}</div>`:""}
+          ${c.new_html?`<div class="add">+ ${strip(c.new_html)}</div>`:""}
+        </div>
+        <div class="row" style="margin-top:11px">
+          <button class="${d&&d.approved===true?"on":""}" onclick="mark('${c.change_id}',true)">Approve</button>
+          <button class="${d&&d.approved===false?"off":""}" onclick="mark('${c.change_id}',false)">Reject</button>
+          <input style="flex:1;min-width:180px" placeholder="reason (sent back to the model on a reject)"
+                 oninput="note('${c.change_id}',this.value)" value="${esc(d?d.feedback:"")}">
+        </div></div>`;
+    }).join("") + `<div class="row" style="margin-top:4px">
+        <button class="go" id="commit" onclick="commit(${g.step_index})">Commit decisions</button>
+        <span class="muted" id="cnt"></span></div>`;
+    count(g);
+  }
+
+  function count(g){
+    const n = g.changes.filter(c => decisions.get(c.change_id)?.approved !== undefined).length;
+    $("cnt").textContent = `${n} of ${g.changes.length} decided`;
+    $("commit").disabled = !n || sending;
+  }
+
+  window.mark = (id, approved) => {
+    const p = decisions.get(id) || {feedback:""};
+    decisions.set(id, {approved: p.approved === approved ? undefined : approved,
+                       feedback: p.feedback});
+    sig = null; poll();
+  };
+  window.note = (id, feedback) => {
+    const p = decisions.get(id) || {};
+    decisions.set(id, {approved:p.approved, feedback});
+  };
+
+  window.commit = async (step) => {
+    if(sending) return; sending = true; $("commit").disabled = true;
+    const changes = [...decisions.entries()]
+      .filter(([,d]) => d.approved !== undefined)
+      .map(([change_id,d]) => ({change_id, approved:d.approved, feedback:d.feedback}));
+    try{
+      const r = await fetch("/api/decide", {method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({step_index: step, changes})});
+      if(!r.ok) throw new Error((await r.json()).detail);
+      decisions.clear(); sig = null;
+      await fetch("/api/run", {method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(budget())});
+    }catch(e){ $("error").hidden=false; $("error").textContent=String(e); }
+    finally{ sending=false; poll(); }
+  };
+
+  const budget = () => ({
+    max_operations: Number($("maxops").value) || null,
+    reserve: Number($("reserve").value) || 0,
+  });
+
+  $("go").onclick = async () => {
+    $("go").disabled = true;
+    try{
+      const r = await fetch("/api/run", {method:"POST",
+        headers:{"Content-Type":"application/json"}, body: JSON.stringify(budget())});
+      if(!r.ok) throw new Error((await r.json()).detail);
+    }catch(e){ $("error").hidden=false; $("error").textContent=String(e); }
+    poll();
+  };
+
+  window.dl = (slug) => {
+    const fmt = $(`fmt-${slug}`).value;
+    window.location = `/api/export/${encodeURIComponent(slug)}?fmt=${fmt}`;
+  };
+
+  window.preview = async (slug) => {
+    previewSlug = slug;
+    $("preview-card").hidden = false;
+    $("preview-name").textContent = slug;
+    $("preview").textContent = "loading…";
+    try{
+      const r = await fetch(`/api/document/${encodeURIComponent(slug)}`);
+      const j = await r.json();
+      if(!r.ok) throw new Error(j.detail);
+      $("preview").textContent = (j.html||"").replace(/<[^>]+>/g, m =>
+        /^<\/?(h1|h2|h3|p|div|li)/i.test(m) ? "\n" : "").replace(/\n{3,}/g,"\n\n").trim();
+    }catch(e){ $("preview").textContent = String(e); }
+  };
+
+  poll(); setInterval(poll, 1000);
+</script>

@@ -20,6 +20,10 @@ The compact job — three synthetic runbooks, eight steps — on 27 August 2026.
 | Billable operations | 8 |
 | Status | `completed` |
 
+A second run, after the verification pass below was added, reported **`blocked`** on the
+same job — because two of its steps had not actually done what they said. That is the
+system working, not failing.
+
 Verified against the server's own transcript rather than the runner's account of itself:
 each of the eight idempotency tokens appears exactly once, and the session holds exactly
 eight chat jobs for eight steps.
@@ -44,7 +48,8 @@ Final documents, each verified after export:
 
 ## What broke
 
-Four findings. Three are mine; one is a rough edge in the product.
+Five findings. Three are mine, one is a rough edge in the product, and the last is the
+one that matters most operationally.
 
 ### 1. One instruction can need several rounds of review — mine
 
@@ -100,6 +105,40 @@ apart from a large-edit continue prompt. On every change-review pause observed h
 field was **absent**, not `"change_review"`. Branching on `== "continue_prompt"` is
 therefore safe, but code written to check `== "change_review"` — which the docs invite —
 would never match.
+
+### 5. The model silently skipped 2 of 8 replacements — the most important finding here
+
+A step told to replace `"PagerDuty"` with `"Rootly"` returned **no proposed changes** for
+a document that plainly contained "PagerDuty". The same happened for `"Ops Lead"` in
+another document. Both steps were recorded as done, with zero changes and zero cost.
+
+Nothing in the runner was wrong: it faithfully recorded that the model proposed nothing.
+That is precisely the problem — **"there was nothing to do" and "I missed it" are
+indistinguishable from the inside.** A run of eight steps reported success while two
+documents still said the thing the job existed to remove.
+
+For the ops team this is built for, that is the worst possible failure: not a crash, not a
+duplicate, but a quiet, confident, wrong "done".
+
+Fixed by checking the document afterwards. Every step now carries an expectation derived
+from its own instruction — a `replace "X" with "Y"` directive already states that X must
+not remain — and the document the server holds is checked against it once the step
+finishes. The check costs nothing, because reading a document is free.
+
+It distinguishes three outcomes, because they mean different things:
+
+| Outcome | Meaning |
+|---|---|
+| `verified` | the document matches |
+| `unmet: a reviewer rejected the change…` | a person chose this. Not a defect |
+| `unmet: nothing was proposed…` | **the step did not do its job.** The run reports `blocked` |
+
+A fourth exists for a step adopted after a ledger loss, where the record that would
+explain the mismatch is gone: it says so rather than guessing.
+
+Only the negative half of an expectation is derived. "X must not remain" is true whether
+or not the document ever contained X; "Y must appear" is not, and asserting it would fail
+every document the step correctly left alone.
 
 ## What the live run confirmed
 

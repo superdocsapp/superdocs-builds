@@ -62,6 +62,7 @@ from .model import (
     Step,
 )
 from .planner import JobSpec
+from .verify import check as verify_check, is_alarming
 
 #: Job states worth waking up for after starting a turn.
 _AWAIT = frozenset({"awaiting_approval", "completed"})
@@ -88,6 +89,8 @@ class StepOutcome:
     duration_ms: int = 0
     billable_ops: int = 0
     error: str | None = None
+    verification: str | None = None
+    verification_detail: str | None = None
 
 
 @dataclass
@@ -189,12 +192,16 @@ class Runner:
         return outcome
 
     def _final_status(self, run_id: str) -> str:
-        """Never report completed while a step is unresolved. I2 and I5 depend on this."""
+        """Never report completed while a step is unresolved, or while a step's own
+        expectation is unmet with nothing proposed. A success line that could also mean
+        "the model quietly skipped this" would be worth nothing."""
         steps = self.ledger.get_steps(run_id)
         if any(s.state == ADJUDICATE for s in steps):
             return RUN_BLOCKED
         if any(s.state == FAILED for s in steps):
             return RUN_FAILED
+        if any(is_alarming(s.verification) for s in steps):
+            return RUN_BLOCKED
         if all(s.is_terminal for s in steps):
             return RUN_COMPLETED
         return RUN_BLOCKED
@@ -585,15 +592,32 @@ class Runner:
         decisions = self.ledger.get_decisions(run.run_id, step.step_index)
         proposals = self.ledger.get_proposals(run.run_id, step.step_index)
         approved = sum(1 for d in decisions if d.approved)
+        rejected = len(decisions) - approved
         # Every proposed change rejected is a real outcome with a name of its own, not a
         # failure and not a success.
         final = REJECTED if (proposals and approved == 0) else DONE
-        post_hash = reconcile.document_hash(self.client, run.session_id, document_id)
+
+        post_hash, html = reconcile.document_state(
+            self.client, run.session_id, document_id
+        )
+        # A turn that proposed nothing may have found nothing to do, or may have missed
+        # it. Only the document can tell those apart, and reading it is free.
+        verification, detail = verify_check(
+            html, step.verify_json, proposed=len(proposals), rejected=rejected,
+            recovered=disposition.startswith("skipped"),
+        )
+        if is_alarming(verification):
+            self.ledger.event(
+                run.run_id, "verify.unmet", f"{step.step_id}: {detail}",
+                step_index=step.step_index,
+            )
+
         duration = int((time.time() - (step.started_at or time.time())) * 1000)
         return self.ledger.transition(
             run.run_id, step.step_index, expect=COMMITTED, to=final, fence=fence,
             post_hash=post_hash, ended_at=time.time(), duration_ms=duration,
-            disposition=disposition,
+            disposition=disposition, verification=verification,
+            verification_detail=detail,
         )
 
     # --- recovery ---------------------------------------------------------
@@ -746,6 +770,8 @@ class Runner:
             duration_ms=step.duration_ms,
             billable_ops=step.billable_ops,
             error=step.error,
+            verification=step.verification,
+            verification_detail=step.verification_detail,
         )
 
 

@@ -9,6 +9,8 @@ lets a resumed run be sure it is finishing the same plan and not inventing a new
 from __future__ import annotations
 
 import hashlib
+import json
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -115,13 +117,47 @@ def load_spec(path: str | Path) -> JobSpec:
     )
 
 
+#: "replace \"X\" with \"Y\"" tells us, without being told, what the document should
+#: look like afterwards: no X, and some Y.
+_RE_REPLACE = re.compile(r'replace\s+"([^"]+)"\s+with\s+"([^"]+)"', re.I)
+
+
+def derive_expectations(instruction: str, declared: dict[str, Any] | None) -> str | None:
+    """What the document should contain, and not contain, once this step has run.
+
+    An explicit ``verify:`` block in the spec always wins. Otherwise a quoted replace
+    directive is taken at its word — it already states the expectation, and making the
+    author repeat it in a second place is how the two drift apart.
+
+    Derivation is deliberately one-sided; see the comment below on why.
+    """
+    if declared:
+        expectation = {
+            "absent": list(declared.get("absent") or []),
+            "present": list(declared.get("present") or []),
+        }
+    else:
+        pairs = _RE_REPLACE.findall(instruction)
+        if not pairs:
+            return None
+        # Only the negative half is derived. "X must not remain" is true whether or not
+        # the document ever contained X, so it is safe to assert everywhere. "Y must
+        # appear" is not: a document that never mentioned X should not be expected to
+        # gain Y, and asserting it would fail every document the step correctly left
+        # alone. An author who does mean it can say so in an explicit verify: block.
+        expectation = {"absent": [old for old, _ in pairs], "present": []}
+    if not expectation["absent"] and not expectation["present"]:
+        return None
+    return json.dumps(expectation, sort_keys=True)
+
+
 def _resolve(spec_dir: Path, rel: str) -> Path:
     """Document paths are relative to the spec, so a spec can be moved with its corpus."""
     p = Path(rel)
     return p if p.is_absolute() else (spec_dir / p).resolve()
 
 
-def expand_steps(spec: JobSpec) -> list[tuple[str, str, str]]:
+def expand_steps(spec: JobSpec) -> list[tuple[str, str, str, str | None]]:
     """Expand step templates into concrete ``(step_id, doc_slug, instruction)`` triples.
 
     Order is deterministic — template order, then document order as declared — because
@@ -129,7 +165,7 @@ def expand_steps(spec: JobSpec) -> list[tuple[str, str, str]]:
     """
     known = {d["slug"] for d in spec.documents}
     declared_order = [d["slug"] for d in spec.documents]
-    out: list[tuple[str, str, str]] = []
+    out: list[tuple[str, str, str, str | None]] = []
 
     for template in spec.steps:
         step_id = template.get("id")
@@ -152,7 +188,8 @@ def expand_steps(spec: JobSpec) -> list[tuple[str, str, str]]:
         if unknown:
             raise SpecError(f"step {step_id} targets undeclared documents: {unknown}")
 
-        out.extend((step_id, slug, instruction) for slug in targets)
+        expectation = derive_expectations(instruction, template.get("verify"))
+        out.extend((step_id, slug, instruction, expectation) for slug in targets)
 
     if not out:
         raise SpecError("the plan expands to zero steps")
@@ -197,8 +234,9 @@ def plan_run(ledger: Ledger, spec: JobSpec, *, run_id: str | None = None) -> Run
             # server "did this turn happen?" without trusting anything local.
             instruction=f"{instruction} {step_token(rid, i)}",
             token=step_token(rid, i),
+            verify_json=expectation,
         )
-        for i, (step_id, slug, instruction) in enumerate(expand_steps(spec))
+        for i, (step_id, slug, instruction, expectation) in enumerate(expand_steps(spec))
     ]
 
     run = Run(

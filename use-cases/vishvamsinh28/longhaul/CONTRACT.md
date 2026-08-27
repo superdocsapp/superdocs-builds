@@ -73,6 +73,22 @@ steps the ledger admits were in flight.
 > `409 session_busy`. The gap was real, the tests that now cover it fail without the fix,
 > and the honest record is that the offline proof did not find it.
 
+### I7 — a success line means the document is in the state the step claimed
+
+A step that finishes carries an expectation of what the document should look like, and
+that expectation is checked against the document the server actually holds. A run with an
+unmet expectation and nothing proposed reports `blocked`, never `completed`.
+
+> Proven by `tests/test_verification.py`.
+>
+> **Also added after a live run.** A turn instructed to replace a string returned no
+> proposed changes for a document that plainly contained it, and the step was recorded as
+> done. Across one eight-step live run this happened **twice**. Nothing in the ledger was
+> wrong — the runner faithfully recorded that the model proposed nothing — and that is
+> exactly the problem: "the model found nothing to do" and "the model missed it" are
+> indistinguishable from the inside. Only the document tells them apart, and reading it
+> is free.
+
 ### I5 — the report is honest
 
 Every step in the run report carries the disposition that actually applied and the evidence that

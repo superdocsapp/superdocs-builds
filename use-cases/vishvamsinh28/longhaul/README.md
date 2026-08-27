@@ -13,15 +13,42 @@ skipped. Get it wrong in the other and an edit is applied to the document twice.
 Longhaul is built so that question always has an answer, and never a guess.
 
 ```bash
-make demo
+make live      # the console, against the real SuperDocs API
+make demo      # kill a run and resume it, offline, in six seconds
 ```
 
-That runs the migration twice — once straight through, once with the process `SIGKILL`ed
-partway and resumed — and diffs the two results. No API key, no network, no cost.
+![The console, live against api.superdocs.app](docs/console.png)
 
-![The review gate](docs/review-ui.png)
+That is a real run against `api.superdocs.app`: every call it makes is on the right, with
+status and timing; what it has spent is in the header; and two steps are flagged **unmet**
+because the model quietly skipped them — see below.
 
 ---
+
+## It refuses to say "done" when it isn't
+
+The most useful thing this build does came out of running it live, and it is not the
+durability.
+
+A step told to replace `"PagerDuty"` with `"Rootly"` returned **no proposed changes** for a
+document that plainly contained "PagerDuty". Across one eight-step run this happened
+twice. Nothing in the runner was wrong — it faithfully recorded that the model proposed
+nothing. That is exactly the problem: *"there was nothing to do"* and *"I missed it"* are
+indistinguishable from the inside, and the run reported success while two documents still
+said the thing the job existed to remove.
+
+For an ops team, that is the worst failure available: not a crash, not a duplicate, but a
+quiet, confident, wrong "done".
+
+So every step now carries an expectation taken from its own instruction — `replace "X"
+with "Y"` already says X must not remain — and the document the server holds is checked
+against it once the step finishes. Reading a document is free, so the check costs nothing.
+A run with an unmet expectation and nothing proposed reports **`blocked`**, never
+`completed`.
+
+It tells apart the three ways this can go, because they mean different things: the
+document matches; a reviewer rejected the change (a decision, not a defect); or nothing
+was proposed and it still does not match (**the step did not do its job**).
 
 ## What it does
 
@@ -110,9 +137,11 @@ Then:
 
 | Command | What it does |
 |---|---|
-| `make test` | The whole suite. 24 kill points, ~40s, no key, no network beyond localhost. |
+| `make live` | The console against the real API. Needs `.env`. **Opens idle** — it spends nothing until you press Run. |
+| `make console` | The same console against the local stand-in. No key, no cost. |
+| `make demo` | Run a job, kill it, resume it, diff the result. |
+| `make test` | The whole suite. 24 kill points, ~40s, no key. |
 | `make proof` | The headline: kill and resume at **every** checkpoint. ~100s. |
-| `make review` | The browser review gate at `http://127.0.0.1:8420`. |
 | `make mcp` | Prints the MCP client config to paste into your agent. |
 
 Every run takes `--max-operations N` and `--reserve N`. Operations cost money and a long
@@ -186,7 +215,8 @@ A human holds the gate, and the gate is the same wherever you stand:
 
 - **Terminal** — `longhaul run --gate manual` walks you through each change; or
   `longhaul pending` / `longhaul decide --approve ch_x --reject ch_y --feedback "..."`.
-- **Browser** — `make review`. The screenshot at the top.
+- **Browser** — `make live` against the real API, or `make console` against the local
+  stand-in. The screenshot at the top.
 - **MCP** — `list_pending_changes` and `decide_changes` are ordinary tools, so another
   agent drives the whole run *including* the approval, explicitly and on the record.
 

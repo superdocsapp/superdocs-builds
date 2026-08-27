@@ -41,6 +41,26 @@ STATE_ORDER = [
 ]
 
 
+# --- Verification outcomes ------------------------------------------------
+#
+# A turn that proposes nothing is ambiguous: the document may already satisfy the
+# instruction, or the model may simply have missed it. Reporting both as success is a
+# bluff, so the two are told apart by checking the document afterwards.
+
+#: The document ended up as the step said it would.
+VERIFIED = "verified"
+#: The expectation is unmet, and a human rejected the change that would have met it.
+#: Not a failure — the rejection is the reason, and it was a person's call.
+UNMET_BY_CHOICE = "unmet: a reviewer rejected the change that would have met this"
+#: The expectation is unmet and nothing was ever proposed. The model missed it.
+UNMET_NO_CHANGES = "unmet: nothing was proposed and the document still does not match"
+#: The expectation is unmet and this attempt did not run the step, so the record that
+#: would explain why is gone. Neither a pass nor a silent miss — genuinely unknown.
+UNMET_UNKNOWN = "unmet: cannot be explained from what survived recovery"
+#: No expectation was declared for this step.
+UNCHECKED = "unchecked"
+
+
 # --- Dispositions (what the honest report says about a step) --------------
 
 EXECUTED = "executed"
@@ -93,6 +113,12 @@ class Step:
     billable_ops: int = 0
     duration_ms: int = 0
     error: str | None = None
+    #: What the document should look like once this step has done its job, as JSON
+    #: ``{"absent": [...], "present": [...]}``. Declared in the job spec.
+    verify_json: str | None = None
+    #: The result of checking that, once the step finished.
+    verification: str | None = None
+    verification_detail: str | None = None
 
     @property
     def is_terminal(self) -> bool:

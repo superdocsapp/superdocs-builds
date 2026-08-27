@@ -84,6 +84,9 @@ CREATE TABLE IF NOT EXISTS steps (
     billable_ops INTEGER NOT NULL DEFAULT 0,
     duration_ms  INTEGER NOT NULL DEFAULT 0,
     error        TEXT,
+    verify_json  TEXT,
+    verification TEXT,
+    verification_detail TEXT,
     PRIMARY KEY (run_id, step_index)
 );
 
@@ -164,12 +167,13 @@ class LeaseLost(LedgerError):
 _STEP_COLUMNS = (
     "run_id, step_index, step_id, doc_slug, instruction, token, state, attempt, "
     "job_id, disposition, evidence, pre_hash, post_hash, started_at, ended_at, "
-    "billable_ops, duration_ms, error"
+    "billable_ops, duration_ms, error, verify_json, verification, verification_detail"
 )
 
 _MUTABLE_STEP_FIELDS = frozenset({
     "attempt", "job_id", "disposition", "evidence", "pre_hash", "post_hash",
     "started_at", "ended_at", "billable_ops", "duration_ms", "error",
+    "verification", "verification_detail",
 })
 
 
@@ -193,6 +197,9 @@ def _row_to_step(row: sqlite3.Row) -> Step:
         billable_ops=row["billable_ops"],
         duration_ms=row["duration_ms"],
         error=row["error"],
+        verify_json=row["verify_json"],
+        verification=row["verification"],
+        verification_detail=row["verification_detail"],
     )
 
 
@@ -277,9 +284,9 @@ class Ledger:
             )
             c.executemany(
                 "INSERT INTO steps (run_id, step_index, step_id, doc_slug, instruction, "
-                "token, state) VALUES (?,?,?,?,?,?,?)",
+                "token, state, verify_json) VALUES (?,?,?,?,?,?,?,?)",
                 [(s.run_id, s.step_index, s.step_id, s.doc_slug, s.instruction,
-                  s.token, s.state) for s in steps],
+                  s.token, s.state, s.verify_json) for s in steps],
             )
             c.execute(
                 "INSERT INTO events (run_id, step_index, kind, detail, at) VALUES (?,?,?,?,?)",
