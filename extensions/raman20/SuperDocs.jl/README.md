@@ -16,11 +16,21 @@ SuperDocs features used: chat editing, human-in-the-loop approve, image upload, 
 
 ## Install
 
-Not in the Julia General registry. From a `superdocs-builds` clone:
+Not in the Julia General registry.
+
+From a [superdocsapp/superdocs-builds](https://github.com/superdocsapp/superdocs-builds) clone:
 
 ```julia
 using Pkg
 Pkg.develop(path="extensions/raman20/SuperDocs.jl")
+```
+
+Or without cloning:
+
+```julia
+using Pkg
+Pkg.add(url="https://github.com/superdocsapp/superdocs-builds",
+        subdir="extensions/raman20/SuperDocs.jl")
 ```
 
 Requires Julia 1.10+. Dependencies: HTTP.jl, JSON3, Base64 (stdlib).
