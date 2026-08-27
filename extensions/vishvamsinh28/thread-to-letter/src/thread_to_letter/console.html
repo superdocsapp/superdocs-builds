@@ -1,0 +1,342 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Thread to letter</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#f7f7f5;--panel:#fff;--sunk:#f1f0ed;--ink:#1a1a18;--dim:#6c6a64;--line:#e3e0da;
+    --ok:#2c6e4b;--warn:#8f6212;--bad:#a03325;--info:#2c5c8f;--accent:#3b3a36;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#141613;--panel:#1c1f1b;--sunk:#191c18;--ink:#e9e7e2;--dim:#96938b;--line:#2e332c;
+    --ok:#7cc39a;--warn:#d4a748;--bad:#e08a79;--info:#82aede;--accent:#cfccc4;
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+  header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:11px 20px;
+    border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:20}
+  .brand{font-weight:650;font-size:15px;letter-spacing:-.01em}
+  .sub{color:var(--dim);font-size:13px}
+  .spacer{margin-left:auto}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;
+    font-size:12px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+  .pill.live{color:var(--ok);border-color:var(--ok);font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .dot.pulse{animation:p 1.3s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+  main{display:grid;grid-template-columns:300px minmax(0,1fr) 340px;gap:16px;
+    padding:16px 20px 60px;max-width:1640px;margin:0 auto;align-items:start}
+  @media (max-width:1240px){main{grid-template-columns:minmax(0,1fr)}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}
+  .card>h2{margin:0;padding:10px 15px;border-bottom:1px solid var(--line);font-size:11px;
+    text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:650;
+    display:flex;align-items:center;gap:8px}
+  .card>h2 .n{margin-left:auto;font-weight:500;text-transform:none;letter-spacing:0}
+  .body{padding:13px 15px}.body.flush{padding:0}
+  button{font:inherit;font-size:13px;padding:6px 13px;border-radius:7px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+  button:hover:not(:disabled){border-color:var(--dim)}
+  button:disabled{opacity:.4;cursor:default}
+  button.go{background:var(--ok);border-color:var(--ok);color:var(--bg);font-weight:650}
+  select,input,textarea{font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);
+    border-radius:7px;background:var(--bg);color:var(--ink);width:100%}
+  textarea{font-family:var(--mono);font-size:11.5px;min-height:90px;resize:vertical}
+  .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .muted{color:var(--dim);font-size:12.5px}
+  /* thread */
+  .msg{padding:8px 15px;border-bottom:1px solid var(--line);font-size:12.5px}
+  .msg:last-child{border-bottom:0}
+  .msg .who{font-weight:600}
+  .msg .when{color:var(--dim);font-size:11px}
+  .msg .txt{color:var(--dim);margin-top:2px;white-space:pre-wrap;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .msg.open .txt{-webkit-line-clamp:unset;color:var(--ink)}
+  /* commitments */
+  .c{border:1px solid var(--line);border-radius:9px;padding:11px 13px;margin-bottom:10px;
+    display:grid;grid-template-columns:24px 1fr;gap:11px;align-items:start}
+  .c.on{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 6%,transparent)}
+  .c.bad{border-color:var(--bad)}
+  .c input[type=checkbox]{width:16px;height:16px;margin-top:3px;accent-color:var(--ok)}
+  .chip{display:inline-block;padding:1px 8px;border-radius:20px;font-size:10.5px;
+    font-weight:650;text-transform:uppercase;letter-spacing:.04em;border:1px solid}
+  .chip.firm{color:var(--ok);border-color:var(--ok)}
+  .chip.superseded{color:var(--warn);border-color:var(--warn)}
+  .chip.hedged{color:var(--info);border-color:var(--info)}
+  .chip.second-hand{color:var(--dim);border-color:var(--dim)}
+  .chip.proposed{color:var(--dim);border-color:var(--dim)}
+  .chip.unverified{color:var(--bad);border-color:var(--bad)}
+  .obl{font-weight:600;margin:5px 0 2px}
+  .quote{font-family:var(--mono);font-size:11.5px;background:var(--sunk);border-radius:6px;
+    padding:6px 9px;margin-top:6px;color:var(--dim)}
+  .quote b{color:var(--ink);font-weight:400}
+  /* letter */
+  .letter{background:var(--sunk);border-radius:8px;padding:18px 20px;max-height:460px;
+    overflow:auto;font-size:13px}
+  .letter h1,.letter h2{font-size:14px;margin:0 0 8px}
+  .letter p{margin:0 0 8px}
+  .letter table{border-collapse:collapse;width:100%}
+  .letter td,.letter th{border:1px solid var(--line);padding:4px 7px;font-size:12px}
+  /* api feed */
+  .feed{font-family:var(--mono);font-size:11.5px;max-height:300px;overflow-y:auto}
+  .call{display:grid;grid-template-columns:42px 1fr 40px 48px;gap:7px;padding:5px 13px;
+    border-bottom:1px solid var(--line);align-items:baseline}
+  .call:last-child{border-bottom:0}
+  .call .m{font-weight:650;color:var(--dim)}
+  .call .p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .call .s{text-align:right;color:var(--ok)}.call .s.err{color:var(--bad)}
+  .call .d{text-align:right;color:var(--dim)}
+  .call .note{grid-column:2/-1;color:var(--dim);font-size:10.5px}
+  .call .note b{color:var(--warn)}
+  .banner{border-radius:8px;padding:9px 13px;margin-bottom:13px;font-size:13px}
+  .banner.err{border:1px solid var(--bad);color:var(--bad)}
+  .banner.warn{border:1px solid var(--warn);color:var(--warn)}
+  .empty{color:var(--dim);font-size:13px;padding:4px 0}
+  .counts{display:flex;flex-wrap:wrap;gap:16px;font-size:12.5px}
+  .counts b{display:block;font-size:17px;font-weight:650}
+</style>
+
+<header>
+  <span class="brand">Thread to letter</span>
+  <span class="sub" id="subject">no thread open</span>
+  <span class="spacer"></span>
+  <span class="pill" id="conn"><span class="dot"></span><span id="conn-label">…</span></span>
+  <span class="pill" id="key"></span>
+  <span class="pill" id="ops"></span>
+</header>
+
+<main>
+  <div>
+    <div class="card">
+      <h2>Thread</h2>
+      <div class="body">
+        <div class="row">
+          <select id="pick"></select>
+          <button id="open">Open</button>
+        </div>
+        <p class="muted" style="margin:10px 0 5px">or paste one</p>
+        <textarea id="paste" placeholder="From: someone@example.com&#10;Subject: ...&#10;&#10;message text"></textarea>
+        <div class="row" style="margin-top:7px">
+          <button id="open-paste">Use pasted</button>
+        </div>
+      </div>
+    </div>
+    <div class="card" id="msgs-card" hidden>
+      <h2>Messages<span class="n" id="msg-count"></span></h2>
+      <div class="body flush" id="msgs"></div>
+    </div>
+  </div>
+
+  <div>
+    <div id="error" class="banner err" hidden></div>
+    <div id="dangling" class="banner warn" hidden></div>
+    <div id="findings" class="banner warn" hidden></div>
+
+    <div class="card">
+      <h2>What was actually committed to<span class="n" id="c-count"></span></h2>
+      <div class="body">
+        <div class="row" style="margin-bottom:12px">
+          <button class="go" id="extract">Find commitments</button>
+          <span class="muted" id="extract-hint"></span>
+        </div>
+        <div class="counts" id="counts" hidden></div>
+        <div id="commitments" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Letter<span class="n" id="l-hint"></span></h2>
+      <div class="body">
+        <div class="row" style="margin-bottom:12px">
+          <select id="shape" style="width:auto"><option value="letter">formal letter</option>
+            <option value="memo">internal memo</option></select>
+          <button class="go" id="write">Write it</button>
+          <span class="spacer"></span>
+          <select id="fmt" style="width:auto"></select>
+          <button id="dl">Download</button>
+          <button id="dl-reply">Reply draft (.eml)</button>
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <input id="sender" placeholder="your address, for the reply draft"
+                 style="max-width:320px">
+        </div>
+        <div id="letter"><p class="empty">Nothing written yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <h2>SuperDocs API<span class="n" id="call-count"></span></h2>
+      <div class="body flush feed" id="feed"></div>
+    </div>
+    <div class="card">
+      <h2>How it decides</h2>
+      <div class="body muted">
+        <p style="margin:0 0 8px">Every candidate carries a <b>verbatim quote</b> from the
+        thread. No quote, no commitment.</p>
+        <p style="margin:0 0 8px"><span class="chip firm">firm</span> somebody accepted an
+        obligation. Only these go in.</p>
+        <p style="margin:0 0 8px"><span class="chip superseded">superseded</span> replaced
+        later in the thread.</p>
+        <p style="margin:0 0 8px"><span class="chip hedged">hedged</span> “should be able
+        to”, “hopefully”.</p>
+        <p style="margin:0 0 8px"><span class="chip second-hand">second-hand</span> what a
+        third party might do.</p>
+        <p style="margin:0"><span class="chip proposed">proposed</span> floated, never
+        agreed.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let callSeq = 0, sig = null, threadsLoaded = false;
+  const esc = s => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+  const ms = n => n >= 1000 ? (n/1000).toFixed(1)+"s" : n+"ms";
+
+  async function poll(){
+    try{
+      const s = await (await fetch(`/api/state?since=${callSeq}`)).json();
+      render(s);
+    }catch(e){ $("conn-label").textContent = "console unreachable"; }
+  }
+
+  function render(s){
+    const c = s.connection;
+    $("conn").className = "pill" + (c.live ? " live" : "");
+    $("conn-label").textContent = (c.live ? "LIVE · " : "local · ") + c.label;
+    $("key").textContent = "key " + c.key;
+    $("ops").textContent = `${c.operations} operation${c.operations===1?"":"s"}`;
+
+    if(!threadsLoaded && s.threads.length){
+      $("pick").innerHTML = s.threads.map(t=>`<option>${esc(t)}</option>`).join("");
+      threadsLoaded = true;
+    }
+    if(!$("fmt").children.length)
+      $("fmt").innerHTML = s.formats.map(f=>`<option>${f}</option>`).join("");
+
+    $("error").hidden = !s.error;
+    if(s.error) $("error").textContent = s.error;
+
+    const busy = !!s.busy;
+    $("extract").disabled = busy || !s.thread;
+    $("write").disabled = busy || !s.commitments.length && !s.thread;
+    $("extract").textContent = busy && s.busy.includes("commitments") ? "Working…" : "Find commitments";
+    $("write").textContent = busy && s.busy.includes("letter") ? "Working…" : "Write it";
+    $("extract-hint").textContent = s.thread
+      ? (c.live ? "one operation against your account" : "one operation")
+      : "open a thread first";
+
+    // thread
+    if(s.thread){
+      $("subject").textContent = s.thread.subject;
+      $("msgs-card").hidden = false;
+      $("msg-count").textContent = `${s.thread.messages.length} messages`;
+      $("msgs").innerHTML = s.thread.messages.map(m=>`
+        <div class="msg" onclick="this.classList.toggle('open')">
+          <div><span class="who">${esc(m.sender)}</span>
+            <span class="when"> · ${esc((m.date||"").slice(0,22))}</span></div>
+          <div class="txt">${esc(m.body)}</div>
+        </div>`).join("");
+      $("findings").hidden = !s.thread.findings.length;
+      if(s.thread.findings.length)
+        $("findings").innerHTML = "<b>This thread contains text addressed to an automated "
+          + "reader.</b> It is reported, never followed — but check who sent it before "
+          + "ticking anything from that message.<br>"
+          + s.thread.findings.map(f=>`<span class="muted">${esc(f.where)}: ${esc(f.excerpt)}</span>`).join("<br>");
+    }
+
+    // commitments
+    $("c-count").textContent = s.commitments.length ? `${s.commitments.length} candidates` : "";
+    const nextSig = JSON.stringify(s.commitments.map(c=>[c.quote,c.chosen]));
+    if(nextSig !== sig){
+      sig = nextSig;
+      $("commitments").innerHTML = s.commitments.length ? s.commitments.map((c,i)=>`
+        <div class="c ${c.chosen?"on":""} ${c.quote_found?"":"bad"}">
+          <input type="checkbox" ${c.chosen?"checked":""}
+                 onchange="toggle(${i}, this.checked)">
+          <div>
+            <span class="chip ${esc(c.status)}">${esc(c.status)}</span>
+            ${c.quote_found?"":'<span class="chip unverified">not in the thread</span>'}
+            <div class="obl">${esc(c.party)} — ${esc(c.obligation)}</div>
+            <div class="muted">${c.due?"due "+esc(c.due):"no date given"}
+              · owed to ${esc(c.owes_to||"—")}
+              ${c.located_in?`· message ${c.located_in}`:""}</div>
+            <div class="quote">“<b>${esc(c.quote)}</b>”</div>
+            ${c.quote_note?`<div class="muted" style="color:var(--bad);margin-top:5px">${esc(c.quote_note)}</div>`:""}
+          </div>
+        </div>`).join("") : '<p class="empty">Press “Find commitments”.</p>';
+      window.__quotes = s.commitments.map(c=>c.quote);
+    }
+
+    if(s.counts && s.counts.usable !== undefined){
+      $("counts").hidden = false;
+      $("counts").innerHTML = [
+        ["going in the letter", s.counts.usable], ["superseded", s.counts.superseded],
+        ["hedged", s.counts.hedged], ["second-hand", s.counts["second-hand"]],
+        ["could not be quoted", s.counts.unverified],
+      ].map(([k,v])=>`<div><b>${v||0}</b><span class="muted">${k}</span></div>`).join("");
+    }
+
+    $("dangling").hidden = !s.dangling.length;
+    if(s.dangling.length)
+      $("dangling").innerHTML = "<b>A commitment was replaced but the replacement is "
+        + "missing.</b> The letter would omit the obligation that actually stands.<br>"
+        + s.dangling.map(d=>`<span class="muted">${esc(d.party)}: ${esc(d.obligation)} (${esc(d.due||"no date")})</span>`).join("<br>");
+
+    // letter
+    const chosen = s.commitments.filter(c=>c.chosen).length;
+    $("l-hint").textContent = s.commitments.length
+      ? `${chosen} commitment${chosen===1?"":"s"} selected` : "";
+    const hasLetter = !!s.letter_html;
+    $("dl").disabled = !hasLetter; $("dl-reply").disabled = !hasLetter;
+    if(hasLetter) $("letter").innerHTML = `<div class="letter">${s.letter_html}</div>`;
+
+    renderFeed(s);
+  }
+
+  function renderFeed(s){
+    if(s.calls && s.calls.length){
+      const feed = $("feed");
+      const ph = feed.querySelector(".empty"); if(ph) ph.remove();
+      feed.insertAdjacentHTML("afterbegin", s.calls.slice().reverse().map(c=>`
+        <div class="call">
+          <span class="m">${esc(c.method)}</span>
+          <span class="p" title="${esc(c.path)}">${esc(c.path)}</span>
+          <span class="s ${(c.status||0)>=400?"err":""}">${c.status??"—"}</span>
+          <span class="d">${ms(c.ms)}</span>
+          ${c.note?`<span class="note">${c.billable?"<b>billable</b> · ":""}${esc(c.note)}</span>`:""}
+        </div>`).join(""));
+      callSeq = s.call_seq;
+    }
+    $("call-count").textContent = `${s.call_seq} calls`;
+    if(!s.call_seq && !$("feed").children.length)
+      $("feed").innerHTML = '<div class="empty" style="padding:11px 13px">No calls yet.</div>';
+  }
+
+  window.toggle = async (i, on) => {
+    await fetch("/api/toggle",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({quote: window.__quotes[i], on})});
+    sig = null; poll();
+  };
+
+  async function post(path, body){
+    const r = await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(body||{})});
+    if(!r.ok){ const j = await r.json(); $("error").hidden=false; $("error").textContent=j.detail; }
+    poll();
+  }
+
+  $("open").onclick = () => { sig=null; post("/api/open",{name:$("pick").value}); };
+  $("open-paste").onclick = () => { sig=null; post("/api/open",{pasted:$("paste").value}); };
+  $("extract").onclick = () => post("/api/extract");
+  $("write").onclick = () => post("/api/letter",{shape:$("shape").value});
+  $("dl").onclick = () => window.location = `/api/export?fmt=${$("fmt").value}`;
+  $("dl-reply").onclick = () =>
+    window.location = `/api/reply?fmt=${$("fmt").value}&sender=${encodeURIComponent($("sender").value)}`;
+
+  poll(); setInterval(poll, 900);
+</script>

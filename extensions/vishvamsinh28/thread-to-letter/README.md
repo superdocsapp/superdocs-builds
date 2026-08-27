@@ -14,9 +14,15 @@ will deliver by the 14th"* — and now there is a document saying somebody promi
 something they did not promise.
 
 ```bash
-make demo      # the whole pipeline, no key, no cost
-make live      # the same thing against api.superdocs.app — two operations
+make console   # the review console, against the real API
+make demo      # the whole pipeline on the terminal, no key, no cost
 ```
+
+![The console, live against api.superdocs.app](docs/console.png)
+
+Every call it makes is on the right, with timings and which ones cost an operation. It
+opens idle: extraction is one operation, the letter is another, and each waits for a
+click.
 
 ## What it actually does
 
@@ -86,7 +92,8 @@ You need [`uv`](https://docs.astral.sh/uv/) and nothing else.
 ```bash
 make demo                                  # no key needed
 cp .env.example .env                       # then put your key in it — .env is gitignored
-make live                                  # two operations
+make console                               # the browser console
+make live                                  # or the same run on the terminal
 ```
 
 On your own thread — export it from Gmail (⋮ → Download message) or just paste it:

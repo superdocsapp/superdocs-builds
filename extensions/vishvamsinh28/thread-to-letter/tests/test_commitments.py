@@ -91,3 +91,38 @@ def test_summary_counts_what_matters() -> None:
     counts = summarise(rows)
     assert counts["firm"] == 1 and counts["hedged"] == 1
     assert counts["usable"] == 1 and counts["unverified"] == 1
+
+
+def test_identical_rows_are_collapsed() -> None:
+    """A model asked for a table will sometimes list one commitment twice. Two rows for
+    one promise makes a reviewer check it twice and makes the counts lie."""
+    from thread_to_letter.commitments import dedupe
+
+    rows = parse(_table(
+        ("Calder and Vance", "N", "schema mapping", "14 Mar", "superseded", "5", "one wording"),
+        ("Calder & Vance", "N", "schema mapping", "14 Mar", "superseded", "5", "a different trim"),
+    ))
+    assert len(rows) == 2
+    assert len(dedupe(rows)) == 1
+
+
+def test_a_date_that_moved_is_two_commitments_not_one() -> None:
+    """Collapsing these would hide precisely what this build exists to surface."""
+    from thread_to_letter.commitments import dedupe
+
+    rows = parse(_table(
+        ("Calder", "N", "schema mapping", "14 Mar", "superseded", "5", "q1"),
+        ("Calder", "N", "schema mapping", "21 Mar", "firm", "7", "q2"),
+    ))
+    assert len(dedupe(rows)) == 2
+
+
+def test_dedupe_keeps_the_first_wording() -> None:
+    from thread_to_letter.commitments import dedupe
+
+    rows = parse(_table(
+        ("A", "B", "thing", "", "firm", "1", "the fuller quote as written"),
+        ("A", "B", "thing", "", "firm", "1", "a trimmed quote"),
+    ))
+    (kept,) = dedupe(rows)
+    assert kept.quote == "the fuller quote as written"

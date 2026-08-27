@@ -1,7 +1,8 @@
-.PHONY: help demo live test sync clean
+.PHONY: help console demo live test sync clean
 
 help:
-	@echo "make live  — run the pipeline against the real SuperDocs API (needs .env, 2 ops)"
+	@echo "make console — the review console in a browser (needs .env)"
+	@echo "make live  — the same pipeline on the terminal (needs .env, 2 ops)"
 	@echo "make demo  — the same pipeline against a local stand-in (no key, no cost)"
 	@echo "make test  — the full suite, no key needed"
 	@echo "make sync  — regenerate the add-on's prompts from the Python source"
@@ -9,6 +10,12 @@ help:
 
 demo:
 	@./scripts/demo.sh
+
+console:
+	@test -f .env || { echo "No .env — copy .env.example and add your key."; exit 2; }
+	@uv run thread2letter doctor
+	@echo ""
+	@uv run thread2letter serve --port 8430
 
 live:
 	@test -f .env || { echo "No .env — copy .env.example and add your key."; exit 2; }

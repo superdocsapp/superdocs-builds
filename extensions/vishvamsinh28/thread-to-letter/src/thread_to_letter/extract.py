@@ -24,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .client import Client, document_html
-from .commitments import Commitment, parse
+from .commitments import Commitment, dedupe, parse
 from .thread import Thread
 from .verify import verify
 
@@ -123,7 +123,7 @@ def extract(client: Client, thread: Thread, session_id: str,
         note="extract commitments",
     )
     html = document_html(result)
-    commitments = verify(thread, parse(html))
+    commitments = verify(thread, dedupe(parse(html)))
     return Extraction(
         commitments=commitments,
         document_html=html,

@@ -184,6 +184,36 @@ def _column_order(header: list[str]) -> dict[str, int] | None:
     return order
 
 
+def _dedupe_key(c: "Commitment") -> tuple[str, ...]:
+    return (
+        _party_key(c.party),
+        " ".join((c.obligation or "").lower().split()),
+        " ".join((c.due or "").lower().split()),
+        c.status,
+    )
+
+
+def dedupe(commitments: list["Commitment"]) -> list["Commitment"]:
+    """Collapse rows that say the same thing about the same obligation.
+
+    A model asked for a table will sometimes list one commitment twice — same party, same
+    obligation, same date, same status — usually with the quote trimmed differently. Two
+    rows for one promise makes a reviewer check the same thing twice and makes the counts
+    lie, so the first is kept and the rest dropped. Rows differing in *any* of party,
+    obligation, date or status are left alone: a date that moved is two commitments, not
+    one, and collapsing those would hide exactly what this build exists to surface.
+    """
+    seen: set[tuple[str, ...]] = set()
+    kept: list[Commitment] = []
+    for c in commitments:
+        key = _dedupe_key(c)
+        if key in seen:
+            continue
+        seen.add(key)
+        kept.append(c)
+    return kept
+
+
 def _party_key(party: str) -> str:
     return " ".join((party or "").lower().replace("&", "and").split())
 

@@ -269,6 +269,22 @@ def run(
     console.print(f"[dim]{spent} operations spent.[/dim]")
 
 
+@app.command()
+def serve(
+    host: str = typer.Option("127.0.0.1", "--host"),
+    port: int = typer.Option(8430, "--port"),
+    threads_dir: str = typer.Option("threads", "--threads"),
+) -> None:
+    """Open the console: pick a thread, review what was committed, write the letter."""
+    import uvicorn
+
+    from .web import create_app
+
+    console.print(f"[green]Console[/green] http://{host}:{port}")
+    console.print("[dim]It spends nothing until you press a button.[/dim]")
+    uvicorn.run(create_app(threads_dir), host=host, port=port, log_level="warning")
+
+
 def main() -> None:  # pragma: no cover
     app()
 
