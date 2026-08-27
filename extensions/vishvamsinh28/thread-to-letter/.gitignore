@@ -7,3 +7,6 @@ out/
 .fake-state/
 out-nothing/
 .capture/
+
+# clasp writes this, and it is specific to your Google account
+gmail-addon/.clasp.json

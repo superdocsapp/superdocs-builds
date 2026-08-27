@@ -124,8 +124,9 @@ verification, the same superseded check — *is* exercised against the live Supe
 and covered by tests. `Prompts.gs` is generated from the Python source and a test fails
 if the two drift, so the sideloaded path cannot quietly diverge from the tested one.
 
-Treat it as a reference implementation to sideload, not as a shipped feature. Setup
-instructions are at the top of `Code.gs`.
+Treat it as a reference implementation to sideload, not as a shipped feature.
+[`gmail-addon/README.md`](gmail-addon/README.md) has the install steps — browser-only
+or via `clasp` — what each OAuth scope is for, and what to check when it misbehaves.
 
 ## Where it breaks
 

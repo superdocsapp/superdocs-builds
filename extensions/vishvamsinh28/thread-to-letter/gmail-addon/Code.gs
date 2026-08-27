@@ -15,9 +15,9 @@
  * shipped feature.
  * ---------------------------------------------------------------------------
  *
- * Setup: Extensions -> Apps Script, paste these files in, then
- * Project Settings -> Script Properties -> add SUPERDOCS_API_KEY.
- * Deploy -> Test deployments -> Install.
+ * Setup: see README.md in this folder. A Gmail add-on must be a STANDALONE Apps Script
+ * project created at script.google.com — not a bound script from Extensions -> Apps
+ * Script, which is a different thing and cannot carry a Gmail add-on manifest.
  */
 
 var API_BASE = 'https://api.superdocs.app';
