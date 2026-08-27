@@ -132,10 +132,12 @@ class ConsoleService:
         state.busy = "Reading the thread for commitments…"
         state.error = None
         try:
-            import hashlib
+            from .session import new_session
 
-            digest = hashlib.sha256(state.thread.normalised.encode()).hexdigest()[:12]
-            state.session_id = f"thread2letter-{digest}"
+            # A fresh session per extraction. Reusing one across runs let two dozen turns
+            # of history pile up, and the model started answering from that instead of
+            # from the thread.
+            state.session_id = new_session(state.thread.normalised)
             with self._client() as client:
                 result = extract_mod.extract(client, state.thread, state.session_id)
                 self._absorb(client)

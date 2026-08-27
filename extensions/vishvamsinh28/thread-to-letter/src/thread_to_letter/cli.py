@@ -50,10 +50,9 @@ def _client() -> Client:
 
 
 def _session(thread: Thread) -> str:
-    import hashlib
+    from .session import new_session
 
-    digest = hashlib.sha256(thread.normalised.encode()).hexdigest()[:12]
-    return f"thread2letter-{digest}"
+    return new_session(thread.normalised)
 
 
 def _show_thread(thread: Thread) -> None:
@@ -232,7 +231,7 @@ def run(
                     raise typer.Exit(3)
 
             confirmed = _gate(extraction.commitments, auto)
-            console.print(f"[dim]{len(confirmed)} commitment(s) will go in the letter.[/dim]")
+            console.print(f"[dim]{len(confirmed)} commitment(s) will go in the {shape}.[/dim]")
 
             console.print("[dim]Drafting…[/dim]")
             today = _dt.date.today().strftime("%d %B %Y")
@@ -241,7 +240,7 @@ def run(
                 today=today, model_tier=model_tier,
             )
 
-            blob = client.export(session_id=session, fmt=fmt,
+            blob = client.export(session_id=result.session_id, fmt=fmt,
                                  options={"filename": draft_mod._slug(thread.subject)})
             letter_path = draft_mod.write(target / f"{draft_mod._slug(thread.subject)}."
                                           f"{draft_mod._SUFFIX.get(fmt, fmt)}", blob)

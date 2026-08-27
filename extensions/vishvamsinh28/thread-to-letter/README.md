@@ -77,6 +77,22 @@ and it is the rarer output.
 
 ## What running it live found
 
+**A session per run, not per thread.** The session id was derived from the thread's
+content, so every run of the same thread reused one conversation and turns piled up.
+After two dozen, a live run came back with commitments about people who were not in the
+thread at all — the model answering from the session's history rather than from the
+evidence. **Every one of them failed quote verification and nothing reached the letter**,
+which is the safety net doing exactly its job; but a safety net should not be load-bearing
+for something this avoidable. Each run now gets a fresh session.
+
+**The letter is drafted in a session of its own.** The extraction prompt contains the
+whole thread, so drafting in that same session let the thread back in — a live memo
+invented a `FROM:` line by reading the sender out of the conversation the reviewer had
+just filtered. With the session isolated it correctly writes `[SENDER NAME]` instead,
+because it cannot see who sent anything. It is given the confirmed commitments and
+nothing else.
+
+
 The first live run **dropped the most important commitment in the thread.** It correctly
 marked the 14 March delivery `superseded` — and then never listed the 21 March commitment
 that superseded it. The letter would have named the payment terms and silently omitted
@@ -106,7 +122,7 @@ make demo                 # http://127.0.0.1:8430
 | `make offline` | The same pipeline in the terminal, against a local stand-in — no key, no cost |
 | `make cli` | One thread, terminal, live |
 | `make addon` | Runs the Apps Script add-on's own code, live |
-| `make test` | 43 tests, no key |
+| `make test` | 48 tests, no key |
 
 On your own thread — export it from Gmail (⋮ → Download message), drop the `.mbox` into
 `threads/`, and it appears in the inbox. Or from the terminal:
@@ -182,7 +198,7 @@ natural shape here, and a table is far more robust to parse than prose.
 ## Tests
 
 ```bash
-make test     # 40 tests, no API key, no network beyond localhost
+make test     # 48 tests, no API key, no network beyond localhost
 ```
 
 Most of what matters is offline and tested for real: thread parsing, quote verification

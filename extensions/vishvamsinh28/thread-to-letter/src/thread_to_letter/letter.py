@@ -1,8 +1,14 @@
 """Turning confirmed commitments into a formal letter or memo.
 
-The second billable turn. It is given the commitments a human confirmed — not the thread
-— because the letter must be able to say only what somebody accepted, and the surest way
-to keep speculation out of it is to keep the raw conversation out of it.
+The second billable turn, and deliberately in **its own session**.
+
+It is given the commitments a human confirmed, not the thread, because the letter must be
+able to say only what somebody accepted — and the surest way to keep speculation out of it
+is to keep the raw conversation out of it. Reusing the extraction session would defeat
+that: the extraction prompt contains the whole thread, so the drafting turn could see
+every hedge and every retracted date the reviewer had just excluded, and write from them.
+
+A fresh session starts empty. The only thing in it is the confirmed list.
 
 The letter states each commitment with its date and its party. It does not editorialise,
 does not add warmth that was not there, and does not fill gaps. Where nothing was
@@ -121,10 +127,12 @@ def draft(
         if commitments
         else NOTHING_PROMPT.format(**common)
     )
-    result = client.chat(session_id, prompt, model_tier=model_tier, note=f"draft {shape}")
+    # Its own session, so the thread cannot leak into the letter. See the note above.
+    letter_session = f"{session_id}-{shape}"
+    result = client.chat(letter_session, prompt, model_tier=model_tier, note=f"draft {shape}")
     return Letter(
         html=document_html(result),
-        session_id=session_id,
+        session_id=letter_session,
         shape=shape,
         operations=1 if client.usage_from(result).get("was_billable") else 0,
         commitments=list(commitments),

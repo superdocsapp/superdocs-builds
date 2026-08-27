@@ -108,3 +108,15 @@ def test_the_dangling_check_runs_on_real_extraction_output(
     # The stand-in pairs its superseded row with a firm replacement, as a real
     # extraction should.
     assert dangling_superseded(result.commitments) == []
+
+
+def test_the_letter_is_drafted_in_its_own_session(client: Client, thread: Thread) -> None:
+    """The extraction session contains the entire thread. Drafting in it would let every
+    hedge and retracted date the reviewer just excluded back into the letter."""
+    extracted = extract_mod.extract(client, thread, "sess-x")
+    drafted = letter_mod.draft(client, thread, extracted.usable, "sess-x")
+    assert drafted.session_id != "sess-x"
+    assert drafted.session_id.startswith("sess-x")
+
+    memo = letter_mod.draft(client, thread, extracted.usable, "sess-x", shape="memo")
+    assert memo.session_id != drafted.session_id, "a memo is not the same document as a letter"
