@@ -197,3 +197,53 @@ def test_a_draft_can_be_discarded_and_the_demo_reset(
     assert blank["thread"] is None
     assert blank["commitments"] == []
     assert blank["call_seq"] == 0
+
+
+def test_send_files_the_draft_in_sent(fake_server, monkeypatch) -> None:
+    """Simulated, and labelled as such — but a Send button that does nothing is a dead
+    button in the middle of the demo."""
+    from fastapi.testclient import TestClient
+
+    from thread_to_letter.web import create_app
+    from tests.conftest import FAKE_KEY, ROOT
+
+    monkeypatch.setenv("SUPERDOCS_API_KEY", FAKE_KEY)
+    monkeypatch.setenv("SUPERDOCS_BASE_URL", fake_server.base_url)
+    client = TestClient(create_app(str(ROOT / "threads")))
+
+    assert client.get("/api/state").json()["sent"] == []
+    assert client.post("/api/send").status_code == 400, "nothing to send yet"
+
+    client.post("/api/open", json={"name": "migration-project.mbox"})
+    client.post("/api/extract")
+    for _ in range(80):
+        if not client.get("/api/state").json()["busy"]:
+            break
+        time.sleep(0.2)
+    client.post("/api/letter", json={"shape": "letter"})
+    for _ in range(80):
+        if not client.get("/api/state").json()["busy"]:
+            break
+        time.sleep(0.2)
+
+    sent = client.post("/api/send")
+    assert sent.status_code == 200
+    state = client.get("/api/state").json()
+
+    assert len(state["sent"]) == 1
+    message = state["sent"][0]
+    assert message["subject"].startswith("Re: ")
+    assert "@" in message["to"]
+    assert message["attachment"].endswith(".docx")
+    assert message["commitments"], "it records what the letter actually stated"
+
+    # Sending clears the draft — it is not in two places at once.
+    assert state["draft"] is None
+
+    # And it is still downloadable from Sent.
+    download = client.get("/api/sent/0", params={"fmt": "markdown"})
+    assert download.status_code == 200 and download.content
+
+    # Reset clears the mailbox too.
+    client.post("/api/reset")
+    assert client.get("/api/state").json()["sent"] == []

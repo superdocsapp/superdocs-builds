@@ -181,6 +181,8 @@
   <nav class="nav">
     <a id="nav-inbox" class="on" data-act="inbox" href="#">Inbox
       <span class="c" id="nav-count"></span></a>
+    <a id="nav-sent" data-act="sent" href="#">Sent
+      <span class="c" id="nav-sent-c"></span></a>
     <a id="nav-draft" data-act="drafts" href="#">Drafts
       <span class="c" id="nav-drafts"></span></a>
   </nav>
@@ -238,8 +240,9 @@
     // than after a round-trip. Only the two that need the server wait for it.
     if(act === "open")      { view = "thread"; post("/api/open", {name: arg}); }
     else if(act === "back" || act === "inbox") { view = "inbox"; post("/api/close"); }
-    else if(act === "drafts"){ view = "drafts"; drawn.thread = null;
-                               if(last) render(last); poll(); }
+    else if(act === "drafts" || act === "sent"){
+      view = act; drawn.thread = null; if(last) render(last); poll();
+    }
     else if(act === "extract"){ post("/api/extract"); }
     else if(act === "write"){ post("/api/letter", {shape}); }
     else if(act === "nothing"){
@@ -248,6 +251,14 @@
                + `to anything.\n\nThis costs one operation.`,
            yes: `Write the ${shape}`})
         .then(ok => ok && post("/api/letter", {shape, record_nothing: true}));
+    }
+    else if(act === "send"){
+      ask({title: "Send this reply?",
+           body: "This is a simulated mailbox — nothing leaves your machine. The message "
+               + "will appear in Sent.\n\nTo really send it, use Save .eml and open it "
+               + "in your mail client.",
+           yes: "Send"})
+        .then(ok => { if(ok){ view = "sent"; post("/api/send"); } });
     }
     else if(act === "discard"){
       ask({title: "Discard this draft?",
@@ -329,10 +340,13 @@
     $("ops").textContent = `${c.operations} operation${c.operations===1?"":"s"}`;
     $("nav-count").textContent = s.inbox.length;
     $("nav-drafts").textContent = s.draft ? "1" : "";
-    $("nav-inbox").className = view === "drafts" ? "" : "on";
+    $("nav-sent-c").textContent = s.sent.length || "";
+    $("nav-inbox").className = (view === "drafts" || view === "sent") ? "" : "on";
     $("nav-draft").className = view === "drafts" ? "on" : "";
+    $("nav-sent").className  = view === "sent"   ? "on" : "";
 
-    if(view === "drafts") renderDrafts(s);
+    if(view === "sent") renderSent(s);
+    else if(view === "drafts") renderDrafts(s);
     else if(!s.thread) renderInbox(s);
     else renderThread(s);
 
@@ -396,6 +410,33 @@
       </div>`
       : `<div style="padding:34px 20px" class="empty">No drafts yet. Open a thread and
          write a letter.</div>`;
+  }
+
+  function renderSent(s){
+    const sig = "sent:" + s.sent.length;
+    if(drawn.thread === sig) return;
+    drawn.thread = sig; drawn.inbox = null;
+    $("mail").innerHTML = s.sent.length ? `<div class="thread">
+        <button class="ghost small" data-act="inbox">← Inbox</button>
+        <p class="sm" style="margin:12px 0 4px">Simulated mailbox — nothing left this
+          machine. Use <b>Save .eml</b> on a draft to really send one.</p>
+        ${s.sent.map((m,i) => `
+          <div class="m">
+            <div class="av" style="background:hsl(145 45% 38%)">↗</div>
+            <div>
+              <div class="who">${esc(m.subject)}</div>
+              <div class="meta">To ${esc(m.to)} · ${esc(m.at)}</div>
+              <div class="txt">${esc(m.body)}</div>
+              <div class="att" style="margin:11px 0 0;max-width:420px">
+                <span class="x">DOCX</span><span>${esc(m.attachment)}</span>
+                <a class="sm" style="margin-left:auto;color:var(--accent)"
+                   href="/api/sent/${i}?fmt=docx">Download</a>
+              </div>
+            </div>
+          </div>`).join("")}
+      </div>`
+      : `<div style="padding:34px 20px" class="empty">Nothing sent yet. Open a thread,
+         write a letter, then press Send.</div>`;
   }
 
   function renderAddon(s){
@@ -503,9 +544,9 @@
         <a class="sm" style="margin-left:auto;color:var(--accent)"
            href="/api/export?fmt=docx">Download</a></div>
       <div class="actions">
-        <button disabled title="This is a demo. It never sends mail.">Send</button>
+        <button data-act="send">Send</button>
         <a class="sm" style="color:var(--accent)" href="/api/reply?fmt=docx">Save .eml</a>
-        <span class="sm" style="margin-left:auto">nothing is ever sent</span>
+        <span class="sm" style="margin-left:auto">simulated — nothing leaves this machine</span>
       </div></div>`;
   }
 

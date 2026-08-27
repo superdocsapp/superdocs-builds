@@ -224,8 +224,27 @@ def dedupe(commitments: list["Commitment"]) -> list["Commitment"]:
     return kept
 
 
+#: Separators that join two parties. Deliberately excludes "and" and "&", because
+#: "Calder and Vance" is one firm and "Meridian Legal / Northwind" is two, and nothing in
+#: the string distinguishes them. Splitting on "and" would tear company names in half —
+#: a worse failure than the one it fixes, because it would silently match the wrong party.
+_PARTY_SPLIT = re.compile(r"\s*(?:/|,|\+|\bor\b)\s*", re.I)
+
+
 def _party_key(party: str) -> str:
     return " ".join((party or "").lower().replace("&", "and").split())
+
+
+def _party_names(party: str) -> set[str]:
+    """The individual parties named in one cell.
+
+    A model writes "Meridian Legal / Northwind" when an obligation involves both, and
+    treating that as one opaque string means it matches neither. Each name is kept
+    alongside the whole, so a joint row is recognised against either of them.
+    """
+    whole = _party_key(party)
+    parts = {p.strip() for p in _PARTY_SPLIT.split(whole) if len(p.strip()) > 2}
+    return (parts | {whole}) - {""}
 
 
 def dangling_superseded(commitments: list[Commitment]) -> list[Commitment]:
@@ -240,10 +259,13 @@ def dangling_superseded(commitments: list[Commitment]) -> list[Commitment]:
     correctly marked superseded, which would have produced a letter missing the vendor's
     actual commitment.
     """
-    firm_parties = {_party_key(c.party) for c in commitments if c.is_firm}
+    firm_parties: set[str] = set()
+    for c in commitments:
+        if c.is_firm:
+            firm_parties |= _party_names(c.party)
     return [
         c for c in commitments
-        if c.status == SUPERSEDED and _party_key(c.party) not in firm_parties
+        if c.status == SUPERSEDED and not (_party_names(c.party) & firm_parties)
     ]
 
 

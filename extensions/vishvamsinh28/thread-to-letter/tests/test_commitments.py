@@ -140,3 +140,40 @@ def test_quotes_inside_the_sentence_are_left_alone() -> None:
     (c,) = parse(_table(("A", "B", "thing", "", "firm", "1",
                          'he said "by Friday" and meant it')))
     assert c.quote == 'he said "by Friday" and meant it'
+
+
+def test_a_joint_party_matches_either_of_its_names() -> None:
+    """A model writes "Meridian Legal / Northwind" when an obligation involves both.
+    Treating that as one opaque party made the replacement look missing when it was not,
+    and a warning that cries wolf gets ignored when it matters."""
+    from thread_to_letter.commitments import dangling_superseded
+
+    for joint in ("Meridian Legal / Northwind", "Northwind, Meridian Legal",
+                  "Meridian Legal + Northwind"):
+        rows = parse(_table(
+            (joint, "both", "wrap renewal", "end of quarter", "superseded", "1", "q"),
+            ("Northwind", "Meridian Legal", "sign renewal", "31 Mar", "firm", "2", "q"),
+        ))
+        assert dangling_superseded(rows) == [], f"{joint!r} should match Northwind"
+
+
+def test_a_company_name_containing_and_is_not_torn_in_half() -> None:
+    """"Calder and Vance" is one firm; "Meridian Legal / Northwind" is two, and nothing
+    in the string tells them apart. So "and" is never treated as a separator — matching
+    the wrong party silently would be worse than the missed join it prevents."""
+    from thread_to_letter.commitments import _party_names
+
+    assert _party_names("Calder and Vance") == {"calder and vance"}
+    assert "meridian legal" in _party_names("Meridian Legal / Northwind")
+    assert "northwind" in _party_names("Meridian Legal / Northwind")
+
+
+def test_a_genuinely_missing_replacement_still_warns() -> None:
+    """The narrowing must not swallow the case the check exists for."""
+    from thread_to_letter.commitments import dangling_superseded
+
+    rows = parse(_table(
+        ("Acme Corp", "Northwind", "deliver widgets", "1 Mar", "superseded", "1", "q"),
+        ("Northwind", "Acme Corp", "pay invoice", "30 days", "firm", "2", "q"),
+    ))
+    assert len(dangling_superseded(rows)) == 1

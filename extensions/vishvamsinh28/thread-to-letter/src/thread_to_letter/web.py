@@ -15,6 +15,7 @@ the letter says.
 from __future__ import annotations
 
 import threading
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -61,6 +62,10 @@ class ConsoleService:
         self.settings = load_settings()
         self.threads_dir = Path(threads_dir)
         self.state = State()
+        #: Messages "sent" in this simulated mailbox. Nothing leaves the machine — the
+        #: banner says so — but a demo where Send does nothing is a demo with a dead
+        #: button in it, and the .eml download is there for really sending one.
+        self.sent: list[dict[str, Any]] = []
         self._lock = threading.Lock()
         self._calls: list[dict[str, Any]] = []
         self._seq = 0
@@ -185,14 +190,45 @@ class ConsoleService:
         finally:
             state.busy = ""
 
+    def send_draft(self) -> str:
+        """File the draft in Sent. Simulated: no mail leaves this machine."""
+        draft = self._draft_preview()
+        if draft is None:
+            raise ValueError("write the letter first")
+        self.sent.insert(0, {
+            **draft,
+            "html": self.state.letter_html,
+            "at": time.strftime("%d %b %H:%M"),
+            "commitments": [
+                {"party": c.party, "obligation": c.obligation, "due": c.due}
+                for c in self.state.commitments if c.quote in self.state.chosen
+            ],
+        })
+        self.state.letter_html = ""
+        self.state.letter_session = ""
+        return draft["subject"]
+
+    def sent_export(self, index: int, fmt: str) -> tuple[bytes, str]:
+        if not 0 <= index < len(self.sent):
+            raise ValueError("no such sent message")
+        item = self.sent[index]
+        if fmt not in EXPORT_FORMATS:
+            raise ValueError(f"format must be one of {', '.join(EXPORT_FORMATS)}")
+        stem = draft_mod._slug(item["subject"])
+        with self._client() as client:
+            blob = client.export(html=item["html"], fmt=fmt, options={"filename": stem})
+            self._absorb(client)
+        return blob, f"{stem}.{_SUFFIX.get(fmt, fmt)}"
+
     def discard_draft(self) -> None:
         """Throw the letter away and keep the review. Costs nothing."""
         self.state.letter_html = ""
         self.state.letter_session = ""
 
     def reset(self) -> None:
-        """Back to a blank demo: no thread, no review, no draft, no call log."""
+        """Back to a blank demo: no thread, no review, no draft, no sent, no call log."""
         self.state = State()
+        self.sent.clear()
         with self._lock:
             self._calls.clear()
             self._seq = 0
@@ -290,6 +326,12 @@ class ConsoleService:
             ],
             "letter_html": state.letter_html,
             "draft": self._draft_preview(),
+            "sent": [
+                {"to": m["to"], "subject": m["subject"], "body": m["body"],
+                 "attachment": m["attachment"], "at": m["at"],
+                 "commitments": m["commitments"]}
+                for m in self.sent
+            ],
             "busy": state.busy,
             "error": state.error,
             "calls": calls,
@@ -353,6 +395,23 @@ def create_app(threads_dir: str = "threads") -> FastAPI:
         """Back to the inbox. Keeps the call log; clears the open thread."""
         service.state = State()
         return {"ok": True}
+
+    @app.post("/api/send")
+    def send() -> dict[str, Any]:
+        try:
+            subject = service.send_draft()
+        except ValueError as exc:
+            raise HTTPException(400, detail=str(exc)) from exc
+        return {"sent": subject}
+
+    @app.get("/api/sent/{index}")
+    def sent_download(index: int, fmt: str = "docx") -> Response:
+        try:
+            blob, filename = service.sent_export(index, fmt)
+        except (ValueError, SuperDocsError) as exc:
+            raise HTTPException(400, detail=str(exc)) from exc
+        return Response(content=blob, media_type=_MEDIA.get(fmt, "application/octet-stream"),
+                        headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 
     @app.post("/api/discard")
     def discard() -> dict[str, Any]:
