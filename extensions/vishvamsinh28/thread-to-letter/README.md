@@ -14,7 +14,7 @@ will deliver by the 14th"* — and now there is a document saying somebody promi
 something they did not promise.
 
 ```bash
-make demo      # a mail client, the add-on panel, the real API
+make live      # a mail client, the add-on panel, the real API
 ```
 
 ![The demo: a simulated inbox with the add-on panel](docs/demo.png)
@@ -113,16 +113,19 @@ You need [`uv`](https://docs.astral.sh/uv/) and nothing else.
 
 ```bash
 cp .env.example .env      # then put your key in it — .env is gitignored
-make demo                 # http://127.0.0.1:8430
+make live                 # http://127.0.0.1:8430
 ```
 
 | Command | What it does |
 |---|---|
-| `make demo` | The mail-client demo above, against the real API |
+| `make live` | The mail-client demo above, against the real API |
 | `make offline` | The same pipeline in the terminal, against a local stand-in — no key, no cost |
 | `make cli` | One thread, terminal, live |
 | `make addon` | Runs the Apps Script add-on's own code, live |
-| `make test` | 48 tests, no key |
+| `make test` | 48 tests, offline |
+
+`live` and `offline` mean the same thing in both of this repository's builds: `live` uses
+your key and costs operations, `offline` touches nothing but localhost.
 
 On your own thread — export it from Gmail (⋮ → Download message), drop the `.mbox` into
 `threads/`, and it appears in the inbox. Or from the terminal:

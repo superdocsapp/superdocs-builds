@@ -13,8 +13,8 @@ skipped. Get it wrong in the other and an edit is applied to the document twice.
 Longhaul is built so that question always has an answer, and never a guess.
 
 ```bash
-make live      # the console, against the real SuperDocs API
-make demo      # kill a run and resume it, offline, in six seconds
+make live      # the operator console, against the real SuperDocs API
+make proof     # kill a run and resume it, diff the result — offline, six seconds
 ```
 
 ![The console, live against api.superdocs.app](docs/console.png)
@@ -130,19 +130,22 @@ You need [`uv`](https://docs.astral.sh/uv/) and nothing else — it fetches the 
 (3.11+) itself.
 
 ```bash
-make demo
+make proof
 ```
 
-Then:
+Six seconds, no key: it runs the job twice, kills one partway, and diffs them. Then:
 
 | Command | What it does |
 |---|---|
-| `make live` | The console against the real API. Needs `.env`. **Opens idle** — it spends nothing until you press Run. |
-| `make console` | The same console against the local stand-in. No key, no cost. |
-| `make demo` | Run a job, kill it, resume it, diff the result. |
-| `make test` | The whole suite. 24 kill points, ~40s, no key. |
-| `make proof` | The headline: kill and resume at **every** checkpoint. ~100s. |
+| `make live` | The operator console against the real API. Needs `.env`. **Opens idle** — spends nothing until you press Run. |
+| `make offline` | The same console against a local stand-in. No key, no cost. |
+| `make proof` | Kill a run, resume it, diff the result. ~6s, offline. |
+| `make proof-all` | The headline: the same at **every** checkpoint. ~95s, offline. |
+| `make test` | The whole suite, 24 kill points, ~40s. Offline. |
 | `make mcp` | Prints the MCP client config to paste into your agent. |
+
+`live` and `offline` mean the same thing in both of this repository's builds: `live`
+uses your key and costs operations, `offline` touches nothing but localhost.
 
 Every run takes `--max-operations N` and `--reserve N`. Operations cost money and a long
 job is exactly the shape of thing that spends an allowance unattended, so a run stops
@@ -215,7 +218,7 @@ A human holds the gate, and the gate is the same wherever you stand:
 
 - **Terminal** — `longhaul run --gate manual` walks you through each change; or
   `longhaul pending` / `longhaul decide --approve ch_x --reject ch_y --feedback "..."`.
-- **Browser** — `make live` against the real API, or `make console` against the local
+- **Browser** — `make live` against the real API, or `make offline` against the local
   stand-in. The screenshot at the top.
 - **MCP** — `list_pending_changes` and `decide_changes` are ordinary tools, so another
   agent drives the whole run *including* the approval, explicitly and on the record.

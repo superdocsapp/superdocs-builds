@@ -102,5 +102,5 @@ else
   bad  "$DUPES instructions were sent more than once."; exit 1
 fi
 rule
-dim "That is one kill point. 'make proof' does the same at every checkpoint a run"
-dim "reaches — all $TOTAL of them for this job — and diffs every one."
+dim "That is one kill point. 'make proof-all' does the same at every checkpoint a"
+dim "run reaches — all $TOTAL of them for this job — and diffs every one."

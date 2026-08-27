@@ -1,33 +1,45 @@
-# Longhaul. Everything below runs offline: no API key, no network, no cost.
-.PHONY: help live console demo test proof lint mcp clean
+# Longhaul.
+#
+# One rule across both of this repository's builds:
+#   live     — talks to api.superdocs.app. Uses your key. Costs operations.
+#   offline  — talks to a local stand-in. No key, no network, no cost.
+.PHONY: help live offline proof proof-all test lint mcp clean
 
 help:
-	@echo "make live    — the console, against the real SuperDocs API (needs .env)"
-	@echo "make console — the same console, against the local stand-in (no key, no cost)"
-	@echo "make demo    — run a job, kill it, resume it, diff the result"
-	@echo "make test    — the full suite, 20+ kill points included"
-	@echo "make proof   — kill and resume at EVERY checkpoint a run reaches"
-	@echo "make mcp     — how to wire the MCP server into an agent"
-	@echo "make clean   — remove local state and exports"
+	@echo "  live      — the operator console, against the real API (needs .env, spends)"
+	@echo "  offline   — the same console, against a local stand-in (no key, no cost)"
+	@echo ""
+	@echo "  proof     — kill a run and resume it, diff the result. ~6s, offline"
+	@echo "  proof-all — the same at EVERY checkpoint a run reaches. ~95s, offline"
+	@echo "  test      — the full suite, offline"
+	@echo ""
+	@echo "  mcp       — how to wire the MCP server into an agent"
+	@echo "  clean     — remove local state and exports"
 
-demo:
+live:
+	@test -f .env || { echo "No .env — copy .env.example and add your key."; exit 2; }
+	@echo "\033[1mLIVE\033[0m — api.superdocs.app. Opens idle; spends nothing until you press Run.\n"
+	@./scripts/live.sh
+
+offline:
+	@echo "\033[2mOFFLINE — local stand-in, no key, no cost.\033[0m\n"
+	@./scripts/console.sh
+
+# One kill point, start to finish, in a few seconds.
+proof:
+	@echo "\033[2mOFFLINE — determinism is only provable against a fixed backend.\033[0m\n"
 	@./scripts/demo.sh
+
+# Every checkpoint a real run traverses.
+proof-all:
+	@echo "\033[2mOFFLINE — 119 kill points, each a real SIGKILL.\033[0m\n"
+	@PROOF_ARTIFACT=docs/proof-results.json uv run pytest tests/test_kill_points.py -s
 
 test:
 	@PROOF_SAMPLE=24 uv run pytest
 
-# The headline claim, unsampled. Writes the raw per-kill-point data to docs/.
-proof:
-	@PROOF_ARTIFACT=docs/proof-results.json uv run pytest tests/test_kill_points.py -s
-
 lint:
 	@uv run python -m compileall -q src tests && echo "ok"
-
-live:
-	@./scripts/live.sh
-
-console:
-	@./scripts/console.sh
 
 mcp:
 	@echo 'Add this to your MCP client config:'
