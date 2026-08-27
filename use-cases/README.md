@@ -90,4 +90,19 @@ See `BUGS.md` for the full list of issues hit and fixed during development. Nota
 - Word (.docx) export was removed after a local Windows file-locking issue — HTML and PDF export both work.
 - The combined draft editor splits sections on `# Heading` markers; a manually-typed line starting with `# ` inside body text would be misread as a new section boundary.
 
-## Demo
+## Screenshots
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/447405a4-c66a-4697-be6e-470d6e3fb205" src="URL_1" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/ee480184-a28b-4beb-9fb7-8d6734ccd877" src="URL_2" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/b2ad3f3c-1e37-45b4-9de6-495403a71684" src="URL_3" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/5b3e0654-0d96-4fc1-8e8d-594d4024d288" src="URL_4" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/8692a3b2-a03b-4852-8733-37f5bd4d6b9b" src="URL_5" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/2e1ffb84-fafd-4cf4-b7d4-cb87877e62ed" src="URL_6" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/b692df39-a831-4847-a5c5-6518d4663b7e" src="URL_7" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/86f8987c-27d4-47f1-9203-fb5a50d96f14" src="URL_8" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/48a29cd6-fe2d-4ec7-9686-6943652fc8f8" src="URL_9" />
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/e89238ee-1a57-4f86-a922-05d9ae6cd79c" src="URL_10" />
+
+
+---
+
+Built for the SuperDocs task by Aditya Singh.
