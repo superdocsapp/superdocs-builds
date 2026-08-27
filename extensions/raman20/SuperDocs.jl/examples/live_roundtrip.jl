@@ -2,7 +2,6 @@
 # Does not run during Pkg.test().
 
 using SuperDocs
-using Printf
 
 if !haskey(ENV, "SUPERDOCS_API_KEY") || get(ENV, "SUPERDOCS_LIVE", "0") != "1"
     println("Skipping live roundtrip (set SUPERDOCS_API_KEY and SUPERDOCS_LIVE=1).")

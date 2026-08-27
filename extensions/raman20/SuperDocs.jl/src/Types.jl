@@ -7,8 +7,6 @@ const THINKING_DEPTHS = ("fast", "balanced", "deep")
 const APPROVAL_MODES  = ("approve_all", "ask_every_time")
 const RESPONSE_MODES  = ("full", "compact")
 const EXPORT_FORMATS  = ("docx", "pdf", "html", "markdown", "txt", "doc")
-const JOB_STATUSES    = ("pending", "in_progress", "awaiting_approval", "completed", "failed", "cancelled")
-const CHANGE_OPS      = ("edit", "create", "delete")
 const OPEN_MODES      = ("replace", "new_focused", "background")
 const IMAGE_MIME      = ("image/png", "image/jpeg", "image/webp", "image/gif", "image/svg+xml")
 const SESSION_ID_RE   = r"^[A-Za-z0-9_.-]{1,256}$"
@@ -160,13 +158,6 @@ Base.@kwdef struct Job
     result::Union{Nothing,JobResult} = nothing
     error::Union{Nothing,String} = nothing
     metadata::Union{Nothing,JobMetadata} = nothing
-end
-
-Base.@kwdef struct AsyncChatResponse
-    job_id::String
-    session_id::String
-    status::String
-    message::Union{Nothing,String} = nothing
 end
 
 Base.@kwdef struct MarginsIn

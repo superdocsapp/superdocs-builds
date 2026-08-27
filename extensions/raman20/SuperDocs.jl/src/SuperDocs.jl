@@ -2,7 +2,6 @@ module SuperDocs
 
 using HTTP
 using JSON3
-using StructTypes
 using Base64
 
 export Client, verify_key, wait, get_job, cancel_job,
