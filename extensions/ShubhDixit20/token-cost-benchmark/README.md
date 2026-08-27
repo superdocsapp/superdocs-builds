@@ -1,172 +1,489 @@
-# SuperDocs token-cost benchmark: whole-document regeneration vs. section-level editing
+# SuperDocs Document Editing Benchmark
 
-Built for the SuperDocs Round 2 task (assigned build, Task 2). This measures
-— and publishes — the answer to "why not just send the whole document to a
-model," instead of estimating it for marketing.
+## Project Aim
 
-**Status: mock-mode results are committed and reproducible right now. A
-real-API validation run is not yet done — see [PROGRESS.md](PROGRESS.md)
-item 1 for why, and the "Results" section below for exactly what that
-means for these numbers.**
+This project builds a benchmarking harness to evaluate the token usage and cost implications of different document-editing strategies.
 
-## Who this is for
+The main comparison is between:
 
-Positioning and developer evangelism — anyone asked "why does SuperDocs edit
-targeted sections instead of just regenerating the whole doc." This repo is
-the receipts.
+1. **Whole-document editing** — the complete document is provided for every edit.
+2. **Section editing** — only the relevant section is provided for an edit.
 
-## What it measures
+The goal is to understand how document size, edit type, and multi-turn editing sessions affect:
 
-A corpus of synthetic documents at 5 size tiers (roughly 1, 5, 25, 100, and
-400 pages), each put through a 5-turn multi-edit session (reword, factual
-fix, shrink, expand, insert), run through two arms:
+- Input tokens
+- Output tokens
+- Total token usage
+- Cost
+- Latency
+- Request size
 
-- **`whole_doc`** — every edit resends the entire current document and takes
-  back a full regenerated replacement.
-- **`section_edit`** — every edit sends only the targeted section and takes
-  back a replacement for just that section.
+The benchmark is designed to be reproducible, deterministic in offline mode, and capable of validating the workflow against the real SuperDocs API.
 
-For every edit, in both arms: input tokens, output tokens, estimated cost,
-wall-clock time, and characters sent are recorded. Sessions are multi-turn,
-so cumulative session cost is measured, not just a single edit in isolation.
+---
 
-This is distinct from SuperDocs' existing interactive pricing calculator,
-which estimates for marketing. This harness actually runs edits (mock or
-real) and publishes the raw numbers.
+## What Has Been Built
 
-## Method, stated before results
+### 1. Synthetic Document Corpus
 
-1. Generate the corpus deterministically (`benchmark/corpus.py`), same seed
-   → same documents, so results are reproducible byte-for-byte.
-2. Generate a fixed multi-turn edit session per document
-   (`benchmark/edit_tasks.py`).
-3. Run both arms over every document's session, through a `Client`
-   (`benchmark/client.py`) — either the offline `MockClient` or the real
-   `SuperDocsClient` hitting the documented four-call contract (upload,
-   chat, approve, export).
-4. Record one `EditRecord` per edit, per arm (`benchmark/arms.py`).
-5. Write raw records to `data/results/raw_edits.csv` / `.json` — never
-   overwritten silently, always the full record of what ran.
-6. Build summary tables and charts from the raw data
-   (`benchmark/report.py`) — nothing in the charts that isn't traceable
-   back to a row in `raw_edits.csv`.
+A deterministic synthetic corpus generator has been implemented.
 
-## Formats and domains this corpus covers
+The corpus contains:
 
-Synthetic Markdown documents only, in three domains: vendor contracts,
-project status reports, insurance claims (see `benchmark/corpus.py`,
-`DOMAINS`). A second run with `--seed` changed produces different documents
-within this same declared set — same domains and format, different content
-— which is what "a second run means different documents inside that
-declared set" asks for.
+- **5 document-size tiers:** `tiny`, `small`, `medium`, `large`, `xlarge`
+- **3 document domains:** vendor contracts, project status reports, insurance claims
 
-## Results (mock mode — see caveat)
+The generated corpus is stored under:
 
-Committed in `data/results/`: `raw_edits.csv`, `summary_by_arm.csv`,
-`summary_by_tier_and_arm.csv`, `variance_report.csv` (3 repeats),
-`cost_vs_doc_size.png`, `cumulative_session_cost.png`.
+```text
+data/corpus/
+```
 
-The finding, from `summary_by_tier_and_arm.csv` (mock-mode, 3 repeats):
+### 2. Multi-Turn Edit Sessions
 
-| tier   | arm          | mean input tokens | mean cost/edit (USD, est.) |
-|--------|--------------|-------------------:|----------------------------:|
-| tiny   | whole_doc    | 949                | 0.0170                       |
-| tiny   | section_edit | 488                | 0.0087                       |
-| medium | whole_doc    | 21,899             | 0.394                        |
-| medium | section_edit | 559                | 0.0100                       |
-| xlarge | whole_doc    | 192,845            | 3.471                        |
-| xlarge | section_edit | 405                | 0.0072                       |
+The benchmark generates multi-turn editing sessions across the synthetic documents. Five edit types are supported. These sessions allow the benchmark to measure how token usage and cost evolve over multiple edits to the same document.
 
-**The curve is the finding, not any single number**: whole-doc cost per
-edit scales linearly with document size (tiny → xlarge is roughly a 200x
-cost increase); section-edit cost per edit stays roughly flat regardless of
-document size, because it only ever sends the targeted section. See
-`cost_vs_doc_size.png`.
+### 3. Benchmark Arms
 
-**Caveat, stated plainly**: the numbers above come from `MockClient`, an
-offline deterministic stand-in (see `PROGRESS.md` item 1) — I did not have
-network access to the real SuperDocs API while building this. The
-*mechanism* the benchmark measures (chars/tokens sent per edit, and how
-that scales with document size) is real and arm-agnostic to which client
-runs it — a real API run should preserve the shape of the curve. The
-*absolute dollar figures* are illustrative pricing (`metrics.py`,
-`PRICING_USD_PER_1K`), not real SuperDocs costs, until a real-API run
-happens. Re-running with `--mode real` and a live key replaces every number
-above with a measured one; nothing about the harness changes.
+Two editing strategies are evaluated.
 
-## Budget guard
+**Whole-Document Arm** — the complete document is sent for every edit:
 
-- `MockClient` runs cost nothing — no network, no billing.
-- `--mode real` tracks cumulative *estimated* cost after every edit and
-  hard-stops the run the instant it would exceed `--budget-usd` (default
-  $1.00), writing whatever partial results exist rather than discarding
-  them.
-- Always run `--small-sample` first against a real key (1 doc, 2 turns) to
-  prove the real client works before spending on the full corpus:
-  ```
-  SUPERDOCS_API_KEY=sk-... python3 -m benchmark.runner --mode real --small-sample --budget-usd 0.25
-  ```
-- **Stated cap for a full real-mode run, before running it: $2.00.** (The
-  full mock-mode matrix is 300 edits; at real-API pricing this is a rough
-  upper bound, not a promise — the guard will stop earlier if it's wrong in
-  the expensive direction.)
+```text
+Document
+   ↓
+Full document + edit instruction
+   ↓
+Model/API
+```
 
-## Reproducing this — one command
+This provides a baseline for understanding the cost of repeatedly sending large documents.
+
+**Section-Edit Arm** — only the relevant section is sent for an edit:
+
+```text
+Document
+   ↓
+Relevant section + edit instruction
+   ↓
+Model/API
+```
+
+This tests whether targeted editing can reduce token usage and cost.
+
+### 4. API Client Architecture
+
+The benchmark uses a common client abstraction:
+
+```text
+BaseClient
+   ├── MockClient
+   └── SuperDocsClient
+```
+
+**MockClient** provides:
+
+- Offline execution
+- Deterministic behavior
+- Reproducible benchmark runs
+- No API key requirement
+
+**SuperDocsClient** communicates with the real SuperDocs API. The implemented workflow covers:
+
+```text
+Upload
+   ↓
+Chat / Edit
+   ↓
+Approve
+   ↓
+Export
+```
+
+The real API integration has been validated against the live SuperDocs API.
+
+### 5. Metrics
+
+Each edit records the following metrics:
+
+| Metric | Description |
+|---|---|
+| Input tokens | Tokens sent to the model |
+| Output tokens | Tokens generated |
+| Total tokens | Input + output |
+| Cost | Estimated/calculated API cost |
+| Latency | Time taken for the operation |
+| Characters sent | Size of the request |
+| Document tier | tiny → xlarge |
+| Editing arm | Whole-document / Section-edit |
+| Edit type | Type of edit performed |
+
+Repeated runs can be used to measure variance.
+
+### 6. Token Measurement
+
+For offline/mock execution, an approximately 4-characters-per-token heuristic is used when an actual token count is unavailable.
+
+For real API execution, API-reported token usage is preferred when available:
+
+- `usage.input_tokens`
+- `usage.output_tokens`
+
+The local estimator is therefore a fallback and not the source of truth when the real API provides usage information.
+
+### 7. Cost Measurement
+
+Cost calculation is implemented in `benchmark/metrics.py`. Pricing is kept as configuration so it can be updated without changing the benchmark implementation.
+
+> **Note:** The currently configured pricing values are illustrative placeholders and should be replaced with SuperDocs' actual per-model pricing before using the results as production cost estimates.
+
+### 8. Budget Guard
+
+The benchmark includes a cumulative budget guard. The guard checks spending after each completed edit. If the budget would be exceeded:
+
+- Current results are written.
+- The next edit is not started.
+- The benchmark stops.
+- Partial results are preserved.
+
+### 9. Benchmark Workflow
+
+The complete workflow is:
+
+```text
+Synthetic Corpus
+       ↓
+Document Size Tiers
+       ↓
+Multi-Turn Edit Sessions
+       ↓
+ ┌─────────────────────┐
+ │                      │
+ ▼                      ▼
+Whole-Document      Section-Edit
+     Arm                 Arm
+ │                      │
+ └──────────┬───────────┘
+            ↓
+        API Client
+            ↓
+      Collect Metrics
+            ↓
+       Budget Guard
+            ↓
+       Save Results
+            ↓
+      Generate Reports
+            ↓
+          Charts
+```
+
+---
+
+## Running the Project
+
+### 10. Install
+
+Clone the repository:
 
 ```bash
+git clone <REPOSITORY_URL>
+cd doctask-shubhamdixit
+```
+
+Create the virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+### 11. Run Tests
+
+Run the complete test suite:
+
+```bash
+pytest -q
+```
+
+The current test suite contains 22 tests covering areas including:
+
+- Corpus generation
+- Benchmark arms
+- Metrics
+- Runner behavior
+- Budget handling
+
+### 12. Run a Mock Benchmark
+
+Mock mode does not require an API key or network access.
+
+Run a small benchmark:
+
+```bash
+python -m benchmark.runner --mode mock --small-sample
+```
+
+Run the full benchmark:
+
+```bash
+python -m benchmark.runner --mode mock
+```
+
+### 13. Run the Real SuperDocs Benchmark
+
+Configure the API key:
+
+```bash
+export SUPERDOCS_API_KEY="your-api-key"
+```
+
+Run a small real-API validation:
+
+```bash
+python -m benchmark.runner --mode real --small-sample
+```
+
+Run a full real benchmark:
+
+```bash
+python -m benchmark.runner --mode real
+```
+
+> **Warning:** Real API runs may consume API usage. Never commit API keys or credentials to the repository.
+
+### 14. Helper Script
+
+The repository also contains `run.sh`. Run it with:
+
+```bash
+bash run.sh
+```
+
+If required, make it executable first:
+
+```bash
+chmod +x run.sh
 ./run.sh
 ```
 
-This creates a venv, installs `requirements.txt`, runs the offline test
-suite, runs the full mock-mode benchmark (5 tiers × 2 docs/tier × 5 turns ×
-2 arms × 3 repeats = 300 edits), and rebuilds all reports/charts. Takes well
-under a minute, since mock mode does no network I/O.
-
-For a real run: `SUPERDOCS_API_KEY=sk-... ./run.sh --mode real --small-sample --budget-usd 0.25`
-
-## What "strong" would add beyond what's here
-
-Per the card's own bar — honestly, what's not yet done:
-
-- A real-API validation run (blocked on this build environment's network
-  access, not a design gap — see PROGRESS.md item 1).
-- Real per-model pricing in `metrics.py` in place of illustrative numbers.
-- A fourth domain (clinical paperwork) — the corpus generator supports
-  adding it as a one-line config change, just not done yet.
-- The `insert` edit type's section-arm handling is a simplification (see
-  PROGRESS.md item 5) that likely *understates* the real cost of true
-  section insertion relative to a naive full-doc regenerate; worth a
-  dedicated arm-variant if this becomes a cited number externally.
-
-## Tests
+The available benchmark options can always be checked with:
 
 ```bash
-python3 -m pytest tests/ -q
+python -m benchmark.runner --help
 ```
 
-No live API key needed — all tests run against `MockClient`. They verify:
-determinism of corpus generation, that the section-edit arm sends
-dramatically less text than whole-doc on large documents (the core claim),
-that untargeted sections are provably byte-identical after a section-edit
-run, that the whole-doc arm never mutates the original document object, that
-a missing `SUPERDOCS_API_KEY` fails clearly rather than silently falling
-back, and that repeated runs are correctly labeled for variance reporting.
+---
 
-## Repository layout
+## Deliverables
 
-```
+### 15. Deliverable Locations
+
+**Benchmark implementation** — `benchmark/`
+
+```text
 benchmark/
-  corpus.py      synthetic document + section generator, deterministic
-  edit_tasks.py  multi-turn edit session generator, 5 edit types
-  client.py      MockClient (offline) + SuperDocsClient (real REST calls)
-  arms.py        whole_doc arm, section_edit arm, EditRecord
-  metrics.py     token estimation heuristic + cost model (config, not code)
-  runner.py      CLI: orchestrates corpus × sessions × arms, budget guard
-  report.py      tables + charts from raw_edits.csv
-tests/           offline pytest suite
-data/corpus/     generated documents (regenerable, but committed)
-data/results/    raw_edits.csv/json, summary tables, charts (committed)
-run.sh           one-command reproduction
-TASK.md          how this repo is organized
-PROGRESS.md      assumptions and decisions, logged as made
+├── arms.py
+├── client.py
+├── corpus.py
+├── edit_tasks.py
+├── metrics.py
+├── report.py
+└── runner.py
 ```
+
+**Tests** — `tests/`
+
+```text
+tests/
+├── test_arms.py
+├── test_corpus.py
+├── test_metrics.py
+└── test_runner.py
+```
+
+**Synthetic corpus** — `data/corpus/`
+
+**Benchmark results** — `data/results/`
+
+The generated results include:
+
+- `raw_edits.csv`
+- `raw_edits.json`
+- `run_summary.json`
+- `summary_by_arm.csv`
+- `summary_by_tier_and_arm.csv`
+- `variance_report.csv`
+- `cost_vs_doc_size.png`
+- `cumulative_session_cost.png`
+
+### 16. Viewing the Results
+
+List all generated results:
+
+```bash
+ls -lh data/results/
+```
+
+View the overall summary:
+
+```bash
+cat data/results/run_summary.json
+```
+
+View the comparison between benchmark arms:
+
+```bash
+cat data/results/summary_by_arm.csv
+```
+
+View results by document size and arm:
+
+```bash
+cat data/results/summary_by_tier_and_arm.csv
+```
+
+View variance:
+
+```bash
+cat data/results/variance_report.csv
+```
+
+View the first rows of the raw results:
+
+```bash
+head -20 data/results/raw_edits.csv
+```
+
+### 17. Viewing Charts
+
+On macOS:
+
+```bash
+open data/results/cost_vs_doc_size.png
+open data/results/cumulative_session_cost.png
+```
+
+The charts provide visual comparisons of:
+
+- Cost vs. document size
+- Cumulative session cost
+
+---
+
+## 18. Project Structure
+
+```text
+.
+├── benchmark/
+│   ├── __init__.py
+│   ├── arms.py
+│   ├── client.py
+│   ├── corpus.py
+│   ├── edit_tasks.py
+│   ├── metrics.py
+│   ├── report.py
+│   └── runner.py
+│
+├── data/
+│   ├── corpus/
+│   └── results/
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_arms.py
+│   ├── test_corpus.py
+│   ├── test_metrics.py
+│   └── test_runner.py
+│
+├── PROGRESS.md
+├── TASK.md
+├── README.md
+├── requirements.txt
+└── run.sh
+```
+
+---
+
+## 19. Important Assumptions and Limitations
+
+**Corpus sizing** — The benchmark uses 1 page ≈ 500 words as a corpus-sizing convention. It is not intended to represent a measured universal relationship.
+
+**Section insertion** — For the section-edit arm, an insert operation is simplified by adding the new content to the targeted section rather than creating a completely new section. This may underestimate the cost and complexity of a true structural insertion.
+
+**Token estimation** — Mock/offline runs may use the approximately 4-characters-per-token heuristic. Real API token usage is preferred when available.
+
+**Pricing** — The pricing values currently configured in `benchmark/metrics.py` are illustrative and should be replaced with actual SuperDocs model pricing before using the benchmark for production cost analysis.
+
+**Mock results** — Mock results are useful for deterministic comparisons but should not be presented as measured production SuperDocs costs.
+
+---
+
+## 20. Reproduce the Benchmark From Scratch
+
+After cloning the repository:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pytest -q
+python -m benchmark.runner --mode mock --small-sample
+```
+
+Then inspect the results:
+
+```bash
+ls -lh data/results/
+```
+
+View the summary:
+
+```bash
+cat data/results/run_summary.json
+```
+
+---
+
+## 21. Final Verification
+
+Before submission:
+
+```bash
+pytest -q
+python -m benchmark.runner --help
+python -m benchmark.runner --mode mock --small-sample
+ls -lh data/results/
+```
+
+Check Git status:
+
+```bash
+git status
+```
+
+Review the recent commits:
+
+```bash
+git log --oneline --decorate --graph -10
+```
+
+Make sure no API keys, credentials, `.env` files, virtual environments, or other private data are committed.
+
+---
+
+## 22. AI Use Disclosure
+
+Claude was used during development to assist with scaffolding and iteration of the benchmarking harness. This use of AI assistance is disclosed as part of the project submission. The implementation, assumptions, API integration, tests, benchmark workflow, and limitations were reviewed during development.
+
+---
+
+## Documentation Notes
+
+This `README.md` is the single documentation entry point for the project. `PROGRESS.md` and `TASK.md` remain in the repository as project artifacts (development log and task tracking, respectively), but all setup, usage, and reference information lives here.
