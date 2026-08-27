@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<title>Annual Report 2026</title>
+
+<style>
+
+        @page {
+            size: A4;
+            margin: 22mm 18mm 22mm 18mm;
+
+            @top-center {
+                content: "Annual Report 2026";
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 8pt;
+                color: #6b7280;
+                letter-spacing: 0.05em;
+            }
+
+            @bottom-right {
+                content: counter(page);
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 8pt;
+                color: #6b7280;
+            }
+
+            @bottom-left {
+                content: "Confidential";
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 8pt;
+                color: #6b7280;
+            }
+        }
+
+        @page :first {
+            @top-center { content: none; }
+            @bottom-right { content: none; }
+            @bottom-left { content: none; }
+        }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        font-family:
+            Arial,
+            Helvetica,
+            sans-serif;
+        color: #1f2937;
+        line-height: 1.55;
+        font-size: 11pt;
+    }
+
+    body {
+        background: white;
+    }
+
+    .report-cover {
+        min-height: 240mm;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        page-break-after: always;
+        break-after: page;
+    }
+
+    .report-cover h1 {
+        font-size: 34pt;
+        margin: 0 0 12pt 0;
+    }
+
+    .report-cover p {
+        font-size: 15pt;
+        margin: 0;
+    }
+
+    .report-section {
+        page-break-before: always;
+        break-before: page;
+    }
+
+    .report-section:first-of-type {
+        page-break-before: auto;
+        break-before: auto;
+    }
+
+    h1 {
+        font-size: 25pt;
+        margin-top: 0;
+        margin-bottom: 18pt;
+    }
+
+    h2 {
+        font-size: 17pt;
+        margin-top: 22pt;
+        margin-bottom: 10pt;
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    h3 {
+        font-size: 13pt;
+        page-break-after: avoid;
+        break-after: avoid;
+    }
+
+    p {
+        margin: 0 0 10pt 0;
+    }
+
+    strong {
+        font-weight: 700;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 14pt 0;
+        page-break-inside: avoid;
+    }
+
+    th,
+    td {
+        border: 1px solid #999;
+        padding: 6pt;
+        text-align: left;
+        vertical-align: top;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .section-divider {
+        margin: 0 0 18pt 0;
+        border-bottom: 2px solid #222;
+    }
+
+    @media print {
+        .report-section {
+            page-break-before: always;
+        }
+
+        .report-cover {
+            page-break-after: always;
+        }
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="report-cover">
+    <h1>Annual Report 2026</h1>
+    <p>Annual and Integrated Report</p>
+</div>
+
+<div class="toc" style="page-break-after: always; break-after: page; padding-top: 40pt;">
+    <h2 style="font-size: 18pt; margin-bottom: 24pt; border-bottom: 2px solid #222; padding-bottom: 8pt;">
+        Contents
+    </h2>
+    <table style="width: 100%; border: none;">
+        <tr><td style="border: none; padding: 6pt 0;">Chair Statement</td><td style="border: none; text-align: right;">3</td></tr>
+        <tr><td style="border: none; padding: 6pt 0;">Strategy</td><td style="border: none; text-align: right;">5</td></tr>
+        <tr><td style="border: none; padding: 6pt 0;">Business Review</td><td style="border: none; text-align: right;">7</td></tr>
+        <tr><td style="border: none; padding: 6pt 0;">Governance</td><td style="border: none; text-align: right;">9</td></tr>
+        <tr><td style="border: none; padding: 6pt 0;">Financial Statements</td><td style="border: none; text-align: right;">11</td></tr>
+    </table>
+</div>
+
+
+<section class="report-section"
+         data-section="1">
+
+    
+<h1>Chair Statement</h1>
+<h2>Performance</h2>
+<p>2025 was a year of continued progress for the company. Revenue reached <strong>£120 million</strong>, reflecting continued demand across our core markets.</p>
+<p>At year end, the company employed <strong>4,500 people</strong> across its operations.</p>
+<h2>Outlook</h2>
+<p>We remain focused on sustainable growth, operational discipline, and delivering long-term value for our stakeholders.</p>
+
+
+</section>
+
+
+<section class="report-section"
+         data-section="2">
+
+    
+<h1>Strategy</h1>
+<h2>Strategic Priorities</h2>
+<p>Our strategy is built around sustainable growth, customer value, and operational efficiency.</p>
+<p>The company employed <strong>4,500 people</strong> at the end of 2025, providing the capabilities required to execute our strategy.</p>
+<h2>Sustainability</h2>
+<p>We achieved a <strong>32%</strong> reduction in operational carbon emissions compared with our baseline.</p>
+
+
+</section>
+
+
+<section class="report-section"
+         data-section="3">
+
+    
+<h1>Business Review</h1>
+<h2>Financial Performance</h2>
+<p>Revenue was <strong>£120 million</strong> in 2025.</p>
+<p>The company employed <strong>4,500 people</strong> at year end.</p>
+<h2>Operational Performance</h2>
+<p>Operational carbon emissions were reduced by <strong>32%</strong> against the stated baseline.</p>
+
+
+</section>
+
+
+<section class="report-section"
+         data-section="4">
+
+    
+<h1>Governance</h1>
+<h2>People and Accountability</h2>
+<p>The company employed <strong>4,500 people</strong> at the end of the reporting period.</p>
+<h2>Board Oversight</h2>
+<p>The Board reviewed progress against the company's strategic and sustainability objectives during 2025.</p>
+
+
+</section>
+
+
+<section class="report-section"
+         data-section="5">
+
+    
+<h1>Financial Statements</h1>
+<h2>Statement of Financial Performance</h2>
+<p>Revenue was <strong>£120 million</strong> in 2025.</p>
+<p>The company employed <strong>4,500 people</strong> at the reporting date.</p>
+<h2>Selected Non-Financial Metrics</h2>
+<p>Operational carbon emissions were reduced by <strong>32%</strong> against the baseline.</p>
+
+
+</section>
+
+
+</body>
+</html>
