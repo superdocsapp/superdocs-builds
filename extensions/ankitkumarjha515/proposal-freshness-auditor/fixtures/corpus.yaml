@@ -1,0 +1,31 @@
+# Document corpus registry for the synthetic fixture set.
+#
+# `path` is relative to this file's directory. Adding a document is a
+# data-only change: add an HTML file under library/ or drafts/ and an
+# entry below — no Python change is required.
+
+documents:
+  - id: cap-statement
+    role: library
+    path: library/cap-statement.html
+    title: "Northwind Relief Alliance — Capability Statement"
+
+  - id: annual-report-summary
+    role: library
+    path: library/annual-report-summary.html
+    title: "Northwind Relief Alliance — Annual Report Summary"
+
+  - id: certifications-overview
+    role: library
+    path: library/certifications-overview.html
+    title: "Northwind Relief Alliance — Certifications and Quality Overview"
+
+  - id: draft-proposal-alpha
+    role: draft
+    path: drafts/draft-proposal-alpha.html
+    title: "Proposal for Regional Emergency Response Partnership"
+
+  - id: draft-proposal-beta
+    role: draft
+    path: drafts/draft-proposal-beta.html
+    title: "Proposal for Community Resilience Fund"
