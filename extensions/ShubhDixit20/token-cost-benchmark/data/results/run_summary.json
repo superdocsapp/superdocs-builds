@@ -1,0 +1,12 @@
+{
+  "mode": "real",
+  "small_sample": true,
+  "num_documents": 1,
+  "num_edits": 4,
+  "repeats": 1,
+  "total_estimated_cost_usd": 0.054516,
+  "budget_cap_usd": 2.0,
+  "stopped_early": false,
+  "stop_reason": null,
+  "wall_clock_s_total": 92.85
+}

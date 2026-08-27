@@ -1,0 +1,5 @@
+task_id,doc_id,arm,turn,edit_type,target_section_id,chars_sent,input_tokens,output_tokens,cost_usd,wall_clock_s,client_source,ops_charged
+r0-tiny-00-t00,tiny-00,whole_doc,0,reword,s00,3547,917,992,0.017631,26.533561791002285,superdocs_api,1
+r0-tiny-00-t01,tiny-00,whole_doc,1,factual_fix,s00,3664,946,985,0.017613,28.42562225000438,superdocs_api,1
+r0-tiny-00-t00,tiny-00,section_edit,0,reword,s00,2082,545,536,0.009675,26.071182209001563,superdocs_api,1
+r0-tiny-00-t01,tiny-00,section_edit,1,factual_fix,s00,2082,544,531,0.009597,11.755995874998916,superdocs_api,1

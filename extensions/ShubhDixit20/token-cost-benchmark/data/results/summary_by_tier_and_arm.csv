@@ -1,0 +1,3 @@
+tier,arm,num_edits,mean_input_tokens,mean_output_tokens,mean_cost_usd,mean_chars_sent,mean_wall_clock_s
+tiny,section_edit,2,544.5,533.5,0.009635999999999999,2082.0,11.319842958000663
+tiny,whole_doc,2,946.5,1016.5,0.018087,3665.0,57.737054750501564

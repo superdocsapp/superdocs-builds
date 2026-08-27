@@ -1,0 +1,4 @@
+pandas>=2.0
+matplotlib>=3.7
+pytest>=7.4
+requests>=2.31   # only needed for --mode real (live SuperDocs API calls)

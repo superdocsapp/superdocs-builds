@@ -1,0 +1,41 @@
+{
+  "generated_by": "benchmark/corpus.py",
+  "words_per_page_assumption": 500,
+  "docs": [
+    {
+      "doc_id": "tiny-00",
+      "domain": "vendor_contract",
+      "word_count": 500,
+      "page_estimate": 1.0,
+      "num_sections": 2
+    },
+    {
+      "doc_id": "small-00",
+      "domain": "project_status_report",
+      "word_count": 2551,
+      "page_estimate": 5.1,
+      "num_sections": 10
+    },
+    {
+      "doc_id": "medium-00",
+      "domain": "insurance_claim",
+      "word_count": 12717,
+      "page_estimate": 25.43,
+      "num_sections": 47
+    },
+    {
+      "doc_id": "large-00",
+      "domain": "vendor_contract",
+      "word_count": 50837,
+      "page_estimate": 101.67,
+      "num_sections": 182
+    },
+    {
+      "doc_id": "xlarge-00",
+      "domain": "project_status_report",
+      "word_count": 111068,
+      "page_estimate": 222.14,
+      "num_sections": 401
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "task_id": "r0-tiny-00-t00",
+    "doc_id": "tiny-00",
+    "arm": "whole_doc",
+    "turn": 0,
+    "edit_type": "reword",
+    "target_section_id": "s00",
+    "chars_sent": 3547,
+    "input_tokens": 917,
+    "output_tokens": 992,
+    "cost_usd": 0.017631,
+    "wall_clock_s": 26.533561791002285,
+    "client_source": "superdocs_api",
+    "ops_charged": 1
+  },
+  {
+    "task_id": "r0-tiny-00-t01",
+    "doc_id": "tiny-00",
+    "arm": "whole_doc",
+    "turn": 1,
+    "edit_type": "factual_fix",
+    "target_section_id": "s00",
+    "chars_sent": 3664,
+    "input_tokens": 946,
+    "output_tokens": 985,
+    "cost_usd": 0.017613,
+    "wall_clock_s": 28.42562225000438,
+    "client_source": "superdocs_api",
+    "ops_charged": 1
+  },
+  {
+    "task_id": "r0-tiny-00-t00",
+    "doc_id": "tiny-00",
+    "arm": "section_edit",
+    "turn": 0,
+    "edit_type": "reword",
+    "target_section_id": "s00",
+    "chars_sent": 2082,
+    "input_tokens": 545,
+    "output_tokens": 536,
+    "cost_usd": 0.009675,
+    "wall_clock_s": 26.071182209001563,
+    "client_source": "superdocs_api",
+    "ops_charged": 1
+  },
+  {
+    "task_id": "r0-tiny-00-t01",
+    "doc_id": "tiny-00",
+    "arm": "section_edit",
+    "turn": 1,
+    "edit_type": "factual_fix",
+    "target_section_id": "s00",
+    "chars_sent": 2082,
+    "input_tokens": 544,
+    "output_tokens": 531,
+    "cost_usd": 0.009597,
+    "wall_clock_s": 11.755995874998916,
+    "client_source": "superdocs_api",
+    "ops_charged": 1
+  }
+]

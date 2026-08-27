@@ -1,0 +1,3 @@
+arm,num_edits,total_input_tokens,total_output_tokens,total_cost_usd,mean_cost_usd,total_wall_clock_s,mean_chars_sent
+section_edit,2,1089,1067,0.019271999999999997,0.009635999999999999,22.639685916001326,2082.0
+whole_doc,2,1893,2033,0.036174,0.018087,115.47410950100313,3665.0
