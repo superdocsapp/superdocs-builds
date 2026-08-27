@@ -14,8 +14,9 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT.parent / "_lib"))
 sys.path.insert(0, str(ROOT))
 
-from fill import TEMPLATE, fill_template, instruction  # noqa: E402
-from superdocs import SuperDocs, SuperDocsError, load_dotenv, parse_pending_changes  # noqa: E402
+from fill import TEMPLATE, fill_template, instruction, pas_items  # noqa: E402
+from gate import items_to_queue, preview_html, record_decision  # noqa: E402
+from superdocs import SuperDocs, SuperDocsError, load_dotenv  # noqa: E402
 
 load_dotenv(ROOT.parent / ".env")
 
@@ -53,13 +54,34 @@ def sample():
 @app.post("/jobs")
 def start(body: GenerateIn):
     payload = body.policy or SAMPLE
-    html = fill_template(payload)
-    if body.sample or not SuperDocs().enabled():
+    items = pas_items(payload)
+    if body.review_mode or body.sample or not SuperDocs().enabled():
         local_id = f"local-{uuid.uuid4()}"
-        JOBS[local_id] = {"mode": "offline", "status": "completed", "html": html, "payload": payload, "session_id": local_id}
+        if not body.review_mode:
+            filled = preview_html(TEMPLATE, items, {c["change_id"]: True for c in items})
+            JOBS[local_id] = {
+                "mode": "offline",
+                "status": "completed",
+                "html": filled,
+                "baseline_html": TEMPLATE,
+                "payload": payload,
+                "session_id": local_id,
+                "changes": [],
+                "queue": items,
+                "applied": True,
+                "register": [{"change_id": c["change_id"], "label": c["ai_explanation"], "decision": True} for c in items],
+            }
+            return _out(local_id)
+        rec = items_to_queue(items)
+        rec["baseline_html"] = TEMPLATE
+        rec["html"] = TEMPLATE
+        rec["payload"] = payload
+        rec["session_id"] = local_id
+        JOBS[local_id] = rec
         return _out(local_id)
     sd = SuperDocs()
     session_id = f"pas-{uuid.uuid4()}"
+    filled = preview_html(TEMPLATE, items, {c["change_id"]: True for c in items})
     try:
         try:
             sd.upload_template("endorsement-template.html", TEMPLATE.encode("utf-8"), "text/html")
@@ -68,13 +90,22 @@ def start(body: GenerateIn):
         job_id = sd.chat_async(
             session_id,
             instruction(payload),
-            document_html=html,
-            approval_mode="ask_every_time" if body.review_mode else "approve_all",
+            document_html=filled,
+            approval_mode="approve_all",
         )
         polled = sd.poll_job(job_id)
     except SuperDocsError as e:
         raise HTTPException(502, str(e)) from e
-    JOBS[job_id] = {"mode": "live", "session_id": session_id, "job": polled, "html": _html(polled) or html, "payload": payload}
+    JOBS[job_id] = {
+        "mode": "live",
+        "session_id": session_id,
+        "job": polled,
+        "html": _html(polled) or filled,
+        "payload": payload,
+        "changes": [],
+        "status": polled.get("status"),
+        "applied": True,
+    }
     return _out(job_id)
 
 
@@ -82,10 +113,6 @@ def start(body: GenerateIn):
 def get_job(job_id: str):
     if job_id not in JOBS:
         raise HTTPException(404, "job not found")
-    rec = JOBS[job_id]
-    if rec["mode"] == "live":
-        rec["job"] = SuperDocs().get_job(job_id)
-        rec["html"] = _html(rec["job"]) or rec.get("html")
     return _out(job_id)
 
 
@@ -94,20 +121,7 @@ def review(job_id: str, body: DecisionIn):
     rec = JOBS.get(job_id)
     if not rec:
         raise HTTPException(404, "job not found")
-    if rec["mode"] != "live":
-        return _out(job_id)
-    sd = SuperDocs()
-    job = rec["job"]
-    kind = (job.get("metadata") or {}).get("awaiting_kind")
-    try:
-        if kind == "continue_prompt":
-            sd.continue_job(rec["session_id"], job_id, True)
-        else:
-            sd.approve(rec["session_id"], job_id, body.decisions)
-        rec["job"] = sd.poll_job(job_id)
-        rec["html"] = _html(rec["job"]) or rec.get("html")
-    except SuperDocsError as e:
-        raise HTTPException(502, str(e)) from e
+    record_decision(rec, body.decisions)
     return _out(job_id)
 
 
@@ -136,16 +150,14 @@ def _html(job: dict) -> str:
 
 def _out(job_id: str) -> dict:
     rec = JOBS[job_id]
-    if rec["mode"] == "offline":
-        return {"id": job_id, "status": rec["status"], "offline": True, "html": rec["html"], "changes": [], "payload": rec["payload"]}
-    job = rec["job"]
     return {
         "id": job_id,
-        "status": job.get("status"),
-        "offline": False,
+        "status": rec.get("status") or (rec.get("job") or {}).get("status"),
+        "offline": rec.get("mode") != "live",
         "html": rec.get("html"),
-        "changes": parse_pending_changes(job),
-        "awaiting_kind": (job.get("metadata") or {}).get("awaiting_kind"),
-        "payload": rec["payload"],
-        "error": job.get("error"),
+        "changes": rec.get("changes") or [],
+        "register": rec.get("register") or [],
+        "payload": rec.get("payload"),
+        "applied": rec.get("applied"),
+        "error": (rec.get("job") or {}).get("error") if rec.get("job") else None,
     }

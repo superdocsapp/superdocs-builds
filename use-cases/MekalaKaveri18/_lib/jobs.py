@@ -51,7 +51,8 @@ def start_job(
         "mode": "live",
         "session_id": session_id,
         "job": polled,
-        "html": _html(polled) or html,
+        "baseline_html": html,
+        "html": html if polled.get("status") == "awaiting_approval" else (_html(polled) or html),
         **extra,
     }
     return out(jobs, job_id)
@@ -63,7 +64,11 @@ def refresh(jobs: dict, job_id: str) -> dict:
         raise HTTPException(404, "job not found")
     if rec["mode"] == "live":
         rec["job"] = SuperDocs().get_job(job_id)
-        rec["html"] = _html(rec["job"]) or rec.get("html")
+        applied = _html(rec["job"]) or rec.get("baseline_html") or rec.get("html")
+        if rec["job"].get("status") == "awaiting_approval":
+            rec["html"] = rec.get("baseline_html") or rec.get("html")
+        else:
+            rec["html"] = applied
     return out(jobs, job_id)
 
 
@@ -82,7 +87,11 @@ def review(jobs: dict, job_id: str, decisions: dict[str, bool]) -> dict:
         else:
             sd.approve(rec["session_id"], job_id, decisions)
         rec["job"] = sd.poll_job(job_id)
-        rec["html"] = _html(rec["job"]) or rec.get("html")
+        applied = _html(rec["job"]) or rec.get("baseline_html") or rec.get("html")
+        if rec["job"].get("status") == "awaiting_approval":
+            rec["html"] = rec.get("baseline_html") or rec.get("html")
+        else:
+            rec["html"] = applied
     except SuperDocsError as e:
         raise HTTPException(502, str(e)) from e
     return out(jobs, job_id)

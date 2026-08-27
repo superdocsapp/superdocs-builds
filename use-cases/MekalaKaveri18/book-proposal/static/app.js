@@ -24,25 +24,41 @@ function renderComps(hits) {
 }
 
 function renderJob(j) {
-  $("status").textContent = `${j.status || ""} ${j.offline ? "(offline sample — no SuperDocs key billed)" : ""}`;
+  const waiting = j.status === "awaiting_approval";
+  const left = (j.changes || []).length;
+  $("status").textContent = waiting
+    ? `Decide every section. ${left} still waiting. Approved text lands in the document; rejected stays the placeholder.`
+    : `${j.status || ""}`;
   $("doc").innerHTML = j.html || "";
   const box = $("changes");
   box.innerHTML = "";
+  const reg = document.createElement("div");
+  reg.className = "card";
+  reg.innerHTML = "<div class='kicker'>Register</div>" + (j.register || [])
+    .map((r) => {
+      const d = r.decision === true ? "approved" : r.decision === false ? "rejected" : "pending";
+      return `<div>${r.label}: <strong>${d}</strong></div>`;
+    })
+    .join("");
+  box.appendChild(reg);
   (j.changes || []).forEach((c) => {
-    const id = c.change_id;
     const el = document.createElement("div");
     el.className = "card";
-    el.innerHTML = `<div>${c.operation || "edit"} · ${c.ai_explanation || ""}</div>
+    el.innerHTML = `<p>${c.ai_explanation || c.operation || "section"}</p>
+      <div class="diff"><div><span class="kicker">If rejected (stays)</span>${c.old_html || ""}</div>
+      <div><span class="kicker">If approved (fills)</span>${c.new_html || ""}</div></div>
       <div class="row">
-        <button data-id="${id}" data-ok="true">Approve</button>
-        <button data-id="${id}" data-ok="false">Reject</button>
+        <button data-id="${c.change_id}" data-ok="true">Approve this section</button>
+        <button data-id="${c.change_id}" data-ok="false">Reject this section</button>
       </div>`;
     box.appendChild(el);
   });
   const exp = $("export");
-  if (j.status === "completed" || j.offline) {
+  if (j.status === "completed") {
     exp.classList.remove("hidden");
     exp.href = `/jobs/${j.id}/export`;
+  } else {
+    exp.classList.add("hidden");
   }
 }
 
@@ -57,7 +73,7 @@ $("search").onclick = async () => {
 };
 
 $("run").onclick = async () => {
-  $("status").textContent = "Working… large SuperDocs edits can take minutes.";
+  $("status").textContent = "Working…";
   const r = await fetch("/jobs", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -76,11 +92,10 @@ $("run").onclick = async () => {
 document.getElementById("changes").addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-id]");
   if (!btn || !jobId) return;
-  const decisions = { [btn.dataset.id]: btn.dataset.ok === "true" };
   const r = await fetch(`/jobs/${jobId}/review`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ decisions }),
+    body: JSON.stringify({ decisions: { [btn.dataset.id]: btn.dataset.ok === "true" } }),
   });
   renderJob(await r.json());
 });

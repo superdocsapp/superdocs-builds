@@ -21,10 +21,10 @@
         <section class="panel">
           <div class="kicker">PAS payload</div>
           <label>JSON<textarea id="json"></textarea></label>
-          <label class="check"><input type="checkbox" id="review" checked /> Review mode</label>
+          <label class="check"><input type="checkbox" id="review" checked /> Review mode (approve or reject each section; register tracks both)</label>
           <div class="row">
-            <button id="load">Load sample</button>
-            <button class="primary" id="run">Generate</button>
+            <button type="button" id="load">Load sample</button>
+            <button type="button" class="primary" id="run">Generate</button>
           </div>
           <p class="cite" id="status"></p>
         </section>
@@ -36,6 +36,6 @@
         </section>
       </main>
     </div>
-    <script src="/static/app.js"></script>
+    <script src="/static/app.js?v=register2"></script>
   </body>
 </html>

@@ -15,7 +15,8 @@ LIB = ROOT.parent / "_lib"
 sys.path.insert(0, str(LIB))
 sys.path.insert(0, str(ROOT))
 
-from catalog import draft_instruction, search_comparables  # noqa: E402
+from catalog import draft_instruction, proposal_items, search_comparables  # noqa: E402
+from gate import items_to_queue, record_decision  # noqa: E402
 from superdocs import SuperDocs, SuperDocsError, load_dotenv, parse_pending_changes  # noqa: E402
 
 load_dotenv(ROOT.parent / ".env")
@@ -62,19 +63,34 @@ def search(body: dict):
 @app.post("/jobs")
 def start(body: ProposalIn):
     comps = search_comparables(body.search_query or body.audience or body.overview, limit=3)
-    html = TEMPLATE
-    if body.sample or not SuperDocs().enabled():
+    items = proposal_items(body.model_dump(), comps)
+    from gate import preview_html
+
+    if body.review_mode or body.sample or not SuperDocs().enabled():
         local_id = f"local-{uuid.uuid4()}"
-        html = _offline_fill(body, comps)
-        JOBS[local_id] = {
-            "mode": "offline",
-            "status": "completed",
-            "html": html,
-            "comps": comps,
-            "session_id": local_id,
-            "changes": [],
-        }
-        return {"id": local_id, "status": "completed", "offline": True, "comps": comps}
+        if not body.review_mode:
+            filled = preview_html(TEMPLATE, items, {c["change_id"]: True for c in items})
+            JOBS[local_id] = {
+                "mode": "offline",
+                "status": "completed",
+                "html": filled,
+                "baseline_html": TEMPLATE,
+                "comps": comps,
+                "session_id": local_id,
+                "changes": [],
+                "queue": items,
+                "decisions": {c["change_id"]: True for c in items},
+                "applied": True,
+                "register": [{"change_id": c["change_id"], "label": c["ai_explanation"], "decision": True} for c in items],
+            }
+            return _job_out(local_id)
+        rec = items_to_queue(items)
+        rec["baseline_html"] = TEMPLATE
+        rec["html"] = TEMPLATE
+        rec["comps"] = comps
+        rec["session_id"] = local_id
+        JOBS[local_id] = rec
+        return _job_out(local_id)
 
     sd = SuperDocs()
     session_id = f"book-proposal-{uuid.uuid4()}"
@@ -86,8 +102,8 @@ def start(body: ProposalIn):
         job_id = sd.chat_async(
             session_id,
             draft_instruction(body.model_dump(), comps),
-            document_html=html,
-            approval_mode="ask_every_time" if body.review_mode else "approve_all",
+            document_html=preview_html(TEMPLATE, items, {c["change_id"]: True for c in items}),
+            approval_mode="approve_all",
         )
         polled = sd.poll_job(job_id)
     except SuperDocsError as e:
@@ -97,7 +113,13 @@ def start(body: ProposalIn):
         "session_id": session_id,
         "job": polled,
         "comps": comps,
-        "html": _html_from_job(polled),
+        "baseline_html": TEMPLATE,
+        "html": _html_from_job(polled) or preview_html(TEMPLATE, items, {c["change_id"]: True for c in items}),
+        "changes": [],
+        "queue": items,
+        "status": polled.get("status"),
+        "register": [{"change_id": c["change_id"], "label": c["ai_explanation"], "decision": True} for c in items],
+        "applied": True,
     }
     return _job_out(job_id)
 
@@ -106,10 +128,6 @@ def start(body: ProposalIn):
 def get_job(job_id: str):
     if job_id not in JOBS:
         raise HTTPException(404, "job not found")
-    rec = JOBS[job_id]
-    if rec["mode"] == "live":
-        rec["job"] = SuperDocs().get_job(job_id)
-        rec["html"] = _html_from_job(rec["job"]) or rec.get("html")
     return _job_out(job_id)
 
 
@@ -118,22 +136,7 @@ def review(job_id: str, body: DecisionIn):
     rec = JOBS.get(job_id)
     if not rec:
         raise HTTPException(404, "job not found")
-    if rec["mode"] != "live":
-        rec["status"] = "completed"
-        return _job_out(job_id)
-    sd = SuperDocs()
-    job = rec["job"]
-    kind = (job.get("metadata") or {}).get("awaiting_kind")
-    session_id = rec["session_id"]
-    try:
-        if kind == "continue_prompt":
-            sd.continue_job(session_id, job_id, True)
-        else:
-            sd.approve(session_id, job_id, body.decisions)
-        rec["job"] = sd.poll_job(job_id)
-        rec["html"] = _html_from_job(rec["job"]) or rec.get("html")
-    except SuperDocsError as e:
-        raise HTTPException(502, str(e)) from e
+    record_decision(rec, body.decisions)
     return _job_out(job_id)
 
 
@@ -181,25 +184,20 @@ def _offline_fill(body: ProposalIn, comps: list[dict]) -> str:
 
 def _job_out(job_id: str) -> dict:
     rec = JOBS[job_id]
-    if rec["mode"] == "offline":
-        return {
-            "id": job_id,
-            "status": rec["status"],
-            "offline": True,
-            "comps": rec["comps"],
-            "html": rec["html"],
-            "changes": [],
-            "awaiting_kind": None,
-        }
-    job = rec["job"]
-    changes = parse_pending_changes(job)
+    status = rec.get("status")
+    if rec.get("mode") == "live" and rec.get("job") and not rec.get("queue"):
+        status = rec["job"].get("status")
+    changes = rec.get("changes") or []
+    if rec.get("mode") == "live" and rec.get("job") and rec.get("status") not in ("awaiting_approval", "completed"):
+        changes = parse_pending_changes(rec["job"])
     return {
         "id": job_id,
-        "status": job.get("status"),
-        "offline": False,
-        "comps": rec["comps"],
+        "status": status,
+        "offline": rec.get("mode") != "live",
+        "comps": rec.get("comps"),
         "html": rec.get("html"),
         "changes": changes,
-        "awaiting_kind": (job.get("metadata") or {}).get("awaiting_kind"),
-        "error": job.get("error"),
+        "register": rec.get("register") or [],
+        "applied": rec.get("applied"),
+        "error": (rec.get("job") or {}).get("error") if rec.get("job") else None,
     }

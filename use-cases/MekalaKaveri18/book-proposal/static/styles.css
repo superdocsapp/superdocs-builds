@@ -42,5 +42,7 @@ button, .btn {
 .check { display: flex; gap: 8px; align-items: center; }
 .doc { line-height: 1.5; }
 .card { border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin: 8px 0; background: #1c2a26; }
+.diff { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; margin: 8px 0; }
+.diff > div { border: 1px dashed var(--line); padding: 8px; max-height: 220px; overflow: auto; }
 .hidden { display: none; }
 .ok { color: var(--ok); }

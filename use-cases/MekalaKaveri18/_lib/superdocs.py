@@ -157,7 +157,11 @@ class SuperDocs:
 
     def approve(self, session_id: str, job_id: str, decisions: dict[str, bool]) -> dict[str, Any]:
         changes = [{"change_id": cid, "approved": ok} for cid, ok in decisions.items()]
-        body = {"job_id": job_id, "approved": True, "changes": changes}
+        body = {
+            "job_id": job_id,
+            "approved": any(decisions.values()),
+            "changes": changes,
+        }
         r = requests.post(
             f"{self.base}/v1/chat/{session_id}/approve",
             headers=self._headers(),

@@ -10,6 +10,42 @@ from catalog import search_comparables
 from superdocs import parse_pending_changes
 
 
+def test_proposal_body_waits_for_approve():
+    from app import JOBS, DecisionIn, ProposalIn, review, start
+
+    JOBS.clear()
+    body = ProposalIn(
+        title="Attention is a Practice",
+        author="Mira Ellison",
+        overview="A book on attention.",
+        audience="productivity knowledge workers",
+        chapters="One\nTwo",
+        review_mode=True,
+        sample=True,
+    )
+    first = start(body)
+    assert first["status"] == "awaiting_approval"
+    assert "Attention is a Practice" not in first["html"]
+    assert len(first["changes"]) == 6
+
+    title = review(first["id"], DecisionIn(decisions={"title": True}))
+    assert title["status"] == "awaiting_approval"
+    assert "Attention is a Practice" in title["html"]
+    assert "[Overview to be filled]" in title["html"]
+
+    overview = review(first["id"], DecisionIn(decisions={"overview": False}))
+    assert "A book on attention." not in overview["html"]
+    assert "[Overview to be filled]" in overview["html"]
+    assert overview["status"] == "awaiting_approval"
+
+    rest = overview
+    for c in list(overview["changes"]):
+        rest = review(first["id"], DecisionIn(decisions={c["change_id"]: True}))
+    assert rest["status"] == "completed"
+    assert "Attention is a Practice" in rest["html"]
+    assert "[Overview to be filled]" in rest["html"]
+
+
 def test_search_returns_specific_real_titles():
     hits = search_comparables("productivity knowledge workers", limit=3)
     titles = {h["title"] for h in hits}
