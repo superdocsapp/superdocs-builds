@@ -1,0 +1,10 @@
+services:
+  evaluator:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SUPERDOCS_API_KEY: "${SUPERDOCS_API_KEY:-}"
+      SUPERDOCS_BASE_URL: "${SUPERDOCS_BASE_URL:-https://api.superdocs.app}"
+    volumes:
+      - ./results/live:/app/results/live

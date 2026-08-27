@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "data_source": "live",
+  "run_date": "2026-08-23",
+  "mode": "small",
+  "operation_cap": 12,
+  "actual_operations": 12,
+  "overall": {
+    "cases": 8,
+    "intended_change_coverage": 0.875,
+    "collateral_damage_rate": 0.0625,
+    "precision_loss": 0.1875,
+    "latency_ms": 17625,
+    "operations_used": 12
+  },
+  "by_instruction_type": {
+    "single_sentence": {"cases": 2, "intended_change_coverage": 1.0, "collateral_damage_rate": 0.0, "precision_loss": 0.0, "latency_ms": 8442, "operations_used": 3},
+    "one_section": {"cases": 2, "intended_change_coverage": 1.0, "collateral_damage_rate": 0.0, "precision_loss": 0.0, "latency_ms": 16016, "operations_used": 3},
+    "table_row": {"cases": 2, "intended_change_coverage": 0.5, "collateral_damage_rate": 0.25, "precision_loss": 0.75, "latency_ms": 23496, "operations_used": 3},
+    "global_rename": {"cases": 2, "intended_change_coverage": 1.0, "collateral_damage_rate": 0.0, "precision_loss": 0.0, "latency_ms": 22546, "operations_used": 3}
+  },
+  "by_approach": {
+    "direct": {"cases": 4, "intended_change_coverage": 0.75, "collateral_damage_rate": 0.125, "precision_loss": 0.375, "latency_ms": 13298, "operations_used": 4},
+    "search_scoped": {"cases": 4, "intended_change_coverage": 1.0, "collateral_damage_rate": 0.0, "precision_loss": 0.0, "latency_ms": 21952, "operations_used": 8}
+  },
+  "failure_examples": [
+    {
+      "case_id": "table-internet-amount",
+      "approach": "direct",
+      "intended_change_coverage": 0.0,
+      "collateral_damage_rate": 0.5,
+      "precision_loss": 1.5,
+      "finding": "The requested amount changed, but all table-row chunk IDs were removed; the target row failed structural validation and three protected rows became collateral changes."
+    }
+  ]
+}
