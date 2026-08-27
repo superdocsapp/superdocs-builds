@@ -1,0 +1,319 @@
+# California residential leasing — state-level requirements.
+#
+# California is the heaviest-disclosure jurisdiction in this pack, and the one
+# whose law moves fastest. That shows up in the review_by dates: settled
+# disclosures (Megan's Law, death on premises) get a long cadence, while the
+# security-deposit cap and the Tenant Protection Act get a short one, because
+# both have been amended within the last few legislative sessions and both are
+# the kind of rule where relying on last year's version produces a confidently
+# wrong document.
+#
+# COMPILED FROM PUBLIC PRIMARY SOURCES. NOT LEGAL ADVICE.
+
+code: US-CA
+name: California
+
+notes: >
+  Local ordinances layer on top of this file and are frequently stricter —
+  Los Angeles, San Francisco, Oakland, San Jose and Santa Monica all operate
+  their own rent stabilisation and just-cause regimes with their own notices.
+  This pack models state law only; a municipal layer is named as a known
+  limitation in the README rather than half-implemented.
+
+rules:
+  # ---------------------------------------------------------------- disclosures
+
+  - id: ca_megans_law
+    kind: disclosure
+    title: Megan's Law Database Notice
+    summary: >
+      Every residential lease in California must contain this notice, in this
+      wording. It is not conditional on anything about the property.
+    citation:
+      authority: Cal. Civ. Code § 2079.10a
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=2079.10a
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    verbatim_statutory: true
+    tenant_acknowledgement: false
+    delivery: in the body of the lease
+    body: |
+      NOTICE: Pursuant to Section 290.46 of the Penal Code, information about
+      specified registered sex offenders is made available to the public via an
+      Internet Web site maintained by the Department of Justice at
+      www.meganslaw.ca.gov. Depending on an offender's criminal history, this
+      information will include either the address at which the offender resides
+      or the community of residence and ZIP Code in which he or she resides.
+    notes: >
+      The statute prescribes this text. Rewording it is non-compliance, which is
+      why verbatim_statutory is set and the AI is instructed not to touch it.
+
+  - id: ca_bed_bug_notice
+    kind: disclosure
+    title: Bed Bug Information Notice
+    summary: >
+      Landlords must give prospective tenants general information about bed bug
+      identification, behaviour and reporting before the tenancy starts.
+    citation:
+      authority: Cal. Civ. Code § 1954.603
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1954.603
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    tenant_acknowledgement: true
+    delivery: before the tenancy begins
+    body: |
+      BED BUG INFORMATION
+
+      Information about bed bugs: Bed bugs are small, flat, wingless insects,
+      about the size of an apple seed, that feed on the blood of humans and
+      animals. They are reddish-brown in colour and are most active at night.
+
+      Bed bug bites may cause no reaction in some people, and itching, welts or
+      swelling in others. Bed bugs are not known to transmit disease.
+
+      Common signs and symptoms of a possible bed bug infestation:
+        - Small red to reddish-brown fecal spots on mattresses, box springs,
+          bed frames, mattress pads, bedding, upholstery or walls.
+        - Molted bed bug skins, white sticky eggs, or empty eggshells.
+        - Very heavily infested areas may have a characteristically sweet odour.
+        - Red, itchy bite marks, commonly on the face, neck, arms, hands or
+          other body parts, though not everyone reacts to bites.
+
+      Tenants are encouraged to report suspected infestations promptly to the
+      landlord in writing. Landlord will respond as required by California law.
+    notes: >
+      The statute requires the substance of this information rather than one
+      prescribed sentence, so verbatim_statutory is deliberately false here —
+      contrast ca_megans_law. The AI may reformat this to the template's styling
+      but is instructed not to drop any of the listed signs.
+
+  - id: ca_death_on_premises
+    kind: disclosure
+    title: Death on the Premises (Three-Year Lookback)
+    summary: >
+      An owner or agent must disclose any death that occurred on the property
+      within the three years preceding the offer, along with the manner of
+      death. Deaths from HIV/AIDS are expressly excluded from this duty.
+    citation:
+      authority: Cal. Civ. Code § 1710.2
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1710.2
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      all:
+        - field: death_on_premises_last_3_years
+          op: is_true
+    tenant_acknowledgement: true
+    delivery: before the tenant is obligated under the lease
+    body: |
+      DISCLOSURE OF DEATH ON THE PREMISES
+
+      Landlord discloses that a death occurred on the Premises within the three
+      years preceding the date of this Lease. Details as known to Landlord are
+      set out below.
+
+      Date of occurrence: ____________________
+      Manner of death as known to Landlord: ____________________
+
+      This disclosure is made under California Civil Code section 1710.2.
+      Nothing in this disclosure relates to a death from HIV/AIDS, which
+      California law expressly excludes from any duty to disclose.
+    notes: >
+      Applicability is a fact the landlord must answer. If
+      death_on_premises_last_3_years is left blank the pack BLOCKS rather than
+      assuming "no" — an unasked question here is a disclosure failure.
+
+  - id: ca_mold_disclosure
+    kind: disclosure
+    title: Known Mold Disclosure
+    summary: >
+      Written disclosure is required where the landlord knows of visible mold
+      that exceeds permissible exposure limits or poses a health threat.
+    citation:
+      authority: Cal. Health & Safety Code § 26147
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=HSC&sectionNum=26147
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      all:
+        - field: known_mold_health_threat
+          op: is_true
+    tenant_acknowledgement: true
+    body: |
+      DISCLOSURE OF KNOWN MOLD
+
+      Landlord discloses actual knowledge of the presence of mold on the
+      Premises that either exceeds permissible exposure limits or poses a
+      health threat, as described below.
+
+      Location and description as known to Landlord: ____________________
+
+      Tenant is provided with the State Department of Public Health's consumer
+      booklet on mold health effects where one has been published and made
+      available for distribution.
+
+  - id: ca_flood_hazard
+    kind: disclosure
+    title: Flood Hazard Disclosure
+    summary: >
+      A landlord with actual knowledge that the property sits in a special flood
+      hazard area or an area of potential flooding must disclose that in
+      writing, and must state that the landlord's insurance does not cover the
+      tenant's possessions.
+    citation:
+      authority: Cal. Gov. Code § 8589.45
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=GOV&sectionNum=8589.45
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      any:
+        - field: in_special_flood_hazard_area
+          op: is_true
+        - field: in_area_of_potential_flooding
+          op: is_true
+    tenant_acknowledgement: true
+    body: |
+      FLOOD HAZARD DISCLOSURE
+
+      Landlord has actual knowledge that the Premises is located in a special
+      flood hazard area or an area of potential flooding.
+
+      Landlord's insurance does not cover the loss of Tenant's personal
+      possessions. Tenant is strongly encouraged to obtain renter's insurance
+      that includes flood coverage. It is not Landlord's responsibility to
+      provide flood insurance for Tenant's personal property.
+
+      Landlord is not required to provide additional information concerning the
+      flood hazards of the Premises, and the information provided under this
+      disclosure may not be the only flood-related information relevant to the
+      Premises.
+
+  - id: ca_demolition_permit
+    kind: disclosure
+    title: Notice of Application for Demolition Permit
+    summary: >
+      A landlord who has applied for a permit to demolish the unit must give
+      written notice to prospective tenants before accepting any deposit or
+      screening fee.
+    citation:
+      authority: Cal. Civ. Code § 1940.6
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1940.6
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      all:
+        - field: demolition_permit_applied_for
+          op: is_true
+    tenant_acknowledgement: true
+    delivery: before any deposit or screening fee is accepted
+    body: |
+      NOTICE OF APPLICATION FOR DEMOLITION PERMIT
+
+      Landlord has applied to the relevant public agency for a permit to
+      demolish the Premises. Tenant is advised of this application before
+      entering into this Lease and before paying any deposit or screening fee.
+
+      Earliest approximate date the demolition may occur: ____________________
+      Earliest approximate date the tenancy would end as a result: ___________
+
+  - id: ca_shared_utility_meter
+    kind: disclosure
+    title: Shared Utility Meter Disclosure
+    summary: >
+      Where the tenant's gas or electric meter also serves areas outside their
+      unit, the landlord must disclose that before the tenancy and agree in
+      writing who pays for the shared portion.
+    citation:
+      authority: Cal. Civ. Code § 1940.9
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1940.9
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      all:
+        - field: utility_meter_serves_other_areas
+          op: is_true
+    tenant_acknowledgement: true
+    body: |
+      SHARED UTILITY METER DISCLOSURE
+
+      Landlord discloses that the gas or electric service measured by Tenant's
+      meter also serves areas outside of Tenant's dwelling unit.
+
+      The parties agree in writing to the following arrangement for payment of
+      the service to those additional areas: ____________________
+
+      Absent such an agreement, California law requires Landlord to be
+      responsible for the cost of service to areas outside Tenant's unit.
+
+  # -------------------------------------------------------------- lease clauses
+
+  - id: ca_tenant_protection_act_notice
+    kind: lease_clause
+    title: Tenant Protection Act — Rent Cap and Just Cause Notice
+    summary: >
+      The Tenant Protection Act requires a prescribed notice stating whether the
+      tenancy is subject to the statewide rent cap and just-cause protections,
+      or is exempt.
+    citation:
+      authority: Cal. Civ. Code §§ 1946.2(f), 1947.12(d)(5) (Tenant Protection Act of 2019, as amended by AB 1482 and successors)
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1946.2
+      verified_on: 2025-08-01
+      review_by: 2026-06-30
+      note: >-
+        SHORT REVIEW CADENCE, DELIBERATELY. The rent-cap percentage and the
+        exemption categories have both been amended since enactment, and the
+        allowable annual increase is tied to a CPI figure that changes yearly.
+        This rule is expected to go stale and to be re-verified, not to sit.
+    verbatim_statutory: true
+    body: |
+      NOTICE: California law limits the amount your rent can be increased. See
+      Section 1947.12 of the Civil Code for more information. California law
+      also provides that after all of the tenants have continuously and lawfully
+      occupied the property for 12 months or more, or at least one of the
+      tenants has continuously and lawfully occupied the property for 24 months
+      or more, a landlord must provide a statement of cause in any notice to
+      terminate a tenancy. See Section 1946.2 of the Civil Code for more
+      information.
+    notes: >
+      Separately prescribed wording exists for properties that are EXEMPT from
+      the Act (most single-family homes and condos where the owner is not a
+      corporate entity, and where the required exemption notice has been given).
+      This pack ships the covered-tenancy notice; the exemption notice is named
+      in the README's limitations rather than guessed at.
+
+  # --------------------------------------------------------------------- limits
+
+  - id: ca_security_deposit_cap
+    kind: limit
+    title: Security Deposit Cap — One Month's Rent
+    summary: >
+      California caps the security deposit at one month's rent for both
+      furnished and unfurnished units. A narrow exception lets a natural-person
+      landlord owning no more than two residential properties with no more than
+      four total units collect up to two months.
+    citation:
+      authority: Cal. Civ. Code § 1950.5(c), as amended by AB 12 (2023), operative July 1, 2024
+      source_url: https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1950.5
+      verified_on: 2025-08-01
+      review_by: 2026-06-30
+      note: >-
+        SHORT REVIEW CADENCE, DELIBERATELY. This cap changed recently and
+        materially — the pre-July-2024 rule allowed two months unfurnished and
+        three months furnished. A stale copy of this rule would approve a
+        deposit that is now unlawful, which is exactly the failure the staleness
+        gate exists to prevent.
+    limit:
+      field: security_deposit
+      relative_to: monthly_rent
+      max_multiple: 1.0
+      message: >-
+        California caps the security deposit at one month's rent for furnished
+        and unfurnished units alike.
+      exception_note: >-
+        A natural-person landlord who owns no more than two residential rental
+        properties collectively comprising no more than four dwelling units may
+        collect up to two months' rent. This pack does not auto-apply that
+        exception; assert it deliberately with --small-landlord-exception if it
+        genuinely applies.
+      exception_multiple: 2.0
+      exception_flag: small_landlord_exception

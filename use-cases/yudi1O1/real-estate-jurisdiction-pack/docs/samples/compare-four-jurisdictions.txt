@@ -1,0 +1,44 @@
+Property: 500 Example Avenue, Unit 7A, Springfield, CA 90000
+Rent 2,000.00 / deposit 4,000.00 / built 1955   evaluated as of 2026-08-27
+Stale rules are included here so the comparison is complete; run `check` for the staleness gate.
+
+Jurisdiction Disclosures  Clauses  Blocking   Deposit verdict
+------------------------------------------------------------------------------
+US-CA                  3        2         1   OVER CAP — blocked
+US-TX                  3        6         0   within limits
+US-NY                  3        4         1   OVER CAP — blocked
+US-FL                  4        3         0   within limits
+
+Disclosures required, by jurisdiction:
+
+  US-CA (California):
+    - Lead-Based Paint Disclosure (Pre-1978 Housing)
+    - Megan's Law Database Notice
+    - Bed Bug Information Notice
+
+  US-TX (Texas):
+    - Lead-Based Paint Disclosure (Pre-1978 Housing)
+    - Flooding Disclosure
+    - Vehicle Towing and Parking Rules Notice
+
+  US-NY (New York):
+    - Lead-Based Paint Disclosure (Pre-1978 Housing)
+    - Sprinkler System Notice
+    - Lead Paint — Additional Inquiry for Pre-1960 Buildings
+
+  US-FL (Florida):
+    - Lead-Based Paint Disclosure (Pre-1978 Housing)
+    - Radon Gas Disclosure
+    - Security Deposit — Notice of Depository and Claim Procedure
+    - Fire Sprinkler Notice — Multi-Storey Buildings
+
+Required in exactly one of these jurisdictions:
+  - Bed Bug Information Notice  (US-CA only)
+  - Fire Sprinkler Notice — Multi-Storey Buildings  (US-FL only)
+  - Flooding Disclosure  (US-TX only)
+  - Lead Paint — Additional Inquiry for Pre-1960 Buildings  (US-NY only)
+  - Megan's Law Database Notice  (US-CA only)
+  - Radon Gas Disclosure  (US-FL only)
+  - Security Deposit — Notice of Depository and Claim Procedure  (US-FL only)
+  - Sprinkler System Notice  (US-NY only)
+  - Vehicle Towing and Parking Rules Notice  (US-TX only)

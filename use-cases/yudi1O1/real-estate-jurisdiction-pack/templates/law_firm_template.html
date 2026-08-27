@@ -1,0 +1,76 @@
+<!--
+  Fictional customer template B — a law firm's document style.
+  Synthetic, fictional firm. Safe to commit and demo with.
+
+  Deliberately unlike templates/brokerage_template.html in every respect that is
+  presentation: serif rather than sans, a numbered-schedule structure rather than
+  a reference strip, rules rather than fills, a formal execution block.
+
+  The point of shipping two is to make the parity claim falsifiable, and it paid
+  off: a live run falsified half of it. Drafting the same pack onto both does
+  produce identical facts — every reference code, citation and date — but the
+  two outputs originally came back textually IDENTICAL, because the branding
+  above was being deleted during the edit turn rather than preserved. That is
+  fixed. What remains true is that the <style> block below is dropped at
+  ingestion, so this template contributes structure and wording but not its
+  serif face or small-caps. See the README's "What the live runs showed".
+-->
+<div class="instrument">
+  <div class="letterhead">
+    <div class="firm">HOLLOWAY &amp; REYES LLP</div>
+    <div class="practice">Real Property &middot; Landlord and Tenant</div>
+    <hr class="rule-heavy" />
+  </div>
+
+  <table class="docket">
+    <tr><td class="k">Instrument</td><td class="v">[document title]</td></tr>
+    <tr><td class="k">Our reference</td><td class="v">[pack reference]</td></tr>
+    <tr><td class="k">Prepared</td><td class="v">[date]</td></tr>
+  </table>
+
+  <div class="content">
+    <p class="placeholder">
+      [The pack's content is set here in the firm's house style: numbered
+      headings, hanging indents for schedules, statutory notices set apart by a
+      vertical rule, and citations in the smaller face.]
+    </p>
+  </div>
+
+  <div class="execution">
+    <hr class="rule-light" />
+    <p class="exec-note">
+      EXECUTED as of the date first written above. Each party acknowledges
+      receipt of a complete counterpart, including every schedule and disclosure
+      listed in the attachment schedule.
+    </p>
+  </div>
+
+  <div class="foot">
+    Holloway &amp; Reyes LLP &middot; 88 Chancery Row &middot; This document is
+    prepared for the named parties and is not a substitute for independent advice.
+  </div>
+</div>
+
+<style>
+  .instrument { font-family: "Sabon", Georgia, "Times New Roman", serif; color: #16181a; line-height: 1.6; }
+  .letterhead { text-align: center; margin-bottom: 4px; }
+  .firm { font-size: 19px; letter-spacing: 0.22em; font-variant: small-caps; }
+  .practice { font-size: 11px; font-style: italic; color: #4a4f55; }
+  .rule-heavy { border: none; border-top: 2px solid #16181a; margin: 8px 0 16px; }
+  .rule-light { border: none; border-top: 1px solid #9aa0a6; margin: 22px 0 10px; }
+  .docket { border-collapse: collapse; width: 100%; font-size: 12px; margin-bottom: 20px; }
+  .docket .k { width: 30%; font-variant: small-caps; letter-spacing: 0.05em; color: #4a4f55; padding: 3px 0; }
+  .docket .v { padding: 3px 0; }
+  .content h1 { font-size: 17px; text-align: center; font-variant: small-caps; letter-spacing: 0.06em; }
+  .content h2 { font-size: 13px; font-variant: small-caps; letter-spacing: 0.04em; margin-top: 20px; }
+  .content h3 { font-size: 12px; font-style: italic; font-weight: normal; }
+  .content table { border-collapse: collapse; width: 100%; font-size: 11px; margin: 10px 0; }
+  .content th, .content td { border-top: 1px solid #c8ccd0; border-bottom: 1px solid #c8ccd0; padding: 5px 6px; text-align: left; vertical-align: top; }
+  .content th { font-variant: small-caps; letter-spacing: 0.04em; }
+  .content .statutory-verbatim { border-left: 3px solid #16181a; padding: 4px 0 4px 14px; margin: 12px 0; font-size: 12px; }
+  .content .unverified { color: #8c2f1d; font-weight: bold; letter-spacing: 0.04em; }
+  .content .citation { font-size: 10px; color: #4a4f55; }
+  .placeholder { color: #7d838a; font-style: italic; }
+  .exec-note { font-size: 11px; }
+  .foot { margin-top: 24px; font-size: 10px; color: #4a4f55; text-align: center; }
+</style>

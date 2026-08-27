@@ -1,0 +1,11 @@
+{
+  "_file": "claude_desktop_config.json (macOS: ~/Library/Application Support/Claude/, Windows: %APPDATA%\\Claude\\)",
+  "_replace": "Swap /absolute/path/to/superdocs-vertical-prompts for your real checkout path.",
+  "mcpServers": {
+    "superdocs-legal-pack": {
+      "command": "python",
+      "args": ["-m", "vertical_prompts.server", "--pack", "packs/legal/pack.yaml"],
+      "cwd": "/absolute/path/to/superdocs-vertical-prompts"
+    }
+  }
+}

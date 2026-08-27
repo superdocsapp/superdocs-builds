@@ -1,0 +1,76 @@
+<!--
+  Fictional customer template A — a residential brokerage's house style.
+  Synthetic, fictional company. Safe to commit and demo with.
+
+  This is the "customer's own template" the pack is laid onto. It is deliberately
+  .html rather than .docx so the diff is readable in a pull request; the client
+  uploads any of DOCX/DOC/ODT/PDF/TXT/HTML/MD/RTF equally well.
+
+  Contrast templates/law_firm_template.html: a different brand, a different
+  structure, a different type scale.
+
+  MEASURED, NOT ASSUMED — and the measurement corrected the claim that used to
+  sit here. A live run of scripts/demo_two_templates.py showed the same pack
+  drafted onto both templates carries identical FACTS (parity held on all three
+  documents), but that the branding below was originally deleted wholesale
+  during the edit turn, so the two outputs came back textually identical. The
+  instruction now preserves it. The <style> block below is a separate matter:
+  SuperDocs drops it at ingestion while keeping the class attributes, so an
+  .html template cannot carry fonts or colours at all. The .html choice that
+  made this file readable in a diff is the same choice that costs it its
+  appearance. See the README's "What the live runs showed".
+-->
+<div class="doc">
+  <header class="masthead">
+    <div class="mark">MERIDIAN&nbsp;RESIDENTIAL</div>
+    <div class="strap">Licensed Residential Brokerage &middot; Lettings &amp; Management</div>
+  </header>
+
+  <div class="ref-strip">
+    <span class="ref-label">Document</span>
+    <span class="ref-value">[document title]</span>
+    <span class="ref-label">File</span>
+    <span class="ref-value">[pack reference]</span>
+  </div>
+
+  <main class="body">
+    <p class="placeholder">
+      [The pack's content is laid out here, in this template's styling. Headings
+      take the house type scale, tables take the striped treatment below, and
+      statutory notices keep their own boxed emphasis.]
+    </p>
+  </main>
+
+  <footer class="colophon">
+    <p>
+      Meridian Residential &middot; 1400 Kestrel Way, Suite 220 &middot;
+      lettings@meridian-residential.example
+    </p>
+    <p class="fine">
+      This document is provided by Meridian Residential in its capacity as
+      managing agent. Retain a signed copy for the tenancy file.
+    </p>
+  </footer>
+</div>
+
+<style>
+  .doc { font-family: "Inter", "Helvetica Neue", Arial, sans-serif; color: #1c2126; line-height: 1.55; }
+  .masthead { border-bottom: 3px solid #0f4c5c; padding-bottom: 10px; margin-bottom: 18px; }
+  .mark { font-size: 21px; font-weight: 700; letter-spacing: 0.14em; color: #0f4c5c; }
+  .strap { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #5c6b73; }
+  .ref-strip { background: #f2f6f7; border-left: 4px solid #0f4c5c; padding: 8px 12px; font-size: 12px; margin-bottom: 22px; }
+  .ref-label { text-transform: uppercase; letter-spacing: 0.06em; color: #5c6b73; margin-right: 6px; }
+  .ref-value { font-weight: 600; margin-right: 18px; }
+  .body h1 { font-size: 20px; color: #0f4c5c; border-bottom: 1px solid #d5e0e3; padding-bottom: 6px; }
+  .body h2 { font-size: 15px; color: #0f4c5c; margin-top: 22px; }
+  .body h3 { font-size: 13px; color: #1c2126; }
+  .body table { border-collapse: collapse; width: 100%; font-size: 12px; margin: 12px 0; }
+  .body th, .body td { border: 1px solid #d5e0e3; padding: 6px 8px; text-align: left; vertical-align: top; }
+  .body tbody tr:nth-child(odd) { background: #fafcfc; }
+  .body .statutory-verbatim { border: 1px solid #0f4c5c; background: #f7fbfc; padding: 10px 14px; margin: 12px 0; }
+  .body .unverified { color: #a4341f; font-weight: 700; }
+  .body .citation { font-size: 11px; color: #5c6b73; }
+  .placeholder { color: #8a979e; font-style: italic; }
+  .colophon { margin-top: 30px; border-top: 1px solid #d5e0e3; padding-top: 10px; font-size: 11px; color: #5c6b73; }
+  .fine { font-size: 10px; }
+</style>

@@ -1,0 +1,13 @@
+{
+  "_file": "Zed settings.json. Note the top-level key is 'context_servers', and the command lives under 'command'/'args' inside it.",
+  "_replace": "Swap /absolute/path/to/superdocs-vertical-prompts for your real checkout path.",
+  "context_servers": {
+    "superdocs-legal-pack": {
+      "source": "custom",
+      "command": "python",
+      "args": ["-m", "vertical_prompts.server", "--pack", "packs/legal/pack.yaml"],
+      "cwd": "/absolute/path/to/superdocs-vertical-prompts",
+      "env": {}
+    }
+  }
+}

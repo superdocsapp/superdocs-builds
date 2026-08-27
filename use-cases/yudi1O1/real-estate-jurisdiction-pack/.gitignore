@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+.superdocs_ledger.json
+
+# Working output. Curated, committed samples live in docs/samples/ instead, so
+# the repo carries evidence without carrying every scratch run.
+out/

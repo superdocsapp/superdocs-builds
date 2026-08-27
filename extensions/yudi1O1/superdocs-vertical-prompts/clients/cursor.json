@@ -1,0 +1,11 @@
+{
+  "_file": ".cursor/mcp.json (project) or ~/.cursor/mcp.json (global)",
+  "_replace": "Swap /absolute/path/to/superdocs-vertical-prompts for your real checkout path.",
+  "mcpServers": {
+    "superdocs-legal-pack": {
+      "command": "python",
+      "args": ["-m", "vertical_prompts.server", "--pack", "packs/legal/pack.yaml"],
+      "cwd": "/absolute/path/to/superdocs-vertical-prompts"
+    }
+  }
+}

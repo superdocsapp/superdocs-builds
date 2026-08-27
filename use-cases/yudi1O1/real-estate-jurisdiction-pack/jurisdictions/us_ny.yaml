@@ -1,0 +1,221 @@
+# New York residential leasing — state-level requirements.
+#
+# New York is in this pack for two reasons. First, the Housing Stability and
+# Tenant Protection Act of 2019 reshaped deposits and notice periods statewide,
+# so it contrasts sharply with Texas. Second, it has a disclosure that exists
+# almost nowhere else — the sprinkler notice — which must appear in EVERY
+# residential lease and must be answered in both directions.
+#
+# Good Cause Eviction carries a short review cadence on purpose: it is 2024
+# legislation with a local opt-in mechanism, so both its geographic reach and
+# its notice requirements are actively moving.
+#
+# COMPILED FROM PUBLIC PRIMARY SOURCES. NOT LEGAL ADVICE.
+
+code: US-NY
+name: New York
+
+notes: >
+  New York City layers substantial additional requirements on top of state law
+  (window guards, bed bug annual filings, Local Law 1 lead rules keyed to
+  pre-1960 construction, stove knob covers). This pack models NEW YORK STATE
+  law. NYC-specific requirements are named in the README's limitations rather
+  than partially implemented, because a half-modelled NYC rider is more
+  dangerous than an absent one.
+
+rules:
+  # ---------------------------------------------------------------- disclosures
+
+  - id: ny_sprinkler_disclosure
+    kind: disclosure
+    title: Sprinkler System Notice
+    summary: >
+      Every residential lease must contain a conspicuous notice stating whether
+      the building has a maintained, operative sprinkler system. If one exists,
+      the notice must also give the date of the last maintenance and inspection.
+    citation:
+      authority: N.Y. Real Prop. Law § 231-b
+      source_url: https://www.nysenate.gov/legislation/laws/RPP/231-B
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    # No applies_when: § 231-b requires this notice in EVERY residential lease.
+    # A building WITHOUT a sprinkler system still needs the notice saying so.
+    requires_facts:
+      - sprinkler_system_present
+    tenant_acknowledgement: true
+    delivery: conspicuously, in the body of the lease
+    body: |
+      SPRINKLER SYSTEM NOTICE
+
+      This notice is provided under New York Real Property Law section 231-b.
+
+      "Sprinkler system" means a system of piping and appurtenances designed
+      and installed under recognised standards to automatically distribute
+      sufficient water to extinguish or contain a fire.
+
+        Does the building contain a maintained and operative sprinkler system?
+                                                           [ ] Yes   [ ] No
+
+        If yes — date of last maintenance:   ____________________
+                 date of last inspection:    ____________________
+
+      Tenant acknowledges receipt of this notice by signing below.
+    notes: >
+      Required in both directions, which is why the answer sits in
+      requires_facts rather than in applies_when. Keying applicability on the
+      answer would mean an unanswered question silently dropped a mandatory
+      notice; requiring the answer means it blocks instead.
+
+  - id: ny_lead_paint_pre1960_state
+    kind: disclosure
+    title: Lead Paint — Additional Inquiry for Pre-1960 Buildings
+    summary: >
+      Federal law keys lead obligations to pre-1978 construction. Older New York
+      housing stock and the stricter local regimes layered on it make the
+      pre-1960 date independently significant, so the pack records it.
+    citation:
+      authority: 42 U.S.C. § 4852d and 40 C.F.R. pt. 745 (federal floor); see N.Y.C. Admin. Code § 27-2056.1 et seq. for the stricter New York City regime keyed to pre-1960 construction
+      source_url: https://www.nysenate.gov/legislation/laws/MDW/A2
+      verified_on: 2025-08-01
+      review_by: 2026-06-30
+      note: >-
+        SHORT REVIEW CADENCE. This entry deliberately points at a LOCAL regime
+        this pack does not fully model. It is an advisory flag telling the user
+        to go and check, not a substitute for the New York City rider.
+    applies_when:
+      all:
+        - field: year_built
+          op: lt
+          value: 1960
+    tenant_acknowledgement: false
+    body: |
+      LEAD PAINT — ADDITIONAL LOCAL REQUIREMENTS MAY APPLY
+
+      This building predates 1960. In addition to the federal lead-based paint
+      disclosure included in this packet, New York City and certain other
+      localities impose stricter obligations on pre-1960 housing where a child
+      under the age of six resides, including periodic inspection, notice, and
+      remediation duties.
+
+      This packet does NOT include a New York City lead rider. If the Premises
+      is located in New York City, obtain and attach the required local rider
+      before the lease is executed.
+    notes: >
+      Intentionally worded as a pointer rather than a compliance document. A
+      disclosure that claims to cover NYC Local Law 1 without implementing it
+      would be worse than this flag.
+
+  # -------------------------------------------------------------- lease clauses
+
+  - id: ny_deposit_return_clause
+    kind: lease_clause
+    title: Security Deposit — Fourteen-Day Return and Itemisation
+    summary: >
+      The deposit must be returned within 14 days of the tenant vacating, with
+      an itemised statement of any deductions. Failing to provide the itemised
+      statement within 14 days forfeits the landlord's right to retain any part.
+    citation:
+      authority: N.Y. Gen. Oblig. Law § 7-108(1-a)(e), as enacted by the Housing Stability and Tenant Protection Act of 2019
+      source_url: https://www.nysenate.gov/legislation/laws/GOB/7-108
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Security Deposit Return. Landlord will return the security deposit, less
+      any lawful deductions, within fourteen (14) days after Tenant vacates the
+      Premises. If Landlord retains any portion, Landlord will provide an
+      itemised written statement describing the basis for each amount retained.
+
+      Landlord's failure to provide that itemised statement within fourteen days
+      forfeits Landlord's right to retain any portion of the deposit.
+
+      Tenant is entitled to be present at an inspection before vacating and to
+      be notified of that right in writing.
+
+  - id: ny_rent_increase_notice_clause
+    kind: lease_clause
+    title: Notice Periods for Rent Increase and Non-Renewal
+    summary: >
+      Required advance notice scales with how long the tenant has occupied:
+      30 days under one year, 60 days for one to two years, 90 days beyond that.
+    citation:
+      authority: N.Y. Real Prop. Law § 226-c
+      source_url: https://www.nysenate.gov/legislation/laws/RPP/226-C
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Notice of Rent Increase or Non-Renewal. Where Landlord intends to raise
+      the rent by five percent or more, or does not intend to renew the tenancy,
+      Landlord will give written notice in advance as required by New York Real
+      Property Law section 226-c:
+
+        - 30 days, where Tenant has occupied for less than one year and has a
+          lease term of less than one year;
+        - 60 days, where Tenant has occupied for more than one year but less
+          than two years, or has a lease term of at least one year but less
+          than two years;
+        - 90 days, where Tenant has occupied for two years or more, or has a
+          lease term of at least two years.
+
+      If Landlord fails to give timely notice, the tenancy continues on the
+      existing terms until the required notice period has run.
+
+  - id: ny_good_cause_eviction_status
+    kind: lease_clause
+    title: Good Cause Eviction — Statement of Coverage
+    summary: >
+      Covered tenancies are entitled to a statement of whether the unit is
+      subject to Good Cause Eviction protections and, if exempt, the ground of
+      exemption.
+    citation:
+      authority: N.Y. Real Prop. Law art. 6-A (Good Cause Eviction), added by L. 2024, ch. 56, pt. HH
+      source_url: https://www.nysenate.gov/legislation/laws/RPP/A6-A
+      verified_on: 2025-08-01
+      review_by: 2026-06-30
+      note: >-
+        SHORT REVIEW CADENCE, DELIBERATELY. Article 6-A applies in New York City
+        and in localities that affirmatively opt in, so its geographic reach
+        changes as municipalities act. The exemption thresholds are also indexed
+        and move. A stale copy of this rule would misstate coverage.
+    body: |
+      GOOD CAUSE EVICTION — STATEMENT OF COVERAGE
+
+      New York law provides certain tenants with protection against eviction
+      without good cause, and against unreasonable rent increases.
+
+        Is this tenancy subject to Good Cause Eviction protections?
+                                                           [ ] Yes   [ ] No
+
+        If no, the ground of exemption is: ____________________
+
+      Where the protections apply, Landlord may not evict except for a ground
+      set out in Article 6-A of the Real Property Law, and a rent increase above
+      the statutory threshold is presumed unreasonable unless justified.
+    notes: >
+      Coverage genuinely depends on locality, building size, ownership and rent
+      level. This pack asks the question and records the answer; it deliberately
+      does not compute coverage, because computing it wrongly would be worse
+      than asking.
+
+  # --------------------------------------------------------------------- limits
+
+  - id: ny_security_deposit_cap
+    kind: limit
+    title: Security Deposit Cap — One Month's Rent
+    summary: >
+      No deposit or advance may exceed one month's rent for any residential
+      tenancy in New York State.
+    citation:
+      authority: N.Y. Gen. Oblig. Law § 7-108(1-a)(a), as enacted by the Housing Stability and Tenant Protection Act of 2019
+      source_url: https://www.nysenate.gov/legislation/laws/GOB/7-108
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    limit:
+      field: security_deposit
+      relative_to: monthly_rent
+      max_multiple: 1.0
+      message: >-
+        New York caps any deposit or advance at one month's rent for residential
+        tenancies statewide.
+      exception_note: >-
+        The statutory cap admits no small-landlord exception, unlike California.
+        Applying --small-landlord-exception in New York has no effect.

@@ -1,0 +1,16 @@
+{
+  "_file": ".claude/mcp.json (or run: claude mcp add)",
+  "_replace": "Swap /absolute/path/to/superdocs-vertical-prompts for your real checkout path.",
+  "mcpServers": {
+    "superdocs-legal-pack": {
+      "command": "python",
+      "args": ["-m", "vertical_prompts.server", "--pack", "packs/legal/pack.yaml"],
+      "cwd": "/absolute/path/to/superdocs-vertical-prompts"
+    },
+    "superdocs-real-estate-pack": {
+      "command": "python",
+      "args": ["-m", "vertical_prompts.server", "--pack", "packs/real_estate/pack.yaml"],
+      "cwd": "/absolute/path/to/superdocs-vertical-prompts"
+    }
+  }
+}

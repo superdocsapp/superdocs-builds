@@ -1,0 +1,17 @@
+Pack CA-SFO-0091 — 91 Guerrero Street, Unit 3, San Francisco, CA 94103
+Jurisdiction: California (US-CA)   evaluated as of 2026-08-27
+Rules evaluated: 11   firing: 6
+  + [disclosure] Lead-Based Paint Disclosure (Pre-1978 Housing)  (Residential Lead-Based Paint Hazard Reduction Act of 1992, 42 U.S.C. § 4852d; implementing regulations at 40 C.F.R. § 745.113(b) and 24 C.F.R. § 35.92(b))
+  + [lease_clause] Delivery of EPA Lead Hazard Information Pamphlet  (40 C.F.R. § 745.107(a)(1))
+  + [disclosure] Megan's Law Database Notice  (Cal. Civ. Code § 2079.10a)
+  + [disclosure] Bed Bug Information Notice  (Cal. Civ. Code § 1954.603)
+  + [lease_clause] Tenant Protection Act — Rent Cap and Just Cause Notice  (Cal. Civ. Code §§ 1946.2(f), 1947.12(d)(5) (Tenant Protection Act of 2019, as amended by AB 1482 and successors))
+  + [limit] Security Deposit Cap — One Month's Rent  (Cal. Civ. Code § 1950.5(c), as amended by AB 12 (2023), operative July 1, 2024)
+
+  BLOCKING [rule ca_death_on_premises] Cannot tell whether "Death on the Premises (Three-Year Lookback)" applies: death_on_premises_last_3_years was not supplied. An unanswered question is never read as 'does not apply' — supply it under disclosure_facts. Authority: Cal. Civ. Code § 1710.2 (verified 2025-08-01, review by 2027-03-31).
+  BLOCKING [rule ca_mold_disclosure] Cannot tell whether "Known Mold Disclosure" applies: known_mold_health_threat was not supplied. An unanswered question is never read as 'does not apply' — supply it under disclosure_facts. Authority: Cal. Health & Safety Code § 26147 (verified 2025-08-01, review by 2027-03-31).
+  BLOCKING [rule ca_flood_hazard] Cannot tell whether "Flood Hazard Disclosure" applies: in_area_of_potential_flooding was not supplied. An unanswered question is never read as 'does not apply' — supply it under disclosure_facts. Authority: Cal. Gov. Code § 8589.45 (verified 2025-08-01, review by 2027-03-31).
+  BLOCKING [rule ca_tenant_protection_act_notice] "Tenant Protection Act — Rent Cap and Just Cause Notice" was last verified on 2025-08-01 and was due for review by 2026-06-30, which has passed (today is 2026-08-27). Re-verify against https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1946.2 and update verified_on/review_by before relying on it. Note: SHORT REVIEW CADENCE, DELIBERATELY. The rent-cap percentage and the exemption categories have both been amended since enactment, and the allowable annual increase is tied to a CPI figure that changes yearly. This rule is expected to go stale and to be re-verified, not to sit.
+  BLOCKING [rule ca_security_deposit_cap] "Security Deposit Cap — One Month's Rent" was last verified on 2025-08-01 and was due for review by 2026-06-30, which has passed (today is 2026-08-27). Re-verify against https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=1950.5 and update verified_on/review_by before relying on it. Note: SHORT REVIEW CADENCE, DELIBERATELY. This cap changed recently and materially — the pre-July-2024 rule allowed two months unfurnished and three months furnished. A stale copy of this rule would approve a deposit that is now unlawful, which is exactly the failure the staleness gate exists to prevent.
+
+REFUSING TO DRAFT: 5 blocking finding(s). No API call was made and no operation was spent.

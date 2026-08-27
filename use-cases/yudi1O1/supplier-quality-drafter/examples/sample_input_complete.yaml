@@ -1,0 +1,78 @@
+# Complete variant of sample_input.yaml with FM-03's detection rating filled in
+# (=6), used for the live end-to-end demo run (see README "Live demo run").
+# sample_input.yaml itself keeps that gap on purpose, to demonstrate the
+# validation gate refusing to draft rather than inventing a number.
+#
+# All data here is synthetic (fictional supplier, fictional customer) — safe to
+# commit and to demo with.
+
+document_type: combined   # fmea | ppap | 8d | combined
+item_or_process: "Bracket Assembly BA-204 — Stamping & Weld Process"
+customer_name: "Acme Automotive Systems"
+engineer_name: "Priya Sharma, Supplier Quality Engineer"
+
+failure_modes:
+  - id: FM-01
+    function: "Stamp mounting bracket to print dimensions"
+    failure_mode: "Hole position out of tolerance"
+    effect: "Bracket misaligns with mating part; assembly line stoppage"
+    severity: 7
+    occurrence: 4
+    detection: 3
+    current_controls: "100% CMM check on first article; SPC on hole position, sample n=5/hr"
+
+  - id: FM-02
+    function: "Weld bracket to base plate"
+    failure_mode: "Incomplete weld penetration"
+    effect: "Reduced joint strength; potential field failure under load"
+    severity: 9
+    occurrence: 2
+    detection: 4
+    current_controls: "Ultrasonic weld inspection, 100%"
+
+  - id: FM-03
+    function: "Weld bracket to base plate"
+    failure_mode: "Weld spatter contaminating adjacent surface finish"
+    effect: "Cosmetic rejection at customer incoming inspection"
+    severity: 3
+    occurrence: 5
+    detection: 6
+    current_controls: "Visual inspection, 100%"
+
+actions:
+  - id: AC-01
+    failure_mode_id: FM-01
+    recommended_action: "Add poka-yoke fixture pin to stamping die to prevent mislocation"
+    responsible: "J. Alvarez (Tooling Eng.)"
+    target_date: "2026-09-30"
+    status: open
+
+  - id: AC-02
+    failure_mode_id: FM-02
+    recommended_action: "Increase weld current setpoint 5%; requalify per WPS-114"
+    responsible: "M. Chen (Welding Eng.)"
+    target_date: "2026-09-15"
+    status: open
+
+ppap:
+  part_number: "BA-204-C"
+  part_name: "Bracket Assembly, Mounting"
+  supplier_name: "Sharma Precision Fabrication Ltd."
+  customer_name: "Acme Automotive Systems"
+  submission_level: 3
+  reason_for_submission: "Annual revalidation per customer PPAP schedule"
+  design_records_summary: "Per drawing BA-204-C rev F, dated 2026-01-12"
+  process_flow_summary: "Blank -> Stamp -> Deburr -> Weld -> Inspect -> Pack"
+  control_plan_summary: "See attached Control Plan CP-BA204-C rev 3"
+  dimensional_results_summary: "All 22 characteristics within tolerance, Cpk >= 1.33 on 4 critical dimensions"
+  material_performance_summary: "Material cert on file (steel grade per print); no performance testing required for this part class"
+
+eightd:
+  d1_team: "P. Sharma (SQE), J. Alvarez (Tooling), M. Chen (Welding), plant quality manager"
+  d2_problem_description: "3 units in customer lot 44821 rejected for hole position out of tolerance (FM-01)"
+  d3_containment_actions: "100% sort of remaining lot 44821 and next 3 lots; hold shipment pending fixture fix"
+  d4_root_cause: "Stamping die locating pin worn beyond spec, allowing part shift during form operation"
+  d5_permanent_corrective_actions: "Replace locating pin; add poka-yoke sensor to detect mislocation before stamp stroke (see AC-01)"
+  d6_implementation_verification: "First-article CMM report post-fix, plus 30-day SPC trend review"
+  d7_prevent_recurrence: "Add locating pin wear check to PM schedule (weekly gauge check) across all stamping dies of this family"
+  d8_team_recognition: "Team debrief scheduled; lessons folded into new-hire tooling training"

@@ -1,0 +1,116 @@
+# Generated with `python -m vertical_prompts.scaffold` (see README "Proving the
+# template" for the exact command), then hand-filled with real domain content —
+# the scaffold gives correct structure, a human transaction-coordinator's
+# knowledge fills in the TODOs. This is the second vertical demonstrating that
+# the template is genuinely reusable, not a one-off fit to the legal pack.
+
+pack_id: real_estate
+display_name: "Real Estate Transaction Pack"
+description: >
+  Disclosure drafting, addendum comparison, and closing checklists for
+  residential transaction coordinators.
+vertical: "Real estate / residential transactions"
+
+commands:
+  - id: draft_disclosure
+    title: "Draft a required disclosure clause"
+    description: >
+      Add a required property disclosure to the open purchase agreement or
+      disclosure statement, in the jurisdiction's required language.
+    arguments:
+      - name: property_description
+        description: >
+          What's being disclosed about — e.g. "123 Maple St., built 1974,
+          known history of a basement water issue repaired in 2019".
+        required: true
+      - name: disclosure_type
+        description: >
+          The kind of disclosure required — e.g. "material defect disclosure
+          (water intrusion)", "lead-based paint disclosure (pre-1978
+          construction)", "HOA transfer disclosure".
+        required: true
+      - name: jurisdiction
+        description: "State/local jurisdiction whose required disclosure language applies, e.g. 'California'."
+        required: true
+    approval_mode: ask_every_time
+    superdocs_tool: chat_async
+    export:
+      format: docx
+      options:
+        filename: disclosure-draft
+    instruction_template: |
+      Add a {disclosure_type} disclosure to the open document for this property:
+      {property_description}.
+
+      Use the disclosure language and format required in {jurisdiction} for
+      this disclosure type. If you are not certain the jurisdiction's exact
+      required wording is captured correctly, say so explicitly in your
+      response and flag it for the transaction coordinator to verify against
+      their state's official disclosure form — do not present an uncertain
+      wording as settled.
+
+  - id: compare_addendum
+    title: "Compare an addendum against the base purchase agreement"
+    description: >
+      Flag every place a proposed addendum or amendment conflicts with, or
+      silently changes, a term in the base purchase agreement.
+    arguments:
+      - name: addendum_description
+        description: >
+          What the addendum covers — e.g. "the financing contingency
+          extension addendum the buyer's agent sent yesterday".
+        required: true
+      - name: base_agreement_description
+        description: "Which document is the base agreement to compare against, e.g. 'the original purchase agreement open in this session'."
+        required: true
+    approval_mode: approve_all
+    superdocs_tool: chat
+    export:
+      format: markdown
+      options:
+        filename: addendum-conflict-report
+    instruction_template: |
+      Compare {addendum_description} against {base_agreement_description} and
+      produce a conflict report as a new document: one row per term the
+      addendum changes, with columns Term | Base Agreement Says | Addendum
+      Says | Conflict Type (extends / contradicts / adds new obligation).
+
+      If the addendum introduces a deadline, confirm whether it's consistent
+      with every other date already committed to in the base agreement (e.g.
+      a financing extension that would run past the closing date is a
+      conflict worth flagging even if the two documents don't literally
+      contradict each other in wording).
+
+  - id: closing_checklist
+    title: "Summarize documents into a closing checklist"
+    description: >
+      Build a closing checklist from every open transaction document: who
+      owes what, and by when, before closing.
+    arguments:
+      - name: transaction_description
+        description: >
+          Which transaction and documents to summarize — e.g. "the purchase
+          agreement, inspection addendum, and financing contingency for the
+          123 Maple St. purchase, all open in this session".
+        required: true
+      - name: closing_date
+        description: "The scheduled closing date, e.g. '2026-10-15'."
+        required: true
+    approval_mode: approve_all
+    superdocs_tool: chat
+    export:
+      format: markdown
+      options:
+        filename: closing-checklist
+    instruction_template: |
+      Read {transaction_description} and produce a closing checklist as a new
+      document, organized as a table: Item | Responsible Party | Due Date |
+      Source Document. The closing date is {closing_date} — express every
+      deadline both as an absolute date and as "N days before closing" so the
+      coordinator can sort by urgency.
+
+      Include financing, inspection, title, insurance, and disclosure items —
+      not just the ones with the earliest deadlines. If a document you'd
+      expect at this stage (e.g. a title commitment) isn't among the open
+      documents, list it as an open item with no source document rather than
+      omitting it.

@@ -1,0 +1,166 @@
+# Legal Redlining Pack — the reference example named directly in the task card:
+# "a legal pack with redline, fallback-clause, and obligation-summary commands".
+#
+# Each command below deliberately picks a DIFFERENT approval_mode / export
+# combination on purpose, not by accident: redline and fallback-clause both
+# rewrite binding contract language, so they gate every change through
+# ask_every_time; obligation-summary only produces new, additive content
+# (a register), so it applies immediately and exports as a markdown table
+# rather than a .docx redline.
+
+pack_id: legal
+display_name: "Legal Redlining Pack"
+description: >
+  Contract redlining, fallback-position drafting, and obligation extraction
+  for in-house and outside counsel working inside a chat-native document tool.
+vertical: "Legal / contracts"
+
+commands:
+  - id: redline
+    title: "Redline a contract"
+    description: >
+      Redline the open contract against a stated negotiating position, one
+      proposed change at a time, with every change reviewed before it lands.
+    arguments:
+      - name: contract_description
+        description: >
+          What's being redlined — e.g. "the vendor MSA currently open in this
+          session" or "the NDA I just uploaded". Be specific enough that the
+          assistant knows which open document to target.
+        required: true
+      - name: focus_areas
+        description: >
+          Which clauses or issues to prioritize — e.g. "limitation of
+          liability, indemnification, and termination for convenience". Leave
+          blank for a full-document redline pass.
+        required: false
+        default: "the entire document"
+      - name: negotiating_position
+        description: >
+          The position to redline toward — e.g. "our standard playbook favors
+          mutual indemnification capped at 12 months' fees" or paste the
+          relevant playbook language directly.
+        required: true
+    approval_mode: ask_every_time
+    superdocs_tool: chat_async
+    export:
+      format: docx
+      options:
+        filename: redline-draft
+    instruction_template: |
+      Redline {contract_description}, focusing on: {focus_areas}.
+
+      Negotiate toward this position: {negotiating_position}
+
+      For each clause that conflicts with the position above, propose a
+      specific replacement — don't just flag the issue, draft the language.
+      Where the current text already matches the position, leave it alone
+      rather than proposing a cosmetic rewrite.
+
+  - id: fallback_clause
+    title: "Draft a fallback clause"
+    description: >
+      Draft a fallback (alternative) version of one clause, for when the
+      counterparty rejects the primary negotiating position.
+    arguments:
+      - name: clause_name
+        description: >
+          The clause to draft a fallback for — e.g. "the limitation of
+          liability clause" or "Section 8.2 (Indemnification)".
+        required: true
+      - name: primary_position
+        description: "The primary position that was already proposed and rejected."
+        required: true
+      - name: fallback_position
+        description: >
+          The fallback approach to draft instead — e.g. "raise the liability
+          cap to 24 months' fees but keep the mutual carve-out for gross
+          negligence".
+        required: true
+    approval_mode: ask_every_time
+    superdocs_tool: chat_async
+    export:
+      format: docx
+      options:
+        filename: fallback-clause-draft
+    instruction_template: |
+      Draft a fallback version of {clause_name}.
+
+      Primary position (already rejected by the counterparty): {primary_position}
+
+      Fallback position to draft instead: {fallback_position}
+
+      Propose the fallback as a replacement for the current clause text, and
+      in your response explain in one sentence what concession this fallback
+      makes relative to the primary position, so the reviewing attorney can
+      see the trade-off at a glance.
+
+  - id: draft_from_playbook
+    title: "Draft from a house template"
+    description: >
+      Draft a new agreement from one of the firm's own saved SuperDocs
+      templates, rather than from generic boilerplate.
+    arguments:
+      - name: document_type
+        description: >
+          What to draft — e.g. "a mutual NDA", "a one-way NDA for a vendor
+          pilot", "a statement of work under our existing MSA".
+        required: true
+      - name: counterparty
+        description: "Who it's with, e.g. 'Northwind Logistics GmbH'."
+        required: true
+      - name: key_terms
+        description: >
+          The commercial terms to fill in — e.g. "2-year term, mutual
+          confidentiality, Delaware law, 30-day termination for convenience".
+        required: true
+    approval_mode: approve_all
+    superdocs_tool: chat
+    templates:
+      use_saved: true
+      hint: "Match on document type (NDA, MSA, SOW) and prefer the firm's most recent version of it."
+    export:
+      format: docx
+      options:
+        filename: draft-from-template
+    instruction_template: |
+      Draft {document_type} with {counterparty}, using the firm's own saved
+      template as the starting point.
+
+      Key terms to incorporate: {key_terms}
+
+      Fill in the template's existing structure rather than restructuring it —
+      the house template's clause order, defined terms, and formatting are
+      deliberate. Where the template has a placeholder or bracketed field the
+      key terms above don't cover, leave the bracket visibly in place for the
+      attorney to complete; do not quietly pick a value for it.
+
+  - id: obligation_summary
+    title: "Summarize contract obligations"
+    description: >
+      Extract every obligation (who owes what, to whom, by when) from the
+      open contract into a register, each row traced to its source clause.
+    arguments:
+      - name: contract_description
+        description: >
+          What's being summarized — e.g. "the vendor MSA currently open in
+          this session".
+        required: true
+    approval_mode: approve_all
+    superdocs_tool: chat
+    export:
+      format: markdown
+      options:
+        filename: obligation-register
+    instruction_template: |
+      Read {contract_description} and produce an obligation register as a new
+      document: one row per obligation, with columns Party | Obligation |
+      Trigger/Deadline | Source Clause.
+
+      Include every obligation you find, not just payment and delivery terms —
+      notice periods, audit rights, insurance requirements, and reporting
+      obligations count too. If the contract genuinely has no obligation of a
+      kind you'd expect (e.g. no indemnification clause at all), say so
+      explicitly in the response rather than leaving it silently absent from
+      the register — an honest "not present" is the correct answer, not a gap
+      to paper over.

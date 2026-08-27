@@ -1,0 +1,54 @@
+# Texas — the clean reference run. No flags needed:
+#
+#   python -m real_estate_pack check   examples/tx_austin_apartment.yaml
+#   python -m real_estate_pack preview examples/tx_austin_apartment.yaml --out-dir out
+#
+# Every Texas rule in this pack has a 2027 review date, so nothing is stale and
+# the pack assembles without --allow-stale. Contrast the California and New York
+# examples, whose fast-moving rules are deliberately past review.
+#
+# Fictional parties and a fictional property. Safe to commit and demo with.
+
+pack_id: TX-AUS-4412
+jurisdiction: US-TX
+
+property:
+  street_address: 4412 Burnet Road
+  unit: "213"
+  city: Austin
+  state: TX
+  postal_code: "78756"
+  county: Travis
+  year_built: 1985          # post-1978, so the federal lead disclosure does NOT fire
+  property_type: apartment
+  units_in_building: 48     # >= 2, so the parking rules notice fires
+
+tenancy:
+  start_date: "2026-09-01"
+  end_date: "2027-08-31"
+  monthly_rent: 2400.00
+  security_deposit: 4800.00 # two months — lawful in Texas, which sets no cap.
+                            # The same figure blocks in California and New York.
+  rent_due_day: 1
+  furnished: false
+  pets_permitted: true
+  term_type: fixed
+
+landlord:
+  name: Balcones Ridge Residential LLC
+  address: 900 Congress Avenue, Suite 400, Austin, TX 78701
+  phone: "512-555-0184"
+
+tenants:
+  - name: Priya Raghunathan
+  - name: Daniel Okonkwo
+
+agent:
+  name: Hill Country Property Management
+
+disclosure_facts:
+  # Texas Prop. Code § 92.0135 requires this notice to be ANSWERED, not merely
+  # given when the answer is yes. Both facts are false here, and the disclosure
+  # still fires — a "no" is a disclosure, not an exemption.
+  in_100_year_floodplain: false
+  flooded_in_last_5_years: false

@@ -1,0 +1,12 @@
+{
+  "_file": ".vscode/mcp.json (VS Code / GitHub Copilot). Note the top-level key is 'servers', not 'mcpServers'.",
+  "_replace": "Swap /absolute/path/to/superdocs-vertical-prompts for your real checkout path.",
+  "servers": {
+    "superdocs-legal-pack": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "vertical_prompts.server", "--pack", "packs/legal/pack.yaml"],
+      "cwd": "/absolute/path/to/superdocs-vertical-prompts"
+    }
+  }
+}

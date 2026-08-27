@@ -1,0 +1,65 @@
+# One property, run against all four jurisdictions. The card's premise, checkable
+# in about a second and with no API key:
+#
+#   python -m real_estate_pack compare examples/compare_all_jurisdictions.yaml
+#
+# Every fact any of the four rulesets asks about is answered here, so nothing is
+# reported as unanswered and the differences you see are real differences in law
+# rather than gaps in the record.
+#
+# The deposit is set to two months on purpose. That is lawful in Texas and
+# Florida, and unlawful in California and New York — the same number, the same
+# property, four jurisdictions, two verdicts. It is the cleanest single proof
+# that a jurisdiction-blind lease pack cannot be compliant everywhere.
+#
+# `compare` holds the physical facts constant and swaps only the ruleset, so it
+# is answering "what if this same building were in each of these states". The
+# property's own `state` field is not changed.
+#
+# Fictional parties and a fictional property.
+
+pack_id: CMP-0001
+jurisdiction: US-CA
+
+property:
+  street_address: 500 Example Avenue
+  unit: "7A"
+  city: Springfield
+  state: CA
+  postal_code: "90000"
+  year_built: 1955          # pre-1978 and pre-1960 — engages both lead rules
+  property_type: apartment
+  units_in_building: 30
+
+tenancy:
+  start_date: "2026-09-01"
+  end_date: "2027-08-31"    # 364 days — over Florida's 45-day radon threshold
+  monthly_rent: 2000.00
+  security_deposit: 4000.00 # two months: fine in TX and FL, over the cap in CA and NY
+  rent_due_day: 1
+  furnished: false
+  pets_permitted: false
+  term_type: fixed
+
+landlord:
+  name: Example Holdings LLC
+  address: 1 Example Plaza, Springfield
+
+tenants:
+  - name: Alex Doe
+
+disclosure_facts:
+  # California
+  death_on_premises_last_3_years: false
+  known_mold_health_threat: false
+  in_special_flood_hazard_area: false
+  in_area_of_potential_flooding: false
+  demolition_permit_applied_for: false
+  utility_meter_serves_other_areas: false
+  # Texas
+  in_100_year_floodplain: false
+  flooded_in_last_5_years: false
+  # New York
+  sprinkler_system_present: true
+  # Florida
+  storeys_in_building: 6

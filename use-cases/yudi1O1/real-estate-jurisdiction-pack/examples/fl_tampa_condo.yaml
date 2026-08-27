@@ -1,0 +1,48 @@
+# Florida — the radon disclosure, which exists in no other jurisdiction here.
+#
+#   python -m real_estate_pack check examples/fl_tampa_condo.yaml
+#
+# The radon notice fires because the lease term exceeds 45 days. That threshold
+# is DERIVED from the start and end dates rather than asked for — see
+# facts.derive_facts. Run `facts` to see it reported as "(derived)".
+#
+# This example blocks on one rule: the multi-storey fire-protection notice
+# carries a short review cadence, because Florida's high-rise retrofit deadlines
+# have been extended more than once. Add --allow-stale to proceed.
+#
+# Fictional parties and a fictional property.
+
+pack_id: FL-TPA-2209
+jurisdiction: US-FL
+
+property:
+  street_address: 2209 Bayshore Boulevard
+  unit: "1104"
+  city: Tampa
+  state: FL
+  postal_code: "33606"
+  county: Hillsborough
+  year_built: 2004          # post-1978 — no federal lead disclosure
+  property_type: condo
+  units_in_building: 96
+
+tenancy:
+  start_date: "2026-09-15"
+  end_date: "2027-09-14"    # 364 days, comfortably over the 45-day radon threshold
+  monthly_rent: 2850.00
+  security_deposit: 5700.00 # two months — lawful in Florida, which sets no cap,
+                            # but strictly regulated as to how it is HELD
+  rent_due_day: 1
+  furnished: true
+  pets_permitted: false
+  term_type: fixed
+
+landlord:
+  name: Bayshore Tower Rentals LLC
+  address: 400 North Ashley Drive, Tampa, FL 33602
+
+tenants:
+  - name: Grace Whitfield
+
+disclosure_facts:
+  storeys_in_building: 12   # > 3, so the fire-protection notice fires

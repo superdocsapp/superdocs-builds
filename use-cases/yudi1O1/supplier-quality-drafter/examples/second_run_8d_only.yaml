@@ -1,0 +1,59 @@
+# A SECOND, genuinely different run — not a variant of the first.
+#
+# Different part, different process (injection moulding, not stamping/welding),
+# different failure modes, different customer, and crucially a different
+# document_type: "8d" alone rather than "combined". This exists to prove the
+# drafter is not fitted to the one example it was developed against.
+#
+# All data synthetic (fictional supplier, fictional customer).
+
+document_type: 8d
+item_or_process: "Connector Housing CH-77 — Injection Moulding"
+customer_name: "Meridian Powertrain Co."
+engineer_name: "Devin Okafor, Supplier Quality Engineer"
+
+# An 8D still needs its corrective actions to trace to named failure modes, so
+# the FMEA rows are supplied even though only the 8D narrative is drafted.
+failure_modes:
+  - id: FM-11
+    function: "Mould connector housing to print dimensions"
+    failure_mode: "Short shot — cavity not fully filled"
+    effect: "Missing locating rib; connector fails retention test at customer assembly"
+    severity: 8
+    occurrence: 3
+    detection: 2
+    current_controls: "Automated vision check on every shot; weight check 1-in-20"
+
+  - id: FM-12
+    function: "Cool and eject housing without distortion"
+    failure_mode: "Warpage beyond flatness tolerance"
+    effect: "Housing does not seat flush; intermittent sealing failure in the field"
+    severity: 6
+    occurrence: 4
+    detection: 5
+    current_controls: "First-article flatness check per shift"
+
+actions:
+  - id: AC-11
+    failure_mode_id: FM-11
+    recommended_action: "Raise holding pressure 8% and extend hold time 0.4s; revalidate per PV-CH77"
+    responsible: "R. Nakamura (Process Eng.)"
+    target_date: "2026-10-09"
+    status: open
+
+  - id: AC-12
+    failure_mode_id: FM-12
+    recommended_action: "Add conformal cooling insert to core side; re-qualify flatness across 30 shots"
+    responsible: "L. Fernandes (Tooling)"
+    target_date: "2026-11-20"
+    status: open
+
+eightd:
+  d1_team: "D. Okafor (SQE), R. Nakamura (Process), L. Fernandes (Tooling), moulding shift lead"
+  d2_problem_description: "Customer rejected 12 of 480 housings in lot MP-7734 for missing locating rib (short shot, FM-11)"
+  d3_containment_actions: "100% vision re-inspection of lot MP-7734 and the two lots either side; quarantined 1 pallet pending disposition"
+  d4_root_cause: "Holding pressure drifted low after hydraulic accumulator pre-charge decayed below spec; the drift was inside the alarm band so no alarm fired"
+  d5_permanent_corrective_actions: "Restore accumulator pre-charge and tighten the alarm band to +/-5% of setpoint; raise holding pressure per AC-11"
+  d6_implementation_verification: "30-shot capability study post-change plus 60-day vision-reject trend"
+  d7_prevent_recurrence: "Add accumulator pre-charge to the monthly PM checklist across all moulding presses; widen alarm-band review to the whole press family"
+  d8_team_recognition: "Findings shared at the plant quality review; alarm-band lesson added to process-engineering onboarding"

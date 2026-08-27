@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+out/
+*.egg-info/
+.pytest_cache/
+.env
+# Local idempotency ledger: machine-specific absolute paths and session ids.
+.superdocs_ledger.json

@@ -1,0 +1,44 @@
+[
+  {
+    "run": 1,
+    "ok": true,
+    "facts_checked": 29,
+    "missing_a": [],
+    "missing_b": [],
+    "attempts_a": 1,
+    "attempts_b": 1,
+    "chars_a": 3379,
+    "chars_b": 3164,
+    "seconds": 67.7,
+    "job_a": "9b79100b-bf72-40e7-8fd8-b5969eb7aad1",
+    "job_b": "b0832872-9e6c-4267-8657-b5c50f3debcf"
+  },
+  {
+    "run": 2,
+    "ok": true,
+    "facts_checked": 29,
+    "missing_a": [],
+    "missing_b": [],
+    "attempts_a": 1,
+    "attempts_b": 1,
+    "chars_a": 3379,
+    "chars_b": 3164,
+    "seconds": 59.8,
+    "job_a": "50f3cf7d-de72-4458-9690-d5caf424bc96",
+    "job_b": "2816cf80-84de-4d3c-ac85-84813287cfd2"
+  },
+  {
+    "run": 3,
+    "ok": true,
+    "facts_checked": 29,
+    "missing_a": [],
+    "missing_b": [],
+    "attempts_a": 1,
+    "attempts_b": 1,
+    "chars_a": 3379,
+    "chars_b": 2996,
+    "seconds": 83.9,
+    "job_a": "96a30591-c24e-4eb6-a75c-bb81403f56b6",
+    "job_b": "e0324c02-da9f-4c75-a145-3b94fd81a208"
+  }
+]

@@ -1,0 +1,227 @@
+# Texas residential leasing — state-level requirements.
+#
+# Texas is in this pack as the deliberate contrast to California and New York.
+# It is a low-disclosure, landlord-flexible jurisdiction: there is NO statutory
+# security deposit cap, and municipal rent control is preempted by state law.
+# The interesting requirement is the flooding disclosure, which is comparatively
+# recent and has no analogue in most states.
+#
+# The absence of a rule is itself a jurisdiction difference. That is why
+# tx_no_deposit_cap exists as an explicit, cited "there is no cap here" note
+# rather than as silence — silence is indistinguishable from an incomplete file.
+#
+# COMPILED FROM PUBLIC PRIMARY SOURCES. NOT LEGAL ADVICE.
+
+code: US-TX
+name: Texas
+
+notes: >
+  Texas Property Code Chapter 92 governs residential tenancies. Several tenant
+  protections in that chapter cannot be waived by agreement, so a lease term
+  purporting to waive them is void rather than merely unenforceable.
+
+rules:
+  # ---------------------------------------------------------------- disclosures
+
+  - id: tx_flooding_disclosure
+    kind: disclosure
+    title: Flooding Disclosure
+    summary: >
+      Before executing a residential lease, the landlord must give written
+      notice stating whether the landlord is aware that the dwelling is in a
+      100-year floodplain, and whether the dwelling has flooded at least once in
+      the five years preceding the lease.
+    citation:
+      authority: Tex. Prop. Code § 92.0135 (added by Acts 2019, 86th Leg., H.B. 1523, eff. Jan. 1, 2020)
+      source_url: https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    # No applies_when: this notice is mandatory in EVERY residential lease.
+    # The two facts below are needed to complete it, not to decide whether it is
+    # required, so they sit in requires_facts and block when unanswered.
+    requires_facts:
+      - in_100_year_floodplain
+      - flooded_in_last_5_years
+    tenant_acknowledgement: true
+    delivery: before the lease is executed
+    body: |
+      FLOODING DISCLOSURE
+
+      This disclosure is provided under Texas Property Code section 92.0135.
+
+      "Flooding" means a general or temporary condition of partial or complete
+      inundation of the dwelling caused by (i) the overflow of inland or tidal
+      waters, (ii) the unusual and rapid accumulation of runoff or surface
+      water from any source, or (iii) mudslides caused by flooding.
+
+      "100-year floodplain" means an area subject to a one percent or greater
+      chance of flooding in any given year, as shown on current Federal
+      Emergency Management Agency flood maps.
+
+      Landlord discloses the following, to the extent of Landlord's knowledge:
+
+        Is the dwelling located in a 100-year floodplain?  [ ] Yes   [ ] No
+        Has the dwelling flooded at least once in the last five years?
+                                                           [ ] Yes   [ ] No
+
+      Tenant is advised that Landlord's insurance does not cover Tenant's
+      personal property and that Tenant should consider obtaining renter's
+      insurance with flood coverage.
+    notes: >
+      The disclosure is mandatory in either direction — "no" is a disclosure,
+      not an exemption — so the pack blocks until the landlord has actually
+      answered both questions. An earlier version of this file expressed that by
+      making applicability depend on is_set, which had exactly the wrong effect:
+      leaving the questions blank silently removed a mandatory notice. Modelling
+      it as requires_facts inverts that back the right way round.
+
+  - id: tx_parking_rules
+    kind: disclosure
+    title: Vehicle Towing and Parking Rules Notice
+    summary: >
+      A landlord of a multi-unit complex who tows or removes vehicles must give
+      the tenant a written notice of the parking rules and policies, signed by
+      the tenant.
+    citation:
+      authority: Tex. Prop. Code § 92.0131
+      source_url: https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      all:
+        - field: units_in_building
+          op: gte
+          value: 2
+    tenant_acknowledgement: true
+    body: |
+      VEHICLE TOWING AND PARKING RULES
+
+      This notice is provided under Texas Property Code section 92.0131.
+
+      Assigned parking space(s), if any: ____________________
+      Vehicles that may be towed or booted without further notice:
+        - Vehicles parked in a space assigned to another resident.
+        - Vehicles parked in a fire lane, in front of a dumpster, or blocking
+          another vehicle.
+        - Vehicles parked in a space reserved for persons with disabilities
+          without the required permit.
+        - Inoperable vehicles, or vehicles without current registration or
+          inspection where required.
+
+      Towing company and contact details: ____________________
+
+      Tenant's signature below acknowledges receipt of these parking rules.
+
+  # -------------------------------------------------------------- lease clauses
+
+  - id: tx_smoke_alarm_clause
+    kind: lease_clause
+    title: Smoke Alarms — Landlord Duty and Non-Waiver
+    summary: >
+      The landlord must install and maintain smoke alarms. The tenant's rights
+      under this subchapter generally may not be waived, and a lease provision
+      attempting to waive them is void.
+    citation:
+      authority: Tex. Prop. Code §§ 92.251–92.262 (see § 92.006 on waiver)
+      source_url: https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Smoke Alarms. Landlord has installed smoke alarms in the Premises as
+      required by Subchapter F of Chapter 92 of the Texas Property Code, and
+      will inspect and repair them as that subchapter requires. Tenant will not
+      disconnect or intentionally damage a smoke alarm, or remove its battery
+      without immediately replacing it with a working battery.
+
+      Tenant's rights under Subchapter F may not be waived, and any provision of
+      this Lease that purports to waive them is void.
+
+  - id: tx_repair_remedies_clause
+    kind: lease_clause
+    title: Tenant's Repair Remedies — Required Notice of Procedure
+    summary: >
+      Chapter 92 Subchapter B gives the tenant repair remedies that are
+      conditioned on giving the landlord notice in a particular way. The lease
+      must not misstate that procedure.
+    citation:
+      authority: Tex. Prop. Code §§ 92.052, 92.056, 92.0561
+      source_url: https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Repairs. Tenant must give Landlord written notice of a condition that
+      materially affects the physical health or safety of an ordinary tenant,
+      and must not be delinquent in rent at the time notice is given. Landlord
+      will make a diligent effort to repair the condition within a reasonable
+      time after receiving that notice, as required by Subchapter B of Chapter
+      92 of the Texas Property Code.
+
+      Address for repair notices: ____________________
+
+  - id: tx_deposit_refund_clause
+    kind: lease_clause
+    title: Security Deposit Refund — Thirty Days
+    summary: >
+      The landlord must refund the deposit within 30 days after the tenant
+      surrenders the premises and gives a forwarding address, with an itemised
+      written description of deductions.
+    citation:
+      authority: Tex. Prop. Code §§ 92.103, 92.104, 92.109
+      source_url: https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Security Deposit Refund. Landlord will refund the security deposit, less
+      any lawful deductions, no later than 30 days after Tenant surrenders the
+      Premises and gives Landlord a written forwarding address. If Landlord
+      retains any part of the deposit, Landlord will give Tenant a written
+      itemised description of the deductions, except where Tenant owes rent at
+      surrender and there is no controversy about the amount owed.
+
+      Tenant's forwarding address: ____________________
+
+  - id: tx_no_deposit_cap
+    kind: lease_clause
+    title: No Statutory Security Deposit Cap (Jurisdiction Note)
+    summary: >
+      Texas sets no statutory ceiling on a residential security deposit. This is
+      recorded explicitly so that the absence of a cap in this pack reads as a
+      researched finding rather than a gap in the file.
+    citation:
+      authority: Tex. Prop. Code ch. 92, subch. C (§§ 92.101–92.109) — refund and accounting duties, no cap on amount
+      source_url: https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+      note: >-
+        Cited to the subchapter that governs deposits precisely because the
+        proposition is a negative one. The subchapter regulates holding,
+        accounting for and refunding a deposit, and does not cap it.
+    body: |
+      Security Deposit Amount. Texas law does not limit the amount of a
+      residential security deposit. The deposit stated in this Lease is set by
+      agreement between the parties and remains subject to Landlord's
+      accounting and refund duties under Chapter 92 of the Texas Property Code.
+    notes: >
+      Contrast California (one month's rent) and New York (one month's rent).
+      The same deposit figure can be lawful here and unlawful in both of those.
+
+  - id: tx_rent_control_preempted
+    kind: lease_clause
+    title: Municipal Rent Control Preempted (Jurisdiction Note)
+    summary: >
+      Texas municipalities may not enact rent control unless the governing body
+      finds a housing emergency and the Governor approves the ordinance.
+    citation:
+      authority: Tex. Loc. Gov't Code § 214.902
+      source_url: https://statutes.capitol.texas.gov/Docs/LG/htm/LG.214.htm
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Rent Adjustment. No municipal rent control ordinance applies to the
+      Premises. Rent adjustments are governed by the terms of this Lease and by
+      Chapter 92 of the Texas Property Code.
+    notes: >
+      This is the mirror image of California's Tenant Protection Act notice. The
+      two jurisdictions produce structurally different leases at exactly this
+      point, which is the clearest single illustration of why a
+      jurisdiction-aware pack is worth building.

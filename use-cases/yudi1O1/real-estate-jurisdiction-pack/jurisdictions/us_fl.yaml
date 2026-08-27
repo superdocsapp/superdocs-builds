@@ -1,0 +1,201 @@
+# Florida residential leasing — state-level requirements.
+#
+# Florida earns its place in this pack for one reason above all: the radon gas
+# disclosure. It is required in every rental agreement for a term longer than
+# 45 days, it is prescribed word-for-word by statute, and it has no analogue in
+# California, Texas or New York. It is the cleanest single proof that a
+# jurisdiction-blind lease pack cannot be compliant everywhere.
+#
+# Florida also shares Texas's posture on deposit AMOUNT (no cap) while imposing
+# a strict, verbatim disclosure about how the deposit is HELD that Texas does
+# not have. Two jurisdictions can agree on one axis and diverge on another,
+# which is why the pack models rules individually rather than by "strict" and
+# "relaxed" jurisdiction archetypes.
+#
+# COMPILED FROM PUBLIC PRIMARY SOURCES. NOT LEGAL ADVICE.
+
+code: US-FL
+name: Florida
+
+notes: >
+  Part II of Chapter 83 of the Florida Statutes (the Residential Landlord and
+  Tenant Act) governs residential tenancies. Several of its notices prescribe
+  exact wording, and the statute directs that the deposit disclosure be given in
+  a specific form and within a specific window.
+
+rules:
+  # ---------------------------------------------------------------- disclosures
+
+  - id: fl_radon_disclosure
+    kind: disclosure
+    title: Radon Gas Disclosure
+    summary: >
+      Every rental agreement for a building in Florida with a term longer than
+      45 days must contain this notice, in this wording.
+    citation:
+      authority: Fla. Stat. § 404.056(5)
+      source_url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0400-0499/0404/Sections/0404.056.html
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    applies_when:
+      all:
+        - field: lease_term_days
+          op: gt
+          value: 45
+    verbatim_statutory: true
+    tenant_acknowledgement: false
+    delivery: in the body of the rental agreement
+    body: |
+      RADON GAS: Radon is a naturally occurring radioactive gas that, when it
+      has accumulated in a building in sufficient quantities, may present health
+      risks to persons who are exposed to it over time. Levels of radon that
+      exceed federal and state guidelines have been found in buildings in
+      Florida. Additional information regarding radon and radon testing may be
+      obtained from your county health department.
+    notes: >
+      The statute prescribes this paragraph. It is reproduced verbatim and the
+      AI is instructed not to reword it. The 45-day threshold is computed by the
+      pack from the lease start and end dates, not asked of the user — see
+      render.derive_facts.
+
+  - id: fl_security_deposit_disclosure
+    kind: disclosure
+    title: Security Deposit — Notice of Depository and Claim Procedure
+    summary: >
+      Within 30 days of receiving a deposit, the landlord must give written
+      notice of where the deposit is held and on what terms. The statute also
+      prescribes a notice about the claim procedure, in a form it sets out.
+    citation:
+      authority: Fla. Stat. § 83.49(2), (3)
+      source_url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0083/Sections/0083.49.html
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    verbatim_statutory: true
+    tenant_acknowledgement: true
+    delivery: within 30 days of Landlord receiving the deposit
+    # The heading and the depository blanks are ordinary scaffolding, so they sit
+    # in the preamble. Only `body` is the statutorily prescribed wording, and
+    # only `body` is marked untouchable to the model. Marking the whole notice
+    # verbatim would have overclaimed — and would have told the model not to
+    # restyle a heading it is perfectly free to restyle.
+    preamble: |
+      SECURITY DEPOSIT — NOTICE TO TENANT
+
+      Landlord holds Tenant's advance rent and security deposit as follows:
+
+        Name of depository: ____________________
+        Address of depository: ____________________
+        Is the account interest-bearing?          [ ] Yes   [ ] No
+        If interest-bearing, the rate and how it is paid: ____________________
+        Is the deposit held in a separate account, commingled with other funds,
+        or secured by a surety bond?  ____________________
+    body: |
+      YOUR LEASE REQUIRES PAYMENT OF CERTAIN DEPOSITS. THE LANDLORD MAY TRANSFER
+      ADVANCE RENTS TO THE LANDLORD'S ACCOUNT AS THEY ARE DUE AND WITHOUT NOTICE.
+      WHEN YOU MOVE OUT, YOU MUST GIVE THE LANDLORD YOUR NEW ADDRESS SO THAT THE
+      LANDLORD CAN SEND YOU NOTICES REGARDING YOUR DEPOSIT. THE LANDLORD MUST
+      MAIL YOU NOTICE, WITHIN 30 DAYS AFTER YOU MOVE OUT, OF THE LANDLORD'S
+      INTENT TO IMPOSE A CLAIM AGAINST THE DEPOSIT. IF YOU DO NOT REPLY TO THE
+      LANDLORD STATING YOUR OBJECTION TO THE CLAIM WITHIN 15 DAYS AFTER RECEIPT
+      OF THE LANDLORD'S NOTICE, THE LANDLORD WILL COLLECT THE CLAIM AND MUST
+      MAIL YOU THE REMAINING DEPOSIT, IF ANY.
+
+      IF THE LANDLORD FAILS TO TIMELY MAIL YOU NOTICE, THE LANDLORD MUST RETURN
+      THE DEPOSIT BUT MAY LATER FILE A LAWSUIT AGAINST YOU FOR DAMAGES. IF YOU
+      DO NOT GIVE THE LANDLORD YOUR NEW ADDRESS, YOU NEED NOT BE NOTIFIED OF THE
+      LANDLORD'S CLAIM. THIS DISCLOSURE IS BASIC. PLEASE REFER TO PART II OF
+      CHAPTER 83, FLORIDA STATUTES, TO DETERMINE YOUR LEGAL RIGHTS AND
+      OBLIGATIONS.
+    notes: >
+      The statute sets out this notice in substantially this form and directs
+      that it be given in conspicuous type. The blanks above are the
+      landlord-specific particulars the statute requires be filled in; the pack
+      leaves them as fields rather than inventing a depository.
+
+  - id: fl_fire_sprinkler_condo_disclosure
+    kind: disclosure
+    title: Fire Sprinkler Notice — Multi-Storey Buildings
+    summary: >
+      Where the dwelling sits in a building of more than three storeys, the
+      tenant is advised of the building's fire-protection arrangements.
+    citation:
+      authority: Fla. Stat. § 83.50; see also ch. 633 (fire prevention) for building-level obligations
+      source_url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0083/Sections/0083.50.html
+      verified_on: 2025-08-01
+      review_by: 2026-06-30
+      note: >-
+        SHORT REVIEW CADENCE. Florida's high-rise fire-safety retrofit deadlines
+        have been extended by the Legislature more than once, so any statement
+        about what a building must have by when is time-sensitive.
+    applies_when:
+      all:
+        - field: storeys_in_building
+          op: gt
+          value: 3
+    tenant_acknowledgement: false
+    body: |
+      FIRE PROTECTION NOTICE
+
+      The Premises is located in a building of more than three storeys.
+
+        Does the building have an automatic fire sprinkler system?
+                                                           [ ] Yes   [ ] No
+        If no, describe the alternative fire-protection arrangements in place:
+        ____________________
+
+      Tenant is advised to locate the nearest exit and to review the building's
+      evacuation plan on taking occupancy.
+    notes: >
+      Deliberately worded as an advisory notice rather than a statement of
+      statutory compliance, because the retrofit obligations and their deadlines
+      are exactly what the short review cadence flags as moving.
+
+  # -------------------------------------------------------------- lease clauses
+
+  - id: fl_landlord_duties_clause
+    kind: lease_clause
+    title: Landlord's Maintenance Obligations
+    summary: >
+      Section 83.51 sets the landlord's non-waivable duties to comply with
+      building and housing codes and to maintain the premises.
+    citation:
+      authority: Fla. Stat. § 83.51
+      source_url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0083/Sections/0083.51.html
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+    body: |
+      Landlord's Obligations. Landlord will comply with the requirements of
+      applicable building, housing and health codes, and will maintain the
+      roofs, windows, doors, floors, steps, porches, exterior walls, foundations
+      and all other structural components in good repair and capable of
+      resisting normal forces and loads, and keep the plumbing in reasonable
+      working condition, as required by section 83.51 of the Florida Statutes.
+
+      Where the Premises is not a single-family home or duplex, Landlord will
+      also make reasonable provision for extermination, locks and keys, clean
+      and safe common areas, garbage removal, and functioning facilities for
+      heat, running water and hot water.
+
+  - id: fl_no_deposit_cap
+    kind: lease_clause
+    title: No Statutory Security Deposit Cap (Jurisdiction Note)
+    summary: >
+      Florida sets no statutory ceiling on the amount of a residential security
+      deposit, but regulates strictly how it is held and returned.
+    citation:
+      authority: Fla. Stat. § 83.49 — holding, disclosure and return of deposits; no cap on amount
+      source_url: http://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0083/Sections/0083.49.html
+      verified_on: 2025-08-01
+      review_by: 2027-03-31
+      note: >-
+        Cited to the deposit section itself because the proposition is negative:
+        the section regulates the handling of a deposit without limiting its size.
+    body: |
+      Security Deposit Amount. Florida law does not limit the amount of a
+      residential security deposit. The deposit stated in this Lease is set by
+      agreement and is held, disclosed and returned in accordance with section
+      83.49 of the Florida Statutes.
+    notes: >
+      Florida and Texas agree that there is no cap, and diverge sharply on
+      disclosure: Florida prescribes a verbatim notice about how the deposit is
+      held, Texas does not.

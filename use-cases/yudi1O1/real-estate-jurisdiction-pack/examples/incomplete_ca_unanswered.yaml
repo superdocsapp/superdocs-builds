@@ -1,0 +1,60 @@
+# The blocking gate, demonstrated. This record is deliberately incomplete.
+#
+#   python -m real_estate_pack check examples/incomplete_ca_unanswered.yaml
+#
+# Two California applicability questions are left unanswered:
+#   - death_on_premises_last_3_years   (Civ. Code § 1710.2)
+#   - known_mold_health_threat         (Health & Safety Code § 26147)
+#
+# A two-state engine would read "absent" as "no" and quietly omit both
+# disclosures. The resulting lease would look completely normal. This pack
+# refuses instead, and names the exact fact and the exact authority.
+#
+# Note also that the flood pair is HALF answered: in_special_flood_hazard_area is
+# false but in_area_of_potential_flooding is missing. Because the rule is an OR,
+# one false and one unknown is genuinely undecidable — the disclosure could still
+# be required. The engine says so rather than guessing.
+#
+# Fill the three missing facts in and it passes (subject to the two stale
+# California rules, which still need --allow-stale).
+#
+# Fictional parties and a fictional property.
+
+pack_id: CA-SFO-0091
+jurisdiction: US-CA
+
+property:
+  street_address: 91 Guerrero Street
+  unit: "3"
+  city: San Francisco
+  state: CA
+  postal_code: "94103"
+  county: San Francisco
+  year_built: 1941
+  property_type: apartment
+  units_in_building: 8
+
+tenancy:
+  start_date: "2026-10-15"
+  end_date: "2027-10-14"
+  monthly_rent: 3900.00
+  security_deposit: 3900.00
+  rent_due_day: 1
+  furnished: false
+  pets_permitted: false
+  term_type: fixed
+
+landlord:
+  name: Guerrero Street Property Co
+  address: 1 Market Street, San Francisco, CA 94105
+
+tenants:
+  - name: Jonah Feldman
+
+disclosure_facts:
+  in_special_flood_hazard_area: false
+  # in_area_of_potential_flooding:  MISSING — the OR cannot be settled
+  # death_on_premises_last_3_years: MISSING — blocks
+  # known_mold_health_threat:       MISSING — blocks
+  demolition_permit_applied_for: false
+  utility_meter_serves_other_areas: false

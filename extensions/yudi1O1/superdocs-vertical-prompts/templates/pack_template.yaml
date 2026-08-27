@@ -1,0 +1,113 @@
+# ============================================================================
+# PACK TEMPLATE — annotated reference for building a workflow-prompt pack for
+# ANY vertical. This file is documentation to read, not something you run —
+# to actually generate a starting pack.yaml, use the scaffolder instead:
+#
+#   python -m vertical_prompts.scaffold \
+#     --pack-id <your_vertical> \
+#     --display-name "..." \
+#     --description "..." \
+#     --vertical "..." \
+#     --command some_id:"Some Title" \
+#     --command another_id:"Another Title" \
+#     --out packs/<your_vertical>/pack.yaml
+#
+# Then fill in every TODO the scaffolder leaves, validate with:
+#   python -m vertical_prompts.validate packs/<your_vertical>/pack.yaml
+#
+# See packs/legal/pack.yaml and packs/real_estate/pack.yaml for two complete,
+# working examples — real_estate was built with exactly this scaffold-then-fill
+# process (see the README's "Proving the template" section).
+# ============================================================================
+
+pack_id: your_vertical          # lowercase_snake_case — becomes the MCP server name and
+                                 # the /pack_id:command_id slash-command namespace.
+display_name: "Human-Readable Pack Name"
+description: >
+  One or two sentences: what this pack is for and who uses it.
+vertical: "Industry / role this pack serves"
+
+commands:
+  - id: command_id               # lowercase_snake_case — becomes /pack_id:command_id
+    title: "Short imperative title"          # shown in the client's slash-command menu
+    description: >
+      One sentence: what this command does. Shown as the slash command's
+      description/tooltip in every client.
+
+    # --- arguments -----------------------------------------------------
+    # Every {placeholder} used in instruction_template below MUST be
+    # declared here, or pack loading fails with a clear error (see
+    # pack_spec.py: _parse_command's "instruction_template references ...
+    # which are not declared" check). An argument declared but never used
+    # in the template is allowed but triggers a warning — it's a smell,
+    # not an error, since a future template revision might use it.
+    arguments:
+      - name: some_argument
+        description: >
+          What this argument means, with a concrete example value — this
+          description is what the end user sees when the client prompts
+          them to fill in the argument, so make it self-explanatory.
+        required: true            # a missing required argument raises an
+                                   # ArgumentError with a helpful message —
+                                   # see pack_spec.CommandSpec.render(). It
+                                   # is NEVER silently defaulted.
+      - name: optional_argument
+        description: "..."
+        required: false
+        default: "a sensible default value"   # only used when required: false
+
+    # --- approval_mode ---------------------------------------------------
+    # "ask_every_time" — use for anything that EDITS existing binding/final
+    #   content (redlines, clause rewrites, corrections to a filed document).
+    #   Forces the async chat_async tool + a human review step per change.
+    # "approve_all" — use for anything that GENERATES new, additive content
+    #   (summaries, registers, reports, checklists) where there's nothing
+    #   existing to accidentally clobber. Applies immediately.
+    # Pick per-command, not once for the whole pack — see how packs/legal
+    # uses ask_every_time for redline/fallback_clause but approve_all for
+    # obligation_summary.
+    approval_mode: ask_every_time   # or: approve_all
+
+    # Which SuperDocs MCP tool the rendered prompt tells the assistant to
+    # call. Convention: chat_async for ask_every_time (HITL requires async),
+    # chat for approve_all (synchronous is fine when nothing needs review).
+    superdocs_tool: chat_async      # or: chat
+
+    # --- templates (the SuperDocs `templates` surface) ----------------------
+    # Set use_saved: true when this command should draft from the user's OWN
+    # saved SuperDocs templates rather than from generic boilerplate — house
+    # NDAs, a supplier's own 8D form, a firm's letterhead. The rendered prompt
+    # then tells the assistant to call `list_user_templates` first, and forbids
+    # inventing house-standard language when nothing matches (offering
+    # `upload_template_base64` instead). Omit the block entirely for commands
+    # that work on the document already open. See packs/legal's
+    # draft_from_playbook for a worked example.
+    templates:
+      use_saved: false
+      hint: "Optional: how to pick among the user's templates, e.g. 'match on document type'."
+
+    # --- export ------------------------------------------------------------
+    # Pick the format that fits what this command produces: docx for anything
+    # meant to look like a real document (redlines, clauses); markdown for
+    # tabular/register-style output that's easier to read as a table than a
+    # styled Word doc. Any of: docx, pdf, html, markdown, txt.
+    export:
+      format: docx
+      options:
+        filename: some-default-filename   # optional export options, passed straight through
+                                           # to SuperDocs' export_document
+
+    # --- instruction_template ----------------------------------------------
+    # The actual task instruction sent to the assistant, with {argument_name}
+    # placeholders substituted from what the user typed. Write it the way
+    # you'd brief a paralegal/analyst/coordinator who's good but has no
+    # context — name the document, name the standard, say what "done" looks
+    # like. Where the domain has a known trap (see real_estate's
+    # draft_disclosure: "if you're not sure the wording is jurisdiction-exact,
+    # say so" — mirrors the FMEA build's "never invent a number" rule applied
+    # to legal/domain uncertainty instead of numbers), say so explicitly here.
+    instruction_template: |
+      Do the actual task, referencing {some_argument} and {optional_argument}.
+
+      Be explicit about what "done" means for this command, and what the
+      assistant should do when it's uncertain (ask, rather than guess).

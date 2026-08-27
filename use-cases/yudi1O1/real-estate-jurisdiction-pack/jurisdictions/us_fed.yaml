@@ -1,0 +1,119 @@
+# Federal residential leasing requirements — layered under EVERY state file.
+#
+# Scope note, stated up front because it bounds everything below: this file
+# covers federal requirements that attach to an ordinary private residential
+# tenancy. It does NOT cover the additional requirements that attach to
+# federally assisted housing (HUD-subsidised, LIHTC, public housing, Section 8
+# HAP contracts), which carry their own lease riders and disclosure sets.
+#
+# Every rule carries authority + source_url + verified_on + review_by. The
+# loader refuses to parse a rule missing any of them, and validate.py blocks a
+# draft that would rely on a rule whose review_by has passed.
+#
+# COMPILED FROM PUBLIC PRIMARY SOURCES. NOT LEGAL ADVICE. See README
+# "What this is not" — a lawyer in the relevant jurisdiction must confirm this
+# content before it is relied on for a real tenancy.
+
+code: US-FED
+name: United States (federal)
+
+notes: >
+  Federal law sets a floor, not a ceiling. Every state file layers on top of
+  this one, and states may (and California and New York in particular do)
+  require considerably more.
+
+rules:
+  - id: fed_lead_paint_disclosure
+    kind: disclosure
+    title: Lead-Based Paint Disclosure (Pre-1978 Housing)
+    summary: >
+      For "target housing" — most residential housing built before 1978 — a
+      lessor must disclose known lead-based paint and lead-based paint hazards,
+      hand over any available records and reports, and give the tenant the
+      EPA-approved lead hazard pamphlet. The Lead Warning Statement below is
+      prescribed word-for-word by regulation.
+    citation:
+      authority: >-
+        Residential Lead-Based Paint Hazard Reduction Act of 1992, 42 U.S.C. § 4852d;
+        implementing regulations at 40 C.F.R. § 745.113(b) and 24 C.F.R. § 35.92(b)
+      source_url: https://www.ecfr.gov/current/title-40/chapter-I/subchapter-R/part-745/subpart-F
+      verified_on: 2025-08-01
+      review_by: 2027-06-30
+      note: >-
+        Long-settled federal rule with a stable text; reviewed on a two-year
+        cadence rather than the shorter cadence used for fast-moving state law.
+    applies_when:
+      all:
+        - field: year_built
+          op: lt
+          value: 1978
+    verbatim_statutory: true
+    tenant_acknowledgement: true
+    delivery: before the tenant is obligated under the lease
+    body: |
+      LEAD WARNING STATEMENT
+
+      Housing built before 1978 may contain lead-based paint. Lead from paint,
+      paint chips, and dust can pose health hazards if not managed properly.
+      Lead exposure is especially harmful to young children and pregnant women.
+      Before renting pre-1978 housing, lessors must disclose the presence of
+      known lead-based paint and/or lead-based paint hazards in the dwelling.
+      Lessees must also receive a federally approved pamphlet on lead poisoning
+      prevention.
+
+      LESSOR'S DISCLOSURE
+      (a) Presence of lead-based paint and/or lead-based paint hazards:
+          [ ] Known lead-based paint and/or lead-based paint hazards are present
+              in the housing (explain): ______________________________________
+          [ ] Lessor has no knowledge of lead-based paint and/or lead-based
+              paint hazards in the housing.
+      (b) Records and reports available to the lessor:
+          [ ] Lessor has provided the lessee with all available records and
+              reports pertaining to lead-based paint and/or lead-based paint
+              hazards in the housing (list documents): ________________________
+          [ ] Lessor has no reports or records pertaining to lead-based paint
+              and/or lead-based paint hazards in the housing.
+
+      LESSEE'S ACKNOWLEDGMENT
+      (c) Lessee has received copies of all information listed above.
+      (d) Lessee has received the pamphlet "Protect Your Family From Lead in
+          Your Home."
+
+      CERTIFICATION OF ACCURACY
+      The following parties have reviewed the information above and certify, to
+      the best of their knowledge, that the information they have provided is
+      true and accurate.
+    notes: >
+      Two exemptions worth knowing and NOT auto-applied by this pack because
+      each turns on a fact the landlord must assert rather than one that can be
+      inferred: zero-bedroom dwellings (studios, dormitories), and housing
+      designated for the elderly or persons with disabilities where no child
+      under 6 resides. If either applies, record it and remove the disclosure
+      deliberately rather than letting the tool drop it silently. Note also that
+      the 10-day opportunity to conduct a risk assessment is a SALES
+      requirement; it does not attach to leases.
+
+  - id: fed_lead_pamphlet_delivery
+    kind: lease_clause
+    title: Delivery of EPA Lead Hazard Information Pamphlet
+    summary: >
+      The lease must record that the tenant received the EPA-approved pamphlet
+      "Protect Your Family From Lead in Your Home" before becoming obligated.
+    citation:
+      authority: 40 C.F.R. § 745.107(a)(1)
+      source_url: https://www.ecfr.gov/current/title-40/section-745.107
+      verified_on: 2025-08-01
+      review_by: 2027-06-30
+    applies_when:
+      all:
+        - field: year_built
+          op: lt
+          value: 1978
+    body: |
+      Lead Hazard Pamphlet. Landlord has provided, and Tenant acknowledges
+      receipt of, the EPA-approved lead hazard information pamphlet "Protect
+      Your Family From Lead in Your Home" prior to Tenant becoming obligated
+      under this Lease.
+    notes: >
+      The pamphlet itself is a separate physical document. This pack records
+      the acknowledgement; it does not reproduce or attach the pamphlet.
