@@ -155,9 +155,21 @@ class SuperDocs:
             raise SuperDocsError(f"{stage}: request failed: {exc}") from exc
         elapsed = time.monotonic() - started
 
-        if response.status_code == 402 or "quota" in response.text.lower()[:400]:
-            if response.status_code == 402:
-                raise QuotaExhausted(f"{stage}: account is out of operations")
+        # Quota exhaustion arrives as a 402, and sometimes as a 429 or 400
+        # whose body says so. Both must raise QuotaExhausted: packet_cli gives
+        # it its own exit code so a run can stop without burning the rest of
+        # the allowance. The body is only inspected on an error response with
+        # a textual content type -- a successful export is binary, and decoding
+        # it here would read the whole payload just to search it.
+        if response.status_code == 402:
+            raise QuotaExhausted(f"{stage}: account is out of operations")
+        if not response.ok:
+            ctype = response.headers.get("content-type", "")
+            if ("json" in ctype or ctype.startswith("text")) and \
+                    "quota" in response.text.lower()[:400]:
+                raise QuotaExhausted(
+                    f"{stage}: HTTP {response.status_code} reports the operation allowance is spent"
+                )
         if not response.ok:
             raise SuperDocsError(
                 f"{stage}: HTTP {response.status_code} from {path} -- {response.text[:400]}"

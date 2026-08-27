@@ -53,6 +53,40 @@ class Pending:
         ]
 
 
+def _marked_missing(html: str, filename: str) -> bool:
+    """Is this filename described as outstanding where the index lists it?
+
+    Read within the row or line that names the file, so wording elsewhere in
+    the document cannot vouch for an item listed as though it were in hand.
+    """
+    words = ("outstanding", "missing", "not present", "not received",
+             "awaited", "pending", "unavailable")
+    for line in html.splitlines():
+        if filename in line:
+            return any(w in line.lower() for w in words)
+    # The filename spans lines; fall back to the surrounding window.
+    at = html.find(filename)
+    if at == -1:
+        return False
+    window = html[max(0, at - 200): at + 200].lower()
+    return any(w in window for w in words)
+
+
+def _states_total(html: str, total: int) -> bool:
+    """Does the cover give this figure as its claimed total?
+
+    Anchored to the label so an incidental number -- a floor area, a date, a
+    certificate id -- cannot stand in for the total the packet computed.
+    """
+    # Allow the markup between label and figure -- "</td><td>", "|", ":" --
+    # but no other digits, so the figure found is the one the label introduces.
+    pattern = re.compile(
+        r"points\s+claimed\b[^0-9]{0,60}?\b" + str(total) + r"\b",
+        re.IGNORECASE | re.DOTALL,
+    )
+    return bool(pattern.search(html))
+
+
 @dataclass
 class Document:
     """One document in the bundle, as it stands after the last approved edit."""
@@ -90,9 +124,10 @@ class Packet:
         # Sections that produced no content even after a retry. Surfaced in
         # verify() rather than leaving a hole in the packet.
         self.empty_sections: list[str] = []
-        # The most recent propagation response, kept so the caller can read
-        # its job id when approving.
-        self.last_propagation: dict = {}
+        # The responses from the most recent propagation, one per document
+        # edited, kept so the caller can read their job ids when approving.
+        # A status change now touches two documents, so this is a list.
+        self.last_propagation: list[dict] = []
 
     # ------------------------------------------------------------- assembly
     def attach_sources(self, credit: registry.Credit) -> None:
@@ -137,7 +172,13 @@ class Packet:
 
         if response.get("status") == "awaiting_approval":
             self.gated += 1
-            if approve:
+            if approve and not changes:
+                # The gate engaged but no changes parsed out of the payload.
+                # Approving an empty decision list sends "approved": false and
+                # silently rejects the section, so record it instead of
+                # discarding work under the appearance of approving it.
+                self.empty_sections.append(key)
+            elif approve:
                 self.sd.approve(
                     self.session_id,
                     [{"change_id": c.change_id, "approved": True} for c in changes],
@@ -265,16 +306,31 @@ class Packet:
         return after, changes
 
     def apply(self, scorecard: registry.Scorecard, decisions: list[dict],
-              *, job_id: str | None = None) -> dict:
+              *, job_id: str | None = None) -> dict | list[dict]:
         """Commit the approved changes. Rejected ones are left behind.
 
         The scorecard is only advanced if at least one change was approved, so
         a wholly rejected batch leaves the packet exactly as it was.
+
+        A status change proposes changes across two documents and so produces
+        two jobs. The approve endpoint decides one job at a time, so decisions
+        are grouped by the job that proposed them and sent per job; an explicit
+        job_id overrides the grouping for the single-job case.
         """
-        result = self.sd.approve(self.session_id, decisions, job_id=job_id)
+        if job_id is None and any(d.get("job_id") for d in decisions):
+            by_job: dict[str, list[dict]] = {}
+            for decision in decisions:
+                by_job.setdefault(decision.get("job_id") or "", []).append(decision)
+            results = [
+                self.sd.approve(self.session_id, group, job_id=jid or None)
+                for jid, group in by_job.items()
+            ]
+        else:
+            results = [self.sd.approve(self.session_id, decisions, job_id=job_id)]
+
         if any(d.get("approved") for d in decisions):
             self.scorecard = scorecard
-        return result
+        return results[0] if len(results) == 1 else results
 
     # --------------------------------------------------------------- export
     def export(self, out_dir: Path, fmt: str = "docx") -> list[Path]:
@@ -332,21 +388,35 @@ class Packet:
                 )
 
         # Criterion 2: the index must not claim a missing document is present.
+        # A missing item has to appear in the index AND be described as missing;
+        # the failure that matters is one listed as though it were in hand, so
+        # the check reads the text around the filename rather than only asking
+        # whether the filename occurs.
         for credit in self.scorecard.credits:
             doc = self.documents.get(credit.id)
             if not doc:
                 continue
             for item in credit.evidence:
-                if not item.present and item.file not in doc.html:
+                if item.present:
+                    continue
+                if item.file not in doc.html:
                     problems.append(
                         f"{credit.id}: evidence index omits missing item {item.file}"
                     )
+                elif not _marked_missing(doc.html, item.file):
+                    problems.append(
+                        f"{credit.id}: evidence index lists missing item "
+                        f"{item.file} without marking it outstanding"
+                    )
 
         # Criterion 3: the cover must carry the computed total, not a guess.
+        # Matched against the labelled figure, not the bare number: a cover
+        # carrying "214,000 sf" or a 2013 date would satisfy a substring test
+        # for "13" while claiming any total at all.
         cover = self.documents.get("scorecard")
-        if cover and str(self.scorecard.points_awarded) not in cover.html:
+        if cover and not _states_total(cover.html, self.scorecard.points_awarded):
             problems.append(
                 f"scorecard: computed total {self.scorecard.points_awarded} "
-                "does not appear in the cover"
+                "does not appear in the cover against its label"
             )
         return problems

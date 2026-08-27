@@ -168,8 +168,11 @@ def main(argv: list[str] | None = None) -> int:
 
     review = sub.add_parser("review", help="approve or reject queued changes")
     review.add_argument("--session", required=True)
-    review.add_argument("--approve-all", action="store_true")
-    review.add_argument("--reject-all", action="store_true")
+    # Mutually exclusive: passing both silently approved everything, which is
+    # the opposite of what anyone typing --reject-all on a human gate expects.
+    verdict = review.add_mutually_exclusive_group()
+    verdict.add_argument("--approve-all", action="store_true")
+    verdict.add_argument("--reject-all", action="store_true")
     review.set_defaults(func=cmd_review)
 
     export = sub.add_parser("export", help="export the session's document")

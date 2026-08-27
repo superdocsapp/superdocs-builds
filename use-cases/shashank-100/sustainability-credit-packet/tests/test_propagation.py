@@ -30,6 +30,7 @@ class FakeSuperDocs:
         self.calls.append({"message": message, "stage": stage, **extra})
         n = len(self.calls)
         return {
+            "job_id": f"j{n}",
             "proposed_change_batch": [
                 {"change_id": f"c{n}", "chunk_id": f"k{n}",
                  "original": "old", "replacement": "new"}
@@ -58,7 +59,11 @@ def pk(bundle):
         "WEc1": packet.Document("WEc1", "WEc1", "<p>narrative</p>", "s-test", "doc-wec1"),
     }
     p.unattached = []
-    p.last_propagation = None
+    p.last_propagation = []
+    p.gated = 0
+    p.ungated = []
+    p.empty_sections = []
+    p.pending = {}
     return p
 
 
@@ -95,6 +100,62 @@ class TestStatusChangeReachesBothDocuments:
         assert len(changes) == 1
 
 
+class TestPropagationHandsBackWhatApprovalNeeds:
+    """Two documents means two jobs, and both must be approvable."""
+
+    def test_last_propagation_holds_every_response(self, pk):
+        pk.change_status("WEc1", registry.AT_RISK)
+        assert isinstance(pk.last_propagation, list)
+        assert len(pk.last_propagation) == 2
+
+    def test_decisions_are_approved_against_their_own_job(self, pk):
+        approved = []
+
+        def fake_approve(session_id, changes, *, job_id=None, feedback=None):
+            approved.append({"job_id": job_id, "n": len(changes)})
+            return {"ok": True}
+
+        pk.sd.approve = fake_approve
+        after, _ = pk.change_status("WEc1", registry.AT_RISK)
+
+        # The caller pairs each decision with the job that proposed it, taking
+        # the ids from last_propagation -- a Change does not carry its own.
+        job_ids = [r.get("job_id") for r in pk.last_propagation]
+        decisions = [
+            {"change_id": f"c{i + 1}", "job_id": jid, "approved": True}
+            for i, jid in enumerate(job_ids)
+        ]
+        pk.apply(after, decisions)
+
+        # One approve call per originating job, not one blanket call.
+        assert len(approved) == 2
+        assert {a["job_id"] for a in approved} == set(job_ids)
+
+    def test_a_single_job_still_sends_one_call(self, pk):
+        approved = []
+        pk.sd.approve = lambda s, c, *, job_id=None, feedback=None: (
+            approved.append(job_id) or {"ok": True}
+        )
+        after = registry.set_status(pk.scorecard, "WEc1", registry.AT_RISK)
+        pk.apply(after, [{"change_id": "c1", "approved": True}], job_id="j-solo")
+        assert approved == ["j-solo"]
+
+
+class TestAGatedSectionIsNeverSilentlyRejected:
+    """An empty decision list sends approved:false -- that is a rejection."""
+
+    def test_unparsed_changes_are_recorded_not_approved(self, pk):
+        calls = []
+        pk.sd.approve = lambda *a, **k: calls.append(k) or {"ok": True}
+        pk.sd.chat_async = lambda *a, **k: {"status": "awaiting_approval", "job_id": "j9"}
+        pk.sd.changes_from = lambda r: []
+
+        pk._run_section("WEc1:test", "do a thing", key="WEc1:test", approve=True)
+
+        assert calls == [], "approving zero changes rejects the section"
+        assert "WEc1:test" in pk.empty_sections
+
+
 class TestAnAtRiskFlagCanBeLifted:
     """A credit flagged at risk must be able to return to its derived status."""
 
@@ -122,6 +183,30 @@ class TestAnAtRiskFlagCanBeLifted:
         credit = next(c for c in scorecard.credits if c.missing_evidence)
         with pytest.raises(ValueError, match="evidence is missing"):
             registry.set_status(scorecard, credit.id, registry.DOCUMENTED)
+
+
+class TestVerifyCatchesWhatItClaimsTo:
+    """Both checks previously reported clean on the failure they exist to catch."""
+
+    def test_a_missing_item_listed_as_present_is_caught(self, bundle):
+        html = "<tr><td>waste_manifest_q3.pdf</td><td>Received and filed</td></tr>"
+        assert not packet._marked_missing(html, "waste_manifest_q3.pdf")
+
+    def test_a_missing_item_marked_outstanding_passes(self, bundle):
+        html = "<tr><td>waste_manifest_q3.pdf</td><td>Outstanding</td></tr>"
+        assert packet._marked_missing(html, "waste_manifest_q3.pdf")
+
+    def test_an_incidental_number_is_not_the_claimed_total(self):
+        # A cover carrying a floor area and a date, but no stated total.
+        html = "<p>Meridian, 214,000 sf, LEED v4.1, certified 2013.</p>"
+        assert not packet._states_total(html, 13)
+
+    def test_the_labelled_total_is_recognised(self):
+        assert packet._states_total("<tr><td>Points claimed</td><td>13</td></tr>", 13)
+        assert packet._states_total("Points claimed: 13", 13)
+
+    def test_a_wrong_labelled_total_is_rejected(self):
+        assert not packet._states_total("Points claimed: 11", 13)
 
 
 class TestEveryInstalledFixtureIsCounted:
