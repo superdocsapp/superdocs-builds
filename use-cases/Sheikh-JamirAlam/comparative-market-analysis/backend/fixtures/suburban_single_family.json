@@ -1,0 +1,88 @@
+{
+  "branding": {
+    "agent_name": "Maya Thompson",
+    "brokerage": "Cedar Lane Realty",
+    "phone": "(555) 014-2088",
+    "email": "maya@example.com"
+  },
+  "subject": {
+    "address": "1842 Willow Creek Drive",
+    "city": "Austin",
+    "state": "TX",
+    "beds": 4,
+    "baths": 3.0,
+    "sqft": 2450,
+    "lot_size_sqft": 8500,
+    "year_built": 2018,
+    "list_price": 0,
+    "sale_price": null,
+    "sale_date": null,
+    "photo_url": "https://images.unsplash.com/photo-1602941525421-8f8b81d3edbb?q=80&w=800&h=600&fit=crop"
+  },
+  "comps": [
+    {
+      "address": "1720 Willow Creek Drive",
+      "city": "Austin",
+      "state": "TX",
+      "beds": 4,
+      "baths": 3.0,
+      "sqft": 2380,
+      "lot_size_sqft": 8200,
+      "year_built": 2017,
+      "list_price": 675000,
+      "sale_price": 668000,
+      "sale_date": "2026-05-18",
+      "photo_url": "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 0.4,
+      "days_on_market": 12
+    },
+    {
+      "address": "2011 Oak Meadow Lane",
+      "city": "Austin",
+      "state": "TX",
+      "beds": 4,
+      "baths": 2.5,
+      "sqft": 2520,
+      "lot_size_sqft": 9100,
+      "year_built": 2019,
+      "list_price": 710000,
+      "sale_price": 700000,
+      "sale_date": "2026-04-29",
+      "photo_url": "https://images.unsplash.com/photo-1592595896551-12b371d546d5?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 0.8,
+      "days_on_market": 9
+    },
+    {
+      "address": "1605 Creek Bend Court",
+      "city": "Austin",
+      "state": "TX",
+      "beds": 3,
+      "baths": 2.5,
+      "sqft": 2290,
+      "lot_size_sqft": 7800,
+      "year_built": 2016,
+      "list_price": 635000,
+      "sale_price": 628000,
+      "sale_date": "2026-03-22",
+      "photo_url": "https://images.unsplash.com/photo-1558036117-15d82a90b9b1?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 1.1,
+      "days_on_market": 21
+    },
+    {
+      "address": "2148 Silverleaf Avenue",
+      "city": "Austin",
+      "state": "TX",
+      "beds": 4,
+      "baths": 3.5,
+      "sqft": 2630,
+      "lot_size_sqft": 8800,
+      "year_built": 2020,
+      "list_price": 735000,
+      "sale_price": 728000,
+      "sale_date": "2026-02-14",
+      "photo_url": "https://images.unsplash.com/photo-1523217582562-09d0def993a6?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 1.4,
+      "days_on_market": 7
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "branding": {
+    "agent_name": "Jordan Lee",
+    "brokerage": "Urban Key Partners",
+    "phone": "(555) 016-4412",
+    "email": "jordan@example.com"
+  },
+  "subject": {
+    "address": "905 Market Street, Unit 708",
+    "city": "Denver",
+    "state": "CO",
+    "beds": 2,
+    "baths": 2.0,
+    "sqft": 1180,
+    "lot_size_sqft": 0,
+    "year_built": 2021,
+    "list_price": 0,
+    "sale_price": null,
+    "sale_date": null,
+    "photo_url": "https://images.unsplash.com/photo-1605146769289-440113cc3d00?q=80&w=800&h=600&fit=crop"
+  },
+  "comps": [
+    {
+      "address": "905 Market Street, Unit 512",
+      "city": "Denver",
+      "state": "CO",
+      "beds": 2,
+      "baths": 2.0,
+      "sqft": 1150,
+      "lot_size_sqft": 0,
+      "year_built": 2021,
+      "list_price": 575000,
+      "sale_price": 568000,
+      "sale_date": "2026-05-11",
+      "photo_url": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 0.0,
+      "days_on_market": 18
+    },
+    {
+      "address": "830 Blake Street, Unit 403",
+      "city": "Denver",
+      "state": "CO",
+      "beds": 2,
+      "baths": 2.0,
+      "sqft": 1210,
+      "lot_size_sqft": 0,
+      "year_built": 2020,
+      "list_price": 610000,
+      "sale_price": 602000,
+      "sale_date": "2026-04-08",
+      "photo_url": "https://images.unsplash.com/photo-1723110994499-df46435aa4b3?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 0.7,
+      "days_on_market": 11
+    },
+    {
+      "address": "1010 Wynkoop Street, Unit 604",
+      "city": "Denver",
+      "state": "CO",
+      "beds": 2,
+      "baths": 1.5,
+      "sqft": 1090,
+      "lot_size_sqft": 0,
+      "year_built": 2019,
+      "list_price": 535000,
+      "sale_price": 528000,
+      "sale_date": "2026-03-16",
+      "photo_url": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 0.9,
+      "days_on_market": 27
+    },
+    {
+      "address": "750 17th Street, Unit 1202",
+      "city": "Denver",
+      "state": "CO",
+      "beds": 2,
+      "baths": 2.0,
+      "sqft": 1260,
+      "lot_size_sqft": 0,
+      "year_built": 2022,
+      "list_price": 635000,
+      "sale_price": 625000,
+      "sale_date": "2026-02-20",
+      "photo_url": "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 1.2,
+      "days_on_market": 8
+    }
+  ]
+}

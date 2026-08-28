@@ -1,0 +1,88 @@
+{
+  "branding": {
+    "agent_name": "Evelyn Carter",
+    "brokerage": "Summit Private Realty",
+    "phone": "(555) 019-7734",
+    "email": "evelyn@example.com"
+  },
+  "subject": {
+    "address": "27 Ridgeview Estate",
+    "city": "Scottsdale",
+    "state": "AZ",
+    "beds": 5,
+    "baths": 5.5,
+    "sqft": 4920,
+    "lot_size_sqft": 33000,
+    "year_built": 2020,
+    "list_price": 0,
+    "sale_price": null,
+    "sale_date": null,
+    "photo_url": "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?q=80&w=800&h=600&fit=crop"
+  },
+  "comps": [
+    {
+      "address": "18 Canyon Crest Road",
+      "city": "Scottsdale",
+      "state": "AZ",
+      "beds": 5,
+      "baths": 5.0,
+      "sqft": 4750,
+      "lot_size_sqft": 30000,
+      "year_built": 2019,
+      "list_price": 2850000,
+      "sale_price": 2780000,
+      "sale_date": "2026-05-26",
+      "photo_url": "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 1.3,
+      "days_on_market": 44
+    },
+    {
+      "address": "41 Desert Bloom Way",
+      "city": "Scottsdale",
+      "state": "AZ",
+      "beds": 5,
+      "baths": 6.0,
+      "sqft": 5200,
+      "lot_size_sqft": 36000,
+      "year_built": 2021,
+      "list_price": 3190000,
+      "sale_price": 3100000,
+      "sale_date": "2026-04-17",
+      "photo_url": "https://images.unsplash.com/photo-1668911494509-14baf3b42fda?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 2.0,
+      "days_on_market": 63
+    },
+    {
+      "address": "9 Sonoran Vista Court",
+      "city": "Scottsdale",
+      "state": "AZ",
+      "beds": 4,
+      "baths": 5.0,
+      "sqft": 4510,
+      "lot_size_sqft": 28000,
+      "year_built": 2018,
+      "list_price": 2590000,
+      "sale_price": 2525000,
+      "sale_date": "2026-03-28",
+      "photo_url": "https://images.unsplash.com/photo-1628624747186-a941c476b7ef?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 2.4,
+      "days_on_market": 38
+    },
+    {
+      "address": "63 Pinnacle View Lane",
+      "city": "Scottsdale",
+      "state": "AZ",
+      "beds": 5,
+      "baths": 5.5,
+      "sqft": 5050,
+      "lot_size_sqft": 34000,
+      "year_built": 2022,
+      "list_price": 3350000,
+      "sale_price": 3290000,
+      "sale_date": "2026-02-09",
+      "photo_url": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?q=80&w=800&h=600&fit=crop",
+      "distance_miles": 2.8,
+      "days_on_market": 29
+    }
+  ]
+}
