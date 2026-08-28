@@ -1,0 +1,28 @@
+\begin{abstract}
+We establish sharp spectral gap estimates for random walks on Cayley graphs of
+finite groups, extending the classical Kesten bound to non-abelian settings.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+\label{sec:intro}
+Random walks on groups are among the most studied objects in probability theory
+and harmonic analysis. Given a finitely generated group $G$ with a symmetric
+generating set $S$, the simple random walk has transition kernel
+\begin{equation}
+\label{eq:kernel}
+P(x, y) = \frac{1}{|S|} \, \mathbf{1}_{y \in x S},
+\end{equation}
+and its $n$-step return probabilities $p^{(n)}(e)$ govern mixing, entropy, and
+spectral phenomena. A central object is the \emph{spectral radius}
+\begin{equation}
+\label{eq:rho}
+\rho(G, S) = \limsup_{n \to \infty} p^{(n)}(e)^{1/n}.
+\end{equation}
+
+For free groups, Kesten proved $\rho = \frac{2\sqrt{|S|-1}}{|S|}$, and it is
+known that $\rho = 1$ characterizes amenability \cite{Kesten1959, Woess2000}.
+Our aim is a quantitative refinement of these facts for \emph{finite} groups,
+where the analogue of $\rho$ is the second-largest eigenvalue $\lambda_1$ of
+$P$, and the \emph{spectral gap} is $1 - \lambda_1$.

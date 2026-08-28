@@ -1,0 +1,15 @@
+node_modules/
+dist/
+extension/
+data/
+*.vsix
+.vscode-test/
+.DS_Store
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.pdf
+!samples/math-paper/figures/spectrum.pdf

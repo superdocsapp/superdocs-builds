@@ -1,0 +1,44 @@
+\section{Proofs}
+\label{sec:proofs-body}
+
+\subsection{The localized Poincar\'e inequality}
+
+We first record the analytic ingredient. The following lemma is essentially
+due to Diaconis and Saloff-Coste; we include a self-contained proof.
+
+\begin{lemma}
+\label{lem:local-poincare}
+Let $G$ be finite with symmetric generating set $S$. For every $f \in \ell^2(G)$,
+\[
+\lVert f - \mathbb{E} f \rVert_2^2
+\;\le\; \frac{d^2}{h(G,S)^2}
+\sum_{s \in S} \lVert f - f_s \rVert_2^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+Fix a geodesic path from $x$ to $y$ in $\Gamma(G,S)$ and telescope the
+differences $f - f_s$ along it; summing over $y$ and using the local
+expansion bound gives the claim. The constant $\frac{d^2}{h(G,S)^2}$ is
+sharp for the two-step random walk, as shown by \cite[Prop.~2.7]{DiaconisSaloffCoste}.
+\end{proof}
+
+\subsection{Interpolation and the spectral radius}
+
+Let $\sigma(P)$ denote the spectrum of the transition operator, and write
+$\sigma(P) \setminus \{1\}$ for its nontrivial part. The following estimate
+is classical.
+
+\begin{equation}
+\label{eq:interp}
+\rho_{n} \;:=\; \max\bigl\{ |\lambda| \;:\; \lambda \in \sigma(P) \setminus \{1\} \bigr\}
+\;\le\; \left( 1 - \frac{h(G,S)^2}{2 d^2} \right)^{1/n}
+\end{equation}
+
+Combining Lemma~\ref{lem:local-poincare} with \eqref{eq:interp} and
+Corollary~\ref{cor:explicit} yields Theorem~\ref{thm:gap}. The verification
+that the constants compose is a matter of arithmetic:
+\[
+\frac{c\, h(G,S)^2}{d^2} \;\ge\; \frac{h(G,S)^2}{64\, d^2}
+\]
+with equality only in the degenerate case $|S| = 1$.

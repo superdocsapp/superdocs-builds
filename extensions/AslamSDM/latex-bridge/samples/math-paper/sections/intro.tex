@@ -1,0 +1,36 @@
+\section{Introduction}
+\label{sec:intro-body}
+
+Random walks on groups are among the most studied objects in probability theory
+and harmonic analysis. Given a finitely generated group $G$ with a symmetric
+generating set $S$, the simple random walk has transition kernel
+\begin{equation}
+\label{eq:kernel}
+P(x, y) = \frac{1}{|S|} \, \mathbf{1}_{y \in x S},
+\end{equation}
+and its $n$-step return probabilities $p^{(n)}(e)$ govern mixing, entropy, and
+spectral phenomena. A central object is the \emph{spectral radius}
+\begin{equation}
+\label{eq:rho}
+\rho(G, S) = \limsup_{n \to \infty} p^{(n)}(e)^{1/n}.
+\end{equation}
+
+For free groups, Kesten proved $\rho = \frac{2\sqrt{|S|-1}}{|S|}$, and it is
+known that $\rho = 1$ characterizes amenability \cite{Kesten1959, Woess2000}.
+Our aim is a quantitative refinement of these facts for \emph{finite} groups,
+where the analogue of $\rho$ is the second-largest eigenvalue $\lambda_1$ of
+$P$, and the \emph{spectral gap} is $1 - \lambda_1$.
+
+We work throughout with the normalized counting measure, and we write
+$|A|$ for the cardinality of a set $A$. The Cayley graph $\Gamma(G, S)$ is
+regular of degree $d = |S|$; its adjacency operator acts on $\ell^2(G)$.
+The reader is referred to \cite{Diaconis} for background on random walks on
+groups and to \cite{Lubotzky} for expander constructions.
+
+\begin{remark}[Notation]
+\label{rem:notation}
+All logarithms are natural, and $e$ denotes the identity element of the group
+as well as Euler's number; context disambiguates the two.\footnote{This
+deliberately ambiguous convention is standard in the literature on random
+walks on groups, cf.\ \cite{Woess2000}.}
+\end{remark}

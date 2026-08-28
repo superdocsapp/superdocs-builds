@@ -1,0 +1,217 @@
+<h1 data-chunk-id="56557be1-ab36-4eec-a771-572d931f804a" style="font-size:19.03pt;line-height:1.2;font-family:serif;text-align:center">Spectral Gaps of Random Walks on Cayley Graphs</h1>
+<p data-chunk-id="d4b37af7-6f22-4797-bc5c-a4b81d9e2e3c" style="font-size:11pt;line-height:1.2;font-family:serif;text-align:center">Aslam SDM</p>
+<p data-chunk-id="1bd6ece3-0e24-42e5-b2c6-8531969f708c" style="font-size:11pt;line-height:1.2;font-family:serif;text-align:center">2026-08-16</p>
+<p data-chunk-id="74c123ae-7a80-44ec-a535-d216fcb42efd" style="font-size:11pt;line-height:1.2;font-family:serif;text-align:center"><strong>Abstract</strong></p>
+<p data-chunk-id="7b122131-ce2d-4e0c-a896-81a9c405aac3" style="font-size:11pt;line-height:1.2;font-family:serif">We establish sharp spectral gap estimates for random walks on Cayley
+graphs of finite groups, extending the classical Kesten bound to
+non-abelian settings.</p>
+<div data-chunk-id="c6b8ddfc-8333-49c6-b270-0a5fe94085db" data-toc="true"><p style="font-size:11pt;line-height:1.2;font-family:serif"><strong>Table of Contents</strong></p></div>
+<h1 data-chunk-id="bec91de9-57b2-4c8f-8c03-4642edcfe548" id="sec:intro" style="font-size:15.84pt;line-height:1.2;font-family:serif">1  Introduction</h1>
+<h1 data-chunk-id="60a7b3fc-be2c-4d45-9f6d-4d7c4382f96b" id="sec:intro-body" style="font-size:15.84pt;line-height:1.2;font-family:serif">2  Introduction</h1>
+<p data-chunk-id="55ef399b-59ba-4af2-9464-d83b007b4ddf" style="font-size:11pt;line-height:1.2;font-family:serif">Random walks on groups are among the most studied objects in
+probability theory and harmonic analysis. Given a finitely generated
+group
+<span data-latex="G" data-type="inline-math">G</span>
+with a symmetric generating set
+<span data-latex="S" data-type="inline-math">S</span>,
+the simple random walk has transition kernel
+<span data-latex="P(x, y) = \frac{1}{|S|} \, \mathbf{1}_{y \in x S}," data-type="block-math">P(x, y) = \frac{1}{|S|} \, \mathbf{1}_{y \in x S},</span> and its
+<span data-latex="n" data-type="inline-math">n</span>-step
+return probabilities
+<span data-latex="p^{(n)}(e)" data-type="inline-math">p^{(n)}(e)</span>
+govern mixing, entropy, and spectral phenomena. A central object is the
+<em>spectral radius</em>
+<span data-latex="\rho(G, S) = \limsup_{n \to \infty} p^{(n)}(e)^{1/n}." data-type="block-math">\rho(G, S) = \limsup_{n \to \infty} p^{(n)}(e)^{1/n}.</span></p>
+<p data-chunk-id="784044fd-c66e-4e9a-9edb-96630bf34a59" style="font-size:11pt;line-height:1.2;font-family:serif">For free groups, Kesten proved
+<span data-latex="\rho = \frac{2\sqrt{|S|-1}}{|S|}" data-type="inline-math">\rho = \frac{2\sqrt{|S|-1}}{|S|}</span>,
+and it is known that
+<span data-latex="\rho = 1" data-type="inline-math">\rho = 1</span>
+characterizes amenability <span data-citation="Kesten1959,Woess2000">(Kesten 1959; Woess 2000)</span>. Our
+aim is a quantitative refinement of these facts for <em>finite</em>
+groups, where the analogue of
+<span data-latex="\rho" data-type="inline-math">\rho</span>
+is the second-largest eigenvalue
+<span data-latex="\lambda_1" data-type="inline-math">\lambda_1</span>
+of
+<span data-latex="P" data-type="inline-math">P</span>,
+and the <em>spectral gap</em> is
+<span data-latex="1 - \lambda_1" data-type="inline-math">1 - \lambda_1</span>.</p>
+<p data-chunk-id="d8af2f2d-ec48-435d-8f89-b9d1248c6608" style="font-size:11pt;line-height:1.2;font-family:serif">We work throughout with the normalized counting measure, and we write
+<span data-latex="|A|" data-type="inline-math">|A|</span>
+for the cardinality of a set
+<span data-latex="A" data-type="inline-math">A</span>.
+The Cayley graph
+<span data-latex="\Gamma(G, S)" data-type="inline-math">\Gamma(G, S)</span>
+is regular of degree
+<span data-latex="d = |S|" data-type="inline-math">d = |S|</span>;
+its adjacency operator acts on
+<span data-latex="\ell^2(G)" data-type="inline-math">\ell^2(G)</span>.
+The reader is referred to <span data-citation="Diaconis">(Diaconis 1988)</span> for background on random
+walks on groups and to <span data-citation="Lubotzky">(Lubotzky 1994)</span> for expander
+constructions.</p>
+<p data-chunk-id="1857c78b-b0f7-4083-9c91-86ef66b67c8c" style="font-size:11pt;line-height:1.2;font-family:serif"><em>Remark 1</em> (Notation). All logarithms are natural, and
+<span data-latex="e" data-type="inline-math">e</span>
+denotes the identity element of the group as well as Euler’s number;
+context disambiguates the two.<sup data-footnote-ref="1">1</sup></p>
+<h1 data-chunk-id="85b5c77c-f742-4897-bc6e-12e4672ddd3c" id="sec:main" style="font-size:15.84pt;line-height:1.2;font-family:serif">3  Main Results</h1>
+<h1 data-chunk-id="833797f4-02e0-427f-842a-94d1ef574c78" id="sec:main-body" style="font-size:15.84pt;line-height:1.2;font-family:serif">4  Main Results</h1>
+<p data-chunk-id="da5bfd40-b353-47f6-b6e6-5b3777f21eae" style="font-size:11pt;line-height:1.2;font-family:serif">Our first result gives a sharp lower bound on the spectral gap in
+terms of a new group-theoretic invariant, the <em>local expansion
+ratio</em>.</p>
+<p data-chunk-id="71763e58-3574-4f40-b44e-812db2d4be08" style="font-size:11pt;line-height:1.2;font-family:serif"><strong>Theorem 1</strong>. <em>Let
+<span data-latex="G" data-type="inline-math">G</span>
+be a finite group with a symmetric generating set
+<span data-latex="S" data-type="inline-math">S</span>
+of size
+<span data-latex="d" data-type="inline-math">d</span>,
+and let
+<span data-latex="\lambda_1" data-type="inline-math">\lambda_1</span>
+be the second-largest eigenvalue of the simple random walk on
+<span data-latex="\Gamma(G, S)" data-type="inline-math">\Gamma(G, S)</span>.
+Then
+<span data-latex="1 - \lambda_1 \;\ge\; \frac{c\, h(G, S)^2}{d^2}," data-type="block-math">1 - \lambda_1 \;\ge\; \frac{c\, h(G, S)^2}{d^2},</span> where
+<span data-latex="h(G, S)" data-type="inline-math">h(G, S)</span>
+is the local expansion ratio and
+<span data-latex="c &gt; 0" data-type="inline-math">c &gt; 0</span>
+is an absolute constant.</em></p>
+<p data-chunk-id="d6262cf6-8b67-475b-a5fe-f7814f47d806" style="font-size:11pt;line-height:1.2;font-family:serif"><em>Proof.</em> We combine the Nash-type inequality of <span data-citation="DiaconisSaloffCoste">(Diaconis and
+Saloff-Coste 1996)</span> with a localized Poincaré inequality. For
+every function
+<span data-latex="f \in \ell^2(G)" data-type="inline-math">f \in \ell^2(G)</span>
+with
+<span data-latex="\mathbb{E} f = 0" data-type="inline-math">\mathbb{E} f = 0</span>,
+<span data-latex="\frac{1}{|S|} \sum_{s \in S} \lVert f - f_s \rVert_2^2
+\;\ge\; \frac{h(G, S)^2}{|S|} \, \lVert f \rVert_2^2," data-type="block-math">\frac{1}{|S|} \sum_{s \in S} \lVert f - f_s \rVert_2^2
+\;\ge\; \frac{h(G, S)^2}{|S|} \, \lVert f \rVert_2^2,</span> where
+<span data-latex="f_s(x) = f(xs)" data-type="inline-math">f_s(x) = f(xs)</span>.
+The theorem follows from the variational characterization of
+<span data-latex="\lambda_1" data-type="inline-math">\lambda_1</span>
+together with a standard interpolation argument; full details appear in
+<span data-citation="Woess2000">(Woess 2000,
+Thm. 3.1)</span>. ◻</p>
+<p data-chunk-id="986db7da-f13c-43e9-ad24-21f492f33178" style="font-size:11pt;line-height:1.2;font-family:serif">The constant
+<span data-latex="c" data-type="inline-math">c</span>
+above is effective; we record the explicit value.</p>
+<p data-chunk-id="c01a8aab-0bbc-407f-92fb-5e69b3f0e40b" style="font-size:11pt;line-height:1.2;font-family:serif"><strong>Corollary 2</strong>. <em>With the hypotheses of Theorem <a href="#thm:gap">1</a>, the inequality <a href="#eq:gap">(3)</a> holds
+with
+<span data-latex="c = 1/64" data-type="inline-math">c = 1/64</span>.</em></p>
+<p data-chunk-id="be24d6b8-9a3c-487f-b5a1-11e62ceb6363" style="font-size:11pt;line-height:1.2;font-family:serif">For nilpotent groups the gap admits a cleaner closed form, which we
+state without proof since it follows from Corollary <a href="#cor:explicit">2</a> by a dimension-counting
+argument.</p>
+<p data-chunk-id="7627e0d1-cf4a-46b3-b298-d49d1b405607" style="font-size:11pt;line-height:1.2;font-family:serif"><strong>Proposition 3</strong>. <em>If
+<span data-latex="G" data-type="inline-math">G</span>
+is finite nilpotent of nilpotency class
+<span data-latex="\le 2" data-type="inline-math">\le 2</span>,
+then
+<span data-latex="1 - \lambda_1 \;=\; \Theta\!\left( \frac{1}{d} \right)," data-type="block-math">1 - \lambda_1 \;=\; \Theta\!\left( \frac{1}{d} \right),</span> with the implied constant
+depending only on the number of generators.</em></p>
+<p data-chunk-id="9c6dcb7f-aa02-4bf6-9e4f-62978ad12eee" style="font-size:11pt;line-height:1.2;font-family:serif;text-align:center"><em>The generators
+<span data-latex="s_1, s_2" data-type="inline-math">s_1, s_2</span>
+and the fundamental cone of the lattice approximation; see Section <a href="#sec:discussion">7</a>.</em></p>
+<p data-chunk-id="b4bc4c49-ff8e-4c03-ab39-dc1a99d92e6b" style="font-size:11pt;line-height:1.2;font-family:serif;text-align:center;border:1pt solid #999999;padding:6pt"><em>[Vector drawing 1 from the LaTeX source — not renderable in this import]</em></p>
+<p data-chunk-id="2796820a-4ec1-499b-a2ee-060b6ca676ce" style="font-size:11pt;line-height:1.2;font-family:serif;text-align:center"><em>Numerical spectrum of
+<span data-latex="P" data-type="inline-math">P</span>
+for a random 3-regular graph on
+<span data-latex="2^{14}" data-type="inline-math">2^{14}</span>
+vertices; the vertical dashed line marks
+<span data-latex="1 - \lambda_1" data-type="inline-math">1 - \lambda_1</span>.</em></p>
+<h1 data-chunk-id="3ad030dc-2178-47a8-8327-410d8ddb28f8" id="sec:proofs" style="font-size:15.84pt;line-height:1.2;font-family:serif">5  Proofs</h1>
+<h1 data-chunk-id="c94f4d3e-e054-4f97-bd45-92613d361220" id="sec:proofs-body" style="font-size:15.84pt;line-height:1.2;font-family:serif">6  Proofs</h1>
+<h2 data-chunk-id="dc2cada2-e24a-4836-a5d2-bf008b69c261" id="the-localized-poincaré-inequality" style="font-size:13.2pt;line-height:1.2;font-family:serif">6.1  The localized Poincaré
+inequality</h2>
+<p data-chunk-id="b81e6b25-7664-4dd3-8318-8551883ac9d5" style="font-size:11pt;line-height:1.2;font-family:serif">We first record the analytic ingredient. The following lemma is
+essentially due to Diaconis and Saloff-Coste; we include a
+self-contained proof.</p>
+<p data-chunk-id="5cf50801-63b1-4b78-a111-317ffe56bd5a" style="font-size:11pt;line-height:1.2;font-family:serif"><strong>Lemma 4</strong>. <em>Let
+<span data-latex="G" data-type="inline-math">G</span>
+be finite with symmetric generating set
+<span data-latex="S" data-type="inline-math">S</span>.
+For every
+<span data-latex="f \in \ell^2(G)" data-type="inline-math">f \in \ell^2(G)</span>,
+<span data-latex="\lVert f - \mathbb{E} f \rVert_2^2
+\;\le\; \frac{d^2}{h(G,S)^2}
+\sum_{s \in S} \lVert f - f_s \rVert_2^2 ." data-type="block-math">\lVert f - \mathbb{E} f \rVert_2^2
+\;\le\; \frac{d^2}{h(G,S)^2}
+\sum_{s \in S} \lVert f - f_s \rVert_2^2 .</span></em></p>
+<p data-chunk-id="20f87667-021d-4d38-ad77-ef25bfb987b4" style="font-size:11pt;line-height:1.2;font-family:serif"><em>Proof.</em> Fix a geodesic path from
+<span data-latex="x" data-type="inline-math">x</span>
+to
+<span data-latex="y" data-type="inline-math">y</span>
+in
+<span data-latex="\Gamma(G,S)" data-type="inline-math">\Gamma(G,S)</span>
+and telescope the differences
+<span data-latex="f - f_s" data-type="inline-math">f - f_s</span>
+along it; summing over
+<span data-latex="y" data-type="inline-math">y</span>
+and using the local expansion bound gives the claim. The constant
+<span data-latex="\frac{d^2}{h(G,S)^2}" data-type="inline-math">\frac{d^2}{h(G,S)^2}</span>
+is sharp for the two-step random walk, as shown by <span data-citation="DiaconisSaloffCoste">(Diaconis and
+Saloff-Coste 1996, Prop. 2.7)</span>. ◻</p>
+<h2 data-chunk-id="d3e38ff4-12e8-4fcf-994b-eadbbff13528" id="interpolation-and-the-spectral-radius" style="font-size:13.2pt;line-height:1.2;font-family:serif">6.2  Interpolation and the spectral
+radius</h2>
+<p data-chunk-id="4297438c-32db-40d6-a4fa-9d59802c2830" style="font-size:11pt;line-height:1.2;font-family:serif">Let
+<span data-latex="\sigma(P)" data-type="inline-math">\sigma(P)</span>
+denote the spectrum of the transition operator, and write
+<span data-latex="\sigma(P) \setminus \{1\}" data-type="inline-math">\sigma(P) \setminus \{1\}</span>
+for its nontrivial part. The following estimate is classical.</p>
+<p data-chunk-id="b9224aaf-782f-40c1-8d09-0a7670608552" style="font-size:11pt;line-height:1.2;font-family:serif"><span data-latex="\rho_{n} \;:=\; \max\bigl\{ |\lambda| \;:\; \lambda \in \sigma(P) \setminus \{1\} \bigr\}
+\;\le\; \left( 1 - \frac{h(G,S)^2}{2 d^2} \right)^{1/n}" data-type="block-math">\rho_{n} \;:=\; \max\bigl\{ |\lambda| \;:\; \lambda \in \sigma(P) \setminus \{1\} \bigr\}
+\;\le\; \left( 1 - \frac{h(G,S)^2}{2 d^2} \right)^{1/n}</span></p>
+<p data-chunk-id="bec1f4ea-922d-43a8-a49d-7b83881d6d02" style="font-size:11pt;line-height:1.2;font-family:serif">Combining Lemma <a href="#lem:local-poincare">4</a> with
+<a href="#eq:interp">(6)</a> and Corollary <a href="#cor:explicit">2</a> yields Theorem <a href="#thm:gap">1</a>. The
+verification that the constants compose is a matter of arithmetic:
+<span data-latex="\frac{c\, h(G,S)^2}{d^2} \;\ge\; \frac{h(G,S)^2}{64\, d^2}" data-type="block-math">\frac{c\, h(G,S)^2}{d^2} \;\ge\; \frac{h(G,S)^2}{64\, d^2}</span>
+with equality only in the degenerate case
+<span data-latex="|S| = 1" data-type="inline-math">|S| = 1</span>.</p>
+<h1 data-chunk-id="24052ada-27f1-4669-9d0a-913dcdccb955" id="sec:discussion" style="font-size:15.84pt;line-height:1.2;font-family:serif">7  Discussion and Open Problems</h1>
+<h1 data-chunk-id="e28a9e91-472f-4c38-ac56-06452ffdedfe" id="sec:discussion-body" style="font-size:15.84pt;line-height:1.2;font-family:serif">8  Discussion and Open Problems</h1>
+<p data-chunk-id="53a3ce64-9222-4a95-abc6-e15bbceb9e54" style="font-size:11pt;line-height:1.2;font-family:serif">Three questions suggest themselves. First, whether the bound of
+Theorem <a href="#thm:gap">1</a> is order-optimal for all nilpotent
+classes; our Proposition <a href="#prop:nilpotent">3</a> settles
+only class
+<span data-latex="\le 2" data-type="inline-math">\le 2</span>.
+Second, whether the <em>bipartite</em> double cover
+<span data-latex="\tilde G = G \times \mathbb{Z}/2" data-type="inline-math">\tilde G = G \times \mathbb{Z}/2</span>
+preserves the gap up to a universal constant – the parity obstruction
+makes this delicate. Third, whether sharp constants can be derived from
+Kesten-type equations <a href="#eq:rho">(2)</a> on the group algebra.</p>
+<p data-chunk-id="df3e0124-e4f6-4eb3-9d20-9a2cfa1833bb" style="font-size:11pt;line-height:1.2;font-family:serif">We expect that a Fourier-analytic approach on the dual
+<span data-latex="\hat G" data-type="inline-math">\hat G</span>,
+combined with the transfer principle of <span data-citation="Lubotzky">(Lubotzky 1994)</span>, yields an upper bound of
+the form
+<span data-latex="1 - \lambda_1 \;\le\; \frac{C}{d} \left( 1 - \frac{\log |G|}{\log 2} \right)^{-1}." data-type="block-math">1 - \lambda_1 \;\le\; \frac{C}{d} \left( 1 - \frac{\log |G|}{\log 2} \right)^{-1}.</span></p>
+<blockquote data-chunk-id="d2dbfe06-f145-4062-bb08-5bd44c3333ff"><p style="font-size:11pt;line-height:1.2;font-family:serif">“The spectral radius is the shadow of the group’s geometry.” —
+folklore</p></blockquote>
+<p data-chunk-id="d3f1c8f4-660e-4669-82be-7d5c06bb638e" style="font-size:11pt;line-height:1.2;font-family:serif">Figure <a href="#fig:cone">1</a> illustrates the lattice approximation
+used in the proof of Proposition <a href="#prop:nilpotent">3</a>, and
+Figure <a href="#fig:spectrum">2</a> reports the numerics mentioned in
+the introduction. Both figures were produced with TikZ and matplotlib
+respectively.</p>
+<h2 data-chunk-id="58712d6f-b605-45d9-a9d5-8da877ba8c45" style="font-size:13.2pt;line-height:1.2;font-family:serif">References</h2>
+<p data-chunk-id="701cd456-d563-4614-8fed-cea3f987a35f" style="font-size:11pt;line-height:1.2;font-family:serif">
+Diaconis, Persi. 1988. <em>Group Representations in Probability and
+Statistics</em>. Vol. 11. Lecture Notes–Monograph Series. Institute of
+Mathematical Statistics.
+</p>
+<p data-chunk-id="51337c0d-40d0-4350-b040-d372ffd210dc" style="font-size:11pt;line-height:1.2;font-family:serif">
+Diaconis, Persi, and Laurent Saloff-Coste. 1996. “Nash
+Inequalities for Finite Markov Chains.” <em>Journal of
+Theoretical Probability</em> 9 (2): 459–510.
+</p>
+<p data-chunk-id="8733db29-b203-4c57-8a93-081e72c69027" style="font-size:11pt;line-height:1.2;font-family:serif">
+Kesten, Harry. 1959. “Symmetric Random Walks on Groups.”
+<em>Transactions of the American Mathematical Society</em> 92 (2):
+336–54.
+</p>
+<p data-chunk-id="b1f5112b-d9bd-4bfb-8f30-b777a09f2985" style="font-size:11pt;line-height:1.2;font-family:serif">
+Lubotzky, Alexander. 1994. <em>Discrete Groups, Expanding Graphs and
+Invariant Measures</em>. Vol. 125. Progress in Mathematics. Birkhäuser.
+</p>
+<p data-chunk-id="c1816bd4-2b40-42a1-998c-8ffbe28f11c3" style="font-size:11pt;line-height:1.2;font-family:serif">
+Woess, Wolfgang. 2000. <em>Random Walks on Infinite Graphs and
+Groups</em>. Vol. 138. Cambridge Tracts in Mathematics. Cambridge
+University Press.
+</p>
+<footer data-chunk-id="5dc487e7-13fc-4714-97c4-7824d69300b0" data-part-section="s0" data-part-type="footer" data-part-variant="default" role="doc-pagefooter"><p style="text-align:center"><span data-field="PAGE">1</span></p></footer>
+<aside data-chunk-id="6f3ca33d-f68d-4e2f-be57-7993345a5ba2" data-part-id="1" data-part-type="footnote" role="doc-footnote"><p style="font-size:11pt;line-height:1.2;font-family:serif">This deliberately ambiguous convention is standard in
+the literature on random walks on groups, cf. <span data-citation="Woess2000">(Woess 2000)</span>.</p></aside>

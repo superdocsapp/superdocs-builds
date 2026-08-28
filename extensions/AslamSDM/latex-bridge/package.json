@@ -1,0 +1,115 @@
+{
+  "name": "latex-bridge",
+  "displayName": "LaTeX Bridge for SuperDocs",
+  "description": "Edit LaTeX projects through SuperDocs with human-in-the-loop review, export Word, and write approved edits back into your .tex sources.",
+  "version": "0.1.0",
+  "publisher": "AslamSDM",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "latex",
+    "superdocs",
+    "word",
+    "docx",
+    "editor",
+    "track-changes"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "latex-bridge.open",
+        "title": "LaTeX Bridge: Open SuperDocs Session",
+        "icon": "media/icon.svg"
+      },
+      {
+        "command": "latex-bridge.focus",
+        "title": "LaTeX Bridge: Focus Chat",
+        "icon": "media/icon.svg"
+      },
+      {
+        "command": "latex-bridge.uploadProject",
+        "title": "LaTeX Bridge: Upload Project to SuperDocs"
+      },
+      {
+        "command": "latex-bridge.exportDocx",
+        "title": "LaTeX Bridge: Export Word Document"
+      },
+      {
+        "command": "latex-bridge.writeBack",
+        "title": "LaTeX Bridge: Write Approved Edits Back to .tex"
+      },
+      {
+        "command": "latex-bridge.importTrackChanges",
+        "title": "LaTeX Bridge: Import Co-author Tracked Changes (.docx)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "latex-bridge",
+          "title": "LaTeX Bridge",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "latex-bridge": [
+        {
+          "type": "webview",
+          "id": "latexBridge.chat",
+          "name": "Chat",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "LaTeX Bridge",
+      "properties": {
+        "latexBridge.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "SuperDocs API key (sk_...). Get one at https://use.superdocs.app or via POST /v1/agents/signup."
+        },
+        "latexBridge.opBudgetPerSession": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "description": "Max SuperDocs AI operations (chat edits) allowed per session before pausing for confirmation."
+        },
+        "latexBridge.pollIntervalMs": {
+          "type": "number",
+          "default": 2000,
+          "minimum": 500,
+          "description": "Job poll interval in ms. Approval deadlines are short, so keep this low."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/test-electron": "^3.1.0",
+    "esbuild": "^0.24.0",
+    "jsdom": "^29.1.1",
+    "jszip": "^3.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  }
+}

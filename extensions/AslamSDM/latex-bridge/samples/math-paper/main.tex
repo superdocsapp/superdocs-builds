@@ -1,0 +1,47 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{hyperref}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+`'
+\title{Spectral Gaps of Random Walks on Cayley Graphs}
+\author{Aslam SDM}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We establish sharp spectral gap estimates for random walks on Cayley graphs of
+finite groups, extending the classical Kesten bound to non-abelian settings.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+\label{sec:intro}
+\input{sections/intro}
+
+\section{Main Results}
+\label{sec:main}
+\input{sections/main}
+
+\section{Proofs}
+\label{sec:proofs}
+\input{sections/proofs}
+
+\section{Discussion and Open Problems}
+\label{sec:discussion}
+\input{sections/discussion}
+
+\bibliographystyle{plain}
+\bibliography{bib/refs}
+
+\end{document}
