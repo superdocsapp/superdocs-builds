@@ -1,0 +1,190 @@
+MICROFINANCE LOAN AGREEMENT
+============================
+
+Agreement No: MFL-2024-08-4729
+Date of Execution: March 12, 2024
+Place of Execution: Mumbai, Maharashtra
+
+BETWEEN:
+
+LENDER: PrimeLend Microfinance Corporation Ltd.
+        Registered Office: 45 Finance Tower, BKC, Mumbai - 400051
+        CIN: U65999MH2019PLC328901
+        RBI Registration: N-13.02415
+
+BORROWER: Priya Ramesh Sharma
+          Aadhaar: XXXX-XXXX-7834
+          Address: Flat 302, Sai Heights, Andheri East, Mumbai - 400069
+          Occupation: Self-employed (Textile Trading)
+          Monthly Income: INR 85,000 (as per ITR FY 2022-23)
+
+---
+
+SECTION 1: LOAN TERMS AND CONDITIONS
+
+1.1 Principal Amount: INR 3,50,000 (Indian Rupees Three Lakhs Fifty Thousand Only)
+
+1.2 Interest Rate: 22.5% per annum on reducing balance method
+    Effective Annual Rate (EAR): 24.87%
+
+1.3 Loan Tenure: 48 months (4 years) from the date of first disbursement
+
+1.4 Equated Monthly Installment (EMI): INR 11,284 per month
+    First EMI due date: April 12, 2024
+    Last EMI due date: March 12, 2028
+
+1.5 Processing Fee: 2.5% of the sanctioned loan amount = INR 8,750
+    (Inclusive of applicable GST @ 18%)
+
+1.6 Stamp Duty and Documentation Charges: INR 1,500
+
+1.7 Insurance Premium (Credit Life): INR 4,200 per annum
+    Coverage: Outstanding principal balance
+
+---
+
+SECTION 2: DISBURSEMENT
+
+2.1 The loan amount shall be disbursed to the Borrower's designated bank account
+    (HDFC Bank, A/C No: XXXX-XXXX-8901) within 3 working days of agreement execution.
+
+2.2 Pre-disbursement conditions:
+    a) Submission of all KYC documents
+    b) Verification of employment/income
+    c) CIBIL score minimum 650 (Borrower's current score: 712)
+    d) Execution of this agreement and personal guarantee
+
+---
+
+SECTION 3: SECURITY AND COLLATERAL
+
+3.1 This is an UNSECURED loan. No collateral or hypothecation is required.
+
+3.2 Personal Guarantee: The Borrower provides a personal guarantee for the
+    full outstanding amount at all times during the tenure.
+
+3.3 Post-dated cheques: 48 PDCs of INR 11,284 each, drawn on HDFC Bank
+    account mentioned in Section 2.1.
+
+---
+
+SECTION 4: PENAL PROVISIONS
+
+4.1 Late Payment Penalty: 2% per month on the overdue EMI amount.
+    Grace period: 5 calendar days from EMI due date.
+
+4.2 Cheque Bounce Charges: INR 750 per instance plus applicable bank charges.
+
+4.3 Penal Interest on Overdue Principal: Base Rate (22.5%) + 6% per annum = 28.5% p.a.
+    Applied on the overdue portion only from the date of default.
+
+4.4 Legal Recovery Charges: Actual costs incurred, to be borne by the Borrower
+    in case of initiation of recovery proceedings under SARFAESI Act or civil suit.
+
+---
+
+SECTION 5: PREPAYMENT AND FORECLOSURE
+
+5.1 Prepayment Lock-in Period: First 12 months from disbursement date.
+    No prepayment (partial or full) permitted during lock-in.
+
+5.2 Prepayment Penalty (after lock-in):
+    - Months 13-24: 4% of prepaid amount
+    - Months 25-36: 2% of prepaid amount
+    - Months 37-48: NIL (no penalty)
+
+5.3 Minimum prepayment amount: INR 25,000 or 3 EMIs (whichever is higher)
+
+5.4 Foreclosure (full prepayment): Subject to prepayment penalty as per 5.2
+    plus administrative charges of INR 2,000.
+
+---
+
+SECTION 6: DEFAULT AND ACCELERATION
+
+6.1 Events of Default:
+    a) Non-payment of 3 consecutive EMIs
+    b) Misrepresentation of income or KYC details
+    c) Insolvency or bankruptcy proceedings against Borrower
+    d) Material adverse change in Borrower's financial condition
+    e) Breach of any covenant under this agreement
+
+6.2 Upon occurrence of an Event of Default, the Lender may:
+    a) Declare the entire outstanding loan (principal + accrued interest) immediately
+       due and payable (acceleration clause)
+    b) Adjust any deposits or credit balances held by the Lender
+    c) Initiate legal proceedings for recovery
+    d) Report the default to credit bureaus (CIBIL, Equifax, Experian, CRIF)
+
+6.3 Cure Period: The Borrower shall have 30 days from written notice of default
+    to remedy the breach before acceleration takes effect.
+
+---
+
+SECTION 7: MORATORIUM AND RESTRUCTURING
+
+7.1 Moratorium: Not applicable under standard terms.
+
+7.2 Restructuring: The Lender may, at its sole discretion, offer restructuring
+    of the loan under the following circumstances:
+    a) Documented medical emergency affecting Borrower's earning capacity
+    b) Natural disaster affecting Borrower's business/residence
+    c) Government-mandated lockdown exceeding 30 days
+
+7.3 Restructuring, if granted, may involve:
+    a) Extension of tenure by up to 12 months
+    b) Temporary reduction of EMI for up to 6 months
+    c) Capitalization of accrued interest (no waiver)
+
+---
+
+SECTION 8: DISCLOSURES AND REPRESENTATIONS
+
+8.1 The Borrower acknowledges and confirms:
+    a) Having read and understood all terms of this agreement
+    b) The loan is being availed for business/personal purposes (not speculation)
+    c) All information provided in the application is true and accurate
+    d) No other undisclosed liabilities exceeding INR 1,00,000 exist
+    e) Monthly obligation-to-income ratio does not exceed 50%
+
+8.2 Total Cost of Credit Disclosure:
+    - Total interest payable over tenure: INR 1,91,632
+    - Total fees (processing + stamp + insurance): INR 18,650
+    - Total amount payable: INR 5,60,282
+    - Annual Percentage Rate (APR): 25.4%
+
+---
+
+SECTION 9: GOVERNING LAW AND JURISDICTION
+
+9.1 This agreement shall be governed by the laws of India and the regulations
+    of the Reserve Bank of India applicable to Non-Banking Financial Companies
+    (NBFC-MFI category).
+
+9.2 Exclusive jurisdiction: Courts of Mumbai, Maharashtra.
+
+9.3 Dispute Resolution: Any dispute shall first be referred to the Lender's
+    internal grievance redressal mechanism. If unresolved within 30 days,
+    the matter may be escalated to the RBI Ombudsman for NBFCs.
+
+---
+
+SIGNATURES:
+
+For PrimeLend Microfinance Corporation Ltd.
+Authorized Signatory: ___________________
+Name: Vikram Mehta (Branch Manager)
+Date: March 12, 2024
+
+Borrower:
+Signature: ___________________
+Name: Priya Ramesh Sharma
+Date: March 12, 2024
+
+Witness 1: ___________________
+Name: Rakesh Kumar Jain
+Aadhaar: XXXX-XXXX-3456
+
+Witness 2: ___________________
+Name: Sunita Devi Patel
+Aadhaar: XXXX-XXXX-9012
