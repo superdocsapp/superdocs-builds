@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aegis — Edit Verification</title>
+<meta name="color-scheme" content="dark" />
+<style>
+  @font-face { font-family: 'stack-sans'; src: local('IBM Plex Sans'), local('Inter'); }
+
+  :root{
+    --bg:#14171A; --surface:#1B1F23; --surface-2:#22262B; --border:#33383D; --border-soft:#282D32;
+    --text:#E7E5DC; --text-dim:#9CA3A8; --text-faint:#8B9195;
+    --paper:#F5F3EC; --paper-ink:#23241F; --paper-ink-dim:#6B675C; --paper-edge:#DAD5C4;
+    --accent:#C9A24B; --accent-dim:#8A7238;
+    --verified:#7FCB9E; --verified-fill:#17301F; --verified-edge:#2C5B3E;
+    --blocked:#E39292; --blocked-fill:#3A1A1A; --blocked-edge:#6B2E2E;
+    --review:#E3C27A; --review-fill:#372C11; --review-edge:#6B5423;
+    --font-display:'IBM Plex Serif', Georgia, 'Times New Roman', serif;
+    --font-body:'IBM Plex Sans', 'stack-sans', -apple-system, Segoe UI, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --radius:3px;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ color-scheme: dark; }
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body);
+    font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  a{ color:var(--accent); }
+  ::selection{ background:var(--accent-dim); color:var(--paper); }
+
+  :focus{ outline:none; }
+  :focus-visible{ outline:2.5px solid var(--accent); outline-offset:2px; border-radius:2px; }
+
+  .skip-link{ position:absolute; left:-9999px; top:0; background:var(--accent); color:var(--bg); padding:.6em 1em; z-index:100; font-weight:600; }
+  .skip-link:focus{ left:1rem; top:1rem; }
+
+  .shell{ max-width:1180px; margin:0 auto; padding:0 24px 96px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:22px 24px; border-bottom:1px solid var(--border-soft);
+  }
+  .wordmark{ display:flex; align-items:baseline; gap:10px; font-family:var(--font-display); }
+  .wordmark .name{ font-size:20px; font-weight:600; letter-spacing:.01em; }
+  .wordmark .tagline{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); letter-spacing:.04em; text-transform:uppercase; }
+  .mode-pill{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--text-dim); border:1px solid var(--border); border-radius:100px; padding:4px 10px;
+  }
+
+  /* ---------- Source selector (tabs) ---------- */
+  .source-bar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:18px 24px 0; }
+  .source-bar .label{ font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); margin-right:4px; }
+  [role="tablist"]{ display:flex; gap:8px; flex-wrap:wrap; }
+  [role="tab"]{
+    font-family:var(--font-body); font-size:13.5px; color:var(--text-dim); background:var(--surface);
+    border:1px solid var(--border); border-radius:100px; padding:7px 16px; cursor:pointer;
+  }
+  [role="tab"]:hover{ color:var(--text); border-color:var(--text-faint); }
+  [role="tab"][aria-selected="true"]{ background:var(--surface-2); color:var(--text); border-color:var(--accent-dim); box-shadow: inset 0 0 0 1px var(--accent-dim); }
+  .file-load{ display:inline-flex; align-items:center; gap:8px; margin-left:auto; }
+  .file-load label.button{
+    font-size:13px; color:var(--text-dim); border:1px dashed var(--border); border-radius:100px;
+    padding:7px 14px; cursor:pointer; font-family:var(--font-body);
+  }
+  .file-load label.button:hover{ color:var(--text); border-color:var(--text-faint); }
+  .file-load input[type="file"]{ position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; }
+
+  #load-error{ margin:10px 24px 0; padding:10px 14px; background:var(--blocked-fill); border:1px solid var(--blocked-edge); color:var(--blocked); border-radius:var(--radius); font-size:13.5px; display:none; }
+  #load-error.visible{ display:block; }
+
+  /* ---------- Header / instruction / stamp ---------- */
+  .case-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:32px; padding:28px 24px 8px; flex-wrap:wrap; }
+  .instruction-block .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); margin-bottom:8px; }
+  .instruction-block blockquote{ margin:0; font-family:var(--font-display); font-size:22px; line-height:1.4; max-width:56ch; font-style:italic; color:var(--text); }
+  .instruction-meta{ margin-top:12px; font-family:var(--font-mono); font-size:12px; color:var(--text-dim); display:flex; gap:18px; flex-wrap:wrap; }
+  .instruction-meta b{ color:var(--text); font-weight:600; }
+
+  .stamp{
+    --c:var(--verified); --cf:var(--verified-fill); --ce:var(--verified-edge);
+    flex:0 0 auto; transform:rotate(-4deg); border:2px solid var(--c); outline:1px solid var(--c); outline-offset:4px;
+    background:var(--cf); color:var(--c); border-radius:6px; padding:14px 22px; text-align:center; min-width:190px;
+  }
+  .stamp[data-decision="BLOCKED"]{ --c:var(--blocked); --cf:var(--blocked-fill); --ce:var(--blocked-edge); }
+  .stamp[data-decision="REQUIRES_REVIEW"]{ --c:var(--review); --cf:var(--review-fill); --ce:var(--review-edge); }
+  .stamp[data-decision="VERIFIED_WITH_WARNINGS"]{ --c:var(--review); --cf:var(--review-fill); --ce:var(--review-edge); }
+  .stamp .glyph{ font-size:22px; line-height:1; margin-bottom:6px; }
+  .stamp .word{ font-family:var(--font-display); font-weight:700; font-size:19px; letter-spacing:.06em; text-transform:uppercase; }
+  .stamp .sub{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; opacity:.85; margin-top:4px; }
+  @media (prefers-reduced-motion: no-preference){
+    .stamp{ animation: stamp-impact 340ms cubic-bezier(.2,1.4,.4,1) both; }
+  }
+  @keyframes stamp-impact{ 0%{ transform:rotate(-4deg) scale(2.2); opacity:0; } 70%{ opacity:1; } 100%{ transform:rotate(-4deg) scale(1); opacity:1; } }
+
+  .status-line{ padding:6px 24px 0; color:var(--text-dim); font-size:14px; max-width:70ch; }
+
+  .injection-notice{
+    margin:18px 24px 0; padding:12px 16px; background:var(--surface); border:1px solid var(--accent-dim);
+    border-radius:var(--radius); font-size:13px; color:var(--text-dim); display:flex; gap:10px; align-items:flex-start;
+  }
+  .injection-notice strong{ color:var(--accent); }
+
+  /* ---------- Layout grid ---------- */
+  .grid{ display:grid; grid-template-columns:1.5fr 1fr; gap:20px; padding:24px; align-items:start; }
+  @media (max-width:840px){ .grid{ grid-template-columns:1fr; } }
+
+  section.panel{ background:var(--surface); border:1px solid var(--border-soft); border-radius:6px; padding:20px; }
+  section.panel > h2{ margin:0 0 14px; font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-faint); display:flex; align-items:center; justify-content:space-between; }
+  section.panel > h2 .count{ color:var(--text-dim); font-weight:400; }
+
+  /* ---------- Diff viewer ---------- */
+  .region{ border:1px solid var(--border-soft); border-radius:5px; overflow:hidden; margin-bottom:14px; }
+  .region:last-child{ margin-bottom:0; }
+  .region-head{ display:flex; gap:10px; align-items:center; padding:8px 12px; background:var(--surface-2); font-family:var(--font-mono); font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.04em; }
+  .region-head .kind{ font-weight:600; }
+  .region-head .kind.modified{ color:var(--review); } .region-head .kind.deleted{ color:var(--blocked); } .region-head .kind.inserted{ color:var(--verified); }
+  .leaf{ padding:12px 14px; font-family:var(--font-display); font-size:14.5px; line-height:1.6; background:var(--paper); color:var(--paper-ink); border-top:1px solid var(--paper-edge); }
+  .leaf:first-of-type{ border-top:none; }
+  .leaf .gutter{ font-family:var(--font-mono); font-size:11px; color:var(--paper-ink-dim); margin-right:8px; user-select:none; }
+  .leaf.before{ text-decoration:line-through; text-decoration-color:var(--blocked-edge); text-decoration-thickness:1.5px; opacity:.85; }
+  .leaf.after{ box-shadow:inset 3px 0 0 var(--verified-edge); }
+  .empty-diff{ color:var(--text-dim); font-size:14px; padding:8px 2px; }
+
+  /* ---------- Invariants ---------- */
+  ul.invariants{ list-style:none; margin:0 0 18px; padding:0; }
+  ul.invariants li{ display:flex; gap:10px; align-items:flex-start; padding:7px 0; border-bottom:1px solid var(--border-soft); font-size:13.5px; }
+  ul.invariants li:last-child{ border-bottom:none; }
+  ul.invariants .mark{ flex:0 0 auto; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; margin-top:1px; }
+  ul.invariants li[data-passed="true"] .mark{ background:var(--verified-fill); color:var(--verified); border:1px solid var(--verified-edge); }
+  ul.invariants li[data-passed="false"] .mark{ background:var(--blocked-fill); color:var(--blocked); border:1px solid var(--blocked-edge); }
+  ul.invariants .label{ color:var(--text); }
+  ul.invariants li[data-passed="false"] .label{ color:var(--blocked); font-weight:600; }
+  ul.invariants .refs{ display:block; font-family:var(--font-mono); font-size:11px; color:var(--text-faint); margin-top:2px; }
+
+  .risk-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:16px; }
+  .risk-cell{ text-align:center; border:1px solid var(--border-soft); border-radius:4px; padding:8px 4px; }
+  .risk-cell .n{ font-family:var(--font-mono); font-size:17px; font-weight:600; }
+  .risk-cell .k{ font-size:9.5px; letter-spacing:.04em; text-transform:uppercase; color:var(--text-faint); margin-top:2px; }
+  .risk-cell.hot .n{ color:var(--blocked); }
+
+  .checks-list{ list-style:none; margin:0; padding:0; font-size:13px; }
+  .checks-list li{ display:flex; justify-content:space-between; padding:5px 0; color:var(--text-dim); border-bottom:1px dotted var(--border-soft); }
+  .checks-list li:last-child{ border-bottom:none; }
+  .checks-list .checker{ font-family:var(--font-mono); text-transform:lowercase; color:var(--text); }
+  .checks-list .badge{ font-family:var(--font-mono); font-size:11px; }
+  .checks-list li[data-passed="true"] .badge{ color:var(--verified); }
+  .checks-list li[data-passed="false"] .badge{ color:var(--blocked); }
+
+  /* ---------- Evidence ledger ---------- */
+  details.ledger{ margin:0 24px 24px; border:1px solid var(--border-soft); border-radius:6px; background:var(--surface); }
+  details.ledger > summary{ cursor:pointer; padding:14px 20px; font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-dim); list-style:none; display:flex; align-items:center; gap:10px; }
+  details.ledger > summary::-webkit-details-marker{ display:none; }
+  details.ledger > summary::before{ content:'▸'; display:inline-block; transition:transform 120ms; color:var(--accent); }
+  details.ledger[open] > summary::before{ transform:rotate(90deg); }
+  @media (prefers-reduced-motion: reduce){ details.ledger > summary::before{ transition:none; } }
+  .ledger-scroll{ max-height:420px; overflow:auto; border-top:1px solid var(--border-soft); }
+  table.evidence{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.evidence caption{ text-align:left; padding:10px 20px; color:var(--text-faint); font-size:12px; }
+  table.evidence th{ position:sticky; top:0; background:var(--surface-2); text-align:left; padding:9px 12px; font-family:var(--font-mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); border-bottom:1px solid var(--border); }
+  table.evidence td{ padding:9px 12px; border-bottom:1px solid var(--border-soft); color:var(--text-dim); vertical-align:top; }
+  table.evidence td.kind{ font-family:var(--font-mono); color:var(--text); }
+  table.evidence td.sev{ font-family:var(--font-mono); font-weight:600; white-space:nowrap; }
+  td.sev[data-sev="CRITICAL"]{ color:var(--blocked); } td.sev[data-sev="HIGH"]{ color:var(--review); }
+  td.sev[data-sev="MEDIUM"]{ color:var(--accent); } td.sev[data-sev="LOW"],td.sev[data-sev="INFO"]{ color:var(--text-faint); }
+  table.evidence td.quote{ font-family:var(--font-display); font-style:italic; }
+
+  /* ---------- Footer / chain of custody ---------- */
+  .custody{ display:flex; flex-wrap:wrap; gap:22px; padding:16px 24px 0; margin:0 24px; border-top:1px solid var(--border-soft); font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); }
+  .custody b{ color:var(--text-dim); font-weight:600; }
+
+  .visually-hidden{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to verification result</a>
+
+<header class="topbar">
+  <div class="wordmark">
+    <span class="name">Aegis</span>
+    <span class="tagline">Verifiable edit engine</span>
+  </div>
+  <span class="mode-pill" id="mode-pill">mock adapter</span>
+</header>
+
+<main id="main" class="shell" tabindex="-1">
+
+  <div class="source-bar">
+    <span class="label">View</span>
+    <div role="tablist" aria-label="Choose which EditProof to view" style="display:contents">
+      <button role="tab" id="tab-unsafe" aria-controls="main" aria-selected="false" data-source="unsafe">Unsafe rewrite (blocked)</button>
+      <button role="tab" id="tab-safe" aria-controls="main" aria-selected="false" data-source="safe">Safe rewrite (verified)</button>
+    </div>
+    <div class="file-load">
+      <label class="button" for="file-input">Load a proof file…</label>
+      <input type="file" id="file-input" accept="application/json" />
+    </div>
+  </div>
+  <div id="load-error" role="alert"></div>
+
+  <div class="case-header">
+    <div class="instruction-block">
+      <div class="eyebrow">Requested edit</div>
+      <blockquote id="instruction-text">—</blockquote>
+      <div class="instruction-meta">
+        <span>Scope: <b id="meta-scope">—</b></span>
+        <span>Edit kind: <b id="meta-editkind">—</b></span>
+        <span>Attempts: <b id="meta-attempts">—</b></span>
+      </div>
+    </div>
+    <div class="stamp" id="stamp" data-decision="VERIFIED">
+      <div class="glyph" id="stamp-glyph" aria-hidden="true">✓</div>
+      <div class="word" id="stamp-word">Verified</div>
+      <div class="sub" id="stamp-sub">operation</div>
+    </div>
+  </div>
+
+  <p class="status-line" id="status-line"></p>
+
+  <div class="injection-notice" id="injection-notice" hidden>
+    <span aria-hidden="true">⚑</span>
+    <span id="injection-text"></span>
+  </div>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="h-diff">
+      <h2 id="h-diff">Changed regions <span class="count" id="diff-count"></span></h2>
+      <div id="diff-list"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-invariants">
+      <h2 id="h-invariants">Protected invariants</h2>
+      <ul class="invariants" id="invariants-list"></ul>
+
+      <h2 id="h-risk" style="margin-top:22px;">Risk assessment</h2>
+      <div class="risk-grid" id="risk-grid" role="img" aria-labelledby="h-risk" aria-describedby="risk-desc"></div>
+      <p id="risk-desc" class="visually-hidden"></p>
+
+      <h2 id="h-checks" style="margin-top:22px;">Verification checks <span class="count" id="checks-count"></span></h2>
+      <ul class="checks-list" id="checks-list"></ul>
+    </section>
+  </div>
+
+  <details class="ledger">
+    <summary>Full proof — evidence ledger (<span id="ledger-count">0</span> findings)</summary>
+    <div class="ledger-scroll">
+      <table class="evidence">
+        <caption>Every finding Aegis recorded for this operation, most severe first. This is the complete evidence backing the decision above — nothing here is summarized away.</caption>
+        <thead>
+          <tr><th scope="col">Severity</th><th scope="col">Checker</th><th scope="col">Kind</th><th scope="col">Before</th><th scope="col">After</th><th scope="col">Message</th></tr>
+        </thead>
+        <tbody id="evidence-body"></tbody>
+      </table>
+    </div>
+  </details>
+
+  <div class="custody">
+    <span><b>proof_hash</b> <span id="c-hash"></span></span>
+    <span><b>operation_id</b> <span id="c-opid"></span></span>
+    <span><b>receipt</b> <span id="c-receipt"></span></span>
+    <span><b>issued</b> <span id="c-time"></span></span>
+  </div>
+
+</main>
+
+<script id="sample-proof-unsafe" type="application/json">{"changed_regions":[{"after_block_id":"paragraph:1","after_excerpt":"The Supplier may deliver the goods within 30 days of the order date. The Supplier shall notify the Customer right away about any expected delay. Delivery shall happen at the address in Exhibit A unless the Customer picks…","before_block_id":"paragraph:1","before_excerpt":"The Supplier shall deliver the goods within 30 days of the order date. The Supplier shall notify the Customer immediately of any anticipated delay. Delivery shall occur at the address specified in Exhibit A unless the Cu…","kind":"modified"},{"after_block_id":"paragraph:3","after_excerpt":"Either party may end this Agreement with 60 days written notice. The Customer may not terminate this Agreement during the first 90 days except for material breach by the Supplier.","before_block_id":"paragraph:3","before_excerpt":"Either party may terminate this Agreement upon 60 days written notice. The Customer may not terminate this Agreement during the first 90 days except for material breach by the Supplier.","kind":"modified"}],"decision":"BLOCKED","drift_results":[],"evidence":{"attempts":[{"attempt":1,"decision":"BLOCKED","findingCount":1,"highestSeverity":"CRITICAL","instructionUsed":"Make this contract easier to read without changing its legal meaning."}],"findings":[{"after":"The Supplier may deliver the goods within 30 days of the order date.","before":"The Supplier shall deliver the goods within 30 days of the order date.","checker":"semantic","confidence":0.85,"id":"semantic:1","kind":"SEMANTIC_OBLIGATION_TO_PERMISSION","location":{"afterBlockId":"paragraph:1","beforeBlockId":"paragraph:1"},"message":"A binding obligation became non-binding (permission): \"The Supplier shall deliver the goods within 30 days of the order date.\" → \"The Supplier may deliver the goods within 30 days of the order date.\"","recoverable":false,"severity":"CRITICAL"}],"proof_hash":"464276903c01829f","rejected_policy_overrides":[{"attemptedSeverity":"LOW","enforcedSeverity":"CRITICAL","kind":"SEMANTIC_OBLIGATION_TO_PERMISSION","reason":"\"SEMANTIC_OBLIGATION_TO_PERMISSION\" is on the non-downgradable list; the requested override to LOW was ignored."}]},"execution_metadata":{"adapter_operation_id":"demo-contract:op1","attempts_used":1,"checker_durations_ms":{"drift":0.09,"formatting":0.17,"protected_value":3.48,"scope":0.08,"semantic":2.01,"structural":0.14},"duration_ms":16.13,"final_receipt_status":"rejected","retry_budget":2,"session_id":"demo-contract","superdoc_mode":"mock"},"intent":{"ai_assisted":false,"confidence":0.7999999999999999,"edit_kind":"style-only","instruction_text":"Make this contract easier to read without changing its legal meaning.","scope":{"kind":"style-only"},"summary":"style-only edit targeting style/wording, document-wide: \"Make this contract easier to read without changing its legal meaning.\""},"operation_id":"396c500c-a9fc-4bb3-97a0-a5149d7a2047","proof_version":"1.0.0","protected_invariants":[{"key":"numbers_preserved","label":"Numbers preserved","passed":true,"violating_finding_ids":[]},{"key":"dates_preserved","label":"Dates & durations preserved","passed":true,"violating_finding_ids":[]},{"key":"currency_preserved","label":"Currency preserved","passed":true,"violating_finding_ids":[]},{"key":"links_preserved","label":"Links & identifiers preserved","passed":true,"violating_finding_ids":[]},{"key":"obligations_preserved","label":"Obligations & permissions preserved","passed":false,"violating_finding_ids":["semantic:1"]},{"key":"structure_preserved","label":"Structure preserved","passed":true,"violating_finding_ids":[]},{"key":"scope_respected","label":"Scope respected","passed":true,"violating_finding_ids":[]},{"key":"formatting_clean","label":"Formatting clean","passed":true,"violating_finding_ids":[]}],"risk_assessment":{"counts":{"CRITICAL":1,"HIGH":0,"INFO":0,"LOW":0,"MEDIUM":0},"highest_severity":"CRITICAL"},"scope":{"kind":"style-only"},"timestamp":"2026-08-25T10:54:05.528Z","unchanged_regions":[{"after_block_id":"heading:1","after_excerpt":"Master Services Agreement — Acme Robotics & Nimbus Logistics","before_block_id":"heading:1","before_excerpt":"Master Services Agreement — Acme Robotics & Nimbus Logistics","kind":"unchanged"},{"after_block_id":"heading:2","after_excerpt":"Delivery Obligations","before_block_id":"heading:2","before_excerpt":"Delivery Obligations","kind":"unchanged"},{"after_block_id":"heading:3","after_excerpt":"Payment Terms","before_block_id":"heading:3","before_excerpt":"Payment Terms","kind":"unchanged"},{"after_block_id":"paragraph:2","after_excerpt":"Payment must be made within 30 days of the invoice date. Late payments accrue interest at a rate of 1.5% per month and a flat late fee of $250 per occurrence. All payments must be made in USD to the account specified in …","before_block_id":"paragraph:2","before_excerpt":"Payment must be made within 30 days of the invoice date. Late payments accrue interest at a rate of 1.5% per month and a flat late fee of $250 per occurrence. All payments must be made in USD to the account specified in …","kind":"unchanged"},{"after_block_id":"heading:4","after_excerpt":"Termination","before_block_id":"heading:4","before_excerpt":"Termination","kind":"unchanged"},{"after_block_id":"heading:5","after_excerpt":"Confidentiality","before_block_id":"heading:5","before_excerpt":"Confidentiality","kind":"unchanged"},{"after_block_id":"paragraph:4","after_excerpt":"Each party shall keep confidential all proprietary information received from the other party. This obligation shall survive termination for a period of 3 years.","before_block_id":"paragraph:4","before_excerpt":"Each party shall keep confidential all proprietary information received from the other party. This obligation shall survive termination for a period of 3 years.","kind":"unchanged"}],"verification_results":[{"checker":"structural","duration_ms":0.14,"finding_count":0,"passed":true},{"checker":"protected_value","duration_ms":3.48,"finding_count":0,"passed":true},{"checker":"semantic","duration_ms":2.01,"finding_count":1,"passed":false},{"checker":"scope","duration_ms":0.08,"finding_count":0,"passed":true},{"checker":"formatting","duration_ms":0.17,"finding_count":0,"passed":true},{"checker":"drift","duration_ms":0.09,"finding_count":0,"passed":true}]}</script>
+<script id="sample-proof-safe" type="application/json">{"changed_regions":[{"after_block_id":"paragraph:1","after_excerpt":"The Supplier shall deliver the goods within 30 days of the order date. The Supplier shall notify the Customer right away about any expected delay. Delivery shall happen at the address in Exhibit A unless the Customer pic…","before_block_id":"paragraph:1","before_excerpt":"The Supplier shall deliver the goods within 30 days of the order date. The Supplier shall notify the Customer immediately of any anticipated delay. Delivery shall occur at the address specified in Exhibit A unless the Cu…","kind":"modified"},{"after_block_id":"paragraph:2","after_excerpt":"Payment must be made within 30 days of the invoice date. Late payments accrue interest at a rate of 1.5% per month and a flat late fee of **$250** per occurrence. All payments must be made in USD to the account specified…","before_block_id":"paragraph:2","before_excerpt":"Payment must be made within 30 days of the invoice date. Late payments accrue interest at a rate of 1.5% per month and a flat late fee of $250 per occurrence. All payments must be made in USD to the account specified in …","kind":"modified"},{"after_block_id":"paragraph:3","after_excerpt":"Either party may end this Agreement with 60 days written notice. The Customer may not terminate this Agreement during the first 90 days except for material breach by the Supplier.","before_block_id":"paragraph:3","before_excerpt":"Either party may terminate this Agreement upon 60 days written notice. The Customer may not terminate this Agreement during the first 90 days except for material breach by the Supplier.","kind":"modified"},{"after_block_id":"paragraph:4","after_excerpt":"Each party shall keep confidential all proprietary information they get from the other party. This duty shall continue for 3 years after termination.","before_block_id":"paragraph:4","before_excerpt":"Each party shall keep confidential all proprietary information received from the other party. This obligation shall survive termination for a period of 3 years.","kind":"modified"}],"decision":"VERIFIED","drift_results":[],"evidence":{"attempts":[{"attempt":1,"decision":"VERIFIED","findingCount":1,"highestSeverity":"LOW","instructionUsed":"Make this contract easier to read without changing its legal meaning."}],"findings":[{"after":"Payment must be made within 30 days of the invoice date. Late payments accrue interest at a rate of 1.5% per month and a flat late fee of **$250** per occurrence. All payments must be made in USD to the account specified in Section 4.2.","before":"Payment must be made within 30 days of the invoice date. Late payments accrue interest at a rate of 1.5% per month and a flat late fee of $250 per occurrence. All payments must be made in USD to the account specified in Section 4.2.","checker":"formatting","confidence":1,"id":"formatting:1","kind":"FORMATTING_ONLY_CHANGE","location":{"afterBlockId":"paragraph:2","beforeBlockId":"paragraph:2"},"message":"The underlying text is identical; only emphasis markup (bold/italic/underline) changed.","recoverable":true,"severity":"LOW"}],"proof_hash":"6d9a6b956333c9ed","rejected_policy_overrides":[]},"execution_metadata":{"adapter_operation_id":"demo-contract:op1","attempts_used":1,"checker_durations_ms":{"drift":0.01,"formatting":0.08,"protected_value":0.54,"scope":0.01,"semantic":0.53,"structural":0.03},"duration_ms":8.23,"final_receipt_status":"applied","retry_budget":2,"session_id":"demo-contract","superdoc_mode":"mock"},"intent":{"ai_assisted":false,"confidence":0.7999999999999999,"edit_kind":"style-only","instruction_text":"Make this contract easier to read without changing its legal meaning.","scope":{"kind":"style-only"},"summary":"style-only edit targeting style/wording, document-wide: \"Make this contract easier to read without changing its legal meaning.\""},"operation_id":"d65fee52-7f93-436d-a700-89b0a360c4cf","proof_version":"1.0.0","protected_invariants":[{"key":"numbers_preserved","label":"Numbers preserved","passed":true,"violating_finding_ids":[]},{"key":"dates_preserved","label":"Dates & durations preserved","passed":true,"violating_finding_ids":[]},{"key":"currency_preserved","label":"Currency preserved","passed":true,"violating_finding_ids":[]},{"key":"links_preserved","label":"Links & identifiers preserved","passed":true,"violating_finding_ids":[]},{"key":"obligations_preserved","label":"Obligations & permissions preserved","passed":true,"violating_finding_ids":[]},{"key":"structure_preserved","label":"Structure preserved","passed":true,"violating_finding_ids":[]},{"key":"scope_respected","label":"Scope respected","passed":true,"violating_finding_ids":[]},{"key":"formatting_clean","label":"Formatting clean","passed":true,"violating_finding_ids":[]}],"risk_assessment":{"counts":{"CRITICAL":0,"HIGH":0,"INFO":0,"LOW":1,"MEDIUM":0},"highest_severity":"LOW"},"scope":{"kind":"style-only"},"timestamp":"2026-08-25T10:54:05.542Z","unchanged_regions":[{"after_block_id":"heading:1","after_excerpt":"Master Services Agreement — Acme Robotics & Nimbus Logistics","before_block_id":"heading:1","before_excerpt":"Master Services Agreement — Acme Robotics & Nimbus Logistics","kind":"unchanged"},{"after_block_id":"heading:2","after_excerpt":"Delivery Obligations","before_block_id":"heading:2","before_excerpt":"Delivery Obligations","kind":"unchanged"},{"after_block_id":"heading:3","after_excerpt":"Payment Terms","before_block_id":"heading:3","before_excerpt":"Payment Terms","kind":"unchanged"},{"after_block_id":"heading:4","after_excerpt":"Termination","before_block_id":"heading:4","before_excerpt":"Termination","kind":"unchanged"},{"after_block_id":"heading:5","after_excerpt":"Confidentiality","before_block_id":"heading:5","before_excerpt":"Confidentiality","kind":"unchanged"}],"verification_results":[{"checker":"structural","duration_ms":0.03,"finding_count":0,"passed":true},{"checker":"protected_value","duration_ms":0.54,"finding_count":0,"passed":true},{"checker":"semantic","duration_ms":0.53,"finding_count":0,"passed":true},{"checker":"scope","duration_ms":0.01,"finding_count":0,"passed":true},{"checker":"formatting","duration_ms":0.08,"finding_count":1,"passed":true},{"checker":"drift","duration_ms":0.01,"finding_count":0,"passed":true}]}</script>
+
+<script>
+(function(){
+  'use strict';
+
+  var SEVERITY_ORDER = ['CRITICAL','HIGH','MEDIUM','LOW','INFO'];
+  var DECISION_GLYPH = { VERIFIED:'✓', VERIFIED_WITH_WARNINGS:'✓', REQUIRES_REVIEW:'?', BLOCKED:'✕' };
+  var DECISION_WORD = { VERIFIED:'Verified', VERIFIED_WITH_WARNINGS:'Verified · warnings', REQUIRES_REVIEW:'Needs review', BLOCKED:'Blocked' };
+
+  var proofs = {
+    unsafe: JSON.parse(document.getElementById('sample-proof-unsafe').textContent),
+    safe: JSON.parse(document.getElementById('sample-proof-safe').textContent)
+  };
+
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  var errorBox = document.getElementById('load-error');
+
+  function selectTab(activeId){
+    tabs.forEach(function(t){
+      var isActive = t.id === activeId;
+      t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      t.tabIndex = isActive ? 0 : -1;
+    });
+  }
+
+  tabs.forEach(function(tab, i){
+    tab.tabIndex = -1;
+    tab.addEventListener('click', function(){
+      clearError();
+      selectTab(tab.id);
+      render(proofs[tab.data ? tab.data : tab.getAttribute('data-source')]);
+    });
+    tab.addEventListener('keydown', function(e){
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      next.focus(); next.click();
+    });
+  });
+
+  document.getElementById('file-input').addEventListener('change', function(e){
+    var file = e.target.files[0];
+    if (!file) return;
+    clearError();
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var parsed = JSON.parse(reader.result);
+        assertLooksLikeProof(parsed);
+        tabs.forEach(function(t){ t.setAttribute('aria-selected','false'); t.tabIndex = -1; });
+        render(parsed);
+      } catch (err) {
+        showError('That file isn\u2019t a usable EditProof (' + err.message + '). Check it has decision, verification_results, and evidence fields, then try again.');
+      }
+    };
+    reader.onerror = function(){ showError('Could not read that file. Try again or pick a different one.'); };
+    reader.readAsText(file);
+  });
+
+  function assertLooksLikeProof(p){
+    if (!p || typeof p !== 'object') throw new Error('not a JSON object');
+    if (!p.decision || !p.evidence || !p.verification_results) throw new Error('missing required fields');
+  }
+
+  function showError(msg){ errorBox.textContent = msg; errorBox.classList.add('visible'); }
+  function clearError(){ errorBox.textContent = ''; errorBox.classList.remove('visible'); }
+
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function scopeLabel(scope){
+    if (!scope) return 'unspecified';
+    if (scope.kind === 'paragraph-index') return 'paragraph ' + scope.index;
+    if (scope.kind === 'heading') return '\u201c' + scope.headingText + '\u201d section';
+    return scope.kind.replace(/-/g,' ');
+  }
+
+  function render(proof){
+    document.getElementById('instruction-text').textContent = '\u201c' + proof.intent.instruction_text + '\u201d';
+    document.getElementById('meta-scope').textContent = scopeLabel(proof.scope);
+    document.getElementById('meta-editkind').textContent = proof.intent.edit_kind;
+    document.getElementById('meta-attempts').textContent = proof.execution_metadata.attempts_used + ' / ' + (proof.execution_metadata.retry_budget + 1) + ' max';
+
+    var stamp = document.getElementById('stamp');
+    stamp.setAttribute('data-decision', proof.decision);
+    document.getElementById('stamp-glyph').textContent = DECISION_GLYPH[proof.decision] || '?';
+    document.getElementById('stamp-word').textContent = DECISION_WORD[proof.decision] || proof.decision;
+    document.getElementById('stamp-sub').textContent = proof.execution_metadata.final_receipt_status + ' \u00b7 ' + proof.risk_assessment.highest_severity;
+    // restart the impact animation on view change
+    stamp.style.animation = 'none'; void stamp.offsetWidth; stamp.style.animation = '';
+
+    document.getElementById('status-line').textContent = statusSentence(proof);
+
+    var overrides = (proof.evidence && proof.evidence.rejected_policy_overrides) || [];
+    var notice = document.getElementById('injection-notice');
+    if (overrides.length) {
+      notice.hidden = false;
+      document.getElementById('injection-text').innerHTML =
+        '<strong>' + overrides.length + ' policy override attempt' + (overrides.length>1?'s were':' was') + ' rejected.</strong> ' +
+        overrides.map(function(o){ return esc(o.kind) + ' tried to downgrade to ' + esc(o.attemptedSeverity) + '; Aegis kept it at ' + esc(o.enforcedSeverity) + '.'; }).join(' ');
+    } else {
+      notice.hidden = true;
+    }
+
+    renderDiff(proof);
+    renderInvariants(proof);
+    renderRisk(proof);
+    renderChecks(proof);
+    renderLedger(proof);
+
+    document.getElementById('c-hash').textContent = proof.evidence.proof_hash;
+    document.getElementById('c-opid').textContent = proof.operation_id;
+    document.getElementById('c-receipt').textContent = proof.execution_metadata.final_receipt_status;
+    document.getElementById('c-time').textContent = new Date(proof.timestamp).toISOString().replace('T',' ').replace('Z',' UTC');
+    document.getElementById('mode-pill').textContent = proof.execution_metadata.superdoc_mode + ' adapter';
+  }
+
+  function statusSentence(proof){
+    var crit = proof.risk_assessment.counts.CRITICAL, high = proof.risk_assessment.counts.HIGH;
+    if (proof.decision === 'BLOCKED') return 'Blocked before it reached the document \u2014 ' + crit + ' critical finding' + (crit===1?'':'s') + ' would have changed what the document means or promises.';
+    if (proof.decision === 'REQUIRES_REVIEW') return 'Held for a person to look at \u2014 ' + high + ' finding' + (high===1?'':'s') + ' at HIGH severity, not auto-committed either way.';
+    if (proof.decision === 'VERIFIED_WITH_WARNINGS') return 'Committed. Nothing protected was touched, but see the warnings below before you move on.';
+    return 'Committed. All ' + proof.verification_results.length + ' checks passed with nothing to flag.';
+  }
+
+  function renderDiff(proof){
+    var changed = proof.changed_regions || [];
+    document.getElementById('diff-count').textContent = '(' + changed.length + ')';
+    var list = document.getElementById('diff-list');
+    if (!changed.length) { list.innerHTML = '<p class="empty-diff">No regions changed.</p>'; return; }
+    list.innerHTML = changed.map(function(r){
+      var head = '<div class="region-head"><span class="kind ' + esc(r.kind) + '">' + esc(r.kind) + '</span>' +
+        '<span>' + esc(r.before_block_id || r.after_block_id || '') + '</span></div>';
+      var beforeLeaf = r.before_excerpt ? '<div class="leaf before"><span class="gutter">\u2212</span>' + esc(r.before_excerpt) + '</div>' : '';
+      var afterLeaf = r.after_excerpt ? '<div class="leaf after"><span class="gutter">+</span>' + esc(r.after_excerpt) + '</div>' : '';
+      return '<div class="region">' + head + beforeLeaf + afterLeaf + '</div>';
+    }).join('');
+  }
+
+  function renderInvariants(proof){
+    var list = document.getElementById('invariants-list');
+    list.innerHTML = (proof.protected_invariants || []).map(function(inv){
+      var refs = inv.violating_finding_ids && inv.violating_finding_ids.length
+        ? '<span class="refs">see ' + inv.violating_finding_ids.join(', ') + ' below</span>' : '';
+      return '<li data-passed="' + inv.passed + '">' +
+        '<span class="mark" aria-hidden="true">' + (inv.passed ? '\u2713' : '\u2715') + '</span>' +
+        '<span><span class="label">' + esc(inv.label) + '</span>' + refs + '</span>' +
+        '<span class="visually-hidden">' + (inv.passed ? 'passed' : 'failed') + '</span>' +
+      '</li>';
+    }).join('');
+  }
+
+  function renderRisk(proof){
+    var counts = proof.risk_assessment.counts;
+    var grid = document.getElementById('risk-grid');
+    grid.innerHTML = SEVERITY_ORDER.map(function(sev){
+      var n = counts[sev] || 0;
+      return '<div class="risk-cell' + (n > 0 && (sev==='CRITICAL'||sev==='HIGH') ? ' hot' : '') + '"><div class="n">' + n + '</div><div class="k">' + sev + '</div></div>';
+    }).join('');
+    document.getElementById('risk-desc').textContent = SEVERITY_ORDER.map(function(s){ return counts[s]+' '+s.toLowerCase(); }).join(', ') + '. Highest: ' + proof.risk_assessment.highest_severity + '.';
+  }
+
+  function renderChecks(proof){
+    document.getElementById('checks-count').textContent = '(' + proof.verification_results.filter(function(c){return c.passed;}).length + '/' + proof.verification_results.length + ' passed)';
+    document.getElementById('checks-list').innerHTML = proof.verification_results.map(function(c){
+      return '<li data-passed="' + c.passed + '"><span class="checker">' + esc(c.checker) + '</span><span class="badge">' + (c.passed ? 'pass' : c.finding_count + ' finding' + (c.finding_count===1?'':'s')) + '</span></li>';
+    }).join('');
+  }
+
+  function renderLedger(proof){
+    var findings = (proof.evidence.findings || []).slice().sort(function(a,b){
+      return SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity);
+    });
+    document.getElementById('ledger-count').textContent = findings.length;
+    document.getElementById('evidence-body').innerHTML = findings.length ? findings.map(function(f){
+      return '<tr>' +
+        '<td class="sev" data-sev="' + f.severity + '">' + f.severity + '</td>' +
+        '<td>' + esc(f.checker) + '</td>' +
+        '<td class="kind">' + esc(f.kind) + '</td>' +
+        '<td class="quote">' + (f.before ? esc(truncate(f.before, 70)) : '\u2014') + '</td>' +
+        '<td class="quote">' + (f.after ? esc(truncate(f.after, 70)) : '\u2014') + '</td>' +
+        '<td>' + esc(f.message) + '</td>' +
+      '</tr>';
+    }).join('') : '<tr><td colspan="6" style="padding:16px 20px;color:var(--text-faint);">No findings recorded \u2014 nothing to review.</td></tr>';
+  }
+
+  function truncate(s, n){ return s.length > n ? s.slice(0, n - 1) + '\u2026' : s; }
+
+  // Default view on load.
+  selectTab('tab-unsafe');
+  render(proofs.unsafe);
+})();
+</script>
+</body>
+</html>
