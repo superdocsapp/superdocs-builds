@@ -1,0 +1,33 @@
+playbook_id: microfinance_v1
+name: "Microfinance Compliance Rules v1"
+version: "1.0"
+rules:
+  - id: "MF-001"
+    description: "APR must not exceed 36%"
+    check_description: >
+      Check if the stated annual percentage rate (APR) exceeds 36%.
+      Look for interest rate declarations in loan terms.
+    scope: source
+    check_type: llm
+
+  - id: "MF-002"
+    description: "Processing fee must be disclosed"
+    check_description: >
+      Verify that a processing fee amount is explicitly stated in the document.
+    scope: both
+
+  - id: "MF-003"
+    description: "Interest rate matches modification"
+    check_description: >
+      The interest rate in repayment statements must match the rate in the
+      most recent modification agreement.
+    scope: claims
+    check_type: structured
+
+  - id: "MF-004"
+    description: "Late payment penalty must not exceed 5% of outstanding balance"
+    check_description: >
+      Verify that any late payment penalty clause does not specify a penalty
+      exceeding 5% of the outstanding balance.
+    scope: source
+    check_type: llm

@@ -1,0 +1,30 @@
+# Python artefacts
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+dist/
+build/
+
+# Node artefacts
+node_modules/
+*.log
+
+# Environment and secrets
+.env
+.env.*
+*.key
+*.pem
+secrets/
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/
+
+# uv artefacts (uv.lock is intentionally kept)
+.uv/
+
+# Uploaded documents
+uploads/

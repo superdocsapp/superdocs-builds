@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-app-primary text-app-primary antialiased;
+  }
+}
+
+@layer utilities {
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-surface-base;
+  }
+}
+
+/* Type color CSS custom properties */
+[data-type-color="finding"] {
+  --type-color: 244 63 94;
+  --type-color-hex: #f43f5e;
+}
+
+[data-type-color="conflict"] {
+  --type-color: 245 158 11;
+  --type-color-hex: #f59e0b;
+}
+
+[data-type-color="proposed_update"] {
+  --type-color: 139 92 246;
+  --type-color-hex: #8b5cf6;
+}
+
+/* Staggered entrance animation support */
+.animate-stagger {
+  animation: fadeSlideUp 300ms ease-out forwards;
+  animation-delay: calc(var(--index) * 50ms);
+  opacity: 0;
+}
+
+/* Decision sweep overlay */
+.decision-sweep {
+  animation: sweepRight 400ms ease-out forwards;
+  transform-origin: left;
+}
+
+/* Conic gradient spinner for in-progress stage */
+.conic-spinner {
+  background: conic-gradient(
+    from 0deg,
+    rgba(99, 102, 241, 0.8) 0deg,
+    rgba(99, 102, 241, 0.1) 60deg,
+    transparent 120deg
+  );
+  animation: spin-slow 2s linear infinite;
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sweepRight {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes warningPulse {
+  0%, 100% {
+    opacity: 0.4;
+    box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.3);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 8px 2px rgba(251, 191, 36, 0.2);
+  }
+}
+
+@keyframes drawCheck {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes connectorFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Connector line fill animation */
+.connector-fill {
+  animation: connectorFill 500ms ease-out forwards;
+}
+
+/* Warning pulse for unverifiable citations */
+.warning-pulse {
+  animation: warningPulse 2s ease-in-out infinite;
+}
+
+/* SVG checkmark draw animation */
+.draw-check path {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 24;
+  animation: drawCheck 300ms ease-out forwards;
+}
+
+/* React Flow dark theme overrides */
+.react-flow__controls {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__controls button {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.react-flow__controls button svg {
+  fill: currentColor !important;
+}
+
+.react-flow__minimap {
+  background: #141927 !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 8px !important;
+}
+
+/* Edge flow animation — flowing dashes on processing edges.
+   Stops instantly when the class is removed (edge source completes). */
+@keyframes edgeFlow {
+  from { stroke-dashoffset: 28; }
+  to { stroke-dashoffset: 0; }
+}
+
+.edge-flow {
+  animation: edgeFlow 1s linear infinite;
+}
+
+/* Node processing glow — subtle border pulse for active nodes.
+   Only applied via class, removed on status change. */
+@keyframes nodeProcessingGlow {
+  0%, 100% { box-shadow: 0 0 8px 0 rgba(99, 102, 241, 0.15); }
+  50% { box-shadow: 0 0 16px 2px rgba(99, 102, 241, 0.25); }
+}
+
+.node-processing {
+  animation: nodeProcessingGlow 2s ease-in-out infinite;
+}

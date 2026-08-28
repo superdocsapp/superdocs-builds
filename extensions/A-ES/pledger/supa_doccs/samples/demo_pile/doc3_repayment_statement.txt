@@ -1,0 +1,47 @@
+SURYODAYA MICROFINANCE PRIVATE LIMITED
+Branch: Baramati Branch, Tal. Baramati, Dist. Pune
+Customer Service: 1800-XXX-4521 | grievance@suryodayamfi.example.in
+
+LOAN ACCOUNT REPAYMENT STATEMENT (LOAN CARD)
+
+Loan Account No: MFI-2024-00187
+Borrower Name: Mrs. Lakshmi Devi Patil
+Group: Saraswati Mahila Bachat Gat
+Statement Generated On: 2nd February 2025
+Statement Period Covered: Instalment No. 1 (April 2024) to Instalment No. 10 (February 2025)
+
+Sanctioned Amount: INR 1,85,000
+Original Rate of Interest: 26.00% p.a. (reducing balance), effective from 14-Mar-2024
+Revised Rate of Interest: 22.50% p.a. (reducing balance), effective from Instalment No. 7 per Modification Agreement MFI-2024-00187-MOD-01 dated 9-Oct-2024
+Original Tenure: 24 months | Revised Tenure: 25 months (post-moratorium adjustment)
+
+TRANSACTION HISTORY
+
+Instalment No. | Due Date    | Payment Date | Amount Collected (INR) | Principal (INR) | Interest (INR) | Rate Applied for Computation | Penal Charge Levied (INR) | Penal Charge Basis | Mode of Collection | Closing Balance (INR)
+
+1  | 14-Apr-2024 | 14-Apr-2024 | 8,976 | 4,972 | 4,004 | 26.00% p.a. | 0     | N/A                                  | Cash at Group Meeting | 1,80,028
+2  | 14-May-2024 | 14-May-2024 | 8,976 | 5,080 | 3,896 | 26.00% p.a. | 0     | N/A                                  | Cash at Group Meeting | 1,74,948
+3  | 14-Jun-2024 | 18-Jun-2024 | 8,976 | 5,190 | 3,786 | 26.00% p.a. | 269   | 3% of overdue instalment (4 days late) | Cash at Group Meeting | 1,69,758
+4  | 14-Jul-2024 | 14-Jul-2024 | 8,976 | 5,303 | 3,673 | 26.00% p.a. | 0     | N/A                                  | Cash at Group Meeting | 1,64,455
+5  | 14-Aug-2024 | 14-Aug-2024 | 8,976 | 5,417 | 3,559 | 26.00% p.a. | 0     | N/A                                  | Cash at Group Meeting | 1,59,038
+6  | 14-Sep-2024 | 14-Sep-2024 | 8,976 | 5,535 | 3,441 | 26.00% p.a. | 0     | N/A                                  | Cash at Group Meeting | 1,53,503
+7  | 14-Oct-2024 | 21-Oct-2024 | 8,714 | 5,720 | 2,994 | 26.00% p.a. | 539   | 6.2% of overdue instalment (7 days late, escalated per branch manager override note dated 21-Oct-2024) | Cash at Group Meeting | 1,47,783
+—  | 14-Nov-2024 | N/A (Moratorium per Modification Agreement MOD-01) | 0 | 0 | 2,769 (accrued) | 22.50% p.a. | 0 | N/A | N/A | 1,50,552
+8  | 14-Dec-2024 | 14-Dec-2024 | 8,714 | 5,942 | 2,772 | 22.50% p.a. | 0     | N/A                                  | NACH Auto-Debit       | 1,44,610
+9  | 14-Jan-2025 | 14-Jan-2025 | 8,714 | 6,052 | 2,662 | 22.50% p.a. | 0     | N/A                                  | NACH Auto-Debit       | 1,38,558
+10 | 14-Feb-2025 | 14-Feb-2025 | 8,714 | 6,165 | 2,549 | 22.50% p.a. | 0     | N/A                                  | NACH Auto-Debit       | 1,32,393
+
+SUMMARY AS OF STATEMENT DATE
+
+Total Instalments Paid: 9 of 25
+Total Principal Repaid: INR 50,376
+Total Interest Paid: INR 34,336
+Total Penal Charges Levied to Date: INR 808
+Current Outstanding Principal: INR 1,32,393
+Days Past Due (Current): 0 (Account is Standard / Regular)
+
+BRANCH MANAGER NOTE (appended 21-Oct-2024): "Instalment 7 payment was 7 days delayed due to borrower's daughter's medical emergency at Baramati Rural Hospital. Given repeated minor delays this quarter and to discourage habitual late payment within the Group, penal charge for this instalment approved at an escalated rate per my discretion, over and above the standard 2%/month slab, given the cumulative delay pattern across the Group this month. — A. Deshpande, Branch Manager"
+
+Note: The Lender's monthly loan card is provided to the Borrower in Marathi as per Fair Practices Code requirements; this English version is generated for internal system and audit purposes and mirrors the same figures.
+
+For queries regarding this statement, contact the Baramati Branch office or the toll-free grievance number above.
