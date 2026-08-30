@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+/* IBM Plex — one type superfamily, three roles:
+   Serif  → the document's own voice (reading pane, quoted source text)
+   Sans   → the product's voice (nav, labels, tables, headings)
+   Mono   → the system's voice (ids, timestamps, versions, scores) */
+@import "@fontsource/ibm-plex-sans/latin-400.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-400.css";
+@import "@fontsource/ibm-plex-sans/latin-500.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-500.css";
+@import "@fontsource/ibm-plex-sans/latin-600.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-600.css";
+@import "@fontsource/ibm-plex-sans/latin-700.css";
+@import "@fontsource/ibm-plex-sans/latin-ext-700.css";
+@import "@fontsource/ibm-plex-serif/latin-400.css";
+@import "@fontsource/ibm-plex-serif/latin-ext-400.css";
+@import "@fontsource/ibm-plex-serif/latin-400-italic.css";
+@import "@fontsource/ibm-plex-serif/latin-ext-400-italic.css";
+@import "@fontsource/ibm-plex-serif/latin-600.css";
+@import "@fontsource/ibm-plex-serif/latin-ext-600.css";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-ext-400.css";
+@import "@fontsource/ibm-plex-mono/latin-500.css";
+@import "@fontsource/ibm-plex-mono/latin-ext-500.css";
+@import "@fontsource/ibm-plex-mono/latin-600.css";
+@import "@fontsource/ibm-plex-mono/latin-ext-600.css";
+
+@theme {
+  /* Type system */
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "IBM Plex Serif", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Ink — dark neutral scale (rail, high-emphasis text) */
+  --color-ink-950: #12151c;
+  --color-ink-900: #1b2028;
+  --color-ink-800: #262c37;
+  --color-ink-700: #3a4150;
+  --color-ink-500: #6b7280;
+
+  /* Paper — cool, precise neutrals (never warm cream) */
+  --color-paper-0: #ffffff;
+  --color-paper-50: #f6f7f9;
+  --color-paper-100: #eef0f3;
+  --color-paper-200: #e2e5ea;
+
+  --color-line: #e2e5ea;
+  --color-line-strong: #cbd1da;
+
+  --color-text-primary: #12151c;
+  --color-text-secondary: #3a4150;
+  --color-text-tertiary: #7c8494;
+  --color-text-on-ink: #eef0f3;
+  --color-text-on-ink-dim: #8891a1;
+
+  /* Trust accent — a blueprint / notarial-ink blue. Used sparingly. */
+  --color-trust: #1d4e89;
+  --color-trust-strong: #163c6b;
+  --color-trust-soft: #e7eef6;
+
+  /* Verification grammar — this IS product information, not decoration.
+     Solid fill = evaluated; the hue carries the result.
+     Hollow/dashed = not yet evaluated (see VerificationMark component). */
+  --color-verified: #1f7a5c;
+  --color-verified-soft: #e5f3ee;
+  --color-warning: #a9690e;
+  --color-warning-soft: #fbf0df;
+  --color-critical: #b23a34;
+  --color-critical-soft: #faeae9;
+  --color-neutral: #6b7280;
+  --color-neutral-soft: #eef0f3;
+
+  --shadow-elevated: 0 16px 40px -12px rgb(18 21 28 / 0.32), 0 4px 12px -4px rgb(18 21 28 / 0.18);
+  --shadow-panel: 0 1px 2px 0 rgb(18 21 28 / 0.06);
+}
+
+@layer base {
+  @keyframes sd-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes sd-slide-in-right {
+    from {
+      transform: translateX(16px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes sd-pop-in {
+    from {
+      transform: scale(0.97);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes sd-toast-in {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  * {
+    border-color: var(--color-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    background: var(--color-paper-50);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-trust-soft);
+    color: var(--color-trust-strong);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-trust);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-line-strong);
+    border-radius: 999px;
+    border: 2px solid var(--color-paper-50);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  /* Tabular, calibrated number rendering for scores/ids/timestamps */
+  .font-numeric {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+}
