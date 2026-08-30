@@ -67,6 +67,3 @@ copy. See docs/TASK_TRACEABILITY.md for the complete, itemized account.
 
 Built and engineered by **Vishwak**.
 
-## Credits
-
-Built and engineered by **Vishwak**.
