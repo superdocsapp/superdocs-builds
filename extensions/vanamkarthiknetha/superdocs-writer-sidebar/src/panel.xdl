@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog"
+            xmlns:script="http://openoffice.org/2000/script"
+            dlg:id="SuperDocsPanel" dlg:left="0" dlg:top="0"
+            dlg:width="130" dlg:height="254" dlg:withtitlebar="false">
+  <!-- Authoring geometry only: these coordinates are the panel's PREFERRED
+       layout. At runtime pythonpath/panel_layout.py re-places every control
+       for the height the sidebar actually gives the panel, so a short office
+       window no longer pushes the status line off the bottom. Keep the control
+       ids and btnSend's 14-unit height in step with that module. -->
+  <dlg:bulletinboard>
+    <dlg:text dlg:id="lblTitle" dlg:left="4" dlg:top="4" dlg:width="122" dlg:height="10"
+              dlg:value="Edit with SuperDocs AI"/>
+    <dlg:text dlg:id="lblHint" dlg:left="4" dlg:top="16" dlg:width="122" dlg:height="18"
+              dlg:multiline="true"
+              dlg:value="Select a passage (or tick Whole document), then describe the change:"/>
+    <dlg:checkbox dlg:id="chkWholeDoc" dlg:left="4" dlg:top="36" dlg:width="122" dlg:height="10"
+                  dlg:value="Whole document" dlg:checked="false"/>
+    <dlg:textfield dlg:id="txtInstruction" dlg:left="4" dlg:top="50" dlg:width="122" dlg:height="48"
+                   dlg:multiline="true" dlg:vscroll="true"/>
+    <dlg:button dlg:id="btnSend" dlg:left="4" dlg:top="102" dlg:width="122" dlg:height="14"
+                dlg:value="Send to SuperDocs"/>
+    <dlg:text dlg:id="lblPreview" dlg:left="4" dlg:top="120" dlg:width="122" dlg:height="64"
+              dlg:multiline="true" dlg:value=""/>
+    <dlg:button dlg:id="btnApprove" dlg:left="4" dlg:top="188" dlg:width="58" dlg:height="14"
+                dlg:value="Apply" dlg:enabled="false"/>
+    <dlg:button dlg:id="btnReject" dlg:left="68" dlg:top="188" dlg:width="58" dlg:height="14"
+                dlg:value="Reject" dlg:enabled="false"/>
+    <dlg:text dlg:id="lblStatus" dlg:left="4" dlg:top="206" dlg:width="122" dlg:height="40"
+              dlg:multiline="true" dlg:value="Ready."/>
+  </dlg:bulletinboard>
+</dlg:window>
