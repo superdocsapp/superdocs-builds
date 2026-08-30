@@ -1,0 +1,23 @@
+{
+  "name": "@prism/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@prism/core": "*",
+    "@prism/delta": "*",
+    "@prism/gate": "*",
+    "@prism/vault": "*",
+    "@prism/grid": "*",
+    "@prism/registry": "*"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "axe-core": "^4.10.2"
+  }
+}

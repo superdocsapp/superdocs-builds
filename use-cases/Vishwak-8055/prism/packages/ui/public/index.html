@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PRISM — Document Intelligence Workspace</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-brand">
+        <span class="brand-mark" aria-hidden="true">&#9670;</span>
+        <span class="brand-name">PRISM</span>
+        <h1 class="visually-hidden">PRISM — Document Intelligence Workspace</h1>
+      </div>
+      <div class="topbar-status" id="workflow-state" role="status" aria-live="polite">CREATED</div>
+    </header>
+
+    <nav class="pane pane-left" aria-label="Task center">
+      <h2 class="pane-title">Tasks (30 defined)</h2>
+      <div id="task-list-mount">
+        <p class="empty-state">Loading tasks…</p>
+      </div>
+    </nav>
+
+    <main class="pane pane-center" id="main">
+      <h2 class="pane-title">PRISM DELTA &amp; PRISM GATE — Compare, review, apply</h2>
+
+      <section aria-labelledby="upload-heading">
+        <h2 id="upload-heading" class="visually-hidden">Upload documents to compare</h2>
+        <div class="upload-row">
+          <div class="upload-field">
+            <label for="base-file">Base document (.docx)</label>
+            <input type="file" id="base-file" accept=".docx" />
+          </div>
+          <div class="upload-field">
+            <label for="target-file">Target document (.docx)</label>
+            <input type="file" id="target-file" accept=".docx" />
+          </div>
+        </div>
+        <div class="upload-row">
+          <button type="button" class="primary-btn" id="compare-btn">Compare documents</button>
+          <button type="button" class="decide-btn" id="use-fixtures-btn">Use bundled sample contracts</button>
+        </div>
+        <div id="upload-error-mount"></div>
+      </section>
+
+      <section aria-labelledby="changes-heading">
+        <h2 id="changes-heading" class="visually-hidden">Proposed changes</h2>
+        <div id="summary-mount"></div>
+        <div id="change-list-mount">
+          <p class="empty-state">Compare two documents to see proposed changes here.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="apply-heading">
+        <h2 id="apply-heading" class="visually-hidden">Apply approved changes</h2>
+        <div class="upload-row">
+          <button type="button" class="primary-btn" id="apply-btn" disabled>Apply approved changes</button>
+          <a class="decide-btn" id="download-link" href="/api/workspace/download" download hidden>Download result (.docx)</a>
+        </div>
+      </section>
+    </main>
+
+    <aside class="pane pane-right" aria-label="Verification center">
+      <h2 class="pane-title">Verification</h2>
+      <div id="verification-mount">
+        <p class="empty-state">No verification has run yet.</p>
+      </div>
+
+      <h2 class="pane-title" style="margin-top: 20px;">Vault</h2>
+      <div id="vault-mount">
+        <p class="empty-state">No versions committed yet.</p>
+      </div>
+      <div class="upload-row" style="margin-top: 8px;">
+        <button type="button" class="decide-btn" id="undo-btn">Undo</button>
+        <button type="button" class="decide-btn" id="redo-btn">Redo</button>
+      </div>
+    </aside>
+
+    <footer class="pane pane-bottom" aria-label="Execution timeline">
+      <h2 class="pane-title">Execution timeline</h2>
+      <div id="timeline-mount">
+        <p class="empty-state">No activity yet.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

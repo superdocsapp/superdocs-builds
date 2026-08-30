@@ -1,0 +1,24 @@
+{
+  "name": "prism",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "test": "npm test --workspaces --if-present",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "check": "npm run typecheck && npm run lint && npm test",
+    "demo": "node cli.js",
+    "ui": "npm run start --workspace=@prism/ui"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "typescript": "^7.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "typescript": "^7.0.2"
+  }
+}

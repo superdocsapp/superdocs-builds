@@ -1,0 +1,16 @@
+{
+  "name": "@prism/registry",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@prism/core": "*",
+    "@prism/delta": "*",
+    "@prism/gate": "*",
+    "@prism/vault": "*"
+  }
+}
