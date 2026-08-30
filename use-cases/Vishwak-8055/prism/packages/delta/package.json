@@ -1,0 +1,18 @@
+{
+  "name": "@prism/delta",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test",
+    "fixtures": "node fixtures/generate-fixtures.js",
+    "demo": "node cli.js fixtures/contract-v1.docx fixtures/contract-v2.docx"
+  },
+  "dependencies": {
+    "@prism/core": "*"
+  },
+  "devDependencies": {
+    "docx": "^9.7.1"
+  }
+}
