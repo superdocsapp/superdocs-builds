@@ -1,0 +1,33 @@
+{
+  "name": "translation-ready-manuscript",
+  "version": "0.1.0",
+  "description": "SuperDocs use case: prepare a manuscript for translation, build a translator-ready packet, and verify a returned translation chapter by chapter against a term base.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "demo": "tsx demo/run-demo.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "tsx src/app/server.ts",
+    "demo:second": "tsx demo/run-second-demo.ts",
+    "verify": "npm run typecheck && npm test && npm run demo && npm run demo:second",
+    "verify:compile": "tsc -p tsconfig.json --noEmit",
+    "verify:all": "npm run typecheck && npm test && npm run demo && npm run demo:second",
+    "doctor": "npm run typecheck && npm test",
+    "demo:superdocs": "tsx demo/run-superdocs-smoke.ts"
+  },
+  "dependencies": {
+    "node-html-parser": "^6.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4",
+    "tsx": "^4.19.2",
+    "@types/node": "^22.9.0"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}
