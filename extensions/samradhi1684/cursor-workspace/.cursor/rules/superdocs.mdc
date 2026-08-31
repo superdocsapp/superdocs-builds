@@ -1,0 +1,184 @@
+---
+description: SuperDocs workflows and editing conventions for Cursor
+alwaysApply: true
+---
+
+# SuperDocs Workspace Rules
+
+You are working in a workspace designed to use the SuperDocs MCP server for structured document work.
+
+## 1. When to use SuperDocs
+
+Use the SuperDocs MCP tools when the user is working with:
+
+- Styled `.docx` documents
+- PDFs that need document-aware editing or conversion
+- HTML documents
+- Long or heavily formatted documents
+- Documents containing tables, borders, shading, fonts, or other formatting that must be preserved
+- Multi-step document editing workflows
+- Documents requiring human approval before sensitive changes
+- Document export to `.docx`, PDF, HTML, Markdown, or plain text
+
+Do not use SuperDocs merely to generate ordinary text in chat or edit a plain README/Markdown file when no document formatting or file output is required.
+
+## 2. Before editing
+
+First determine whether the requested document is already available in the SuperDocs session.
+
+Prefer metadata-only tools such as:
+
+- `list_session_documents`
+- `open_documents`
+- `init_session`
+- `focus_session_document`
+- `list_documents`
+- `get_document_detail`
+
+Use `include_html=true` only when the document body is actually needed.
+
+For an existing local document:
+
+- Files under 100KB may use `upload_document_base64`.
+- Larger files should use `request_upload_url`, upload the bytes directly, then call `process_uploaded_document`.
+- Use `parse_mode="document"` when the file should become the editable document.
+- Use `parse_mode="attachment"` when it is only a read-only reference.
+
+## 3. Editing rules
+
+Prefer targeted structural edits over regenerating the entire document.
+
+Examples:
+
+- "Add Appendix A after Section 9" → add the section at that location.
+- "Rewrite Section 6" → replace Section 6 rather than regenerating the document.
+- "Replace X with Y" → perform the find-and-modify operation.
+- "Move the org chart into Section 2" → move the existing content rather than duplicating it.
+- "Replace the entire document" → only perform a whole-document rebuild when the user explicitly asks for it.
+
+Respect explicit placement instructions such as:
+
+- at the top
+- after Section 2
+- before the conclusion
+- replace a named placeholder
+
+Never silently append content when the requested location cannot be resolved.
+
+Never invent or construct SuperDocs chunk IDs. Only reuse IDs returned by SuperDocs.
+
+## 4. Preserve formatting
+
+SuperDocs is specifically useful when formatting matters.
+
+Preserve existing:
+
+- headings
+- tables
+- borders
+- shading
+- fonts
+- inline styling
+- page breaks
+- document structure
+
+Do not dump or regenerate the entire document HTML in the conversation just to make a local edit.
+
+When making a narrow edit, make the target unambiguous. For example:
+
+"Bold only the paragraph beginning 'Curabitur' and leave the following paragraphs unchanged."
+
+## 5. Large documents
+
+For documents larger than approximately 20 pages, prefer:
+
+`response_mode="compact"`
+
+This keeps responses focused on changed sections instead of returning the entire document HTML.
+
+For large document generation or operations that may exceed synchronous limits, use:
+
+`chat_async`
+
+and poll with:
+
+`get_job`
+
+Use the same `session_id` throughout one logical document workflow.
+
+## 6. Verify important edits
+
+After an important edit, use `get_document_detail` to verify the document structure.
+
+Do not export a document solely to check whether an edit succeeded.
+
+For sensitive changes such as contracts, financial filings, or documents intended for external delivery, prefer human-in-the-loop approval using:
+
+- `chat_async`
+- `get_job`
+- `approve_change`
+
+## 7. Drafting new documents
+
+For a new formatted document:
+
+1. Initialize an empty SuperDocs document/session.
+2. Ask SuperDocs `chat` to create the document.
+3. Iterate with targeted edits.
+4. Export only when the document is ready.
+
+Do not generate a large HTML document locally and upload it merely to get started.
+
+## 8. Export and delivery
+
+Use `export_document` when the user wants a document exported.
+
+Use `request_download_url` when the user needs a downloadable file.
+
+Supported output formats include:
+
+- `docx`
+- `pdf`
+- `html`
+- `markdown`
+- `txt`
+
+## 9. Attachments
+
+If a file is only reference material and should not be edited, upload/process it as an attachment.
+
+Use:
+
+`upload_attachment_base64`
+
+or the pre-signed upload flow for larger files.
+
+Wait for the attachment to become ready with:
+
+`get_attachment_status`
+
+before relying on it for document work.
+
+## 10. Keep changes minimal
+
+When editing workspace documentation or configuration:
+
+- Prefer the smallest correct change.
+- Follow existing repository conventions.
+- Do not introduce dependencies unless necessary.
+- Do not modify unrelated files.
+- Explain what was changed and how it was verified.
+
+## 11. First-edit behavior
+
+When a new user gives a document-editing request:
+
+1. Identify whether the request requires SuperDocs.
+2. Check whether the MCP server is available.
+3. Identify the relevant document/session.
+4. Choose the smallest appropriate SuperDocs operation.
+5. Make the requested targeted edit.
+6. Verify important structural changes.
+7. Report the result concisely.
+
+Do not make the user read SuperDocs documentation before attempting a straightforward document edit.
