@@ -20,18 +20,20 @@ from common.superdocs_client import OperationBudget, SuperDocsClient  # noqa: E4
 def search_versions(query: str, before_text: str, after_text: str) -> list[dict]:
     """Return exact query matches across both versions for review context."""
     results = []
-    lowered_query = query.strip().lower()
-    if not lowered_query:
+    terms = [term for term in query.lower().split() if len(term) >= 4]
+    if not terms:
         return results
     for version, text in (("before", before_text), ("after", after_text)):
         lowered_text = text.lower()
-        start = 0
-        while True:
-            index = lowered_text.find(lowered_query, start)
-            if index < 0:
-                break
-            results.append({"version": version, "start": index, "text": text[max(0, index - 80):index + len(query) + 80]})
-            start = index + len(lowered_query)
+        for term in terms:
+            index = lowered_text.find(term)
+            if index >= 0:
+                results.append({
+                    "version": version,
+                    "term": term,
+                    "start": index,
+                    "text": text[max(0, index - 80):index + len(term) + 80],
+                })
     return results
 
 
@@ -83,7 +85,14 @@ def run_session_workflow(
     output_path = Path(out_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    client.export(session_id, "markdown", str(output_path.with_suffix(".md")))
+    session_export = output_path.with_name(f"{output_path.stem}.session.md")
+    client.export(session_id, "markdown", str(session_export))
+    output_path.with_suffix(".md").write_text(
+        "# Version difference report\n\n"
+        f"Material change: {report['has_material_change']}\n\n"
+        f"Impact analysis:\n\n{report['impact_analysis']}\n",
+        encoding="utf-8",
+    )
     return report
 
 

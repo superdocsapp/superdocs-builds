@@ -83,7 +83,19 @@ def run_session_workflow(
     output_path = Path(out_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    client.export(session_id, "markdown", str(output_path.with_suffix(".md")))
+    session_export = output_path.with_name(f"{output_path.stem}.session.md")
+    client.export(session_id, "markdown", str(session_export))
+    output_path.with_suffix(".md").write_text(
+        "# Multi-hop QA report\n\n"
+        f"Question: {question}\n\n"
+        + "\n".join(
+            f"- **{hop['source_doc_id']}**: {hop['evidence_quote']} "
+            f"(verified: {hop['verified']})"
+            for hop in report["hops"]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     return report
 
 

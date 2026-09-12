@@ -121,3 +121,4 @@ def test_session_workflow_uploads_versions_and_records_impact(tmp_path):
     assert client.exports[0][1] == "markdown"
     assert report["search_hits"]
     assert (tmp_path / "nested" / "diff.json").is_file()
+    assert "Version difference report" in (tmp_path / "nested" / "diff.md").read_text()

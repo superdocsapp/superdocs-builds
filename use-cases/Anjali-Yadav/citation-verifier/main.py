@@ -146,7 +146,18 @@ def run_session_workflow(
     output_path = Path(out_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    client.export(session_id, "markdown", str(output_path.with_suffix(".md")))
+    session_export = output_path.with_name(f"{output_path.stem}.session.md")
+    client.export(session_id, "markdown", str(session_export))
+    output_path.with_suffix(".md").write_text(
+        "# Citation verification report\n\n"
+        + "\n".join(
+            f"- **{finding['citation_target']}**: {finding['verdict']} - "
+            f"{finding['reason']} (accepted: {finding['accepted']})"
+            for finding in report["findings"]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
     return report
 
 

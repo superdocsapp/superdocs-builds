@@ -99,3 +99,4 @@ def test_session_workflow_uploads_all_sources_and_exports_report(tmp_path):
     assert report["hops"]
     assert client.exports[0][1] == "markdown"
     assert (tmp_path / "nested" / "answer.json").is_file()
+    assert "contract" in (tmp_path / "nested" / "answer.md").read_text()

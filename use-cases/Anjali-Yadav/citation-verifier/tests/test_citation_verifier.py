@@ -156,6 +156,7 @@ def test_session_workflow_uploads_source_and_exports_report(tmp_path):
     assert report["findings"][0]["verdict"] == "yes"
     assert client.exports[0][1] == "markdown"
     assert (tmp_path / "nested" / "citations.json").is_file()
+    assert "Citation verification report" in (tmp_path / "nested" / "citations.md").read_text()
 
 
 def test_session_entailment_adapter_extracts_superdocs_response_text():
