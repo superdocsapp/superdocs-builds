@@ -65,6 +65,38 @@ The command writes JSON containing both extracted pairs and independent
 findings, and creates `output\citation_report.md`. The entailment calls are
 billable; upload and export are free.
 
+## Example
+
+Input:
+
+```text
+The payment term is 30 days.[A]
+The vendor may charge a late fee after 10 days.[B]
+This sentence cites a missing source.[99]
+```
+
+References:
+
+```json
+{
+  "A": "Payment is due within 30 days.",
+  "B": "Late fees apply after 30 days."
+}
+```
+
+Representative findings after review:
+
+```json
+[
+  {"citation_target": "A", "verdict": "yes", "accepted": true},
+  {"citation_target": "B", "verdict": "no", "accepted": true},
+  {"citation_target": "99", "verdict": "unverifiable", "accepted": true}
+]
+```
+
+The complete report also includes each claim, reason, candidate sources, and
+review status. Live session IDs are intentionally omitted.
+
 ## Tests
 
 ```powershell

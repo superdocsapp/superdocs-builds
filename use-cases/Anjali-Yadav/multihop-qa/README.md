@@ -62,6 +62,36 @@ The command uploads the sources, writes JSON evidence, and creates
 `output\multihop_answer.md`. Upload and export are free; API chat/entailment
 operations are billable when used by the configured workflow.
 
+## Example
+
+Input documents:
+
+```text
+contract.txt: Payment terms are net 30 days.
+shipping.txt: Orders ship within 5 business days.
+```
+
+Question:
+
+```text
+What are the payment and shipping terms?
+```
+
+Representative JSON result:
+
+```json
+{
+  "answer": "- What are the payment and shipping terms? (contract)\n- What are the payment and shipping terms? (shipping)",
+  "could_not_answer": false,
+  "hops": [
+    {"source_doc_id": "contract", "evidence_quote": "Payment terms are net 30 days.", "verified": true},
+    {"source_doc_id": "shipping", "evidence_quote": "Orders ship within 5 business days.", "verified": true}
+  ]
+}
+```
+
+Live session IDs are intentionally omitted from documentation.
+
 ## Tests
 
 ```powershell

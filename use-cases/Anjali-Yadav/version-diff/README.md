@@ -65,6 +65,38 @@ impact analysis, requests approval, writes JSON, and creates
 automation. Chat and review operations are billable; upload and export are
 free.
 
+## Example
+
+Before:
+
+```text
+Payment is due within 30 days.
+See Section 3.2 for definitions.
+```
+
+After:
+
+```text
+Payment is due within 45 days.
+See Section 4.2 for definitions.
+```
+
+Representative result:
+
+```json
+{
+  "has_material_change": true,
+  "material_changes": [
+    {"reason": "cross_reference_changed"}
+  ],
+  "impact_analysis": "The payer benefits from the additional 15 days; consider negotiating partial payments or revisiting late-fee protection."
+}
+```
+
+The real report also preserves before/after text, search context, approval
+state, and the professional-review caveat. Live session IDs are intentionally
+omitted.
+
 ## Tests
 
 ```powershell
