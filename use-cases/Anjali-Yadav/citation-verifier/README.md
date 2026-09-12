@@ -18,6 +18,26 @@ The claim-generation step and entailment step are separate. A citation marker
 is never treated as proof, and a missing source is never silently substituted
 with another reference.
 
+## Architecture
+
+```mermaid
+flowchart TD
+  A[Claim document and reference map] --> B[Extract claim/citation pairs]
+  B --> C[Upload source to one SuperDocs session]
+  C --> D[Resolve exact citation target]
+  D --> E[Independent SuperDocs entailment call]
+  D --> F[Missing target]
+  E --> G[yes / no / partial verdict]
+  F --> H[unverifiable verdict]
+  G --> I[Per-citation JSON report]
+  H --> I
+  I --> J[Markdown export]
+```
+
+The source lookup is local and exact. SuperDocs supplies an independent
+entailment opinion; it does not get to decide whether a missing citation is
+valid.
+
 ## Failure behavior
 
 - Missing API configuration exits with status `2`.

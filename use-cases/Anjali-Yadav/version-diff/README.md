@@ -19,6 +19,27 @@ impact opinion about who benefits and what to push back on.
 The mechanical diff is the source of truth for what changed. The model provides
 an opinion about impact; it does not get to invent changes that were not found.
 
+## Architecture
+
+```mermaid
+flowchart TD
+  A[Before document] --> B[Upload both versions to one SuperDocs session]
+  C[After document] --> B
+  B --> D[Deterministic normalization and diff]
+  D --> E[Formatting vs material classification]
+  E --> F[Impact prompt with material changes only]
+  F --> G[SuperDocs advisory impact analysis]
+  G --> H{Human approval}
+  H -- approve --> I[Combined JSON report]
+  H -- reject --> J[Report records no committed review]
+  I --> K[Markdown export]
+  J --> K
+```
+
+The model sees candidate material changes, not an unconstrained request to
+invent differences. Approval is human-gated unless `--approve-all` is supplied
+explicitly for unattended automation.
+
 ## Failure behavior
 
 - Both versions must contain text.

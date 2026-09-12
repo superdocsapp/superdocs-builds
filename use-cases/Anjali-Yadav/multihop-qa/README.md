@@ -18,6 +18,26 @@ quoted evidence for every hop.
 The deterministic local grounding check is authoritative. SuperDocs is not
 allowed to turn an unsupported quote into a supported fact.
 
+## Architecture
+
+```mermaid
+flowchart TD
+  A[UTF-8 document directory] --> B[Upload each source to one SuperDocs session]
+  B --> C[Local paragraph chunking]
+  C --> D[Hybrid lexical retrieval]
+  D --> E[Structured hop chain]
+  E --> F{Exact quote in cited document?}
+  F -- yes --> G[Verified evidence]
+  F -- no --> H[Unverified hop]
+  G --> I[JSON report]
+  H --> I
+  I --> J[SuperDocs Markdown export]
+```
+
+The API session provides document persistence and export. Retrieval, hop
+construction, deduplication, and quote verification remain deterministic and
+auditable locally.
+
 ## Failure behavior
 
 - Empty document sets fail clearly.
