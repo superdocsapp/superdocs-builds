@@ -1,0 +1,35 @@
+# Core service layer
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+
+# LLM + agent orchestration
+langchain
+langchain-community
+langchain-openai
+openai
+
+# Retrieval / RAG
+faiss-cpu
+tiktoken
+numpy
+
+# MCP client (to call SuperDocs' MCP server)
+mcp
+
+# HTTP
+httpx
+
+# Dev / testing
+pytest
+pytest-asyncio
+ruff
+
+# UI
+streamlit
+pandas
+
+# Document parsing for source uploads
+pypdf
+python-docx
