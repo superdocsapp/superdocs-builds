@@ -148,13 +148,14 @@ def test_session_workflow_uploads_source_and_exports_report(tmp_path):
         "The service is available daily.[A]",
         {"A": "The service is available every day."},
         client,
-        str(tmp_path / "citations.json"),
+        str(tmp_path / "nested" / "citations.json"),
         session_id="session-2",
     )
 
     assert len(client.uploads) == 1
     assert report["findings"][0]["verdict"] == "yes"
     assert client.exports[0][1] == "markdown"
+    assert (tmp_path / "nested" / "citations.json").is_file()
 
 
 def test_session_entailment_adapter_extracts_superdocs_response_text():

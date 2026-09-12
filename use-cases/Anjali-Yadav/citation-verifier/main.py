@@ -143,8 +143,10 @@ def run_session_workflow(
             for finding in report["findings"]
         ]
     report["session_id"] = session_id
-    Path(out_path).write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    client.export(session_id, "markdown", str(Path(out_path).with_suffix(".md")))
+    output_path = Path(out_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    client.export(session_id, "markdown", str(output_path.with_suffix(".md")))
     return report
 
 

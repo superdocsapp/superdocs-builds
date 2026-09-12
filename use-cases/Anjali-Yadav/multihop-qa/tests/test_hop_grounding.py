@@ -90,7 +90,7 @@ def test_session_workflow_uploads_all_sources_and_exports_report(tmp_path):
         "Where are payment and shipping terms?",
         {"contract": DOCUMENTS["doc_a"], "orders": DOCUMENTS["doc_b"]},
         client,
-        str(tmp_path / "answer.json"),
+        str(tmp_path / "nested" / "answer.json"),
         session_id="session-1",
     )
 
@@ -98,3 +98,4 @@ def test_session_workflow_uploads_all_sources_and_exports_report(tmp_path):
     assert report["session_id"] == "session-1"
     assert report["hops"]
     assert client.exports[0][1] == "markdown"
+    assert (tmp_path / "nested" / "answer.json").is_file()

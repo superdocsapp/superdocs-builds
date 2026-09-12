@@ -112,7 +112,7 @@ def test_session_workflow_uploads_versions_and_records_impact(tmp_path):
         "Payment is due in 30 days.",
         "Payment is due in 45 days.",
         client,
-        str(tmp_path / "diff.json"),
+        str(tmp_path / "nested" / "diff.json"),
         session_id="session-3",
     )
 
@@ -120,3 +120,4 @@ def test_session_workflow_uploads_versions_and_records_impact(tmp_path):
     assert "push back" in report["impact_analysis"]
     assert client.exports[0][1] == "markdown"
     assert report["search_hits"]
+    assert (tmp_path / "nested" / "diff.json").is_file()
