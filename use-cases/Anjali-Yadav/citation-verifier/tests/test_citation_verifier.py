@@ -49,6 +49,16 @@ def test_extract_citation_pairs_from_inline_markers():
     assert pairs[0].citation_target == "1"
 
 
+def test_extract_citation_pairs_supports_document_qualified_targets():
+    pairs = extract_citation_pairs(
+        "The term is defined here.[contract:A]",
+        {"contract": {"A": "The term is 30 days."}},
+    )
+
+    assert pairs[0].source_doc_id == "contract"
+    assert pairs[0].citation_target == "A"
+
+
 def test_verify_pairs_marks_missing_reference_as_unverifiable():
     pairs = [
         CitationPair(
@@ -62,6 +72,7 @@ def test_verify_pairs_marks_missing_reference_as_unverifiable():
 
     assert result[0]["verdict"] == "unverifiable"
     assert "not in the uploaded set" in result[0]["reason"].lower()
+    assert result[0]["candidate_sources"]
 
 
 def test_verify_pairs_uses_per_citation_findings_not_claim_level_summary():
@@ -156,3 +167,25 @@ def test_session_entailment_adapter_extracts_superdocs_response_text():
     result = adapter.chat(message="evaluate this citation")
 
     assert result.startswith("VERDICT: partial")
+
+
+def test_session_workflow_marks_findings_unreviewed_by_default(tmp_path):
+    class Client:
+        def upload(self, filename, text, session_id):
+            pass
+
+        def chat(self, session_id, message):
+            return {"verdict": "yes", "reason": "Supported."}
+
+        def export(self, session_id, fmt, out_path):
+            pass
+
+    report = citation_main.run_session_workflow(
+        "The term is 30 days.[A]",
+        {"A": "The term is 30 days."},
+        Client(),
+        str(tmp_path / "report.json"),
+    )
+
+    assert report["findings"][0]["reviewed"] is False
+    assert report["findings"][0]["accepted"] is None

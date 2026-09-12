@@ -16,6 +16,24 @@ from common.config import get_budget_floor, get_required_api_key, load_environme
 from common.superdocs_client import OperationBudget, SuperDocsClient  # noqa: E402
 
 
+def search_versions(query: str, before_text: str, after_text: str) -> list[dict]:
+    """Return exact query matches across both versions for review context."""
+    results = []
+    lowered_query = query.strip().lower()
+    if not lowered_query:
+        return results
+    for version, text in (("before", before_text), ("after", after_text)):
+        lowered_text = text.lower()
+        start = 0
+        while True:
+            index = lowered_text.find(lowered_query, start)
+            if index < 0:
+                break
+            results.append({"version": version, "start": index, "text": text[max(0, index - 80):index + len(query) + 80]})
+            start = index + len(lowered_query)
+    return results
+
+
 def build_impact_prompt(report: dict) -> str:
     """Ask SuperDocs for a reviewable impact opinion over mechanical changes."""
     return (
@@ -47,6 +65,13 @@ def run_session_workflow(
     client.upload("before.txt", before_text, session_id)
     client.upload("after.txt", after_text, session_id)
     report = build_report(before_text, after_text)
+    report["search_hits"] = [
+        {
+            "change": change,
+            "matches": search_versions(change["after_text"], before_text, after_text),
+        }
+        for change in report["material_changes"]
+    ]
     impact = client.chat_with_review(
         session_id,
         build_impact_prompt(report),

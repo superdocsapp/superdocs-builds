@@ -119,3 +119,4 @@ def test_session_workflow_uploads_versions_and_records_impact(tmp_path):
     assert [item[0] for item in client.uploads] == ["before.txt", "after.txt"]
     assert "push back" in report["impact_analysis"]
     assert client.exports[0][1] == "markdown"
+    assert report["search_hits"]

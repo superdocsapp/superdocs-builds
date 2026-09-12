@@ -9,10 +9,11 @@ support the sentence it is attached to.
 
 1. Parse inline claim/citation pairs such as `The term is 30 days.[A]`.
 2. Upload the source document into one persistent SuperDocs session.
-3. Resolve each citation target in the supplied reference map.
-4. Ask SuperDocs for an independent entailment verdict per citation.
-5. Emit `yes`, `no`, `partial`, or `unverifiable` findings.
-6. Write JSON findings and export a Markdown copy of the session document.
+3. Resolve each citation target in the supplied multi-document reference map.
+4. Search reference text for useful review context without changing citation identity.
+5. Ask SuperDocs for an independent entailment verdict per citation.
+6. Review every finding explicitly when `--review` is supplied.
+7. Write JSON findings and export a Markdown copy of the session document.
 
 The claim-generation step and entailment step are separate. A citation marker
 is never treated as proof, and a missing source is never silently substituted
@@ -31,7 +32,8 @@ flowchart TD
   F --> H[unverifiable verdict]
   G --> I[Per-citation JSON report]
   H --> I
-  I --> J[Markdown export]
+  I --> J{Human review with --review}
+  J --> K[Markdown export]
 ```
 
 The source lookup is local and exact. SuperDocs supplies an independent
@@ -55,7 +57,8 @@ in `citation-verifier/.env`, then run:
 ```powershell
 python citation-verifier\main.py input\article.txt `
   --refs input\references.json `
-  --out output\citation_report.json
+  --out output\citation_report.json `
+  --review
 ```
 
 The command writes JSON containing both extracted pairs and independent
