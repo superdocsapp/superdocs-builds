@@ -1,0 +1,5 @@
+requests>=2.32
+beautifulsoup4>=4.12
+lxml>=5.3
+pytest>=8.3
+python-dotenv>=1.0

@@ -1,0 +1,130 @@
+from __future__ import annotations
+
+import argparse
+import json
+import requests
+import sys
+import uuid
+from pathlib import Path
+
+BUILD_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = BUILD_ROOT.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from common.local_retrieval import chunk_documents, hybrid_search  # noqa: E402
+from common.verification import quote_grounded  # noqa: E402
+from common.superdocs_client import SuperDocsClient  # noqa: E402
+from common.config import get_budget_floor, get_required_api_key, load_environment  # noqa: E402
+from common.superdocs_client import OperationBudget  # noqa: E402
+from schemas import Hop, MultiHopAnswer  # noqa: E402
+
+
+def answer_question(question: str, documents: dict[str, str]) -> MultiHopAnswer:
+    """Minimal, deterministic multi-hop answer builder.
+
+    The real integration path would call the SuperDocs API to answer using only
+    top retrieved chunks. This local logic keeps the grounding and deduplication
+    rules testable without network access.
+    """
+    chunks = []
+    for doc_id, text in documents.items():
+        chunks.extend(chunk_documents([{"doc_id": doc_id, "text": text}]))
+
+    retrieved = hybrid_search(question, chunks, top_k=4)
+    if not retrieved:
+        return MultiHopAnswer(answer=None, could_not_answer=True, hops=[])
+
+    hops: list[Hop] = []
+    for chunk in retrieved:
+        evidence = chunk.text.strip()
+        if evidence:
+            hops.append(
+                Hop(
+                    claim=question.strip(),
+                    source_doc_id=chunk.doc_id,
+                    evidence_quote=evidence,
+                    verified=quote_grounded(evidence, documents.get(chunk.doc_id, "")),
+                )
+            )
+
+    deduped = MultiHopAnswer.dedupe_hops(hops)
+    answer = "\n".join(f"- {hop.claim} ({hop.source_doc_id})" for hop in deduped)
+    return MultiHopAnswer(
+        answer=answer or None,
+        could_not_answer=False,
+        hops=deduped,
+    ).validate_against_documents(documents)
+
+
+def run_session_workflow(
+    question: str,
+    documents: dict[str, str],
+    client: SuperDocsClient,
+    out_path: str,
+    session_id: str | None = None,
+) -> dict:
+    """Upload a document set, answer locally, and export an auditable report."""
+    if not documents:
+        raise ValueError("At least one document is required.")
+    session_id = session_id or f"multihop-qa-{uuid.uuid4()}"
+    for doc_id, text in documents.items():
+        if not text.strip():
+            raise ValueError(f"Document '{doc_id}' is empty.")
+        client.upload(f"{doc_id}.txt", text, session_id)
+
+    result = answer_question(question, documents)
+    report = {
+        "session_id": session_id,
+        "question": question,
+        **result.as_dict(),
+        "source_documents": sorted(documents),
+    }
+    output_path = Path(out_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+    session_export = output_path.with_name(f"{output_path.stem}.session.md")
+    client.export(session_id, "markdown", str(session_export))
+    output_path.with_suffix(".md").write_text(
+        "# Multi-hop QA report\n\n"
+        f"Question: {question}\n\n"
+        + "\n".join(
+            f"- **{hop['source_doc_id']}**: {hop['evidence_quote']} "
+            f"(verified: {hop['verified']})"
+            for hop in report["hops"]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return report
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Multi-hop QA over a document set.")
+    parser.add_argument("question", help="Question to answer from the uploaded set.")
+    parser.add_argument("--docs-dir", required=True)
+    parser.add_argument("--out", default="output/multihop_answer.json")
+    parser.add_argument("--session-id")
+    args = parser.parse_args()
+
+    load_environment(Path(__file__).resolve().parent)
+    api_key = get_required_api_key()
+    docs_dir = Path(args.docs_dir)
+    documents = {
+        path.stem: path.read_text(encoding="utf-8")
+        for path in sorted(docs_dir.glob("*.txt"))
+    }
+    client = SuperDocsClient(api_key, budget=OperationBudget(floor=get_budget_floor()))
+    try:
+        report = run_session_workflow(args.question, documents, client, args.out, args.session_id)
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code in {401, 403}:
+            raise SystemExit(
+                "Authentication failed: set SUPERDOCS_API_KEY to a valid key."
+            ) from exc
+        raise
+    print(json.dumps(report, indent=2))
+
+
+if __name__ == "__main__":
+    main()
