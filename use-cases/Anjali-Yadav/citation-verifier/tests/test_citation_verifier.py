@@ -144,3 +144,15 @@ def test_session_workflow_uploads_source_and_exports_report(tmp_path):
     assert len(client.uploads) == 1
     assert report["findings"][0]["verdict"] == "yes"
     assert client.exports[0][1] == "markdown"
+
+
+def test_session_entailment_adapter_extracts_superdocs_response_text():
+    class Client:
+        def chat(self, session_id, message):
+            return {"response": "VERDICT: partial\nReason: It supports the claim partly."}
+
+    adapter = citation_main.SessionEntailmentClient(Client(), "session-4")
+
+    result = adapter.chat(message="evaluate this citation")
+
+    assert result.startswith("VERDICT: partial")

@@ -24,7 +24,10 @@ class SessionEntailmentClient:
         self.session_id = session_id
 
     def chat(self, **kwargs):
-        return self.client.chat(self.session_id, kwargs["message"])
+        result = self.client.chat(self.session_id, kwargs["message"])
+        if isinstance(result, dict) and "verdict" not in result:
+            return result.get("response", result)
+        return result
 
 
 def extract_citation_pairs(document_text: str, reference_map: dict[str, str] | dict[str, dict[str, str]]) -> list[CitationPair]:
