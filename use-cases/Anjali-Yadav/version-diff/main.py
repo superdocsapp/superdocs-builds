@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import requests
 import uuid
 from pathlib import Path
 
@@ -103,13 +104,20 @@ def main() -> int:
     load_environment(Path(__file__).resolve().parent)
     api_key = get_required_api_key()
     client = SuperDocsClient(api_key, budget=OperationBudget(floor=get_budget_floor()))
-    report = run_session_workflow(
-        before_text,
-        after_text,
-        client,
-        args.out or "output/version_diff.json",
-        approve_all=args.approve_all,
-    )
+    try:
+        report = run_session_workflow(
+            before_text,
+            after_text,
+            client,
+            args.out or "output/version_diff.json",
+            approve_all=args.approve_all,
+        )
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code in {401, 403}:
+            raise SystemExit(
+                "Authentication failed: set SUPERDOCS_API_KEY to a valid key."
+            ) from exc
+        raise
     rendered = json.dumps(report, indent=2, ensure_ascii=True)
 
     print(rendered)

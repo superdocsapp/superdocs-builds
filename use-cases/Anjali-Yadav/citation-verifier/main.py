@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import re
 import json
+import requests
 import sys
 import uuid
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+BUILD_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = BUILD_ROOT.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from common.verification import check_entailment  # noqa: E402
 from common.local_retrieval import chunk_documents, hybrid_search  # noqa: E402
@@ -167,7 +169,14 @@ def main() -> None:
         budget=OperationBudget(floor=get_budget_floor()),
     )
     report_path = args.out or "output/citation_report.json"
-    report = run_session_workflow(document_text, refs, client, report_path, review=args.review)
+    try:
+        report = run_session_workflow(document_text, refs, client, report_path, review=args.review)
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code in {401, 403}:
+            raise SystemExit(
+                "Authentication failed: set SUPERDOCS_API_KEY to a valid key."
+            ) from exc
+        raise
     rendered = __import__("json").dumps(report, indent=2, ensure_ascii=True)
     print(rendered)
 

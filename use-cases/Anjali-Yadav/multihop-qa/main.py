@@ -2,13 +2,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import requests
 import sys
 import uuid
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+BUILD_ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = BUILD_ROOT.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from common.local_retrieval import chunk_documents, hybrid_search  # noqa: E402
 from common.verification import quote_grounded  # noqa: E402
@@ -99,7 +101,14 @@ def main() -> None:
         for path in sorted(docs_dir.glob("*.txt"))
     }
     client = SuperDocsClient(api_key, budget=OperationBudget(floor=get_budget_floor()))
-    report = run_session_workflow(args.question, documents, client, args.out, args.session_id)
+    try:
+        report = run_session_workflow(args.question, documents, client, args.out, args.session_id)
+    except requests.HTTPError as exc:
+        if exc.response is not None and exc.response.status_code in {401, 403}:
+            raise SystemExit(
+                "Authentication failed: set SUPERDOCS_API_KEY to a valid key."
+            ) from exc
+        raise
     print(json.dumps(report, indent=2))
 
 
