@@ -73,8 +73,6 @@ def verify_pairs(pairs: list[CitationPair], reference_map: dict, client) -> list
     findings: list[dict] = []
     for pair in pairs:
         target_map = reference_map.get(pair.source_doc_id, reference_map)
-        if isinstance(target_map, str):
-            target_map = {pair.citation_target: target_map}
         if isinstance(target_map, dict) and pair.citation_target in target_map:
             cited_text = target_map[pair.citation_target]
             verdict = check_entailment(pair.claim, cited_text, client)
