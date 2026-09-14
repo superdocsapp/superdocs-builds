@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>API-reference &amp; Guide Authoring</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --surface: #ffffff;
+      --border: #e5e5e8;
+      --text: #17181c;
+      --text-muted: #6b6f76;
+      --accent: #5b5ee8;
+      --accent-hover: #4a4dd6;
+      --ok-bg: #e7f6ec;
+      --ok-text: #1c7a3f;
+      --fail-bg: #fdecea;
+      --fail-text: #b3261e;
+      --fake-bg: #fff4e0;
+      --fake-text: #9a6200;
+      --code-bg: #f2f2f5;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.01em;
+    }
+    .subtitle { color: var(--text-muted); margin: 0 0 1.5rem; font-size: 0.95rem; }
+    h2 { font-size: 1.15rem; font-weight: 650; margin: 0 0 0.35rem; }
+    h3 { font-size: 0.95rem; font-weight: 650; margin: 1.25rem 0 0.6rem; color: var(--text); }
+    h4 {
+      font-size: 0.75rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--text-muted); margin: 0 0 0.5rem;
+    }
+    .mode-desc { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 1rem; }
+
+    a { overflow-wrap: anywhere; }
+
+    .uploaded-image-preview {
+      display: flex; align-items: center; gap: 0.9rem;
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.75rem 1rem; margin: 0 0 1rem;
+    }
+    .uploaded-image-preview img {
+      width: 56px; height: 56px; object-fit: cover; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface); flex-shrink: 0;
+    }
+    .view-full-link { color: var(--accent); font-weight: 650; font-size: 0.85rem; text-decoration: none; }
+
+    .revision-panel {
+      border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
+      padding: 1.1rem 1.25rem; margin-top: 1.1rem;
+    }
+    .ai-explanation {
+      background: #eeeefd; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1rem; font-size: 0.9rem; margin-bottom: 1rem;
+    }
+    .diff-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; margin-bottom: 1rem; }
+    @media (max-width: 620px) { .diff-cols { grid-template-columns: 1fr; } }
+    .diff-panel {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.85rem 0.95rem; font-size: 0.82rem; overflow-x: auto; white-space: pre-wrap;
+      max-height: 260px; overflow-y: auto;
+    }
+    .diff-label {
+      font-size: 0.68rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin-bottom: 0.4rem; display: block;
+    }
+    .diff-old { border-left: 3px solid var(--fail-text); }
+    .diff-new { border-left: 3px solid var(--ok-text); }
+    .btn-approve, .btn-reject {
+      padding: 0.55rem 1.1rem; border-radius: 7px; border: none; cursor: pointer;
+      font-weight: 650; font-size: 0.85rem; margin-right: 0.6rem; color: white;
+    }
+    .btn-approve { background: var(--ok-text); }
+    .btn-reject { background: var(--fail-text); }
+    .view-full-link:hover { text-decoration: underline; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+    .badge-fake { background: var(--fake-bg); color: var(--fake-text); }
+    .badge-ok { background: var(--ok-bg); color: var(--ok-text); }
+    .badge-fail { background: var(--fail-bg); color: var(--fail-text); }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+    }
+
+    textarea {
+      width: 100%;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.85rem;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--text);
+      resize: vertical;
+    }
+    textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+
+    .file-label {
+      display: block; font-size: 0.82rem; color: var(--text-muted); margin-top: 0.6rem;
+    }
+    .file-label input[type="file"] { display: block; margin-top: 0.35rem; font-size: 0.82rem; }
+
+    .code-panel { position: relative; }
+    pre {
+      background: var(--code-bg);
+      padding: 0.85rem;
+      padding-top: 2.4rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.8rem;
+      margin: 0;
+      border: 1px solid var(--border);
+    }
+    .plain-pre { padding-top: 0.85rem; }
+
+    button {
+      padding: 0.55rem 1.1rem;
+      border: none;
+      border-radius: 7px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    button:hover { background: var(--accent-hover); }
+    .form-actions { margin: 0.85rem 0 0; }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--code-bg); color: var(--text); }
+    .copy-btn.copied { background: var(--ok-bg); color: var(--ok-text); border-color: transparent; }
+
+    .result-badges { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0.9rem 0 0.25rem; }
+    .result-badges .badge-row { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--text-muted); }
+
+    .cols { display: flex; gap: 1rem; margin-top: 1rem; }
+    .cols > div { flex: 1; min-width: 0; }
+
+    @media (max-width: 720px) {
+      .cols { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <h1>API-reference &amp; Guide Authoring</h1>
+  <p class="subtitle">Chat-driven authoring for developer docs, powered by SuperDocs.</p>
+  {% if using_fake %}<p class="badge badge-fake">⚡ Running against the offline fake client (no SUPERDOCS_API_KEY set)</p>{% endif %}
+
+  <section>
+    <h2>Mode 1 &middot; Markdown round-trip</h2>
+    <p class="mode-desc">Paste markdown with a code block and an image/diagram reference. Converts to a SuperDocs styled document and back — both must survive unchanged.</p>
+    <form method="post" action="/roundtrip" enctype="multipart/form-data">
+      <textarea name="markdown_text" rows="12">{{ sample_markdown }}</textarea>
+      <label class="file-label">
+        Optional: attach a real diagram image to embed in place of the placeholder path above (actually
+        uploaded to SuperDocs, not just a text reference)
+        <input type="file" name="diagram_image" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml">
+      </label>
+      <div class="form-actions"><button type="submit">Convert &amp; round-trip</button></div>
+    </form>
+
+    {% if roundtrip_result %}
+      <h3>Result</h3>
+      <div class="result-badges">
+        <span class="badge-row">Image/diagram reference:
+          {% if roundtrip_result.image_refs_preserved %}<span class="badge badge-ok">preserved</span>{% else %}<span class="badge badge-fail">changed</span>{% endif %}
+        </span>
+        {% if roundtrip_result.real_image_url %}
+        <span class="badge-row">Same underlying image:
+          {% if roundtrip_result.image_target_preserved %}<span class="badge badge-ok">preserved</span>{% else %}<span class="badge badge-fail">changed</span>{% endif %}
+        </span>
+        {% endif %}
+        <span class="badge-row">Code fence (tag + content):
+          {% if roundtrip_result.code_blocks_preserved %}<span class="badge badge-ok">preserved exactly</span>{% else %}<span class="badge badge-fail">changed</span>{% endif %}
+        </span>
+        <span class="badge-row">Code content only:
+          {% if roundtrip_result.code_content_preserved %}<span class="badge badge-ok">preserved exactly</span>{% else %}<span class="badge badge-fail">changed</span>{% endif %}
+        </span>
+      </div>
+      {% if roundtrip_result.real_image_url %}
+      <div class="uploaded-image-preview">
+        <img src="{{ roundtrip_result.real_image_url }}" alt="Uploaded diagram preview">
+        <div>
+          <p class="mode-desc" style="margin-bottom: 0.3rem;">Real image uploaded to SuperDocs</p>
+          <a class="view-full-link" href="{{ roundtrip_result.real_image_url }}" target="_blank" rel="noopener">View full size &rarr;</a>
+        </div>
+      </div>
+      {% endif %}
+      <div class="cols">
+        <div>
+          <h4>Original</h4>
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="original-md">Copy</button>
+            <pre id="original-md">{{ roundtrip_result.original_markdown }}</pre>
+          </div>
+        </div>
+        <div>
+          <h4>After round-trip</h4>
+          <div class="code-panel">
+            <button class="copy-btn" data-copy-target="roundtripped-md">Copy</button>
+            <pre id="roundtripped-md">{{ roundtrip_result.round_tripped_markdown }}</pre>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Mode 2 &middot; Getting-started guide generator</h2>
+    <p class="mode-desc">Describe an API or feature in plain language — get a numbered onboarding guide.</p>
+    <form method="post" action="/guide">
+      <textarea name="feature_description" rows="4" placeholder="e.g. Sign up for an account. Create an API key in Settings. Install the SDK. Call client.doThing() to get started."></textarea>
+      <div class="form-actions"><button type="submit">Generate guide</button></div>
+    </form>
+
+    {% if guide_result %}
+      <h3>Generated guide</h3>
+      <div class="code-panel">
+        <button class="copy-btn" data-copy-target="generated-guide">Copy</button>
+        <pre id="generated-guide" class="plain-pre" style="padding-top: 2.4rem;">{{ guide_result }}</pre>
+      </div>
+
+      {% if pending_revision %}
+        <div class="revision-panel">
+          <h4>Proposed revision - awaiting your review</h4>
+          {% if pending_revision.ai_explanation %}
+          <div class="ai-explanation">{{ pending_revision.ai_explanation }}</div>
+          {% endif %}
+          <div class="diff-cols">
+            <div>
+              <span class="diff-label">Before</span>
+              <div class="diff-panel diff-old">{{ pending_revision.old_html or "(nothing yet)" }}</div>
+            </div>
+            <div>
+              <span class="diff-label">After</span>
+              <div class="diff-panel diff-new">{{ pending_revision.new_html or "(no change proposed)" }}</div>
+            </div>
+          </div>
+          <form method="post" action="/guide/revise/decide">
+            <button type="submit" name="approved" value="true" class="btn-approve">Approve revision</button>
+            <button type="submit" name="approved" value="false" class="btn-reject">Reject</button>
+          </form>
+        </div>
+      {% else %}
+        <h3>Request a revision</h3>
+        <p class="mode-desc">Ask for a specific change - the proposed edit pauses for your review above before it's applied.</p>
+        <form method="post" action="/guide/revise">
+          <textarea name="revision_instruction" rows="2" placeholder="e.g. Add a troubleshooting section for auth errors"></textarea>
+          <div class="form-actions"><button type="submit">Propose revision</button></div>
+        </form>
+      {% endif %}
+    {% endif %}
+  </section>
+
+  <script>
+    document.querySelectorAll(".copy-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var target = document.getElementById(btn.getAttribute("data-copy-target"));
+        navigator.clipboard.writeText(target.textContent).then(function () {
+          var original = btn.textContent;
+          btn.textContent = "Copied!";
+          btn.classList.add("copied");
+          setTimeout(function () {
+            btn.textContent = original;
+            btn.classList.remove("copied");
+          }, 1500);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

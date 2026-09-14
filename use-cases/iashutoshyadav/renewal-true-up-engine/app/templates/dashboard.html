@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Renewal &amp; True-Up Documentation Engine</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --surface: #ffffff;
+      --border: #e5e5e8;
+      --text: #17181c;
+      --text-muted: #6b6f76;
+      --accent: #5b5ee8;
+      --accent-hover: #4a4dd6;
+      --ok-bg: #e7f6ec;
+      --ok-text: #1c7a3f;
+      --fail-bg: #fdecea;
+      --fail-text: #b3261e;
+      --fake-bg: #fff4e0;
+      --fake-text: #9a6200;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+    h1 { font-size: 1.6rem; font-weight: 700; margin: 0 0 0.35rem; letter-spacing: -0.01em; }
+    .subtitle { color: var(--text-muted); margin: 0 0 1.5rem; font-size: 0.95rem; }
+    h2 { font-size: 1.05rem; font-weight: 650; margin: 0 0 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .count-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 1.5rem; height: 1.5rem; padding: 0 0.4rem; border-radius: 999px;
+      background: var(--border); color: var(--text-muted); font-size: 0.78rem; font-weight: 700;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+    .badge-fake { background: var(--fake-bg); color: var(--fake-text); }
+    .badge-reason { background: var(--fail-bg); color: var(--fail-text); }
+    .badge-amount-zero { background: var(--ok-bg); color: var(--ok-text); }
+    .badge-amount { background: var(--fail-bg); color: var(--fail-text); }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin: 1.5rem 0;
+      box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 7px;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.12s ease;
+    }
+    button:hover { background: var(--accent-hover); }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 0.55rem 0.6rem; font-size: 0.72rem; font-weight: 650;
+      text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    td { text-align: left; padding: 0.7rem 0.6rem; font-size: 0.88rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg); }
+
+    a.review-link {
+      color: var(--accent); font-weight: 650; text-decoration: none; font-size: 0.85rem;
+    }
+    a.review-link:hover { text-decoration: underline; }
+
+    .empty-note { color: var(--text-muted); font-size: 0.88rem; padding: 0.5rem 0; }
+
+    .warn-banner {
+      background: var(--fake-bg); color: var(--fake-text);
+      border-radius: 8px; padding: 0.8rem 1rem; font-size: 0.88rem; margin: 0 0 1.5rem;
+    }
+
+    button:disabled { background: var(--text-muted); cursor: not-allowed; }
+    .progress-status {
+      display: none; align-items: center; gap: 0.6rem; margin-top: 0.9rem;
+      font-size: 0.88rem; color: var(--text-muted);
+    }
+    .progress-status.active { display: flex; }
+    .spinner {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1>Renewal &amp; True-Up Documentation Engine</h1>
+  <p class="subtitle">Assemble a customer cohort's renewal pack, auto-apply clean renewals, and hold genuine exceptions for review.</p>
+  {% if using_fake %}<p class="badge badge-fake">⚡ Running against the offline fake client (no SUPERDOCS_API_KEY set)</p>{% endif %}
+
+  {% if result and result.skipped_over_limit %}
+  <p class="warn-banner">
+    ⚠ {{ result.skipped_over_limit|length }} customer(s) were skipped by the operation-limit stopping rule
+    and never processed this run: {{ result.skipped_over_limit|join(", ") }}.
+  </p>
+  {% endif %}
+
+  <section>
+    <form id="batch-form" method="post" action="/batch/run">
+      <button id="batch-submit" type="submit">Run cohort batch (sample data)</button>
+      <div class="progress-status" id="batch-progress">
+        <span class="spinner"></span>
+        <span id="batch-progress-text">Starting…</span>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    (function () {
+      var form = document.getElementById("batch-form");
+      var button = document.getElementById("batch-submit");
+      var status = document.getElementById("batch-progress");
+      var statusText = document.getElementById("batch-progress-text");
+      var pollTimer = null;
+
+      function poll() {
+        fetch("/batch/progress").then(function (r) { return r.json(); }).then(function (p) {
+          if (!p) return;
+          if (p.total) {
+            statusText.textContent = "Processing " + p.current + " of " + p.total + ": " + (p.customer_id || "…");
+          } else {
+            statusText.textContent = "Starting…";
+          }
+        }).catch(function () {});
+      }
+
+      form.addEventListener("submit", function () {
+        button.disabled = true;
+        status.classList.add("active");
+        pollTimer = setInterval(poll, 500);
+        // The form still submits normally (full page reload on completion) - this just adds live
+        // feedback while that request is in flight, not a replacement for the request itself.
+      });
+    })();
+  </script>
+
+  {% if result %}
+    <section>
+      <h2>Clean renewals <span class="count-pill">{{ result.clean|length }}</span></h2>
+      {% if result.clean %}
+      <table>
+        <tr><th>Customer</th><th>Entitlement</th><th>Usage</th><th>True-up</th><th></th></tr>
+        {% for p in result.clean %}
+        <tr>
+          <td>{{ p.customer.name }}</td>
+          <td>{{ "%.0f"|format(p.true_up.entitlement_units) if p.true_up else "-" }}</td>
+          <td>{{ "%.0f"|format(p.usage.units_used) }}</td>
+          <td><span class="badge badge-amount-zero">{{ "$%.2f"|format(p.true_up.true_up_amount) if p.true_up else "-" }}</span></td>
+          <td><a class="review-link" href="/pack/{{ p.customer.customer_id }}">View pack →</a></td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% else %}
+      <p class="empty-note">No clean renewals this run.</p>
+      {% endif %}
+    </section>
+
+    <section>
+      <h2>Needs human review <span class="count-pill">{{ result.pending_review|length }}</span></h2>
+      {% if result.pending_review %}
+      <table>
+        <tr><th>Customer</th><th>Reason</th><th>True-up owed</th><th></th></tr>
+        {% for item in result.pending_review %}
+        <tr>
+          <td>{{ item.package.customer.name }}</td>
+          <td><span class="badge badge-reason">{{ item.package.exception.reason }}</span></td>
+          <td>{% if item.package.true_up %}<span class="badge badge-amount">${{ "%.2f"|format(item.package.true_up.true_up_amount) }}</span>{% else %}<span class="empty-note">-</span>{% endif %}</td>
+          <td><a class="review-link" href="/review/{{ item.package.customer.customer_id }}">Review →</a></td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% else %}
+      <p class="empty-note">Nothing needs review this run.</p>
+      {% endif %}
+    </section>
+
+    {% if result.failed %}
+    <section>
+      <h2>Failed <span class="count-pill">{{ result.failed|length }}</span></h2>
+      <table>
+        <tr><th>Customer</th><th>Error</th></tr>
+        {% for f in result.failed %}
+        <tr><td>{{ f.customer_id }}</td><td>{{ f.error }}</td></tr>
+        {% endfor %}
+      </table>
+    </section>
+    {% endif %}
+  {% endif %}
+</body>
+</html>
