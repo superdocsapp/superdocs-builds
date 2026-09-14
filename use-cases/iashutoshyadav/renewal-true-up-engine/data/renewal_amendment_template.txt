@@ -1,0 +1,20 @@
+RENEWAL AMENDMENT TEMPLATE
+
+Vertex Cloud Partners LLC - Standard Renewal Amendment Letterhead
+
+This Amendment updates the entitlement clause of the referenced Master Services Agreement for
+the upcoming renewal term. Amendments drafted from this template must:
+
+- State the new Monthly Entitlement in the same numbered-clause format as the original agreement
+  (e.g. "2.1 Customer is entitled to use up to N compute units per month").
+- Leave every other clause of the original agreement unchanged.
+- Use plain, formal contract language consistent with the rest of the agreement - no informal phrasing.
+
+Signature block:
+
+Vertex Cloud Partners LLC                    Customer
+
+_______________________                      _______________________
+Authorized Signatory                          Authorized Signatory
+
+Date: _______________                        Date: _______________

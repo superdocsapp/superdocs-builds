@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Review renewal - {{ item.package.customer.name }}</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --surface: #ffffff;
+      --border: #e5e5e8;
+      --text: #17181c;
+      --text-muted: #6b6f76;
+      --accent: #5b5ee8;
+      --ok: #1e7a34;
+      --ok-hover: #17632e;
+      --fail: #b3261e;
+      --fail-hover: #942019;
+      --warn-bg: #fdecea;
+      --warn-border: #b3261e;
+      --code-bg: #f2f2f5;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+    a.back-link { color: var(--text-muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+    a.back-link:hover { color: var(--text); }
+    h1 { font-size: 1.5rem; font-weight: 700; margin: 0.75rem 0 1.5rem; letter-spacing: -0.01em; }
+    h3 {
+      font-size: 0.75rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--text-muted); margin: 0 0 0.6rem;
+    }
+
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin: 1.25rem 0;
+      box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+    }
+    .diff-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    @media (max-width: 620px) { .diff-cols { grid-template-columns: 1fr; } }
+    .diff-panel {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.85rem 0.95rem; font-size: 0.82rem; overflow-x: auto; white-space: pre-wrap;
+      max-height: 260px; overflow-y: auto;
+    }
+    .diff-label {
+      font-size: 0.68rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--text-muted); margin-bottom: 0.4rem; display: block;
+    }
+    .diff-old { border-left: 3px solid var(--fail); }
+    .diff-new { border-left: 3px solid var(--ok); }
+    .ai-explanation {
+      background: #eeeefd; border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1rem; font-size: 0.9rem; margin-bottom: 1rem;
+    }
+
+    .math {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 1rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    .math .result { color: var(--ok); font-weight: 700; }
+
+    .quote-panel { position: relative; }
+    .quote {
+      background: var(--code-bg);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 0.9rem 1rem;
+      padding-right: 4.5rem;
+      font-style: italic;
+      color: var(--text);
+      font-size: 0.92rem;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      background: var(--surface);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--code-bg); color: var(--text); }
+    .copy-btn.copied { background: #e7f6ec; color: var(--ok); border-color: transparent; }
+
+    .not-applied { color: var(--text-muted); font-size: 0.9rem; margin: 0.75rem 0 1.1rem; }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      border-radius: 7px;
+      border: none;
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 0.88rem;
+      margin-right: 0.6rem;
+      color: white;
+    }
+    .approve { background: var(--ok); }
+    .approve:hover { background: var(--ok-hover); }
+    .reject { background: var(--fail); }
+    .reject:hover { background: var(--fail-hover); }
+    .ack { background: #555; }
+    .ack:hover { background: #3f3f3f; }
+
+    label { font-size: 0.85rem; color: var(--text-muted); display: block; margin-top: 1rem; }
+    input[type="text"] {
+      margin-top: 0.4rem; width: 100%; max-width: 360px; padding: 0.5rem 0.7rem;
+      border: 1px solid var(--border); border-radius: 7px; font-size: 0.88rem;
+    }
+    input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+
+    .warn {
+      background: var(--warn-bg);
+      border-left: 3px solid var(--warn-border);
+      border-radius: 0 8px 8px 0;
+      padding: 1rem 1.1rem;
+      font-size: 0.92rem;
+    }
+    .warn code { background: rgba(0,0,0,0.06); padding: 0.1rem 0.35rem; border-radius: 4px; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="/">&larr; back</a>
+  <h1>{{ item.package.customer.name }}</h1>
+
+  {% if item.package.renewal_quote %}
+    <section>
+      <h3>Renewal quote</h3>
+      <p>{{ item.package.renewal_quote }}</p>
+    </section>
+  {% endif %}
+
+  {% if item.package.true_up %}
+    <section>
+      <h3>True-up calculation</h3>
+      <div class="math">
+        entitlement = {{ "%.0f"|format(item.package.true_up.entitlement_units) }}<br>
+        usage       = {{ "%.0f"|format(item.package.true_up.units_used) }}<br>
+        overage     = {{ "%.0f"|format(item.package.true_up.overage_units) }}<br>
+        rate        = ${{ item.package.true_up.overage_rate }}<br>
+        true-up     = {{ "%.0f"|format(item.package.true_up.overage_units) }} &times; ${{ item.package.true_up.overage_rate }}
+                    = <span class="result">${{ "%.2f"|format(item.package.true_up.true_up_amount) }}</span>
+      </div>
+    </section>
+
+    <section>
+      <h3>Governing clause (from the signed agreement)</h3>
+      <div class="quote-panel">
+        <button class="copy-btn" data-copy-target="clause-quote">Copy</button>
+        <div class="quote" id="clause-quote">&ldquo;{{ item.package.true_up.governing_clause_quote }}&rdquo;</div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Proposed amendment</h3>
+      <p class="not-applied">This edit has <strong>not</strong> been applied yet - review it below before deciding.</p>
+      {% if item.ai_explanation %}
+      <div class="ai-explanation">{{ item.ai_explanation }}</div>
+      {% endif %}
+      {% if item.old_html or item.new_html %}
+      <div class="diff-cols">
+        <div>
+          <span class="diff-label">Before</span>
+          <div class="diff-panel diff-old">{{ item.old_html or "(nothing - this is a new addition)" }}</div>
+        </div>
+        <div>
+          <span class="diff-label">After</span>
+          <div class="diff-panel diff-new">{{ item.new_html or "(no change proposed)" }}</div>
+        </div>
+      </div>
+      {% else %}
+      <p class="not-applied">SuperDocs did not return diff content for this change - approve or reject based on the true-up math and clause above.</p>
+      {% endif %}
+    </section>
+
+    {% if item.package.talk_track %}
+    <section>
+      <h3>Talk track</h3>
+      <p>{{ item.package.talk_track }}</p>
+    </section>
+    {% endif %}
+
+    <section>
+      <form method="post" action="/review/{{ item.package.customer.customer_id }}/decide">
+        <button type="submit" name="approved" value="true" class="approve">Approve amendment</button>
+        <button type="submit" name="approved" value="false" class="reject">Reject</button>
+        <label>Reason (optional)<input type="text" name="reason"></label>
+      </form>
+    </section>
+  {% else %}
+    <section>
+      <div class="warn">
+        <strong>No amendment could be proposed.</strong><br>
+        Reason: <code>{{ item.package.exception.reason }}</code> - the governing entitlement/rate clause
+        could not be located in this customer's contract text. Nothing was sent to SuperDocs; there is no
+        true-up figure to trust until the contract itself is checked by a human.
+      </div>
+      <form method="post" action="/review/{{ item.package.customer.customer_id }}/decide" style="margin-top: 1.1rem;">
+        <button type="submit" name="approved" value="false" class="ack">Acknowledge and remove from queue</button>
+      </form>
+    </section>
+  {% endif %}
+
+  <script>
+    document.querySelectorAll(".copy-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var target = document.getElementById(btn.getAttribute("data-copy-target"));
+        navigator.clipboard.writeText(target.textContent).then(function () {
+          var original = btn.textContent;
+          btn.textContent = "Copied!";
+          btn.classList.add("copied");
+          setTimeout(function () {
+            btn.textContent = original;
+            btn.classList.remove("copied");
+          }, 1500);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Renewal pack - {{ package.customer.name }}</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --surface: #ffffff;
+      --border: #e5e5e8;
+      --text: #17181c;
+      --text-muted: #6b6f76;
+      --accent: #5b5ee8;
+      --ok: #1e7a34;
+      --code-bg: #f2f2f5;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+    a.back-link { color: var(--text-muted); text-decoration: none; font-size: 0.88rem; font-weight: 600; }
+    a.back-link:hover { color: var(--text); }
+    h1 { font-size: 1.5rem; font-weight: 700; margin: 0.75rem 0 1.5rem; letter-spacing: -0.01em; }
+    h3 {
+      font-size: 0.75rem; font-weight: 650; text-transform: uppercase; letter-spacing: 0.04em;
+      color: var(--text-muted); margin: 0 0 0.6rem;
+    }
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem 1.75rem;
+      margin: 1.25rem 0;
+      box-shadow: 0 1px 2px rgba(20, 20, 30, 0.04);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 650;
+      background: #e7f6ec; color: var(--ok);
+    }
+    .math {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      padding: 1rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+    }
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+      padding: 1rem 1.1rem; font-size: 0.82rem; overflow-x: auto; white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <a class="back-link" href="/">&larr; back</a>
+  <h1>{{ package.customer.name }} <span class="badge">clean renewal</span></h1>
+
+  <section>
+    <h3>Usage &amp; value summary</h3>
+    <div class="math">
+      entitlement = {{ "%.0f"|format(package.true_up.entitlement_units) }} units/month<br>
+      usage       = {{ "%.0f"|format(package.true_up.units_used) }} units this period<br>
+      overage     = {{ "%.0f"|format(package.true_up.overage_units) }} units (none - within entitlement)
+    </div>
+    {% if package.usage_chart_url %}
+    <img src="{{ package.usage_chart_url }}" alt="Usage vs. entitlement chart" style="max-width: 100%; margin-top: 1rem; border: 1px solid var(--border); border-radius: 8px;">
+    {% endif %}
+  </section>
+
+  {% if package.renewal_quote %}
+  <section>
+    <h3>Renewal quote</h3>
+    <p>{{ package.renewal_quote }}</p>
+  </section>
+  {% endif %}
+
+  {% if package.talk_track %}
+  <section>
+    <h3>Talk track</h3>
+    <p>{{ package.talk_track }}</p>
+  </section>
+  {% endif %}
+
+  {% if package.exported_summary_markdown %}
+  <section>
+    <h3>Amendment document (applied)</h3>
+    <pre>{{ package.exported_summary_markdown }}</pre>
+  </section>
+  {% endif %}
+</body>
+</html>
