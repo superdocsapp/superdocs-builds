@@ -1,0 +1,166 @@
+{
+  "$schema": "../schema/fixture-cases.schema.json",
+  "client": "codex",
+  "cases_version": 1,
+
+  "_readme": [
+    "TOML. The third format, and the one where a reserialise would do the most damage: Codex keeps",
+    "model settings, plugin toggles, project trust levels and MCP servers in ONE file. A repair",
+    "that reformats the document rewrites configuration it was never asked to touch.",
+    "",
+    "The inputs below are shaped after the real ~/.codex/config.toml read on 2026-08-22: table",
+    "syntax, comments, blank-line spacing and unrelated sections around the target. The unrelated",
+    "sections are the point — they must come back byte-identical.",
+    "",
+    "Fix expectations describe the target for step 3. This client is not write-capable yet: its",
+    "remote-HTTP field names are documented rather than captured."
+  ],
+
+  "cases": [
+    {
+      "name": "healthy",
+      "description": "A correct remote entry sitting beside unrelated configuration.",
+      "raw_files": {
+        ".codex/config.toml": "model = \"gpt-5.6-terra\"\nmodel_reasoning_effort = \"high\"\n\n[mcp_servers.superdocs]\nurl = \"https://api.superdocs.app/mcp\"\n\n[mcp_servers.superdocs.http_headers]\nAuthorization = \"Bearer sk_fixture_toml_healthy_0\"\n\n[projects.\"/Users/dev/work\"]\ntrust_level = \"trusted\"\n"
+      },
+      "expect": {
+        "scan": { "exit_code": 0, "findings": [] },
+        "fix": { "exit_code": 0, "findings": [], "files_unchanged": true, "backup_expected": false }
+      }
+    },
+
+    {
+      "name": "scheme-insecure",
+      "description": "http:// on the canonical host, with unrelated tables above and below.",
+      "raw_files": {
+        ".codex/config.toml": "model = \"gpt-5.6-terra\"\n\n# The document service\n[mcp_servers.superdocs]\nurl = \"http://api.superdocs.app/mcp\"\nstartup_timeout_sec = 120\n\n[mcp_servers.superdocs.http_headers]\nAuthorization = \"Bearer sk_fixture_toml_scheme_00\"\n\n[projects.\"/Users/dev/work\"]\ntrust_level = \"trusted\"\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.scheme-insecure", "severity": "error", "auto_fixable": true }]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.scheme-insecure", "fixed": true }],
+          "backup_expected": true,
+          "files": {
+            ".codex/config.toml": "model = \"gpt-5.6-terra\"\n\n# The document service\n[mcp_servers.superdocs]\nurl = \"https://api.superdocs.app/mcp\"\nstartup_timeout_sec = 120\n\n[mcp_servers.superdocs.http_headers]\nAuthorization = \"Bearer sk_fixture_toml_scheme_00\"\n\n[projects.\"/Users/dev/work\"]\ntrust_level = \"trusted\"\n"
+          }
+        }
+      },
+      "_why": "The comment, the blank lines, the sibling key and both unrelated tables survive verbatim. One word changes."
+    },
+
+    {
+      "name": "auth-header-no-bearer",
+      "description": "A key in the header table without the Bearer scheme.",
+      "raw_files": {
+        ".codex/config.toml": "[mcp_servers.superdocs]\nurl = \"https://api.superdocs.app/mcp\"\n\n[mcp_servers.superdocs.http_headers]\nAuthorization = \"sk_fixture_toml_nobearer\"\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [
+            { "id": "config.auth-header-no-bearer", "severity": "error", "auto_fixable": true }
+          ]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.auth-header-no-bearer", "fixed": true }],
+          "backup_expected": true,
+          "files": {
+            ".codex/config.toml": "[mcp_servers.superdocs]\nurl = \"https://api.superdocs.app/mcp\"\n\n[mcp_servers.superdocs.http_headers]\nAuthorization = \"Bearer sk_fixture_toml_nobearer\"\n"
+          }
+        }
+      }
+    },
+
+    {
+      "name": "stdio-server",
+      "description": "A command-based entry, the shape actually observed in the live config. Out of scope, named rather than ignored.",
+      "raw_files": {
+        ".codex/config.toml": "[mcp_servers.superdocs]\ncommand = \"superdocs-mcp\"\nargs = [\"--stdio\"]\nstartup_timeout_sec = 120\n\n[mcp_servers.superdocs.env]\nSUPERDOCS_API_KEY = \"sk_fixture_toml_stdio_000\"\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.stdio-server", "severity": "info" }]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.stdio-server" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "Both MCP servers in the real config were this shape, so it is the likeliest thing the tool will meet in a Codex file."
+    },
+
+    {
+      "name": "no-entry-among-other-servers",
+      "description": "Other MCP servers configured, none of them SuperDocs.",
+      "env": { "SUPERDOCS_API_KEY": null },
+      "raw_files": {
+        ".codex/config.toml": "model = \"gpt-5.6-terra\"\n\n[mcp_servers.node_repl]\ncommand = \"/usr/local/bin/node-repl\"\nargs = []\n\n[mcp_servers.computer-use]\ncommand = \"/usr/local/bin/computer-use\"\nargs = [\"mcp\"]\nenabled = false\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.no-entry", "severity": "info" }]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.key-absent", "severity": "error" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "Modelled on the real file, which had exactly these two stdio servers. Other people's servers must be left completely alone."
+    },
+
+    {
+      "name": "host-rule-gateway",
+      "description": "The host rule in TOML: an entry pointing at a policy gateway is left byte-identical.",
+      "raw_files": {
+        ".codex/config.toml": "# routed via the platform gateway\n[mcp_servers.superdocs]\nurl = \"http://localhost:8080/mcp\"\n\n[mcp_servers.superdocs.http_headers]\nAuthorization = \"Bearer gw_fixture_toml_team_000\"\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.non-canonical-host", "severity": "info" }],
+          "must_not_contain_findings": ["config.scheme-insecure"],
+          "no_network_to": ["localhost", "127.0.0.1"]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.non-canonical-host" }],
+          "files_unchanged": true,
+          "backup_expected": false,
+          "no_network_to": ["localhost", "127.0.0.1"]
+        }
+      }
+    },
+
+    {
+      "name": "invalid-toml",
+      "description": "A broken TOML file is never auto-rewritten.",
+      "raw_files": {
+        ".codex/config.toml": "[mcp_servers.superdocs\nurl = \"https://api.superdocs.app/mcp\"\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.invalid-syntax", "severity": "error", "auto_fixable": false }]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.invalid-syntax" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "An unclosed table header. Repairing a file we could not parse would mean guessing at the structure of a document holding this user's project trust levels."
+    }
+  ]
+}

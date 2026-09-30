@@ -1,0 +1,135 @@
+/* A browser tool, not a task pane: room to read a long outline beside the parts
+   it produces.
+
+   **Light only, deliberately.** This renders a paper document at its real page
+   size, and paper is white — a dark preview would show the reviewer something
+   that looks nothing like the file they are about to export. `color-scheme`
+   says so to the browser as well as to us: without it, a reviewer on a dark
+   laptop gets dark-chromed file and number inputs and dark scrollbars dropped
+   into a white page, because those are painted by the OS and not by the CSS
+   above. */
+:root {
+  color-scheme: light;
+  --ink:#1b1b1b; --muted:#5f6368; --rule:#e3e3e3; --ground:#fff; --panel:#f7f7f8;
+  --accent:#0f6cbd; --ok:#0f7b3f; --ok-wash:#eef8f1;
+  --warn:#a4262c; --warn-wash:#fdf3f4;
+}
+* { box-sizing: border-box }
+body {
+  margin:0; padding:32px 20px 96px; color:var(--ink); background:var(--ground);
+  font:15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+main { max-width:960px; margin:0 auto }
+h1 { font-size:22px; margin:0 0 4px }
+h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:0 0 12px }
+.lede { color:var(--muted); margin:0 0 24px }
+section { border:1px solid var(--rule); border-radius:8px; padding:16px 18px; margin-bottom:16px }
+.row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0 }
+.count { color:var(--muted); font-size:13px; margin-left:auto }
+
+button {
+  font:inherit; font-size:14px; padding:7px 13px; border:1px solid var(--rule);
+  border-radius:6px; background:var(--ground); color:var(--ink); cursor:pointer;
+}
+button:disabled { opacity:.5; cursor:default }
+button.primary { background:var(--accent); border-color:var(--accent); color:#fff }
+
+/* The outline scrolls; a 200-block master must not push the parts table off the page. */
+
+table { border-collapse:collapse; width:100%; font-size:13px; margin-top:6px }
+th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--rule); vertical-align:top }
+th { color:var(--muted); font-weight:600 }
+code { background:var(--panel); padding:1px 5px; border-radius:3px; font-size:12px; word-break:break-all }
+
+.verdict { margin-top:12px; padding:10px 12px; border-radius:6px; border-left:3px solid; font-size:13px }
+.verdict.ok  { background:var(--ok-wash);   border-color:var(--ok);   color:var(--ok) }
+.verdict.bad { background:var(--warn-wash); border-color:var(--warn); color:var(--warn) }
+.furniture { color:var(--muted); font-weight:normal }
+
+.note { font-size:13px; color:var(--muted); margin:8px 0 0 }
+.note.bad  { color:var(--warn) }
+.note.warn { color:var(--warn) }
+.limit { font-size:12px; color:var(--muted); margin-top:24px }
+
+/* Pinned: the result of an export must not be missed because the page scrolled. */
+.banner {
+  position:fixed; left:50%; bottom:20px; transform:translateX(-50%);
+  max-width:min(900px, calc(100vw - 40px));
+  display:flex; gap:10px; align-items:flex-start;
+  padding:10px 14px; border-radius:8px; border-left:3px solid; font-size:13px;
+  box-shadow:0 4px 18px rgba(0,0,0,.18);
+}
+.banner.ok   { background:var(--ok-wash);   border-color:var(--ok);   color:var(--ok) }
+.banner.bad  { background:var(--warn-wash); border-color:var(--warn); color:var(--warn); font-weight:600 }
+.banner.busy { background:var(--panel);     border-color:var(--muted); color:var(--muted) }
+.banner .close { border:0; background:none; color:inherit; font-size:16px; line-height:1; padding:0 2px; opacity:.7 }
+.banner .close:hover { opacity:1 }
+
+/* ── the document preview ────────────────────────────────────────────────
+   Paper on a desk: the printable box at its real width, a line-number rail
+   down the side, and page rules where our pagination says a page ends. It
+   scrolls inside its own frame so a 90-page master does not push the parts
+   table off the screen. */
+.preview {
+  display:flex; gap:0; margin-top:12px;
+  max-height:560px; overflow:auto;
+  border:1px solid var(--rule); border-radius:6px; background:var(--panel);
+  padding:16px 16px 24px;
+}
+.preview__rail { position:relative; width:2.6em; flex:none; user-select:none }
+.rail__line {
+  position:absolute; right:8px; font-size:10px; line-height:1;
+  color:var(--muted); font-variant-numeric:tabular-nums;
+}
+.preview__paper { position:relative; flex:none; background:var(--ground);
+  box-shadow:0 1px 4px rgba(0,0,0,.14); padding:0 }
+.preview__doc { font:14px/1.55 Georgia, "Times New Roman", serif; color:var(--ink); padding:2px 0 }
+/* Clicking places a cut, so the whole page is a target. */
+.preview__doc { cursor:text }
+.preview__doc h1, .preview__doc h2, .preview__doc h3 { font-size:15px; margin:14px 0 6px }
+.preview__doc p { margin:0 0 10px }
+
+.preview__pagebreak {
+  position:absolute; left:0; right:0; border-top:1px dashed var(--rule);
+  pointer-events:none;
+}
+.preview__pagebreak span {
+  position:absolute; right:2px; top:2px; font-size:10px; color:var(--muted);
+  background:var(--ground); padding:0 4px;
+}
+
+/* Where a part begins — drawn AT THE CHARACTER, not across the paragraph.
+   A rule spanning the block showed which line the cut was on and nothing more,
+   so a cut inside a word looked the same as one at the paragraph's start. The
+   caret sits on the character; the rule runs from there to the end of the line,
+   which is the shape of what the next part takes. */
+.marker { position:absolute; left:0; right:0; pointer-events:none }
+.marker__caret {
+  position:absolute; top:-2px; bottom:-2px; width:2px;
+  background:var(--accent); border-radius:1px;
+  box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.marker__rule {
+  position:absolute; right:0; top:-2px; border-top:2px dashed var(--accent); opacity:.65;
+}
+.marker__tag {
+  position:absolute; left:0; top:-8px; transform:translateY(-100%);
+  background:var(--accent); color:#fff; font-size:10px; font-weight:600;
+  padding:2px 7px; border-radius:10px; white-space:nowrap;
+}
+.marker__remove {
+  position:absolute; right:0; top:-8px; transform:translateY(-100%);
+  pointer-events:auto; border:0; border-radius:10px; cursor:pointer;
+  background:var(--accent); color:#fff; font-size:11px; line-height:1; padding:3px 7px;
+}
+
+/* Granularity toggle. */
+.chip { font-size:12px; padding:4px 10px; border-radius:14px }
+.chip.on { background:var(--accent); border-color:var(--accent); color:#fff }
+
+.parts { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted) }
+.parts input {
+  font:inherit; font-size:14px; width:5em; padding:5px 8px; color:var(--ink);
+  background:var(--ground); border:1px solid var(--rule); border-radius:6px;
+}
+.cuts code { font-size:11px }

@@ -1,0 +1,555 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://superdocs.app/mcp-doctor/schema/client-registry.json",
+  "title": "mcp-doctor client registry entry",
+  "description": "One file per MCP client. Adding a client is adding one of these plus fixtures \u2014 never a code change (Decision D3).",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "entry_version",
+    "evidence",
+    "write_capable",
+    "locations",
+    "server_map",
+    "http_server_schema",
+    "identification",
+    "repairs"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entry_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "paths",
+        "schema",
+        "repairs"
+      ],
+      "properties": {
+        "_readme": {
+          "type": "string"
+        },
+        "paths": {
+          "type": "object",
+          "description": "PER OS. Verifying a path on macOS says nothing about Windows, so a single global claim would over-claim for platforms never seen.",
+          "required": [
+            "darwin",
+            "linux",
+            "win32"
+          ],
+          "properties": {
+            "darwin": {
+              "$ref": "#/$defs/claim"
+            },
+            "linux": {
+              "$ref": "#/$defs/claim"
+            },
+            "win32": {
+              "$ref": "#/$defs/claim"
+            }
+          },
+          "additionalProperties": false
+        },
+        "schema": {
+          "$ref": "#/$defs/claim"
+        },
+        "repairs": {
+          "$ref": "#/$defs/claim"
+        }
+      },
+      "additionalProperties": false
+    },
+    "write_capable": {
+      "type": "object",
+      "description": "Derived per OS, never asserted. validate_contract.py fails the build if any platform is true while that platform's path evidence, the schema evidence, or the repair evidence is not 'captured'.",
+      "required": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "properties": {
+        "_note": {
+          "type": "string"
+        },
+        "darwin": {
+          "type": "boolean"
+        },
+        "linux": {
+          "type": "boolean"
+        },
+        "win32": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "locations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/location"
+      }
+    },
+    "server_map": {
+      "type": "object",
+      "required": [
+        "container_key",
+        "shape"
+      ],
+      "properties": {
+        "container_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "shape": {
+          "enum": [
+            "object",
+            "array"
+          ]
+        },
+        "_shape_note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "http_server_schema": {
+      "type": "object",
+      "required": [
+        "transport",
+        "url",
+        "headers"
+      ],
+      "properties": {
+        "transport": {
+          "type": "object",
+          "description": "How a remote entry is recognised. Not every client has an explicit transport field \u2014 some infer it from the presence of a URL field.",
+          "required": [
+            "detected_by"
+          ],
+          "properties": {
+            "detected_by": {
+              "enum": [
+                "type-field",
+                "url-field-presence"
+              ],
+              "description": "type-field: an explicit field names the transport. url-field-presence: the entry is remote because it carries a URL at all."
+            },
+            "field": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "http_values": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "preferred": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "stdio_indicator_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "sse_only": {
+              "type": "boolean",
+              "description": "The client's only remote transport is SSE. Recorded because SuperDocs answers in plain JSON, so compatibility is not assumed."
+            },
+            "_note": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "if": {
+            "properties": {
+              "detected_by": {
+                "const": "type-field"
+              }
+            },
+            "required": [
+              "detected_by"
+            ]
+          },
+          "then": {
+            "required": [
+              "field",
+              "http_values",
+              "preferred"
+            ]
+          }
+        },
+        "url": {
+          "type": "object",
+          "required": [
+            "field"
+          ],
+          "properties": {
+            "field": {
+              "type": "string",
+              "description": "NOT always 'url'. Antigravity uses 'serverUrl'; a doctor hunting for 'url' would report 'no entry' while one sits right there."
+            }
+          },
+          "additionalProperties": false
+        },
+        "headers": {
+          "type": "object",
+          "description": "Some clients offer no header mechanism at all. Since SuperDocs authenticates with an Authorization header, such a client cannot hold a SuperDocs key \u2014 which is a finding to report honestly, not a gap to paper over.",
+          "required": [
+            "supported"
+          ],
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "field": {
+              "type": "string"
+            },
+            "shape": {
+              "enum": [
+                "object"
+              ]
+            },
+            "case_insensitive_names": {
+              "type": "boolean"
+            },
+            "authorization_header": {
+              "type": "string"
+            },
+            "accept_header": {
+              "type": "string"
+            },
+            "client_sends_own_accept": {
+              "type": "boolean"
+            },
+            "_accept_note": {
+              "type": "string"
+            },
+            "unsupported_reason": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "supported": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "supported"
+                ]
+              },
+              "then": {
+                "required": [
+                  "field",
+                  "authorization_header"
+                ]
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "supported": {
+                    "const": false
+                  }
+                },
+                "required": [
+                  "supported"
+                ]
+              },
+              "then": {
+                "required": [
+                  "unsupported_reason"
+                ]
+              }
+            }
+          ]
+        },
+        "env_interpolation": {
+          "type": "object",
+          "required": [
+            "supported"
+          ],
+          "properties": {
+            "supported": {
+              "type": "boolean"
+            },
+            "syntax": {
+              "type": "string"
+            },
+            "with_default": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "identification": {
+      "type": "object",
+      "required": [
+        "rules"
+      ],
+      "properties": {
+        "_readme": {
+          "type": "string"
+        },
+        "_host_rule": {
+          "type": "string"
+        },
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "by",
+              "confidence"
+            ],
+            "properties": {
+              "by": {
+                "enum": [
+                  "url_host",
+                  "name"
+                ]
+              },
+              "equals": {
+                "type": "string"
+              },
+              "matches": {
+                "type": "string",
+                "not": {
+                  "pattern": "\\(\\?[aiLmsux]+\\)"
+                },
+                "description": "A regex both languages can compile. Inline flag groups like (?i) are Python-only syntax and throw in JavaScript, so flags go in `flags` instead."
+              },
+              "confidence": {
+                "enum": [
+                  "certain",
+                  "likely"
+                ]
+              },
+              "flags": {
+                "type": "string",
+                "pattern": "^[imsu]*$",
+                "description": "Regex flags, expressed portably. 'i' is case-insensitive in both languages."
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "repairs": {
+      "type": "object",
+      "required": [
+        "allowed"
+      ],
+      "properties": {
+        "_readme": {
+          "type": "string"
+        },
+        "_allowed_empty_note": {
+          "type": "string"
+        },
+        "allowed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fix_kind"
+          },
+          "uniqueItems": true
+        },
+        "planned": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fix_kind"
+          },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "claim": {
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "captured",
+            "documented",
+            "unverified"
+          ],
+          "description": "captured = read from a real install or round-tripped; documented = from the client's official docs; unverified = neither."
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "host_os": {
+          "enum": [
+            "darwin",
+            "linux",
+            "win32"
+          ]
+        },
+        "how": {
+          "type": "string"
+        },
+        "unverified_platforms": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "darwin",
+              "linux",
+              "win32"
+            ]
+          }
+        },
+        "capture_todo": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "captured",
+              "documented"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "date",
+          "how"
+        ]
+      }
+    },
+    "location": {
+      "type": "object",
+      "description": "One config file location, anchored to a named base from path-bases.json. Registry data never embeds '~' or '%VAR%' \u2014 expansion is defined once, in data, so neither implementation invents platform behaviour.",
+      "required": [
+        "scope",
+        "precedence",
+        "format",
+        "os",
+        "base",
+        "path"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "project",
+            "workspace",
+            "user"
+          ]
+        },
+        "precedence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "format": {
+          "enum": [
+            "json",
+            "jsonc",
+            "toml"
+          ]
+        },
+        "os": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "darwin",
+              "linux",
+              "win32"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "base": {
+          "enum": [
+            "home",
+            "project_root",
+            "app_config",
+            "app_data",
+            "codex_home"
+          ]
+        },
+        "path": {
+          "type": "string",
+          "pattern": "^[^~%\\\\]+$",
+          "description": "Relative to `base`, '/' separated. The pattern rejects '~', '%' and backslashes so an un-expandable path cannot be smuggled in."
+        },
+        "note": {
+          "type": "string"
+        },
+        "containers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "json_path"
+            ],
+            "properties": {
+              "json_path": {
+                "type": "string"
+              },
+              "scope_hint": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "fix_kind": {
+      "enum": [
+        "url-scheme",
+        "url-path",
+        "transport-field",
+        "auth-header",
+        "accept-header",
+        "add-entry"
+      ]
+    }
+  }
+}

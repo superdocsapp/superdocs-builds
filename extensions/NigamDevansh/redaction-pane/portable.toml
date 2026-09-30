@@ -1,0 +1,18 @@
+# What this app copies from packages/core/src/doctask_core/portable/.
+# Refresh with:  uv run python scripts/sync_portable.py
+#
+# This file is the ONLY link between this app and the rest of the repo, and it
+# is a build-time link, not an import. The app itself imports nothing outside
+# its own folder — which is what makes `cp -r extensions/redaction-pane` a
+# complete PR.
+
+# `document_text.py` is deliberately NOT here. It reads a .docx body through
+# python-docx semantics; `service/blocks.py` reads the whole package — headers,
+# footers, comments, tracked deletions — which is strictly more, and is what
+# this app actually scans. Carrying both meant one of them was decoration.
+files = [
+    "superdocs_client.py",
+    "llm_client.py",
+    "ner_gliner.py",
+    "verify.py",
+]

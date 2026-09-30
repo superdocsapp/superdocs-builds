@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "superdocs-mcp-doctor"
+version = "0.1.0"
+description = "Diagnose SuperDocs MCP client configuration"
+requires-python = ">=3.12"
+license = "MIT"
+readme = "README.md"
+
+[project.scripts]
+mcp-doctor = "mcp_doctor.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mcp_doctor = ["shared/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501"]

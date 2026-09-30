@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://superdocs.app/mcp-doctor/schema/fixture-cases.json",
+  "title": "mcp-doctor fixture cases",
+  "description": "The specification expressed as examples. Both implementations run every case and must agree.",
+
+  "$comment": [
+    "TWO RUNS PER CASE. `expect.scan` is a read-only run; `expect.fix` is a --fix run. They are",
+    "separate because they answer different questions, and a corpus that conflates them cannot",
+    "prove that scanning changes nothing or that fixing reports what it changed.",
+    "",
+    "EXACT BYTES. Inputs are `raw_files` — literal file content, not JSON objects — and",
+    "`expect.fix.files` is the literal expected content afterwards. Asserting on parsed FIELDS",
+    "would let two implementations reformat differently and both 'pass', which is exactly the",
+    "drift the conformance suite exists to catch. Byte equality is also the only way to prove",
+    "the span-edit model (PLAN D6) preserves comments, CRLF and BOM.",
+    "",
+    "`expect.fix` is SKIPPED by the harness when the client is not write-capable on the running",
+    "OS. The fixtures still describe the target behaviour, so they are written before the",
+    "capability is enabled rather than after."
+  ],
+
+  "type": "object",
+  "required": ["client", "cases_version", "cases"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "_readme": { "type": "array", "items": { "type": "string" } },
+    "client": { "type": "string", "$comment": "Must match a registry entry id." },
+    "cases_version": { "type": "integer", "minimum": 1 },
+    "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/case" } }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "case": {
+      "type": "object",
+      "required": ["name", "description", "raw_files", "expect"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "description": { "type": "string", "minLength": 1 },
+        "raw_files": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "path → exact bytes. Always literal: formatting, comments, line endings and any BOM are part of the fixture.",
+          "additionalProperties": { "type": "string" }
+        },
+        "env": {
+          "type": "object",
+          "description": "Variable → value; null means explicitly unset for this case.",
+          "additionalProperties": { "type": ["string", "null"] }
+        },
+        "expect": {
+          "type": "object",
+          "required": ["scan"],
+          "properties": {
+            "scan": { "$ref": "#/$defs/scan_expectation" },
+            "fix": { "$ref": "#/$defs/fix_expectation" }
+          },
+          "additionalProperties": false
+        },
+        "_why": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+
+    "scan_expectation": {
+      "type": "object",
+      "description": "A read-only run. It must never modify a file, which the harness asserts for every case without needing to be told.",
+      "required": ["exit_code", "findings"],
+      "properties": {
+        "exit_code": { "enum": [0, 1, 2] },
+        "findings": {
+          "type": "array",
+          "description": "Findings that MUST be present. Order-independent.",
+          "items": { "$ref": "#/$defs/expected_finding" }
+        },
+        "must_not_contain_findings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Findings that MUST NOT appear — how a short-circuit like the host rule is proven."
+        },
+        "no_network_to": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Hosts the run must never contact. Asserted by the fake transport."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "fix_expectation": {
+      "type": "object",
+      "description": "A --fix run. Exactly one of `files` or `files_unchanged` is required: either we know the resulting bytes, or we are asserting there are none.",
+      "required": ["exit_code", "findings"],
+      "properties": {
+        "exit_code": { "enum": [0, 1, 2] },
+        "findings": {
+          "type": "array",
+          "description": "Findings reported AFTER the fix. A repaired defect appears with fixed=true; an unrepairable one persists.",
+          "items": { "$ref": "#/$defs/expected_finding" }
+        },
+        "files": {
+          "type": "object",
+          "description": "path → exact expected bytes after the fix. Every other byte in the file must be untouched.",
+          "additionalProperties": { "type": "string" }
+        },
+        "files_unchanged": {
+          "type": "boolean",
+          "description": "Every file must remain byte-identical. This is how the host rule stops being a promise."
+        },
+        "backup_expected": {
+          "type": "boolean",
+          "description": "Whether a timestamped .bak must exist afterwards. False when nothing was written."
+        },
+        "no_network_to": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false,
+      "oneOf": [{ "required": ["files"] }, { "required": ["files_unchanged"] }]
+    },
+
+    "expected_finding": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string" },
+        "severity": { "enum": ["error", "warn", "info"] },
+        "auto_fixable": { "type": "boolean" },
+        "fixed": { "type": "boolean", "$comment": "Only meaningful inside expect.fix." }
+      },
+      "additionalProperties": false
+    }
+  }
+}

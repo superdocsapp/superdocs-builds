@@ -1,0 +1,25 @@
+# One service, no database server, no Office host.
+#
+#   cp .env.example .env     # add your SuperDocs key
+#   docker compose up        # → http://localhost:8080
+services:
+  splitter:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      # The SQLite log, the exported parts and the exported logs.
+      - ./data:/app/data
+    environment:
+      - SUPERDOCS_API_KEY
+      - SUPERDOCS_BASE_URL
+      - MAX_PARTS
+      - VERIFY_COVERAGE
+    env_file:
+      - path: .env
+        required: false
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 6

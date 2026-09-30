@@ -1,0 +1,105 @@
+{
+  "$schema": "../schema/endpoint-profile.schema.json",
+  "profile_version": 1,
+  "measured_on": "2026-08-22",
+  "measured_by": "read-only requests against the canonical endpoint; no billable tool was called",
+
+  "canonical": {
+    "url": "https://api.superdocs.app/mcp",
+    "host": "api.superdocs.app",
+    "path": "/mcp",
+    "scheme": "https",
+    "follow_redirects": false,
+    "path_aliases": ["/mcp", "/mcp/"],
+    "note": "This is the only address that ever receives the user's key. Every field is pinned in the schema and re-checked by the validator (no userinfo, no port, no query, no fragment) because a silent edit here would exfiltrate credentials. Both /mcp and /mcp/ are accepted by the server; a client that fails on one has a client-side URL-handling fault, not a server fault."
+  },
+
+  "credential": {
+    "transport": "header",
+    "header_name": "Authorization",
+    "header_scheme": "Bearer",
+    "key_prefixes": ["sk_", "lce_"],
+    "evidence": "401 body: \"Authentication required. Provide an sk_ or lce_ API key as Bearer token.\"",
+    "note": "Both prefixes are valid. A check that demands sk_ rejects real keys."
+  },
+
+  "unauthenticated": {
+    "initialize_status": 401,
+    "tools_list_status": 401,
+    "body_contains": "Authentication required",
+    "note": "Every MCP method is auth-gated. An expected 401 is therefore a credential-free proof that the endpoint is reachable and speaking.",
+    "fingerprint": {
+      "header": "www-authenticate",
+      "must_contain": [
+        "Bearer",
+        "resource_metadata=",
+        "api.superdocs.app"
+      ],
+      "observed": "Bearer realm=\"OAuth\", resource_metadata=\"https://api.superdocs.app/mcp/.well-known/oauth-protected-resource\", error=\"invalid_token\", error_description=\"Missing or invalid access token\"",
+      "purpose": "Distinguishes a genuine SuperDocs 401 from a corporate proxy or captive portal returning 401/407. Without it, a network interception is misdiagnosed as a bad key."
+    }
+  },
+
+  "discovery": {
+    "protected_resource_url": "https://api.superdocs.app/mcp/.well-known/oauth-protected-resource",
+    "path_suffix": "/.well-known/oauth-protected-resource",
+    "requires_credential": false,
+    "status": 200,
+    "observed_fields": {
+      "resource": "https://api.superdocs.app/mcp",
+      "bearer_methods_supported": ["header"],
+      "resource_documentation": "https://docs.superdocs.app/account/api-keys",
+      "resource_name": "SuperDocs MCP Server"
+    },
+    "purpose": "An unambiguous, machine-readable liveness probe that needs no credential, and the authoritative URL to cite when telling a developer where to obtain a key."
+  },
+
+  "accept_header": {
+    "required": true,
+    "must_include": "application/json",
+    "rejected_status": 406,
+    "rejected_body_contains": "Not Acceptable: Client must accept application/js",
+    "accepted_values": [
+      "application/json",
+      "application/json, text/event-stream"
+    ],
+    "rejected_values": [
+      "*/*",
+      "text/html"
+    ],
+    "absent_header_status": 406,
+    "note": "A wildcard is NOT sufficient. Absent, */* and text/html all return 406. Modern streamable-HTTP clients sending 'application/json, text/event-stream' are accepted."
+  },
+
+  "protocol": {
+    "negotiated": true,
+    "rejects_unknown_versions": false,
+    "server_preferred": "2025-11-25",
+    "observed_negotiations": [
+      { "proposed": "2026-07-28", "status": 200, "answered": "2025-11-25" },
+      { "proposed": "2025-11-25", "status": 200, "answered": "2025-11-25" },
+      { "proposed": "2025-06-18", "status": 200, "answered": "2025-06-18" },
+      { "proposed": "2024-11-05", "status": 200, "answered": "2024-11-05" }
+    ],
+    "request_header_also_accepted": "MCP-Protocol-Version",
+    "doctor_rule": "NEVER diagnose a protocol version as a fault. Send initialize, read result.protocolVersion, report it as an observation. The server negotiates; treating a version as broken would send a developer to change a working configuration."
+  },
+
+  "session": {
+    "returns_mcp_session_id": false,
+    "note": "Stateless at the transport layer. Tolerate a session header if one appears in future rather than assuming its absence forever."
+  },
+
+  "handshake": {
+    "sequence": ["initialize", "notifications/initialized", "tools/list"],
+    "note": "The canonical authenticated sequence used for the connected check."
+  },
+
+  "inventory": {
+    "tools": 38,
+    "prompts": 4,
+    "resources": 0,
+    "drift_policy": "warn",
+    "note": "Dated observation. A difference is reported as profile drift and never fails a working connection."
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://superdocs.app/mcp-doctor/schema/findings.json",
+  "title": "mcp-doctor --json output",
+  "description": "The wire contract between the two implementations. The conformance suite runs both over the same fixtures and asserts this document is IDENTICAL, so anything non-deterministic must be excluded by DETERMINISTIC MODE below.",
+
+  "$comment": [
+    "DETERMINISTIC MODE. Absolute paths, timings and timestamps differ per machine and per run,",
+    "so byte-comparison needs a stable mode. When MCP_DOCTOR_DETERMINISTIC=1:",
+    "  * `generated_at` is omitted entirely,",
+    "  * `duration_ms` is omitted entirely,",
+    "  * `tool.version` is replaced by the literal string 'deterministic',",
+    "  * every path is emitted relative to the scan root with forward slashes,",
+    "  * arrays are ordered as specified in `ordering` below.",
+    "Designing this in now avoids retrofitting determinism onto a shipped format later."
+  ],
+
+  "type": "object",
+  "required": ["schema_version", "tool", "summary", "clients", "findings", "exit_code"],
+  "properties": {
+    "schema_version": { "type": "integer", "minimum": 1 },
+
+    "tool": {
+      "type": "object",
+      "required": ["name", "version", "implementation"],
+      "properties": {
+        "name": { "const": "mcp-doctor" },
+        "version": { "type": "string" },
+        "implementation": {
+          "enum": ["typescript", "python"],
+          "$comment": "The ONLY field permitted to differ between the two implementations. Conformance excludes exactly this key and no other."
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "generated_at": { "type": "string", "format": "date-time", "$comment": "Omitted in deterministic mode." },
+    "duration_ms": { "type": "number", "$comment": "Omitted in deterministic mode." },
+
+    "summary": {
+      "type": "object",
+      "required": ["clients_scanned", "config_files_read", "entries_found", "errors", "warnings", "fixed"],
+      "properties": {
+        "clients_scanned": { "type": "integer", "minimum": 0 },
+        "config_files_read": { "type": "integer", "minimum": 0 },
+        "entries_found": { "type": "integer", "minimum": 0 },
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "fixed": { "type": "integer", "minimum": 0 },
+        "connection": { "enum": ["connected", "connected-with-drift", "failed", "not-attempted"] }
+      },
+      "additionalProperties": false
+    },
+
+    "clients": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "write_capable", "config_files"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "write_capable": { "type": "boolean" },
+          "evidence_tier": {
+            "enum": ["captured", "documented", "unverified"],
+            "$comment": "Surfaced so a user can see how much the tool actually knows about their client."
+          },
+          "config_files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["path", "scope", "format", "status"],
+              "properties": {
+                "path": { "type": "string" },
+                "scope": { "enum": ["project", "workspace", "user"] },
+                "format": { "enum": ["json", "jsonc", "toml"] },
+                "status": { "enum": ["ok", "absent", "unreadable", "invalid"] },
+                "entries": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["name", "kind"],
+                    "properties": {
+                      "name": { "type": "string" },
+                      "kind": { "enum": ["http", "stdio", "unknown"] },
+                      "host": { "type": "string", "$comment": "Host only — never the full URL with any credential in it." },
+                      "canonical": { "type": "boolean" },
+                      "in_scope": { "type": "boolean" }
+                    },
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+
+    "connection": {
+      "type": ["object", "null"],
+      "properties": {
+        "attempted": { "type": "boolean" },
+        "endpoint_reachable": { "type": "boolean" },
+        "fingerprint_matched": { "type": ["boolean", "null"], "$comment": "null when no 401 was observed. false means an interceptor answered." },
+        "authenticated": { "type": ["boolean", "null"] },
+        "protocol_version": { "type": ["string", "null"] },
+        "tools": { "type": ["integer", "null"] },
+        "prompts": { "type": ["integer", "null"] },
+        "resources": { "type": ["integer", "null"] }
+      },
+      "additionalProperties": false
+    },
+
+    "exit_code": { "enum": [0, 1, 2] },
+
+    "ordering": {
+      "type": "object",
+      "$comment": "Documents the sort that makes output stable. Both implementations MUST apply it.",
+      "properties": {
+        "clients": { "const": "by id, ascending" },
+        "config_files": { "const": "by precedence ascending, then path ascending" },
+        "findings": { "const": "by severity (error, warn, info), then defect id, then path, then entry name — all ascending" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "required": ["id", "class", "severity", "message"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(ok|config|scope|network|auth|drift)\\.[a-z0-9]+(-[a-z0-9]+)*$",
+          "$comment": "MUST exist in defects.json. Referential integrity is enforced by validate_contract.py."
+        },
+        "class": { "enum": ["ok", "config", "scope", "network", "auth", "drift"] },
+        "severity": { "enum": ["error", "warn", "info"] },
+        "message": { "type": "string", "$comment": "Rendered from the catalogue template plus `data`. Never contains a credential." },
+        "remediation": { "type": ["string", "null"] },
+        "client": { "type": ["string", "null"] },
+        "location": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "json_path": { "type": "string" },
+            "line": { "type": "integer", "minimum": 1 },
+            "column": { "type": "integer", "minimum": 1 }
+          },
+          "additionalProperties": false
+        },
+        "auto_fixable": { "type": "boolean" },
+        "fixed": { "type": "boolean" },
+        "data": {
+          "type": "object",
+          "$comment": "Values substituted into the message template. MUST be redacted: no key, no Authorization value, no URL containing credentials.",
+          "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

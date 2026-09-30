@@ -1,0 +1,133 @@
+{
+  "$schema": "../schema/fixture-cases.schema.json",
+  "client": "vscode",
+  "cases_version": 1,
+
+  "_readme": [
+    "JSONC. This is the corpus that decides whether --fix is trustworthy.",
+    "",
+    "VS Code's mcp.json is JSON with comments and trailing commas. `json.load` rejects it, and",
+    "load-then-dump silently deletes every comment, reorders nothing but reformats everything,",
+    "and turns a four-byte repair into a whole-file diff. Both are unacceptable, so the fixtures",
+    "below assert the surviving bytes rather than the parsed fields.",
+    "",
+    "Until a source-preserving editor is proven, JSONC stays READ-ONLY: the scan expectations",
+    "hold from step 2, and the fix expectations describe the target for step 3."
+  ],
+
+  "cases": [
+    {
+      "name": "jsonc-line-comments-preserved",
+      "description": "Line comments around and inside the entry survive a scheme repair.",
+      "raw_files": {
+        ".vscode/mcp.json": "{\n  // SuperDocs — added by the platform team, do not remove\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      // FIXME: this should be https\n      \"url\": \"http://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_jsonc_line_000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.scheme-insecure", "severity": "error" }]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.scheme-insecure", "fixed": true }],
+          "backup_expected": true,
+          "files": {
+            ".vscode/mcp.json": "{\n  // SuperDocs — added by the platform team, do not remove\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      // FIXME: this should be https\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_jsonc_line_000\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      },
+      "_why": "Both comments must survive verbatim, including the now-stale FIXME. Deleting a developer's comment because it is no longer accurate is not our decision to make."
+    },
+
+    {
+      "name": "jsonc-block-comment-preserved",
+      "description": "A block comment, including one between a key and its value.",
+      "raw_files": {
+        ".vscode/mcp.json": "{\n  /*\n   * Managed file. Edit via the platform runbook.\n   */\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": /* remote */ \"stdio\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_jsonc_block_00\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.transport-not-http", "severity": "error" }]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.transport-not-http", "fixed": true }],
+          "backup_expected": true,
+          "files": {
+            ".vscode/mcp.json": "{\n  /*\n   * Managed file. Edit via the platform runbook.\n   */\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": /* remote */ \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_jsonc_block_00\"\n      }\n    }\n  }\n}\n"
+          }
+        }
+      },
+      "_why": "The inline block comment sits between the key and the value being replaced. A span edit that keys on the VALUE's range survives it; one that replaces the whole key-value pair eats it."
+    },
+
+    {
+      "name": "jsonc-trailing-commas-preserved",
+      "description": "Trailing commas are legal here and must not be normalised away.",
+      "raw_files": {
+        ".vscode/mcp.json": "{\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/v1/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_jsonc_comma_00\",\n      },\n    },\n  },\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.path-wrong", "severity": "error" }]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.path-wrong", "fixed": true }],
+          "backup_expected": true,
+          "files": {
+            ".vscode/mcp.json": "{\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_jsonc_comma_00\",\n      },\n    },\n  },\n}\n"
+          }
+        }
+      },
+      "_why": "Four trailing commas. A strict serialiser removes all of them and reports a five-line diff for a one-word change."
+    },
+
+    {
+      "name": "jsonc-wrong-container-key",
+      "description": "The most common cross-client mistake: mcpServers pasted into a VS Code file, which expects servers. The client silently ignores it and reports only 'failed to connect'.",
+      "raw_files": {
+        ".vscode/mcp.json": "{\n  // pasted from a Claude Code config\n  \"mcpServers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"https://api.superdocs.app/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer sk_fixture_wrongkey_0000\"\n      }\n    }\n  }\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "config.no-entry", "severity": "info" }]
+        },
+        "fix": {
+          "exit_code": 1,
+          "findings": [{ "id": "config.no-entry" }],
+          "files_unchanged": true,
+          "backup_expected": false
+        }
+      },
+      "_why": "Under VS Code's schema there is genuinely no SuperDocs server here, so the honest finding is 'no entry'. Moving the block between container keys is NOT in the planned repair set — it means deciding a foreign top-level key was a mistake rather than another tool's data, and that is a guess. Recorded here so the limitation is visible rather than discovered later."
+    },
+
+    {
+      "name": "jsonc-host-rule-comments-untouched",
+      "description": "The host rule under JSONC: an out-of-scope entry with comments is left byte-identical.",
+      "raw_files": {
+        ".vscode/mcp.json": "{\n  // routed through the corporate egress proxy — required by policy\n  \"servers\": {\n    \"superdocs\": {\n      \"type\": \"http\",\n      \"url\": \"http://mcp-egress.corp.example:8080/mcp\",\n      \"headers\": {\n        \"Authorization\": \"Bearer gw_fixture_corp_token_000\",\n      },\n    },\n  },\n}\n"
+      },
+      "expect": {
+        "scan": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.non-canonical-host", "severity": "info" }],
+          "must_not_contain_findings": ["config.scheme-insecure"],
+          "no_network_to": ["mcp-egress.corp.example"]
+        },
+        "fix": {
+          "exit_code": 0,
+          "findings": [{ "id": "scope.non-canonical-host" }],
+          "files_unchanged": true,
+          "backup_expected": false,
+          "no_network_to": ["mcp-egress.corp.example"]
+        }
+      },
+      "_why": "http:// on a non-canonical host is not a defect, and the comment explains why the entry is deliberate. Both the bytes and the developer's stated reason survive."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+# The audit log is operational data about real traffic — team names, tool
+# usage, payload hashes. It belongs on the host volume, never in the repo.
+data/
+*.jsonl
+
+# Resolved from the environment, never inlined. See policy.yml's `key_env`.
+.env
+
+# Deployment-specific: real team names and token hashes. Ship the .example.
+policy.yml
+
+.venv/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.egg-info/
+
+# macOS Finder metadata.
+.DS_Store

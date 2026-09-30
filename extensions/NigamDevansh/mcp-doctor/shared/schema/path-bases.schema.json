@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://superdocs.app/mcp-doctor/schema/path-bases.json",
+  "title": "Config path expansion bases",
+  "description": "Defines what 'home', 'project_root' and friends mean per platform, so neither implementation invents platform behaviour.",
+  "type": "object",
+  "required": [
+    "bases_version",
+    "bases",
+    "rules"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "_readme": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "bases_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "bases": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "enum": [
+          "home",
+          "project_root",
+          "app_config",
+          "app_data",
+          "codex_home"
+        ]
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/base"
+      }
+    },
+    "rules": {
+      "type": "object",
+      "required": [
+        "no_tilde_in_registry",
+        "no_env_syntax_in_registry",
+        "path_separator_in_data"
+      ],
+      "properties": {
+        "no_tilde_in_registry": {
+          "const": true
+        },
+        "no_env_syntax_in_registry": {
+          "const": true
+        },
+        "path_separator_in_data": {
+          "const": "/"
+        },
+        "_note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "base": {
+      "type": "object",
+      "required": [
+        "description",
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "darwin": {
+          "$ref": "#/$defs/resolution"
+        },
+        "linux": {
+          "$ref": "#/$defs/resolution"
+        },
+        "win32": {
+          "$ref": "#/$defs/resolution"
+        },
+        "markers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ascend": {
+          "type": "boolean"
+        },
+        "_note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "resolution": {
+      "type": "object",
+      "required": [
+        "from_env",
+        "fallback"
+      ],
+      "properties": {
+        "from_env": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tried in order; the first set and non-empty wins."
+        },
+        "fallback": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "null means the location is UNRESOLVABLE on this platform when no env var is set \u2014 reported, never guessed."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

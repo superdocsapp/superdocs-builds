@@ -1,0 +1,373 @@
+{
+  "$schema": "schema/defect-catalogue.schema.json",
+  "catalogue_version": 1,
+  "placeholder_policy": {
+    "_why": [
+      "A message template is rendered into the terminal, into --json, and into the --report",
+      "Markdown a developer pastes into a support thread. Any placeholder that can carry a",
+      "credential is therefore a leak in three places at once.",
+      "",
+      "A full URL is the dangerous one and the easy one to miss: an out-of-scope entry such as",
+      "https://secret@internal-gateway.example/mcp carries its credential in the userinfo. The",
+      "host rule stops us SENDING a key there; only this stops us PRINTING one.",
+      "",
+      "So templates interpolate {host}, never {url}. Enforced by validate_contract.py, which",
+      "rejects any template using a forbidden name — the rule cannot be reintroduced by a",
+      "well-meaning edit to a single message."
+    ],
+    "forbidden": [
+      "url",
+      "uri",
+      "endpoint",
+      "key",
+      "api_key",
+      "token",
+      "secret",
+      "credential",
+      "password",
+      "authorization",
+      "header_value",
+      "value"
+    ],
+    "safe_examples": [
+      "host",
+      "client",
+      "path",
+      "found",
+      "expected",
+      "variable",
+      "count",
+      "names"
+    ]
+  },
+  "_readme": [
+    "Every finding either implementation can emit is defined here and nowhere else.",
+    "Ids are stable and greppable: changing one is a breaking change to the --json contract.",
+    "`message` and `remediation` are templates; {placeholders} are filled from the finding's",
+    "`data` object. Both languages must render the same string from the same data, which the",
+    "conformance suite asserts.",
+    "`auto_fixable` is a property of the DEFECT; whether a fix actually runs also requires the",
+    "client registry to permit that fix_kind for that client (see clients/*.json → repairs)."
+  ],
+  "defects": [
+    {
+      "id": "ok.connected",
+      "class": "ok",
+      "severity": "info",
+      "title": "Connected to SuperDocs",
+      "message": "{client}: connected to SuperDocs ({tools} tools, {prompts} prompts)",
+      "remediation": null,
+      "auto_fixable": false
+    },
+    {
+      "id": "config.file-unreadable",
+      "class": "config",
+      "severity": "error",
+      "title": "Configuration file cannot be read",
+      "message": "{client}: cannot read {path} ({reason})",
+      "remediation": "Check the file's permissions, then run mcp-doctor again.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.invalid-syntax",
+      "class": "config",
+      "severity": "error",
+      "title": "Configuration file is not valid",
+      "message": "{client}: {path} is not valid {format} (line {line}, column {column}: {reason})",
+      "remediation": "Repair the syntax by hand. mcp-doctor never rewrites a file it cannot parse.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.file-empty",
+      "class": "config",
+      "severity": "info",
+      "title": "Configuration file is empty",
+      "message": "{client}: {path} exists but is empty",
+      "remediation": "Nothing is configured yet. Add a SuperDocs server entry for this client.",
+      "auto_fixable": false,
+      "note": "Distinct from invalid-syntax on purpose. Both of Antigravity's mcp_config.json files on the machine this was written against were 0 bytes — a freshly installed client, not a corrupted one. Reporting 'invalid JSON at line 1 column 1' would be technically true and useless."
+    },
+    {
+      "id": "config.no-entry",
+      "class": "config",
+      "severity": "info",
+      "title": "No SuperDocs entry configured",
+      "message": "{client}: no SuperDocs server configured in {path}",
+      "remediation": "Add a SuperDocs server entry for this client. A key must be resolvable from {key_env}.",
+      "auto_fixable": true,
+      "fix_kind": "add-entry"
+    },
+    {
+      "id": "config.duplicate-entries",
+      "class": "config",
+      "severity": "error",
+      "title": "More than one SuperDocs entry",
+      "message": "{client}: {count} SuperDocs entries found in {path} ({names})",
+      "remediation": "Remove the entries you do not want. mcp-doctor will not guess which to keep.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.duplicate-keys",
+      "class": "config",
+      "severity": "warn",
+      "title": "Repeated key in the configuration",
+      "message": "{client}: '{field_name}' appears more than once in {container}; the last one wins and the earlier value is ignored",
+      "remediation": "Remove the duplicate. A stale value sitting above a good one is invisible to the client and to this tool.",
+      "auto_fixable": false,
+      "note": "JSON has no duplicate-key error: parsers silently keep the last. A wrong url above a right one therefore looks like a working config that does not work. TOML rejects duplicates outright, so this only arises for JSON and JSONC. The placeholder is `field_name`, not `key`: the credential denylist bans `key` outright so that nobody has to judge, per message, whether a given {key} means a JSON field or an API key."
+    },
+    {
+      "id": "config.transport-not-http",
+      "class": "config",
+      "severity": "error",
+      "title": "Entry has a URL but is not an HTTP server",
+      "message": "{client}: the SuperDocs entry has a url but its transport is {found}, not {expected}",
+      "remediation": "Set the transport to {expected}.",
+      "auto_fixable": true,
+      "fix_kind": "transport-field"
+    },
+    {
+      "id": "config.scheme-insecure",
+      "class": "config",
+      "severity": "error",
+      "title": "SuperDocs URL uses http://",
+      "message": "{client}: SuperDocs URL uses http:// — the endpoint requires https://",
+      "remediation": "Change the scheme to https://.",
+      "auto_fixable": true,
+      "fix_kind": "url-scheme"
+    },
+    {
+      "id": "config.path-wrong",
+      "class": "config",
+      "severity": "error",
+      "title": "Wrong path on the SuperDocs host",
+      "message": "{client}: SuperDocs URL path is {found}, expected {expected}",
+      "remediation": "Change the path to {expected}.",
+      "auto_fixable": true,
+      "fix_kind": "url-path"
+    },
+    {
+      "id": "config.url-embedded-credentials",
+      "class": "config",
+      "severity": "error",
+      "title": "Credentials embedded in the URL",
+      "message": "{client}: the SuperDocs URL contains embedded credentials",
+      "remediation": "Remove the credentials from the URL and supply the key as an Authorization header.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.url-missing",
+      "class": "config",
+      "severity": "error",
+      "title": "SuperDocs entry has no URL",
+      "message": "{client}: the SuperDocs entry has no URL",
+      "remediation": "Set the URL to https://api.superdocs.app/mcp.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.url-query-or-fragment",
+      "class": "config",
+      "severity": "error",
+      "title": "SuperDocs URL has a query or fragment",
+      "message": "{client}: the SuperDocs URL must not contain a query string or fragment",
+      "remediation": "Use the bare endpoint https://api.superdocs.app/mcp.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.auth-header-missing",
+      "class": "config",
+      "severity": "error",
+      "title": "No Authorization header",
+      "message": "{client}: the SuperDocs entry has no Authorization header",
+      "remediation": "Add: Authorization: Bearer <your key>.",
+      "auto_fixable": true,
+      "fix_kind": "auth-header"
+    },
+    {
+      "id": "config.auth-header-no-bearer",
+      "class": "config",
+      "severity": "error",
+      "title": "Authorization header is missing the Bearer scheme",
+      "message": "{client}: the Authorization header does not start with 'Bearer '",
+      "remediation": "The value must be: Bearer <your key>.",
+      "auto_fixable": true,
+      "fix_kind": "auth-header"
+    },
+    {
+      "id": "config.auth-header-doubled-bearer",
+      "class": "config",
+      "severity": "error",
+      "title": "Authorization header says Bearer twice",
+      "message": "{client}: the Authorization header repeats the Bearer scheme",
+      "remediation": "The value must be: Bearer <your key>, once.",
+      "auto_fixable": true,
+      "fix_kind": "auth-header"
+    },
+    {
+      "id": "config.accept-header-incompatible",
+      "class": "config",
+      "severity": "error",
+      "title": "Accept header cannot accept JSON",
+      "message": "{client}: the configured Accept header is {found}; SuperDocs requires it to include application/json",
+      "remediation": "Set Accept to application/json, or remove the override so the client sends its own.",
+      "auto_fixable": true,
+      "fix_kind": "accept-header"
+    },
+    {
+      "id": "config.env-placeholder-unresolved",
+      "class": "config",
+      "severity": "error",
+      "title": "Environment variable is not set",
+      "message": "{client}: the entry references {variable}, which is not set in this environment",
+      "remediation": "Export {variable}, or replace the placeholder with a value the client can resolve.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.key-absent",
+      "class": "config",
+      "severity": "error",
+      "title": "No key available",
+      "message": "{client}: no SuperDocs key found in the configuration or in {key_env}",
+      "remediation": "Create a key at https://docs.superdocs.app/account/api-keys and export it as {key_env}.",
+      "auto_fixable": false
+    },
+    {
+      "id": "config.key-shape-unexpected",
+      "class": "config",
+      "severity": "warn",
+      "title": "Key does not look like a SuperDocs key",
+      "message": "{client}: the configured key does not begin with {expected_prefixes}",
+      "remediation": "SuperDocs keys begin with sk_ or lce_. Check you pasted the right value.",
+      "auto_fixable": false
+    },
+    {
+      "id": "scope.non-canonical-host",
+      "class": "scope",
+      "severity": "info",
+      "title": "Entry points somewhere other than SuperDocs",
+      "message": "{client}: SuperDocs entry points at host {host}, not the canonical endpoint. Left unchanged — mcp-doctor only diagnoses direct connections to {canonical_host}.",
+      "remediation": null,
+      "auto_fixable": false,
+      "note": "THE HOST RULE. This entry is deliberate: a policy gateway, egress proxy, self-hosted relay, staging endpoint or mock server. Never repaired, never rewritten, never diagnosed."
+    },
+    {
+      "id": "scope.stdio-server",
+      "class": "scope",
+      "severity": "info",
+      "title": "stdio server, out of scope",
+      "message": "{client}: the SuperDocs entry launches a local process; mcp-doctor v1 only diagnoses remote HTTP connections",
+      "remediation": null,
+      "auto_fixable": false
+    },
+    {
+      "id": "scope.oauth-configured",
+      "class": "scope",
+      "severity": "info",
+      "title": "OAuth-configured entry, out of scope",
+      "message": "{client}: the SuperDocs entry uses an OAuth flow; mcp-doctor v1 only diagnoses static Bearer keys",
+      "remediation": null,
+      "auto_fixable": false
+    },
+    {
+      "id": "scope.client-cannot-authenticate",
+      "class": "scope",
+      "severity": "info",
+      "title": "This client cannot send a SuperDocs key",
+      "message": "{client}: its remote-server configuration has no header mechanism, so a SuperDocs key cannot be supplied ({reason})",
+      "remediation": "Not fixable from here. Use a client that supports request headers, or put a gateway in front that adds the credential.",
+      "auto_fixable": false,
+      "note": "Discovered while adding Antigravity: its shipped mcp_config.json documentation defines only `command`/`args`/`env` for stdio and `serverUrl` for SSE — no headers field anywhere. SuperDocs authenticates with `Authorization: Bearer`, so the honest answer is that the combination is not configurable, rather than emitting repair advice that cannot work."
+    },
+    {
+      "id": "scope.client-unknown",
+      "class": "scope",
+      "severity": "info",
+      "title": "Unrecognised client",
+      "message": "{path}: parsed, but this client is not in the registry — reported only, never edited",
+      "remediation": null,
+      "auto_fixable": false
+    },
+    {
+      "id": "network.dns",
+      "class": "network",
+      "severity": "error",
+      "title": "Host could not be resolved",
+      "message": "Cannot resolve {host} ({reason})",
+      "remediation": "Check your network connection and DNS settings.",
+      "auto_fixable": false
+    },
+    {
+      "id": "network.connect",
+      "class": "network",
+      "severity": "error",
+      "title": "Connection failed",
+      "message": "Cannot connect to {host} ({reason})",
+      "remediation": "Check your network, VPN, or firewall. If you use an outbound proxy, confirm it permits {host}.",
+      "auto_fixable": false
+    },
+    {
+      "id": "network.tls",
+      "class": "network",
+      "severity": "error",
+      "title": "TLS handshake failed",
+      "message": "TLS failure talking to {host} ({reason})",
+      "remediation": "A TLS-intercepting proxy or an out-of-date certificate store is the usual cause.",
+      "auto_fixable": false
+    },
+    {
+      "id": "network.timeout",
+      "class": "network",
+      "severity": "error",
+      "title": "Request timed out",
+      "message": "Timed out after {seconds}s talking to {host}",
+      "remediation": "Retry; if it persists, check for a slow or blocking network path.",
+      "auto_fixable": false
+    },
+    {
+      "id": "network.interceptor",
+      "class": "network",
+      "severity": "error",
+      "title": "Something other than SuperDocs answered",
+      "message": "{host} returned {status} without the SuperDocs authentication header — a proxy or captive portal is answering instead of the endpoint",
+      "remediation": "This is a network interception, not a key problem. Do not rotate your key; check your proxy or network.",
+      "auto_fixable": false,
+      "note": "Depends on the fingerprint in profile/superdocs.json → unauthenticated.fingerprint."
+    },
+    {
+      "id": "auth.invalid-key",
+      "class": "auth",
+      "severity": "error",
+      "title": "Key rejected",
+      "message": "{client}: SuperDocs rejected the key (401)",
+      "remediation": "The key is missing, revoked or mistyped. Check or rotate it at https://docs.superdocs.app/account/api-keys.",
+      "auto_fixable": false
+    },
+    {
+      "id": "auth.forbidden",
+      "class": "auth",
+      "severity": "error",
+      "title": "Key accepted but access denied",
+      "message": "{client}: SuperDocs accepted the key but denied access (403)",
+      "remediation": "The key is valid but lacks access. Check the account's plan and permissions.",
+      "auto_fixable": false
+    },
+    {
+      "id": "drift.protocol-version",
+      "class": "drift",
+      "severity": "warn",
+      "title": "Negotiated a different protocol version",
+      "message": "Connected, but SuperDocs negotiated {found} where the profile recorded {expected}",
+      "remediation": "No action needed. The connection works; this is a dated observation, not a fault.",
+      "auto_fixable": false
+    },
+    {
+      "id": "drift.inventory",
+      "class": "drift",
+      "severity": "warn",
+      "title": "Tool or prompt count changed",
+      "message": "Connected, but saw {tools} tools and {prompts} prompts where the profile recorded {expected_tools} and {expected_prompts}",
+      "remediation": "No action needed. Reported so a changed surface is visible, never as a failure.",
+      "auto_fixable": false
+    }
+  ]
+}

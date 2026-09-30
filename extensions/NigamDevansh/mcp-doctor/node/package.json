@@ -1,0 +1,32 @@
+{
+  "name": "@superdocs/mcp-doctor",
+  "version": "0.1.0",
+  "description": "Diagnose and fix SuperDocs MCP client configuration",
+  "type": "module",
+  "bin": {
+    "mcp-doctor": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "shared"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "check": "tsc --noEmit",
+    "prepack": "tsc && node scripts/bundle-shared.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jsonc-parser": "^3.3.1",
+    "smol-toml": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}

@@ -1,0 +1,39 @@
+# Development overlay. **Not what a reviewer runs.**
+#
+#     make dev           # this file, on top of docker-compose.yml
+#     docker compose up  # README's path — the real image, unchanged
+#
+# `service/` and `ui/dist` are mounted, so a Python edit is a reload; a second
+# container runs `vite build --watch`, so the host needs no Node. Kept out of docker-compose.yml so a reviewer
+# typing the documented command gets the artefact, not somebody's working tree.
+services:
+  splitter:
+    volumes:
+      - ./service:/app/service:ro
+      - ./ui/dist:/app/ui/dist:ro
+    command:
+      - uvicorn
+      - service.app:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8080"
+      - --reload
+      # Scoped: without it the reloader also watches /app/data and restarts
+      # every time SQLite touches its journal.
+      - --reload-dir
+      - /app/service
+
+  ui-watch:
+    image: node:24-slim
+    working_dir: /ui
+    init: true
+    volumes:
+      - ./ui:/ui
+      # A named volume: the container's Linux node_modules must not overwrite a
+      # host install, or be overwritten by one.
+      - splitter-node-modules:/ui/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npm run watch"
+
+volumes:
+  splitter-node-modules:

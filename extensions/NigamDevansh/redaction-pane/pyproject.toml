@@ -1,0 +1,65 @@
+[project]
+name = "redaction-pane"
+version = "0.1.0"
+description = "Word add-in: a redaction pane with human confirmation. Standalone."
+requires-python = ">=3.12"
+license = { text = "MIT" }
+
+# **`doctask-core` is deliberately absent, and that is the point of this file.**
+# This app is a pull request into somebody else's repository. It imports
+# `service._portable`, which is a *copy* — see `portable.toml` — so a `cp -r` of
+# this folder is a complete, installable project with no link back here.
+#
+# Every dependency below is required by a file this app actually imports:
+dependencies = [
+    "fastapi>=0.115",          # the pane's API and the static task-pane host
+    "uvicorn[standard]>=0.30",  # HTTPS server — Office refuses http:// task panes
+    "python-multipart>=0.0.9", # `POST /scan` is a file upload. FastAPI does not
+                               # pull this in, and without it the app raises at
+                               # IMPORT time, not at the request — the whole
+                               # service refuses to start.
+    "pydantic-settings>=2.3",   # one typed boundary for .env
+    "httpx>=0.27",             # _portable/superdocs_client.py
+    "jsonschema>=4.22",        # _portable/llm_client.py — we validate structured
+                               # output ourselves rather than trusting the vendor
+    "openai>=1.40",            # tier 3, and the default provider. The SDKs import
+                               # lazily inside the client, so only the selected
+                               # provider need be present; the image installs it
+                               # via the LLM_PROVIDER build arg (see Dockerfile).
+]
+
+[project.optional-dependencies]
+# The other two providers. The Dockerfile installs one of these when the
+# LLM_PROVIDER build arg selects it; openai (above) is the default.
+gemini = ["google-genai>=1.0"]
+anthropic = ["anthropic>=0.34"]
+# Tier 2. ON by default and baked into the image — the Dockerfile installs
+# `.[ner]` and prefetches the model, so it costs image size at build and nothing
+# at run. GLINER_ENABLED=false skips it; the pane says on screen which tiers ran.
+ner = ["gliner>=0.2.13"]
+
+[dependency-groups]
+dev = ["pytest>=8.2", "pytest-asyncio>=0.23", "respx>=0.21", "ruff>=0.6"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["service"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# `service/_portable/` is a COPY, kept byte-identical to the source it came from
+# so `sync_portable.py --check` can prove it. Linting it here would produce
+# fixes that make it differ — and the check that guarantees this app is
+# standalone is worth more than a lint rule applied twice.
+extend-exclude = ["service/_portable"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

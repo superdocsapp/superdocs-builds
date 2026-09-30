@@ -1,0 +1,5 @@
+build/
+dist/
+src/*.egg-info/
+# Bundled into artifacts from ../shared by setup.py; do not make a second source of truth.
+src/mcp_doctor/shared/

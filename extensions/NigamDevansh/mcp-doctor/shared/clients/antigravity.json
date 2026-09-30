@@ -1,0 +1,111 @@
+{
+  "$schema": "../schema/client-registry.schema.json",
+  "id": "antigravity",
+  "name": "Antigravity IDE",
+  "entry_version": 1,
+  "evidence": {
+    "_readme": "The client that cannot hold a SuperDocs key. Its own shipped documentation defines `command`/`args`/`env` for stdio and `serverUrl` for SSE \u2014 and no headers field anywhere. Since SuperDocs authenticates with an Authorization header, the honest diagnosis is that the combination is not configurable. That is a finding worth reporting precisely, not a gap to work around.",
+    "paths": {
+      "darwin": {
+        "status": "captured",
+        "date": "2026-08-22",
+        "how": "~/.gemini/config/mcp_config.json confirmed present on a real installation (Antigravity IDE.app installed). The file was 0 bytes \u2014 a fresh client with nothing configured, which is why config.file-empty exists as a distinct defect."
+      },
+      "linux": {
+        "status": "unverified",
+        "how": "Same ~/.gemini layout expected; no Linux installation available."
+      },
+      "win32": {
+        "status": "unverified",
+        "how": "No Windows installation available."
+      }
+    },
+    "schema": {
+      "status": "documented",
+      "date": "2026-08-22",
+      "how": "Read from documentation SHIPPED WITH THE IDE \u2014 builtin/skills/agy-customizations/docs/mcp_servers.md \u2014 which is stronger than third-party docs but still not an observed config. It gives the container key `mcpServers`, stdio fields `command`/`args`/`env`, and the SSE field `serverUrl`. Grepping that document for header, auth, token, bearer and api-key returns NOTHING.",
+      "capture_todo": "If Antigravity later gains a headers mechanism, capture a real remote entry before changing any of this."
+    },
+    "repairs": {
+      "status": "unverified",
+      "how": "Not applicable while the client cannot carry a credential; nothing useful could be repaired."
+    }
+  },
+  "write_capable": {
+    "_note": "All false, and likely to stay false: with no header mechanism there is no working configuration to write.",
+    "darwin": false,
+    "linux": false,
+    "win32": false
+  },
+  "locations": [
+    {
+      "scope": "user",
+      "precedence": 1,
+      "format": "json",
+      "os": [
+        "darwin",
+        "linux",
+        "win32"
+      ],
+      "base": "home",
+      "path": ".gemini/config/mcp_config.json",
+      "note": "Global configuration, applying to all sessions. A second copy exists under ~/.gemini/antigravity-ide/, and plugins may carry their own mcp_config.json; only the documented global path is scanned.",
+      "containers": [
+        {
+          "json_path": "$.mcpServers",
+          "scope_hint": "user"
+        }
+      ]
+    }
+  ],
+  "server_map": {
+    "container_key": "mcpServers",
+    "shape": "object",
+    "_shape_note": "mcpServers, like Claude Code \u2014 but the entry shape inside is different, which is exactly why container key and entry schema are separate pieces of data."
+  },
+  "http_server_schema": {
+    "transport": {
+      "detected_by": "url-field-presence",
+      "field": null,
+      "http_values": [],
+      "preferred": null,
+      "stdio_indicator_fields": [
+        "command",
+        "args"
+      ],
+      "sse_only": true,
+      "_note": "The only documented remote transport is SSE. SuperDocs answers in plain JSON with no SSE stream, so compatibility is NOT assumed here \u2014 it would need testing against a real Antigravity client before any claim is made."
+    },
+    "url": {
+      "field": "serverUrl"
+    },
+    "headers": {
+      "supported": false,
+      "unsupported_reason": "Antigravity's mcp_config.json schema documents no headers field for either transport, so there is no way to send Authorization: Bearer. SuperDocs requires one."
+    },
+    "env_interpolation": {
+      "supported": false
+    }
+  },
+  "identification": {
+    "rules": [
+      {
+        "by": "url_host",
+        "equals": "api.superdocs.app",
+        "confidence": "certain"
+      },
+      {
+        "by": "name",
+        "matches": "^superdocs",
+        "confidence": "likely",
+        "flags": "i"
+      }
+    ],
+    "_host_rule": "Exact host comparison only. Applied to serverUrl, not url."
+  },
+  "repairs": {
+    "_readme": "Deliberately empty in both lists. Nothing here is repairable while the client cannot carry a credential \u2014 planning repairs would imply a fix that cannot work.",
+    "allowed": [],
+    "planned": []
+  }
+}
