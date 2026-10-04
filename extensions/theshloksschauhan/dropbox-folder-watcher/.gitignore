@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Environment / Secrets
+.env
+*.env.local
+*.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (frontend)
+node_modules/
+frontend/build/
+frontend/dist/
+
+# Docker
+postgres_data/
+
+# Alembic
+# (we DO commit migrations, but not generated __pycache__)
+alembic/__pycache__/
