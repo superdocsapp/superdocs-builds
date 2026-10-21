@@ -1,0 +1,19 @@
+{
+  "health_insurance": {
+    "provider": "BlueCross",
+    "deductible_individual": "$1,200",
+    "deductible_family": "$2,400",
+    "out_of_pocket_max_individual": "$3,500",
+    "premium_employee_only": "$115/month",
+    "premium_family": "$345/month",
+    "telehealth_copay": "$0"
+  },
+  "dental": {
+    "provider": "Delta Dental",
+    "annual_max": "$2,000"
+  },
+  "vision": {
+    "provider": "VSP",
+    "copay": "$10"
+  }
+}

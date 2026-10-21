@@ -1,0 +1,18 @@
+[
+  {
+    "employee_id": "E101",
+    "name": "Alice Smith",
+    "location": "New York",
+    "union_status": "Non-Union",
+    "employment_type": "Full-Time",
+    "current_elections": ["Health: Family", "Dental: Individual"]
+  },
+  {
+    "employee_id": "E102",
+    "name": "Bob Jones",
+    "location": "California",
+    "union_status": "Union",
+    "employment_type": "Part-Time",
+    "current_elections": ["Health: Employee Only"]
+  }
+]
