@@ -1,0 +1,52 @@
+﻿[
+  {
+    "element_index": 0,
+    "element_type": "scene_heading",
+    "scene_number": 1,
+    "original_text": "int. neon coffee shop - night",
+    "formatted_text": "INT. NEON COFFEE SHOP - NIGHT",
+    "confidence": 0.98,
+    "status": "approved",
+    "reason": "Standardized lowercase scene heading to canonical industry uppercase with scene numbering."
+  },
+  {
+    "element_index": 1,
+    "element_type": "action",
+    "scene_number": 1,
+    "original_text": "Rain lashes against the fogged-up glass windows. The streetlights outside bleed pink and blue into the dim room.",
+    "formatted_text": "Rain lashes against the fogged-up glass windows. The streetlights outside bleed pink and blue into the dim room.",
+    "confidence": 0.95,
+    "status": "approved",
+    "reason": "Action block validated without content drift."
+  },
+  {
+    "element_index": 3,
+    "element_type": "character",
+    "scene_number": 1,
+    "original_text": "maya",
+    "formatted_text": "MAYA",
+    "confidence": 0.99,
+    "status": "approved",
+    "reason": "Standardized character cue from lowercase to uppercase."
+  },
+  {
+    "element_index": 4,
+    "element_type": "parenthetical",
+    "scene_number": 1,
+    "original_text": "(whispering to herself)",
+    "formatted_text": "(whispering to herself)",
+    "confidence": 0.97,
+    "status": "approved",
+    "reason": "Parenthetical direction verified and preserved."
+  },
+  {
+    "element_index": 11,
+    "element_type": "transition",
+    "scene_number": 1,
+    "original_text": "cut to:",
+    "formatted_text": "CUT TO:",
+    "confidence": 0.99,
+    "status": "approved",
+    "reason": "Capitalized standard transition marker."
+  }
+]
