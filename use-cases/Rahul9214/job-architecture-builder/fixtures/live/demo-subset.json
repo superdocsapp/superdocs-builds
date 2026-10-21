@@ -1,0 +1,28 @@
+{
+  "corpus_id": "corpus-a",
+  "session_id": "job-arch-live",
+  "surgical_role_id": "ns-swe-ii-payments",
+  "search_query": "Find documents or role profiles that reference the IC4 level.",
+  "roles": [
+    {
+      "role_id": "ns-swe-backend",
+      "kind": "engineering_ic",
+      "purpose": "Typical engineering individual-contributor role."
+    },
+    {
+      "role_id": "ns-swe-ii-payments",
+      "kind": "higher_scope_engineering_ic",
+      "purpose": "Broader-scope engineering IC used for the occupied-level surgical demo."
+    },
+    {
+      "role_id": "ns-em-platform",
+      "kind": "people_manager",
+      "purpose": "People-manager role with direct-report evidence."
+    },
+    {
+      "role_id": "ns-program-coordinator",
+      "kind": "provisional",
+      "purpose": "Sparse/ambiguous role that must stay visibly provisional."
+    }
+  ]
+}

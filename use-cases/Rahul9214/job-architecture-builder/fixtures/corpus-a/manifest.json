@@ -1,0 +1,133 @@
+{
+  "corpus_id": "corpus-a",
+  "organization": "Northstar Systems",
+  "description": "Primary synthetic technology-company corpus used during implementation. Roles span engineering, product, design, data, customer success, people, and finance.",
+  "roles": [
+    {
+      "id": "ns-swe-backend",
+      "file": "software-engineer-backend.md",
+      "title": "Software Engineer, Backend",
+      "team": "Platform Services"
+    },
+    {
+      "id": "ns-staff-swe-infra",
+      "file": "staff-software-engineer-infrastructure.md",
+      "title": "Staff Software Engineer, Infrastructure",
+      "team": "Cloud Platform"
+    },
+    {
+      "id": "ns-senior-swe-internal-tools",
+      "file": "senior-software-engineer-workplace-tools.md",
+      "title": "Senior Software Engineer, Workplace Tools",
+      "team": "Workplace Technology"
+    },
+    {
+      "id": "ns-swe-ii-payments",
+      "file": "software-engineer-ii-payments.md",
+      "title": "Software Engineer II, Payments",
+      "team": "Commerce"
+    },
+    {
+      "id": "ns-em-developer-experience",
+      "file": "engineering-manager-developer-experience.md",
+      "title": "Engineering Manager, Developer Experience",
+      "team": "Developer Platform"
+    },
+    {
+      "id": "ns-em-platform",
+      "file": "engineering-manager-platform-services.md",
+      "title": "Engineering Manager, Platform Services",
+      "team": "Platform Services"
+    },
+    {
+      "id": "ns-frontend-engineer",
+      "file": "software-engineer-web-client.md",
+      "title": "Software Engineer, Web Client",
+      "team": "Product Engineering"
+    },
+    {
+      "id": "ns-set-checkout",
+      "file": "software-engineer-in-test-checkout.md",
+      "title": "Software Engineer in Test, Checkout",
+      "team": "Commerce Quality"
+    },
+    {
+      "id": "ns-pm-billing",
+      "file": "product-manager-billing.md",
+      "title": "Product Manager, Billing",
+      "team": "Monetization"
+    },
+    {
+      "id": "ns-senior-pm-platform",
+      "file": "senior-product-manager-developer-platform.md",
+      "title": "Senior Product Manager, Developer Platform",
+      "team": "Developer Platform"
+    },
+    {
+      "id": "ns-product-designer",
+      "file": "product-designer-growth.md",
+      "title": "Product Designer, Growth",
+      "team": "Growth Design"
+    },
+    {
+      "id": "ns-staff-product-designer",
+      "file": "staff-product-designer-design-systems.md",
+      "title": "Staff Product Designer, Design Systems",
+      "team": "Design Systems"
+    },
+    {
+      "id": "ns-data-engineer",
+      "file": "data-engineer-analytics-platform.md",
+      "title": "Data Engineer, Analytics Platform",
+      "team": "Data Platform"
+    },
+    {
+      "id": "ns-data-scientist",
+      "file": "data-scientist-marketplace.md",
+      "title": "Data Scientist, Marketplace",
+      "team": "Marketplace Science"
+    },
+    {
+      "id": "ns-csm-enterprise",
+      "file": "customer-success-manager-enterprise.md",
+      "title": "Customer Success Manager, Enterprise",
+      "team": "Customer Success"
+    },
+    {
+      "id": "ns-people-bp",
+      "file": "people-business-partner-engineering.md",
+      "title": "People Business Partner, Engineering",
+      "team": "People"
+    },
+    {
+      "id": "ns-technical-recruiter",
+      "file": "technical-recruiter.md",
+      "title": "Technical Recruiter",
+      "team": "Talent Acquisition"
+    },
+    {
+      "id": "ns-fpna-analyst",
+      "file": "financial-analyst-fpa.md",
+      "title": "Financial Analyst, FP&A",
+      "team": "Finance"
+    },
+    {
+      "id": "ns-solutions-architect",
+      "file": "solutions-architect.md",
+      "title": "Solutions Architect",
+      "team": "Revenue Engineering"
+    },
+    {
+      "id": "ns-developer-advocate",
+      "file": "developer-advocate.md",
+      "title": "Developer Advocate",
+      "team": "Developer Relations"
+    },
+    {
+      "id": "ns-program-coordinator",
+      "file": "program-coordinator.md",
+      "title": "Program Coordinator",
+      "team": "Office of the CEO"
+    }
+  ]
+}

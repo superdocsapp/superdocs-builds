@@ -1,0 +1,188 @@
+{
+  "corpus_id": "corpus-a",
+  "organization": "Northstar Systems",
+  "adversarial_cases": [
+    "misleading_senior_title",
+    "modest_title_broad_scope",
+    "management_title_without_people",
+    "hybrid",
+    "specialized_misfit",
+    "sparse_evidence"
+  ],
+  "assessments": [
+    {
+      "role_id": "ns-swe-backend",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Clear backend IC ownership of services within Platform Services."
+    },
+    {
+      "role_id": "ns-staff-swe-infra",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L6",
+      "fit_status": "strong_fit",
+      "notes": "Org-wide infrastructure impact with technical leadership and no people-management duties."
+    },
+    {
+      "role_id": "ns-senior-swe-internal-tools",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "misleading_senior_title",
+      "notes": "Senior title and years-of-experience requirement conflict with narrow, locally scoped maintenance work. Family is engineering; level is intentionally unspecified."
+    },
+    {
+      "role_id": "ns-swe-ii-payments",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": null,
+      "fit_status": "strong_fit",
+      "adversarial_case": "modest_title_broad_scope",
+      "notes": "Title is modest, but evidence of company-wide payments ownership is consistent. Level is left unspecified so tests do not over-pin L5 vs L6."
+    },
+    {
+      "role_id": "ns-em-developer-experience",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "management_title_without_people",
+      "notes": "Manager title with explicit absence of hiring, reviews, and direct reports. Evidence points to an IC engineering role; track assignment stays cautious."
+    },
+    {
+      "role_id": "ns-em-platform",
+      "proposed_family": "engineering",
+      "proposed_track": "people_manager",
+      "proposed_level": "M1",
+      "fit_status": "strong_fit",
+      "notes": "Genuine people-manager evidence: hiring, coaching, performance, and delivery ownership for a platform team."
+    },
+    {
+      "role_id": "ns-frontend-engineer",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L3",
+      "fit_status": "strong_fit",
+      "notes": "Standard web-client IC implementing product features with guided autonomy."
+    },
+    {
+      "role_id": "ns-set-checkout",
+      "proposed_family": "engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Quality engineering IC embedded in checkout; still software engineering evidence, not a separate operations role."
+    },
+    {
+      "role_id": "ns-pm-billing",
+      "proposed_family": "product",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Owns billing outcomes, roadmap, and discovery for a bounded product area."
+    },
+    {
+      "role_id": "ns-senior-pm-platform",
+      "proposed_family": "product",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L5",
+      "fit_status": "strong_fit",
+      "notes": "Cross-team platform product ownership with strategy and prioritization authority."
+    },
+    {
+      "role_id": "ns-product-designer",
+      "proposed_family": "design",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "End-to-end product design for growth surfaces."
+    },
+    {
+      "role_id": "ns-staff-product-designer",
+      "proposed_family": "design",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L6",
+      "fit_status": "strong_fit",
+      "notes": "Design-system leadership across product lines without people-management responsibility."
+    },
+    {
+      "role_id": "ns-data-engineer",
+      "proposed_family": "data",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Pipelines, warehouse modeling, and analytics-platform reliability."
+    },
+    {
+      "role_id": "ns-data-scientist",
+      "proposed_family": "data",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L5",
+      "fit_status": "strong_fit",
+      "notes": "Marketplace modeling, experimentation, and decision support for product and finance."
+    },
+    {
+      "role_id": "ns-csm-enterprise",
+      "proposed_family": "customer_success",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Named enterprise book of business, renewal, and adoption outcomes."
+    },
+    {
+      "role_id": "ns-people-bp",
+      "proposed_family": "people",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L5",
+      "fit_status": "strong_fit",
+      "notes": "HR business-partner work for engineering leaders: org design advice, employee relations, workforce planning."
+    },
+    {
+      "role_id": "ns-technical-recruiter",
+      "proposed_family": "people",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L3",
+      "fit_status": "strong_fit",
+      "notes": "Full-cycle technical recruiting with a defined requisition load."
+    },
+    {
+      "role_id": "ns-fpna-analyst",
+      "proposed_family": "finance",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Planning, forecasting, and variance analysis for a product portfolio."
+    },
+    {
+      "role_id": "ns-solutions-architect",
+      "proposed_family": null,
+      "proposed_track": null,
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "hybrid",
+      "notes": "Work spans pre-sales solution design, light integration engineering, and post-sale customer success. No single Northstar family is assigned."
+    },
+    {
+      "role_id": "ns-developer-advocate",
+      "proposed_family": null,
+      "proposed_track": null,
+      "proposed_level": null,
+      "fit_status": "misfit",
+      "adversarial_case": "specialized_misfit",
+      "notes": "External community, content, and conference work is outside Northstar's standard families. Do not force into engineering, product, or customer success."
+    },
+    {
+      "role_id": "ns-program-coordinator",
+      "proposed_family": null,
+      "proposed_track": null,
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "sparse_evidence",
+      "notes": "Job description is too thin to defend a family or level."
+    }
+  ]
+}

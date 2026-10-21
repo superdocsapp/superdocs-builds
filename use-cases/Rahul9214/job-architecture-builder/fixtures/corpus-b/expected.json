@@ -1,0 +1,112 @@
+{
+  "corpus_id": "corpus-b",
+  "organization": "Meridian HealthTech",
+  "adversarial_cases": [
+    "misleading_title",
+    "hybrid",
+    "sparse_evidence",
+    "specialized_misfit"
+  ],
+  "assessments": [
+    {
+      "role_id": "mh-platform-engineer",
+      "proposed_family": "platform_engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Builds and operates EHR platform services used by clinical applications."
+    },
+    {
+      "role_id": "mh-sre-clinical-cloud",
+      "proposed_family": "platform_engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L5",
+      "fit_status": "strong_fit",
+      "notes": "Reliability, incident command, and SLO ownership for clinical cloud systems."
+    },
+    {
+      "role_id": "mh-clinical-pm",
+      "proposed_family": "clinical_product",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Clinical workflow product ownership with licensed-clinician stakeholders."
+    },
+    {
+      "role_id": "mh-appsec-engineer",
+      "proposed_family": "security",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Application security reviews, threat modeling, and secure SDLC for PHI systems."
+    },
+    {
+      "role_id": "mh-informatics-analyst",
+      "proposed_family": "analytics",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Clinical quality measures, cohort definitions, and analytics for care programs."
+    },
+    {
+      "role_id": "mh-implementation-specialist",
+      "proposed_family": "implementation",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L3",
+      "fit_status": "strong_fit",
+      "notes": "Configures and launches Meridian at health-system sites; not product ownership."
+    },
+    {
+      "role_id": "mh-clinical-ops-lead",
+      "proposed_family": "operations",
+      "proposed_track": "people_manager",
+      "proposed_level": "M1",
+      "fit_status": "strong_fit",
+      "notes": "Runs care-delivery operations staff, staffing grids, and escalation procedures."
+    },
+    {
+      "role_id": "mh-talent-partner",
+      "proposed_family": "people",
+      "proposed_track": "individual_contributor",
+      "proposed_level": "L4",
+      "fit_status": "strong_fit",
+      "notes": "Recruiting and workforce planning for clinical product teams."
+    },
+    {
+      "role_id": "mh-principal-engineer-widgets",
+      "proposed_family": "platform_engineering",
+      "proposed_track": "individual_contributor",
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "misleading_title",
+      "notes": "Principal title overstates a narrowly scoped widget-maintenance role. Family is engineering-adjacent; level is unspecified."
+    },
+    {
+      "role_id": "mh-clinical-implementation-architect",
+      "proposed_family": null,
+      "proposed_track": null,
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "hybrid",
+      "notes": "Combines clinical workflow design, integration engineering, and customer implementation. Left unassigned rather than forced into one family."
+    },
+    {
+      "role_id": "mh-associate-special-programs",
+      "proposed_family": null,
+      "proposed_track": null,
+      "proposed_level": null,
+      "fit_status": "provisional",
+      "adversarial_case": "sparse_evidence",
+      "notes": "Near-empty description; cannot defend a family or level."
+    },
+    {
+      "role_id": "mh-medical-science-liaison",
+      "proposed_family": null,
+      "proposed_track": null,
+      "proposed_level": null,
+      "fit_status": "misfit",
+      "adversarial_case": "specialized_misfit",
+      "notes": "Field medical-affairs scientific exchange sits outside Meridian's software/operations architecture. Do not force into clinical product or implementation."
+    }
+  ]
+}

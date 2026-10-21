@@ -1,0 +1,79 @@
+{
+  "corpus_id": "corpus-b",
+  "organization": "Meridian HealthTech",
+  "description": "Independent healthcare-technology validation corpus with different titles, wording, and family mix from Corpus A.",
+  "roles": [
+    {
+      "id": "mh-platform-engineer",
+      "file": "platform-engineer-ehr-services.md",
+      "title": "Platform Engineer, EHR Services",
+      "team": "Clinical Platform"
+    },
+    {
+      "id": "mh-sre-clinical-cloud",
+      "file": "site-reliability-engineer-clinical-cloud.md",
+      "title": "Site Reliability Engineer, Clinical Cloud",
+      "team": "Clinical Reliability"
+    },
+    {
+      "id": "mh-clinical-pm",
+      "file": "clinical-product-manager-care-pathways.md",
+      "title": "Clinical Product Manager, Care Pathways",
+      "team": "Care Pathways"
+    },
+    {
+      "id": "mh-appsec-engineer",
+      "file": "application-security-engineer.md",
+      "title": "Application Security Engineer",
+      "team": "Information Security"
+    },
+    {
+      "id": "mh-informatics-analyst",
+      "file": "health-informatics-analyst.md",
+      "title": "Health Informatics Analyst",
+      "team": "Clinical Analytics"
+    },
+    {
+      "id": "mh-implementation-specialist",
+      "file": "implementation-specialist-health-systems.md",
+      "title": "Implementation Specialist, Health Systems",
+      "team": "Customer Implementation"
+    },
+    {
+      "id": "mh-clinical-ops-lead",
+      "file": "clinical-operations-lead.md",
+      "title": "Clinical Operations Lead",
+      "team": "Care Delivery Operations"
+    },
+    {
+      "id": "mh-talent-partner",
+      "file": "talent-partner-clinical-product.md",
+      "title": "Talent Partner, Clinical Product",
+      "team": "People"
+    },
+    {
+      "id": "mh-principal-engineer-widgets",
+      "file": "principal-engineer-patient-portal-widgets.md",
+      "title": "Principal Engineer, Patient Portal Widgets",
+      "team": "Patient Experience Engineering"
+    },
+    {
+      "id": "mh-clinical-implementation-architect",
+      "file": "clinical-implementation-architect.md",
+      "title": "Clinical Implementation Architect",
+      "team": "Enterprise Deployments"
+    },
+    {
+      "id": "mh-associate-special-programs",
+      "file": "associate-special-programs.md",
+      "title": "Associate, Special Programs",
+      "team": "Office of the CMO"
+    },
+    {
+      "id": "mh-medical-science-liaison",
+      "file": "medical-science-liaison-cardiology.md",
+      "title": "Medical Science Liaison, Cardiology",
+      "team": "Medical Affairs"
+    }
+  ]
+}

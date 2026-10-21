@@ -1,0 +1,23 @@
+{
+  "template_id": "job-architecture-framework",
+  "sections": [
+    "purpose",
+    "principles",
+    "career_tracks",
+    "canonical_levels",
+    "job_families",
+    "competency_matrices",
+    "role_mappings",
+    "provisional_roles",
+    "misfits"
+  ],
+  "required_levels": ["IC1", "IC2", "IC3", "IC4", "IC5", "M1", "M2", "M3"],
+  "level_dimensions": [
+    "scope",
+    "autonomy_decision_authority",
+    "complexity",
+    "impact",
+    "leadership",
+    "people_management"
+  ]
+}

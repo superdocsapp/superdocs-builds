@@ -1,0 +1,20 @@
+{
+  "template_id": "job-architecture-role-profile",
+  "classification": ["strong_fit", "provisional"],
+  "section_ids": [
+    "title",
+    "family",
+    "track",
+    "level",
+    "purpose",
+    "responsibilities",
+    "scope_decision_making",
+    "core_competencies",
+    "level_expectations",
+    "progression",
+    "evidence_note",
+    "classification"
+  ],
+  "level_dependency_section": "level_expectations",
+  "competency_dependency_section": "core_competencies"
+}
