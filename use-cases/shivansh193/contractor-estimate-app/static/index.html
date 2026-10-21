@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Bright Line Electric — Estimate Builder</title>
+<style>
+  :root { --accent: #0b6e4f; --ink: #1a1a1a; --muted: #666; --line: #ddd; }
+  body { font-family: -apple-system, "Segoe UI", sans-serif; max-width: 760px; margin: 40px auto; padding: 0 20px; color: var(--ink); }
+  h1 { color: var(--accent); margin-bottom: 4px; }
+  .sub { color: var(--muted); margin-top: 0; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  legend { font-weight: 600; color: var(--accent); padding: 0 6px; }
+  label { display: block; margin: 10px 0 4px; font-size: 0.9rem; color: var(--muted); }
+  textarea, input[type="text"] { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 4px; font-family: inherit; font-size: 0.95rem; }
+  textarea { min-height: 70px; }
+  button { background: var(--accent); color: white; border: none; padding: 10px 22px; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  #status { margin: 16px 0; color: var(--muted); font-family: ui-monospace, monospace; font-size: 0.85rem; white-space: pre-wrap; }
+  #result { border: 1px solid var(--line); border-radius: 6px; padding: 20px; margin-top: 20px; }
+  #result img { display: block; margin: 8px 0; border: 1px solid var(--line); border-radius: 4px; }
+  .verify-pass { color: #0b6e4f; font-weight: 600; }
+  .verify-fail { color: #a33; font-weight: 600; }
+</style>
+</head>
+<body>
+  <h1>Bright Line Electric</h1>
+  <p class="sub">Estimate builder — from site-visit notes and photos to a branded, traceable estimate.</p>
+
+  <form id="estimate-form">
+    <fieldset>
+      <legend>Job</legend>
+      <label for="job_notes">Site visit notes (address, client, overview)</label>
+      <textarea id="job_notes" name="job_notes" required>118 Larkspur Ave -- Dana Whitfield, kitchen renovation. Walked the space with the client. Existing panel and wall wiring are original to the 1974 build and need replacing before new circuits can be added for the kitchen remodel.</textarea>
+    </fieldset>
+
+    <fieldset>
+      <legend>Issue 1</legend>
+      <label for="caption_1">What this photo shows</label>
+      <input type="text" id="caption_1" name="caption_1" required value="Corroded panel, double-tapped breakers, no room for new circuits" />
+      <label for="photo_1">Photo</label>
+      <input type="file" id="photo_1" name="photo_1" accept="image/*" required />
+    </fieldset>
+
+    <fieldset>
+      <legend>Issue 2</legend>
+      <label for="caption_2">What this photo shows</label>
+      <input type="text" id="caption_2" name="caption_2" required value="Knob-and-tube wiring exposed in wall cavity, needs full replacement" />
+      <label for="photo_2">Photo</label>
+      <input type="file" id="photo_2" name="photo_2" accept="image/*" required />
+    </fieldset>
+
+    <button type="submit" id="submit-btn">Generate estimate</button>
+  </form>
+
+  <div id="status"></div>
+  <div id="result" style="display:none"></div>
+
+  <script>
+    const form = document.getElementById('estimate-form');
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+    const btn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      resultEl.style.display = 'none';
+      statusEl.textContent = 'Uploading photos and drafting the estimate against the real SuperDocs API -- this can take 30s to a few minutes, no visible progress is normal.';
+
+      const formData = new FormData(form);
+      try {
+        const res = await fetch('/api/estimate', { method: 'POST', body: formData });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`${res.status}: ${text}`);
+        }
+        const data = await res.json();
+        statusEl.textContent = `Done. Exported to ${data.export_path}`;
+
+        const v = data.verification;
+        const verifyHtml = v.details
+          .map(
+            (d) =>
+              `<li class="${d.photo_embedded ? 'verify-pass' : 'verify-fail'}">` +
+              `${d.photo_embedded ? 'PASS' : 'FAIL'}: "${d.caption}" — photo ${d.photo_embedded ? 'is' : 'is NOT'} embedded in the output` +
+              `</li>`
+          )
+          .join('');
+
+        resultEl.innerHTML = `<h2>Verification</h2><ul>${verifyHtml}</ul><h2>Estimate</h2>${data.html}`;
+        resultEl.style.display = 'block';
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
