@@ -1,0 +1,21 @@
+{
+  "name": "twilio-sms-doc-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Twilio SMS to SuperDocs document-editing bridge",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env src/index.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "twilio": "^5.8.0"
+  },
+  "devDependencies": {
+    "ngrok": "^5.0.0-beta.2"
+  }
+}
