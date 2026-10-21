@@ -1,0 +1,17 @@
+entry_id,at,category,device,feeder,consumers_out,note,flag
+TEL-0001,2026-04-24T18:22:00,outage,RTU-NMT-01,11 kV BRK-03,2410,"BRK-03 tripped on earth fault and failed to reclose. Barakar Bazaar section out.",
+TEL-0002,2026-04-24T18:41:00,outage,RTU-NMT-01,11 kV MHS-07,6370,"MHS-07 tripped on overcurrent. Mohishila section out.",
+TEL-0003,2026-04-24T19:15:00,outage,RTU-NMT-02,11 kV KLT-02,12270,"KLT-02 tripped after cascading faults on the Kulti trunk.",
+TEL-0004,2026-04-24T19:33:00,outage,RTU-NMT-02,11 kV STP-05,16250,"STP-05 out. Sitarampur laterals lost supply.",
+TEL-0005,2026-04-24T19:52:00,outage,RTU-NMT-02,11 kV SRN-01,17790,"SRN-01 tripped. Srishti Nagar section out.",
+TEL-0006,2026-04-24T20:15:00,outage,OMS-NMT,,17790,"Peak consumers without supply confirmed at 17,790 across five feeders.",
+TEL-0007,2026-04-24T23:30:00,restoration,RTU-NMT-01,11 kV MHS-07,13830,"MHS-07 restored after the faulted section was isolated at the Mohishila sectionaliser.",
+TEL-0008,2026-04-25T01:20:00,assessment,OMS-NMT,,,"Outage management system link to the Neamatpur RTU lost. Consumer counts are not recorded from this point.",counts_lost
+TEL-0009,2026-04-25T05:05:00,assessment,OMS-NMT,,,"Outage management system link restored after 3 hours 45 minutes. Counts resume.",counts_resumed
+TEL-0010,2026-04-25T05:10:00,restoration,OMS-NMT,,13250,"First consumer count after the outage management system link was restored.",
+TEL-0011,2026-04-25T09:40:00,restoration,RTU-NMT-01,11 kV BRK-03,10840,"BRK-03 re-energised after pole replacement near the Barakar level crossing.",
+TEL-0012,2026-04-25T14:25:00,restoration,RTU-NMT-02,11 kV SRN-01,9300,"SRN-01 restored. Srishti Nagar back on supply.",
+TEL-0013,2026-04-25T20:10:00,restoration,RTU-NMT-02,11 kV KLT-02,3400,"KLT-02 restored to the Kulti trunk. Sitarampur laterals remain out.",
+TEL-0014,2026-04-26T04:30:00,restoration,OMS-NMT,,1870,"Remaining outages are individual service connections on the Sitarampur laterals.",
+TEL-0015,2026-04-26T10:15:00,restoration,RTU-NMT-02,11 kV STP-05,430,"STP-05 laterals energised after transformer replacement at Sitarampur.",
+TEL-0016,2026-04-26T13:20:00,restoration,OMS-NMT,,0,"Final consumer restored. Event closed.",

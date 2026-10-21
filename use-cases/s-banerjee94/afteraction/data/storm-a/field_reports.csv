@@ -1,0 +1,11 @@
+entry_id,at,category,location,feeder,note,reported_by
+FLD-0001,2026-04-24T18:45:00,safety,Barakar level crossing,11 kV BRK-03,"Live conductor down across the approach road. Area cordoned and the section isolated before any gang approached.",Gang 1 supervisor
+FLD-0002,2026-04-24T19:20:00,damage,Kulti to Sitarampur trunk,11 kV KLT-02,"Patrol finds seven spans of conductor down between poles 14 and 21.",Gang 3 supervisor
+FLD-0003,2026-04-24T20:05:00,damage,Srishti Nagar Phase 2,11 kV SRN-01,"Four cross-arms broken. Insulator strings intact.",Section engineer
+FLD-0004,2026-04-24T20:10:00,access,Mohishila Colony,11 kV MHS-07,"Fallen tree blocking the line route. A tree-cutting gang is required before line work can start.",Gang 2 supervisor
+FLD-0005,2026-04-24T23:50:00,access,Kulti section,11 kV KLT-02,"Night working suspended on the Kulti section. Standing water around the pole bases and no safe access with the trunk still live upstream.",Duty engineer
+FLD-0006,2026-04-25T08:20:00,damage,Kulti section poles 8 to 12,11 kV KLT-02,"Six insulators found cracked by hail during patrolling.",Gang 3 supervisor
+FLD-0007,2026-04-25T11:40:00,safety,Kulti section,11 kV KLT-02,"Lineman sustained a minor laceration while clearing a fallen span. Treated on site, no lost time.",Safety officer
+FLD-0008,2026-04-25T12:10:00,access,Sitarampur Ward 6,11 kV STP-05,"Field flooded to knee depth. The gang cannot reach the downed spans and work is deferred until the water recedes.",Gang 8 supervisor
+FLD-0009,2026-04-26T06:30:00,access,Sitarampur Ward 6,11 kV STP-05,"Water receded overnight. Access restored and conductor stringing resumed.",Gang 8 supervisor
+FLD-0010,2026-04-26T11:50:00,safety,All sections,,"All snapped-conductor sites cleared and released for normal operation.",Safety officer

@@ -1,0 +1,5 @@
+lesson_id,status,note,sources
+LL-A2,closed,"First consumer notification was issued 38 minutes after the first recorded outage, inside the two-hour target.",TEL-0001;COM-0002
+LL-A4,closed,"The Mohishila Bazaar pole was inspected during this event. The tree trunk has been removed and the pole is sound.",FLD-0005
+LL-A1,open,"A mutual-aid gang from the Durgapur circle worked this event and again carries no mobilisation time.",CRW-0006
+LL-A3,open,"The link held for this event, so the gap did not recur, but the manual fallback capture procedure remains undeveloped.",TEL-0010

@@ -1,0 +1,11 @@
+{
+  "event_id": "storm-a",
+  "name": "Kalbaisakhi Squall",
+  "utility": "Barakar Valley Power Distribution Limited",
+  "substation": "Neamatpur 33/11 kV",
+  "consumers_served": 28400,
+  "started_at": "2026-04-24T17:00:00",
+  "ended_at": "2026-04-26T14:00:00",
+  "previous_event_id": null,
+  "complaint_target_hours": 24
+}

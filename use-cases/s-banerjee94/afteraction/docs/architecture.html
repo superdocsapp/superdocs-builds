@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sandeepan Banerjee — afteraction — architecture</title>
+<style>
+  :root{
+    --ink:#1b2430; --dim:#5b6672; --faint:#8b98a5;
+    --blue:#1f5fae; --blue-soft:#e8f0fa;
+    --amber:#8a5a1e; --amber-soft:#fbf1e3;
+    --grey-soft:#f0f2f5;
+    --line:#c9d4da; --page:#ffffff;
+    --serif:Georgia,"Times New Roman",serif;
+    --sans:"Segoe UI",Calibri,system-ui,sans-serif;
+    --mono:Consolas,"SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--page);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.45}
+  .page{width:1288px;margin:0 auto;padding:24px 24px 28px;position:relative}
+
+  header{border-bottom:2px solid var(--blue);padding-bottom:9px;margin-bottom:6px}
+  h1{font-family:var(--serif);font-weight:400;font-size:27px;color:var(--blue)}
+  .byline{font-size:13.5px;color:var(--dim);margin-top:3px}
+  .legend{display:flex;gap:24px;margin:12px 0 4px;font-size:13px;color:var(--dim);flex-wrap:wrap;align-items:center}
+  .legend span{display:flex;align-items:center;gap:7px}
+  .sw{width:15px;height:13px;border-radius:2px;border:1px solid var(--line)}
+  .hint{margin-left:auto;color:var(--blue);font-size:12.5px}
+
+  svg{display:block;margin:0 auto;width:100%;height:auto}
+  .lbl-b{font-family:var(--sans);font-size:13.5px;font-weight:700;fill:var(--ink)}
+  .sm{font-family:var(--sans);font-size:11.5px;fill:var(--dim)}
+  .mono{font-family:var(--mono);font-size:12px;fill:var(--blue)}
+  .mono-d{font-family:var(--mono);font-size:11.5px;fill:var(--dim)}
+  .band{font-family:var(--sans);font-size:12px;font-weight:700;letter-spacing:.09em;fill:var(--faint)}
+  .flow{stroke:var(--blue);stroke-width:1.8;fill:none;marker-end:url(#a)}
+  .flow-d{stroke:var(--faint);stroke-width:1.5;fill:none;stroke-dasharray:5 3.5;marker-end:url(#ag)}
+
+  /* every box explains itself on hover — so the diagram can be presented from */
+  .node{cursor:help}
+  .node rect{transition:stroke-width .12s, filter .12s}
+  .node:hover rect:first-of-type{stroke-width:2.4}
+  .node:hover text{font-weight:inherit}
+
+  #tip{
+    position:absolute;z-index:10;max-width:390px;
+    background:#12212f;color:#eef4f7;border-radius:7px;
+    padding:11px 13px;font-size:13px;line-height:1.5;
+    box-shadow:0 6px 22px rgba(18,33,47,.28);
+    pointer-events:none;opacity:0;transition:opacity .1s;
+  }
+  #tip.on{opacity:1}
+  #tip b{color:#8ec2f7;display:block;margin-bottom:3px;font-size:12.5px;
+         letter-spacing:.04em;text-transform:uppercase}
+
+  .notes{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:14px;
+         border-top:1px solid var(--line);padding-top:12px}
+  .notes h3{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+  .notes li{font-size:13px;color:var(--dim);margin-bottom:5px;list-style:none;padding-left:13px;position:relative;line-height:1.42}
+  .notes li::before{content:"—";position:absolute;left:0;color:var(--faint)}
+  .notes b{color:var(--ink)}
+
+  @media print{
+    .page{width:auto;padding:0}
+    #tip,.hint{display:none}
+    @page{size:A4 landscape;margin:9mm}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>afteraction — architecture</h1>
+  <div class="byline"><b>Sandeepan Banerjee</b> · afteraction — storm restoration after-action reports, built on SuperDocs · SuperDocs Round 2, Task 2</div>
+</header>
+
+<div class="legend">
+  <span><i class="sw" style="background:var(--grey-soft)"></i> data on disk</span>
+  <span><i class="sw" style="background:var(--page)"></i> Python — computes, decides, checks</span>
+  <span><i class="sw" style="background:var(--blue-soft);border-color:var(--blue)"></i> SuperDocs API</span>
+  <span><i class="sw" style="background:var(--amber-soft);border-color:var(--amber)"></i> person</span>
+  <span><b style="color:var(--blue);font-family:var(--mono)">$</b> costs an operation</span>
+  <span class="hint">▸ hover any box for what it does</span>
+</div>
+
+<svg viewBox="0 0 1240 546" width="1240" height="546" role="img"
+     aria-label="Records are parsed into facts and time windows in Python, charts are rendered, one instruction per section is sent to SuperDocs, a person approves each change, the document is exported and fingerprinted after every turn, then verified, and the lessons register carries into the next event.">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f5fae"/>
+    </marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8b98a5"/>
+    </marker>
+  </defs>
+
+  <!-- ============ band 1: records ============ -->
+  <text class="band" x="16" y="22">RECORDS ON DISK</text>
+  <g class="node" data-title="Six record sets, not one log"
+     data-tip="The records come in six files. Each file holds one kind of record. The ID prefix tells you where a fact came from. TEL means a machine reported it. COM means a person phoned in. FLD means a crew saw it. A reader can tell the difference at a glance.">
+    <rect x="16" y="32" width="236" height="146" rx="5" fill="#f0f2f5" stroke="#c9d4da"/>
+    <text class="lbl-b" x="30" y="53">data/&lt;event&gt;/</text>
+    <text class="mono-d" x="30" y="74">weather.csv        WEA</text>
+    <text class="mono-d" x="30" y="90">telemetry.csv      TEL</text>
+    <text class="mono-d" x="30" y="106">damage.csv         DMG</text>
+    <text class="mono-d" x="30" y="122">crew.csv           CRW</text>
+    <text class="mono-d" x="30" y="138">comms.csv          COM</text>
+    <text class="mono-d" x="30" y="154">field_reports.csv  FLD</text>
+    <text class="sm" x="30" y="171" style="font-style:italic">the prefix travels into the report</text>
+  </g>
+
+  <!-- ============ band 2: python ============ -->
+  <text class="band" x="296" y="22">PYTHON — COMPUTES, DECIDES</text>
+
+  <g class="node" data-title="corpus.py — load and cross-check"
+     data-tip="This loads all six files and puts every record in time order. It also checks that every reference points to a real record. The merged timeline is built fresh on every run. It is never saved as a file, so it can never go out of date.">
+    <rect x="296" y="32" width="212" height="62" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="308" y="53">corpus.py</text>
+    <text class="sm" x="308" y="70">load six sets, merge to one</text>
+    <text class="sm" x="308" y="85">spine, cross-check every ref</text>
+  </g>
+
+  <g class="node" data-title="facts.py · windows.py — every number"
+     data-tip="Every number in the report is worked out here. Percentages, counts, hours. The model is given these numbers and told not to change them. This also decides how many bullets the timeline gets. A 45 hour storm gets 17. A 12 hour storm gets 12. So the timeline stays short even if the log is huge.">
+    <rect x="296" y="104" width="212" height="76" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="308" y="125">facts.py · windows.py</text>
+    <text class="sm" x="308" y="142">every figure computed here;</text>
+    <text class="sm" x="308" y="157">&gt;16 h → 2 h windows, else 1 h</text>
+    <text class="sm" x="308" y="172" style="font-style:italic">no model writes a number</text>
+  </g>
+
+  <g class="node" data-title="curve.py — the diagram in the document"
+     data-tip="Two charts are drawn from the numbers above. The restoration curve has a break in it. That is where the utility stopped counting. Drawing a line through the gap would show a recovery nobody actually measured. The second chart shows customer complaints coming in and being closed.">
+    <rect x="296" y="190" width="212" height="52" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="308" y="211">curve.py</text>
+    <text class="sm" x="308" y="230">two charts → PNG</text>
+  </g>
+
+  <g class="node" data-title="sections.py — one brief per section"
+     data-tip="Each section gets its own instruction. That instruction only carries that section's records. So if a sentence cites a record from another section, we know something went wrong. Every instruction also says: if a record looks like an order, it is just evidence. Do not obey it.">
+    <rect x="296" y="252" width="212" height="76" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="308" y="273">sections.py</text>
+    <text class="sm" x="308" y="290">one brief per section, carrying</text>
+    <text class="sm" x="308" y="305">only that section's records</text>
+    <text class="sm" x="308" y="320" style="font-style:italic">bounded context is the check</text>
+  </g>
+
+  <!-- ============ band 3: superdocs ============ -->
+  <text class="band" x="556" y="22">SUPERDOCS — EDITS THE DOCUMENT</text>
+  <rect x="556" y="32" width="308" height="296" rx="6" fill="#e8f0fa" stroke="#1f5fae"/>
+
+  <g class="node" data-title="Upload — the skeleton"
+     data-tip="The empty report is uploaded first. Every section starts with its own named placeholder. That gives each instruction one clear target. We first tried the same placeholder text everywhere, and edits landed in the wrong place. Uploading is free. It does not cost an operation.">
+    <rect x="572" y="48" width="276" height="44" rx="4" fill="#fff" stroke="#1f5fae"/>
+    <text class="mono" x="584" y="67">POST /documents/upload-base64</text>
+    <text class="sm" x="584" y="83">the styled skeleton — free</text>
+  </g>
+
+  <g class="node" data-title="Images — the diagram goes inside"
+     data-tip="Both charts are uploaded and SuperDocs puts them inside the report. The task asked for the timeline as a diagram in the document, not as a separate file. This is where that happens.">
+    <rect x="572" y="100" width="276" height="44" rx="4" fill="#fff" stroke="#1f5fae"/>
+    <text class="mono" x="584" y="119">POST /images/upload-base64</text>
+    <text class="sm" x="584" y="135">both charts — free</text>
+  </g>
+
+  <g class="node" data-title="Chat — ten instructions, one per section"
+     data-tip="Ten instructions per report. One for each section. The whole timeline goes in a single instruction, all 17 windows together. The API allows 25 edits in one operation, so this costs 1 operation instead of 17. We poll for the result instead of streaming, because polling gives back clean data.">
+    <rect x="572" y="152" width="276" height="60" rx="4" fill="#fff" stroke="#1f5fae"/>
+    <text class="mono" x="584" y="171">POST /chat/async → /jobs/{id}</text>
+    <text class="lbl-b" x="826" y="171" style="fill:#1f5fae">$</text>
+    <text class="sm" x="584" y="188">10 turns per report · poll, don't stream</text>
+    <text class="sm" x="584" y="204">17 timeline windows ride in ONE turn</text>
+  </g>
+
+  <g class="node" data-title="Approve — the human gate"
+     data-tip="Nothing is written until a person says yes. Each change is shown in full, before and after. Nothing is cut short. If you reject a change, your reason goes back to the model. The section is left empty rather than filled with something you do not trust.">
+    <rect x="572" y="220" width="276" height="44" rx="4" fill="#fbf1e3" stroke="#8a5a1e"/>
+    <text class="mono" x="584" y="239" style="fill:#8a5a1e">POST /chat/{id}/approve</text>
+    <text class="sm" x="584" y="255">a person approves or rejects, per change</text>
+  </g>
+
+  <g class="node" data-title="Export — after every single turn"
+     data-tip="Exporting is free. It does not cost an operation. That is why we can export the document after every single turn and compare it to the last one. It means we can prove nothing else changed, instead of just promising it.">
+    <rect x="572" y="272" width="276" height="44" rx="4" fill="#fff" stroke="#1f5fae"/>
+    <text class="mono" x="584" y="291">POST /documents/export</text>
+    <text class="sm" x="584" y="307">after every turn — free, so proof is free</text>
+  </g>
+
+  <!-- ============ band 4: checks ============ -->
+  <text class="band" x="912" y="22">CHECKS — MEASURE, DON'T CLAIM</text>
+
+  <g class="node" data-title="surgical.py — change only what you meant to"
+     data-tip="After each turn we take a fingerprint of every section. Then we compare. If we asked it to edit section 7 and section 6 also moved, the run fails. This caught a real problem on a live run, where the chart edit changed the section next to it.">
+    <rect x="912" y="32" width="312" height="62" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="924" y="53">surgical.py</text>
+    <text class="sm" x="924" y="70">hash each section between turns:</text>
+    <text class="sm" x="924" y="85">an edit that strays fails the run</text>
+  </g>
+
+  <g class="node" data-title="trace.py — every claim points at a record"
+     data-tip="This reads the finished document, not the instruction we sent. It checks that every citation points to a real record. Checking our own instruction would prove nothing. It also checks the shape: no made up headings, and no placeholder left behind.">
+    <rect x="912" y="104" width="312" height="76" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="924" y="125">trace.py</text>
+    <text class="sm" x="924" y="142">reads the EXPORTED document —</text>
+    <text class="sm" x="924" y="157">every citation must resolve;</text>
+    <text class="sm" x="924" y="172">no invented heading, no placeholder</text>
+  </g>
+
+  <g class="node" data-title="retry — an edit that did nothing"
+     data-tip="Sometimes a change is approved and then simply does not appear in the document. The run looks fine until someone opens the file. So we ask the document, not the API. If a section still has its placeholder, we send the instruction once more. Only once, because each try costs money.">
+    <rect x="912" y="190" width="312" height="62" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="924" y="211">retry — bounded, one pass</text>
+    <text class="sm" x="924" y="228">an edit that reports success and</text>
+    <text class="sm" x="924" y="243">changes nothing is re-issued once</text>
+  </g>
+
+  <g class="node" data-title="out/ — what the utility receives"
+     data-tip="A Word file for the board and the regulator, a Markdown copy, and both charts. The Word file is what the utility uses. The Markdown copy is what our checks read, because we must check what was really produced.">
+    <rect x="912" y="262" width="312" height="52" rx="5" fill="#fff" stroke="#c9d4da"/>
+    <text class="lbl-b" x="924" y="283">out/&lt;event&gt;/</text>
+    <text class="sm" x="924" y="302">.docx · .md · both charts</text>
+  </g>
+
+  <!-- ============ flows ============ -->
+  <!-- the records are loaded by corpus.py; facts.py only ever sees what corpus produced -->
+  <path class="flow" d="M252,63 L292,63"/>
+  <path class="flow" d="M402,94 L402,100"/>
+  <path class="flow" d="M402,180 L402,186"/>
+  <path class="flow" d="M402,242 L402,248"/>
+
+  <!-- the skeleton is built from the computed facts, not from the raw load -->
+  <path class="flow" d="M508,130 L516,130 L516,70 L566,70"/>
+  <path class="flow" d="M508,216 L528,216 L528,122 L566,122"/>
+  <path class="flow" d="M508,290 L540,290 L540,182 L566,182"/>
+
+  <!-- all three checks read the export. one trunk, one riser, two stubs -->
+  <path class="flow" d="M850,294 L908,294"/>
+  <path class="flow" d="M888,294 L888,63 L908,63"/>
+  <path class="flow" d="M888,142 L908,142"/>
+
+  <!-- a stalled section is re-issued as another chat turn, not another approval -->
+  <path class="flow-d" d="M906,221 L876,221 L876,182 L854,182"/>
+
+  <!-- ============ band 5: memory ============ -->
+  <text class="band" x="16" y="396">MEMORY — WHY THE SECOND REPORT KNOWS ABOUT THE FIRST</text>
+  <g class="node" data-title="The carry-forward register"
+     data-tip="One small JSON file, saved with the project so you can read it in the pull request. Storm A raised four action items. Storm B opened all four and closed two of them. Time to first customer message went from 2 hours 13 minutes down to 38 minutes. Both figures are worked out from the records, not judged by a model.">
+    <rect x="16" y="406" width="1208" height="78" rx="5" fill="#fbf1e3" stroke="#8a5a1e"/>
+    <text class="lbl-b" x="32" y="429">state/lessons.json</text>
+    <text class="sm" x="32" y="448">one register, committed — inspectable in the pull-request diff</text>
+    <text class="sm" x="32" y="466" style="font-style:italic">no database: state is two data folders and one file</text>
+
+    <text class="mono" x="416" y="429">storm-a  raises LL-A1 … LL-A4</text>
+    <text class="mono" x="416" y="450">storm-b  inherits 4 → closes 2 on evidence, 2 stay open</text>
+    <text class="sm" x="416" y="468">a closure is arithmetic over the records, never a model's opinion</text>
+
+    <text class="sm" x="880" y="429">LL-A2 closed: first notification</text>
+    <text class="lbl-b" x="880" y="450">2 h 13 min  →  38 min</text>
+    <text class="sm" x="880" y="468">computed in both reports, compared here</text>
+  </g>
+
+  <path class="flow" d="M1068,314 L1068,360 L620,360 L620,402"/>
+  <path class="flow-d" d="M430,406 L430,352 L272,352 L272,155 L256,155"/>
+  <text class="sm" x="286" y="371">read as an input to the next event</text>
+
+  <text class="sm" x="16" y="512">10 operations per report. Uploading and exporting are free, so we can check the document after every single turn without paying for it.</text>
+  <text class="sm" x="16" y="532">163 tests run with no API key and no internet. A stand-in copy of the API can be told to fail on purpose, so we can prove each check really catches its problem.</text>
+</svg>
+
+<div class="notes">
+  <div>
+    <h3>The one rule</h3>
+    <ul>
+      <li><b>SuperDocs does the editing.</b> This tool only decides what the document should say. It is built on top of SuperDocs, not a copy of it, so there is no second review screen.</li>
+      <li><b>Python picks the records. The model writes the sentence.</b> If a model picked which 20 records out of 2,000 mattered, we could not explain why it dropped the rest.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Why the checks are cheap</h3>
+    <ul>
+      <li><b>Exporting is free.</b> So we export after every turn and compare. We can show that nothing else changed instead of just saying so.</li>
+      <li><b>We check the finished file</b>, not the instruction we sent. Checking our own instruction would prove nothing.</li>
+    </ul>
+  </div>
+  <div>
+    <h3>Where it fails</h3>
+    <ul>
+      <li><b>We check citations, not meaning.</b> We can prove a sentence points at a real record. We cannot prove it describes that record correctly. That is what the person approving is for.</li>
+      <li><b>A crashed run starts over.</b> If the server is busy we retry safely, but we cannot pick up a half-finished run from where it stopped.</li>
+    </ul>
+  </div>
+</div>
+
+<div id="tip"></div>
+</div>
+
+<script>
+  var tip = document.getElementById('tip');
+  var page = document.querySelector('.page');
+
+  function show(node, ev){
+    tip.innerHTML = '<b>' + node.dataset.title + '</b>' + node.dataset.tip;
+    tip.classList.add('on');
+    place(ev);
+  }
+  function place(ev){
+    var box = page.getBoundingClientRect();
+    var x = ev.clientX - box.left + 16;
+    var y = ev.clientY - box.top + 16;
+    // keep it on the page rather than letting it run off the right edge
+    if (x + tip.offsetWidth > box.width - 8) { x = box.width - tip.offsetWidth - 8; }
+    if (y + tip.offsetHeight > box.height - 8) { y = ev.clientY - box.top - tip.offsetHeight - 14; }
+    tip.style.left = x + 'px';
+    tip.style.top = y + 'px';
+  }
+  document.querySelectorAll('.node').forEach(function(node){
+    node.addEventListener('mouseenter', function(ev){ show(node, ev); });
+    node.addEventListener('mousemove', place);
+    node.addEventListener('mouseleave', function(){ tip.classList.remove('on'); });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+entry_id,at,direction,channel,audience,subject,note,resolved_at,sources
+COM-0001,2026-08-11T11:12:00,in,call centre,62,"Supply failure reported, Barakar Bazaar","",2026-08-11T15:20:00,TEL-0001
+COM-0002,2026-08-11T11:43:00,out,SMS,1780,"Supply interruption acknowledged, gangs deployed","Issued 38 minutes after the first recorded outage.",,TEL-0001
+COM-0003,2026-08-11T11:43:00,out,IVR,620,"Supply interruption acknowledged, gangs deployed","",,TEL-0001
+COM-0004,2026-08-11T11:55:00,in,call centre,118,"Leaning poles reported, Kulti Road","",2026-08-11T19:30:00,
+COM-0005,2026-08-11T12:50:00,in,WhatsApp,44,"Supply failure reported, Mohishila","",2026-08-11T16:55:00,TEL-0003
+COM-0006,2026-08-11T13:15:00,in,email,9,"Restoration time requested for Kulti laterals","",2026-08-11T18:00:00,
+COM-0007,2026-08-11T14:00:00,out,WhatsApp,9200,"Estimated restoration times published","",,TEL-0004
+COM-0008,2026-08-11T14:00:00,out,web,9200,"Consumer portal updated with estimated restoration times","",,TEL-0004
+COM-0009,2026-08-11T15:30:00,in,SMS,71,"Broken cross-arms reported, Mohishila Colony","",2026-08-11T20:20:00,
+COM-0010,2026-08-11T17:30:00,out,SMS,3460,"Revised estimated restoration times","",,TEL-0006
+COM-0011,2026-08-11T19:40:00,in,call centre,15,"Individual service connection still out, Kulti laterals","",2026-08-11T21:05:00,
+COM-0012,2026-08-11T21:25:00,out,SMS,9200,"All-clear issued to all affected service connections","",,TEL-0009

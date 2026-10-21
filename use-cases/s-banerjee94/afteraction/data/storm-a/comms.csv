@@ -1,0 +1,16 @@
+entry_id,at,direction,channel,audience,subject,note,resolved_at,sources
+COM-0001,2026-04-24T18:30:00,in,call centre,88,"Supply failure reported, Barakar Bazaar","",2026-04-25T09:45:00,TEL-0001
+COM-0002,2026-04-24T18:58:00,in,call centre,140,"Tree on line, Mohishila Colony","Caller described three leaning poles.",2026-04-26T00:30:00,
+COM-0003,2026-04-24T20:35:00,out,SMS,12270,"Supply interruption acknowledged, gangs deployed","",,TEL-0006
+COM-0004,2026-04-24T20:35:00,out,IVR,4180,"Supply interruption acknowledged, gangs deployed","",,TEL-0006
+COM-0005,2026-04-24T21:12:00,in,WhatsApp,34,"Tree trunk resting against pole, Mohishila Bazaar","",,
+COM-0006,2026-04-24T22:40:00,in,call centre,410,"Restoration time requested","Busiest hour on the call centre for the event.",2026-04-25T08:10:00,
+COM-0007,2026-04-25T06:00:00,out,WhatsApp,13250,"Estimated restoration times published","",,TEL-0010
+COM-0008,2026-04-25T06:00:00,out,web,13250,"Consumer portal updated with estimated restoration times","",,TEL-0010
+COM-0009,2026-04-25T11:05:00,in,email,17,"Lines down in flooded field, Sitarampur Ward 6","",2026-04-26T09:30:00,
+COM-0010,2026-04-25T13:15:00,in,SMS,96,"Supply still out, Sitarampur","",2026-04-26T10:40:00,
+COM-0011,2026-04-25T15:30:00,out,SMS,9300,"Revised estimated restoration times","",,TEL-0012
+COM-0012,2026-04-25T21:00:00,in,call centre,58,"Supply still out, Sitarampur laterals","",2026-04-26T11:15:00,
+COM-0013,2026-04-26T08:00:00,out,SMS,1870,"Same-day restoration commitment to remaining consumers","",,TEL-0014
+COM-0014,2026-04-26T09:20:00,in,call centre,12,"Individual service connection still out, Ward 6","",,
+COM-0015,2026-04-26T13:45:00,out,SMS,17790,"All-clear issued to all affected service connections","",,TEL-0016

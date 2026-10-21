@@ -1,0 +1,9 @@
+entry_id,reported_at,asset_type,count,status,reported_by,feeder,location,note,source_ref,confirmed_at,repaired_at
+DMG-0001,2026-04-24T18:35:00,pole,1,confirmed,telemetry,11 kV BRK-03,Barakar level crossing,"Pole snapped at the base with the conductor down across the approach road.",TEL-0001,2026-04-24T19:10:00,2026-04-25T09:20:00
+DMG-0002,2026-04-24T18:58:00,pole,3,confirmed,customer,11 kV MHS-07,Mohishila Colony,"Three poles tilted after a tree fell along the line route.",COM-0002,2026-04-24T20:25:00,2026-04-25T16:40:00
+DMG-0003,2026-04-24T19:20:00,conductor_span,7,confirmed,crew,11 kV KLT-02,Kulti to Sitarampur trunk,"Seven spans of conductor down between poles 14 and 21.",FLD-0002,2026-04-24T19:20:00,2026-04-25T19:50:00
+DMG-0004,2026-04-24T19:44:00,transformer,2,confirmed,telemetry,11 kV STP-05,Sitarampur DTR-14 and DTR-22,"Two distribution transformers failed on overcurrent.",TEL-0004,2026-04-25T07:15:00,2026-04-26T09:50:00
+DMG-0005,2026-04-24T20:05:00,cross_arm,4,confirmed,crew,11 kV SRN-01,Srishti Nagar Phase 2,"Four cross-arms broken. Insulator strings intact.",FLD-0003,2026-04-24T21:30:00,2026-04-25T13:55:00
+DMG-0006,2026-04-24T21:12:00,pole,1,reported,customer,11 kV MHS-07,Mohishila Bazaar,"A consumer reports a large tree trunk resting against a pole. No gang has inspected it and the pole is not confirmed damaged.",COM-0005,,
+DMG-0007,2026-04-25T08:20:00,insulator,6,confirmed,crew,11 kV KLT-02,Kulti section poles 8 to 12,"Six insulators cracked by hail, found during patrolling.",FLD-0006,2026-04-25T08:20:00,2026-04-25T18:30:00
+DMG-0008,2026-04-25T11:05:00,conductor_span,2,confirmed,customer,11 kV STP-05,Sitarampur Ward 6,"Two spans down in a flooded field. Access delayed until the water receded.",COM-0009,2026-04-25T11:50:00,2026-04-26T09:10:00

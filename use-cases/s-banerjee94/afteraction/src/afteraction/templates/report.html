@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Storm Restoration After-Action Report — template</title>
+</head>
+<!--
+  This file is the report's design, and the only place design lives.
+
+  Everything between a `block:NAME` marker and its closing marker is uploaded to
+  SuperDocs; everything outside the markers — this comment, the page chrome above and
+  below — is local preview only and is never sent. Open this file in a browser to see
+  the design with its slots visible.
+
+  Styling is inline on purpose. SuperDocs keeps inline `style` attributes through the
+  AI edit and through the .docx export, where they become native Word formatting:
+  `background-color` becomes cell shading, `border-bottom` becomes a cell border,
+  `padding` becomes a cell margin, `color` and `font-family` become run properties.
+  A `<style>` block in the head does not survive the upload, so there is not one here.
+
+  Slots are `{{name}}`. `template.py` fills them; it never adds styling of its own.
+-->
+<body style="margin:0;background-color:#eef1f4;">
+<div style="max-width:52rem;margin:0 auto;padding:2rem 2.5rem;background-color:#ffffff;">
+
+<!-- block:document -->
+<div style="border-bottom:3px solid #1f5fae;padding-bottom:0.4rem;margin-bottom:0.9rem;">
+  <p style="margin:0 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;letter-spacing:0.12em;text-transform:uppercase;color:#5b6672;">{{utility}} &middot; {{substation}}</p>
+  <h1 style="margin:0;font-family:Georgia,'Times New Roman',serif;font-size:18pt;font-weight:normal;color:#1f5fae;">Storm Restoration After-Action Report</h1>
+  <p style="margin:0.25rem 0 0;font-family:Georgia,'Times New Roman',serif;font-size:12pt;color:#1b2430;">{{event_name}}</p>
+</div>
+
+<table style="border-collapse:collapse;width:100%;margin-bottom:0.9rem;">
+  <tbody>
+    <tr>
+      <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Event period</td>
+      <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{period}}</td>
+    </tr>
+    <tr>
+      <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Consumers served</td>
+      <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{consumers}}</td>
+    </tr>
+    <tr>
+      <td style="width:34%;padding:3px 10px 3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;text-transform:uppercase;letter-spacing:0.08em;color:#5b6672;">Records reviewed</td>
+      <td style="padding:3px 0;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;color:#1b2430;">{{records}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<table style="border-collapse:collapse;width:100%;margin-bottom:1.2rem;">
+  <tbody>
+    <tr>
+      <td style="background-color:#f2f6f8;border-left:3px solid #1f5fae;padding:9px 12px;font-family:Calibri,'Segoe UI',sans-serif;font-size:9.5pt;color:#3c4753;">
+        This report keeps two kinds of statement apart.
+        <b style="color:#1f5fae;">Observed</b> statements are traceable to a numbered record and carry that record in square brackets.
+        <b style="color:#8a5a1e;">Assessed</b> statements are the response team's judgement and carry no record because none supports them.
+        Where the records cannot answer a question, the report says so rather than estimating.
+        A citation's prefix names the record set it came from: <b>TEL</b> network telemetry, <b>DMG</b> a damage record, <b>CRW</b> a crew record, <b>COM</b> a consumer contact, <b>FLD</b> a crew's report from site, <b>WEA</b> a weather reading.
+      </td>
+    </tr>
+  </tbody>
+</table>
+{{body_html}}
+<!-- /block:document -->
+
+<!--
+  The summary is a real <h2>, not a styled table cell, and that is a functional choice
+  rather than a visual one. The exported markdown becomes "## Executive Summary", which
+  is what the per-section fingerprint in surgical.py splits on and what the placeholder
+  check in trace.py searches under. As a table it would have been invisible to both, and
+  a summary that silently failed to write would have shipped.
+-->
+<!-- block:summary -->
+<h2 style="margin:0 0 0.5rem;padding-bottom:0.25rem;border-bottom:1px solid #c9d4da;font-family:Georgia,'Times New Roman',serif;font-size:12.5pt;font-weight:normal;color:#1f5fae;">Executive Summary</h2>
+<table style="border-collapse:collapse;width:100%;margin:0 0 1.1rem;">
+  <tbody>
+    <tr>
+      <td style="background-color:#f7fafb;border-left:3px solid #1f5fae;padding:11px 12px;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.45;color:#1b2430;">Placeholder for the executive summary.</td>
+    </tr>
+  </tbody>
+</table>
+<!-- /block:summary -->
+
+<!-- block:section -->
+<h2 style="margin:1.1rem 0 0.5rem;padding-bottom:0.25rem;border-bottom:1px solid #c9d4da;font-family:Georgia,'Times New Roman',serif;font-size:12.5pt;font-weight:normal;color:#1f5fae;">{{number}}. {{title}}</h2>
+{{body_html}}
+<!-- /block:section -->
+
+<!-- block:observed -->
+<h3 style="margin:0.7rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#1f5fae;">Observed</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for observed statements in {{where}}.</p>
+<!-- /block:observed -->
+
+<!-- block:assessed -->
+<h3 style="margin:0.7rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#8a5a1e;">Assessed</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for assessed statements in {{where}}.</p>
+<!-- /block:assessed -->
+
+<!-- block:gaps -->
+<h3 style="margin:0.7rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#6b7683;">What the records do not show</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#3c4753;">Placeholder for gaps in {{where}}.</p>
+<!-- /block:gaps -->
+
+<!-- block:curve -->
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for the restoration curve.</p>
+<!-- /block:curve -->
+
+<!-- block:complaints -->
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for the consumer contacts chart.</p>
+<!-- /block:complaints -->
+
+<!-- block:carried_heading -->
+<h3 style="margin:0.7rem 0 0.25rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#1f5fae;">Carried forward from previous events</h3>
+<!-- /block:carried_heading -->
+
+<!-- block:raised_heading -->
+<h3 style="margin:0.9rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#1f5fae;">Raised by this event</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">Placeholder for items raised by this event.</p>
+<!-- /block:raised_heading -->
+
+<!-- block:raised_none -->
+<h3 style="margin:0.9rem 0 0.2rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:#1f5fae;">Raised by this event</h3>
+<p style="margin:0 0 0.5rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:10pt;line-height:1.4;color:#1b2430;">No new lessons-learned items were raised by this event. The items above remain the open record.</p>
+<!-- /block:raised_none -->
+
+<!-- block:carry_table -->
+<table style="border-collapse:collapse;width:100%;margin:0 0 0.6rem;font-family:Calibri,'Segoe UI',sans-serif;font-size:9pt;">
+<thead><tr>
+<th style="background-color:#1f5fae;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Item</th>
+<th style="background-color:#1f5fae;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Raised in</th>
+<th style="background-color:#1f5fae;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Owner</th>
+<th style="background-color:#1f5fae;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Status</th>
+<th style="background-color:#1f5fae;color:#ffffff;text-align:left;padding:5px 7px;font-size:8pt;letter-spacing:0.06em;text-transform:uppercase;">Note</th>
+</tr></thead>
+<tbody>{{rows_html}}</tbody>
+</table>
+<!-- /block:carry_table -->
+
+<!-- block:carry_row -->
+<tr>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#1b2430;">{{item}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{raised_in}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{owner}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{status}}</td>
+<td style="border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{note}}</td>
+</tr>
+<!-- /block:carry_row -->
+
+<!-- block:carry_row_shaded -->
+<tr>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#1b2430;">{{item}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{raised_in}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{owner}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{status}}</td>
+<td style="background-color:#f2f6f8;border-bottom:1px solid #dbe1e8;padding:5px 7px;color:#3c4753;">{{note}}</td>
+</tr>
+<!-- /block:carry_row_shaded -->
+
+</div>
+</body>
+</html>

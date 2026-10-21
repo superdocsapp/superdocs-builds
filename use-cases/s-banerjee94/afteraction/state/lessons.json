@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "lessons": [
+    {
+      "lesson_id": "LL-A1",
+      "title": "Mutual-aid gang mobilisation times are not captured",
+      "detail": "Two mutual-aid gangs from the Durgapur circle worked the event and both were released against a recorded time, but neither carries a mobilisation time, so mutual-aid gang-hours cannot be computed from the records.",
+      "owner": "Distribution Operations, Neamatpur Section",
+      "opened_in_event": "storm-a",
+      "status": "open",
+      "closed_in_event": null,
+      "closed_note": null,
+      "closed_sources": [],
+      "sources": [
+        "CRW-0006",
+        "CRW-0008"
+      ],
+      "carry_note": "A mutual-aid gang from the Durgapur circle worked this event and again carries no mobilisation time.",
+      "carry_sources": [
+        "CRW-0006"
+      ],
+      "last_reviewed_event": "storm-b"
+    },
+    {
+      "lesson_id": "LL-A2",
+      "title": "Time to first consumer notification exceeded the two-hour target",
+      "detail": "The first outage was recorded at 18:22 and the first consumer notification was issued at 20:35, an interval of 2 hours 13 minutes against a two-hour internal target.",
+      "owner": "Consumer Services Wing",
+      "opened_in_event": "storm-a",
+      "status": "closed",
+      "closed_in_event": "storm-b",
+      "closed_note": "First consumer notification was issued 38 minutes after the first recorded outage, inside the two-hour target.",
+      "closed_sources": [
+        "TEL-0001",
+        "COM-0002"
+      ],
+      "sources": [
+        "TEL-0001",
+        "COM-0003"
+      ],
+      "carry_note": null,
+      "carry_sources": [],
+      "last_reviewed_event": "storm-b"
+    },
+    {
+      "lesson_id": "LL-A3",
+      "title": "Outage management system link was lost with no fallback capture",
+      "detail": "The link to the Neamatpur RTU was unavailable for 3 hours 45 minutes and no manual consumer counts were taken during the gap, leaving a hole in the restoration curve that cannot be reconstructed.",
+      "owner": "SCADA and IT Wing",
+      "opened_in_event": "storm-a",
+      "status": "open",
+      "closed_in_event": null,
+      "closed_note": null,
+      "closed_sources": [],
+      "sources": [
+        "TEL-0008",
+        "TEL-0009"
+      ],
+      "carry_note": "The link held for this event, so the gap did not recur, but the manual fallback capture procedure remains undeveloped.",
+      "carry_sources": [
+        "TEL-0010"
+      ],
+      "last_reviewed_event": "storm-b"
+    },
+    {
+      "lesson_id": "LL-A4",
+      "title": "A consumer-reported pole was never inspected",
+      "detail": "A consumer reported a tree trunk resting against a pole at Mohishila Bazaar on the first evening. No gang was assigned, the report was still unresolved when the event closed, and the pole has never been confirmed either damaged or sound.",
+      "owner": "Distribution Operations, Neamatpur Section",
+      "opened_in_event": "storm-a",
+      "status": "closed",
+      "closed_in_event": "storm-b",
+      "closed_note": "The Mohishila Bazaar pole was inspected during this event. The tree trunk has been removed and the pole is sound.",
+      "closed_sources": [
+        "FLD-0005"
+      ],
+      "sources": [
+        "DMG-0006",
+        "COM-0005"
+      ],
+      "carry_note": null,
+      "carry_sources": [],
+      "last_reviewed_event": "storm-b"
+    },
+    {
+      "lesson_id": "LL-B1",
+      "title": "Tree contact in the Nunia canal corridor initiated the event",
+      "detail": "The first outage originated from branch contact in the Nunia canal corridor, which the section engineer records as last cleared in 2023. Restringing could not start until a tree-cutting gang had opened the corridor.",
+      "owner": "Line Clearance Wing",
+      "opened_in_event": "storm-b",
+      "status": "open",
+      "closed_in_event": null,
+      "closed_note": null,
+      "closed_sources": [],
+      "sources": [
+        "DMG-0001",
+        "FLD-0002"
+      ],
+      "carry_note": null,
+      "carry_sources": [],
+      "last_reviewed_event": null
+    }
+  ]
+}

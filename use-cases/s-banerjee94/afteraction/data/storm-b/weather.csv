@@ -1,0 +1,5 @@
+entry_id,at,kind,note,issued_by
+WEA-0001,2026-08-11T09:15:00,warning,"IMD Kolkata issues a heavy rainfall warning for Paschim Bardhaman as a monsoon depression tracks across Gangetic West Bengal.",IMD Kolkata
+WEA-0002,2026-08-11T10:40:00,observation,"Rainfall of 42 mm in one hour recorded at the Neamatpur substation gauge.",Neamatpur gauge
+WEA-0003,2026-08-11T13:20:00,observation,"Gusts to 58 km/h recorded at the Sitarampur monitoring mast. No squall line developed.",Sitarampur mast
+WEA-0004,2026-08-11T17:00:00,observation,"Rain eases to light showers. Cumulative rainfall 121 mm over the event.",Neamatpur gauge

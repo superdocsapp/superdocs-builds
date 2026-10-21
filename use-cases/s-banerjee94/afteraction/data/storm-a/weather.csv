@@ -1,0 +1,6 @@
+entry_id,at,kind,note,issued_by
+WEA-0001,2026-04-24T17:00:00,warning,"IMD Kolkata issues a thunderstorm warning with squall for the Asansol sub-division, gusts of 70 to 90 km/h expected from 18:00.",IMD Kolkata
+WEA-0002,2026-04-24T18:20:00,observation,"Squall line reaches Neamatpur. Gust of 96 km/h recorded at the Sitarampur monitoring mast, with heavy rain and hail at Mohishila.",Sitarampur mast
+WEA-0003,2026-04-24T21:40:00,observation,"Rainfall of 88 mm recorded in five hours at the Neamatpur substation gauge.",Neamatpur gauge
+WEA-0004,2026-04-25T02:10:00,observation,"A second line of thunderstorms passes over Kulti with gusts to 62 km/h. No further squall recorded.",Sitarampur mast
+WEA-0005,2026-04-25T06:30:00,observation,"Rain stops. Winds fall below 20 km/h across the substation area.",Sitarampur mast
