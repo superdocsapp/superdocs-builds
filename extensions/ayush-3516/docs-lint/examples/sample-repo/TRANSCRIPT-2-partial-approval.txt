@@ -1,0 +1,47 @@
+Every proposed fix was approved EXCEPT the 'in order to' one, which was deliberately
+rejected. The point of this transcript is that the rejected finding survives untouched
+while its neighbours are corrected, and that the run still exits non-zero afterwards -
+the document does still violate the guide, and docs-lint does not pretend otherwise
+just because a human declined the fix.
+
+$ docs-lint apply .docs-lint/runs/<run-id>/decisions.json
+applied docs/getting-started.md: Parallel edit: Fix style guide violations only. Specifically:
+change 'utilise' to 'utilize'…
+applied docs/getting-started.md: 'Configuring The Widget' -> 'Configuring the widget'
+applied docs/getting-started.md: 'Installing The Widget' -> 'Installing the widget'
+applied docs/getting-started.md: 'utilise' -> 'use'
+applied docs/getting-started.md: 'Getting Started With The Widget.' -> 'Getting started with 
+the widget.'
+not applied docs/getting-started.md (heading-punctuation): superseded by another approved fix 
+on the same text; re-run docs-lint to catch what remains
+
+Warning: the export changed text nobody approved.
+This is a SuperDocs export fidelity issue rather than an approved edit (see BUGS.md). Check 
+these before committing:
+  docs/getting-started.md: '```\npip install widget\n```' — (whitespace changed)
+  docs/getting-started.md: 'Configuration is read from `widget.toml`. The file is validated by
+the…' — no longer present
+
+5 fix(es) applied across 1 file(s), 2 rejected, 1 could not be applied, 2 unapproved change(s)
+detected in the export
+
+$ docs-lint check
+
+
+docs/getting-started.md
+     1  warning heading-punctuation (rule)  Heading ends with '.'; headings are labels, not 
+sentences.
+        - Getting started with the widget.
+        + Getting started with the widget
+     3  error   banned-terms (rule)  Avoid 'in order to'; the style guide prefers 'to'.
+        in Getting started with the widget.
+        - in order to
+        + to
+     9  warning fence-language (rule)  Fenced code block has no language (for example 
+```bash).
+        in Getting started with the widget. > Installing the widget
+
+3 findings in 1 files (1 at gating severity)
+2 of these can be fixed. Run `docs-lint fix` to review them one by one.
+
+exit code: 1  (the rejected finding is still there, as it should be)

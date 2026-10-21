@@ -1,0 +1,55 @@
+$ docs-lint check -v
+
+ selected — 1 document(s)
+ miss docs/getting-started.md — checking
+ checked docs/getting-started.md — 7 local finding(s)
+ instructed docs/getting-started.md — job c6beaf60
+ no-findings docs/getting-started.md — the review proposed no changes
+ findings docs/getting-started.md — 7 finding(s)
+
+docs/getting-started.md
+     1  warning heading-case (rule)  Heading looks like Title Case; sentence case reads 
+'Getting started with the widget.'.
+        Capitalised mid-heading: Started, With, The, Widget.
+        - Getting Started With The Widget.
+        + Getting started with the widget.
+     1  warning heading-punctuation (rule)  Heading ends with '.'; headings are labels, not 
+sentences.
+        - Getting Started With The Widget.
+        + Getting Started With The Widget
+     3  error   banned-terms (rule)  Avoid 'utilise'; the style guide prefers 'use'.
+        in Getting Started With The Widget.
+        - utilise
+        + use
+     3  error   banned-terms (rule)  Avoid 'in order to'; the style guide prefers 'to'.
+        in Getting Started With The Widget.
+        - in order to
+        + to
+     6  warning heading-case (rule)  Heading looks like Title Case; sentence case reads 
+'Installing the widget'.
+        in Getting Started With The Widget.
+        Capitalised mid-heading: The, Widget
+        - Installing The Widget
+        + Installing the widget
+     8  warning fence-language (rule)  Fenced code block has no language (for example 
+```bash).
+        in Getting Started With The Widget. > Installing The Widget
+    14  warning heading-case (rule)  Heading looks like Title Case; sentence case reads 
+'Configuring the widget'.
+        in Getting Started With The Widget.
+        Capitalised mid-heading: The, Widget
+        - Configuring The Widget
+        + Configuring the widget
+
+ Where the time and money went 
+ stage               ┃ seconds 
+━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━
+ local               │    0.00 
+ superdocs           │  103.10 
+ operations charged  │       1 
+ answered from cache │     0/1 
+
+7 findings in 1 files (2 at gating severity)
+6 of these can be fixed. Run `docs-lint fix` to review them one by one.
+
+exit code: 1  (findings at gating severity)

@@ -1,0 +1,10 @@
+{
+  "recorded": "2026-08-11",
+  "status": 200,
+  "note": "Approve one change, reject the other, in one review.",
+  "body": {
+    "status": "ok",
+    "message": "Approval processed",
+    "batch_complete": true
+  }
+}

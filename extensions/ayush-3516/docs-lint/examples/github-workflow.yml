@@ -1,0 +1,61 @@
+# Example CI workflow. Copy to .github/workflows/docs-lint.yml in your own repository.
+#
+# Two things worth noting:
+#
+# 1. `--since` narrows the run to what the pull request changed, so a thousand-document repository
+#    still costs a handful of operations per PR.
+# 2. SARIF output is uploaded to code scanning, so findings appear inline on the diff rather than
+#    buried in a log. `continue-on-error` on the lint step lets the upload happen either way; the
+#    job still fails, because the final step re-checks the exit code.
+
+name: docs-lint
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+      - "**/*.mdx"
+      - "docs-lint.toml"
+      - "styleguide.md"
+
+permissions:
+  contents: read
+  security-events: write   # required to upload SARIF
+
+jobs:
+  house-style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # --since needs history to diff against the base branch.
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install docs-lint
+        run: pip install ./extensions/ayush-3516/docs-lint
+
+      - name: Check changed documents
+        id: lint
+        continue-on-error: true
+        env:
+          SUPERDOCS_API_KEY: ${{ secrets.SUPERDOCS_API_KEY }}
+        run: |
+          docs-lint check \
+            --since "origin/${{ github.base_ref }}" \
+            --format sarif > docs-lint.sarif
+
+      - name: Upload findings to code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: docs-lint.sarif
+          category: docs-lint
+
+      - name: Fail if the style gate did not pass
+        if: steps.lint.outcome == 'failure'
+        run: |
+          echo "::error::docs-lint found problems at gating severity. See the Files changed tab."
+          exit 1

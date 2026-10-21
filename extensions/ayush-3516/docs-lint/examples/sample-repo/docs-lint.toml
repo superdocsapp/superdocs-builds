@@ -1,0 +1,51 @@
+# docs-lint configuration.
+# Everything here is data: severities, banned terms and the style guide itself.
+# Changing any of it is a config edit, never a code change.
+
+[docs-lint]
+include = ["**/*.md", "**/*.mdx"]
+exclude = ["**/node_modules/**", "**/.venv/**", "CHANGELOG.md"]
+# Only these severities make the command exit non-zero.
+error_on = ["error"]
+
+[styleguide]
+path = "styleguide.md"
+attachment_id = "7ba50785-21d4-448c-a9b4-dfb06b7ee0f8"
+# Edit the guide and this hash stops matching, which correctly invalidates every cached verdict.
+content_sha256 = "835b7e1e76eea3d410707a6e44204ac41454706732fde74e312fef9d1dee21cb"
+
+[superdocs]
+enabled = true
+# Hard ceiling on billed operations per run. The run stops and says what it skipped.
+budget_operations = 100
+# Check at most this many files in one run; 0 means no limit.
+sample = 0
+
+[rules.banned-terms]
+severity = "error"
+terms = { utilise = "use", utilize = "use", leverage = "use", "in order to" = "to", "a large number of" = "many" }
+
+[rules.heading-case]
+severity = "warning"
+proper_nouns = []
+
+[rules.heading-punctuation]
+severity = "warning"
+
+[rules.fence-language]
+severity = "warning"
+
+[rules.long-sentence]
+severity = "info"
+max_words = 35
+
+[rules.passive-voice]
+severity = "off"
+
+# Findings proposed by the style-guide review.
+[rules.style-guide]
+severity = "warning"
+
+# Proposals that did not match any part of the document under review.
+[rules.unanchored-proposal]
+severity = "warning"

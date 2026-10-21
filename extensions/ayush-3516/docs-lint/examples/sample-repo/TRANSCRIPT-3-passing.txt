@@ -1,0 +1,47 @@
+The reviewer then did three things a human does:
+  - repaired the paragraphs and code fence that the export had altered without approval
+    (docs-lint had flagged both in the previous step)
+  - gave the fenced block a language, which no rule can guess
+  - approved the two remaining proposals, including the one rejected last round
+
+$ docs-lint apply .docs-lint/runs/<run-id>/decisions.json
+applied docs/getting-started.md: 'in order to' -> 'to'
+applied docs/getting-started.md: 'Getting started with the widget.' -> 'Getting started with 
+the widget'
+
+2 fix(es) applied across 1 file(s)
+
+$ docs-lint check -v
+
+ selected — 1 document(s)
+ miss docs/getting-started.md — checking
+ checked docs/getting-started.md — 0 local finding(s)
+ instructed docs/getting-started.md — job 8dc6f691
+ dropped docs/getting-started.md — 2 proposal(s) would have changed nothing
+ no-findings docs/getting-started.md — 2 proposal(s) dropped as no-ops
+ clean docs/getting-started.md — 0 finding(s)
+
+ Where the time and money went 
+ stage               ┃ seconds 
+
+$ docs-lint check -v
+
+ selected — 1 document(s)
+ miss docs/getting-started.md — checking
+ checked docs/getting-started.md — 0 local finding(s)
+ instructed docs/getting-started.md — job d6cc0170
+ dropped docs/getting-started.md — 2 proposal(s) would have changed nothing
+ no-findings docs/getting-started.md — 2 proposal(s) dropped as no-ops
+ clean docs/getting-started.md — 0 finding(s)
+
+ Where the time and money went 
+ stage               ┃ seconds 
+━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━
+ local               │    0.00 
+ superdocs           │   88.15 
+ operations charged  │       1 
+ answered from cache │     0/1 
+
+1 files checked, no findings
+
+exit code: 0  (clean: both passes ran, nothing found)

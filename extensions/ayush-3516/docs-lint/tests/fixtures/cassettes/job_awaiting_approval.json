@@ -1,0 +1,93 @@
+{
+  "recorded": "2026-08-11",
+  "status": 200,
+  "note": "Real pending_changes shape. Note old_html/new_html are PLAIN strings here.",
+  "body": {
+    "job_id": "934e4a01-3ad7-4b66-8b3d-7c3c2f178c3e",
+    "organization_id": null,
+    "user_id": "00000000-0000-0000-0000-000000000000",
+    "session_id": "docslint-rec-session",
+    "job_type": "chat",
+    "status": "awaiting_approval",
+    "created_at": "2026-08-11T14:24:51.045077",
+    "updated_at": "2026-08-11T14:25:02.440858",
+    "progress": 90,
+    "result": null,
+    "error": null,
+    "metadata": {
+      "filename": null,
+      "file_size": null,
+      "content_type": null,
+      "message": "Edit this document so that it complies with the uploaded style guide styleguide.md. For each violation, make the smallest change that fixes it. Leave every sentence that does not violate a rule exactly as it is.",
+      "document_html_provided": true,
+      "pending_changes": [
+        {
+          "change_id": "3ce53c13-0ab0-47b3-889d-b434a7bb5533",
+          "operation": "edit",
+          "chunk_id": "b74099d5-3446-4694-aca7-5ea248cd94c4",
+          "document_id": "doc_primary",
+          "old_html": "<p data-chunk-id=\"b74099d5-3446-4694-aca7-5ea248cd94c4\">We utilise the API in order to fetch results.</p>",
+          "new_html": "<p data-chunk-id=\"b74099d5-3446-4694-aca7-5ea248cd94c4\">We use the API to fetch results.</p>",
+          "ai_explanation": "Parallel edit: Lint document against styleguide.md by replacing complex words with simpler\u2026"
+        },
+        {
+          "change_id": "cddf8341-5925-4205-ada6-3c3aa14b271e",
+          "operation": "edit",
+          "chunk_id": "b5d2e28e-f50e-4943-92e6-cd9f2ef45264",
+          "document_id": "doc_primary",
+          "old_html": "<p data-chunk-id=\"b5d2e28e-f50e-4943-92e6-cd9f2ef45264\">You can leverage the client for batch work.</p>",
+          "new_html": "<p data-chunk-id=\"b5d2e28e-f50e-4943-92e6-cd9f2ef45264\">You can use the client for batch work.</p>",
+          "ai_explanation": "Parallel edit: Lint document against styleguide.md by replacing complex words with simpler\u2026"
+        }
+      ],
+      "intermediate_responses": [
+        {
+          "type": "document_sync",
+          "content": "<h1 data-chunk-id=\"4f57ef86-9637-44e4-a29b-4c994b03e127\">Getting Started</h1>\n<p data-chunk-id=\"b74099d5-3446-4694-aca7-5ea248cd94c4\">We utilise the API in order to fetch results.</p>\n<p data-chunk-id=\"7012d42c-1363-4d5b-a1d1-a9e0c92ac49b\">This paragraph is already fine and must not change.</p>\n<p data-chunk-id=\"b5d2e28e-f50e-4943-92e6-cd9f2ef45264\">You can leverage the client for batch work.</p>",
+          "context": "pre_agent_chunk_sync",
+          "sequence": 1,
+          "timestamp": "2026-08-11T14:24:51.127020+00:00",
+          "focused_document_id": "doc_primary"
+        },
+        {
+          "type": "user_facing",
+          "content": "I'll review your document against the 'styleguide.md' reference and propose targeted corrections for any violations found.",
+          "context": "supervisor_decision",
+          "sequence": 2,
+          "timestamp": "2026-08-11T14:24:54.704399+00:00"
+        },
+        {
+          "type": "user_facing",
+          "content": "I've prepared a change for your review.",
+          "context": "supervisor_decision_hitl",
+          "sequence": 3,
+          "timestamp": "2026-08-11T14:25:01.578904+00:00"
+        },
+        {
+          "type": "user_facing",
+          "content": "\ud83d\udd04 Processing 2 sections in parallel...",
+          "context": "parallel_chunk_start",
+          "sequence": 4,
+          "timestamp": "2026-08-11T14:25:01.591390+00:00"
+        },
+        {
+          "type": "proposed_change_batch",
+          "content": "{\"type\": \"batch_approval\", \"batch_id\": \"3ce53c13-0ab0-47b3-889d-b434a7bb5533\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"3ce53c13-0ab0-47b3-889d-b434a7bb5533\", \"operation\": \"edit\", \"chunk_id\": \"b74099d5-3446-4694-aca7-5ea248cd94c4\", \"old_html\": \"<p data-chunk-id=\\\"b74099d5-3446-4694-aca7-5ea248cd94c4\\\">We utilise the API in order to fetch results.</p>\", \"new_html\": \"<p data-chunk-id=\\\"b74099d5-3446-4694-aca7-5ea248cd94c4\\\">We use the API to fetch results.</p>\", \"ai_explanation\": \"Parallel edit: Lint document against styleguide.md by replacing complex words with simpler\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"cddf8341-5925-4205-ada6-3c3aa14b271e\", \"operation\": \"edit\", \"chunk_id\": \"b5d2e28e-f50e-4943-92e6-cd9f2ef45264\", \"old_html\": \"<p data-chunk-id=\\\"b5d2e28e-f50e-4943-92e6-cd9f2ef45264\\\">You can leverage the client for batch work.</p>\", \"new_html\": \"<p data-chunk-id=\\\"b5d2e28e-f50e-4943-92e6-cd9f2ef45264\\\">You can use the client for batch work.</p>\", \"ai_explanation\": \"Parallel edit: Lint document against styleguide.md by replacing complex words with simpler\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+          "context": null,
+          "sequence": 5,
+          "timestamp": "2026-08-11T14:25:02.279176+00:00"
+        }
+      ],
+      "user_id": null,
+      "model_tier": "core",
+      "session_id": "docslint-rec-session",
+      "response_mode": "full",
+      "thinking_depth": null,
+      "request_message": "Edit this document so that it complies with the uploaded style guide styleguide.md. For each violation, make the smallest change that fixes it. Leave every sentence that does not violate a rule exactly as it is.",
+      "cumulative_tokens": 159520,
+      "initial_doc_version": "b5efa7f5-789d-4ca4-ab56-62230aa883b9",
+      "last_real_progress_ts": "2026-08-11T14:25:02.279186+00:00",
+      "user_turn_index_pre_inserted": 2
+    }
+  }
+}

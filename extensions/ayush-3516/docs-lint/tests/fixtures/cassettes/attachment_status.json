@@ -1,0 +1,35 @@
+{
+  "recorded": "2026-08-11",
+  "request": {
+    "method": "GET",
+    "path": "/v1/attachments/status/docslint-rec-session"
+  },
+  "status": 200,
+  "elapsed_seconds": 0.53,
+  "note": "attachment processing state; polled until ready",
+  "body": {
+    "session_id": "docslint-rec-session",
+    "ready_attachments": [
+      {
+        "attachment_id": "e3cd4780-8763-4788-bf5f-df788d8d5f66",
+        "filename": "styleguide.md",
+        "file_extension": ".md",
+        "chunks_count": 2,
+        "file_size": 241,
+        "upload_timestamp": "2026-08-11T14:23:01.921089"
+      }
+    ],
+    "processing_jobs": [
+      {
+        "job_id": "f700be2d-6107-4d00-81be-1f2009f8c3f3",
+        "filename": "styleguide.md",
+        "status": "completed",
+        "progress": 100,
+        "error": null,
+        "attachment_id": "e3cd4780-8763-4788-bf5f-df788d8d5f66"
+      }
+    ],
+    "total_ready": 1,
+    "total_processing": 0
+  }
+}
