@@ -1,0 +1,20 @@
+# Local credentials
+.env
+.env.*
+!.env.example
+
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated run artifacts
+accessible-doc-kit/output/*
+haccp-drafter/output/*
+common/output/*
+output/*
+project_dump.txt
+
+# Keep output directories available in a fresh clone
+!accessible-doc-kit/output/.gitkeep
+!haccp-drafter/output/.gitkeep
