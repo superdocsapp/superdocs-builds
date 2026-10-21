@@ -1,0 +1,4 @@
+HDFC Bank - Disbursement Advice
+Application: LN-4471
+Net disbursed to account after processing fee.
+Disbursed amount: Rs 520,000.
