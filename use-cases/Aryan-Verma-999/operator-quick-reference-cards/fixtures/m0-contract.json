@@ -1,0 +1,12 @@
+{
+  "upload_process": {"upload_id": "00000000-0000-4000-8000-000000000001", "version_id": "00000000-0000-4000-8000-000000000002", "status": "processed"},
+  "document_list": {"documents": [{"document_id": "00000000-0000-4000-8000-000000000003", "title": "LC-100 manual", "version": 4}], "total": 1},
+  "session_roster": {"documents": [{"document_id": "doc_primary", "durable_document_id": "00000000-0000-4000-8000-000000000004", "title": "LineCard"}]},
+  "awaiting_approval": {"job_id": "00000000-0000-4000-8000-000000000005", "status": "awaiting_approval", "metadata": {"pending_changes": [{"change_id": "change-001", "chunk_id": "chunk-001", "document_id": "doc_primary", "old_html": "<p>old</p>", "new_html": "<p>new</p>", "operation": "replace"}]}},
+  "proposed_change_batch": {"type": "proposed_change_batch", "data": {"changes": [{"change_id": "change-001", "document_id": "doc_primary", "operation": "replace"}]}},
+  "first_approval_round": {"approved": true, "changes": [{"change_id": "change-001", "approved": false, "feedback": "reject first proposal"}, {"change_id": "change-002", "approved": true, "feedback": null}]},
+  "second_approval_round": {"approved": true, "changes": [{"change_id": "change-003", "approved": true, "feedback": null}]},
+  "completed": {"status": "completed", "result": {"document_id": "00000000-0000-4000-8000-000000000004", "version": 5}},
+  "authoritative_detail": {"document_id": "00000000-0000-4000-8000-000000000004", "version": 5, "html": "<section class=\"card-page card-page-1\"></section><section class=\"card-page card-page-2\"></section>"},
+  "export_response": {"status_code": 200, "content_type": "application/pdf", "warning_headers": [], "bytes": 18524}
+}

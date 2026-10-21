@@ -1,0 +1,16 @@
+{
+  "schema": "linecard-gold-ledger-v1",
+  "manual": "scale-manual-400-pages.pdf",
+  "manual_sha256": "d0a2de13ab5a60e1f918dc220410aba9e028f64fcdadb2f819af518b9dcbf30b",
+  "tasks": [{
+    "task": "Clear a jam on the infeed",
+    "relevant_pages": [16, 17, 53, 54],
+    "required_safety": ["Isolate electrical and pneumatic energy before clearing a jam."],
+    "required_steps": ["Stop the infeed.", "Verify stored energy is released.", "Remove the obstruction using the approved tool."],
+    "required_specifications": ["24 N·m ± 2 N·m"],
+    "cross_reference_edges": [{"from": 16, "to": 53, "label": "restart procedure"}],
+    "expected_conflicts": ["31 N·m ± 3 N·m is for a different assembly/condition"],
+    "non_applicable": ["image-only page 102"]
+  }],
+  "denominator": {"safety": 1, "procedure": 3, "specification": 1, "citation": 5}
+}
