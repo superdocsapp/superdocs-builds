@@ -1,0 +1,10 @@
+{
+    "doc_ids": {
+        "questionnaire.txt": "mock_doc_1786009106"
+    },
+    "chat_ids": {
+        "mock_doc_17860091065930696109182740276": "mock_chat_1786009109"
+    },
+    "approved": true,
+    "exported": true
+}
