@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SuperDocs Reality Engine — Preview</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+      "lucide-react": "https://esm.sh/lucide-react@0.468.0?external=react"
+    }
+  }
+  </script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.7/babel.min.js"></script>
+  <style>
+    html, body { margin: 0; min-height: 100%; background: #eef0e9; }
+    #root { min-height: 100vh; padding: 28px 18px; box-sizing: border-box; }
+    .preview-error { max-width: 900px; margin: 40px auto; padding: 20px; border: 1px solid #d9b0aa; border-radius: 10px; background: #fff; color: #7a2d26; font: 14px/1.5 ui-monospace, monospace; white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module">
+    const root = document.getElementById('root');
+    try {
+      const source = await fetch('../dist/document_os.jsx', { cache: 'no-store' }).then((r) => {
+        if (!r.ok) throw new Error(`Could not load dist/document_os.jsx (${r.status})`);
+        return r.text();
+      });
+      const transformed = Babel.transform(source, {
+        presets: [['react', { runtime: 'classic' }]],
+        sourceType: 'module',
+        filename: 'document_os.jsx'
+      }).code;
+      const blob = new Blob([transformed], { type: 'text/javascript' });
+      const moduleUrl = URL.createObjectURL(blob);
+      const mod = await import(moduleUrl);
+      const React = await import('react');
+      const ReactDOM = await import('react-dom/client');
+      ReactDOM.createRoot(root).render(React.createElement(mod.default));
+      URL.revokeObjectURL(moduleUrl);
+    } catch (error) {
+      console.error(error);
+      root.innerHTML = `<div class="preview-error">Preview failed.\n\n${String(error?.stack || error)}</div>`;
+    }
+  </script>
+</body>
+</html>
