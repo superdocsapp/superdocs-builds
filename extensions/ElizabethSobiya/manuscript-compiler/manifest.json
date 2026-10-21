@@ -1,0 +1,10 @@
+{
+  "id": "superdocs-manuscript-compiler",
+  "name": "Manuscript Compiler for SuperDocs",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "Compile a vault into a print-ready manuscript — chapters in order, continuous figure and footnote numbering, resolved citations, generated front and back matter — and export it as PDF and DOCX through SuperDocs.",
+  "author": "Elizabeth Sobiya",
+  "authorUrl": "https://github.com/ElizabethSobiya",
+  "isDesktopOnly": false
+}

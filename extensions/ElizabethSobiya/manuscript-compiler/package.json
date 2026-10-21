@@ -1,0 +1,45 @@
+{
+  "name": "obsidian-manuscript-compiler",
+  "version": "1.0.0",
+  "description": "Compile an Obsidian vault into a print-ready manuscript (PDF + DOCX) via SuperDocs.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22 <26"
+  },
+  "scripts": {
+    "build": "npm run clean --silent && node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "cli": "node dist/cli.mjs",
+    "demo": "npm run build --silent && node dist/cli.mjs compile demo-vault --out build --offline",
+    "demo:export": "npm run build --silent && node dist/cli.mjs compile demo-vault --out build --format pdf,docx,html",
+    "verify": "npm run typecheck && npm run test && npm run demo && npm run scale --silent",
+    "clean": "rm -rf dist main.js",
+    "scale": "npm run build --silent && node dist/cli.mjs scale"
+  },
+  "keywords": [
+    "obsidian-plugin",
+    "superdocs",
+    "manuscript",
+    "book",
+    "docx",
+    "pdf"
+  ],
+  "author": "Elizabeth Sobiya",
+  "devDependencies": {
+    "@types/js-yaml": "4.0.9",
+    "@types/markdown-it": "14.1.2",
+    "@types/node": "22.10.2",
+    "esbuild": "0.24.2",
+    "obsidian": "1.7.2",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  },
+  "dependencies": {
+    "js-yaml": "4.1.0",
+    "markdown-it": "14.1.0"
+  }
+}

@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+main.js
+*.tsbuildinfo
+.env
+.env.local
+.manuscript-cache/
+demo-vault/.manuscript-cache/
+demo-vault/build/
+demo-vault/.obsidian/
+coverage/
+
+# macOS noise, stray build copies, and the wrong package manager's lockfile
+.DS_Store
+main *.__r
+yarn.lock

@@ -1,0 +1,395 @@
+/*
+ * Manuscript Compiler — plugin styles.
+ *
+ * Everything here uses Obsidian's own CSS variables, so the plugin looks like the
+ * app the user chose rather than like a plugin. No hard-coded colours except the
+ * three semantic accents (accepted / rejected / unresolved), which are derived
+ * from Obsidian's own success and error variables.
+ */
+
+/* ---------- Compile report ------------------------------------------------ */
+
+.mc-report {
+  padding: 0.75rem 1rem 3rem;
+  font-size: var(--font-ui-small);
+}
+
+.mc-report-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.mc-report-header h3 {
+  margin: 0;
+  font-size: var(--font-ui-medium);
+}
+
+.mc-report-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mc-meta {
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.mc-book-title {
+  font-weight: 600;
+  font-size: var(--font-ui-medium);
+}
+
+.mc-book-author {
+  color: var(--text-muted);
+}
+
+/* Six stats, and they should stay on one row. A wrapped row that drops a single
+   number onto a line of its own reads as a layout accident rather than a summary,
+   so the cells shrink before the grid breaks. */
+.mc-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3.1rem, 1fr));
+  gap: 0.3rem;
+  margin: 0.6rem 0;
+}
+
+.mc-stat {
+  background: var(--background-secondary);
+  border-radius: var(--radius-s);
+  padding: 0.45rem 0.3rem;
+  text-align: center;
+  min-width: 0;
+}
+
+.mc-stat-value {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mc-stat-label {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  text-transform: lowercase;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.mc-timings,
+.mc-note {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.5;
+}
+
+.mc-section {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.mc-section h4 {
+  margin: 0 0 0.4rem;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+.mc-busy,
+.mc-empty {
+  color: var(--text-muted);
+  padding: 1rem 0;
+  line-height: 1.6;
+}
+
+.mc-error-box {
+  background: var(--background-modifier-error);
+  border-radius: var(--radius-s);
+  padding: 0.7rem 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.mc-clean {
+  color: var(--text-success, var(--text-accent));
+  line-height: 1.6;
+}
+
+/* ---------- Incremental report -------------------------------------------- */
+
+.mc-change-list {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+
+.mc-change-list li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 0.35rem 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.mc-kind {
+  font-size: var(--font-ui-smaller);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  align-self: start;
+  padding: 0.05rem 0.35rem;
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.mc-kind-rewritten { color: var(--text-accent); }
+.mc-kind-added { color: var(--text-success, var(--text-accent)); }
+.mc-kind-removed { color: var(--text-error); }
+
+.mc-change-title { font-weight: 500; }
+
+.mc-change-reason {
+  grid-column: 2;
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+/* ---------- Diagnostics ---------------------------------------------------- */
+
+.mc-diagnostics {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mc-diag {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.15rem;
+  padding: 0.45rem 0 0.45rem 0.6rem;
+  border-left: 2px solid var(--background-modifier-border);
+  margin-bottom: 0.4rem;
+}
+
+.mc-diag-error { border-left-color: var(--text-error); }
+.mc-diag-warning { border-left-color: var(--text-warning, var(--text-accent)); }
+.mc-diag-info { border-left-color: var(--background-modifier-border); }
+
+.mc-diag-code {
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+}
+
+.mc-diag-message { line-height: 1.5; }
+
+.mc-diag-file {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-accent);
+  cursor: pointer;
+}
+
+.mc-diag-snippet {
+  font-size: var(--font-ui-smaller);
+  background: var(--background-secondary);
+  padding: 0.15rem 0.3rem;
+  border-radius: var(--radius-s);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+/* ---------- Editorial passes ----------------------------------------------- */
+
+.mc-pass-list { display: grid; gap: 0.4rem; }
+
+.mc-pass {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mc-pass-desc {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.4;
+}
+
+.mc-pass-cost {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ---------- Review modal ---------------------------------------------------- */
+
+.mc-review { max-width: min(46rem, 90vw); }
+
+.mc-review-instruction {
+  color: var(--text-muted);
+  margin: 0.2rem 0 0.1rem;
+}
+
+.mc-review-note {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  margin: 0 0 0.8rem;
+}
+
+.mc-review-list {
+  max-height: 55vh;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.6rem;
+  padding-right: 0.25rem;
+}
+
+.mc-change-card {
+  border: 1px solid var(--background-modifier-border);
+  border-left-width: 3px;
+  border-radius: var(--radius-s);
+  padding: 0.6rem 0.7rem;
+  background: var(--background-primary-alt);
+}
+
+.mc-change-card.mc-accepted { border-left-color: var(--text-success, var(--interactive-accent)); }
+.mc-change-card.mc-rejected { border-left-color: var(--text-error); opacity: 0.65; }
+.mc-change-card.mc-undecided { border-left-color: var(--background-modifier-border); }
+
+.mc-change-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  margin-bottom: 0.3rem;
+}
+
+.mc-op {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.mc-op-create { color: var(--text-success, var(--text-accent)); }
+.mc-op-delete { color: var(--text-error); }
+
+.mc-change-why {
+  margin: 0 0 0.45rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.5;
+}
+
+.mc-diff,
+.mc-diff-removed,
+.mc-diff-added {
+  font-family: var(--font-text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--background-primary);
+  border-radius: var(--radius-s);
+  padding: 0.5rem 0.6rem;
+  max-height: 16rem;
+  overflow-y: auto;
+}
+
+.mc-diff-add {
+  background: color-mix(in srgb, var(--text-success, #3fa66a) 22%, transparent);
+  border-radius: 2px;
+}
+
+.mc-diff-del {
+  background: color-mix(in srgb, var(--text-error) 20%, transparent);
+  text-decoration: line-through;
+  border-radius: 2px;
+}
+
+.mc-diff-removed { text-decoration: line-through; opacity: 0.75; }
+
+.mc-change-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.mc-feedback { flex: 1 1 14rem; }
+
+.mc-feedback-input {
+  width: 100%;
+  font-size: var(--font-ui-smaller);
+}
+
+.mc-review-footer { margin-top: 0.8rem; }
+
+/* ---------- Spend confirmation ---------------------------------------------- */
+
+.mc-confirm { max-width: min(38rem, 90vw); }
+
+.mc-confirm-facts {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.3rem 0.8rem;
+  margin: 0.8rem 0;
+}
+
+.mc-confirm-facts dt {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mc-confirm-facts dd { margin: 0; }
+
+.mc-confirm-preview summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.mc-confirm-preview pre {
+  max-height: 14rem;
+  overflow: auto;
+  font-size: var(--font-ui-smaller);
+  background: var(--background-secondary);
+  padding: 0.5rem;
+  border-radius: var(--radius-s);
+  white-space: pre-wrap;
+}
+
+/* The busy panel updates in place while a compile runs, so it needs to hold its
+   shape as the progress text changes length. */
+.mc-busy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  margin: 0.6rem 0;
+  background: var(--background-secondary);
+  border-radius: var(--radius-s);
+}
+
+.mc-busy-text {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.mc-cancel {
+  flex: 0 0 auto;
+}
+
+.mc-idle {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  padding: 0.4rem 0;
+}
