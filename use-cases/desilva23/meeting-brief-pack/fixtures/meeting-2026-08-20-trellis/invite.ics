@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Harrowgate Health//Exec Calendar//EN
+BEGIN:VEVENT
+UID:qbr-trellis-2026q3@harrowgate.example
+DTSTART:20260820T093000Z
+DTEND:20260820T103000Z
+SUMMARY:Q3 Partnership Review — Trellis Diagnostics
+LOCATION:Boardroom 2 / Teams
+ORGANIZER;CN=Amara Osei:mailto:amara.osei@harrowgate.example
+ATTENDEE;CN=Amara Osei;ROLE=CHAIR:mailto:amara.osei@harrowgate.example
+ATTENDEE;CN=Daniel Kerr;ROLE=REQ-PARTICIPANT:mailto:daniel.kerr@harrowgate.example
+ATTENDEE;CN=Priyanka Raman;ROLE=REQ-PARTICIPANT:mailto:p.raman@trellisdx.example
+ATTENDEE;CN=Stefan Lindqvist;ROLE=OPT-PARTICIPANT:mailto:s.lindqvist@trellisdx.example
+DESCRIPTION:Quarterly partnership review with Trellis Diagnostics.\nAgenda:\n1. Integration milestone status\n2. Pricing schedule for renewal\n3. Open actions from Q2 review\n4. AOB
+END:VEVENT
+END:VCALENDAR
