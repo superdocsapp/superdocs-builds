@@ -1,0 +1,157 @@
+{
+    "corpus_id": "qpcr",
+    "parameters": [
+        {
+            "name": "annealing temperature",
+            "raw_name": "annealing temperature",
+            "value": "58",
+            "unit": "C",
+            "quote": "annealing ran at 58 C",
+            "char_start": 190,
+            "char_end": 211,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "annealing temperature",
+            "raw_name": "annealing temperature",
+            "value": "60",
+            "unit": "C",
+            "quote": "Annealing at 60 C",
+            "char_start": 223,
+            "char_end": 240,
+            "filename": "notebook_2026-03-21.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "date",
+            "raw_name": "date",
+            "value": "21 March 2026",
+            "unit": null,
+            "quote": "21 March 2026",
+            "char_start": 17,
+            "char_end": 30,
+            "filename": "notebook_2026-03-21.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "number of cycles",
+            "raw_name": "number of cycles",
+            "value": "40",
+            "unit": "cycles",
+            "quote": "40 cycles",
+            "char_start": 326,
+            "char_end": 335,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "number of isolates",
+            "raw_name": "number of isolates",
+            "value": "six",
+            "unit": null,
+            "quote": "six isolates",
+            "char_start": 64,
+            "char_end": 76,
+            "filename": "notebook_2026-03-21.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "operator",
+            "raw_name": "operator",
+            "value": "R. Iyer",
+            "unit": null,
+            "quote": "R. Iyer",
+            "char_start": 33,
+            "char_end": 40,
+            "filename": "notebook_2026-03-21.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "protocol annealing temperature",
+            "raw_name": "protocol annealing temperature",
+            "value": "60",
+            "unit": "C",
+            "quote": "60 C",
+            "char_start": 228,
+            "char_end": 232,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "protocol reference",
+            "raw_name": "protocol reference",
+            "value": "SOP-QP-004 v2",
+            "unit": null,
+            "quote": "SOP-QP-004 v2",
+            "char_start": 298,
+            "char_end": 311,
+            "filename": "notebook_2026-03-21.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "reverse transcription temperature",
+            "raw_name": "reverse transcription temperature",
+            "value": "42",
+            "unit": "C",
+            "quote": "RT step at 42 C",
+            "char_start": 287,
+            "char_end": 302,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "reverse transcription time",
+            "raw_name": "reverse transcription time",
+            "value": "30",
+            "unit": "min",
+            "quote": "30 min",
+            "char_start": 307,
+            "char_end": 313,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "sample count",
+            "raw_name": "sample count",
+            "value": "six",
+            "unit": "clinical isolates",
+            "quote": "six clinical isolates",
+            "char_start": 67,
+            "char_end": 88,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        },
+        {
+            "name": "sop version",
+            "raw_name": "SOP version",
+            "value": "SOP-QP-004 v2",
+            "unit": null,
+            "quote": "SOP-QP-004 v2",
+            "char_start": 105,
+            "char_end": 118,
+            "filename": "notebook_2026-03-14.md",
+            "doc_type": "notebook"
+        }
+    ],
+    "gaps": [
+        {
+            "name": "isolate identification numbers",
+            "why": "The document refers to 'the same six isolates' but does not state their sample names or identifiers.",
+            "rejected_value": null,
+            "filename": "notebook_2026-03-21.md"
+        },
+        {
+            "name": "polymerase lot number",
+            "why": "The lot of polymerase used was not recorded because the tube was already open on the bench.",
+            "rejected_value": null,
+            "filename": "notebook_2026-03-14.md"
+        },
+        {
+            "name": "sop experimental parameters",
+            "why": "The document states 'Everything else per SOP-QP-004 v2' without detailing specific incubation times, cycle counts, or temperatures.",
+            "rejected_value": null,
+            "filename": "notebook_2026-03-21.md"
+        }
+    ]
+}

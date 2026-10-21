@@ -1,0 +1,4 @@
+Flask>=2.2
+Flask-Caching>=2.0
+PyLTI1p3>=2.0
+requests>=2.31

@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head><title>Review: {{ doc_title }}</title>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+.doc-content { border: 1px solid #ccc; border-radius: 8px; padding: 1rem 1.5rem; background: #fafafa; }
+.panel { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+textarea { width: 100%; box-sizing: border-box; min-height: 4rem; }
+button { padding: 0.5rem 1rem; cursor: pointer; margin-right: 0.5rem; }
+.pending { background: #fff8e1; border-color: #e0a800; }
+#status { font-size: 0.9rem; color: #555; }
+#complete-btn { background: #2e7d32; color: white; border: none; border-radius: 4px; }
+#complete-btn:disabled { background: #999; }
+</style>
+</head>
+<body>
+<h1>{{ doc_title }}</h1>
+<p>Reviewing as <strong>{{ user_name }}</strong>.</p>
+
+<div class="doc-content" id="doc-content">{{ doc_html | safe }}</div>
+
+<div class="panel">
+  <h3>Request an edit</h3>
+  <textarea id="instruction" placeholder="e.g. Change the data retention period in section 2 to 60 days"></textarea>
+  <br><br>
+  <button id="send-btn" onclick="sendEdit()">Send to SuperDocs</button>
+  <div id="status"></div>
+</div>
+
+<div class="panel pending" id="pending-panel" style="display:none;">
+  <h3>Proposed change (awaiting your decision)</h3>
+  <div id="pending-content"></div>
+  <button onclick="decide(true)">Approve</button>
+  <button onclick="decide(false)">Deny</button>
+</div>
+
+<div class="panel">
+  <button id="complete-btn" onclick="markComplete()" {% if not has_ags %}disabled title="This platform did not grant grade services."{% endif %}>
+    Mark review complete{% if not has_ags %} (no grade service on this launch){% endif %}
+  </button>
+  <div id="complete-status"></div>
+</div>
+
+<script>
+const launchId = "{{ launch_id }}";
+
+function setStatus(el, text) { document.getElementById(el).textContent = text; }
+
+async function sendEdit() {
+  const instruction = document.getElementById("instruction").value.trim();
+  if (!instruction) return;
+  setStatus("status", "Sending to SuperDocs...");
+  const res = await fetch(`/api/review/${launchId}/edit`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({instruction})
+  });
+  const data = await res.json();
+  handleJobResult(data);
+}
+
+async function decide(approved) {
+  setStatus("status", approved ? "Approving..." : "Denying...");
+  const res = await fetch(`/api/review/${launchId}/decide`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({approved})
+  });
+  const data = await res.json();
+  handleJobResult(data);
+}
+
+function handleJobResult(data) {
+  if (data.error) { setStatus("status", "Error: " + data.error); return; }
+  setStatus("status", "Status: " + data.status);
+  const pendingPanel = document.getElementById("pending-panel");
+  if (data.pending_change) {
+    pendingPanel.style.display = "block";
+    document.getElementById("pending-content").innerText =
+      JSON.stringify(data.pending_change, null, 2);
+  } else {
+    pendingPanel.style.display = "none";
+    if (data.response) {
+      document.getElementById("instruction").value = "";
+    }
+  }
+}
+
+async function markComplete() {
+  setStatus("complete-status", "Posting grade...");
+  const res = await fetch(`/api/review/${launchId}/complete`, {method: "POST"});
+  const data = await res.json();
+  if (data.error) { setStatus("complete-status", "Error: " + data.error); return; }
+  setStatus("complete-status", "Grade posted to the gradebook.");
+  document.getElementById("complete-btn").disabled = true;
+}
+</script>
+</body>
+</html>

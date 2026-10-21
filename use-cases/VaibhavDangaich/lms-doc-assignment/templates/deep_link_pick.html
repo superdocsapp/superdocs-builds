@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head><title>Place a document review</title>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 640px; margin: 3rem auto; }
+.doc { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+.doc h3 { margin-top: 0; }
+button { padding: 0.5rem 1rem; cursor: pointer; }
+</style>
+</head>
+<body>
+<h1>Place a document review</h1>
+<p>Choose the document this assignment will ask a student or reviewer to review through
+SuperDocs' track-changes flow.</p>
+{% for doc_id, doc in documents.items() %}
+<div class="doc">
+  <h3>{{ doc.title }}</h3>
+  <form method="post" action="{{ url_for('configure', launch_id=launch_id, doc_id=doc_id) }}">
+    <button type="submit">Place this assignment</button>
+  </form>
+</div>
+{% endfor %}
+</body>
+</html>

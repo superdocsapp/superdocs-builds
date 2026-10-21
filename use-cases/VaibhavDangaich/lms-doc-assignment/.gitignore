@@ -1,0 +1,8 @@
+.env
+.venv/
+moodle-dev/.venv/
+__pycache__/
+*.pyc
+configs/private.key
+configs/public.key
+moodle-dev/deeplink_jwt.txt
