@@ -1,0 +1,11 @@
+rate_card_id,version,effective_date,expiry_date,destination,prefix,rate_usd_per_min,billing_increment,minimum_duration_sec,change_vs_old_pct
+RC-NEW-2025Q3,2.0,2025-09-01,,United States,1,0.0039,6/6,0,-4.9
+RC-NEW-2025Q3,2.0,2025-09-01,,United Kingdom,44,0.0061,6/6,0,+5.2
+RC-NEW-2025Q3,2.0,2025-09-01,,Germany,49,0.0064,6/6,0,+3.2
+RC-NEW-2025Q3,2.0,2025-09-01,,Brazil,55,0.0212,6/6,0,+8.7
+RC-NEW-2025Q3,2.0,2025-09-01,,South Africa,27,0.0399,1/1,0,-2.7
+RC-NEW-2025Q3,2.0,2025-09-01,,Malaysia,60,0.0341,6/6,18,+3.3
+RC-NEW-2025Q3,2.0,2025-09-01,,Portugal,351,0.0181,1/1,0,+3.4
+RC-NEW-2025Q3,2.0,2025-09-01,,Netherlands,31,0.0091,1/1,0,+2.2
+RC-NEW-2025Q3,2.0,2025-09-01,,Mexico,52,0.0126,6/6,0,+4.1
+RC-NEW-2025Q3,2.0,2025-09-01,,India,91,0.0083,6/6,0,-5.7

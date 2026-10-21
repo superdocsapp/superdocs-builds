@@ -1,0 +1,4 @@
+rate_card_id,version,effective_date,expiry_date,destination,prefix,rate_usd_per_min,billing_increment,minimum_duration_sec,change_vs_old_pct
+RC-NEW-2025Q3,2.1,2025-10-01,,United States,1,0.0041,6/6,0,0.0
+RC-NEW-2025Q3,2.1,2025-10-01,,United Kingdom,44,0.0070,6/6,0,+20.7
+RC-NEW-2025Q3,2.1,2025-10-01,,Germany,49,0.0062,6/6,0,0.0
