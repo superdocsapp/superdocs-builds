@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Replit Extension Host Harness</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0e1525;
+      color: #fff;
+    }
+    #host-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    #replit-header {
+      padding: 10px 16px;
+      background: #1c2333;
+      border-bottom: 1px solid #2b3245;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    #replit-header h2 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #replit-badge {
+      font-size: 11px;
+      background: #f26207;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    #frame-wrapper {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      background: #ffffff;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="host-container">
+    <div id="replit-header">
+      <h2>
+        <span id="replit-badge">REPLIT IDE</span>
+        <span>Workspace: superdocs-replit-demo</span>
+      </h2>
+      <div style="font-size: 12px; color: #94a3b8;">
+        Extension Iframe Container
+      </div>
+    </div>
+    <div id="frame-wrapper">
+      <iframe id="ext-frame" src="/index.html"></iframe>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as Comlink from '/node_modules/comlink/dist/esm/comlink.mjs';
+
+    // Virtual In-Memory Filesystem for the Repl Workspace
+    const virtualFs = new Map([
+      ['package.json', JSON.stringify({ name: 'superdocs-replit-demo', version: '1.0.0', main: 'src/index.ts' }, null, 2)],
+      ['src/index.ts', 'export function add(a: number, b: number): number {\n  return a + b;\n}\n\nexport function multiply(a: number, b: number): number {\n  return a * b;\n}'],
+      ['src/auth.ts', 'export async function verifyToken(token: string): Promise<boolean> {\n  return token.startsWith("Bearer test_");\n}'],
+      ['README.md', '# SuperDocs Replit Demo App\n\nA demonstration project for live documentation generation and zero-drift review in Replit.'],
+      ['.superdocs-state.json', '']
+    ]);
+
+    window.__virtualFs = virtualFs;
+    window.__writtenFiles = new Map();
+
+    const hostService = {
+      handshake: async (args) => {
+        console.log('[Replit Host] Handshake received from extension:', args);
+        return { status: 'ready' };
+      },
+      activatePane: async () => {
+        console.log('[Replit Host] activatePane called');
+      },
+      filePath: 'src/main.tsx',
+      readDir: async (dirPath) => {
+        const cleanPath = (dirPath || '').replace(/^\/+|\/+$/g, '');
+        const filesInDir = [];
+        const subdirs = new Set();
+
+        for (const [filePath] of virtualFs.entries()) {
+          if (!cleanPath) {
+            const parts = filePath.split('/');
+            if (parts.length === 1) {
+              filesInDir.push({ filename: parts[0], type: 'FILE' });
+            } else {
+              subdirs.add(parts[0]);
+            }
+          } else if (filePath.startsWith(cleanPath + '/')) {
+            const remainder = filePath.slice(cleanPath.length + 1);
+            const parts = remainder.split('/');
+            if (parts.length === 1) {
+              filesInDir.push({ filename: parts[0], type: 'FILE' });
+            } else {
+              subdirs.add(parts[0]);
+            }
+          }
+        }
+
+        for (const dir of subdirs) {
+          filesInDir.push({ filename: dir, type: 'DIRECTORY' });
+        }
+
+        return { children: filesInDir };
+      },
+      readFile: async (path, encoding) => {
+        const clean = (path || '').replace(/^\/+/, '');
+        if (virtualFs.has(clean)) {
+          return { content: virtualFs.get(clean) };
+        }
+        return { error: `File not found: ${path}` };
+      },
+      writeFile: async (path, content) => {
+        const clean = (path || '').replace(/^\/+/, '');
+        const stringContent = typeof content === 'string' ? content : '[Binary Blob]';
+        virtualFs.set(clean, stringContent);
+        window.__writtenFiles.set(clean, content);
+        console.log(`[Replit Host] File written: ${clean} (${stringContent.length} bytes)`);
+        return { success: true };
+      },
+      createDir: async (path) => {
+        return { success: true };
+      },
+      deleteFile: async (path) => {
+        const clean = (path || '').replace(/^\/+/, '');
+        virtualFs.delete(clean);
+        return { success: true };
+      },
+      getCurrentTheme: async () => 'dark',
+      getCurrentThemeValues: async () => ({}),
+      onThemeChange: async (cb) => Comlink.proxy(() => {}),
+      onThemeChangeValues: async (cb) => Comlink.proxy(() => {}),
+      debug: {
+        info: (msg) => console.log('[Replit Debug Info]', msg),
+        warn: (msg) => console.warn('[Replit Debug Warn]', msg),
+        error: (msg) => console.error('[Replit Debug Error]', msg),
+      },
+      commands: {
+        registerCreateCommand: () => {},
+      }
+    };
+
+    const iframe = document.getElementById('ext-frame');
+
+    const dynamicEndpoint = {
+      postMessage: (msg, transferables) => {
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage(msg, '*', transferables);
+        }
+      },
+      addEventListener: (type, listener) => window.addEventListener(type, listener),
+      removeEventListener: (type, listener) => window.removeEventListener(type, listener),
+    };
+
+    Comlink.expose(hostService, dynamicEndpoint);
+    console.log('[Replit Host] Dynamic Comlink endpoint exposed');
+  </script>
+</body>
+</html>

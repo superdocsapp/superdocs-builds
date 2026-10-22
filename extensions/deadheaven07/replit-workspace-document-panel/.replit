@@ -1,0 +1,9 @@
+run = "pnpm dev"
+hidden = [".config", "dist", "node_modules"]
+entrypoint = "src/main.tsx"
+
+[extension]
+isExtension = true
+buildCommand = "pnpm build"
+outputDirectory = "dist"
+extensionID = "replit-workspace-document-panel"

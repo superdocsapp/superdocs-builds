@@ -1,0 +1,74 @@
+[project]
+name = "bates-exhibit-privilege-packet"
+version = "0.1.0"
+description = "Bates-stamped exhibit and privilege-log packet builder for legal e-discovery"
+readme = "../../README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "deadheaven07"}]
+dependencies = [
+    "fastapi>=0.109",
+    "uvicorn[standard]>=0.27",
+    "sqlalchemy>=2.0",
+    "asyncpg>=0.29",
+    "alembic>=1.13",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.1",
+    "python-multipart>=0.0.6",
+    "pypdf>=3.17",
+    "pdfplumber>=0.11",
+    "pymupdf>=1.23",
+    "pdf2image>=1.16",
+    "pytesseract>=0.3.10",
+    "python-docx>=1.1",
+    "pillow>=10.2",
+    "httpx>=0.26",
+    "tenacity>=8.2",
+    "python-magic>=0.4.27",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.3",
+    "mypy>=1.8",
+    "httpx>=0.26",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "T20"]
+ignore = ["S101", "S106", "B008"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]

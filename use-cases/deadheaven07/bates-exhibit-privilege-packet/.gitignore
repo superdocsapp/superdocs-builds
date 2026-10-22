@@ -1,0 +1,53 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+build/
+*.log
+.npm
+.yarn
+
+# Database
+*.db
+*.sqlite
+
+# Storage
+storage/
+*.pdf
+*.docx
+*.png
+*.jpg
+*.jpeg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test output
+test-results/
+playwright-report/
+coverage/

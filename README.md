@@ -26,3 +26,5 @@ Fork the repo, build in your own folder, open a pull request. The full mechanics
 ## License
 
 MIT. Every contribution stays publicly credited to its author, permanently.
+
+> **I built this for the SuperDocs task.**

@@ -1,0 +1,252 @@
+{
+  "version": "1.0",
+  "description": "Court rule profiles for Bates stamping and exhibit formatting. Changing courts or formatting rules is a data change, not a code rewrite.",
+  "default_profile": "SDNY_FEDERAL",
+  "profiles": {
+    "SDNY_FEDERAL": {
+      "name": "Southern District of New York (Federal)",
+      "prefix_format": "CASE-{number:06d}",
+      "prefix_example": "CASE-000001",
+      "stamp_position": {
+        "horizontal": "right",
+        "vertical": "bottom",
+        "margin_x": 160,
+        "margin_y": 30
+      },
+      "font": {
+        "name": "helv",
+        "size": 10,
+        "color": [0, 0, 0]
+      },
+      "confidentiality_stamp": {
+        "enabled": true,
+        "text": "CONFIDENTIAL - SUBJECT TO PROTECTIVE ORDER",
+        "position": {
+          "horizontal": "center",
+          "vertical": "top",
+          "margin_x": 0,
+          "margin_y": 50
+        },
+        "font": {
+          "name": "helv",
+          "size": 12,
+          "color": [1, 0, 0],
+          "bold": true
+        },
+        "opacity": 0.3
+      },
+      "cover_sheet": {
+        "include_bates_range": true,
+        "include_page_count": true,
+        "include_privilege_status": true,
+        "include_description": true
+      },
+      "exhibit_index": {
+        "format": "EXHIBIT {letter}",
+        "columns": ["exhibit", "bates_range", "description", "pages"]
+      },
+      "privilege_log": {
+        "include_category": true,
+        "include_reason": true
+      },
+      "page_size": [612, 792],
+      "margins": [54, 54, 54, 54]
+    },
+    "CALIFORNIA_SUPERIOR": {
+      "name": "California Superior Court",
+      "prefix_format": "EXH-{letter}-{number:03d}",
+      "prefix_example": "EXH-A-001",
+      "stamp_position": {
+        "horizontal": "center",
+        "vertical": "bottom",
+        "margin_x": 0,
+        "margin_y": 40
+      },
+      "font": {
+        "name": "helv",
+        "size": 9,
+        "color": [0, 0, 0]
+      },
+      "confidentiality_stamp": {
+        "enabled": true,
+        "text": "CONFIDENTIAL - ATTORNEYS' EYES ONLY",
+        "position": {
+          "horizontal": "center",
+          "vertical": "top",
+          "margin_x": 0,
+          "margin_y": 40
+        },
+        "font": {
+          "name": "helv",
+          "size": 11,
+          "color": [0.8, 0, 0],
+          "bold": true
+        },
+        "opacity": 0.4
+      },
+      "cover_sheet": {
+        "include_bates_range": true,
+        "include_page_count": true,
+        "include_privilege_status": true,
+        "include_description": true
+      },
+      "exhibit_index": {
+        "format": "EXHIBIT {letter}",
+        "columns": ["exhibit", "bates_range", "description", "pages"]
+      },
+      "privilege_log": {
+        "include_category": true,
+        "include_reason": true
+      },
+      "page_size": [612, 792],
+      "margins": [54, 54, 54, 54]
+    },
+    "USPTO_PATENT": {
+      "name": "USPTO Patent Trial and Appeal Board",
+      "prefix_format": "PTAB-{number:06d}",
+      "prefix_example": "PTAB-000001",
+      "stamp_position": {
+        "horizontal": "right",
+        "vertical": "top",
+        "margin_x": 180,
+        "margin_y": 40
+      },
+      "font": {
+        "name": "helv",
+        "size": 10,
+        "color": [0, 0, 0]
+      },
+      "confidentiality_stamp": {
+        "enabled": true,
+        "text": "CONFIDENTIAL - SUBJECT TO PROTECTIVE ORDER 37 CFR § 42.54",
+        "position": {
+          "horizontal": "center",
+          "vertical": "top",
+          "margin_x": 0,
+          "margin_y": 30
+        },
+        "font": {
+          "name": "helv",
+          "size": 10,
+          "color": [1, 0, 0],
+          "bold": true
+        },
+        "opacity": 0.25
+      },
+      "cover_sheet": {
+        "include_bates_range": true,
+        "include_page_count": true,
+        "include_privilege_status": false,
+        "include_description": true
+      },
+      "exhibit_index": {
+        "format": "EXHIBIT {number}",
+        "columns": ["exhibit", "bates_range", "description", "pages"]
+      },
+      "privilege_log": {
+        "include_category": true,
+        "include_reason": true
+      },
+      "page_size": [612, 792],
+      "margins": [54, 54, 54, 54]
+    },
+    "DELAWARE_CHANCERY": {
+      "name": "Delaware Court of Chancery",
+      "prefix_format": "CH-{number:05d}",
+      "prefix_example": "CH-00001",
+      "stamp_position": {
+        "horizontal": "left",
+        "vertical": "bottom",
+        "margin_x": 60,
+        "margin_y": 30
+      },
+      "font": {
+        "name": "helv",
+        "size": 10,
+        "color": [0, 0, 0]
+      },
+      "confidentiality_stamp": {
+        "enabled": true,
+        "text": "CONFIDENTIAL - PURSUANT TO COURT ORDER",
+        "position": {
+          "horizontal": "center",
+          "vertical": "top",
+          "margin_x": 0,
+          "margin_y": 45
+        },
+        "font": {
+          "name": "helv",
+          "size": 11,
+          "color": [0.7, 0, 0],
+          "bold": true
+        },
+        "opacity": 0.35
+      },
+      "cover_sheet": {
+        "include_bates_range": true,
+        "include_page_count": true,
+        "include_privilege_status": true,
+        "include_description": true
+      },
+      "exhibit_index": {
+        "format": "EXHIBIT {letter}",
+        "columns": ["exhibit", "bates_range", "description", "pages"]
+      },
+      "privilege_log": {
+        "include_category": true,
+        "include_reason": true
+      },
+      "page_size": [612, 792],
+      "margins": [54, 54, 54, 54]
+    },
+    "TEXAS_DISTRICT": {
+      "name": "Texas Federal District Courts",
+      "prefix_format": "TX-{number:06d}",
+      "prefix_example": "TX-000001",
+      "stamp_position": {
+        "horizontal": "right",
+        "vertical": "bottom",
+        "margin_x": 150,
+        "margin_y": 35
+      },
+      "font": {
+        "name": "helv",
+        "size": 10,
+        "color": [0, 0, 0]
+      },
+      "confidentiality_stamp": {
+        "enabled": true,
+        "text": "CONFIDENTIAL - HIGHLY CONFIDENTIAL - ATTORNEYS' EYES ONLY",
+        "position": {
+          "horizontal": "center",
+          "vertical": "top",
+          "margin_x": 0,
+          "margin_y": 50
+        },
+        "font": {
+          "name": "helv",
+          "size": 11,
+          "color": [1, 0, 0],
+          "bold": true
+        },
+        "opacity": 0.4
+      },
+      "cover_sheet": {
+        "include_bates_range": true,
+        "include_page_count": true,
+        "include_privilege_status": true,
+        "include_description": true
+      },
+      "exhibit_index": {
+        "format": "EXHIBIT {letter}",
+        "columns": ["exhibit", "bates_range", "description", "pages"]
+      },
+      "privilege_log": {
+        "include_category": true,
+        "include_reason": true
+      },
+      "page_size": [612, 792],
+      "margins": [54, 54, 54, 54]
+    }
+  }
+}
