@@ -1,0 +1,109 @@
+{
+  "benchmark_run_id": 4,
+  "benchmark_run_name": "Benchmark run 4",
+  "corpus_version": "1.1.0",
+  "selection_rule": "Latest execution attempt per official case in the selected complete official benchmark run",
+  "total_cases": 60,
+  "targeting": {
+    "total": 60,
+    "pass": 56,
+    "fail": 4,
+    "cannot_determine": 0,
+    "accuracy": 0.9333333333333333
+  },
+  "strict": {
+    "total": 60,
+    "pass": 56,
+    "fail": 4,
+    "cannot_determine": 0,
+    "accuracy": 0.9333333333333333
+  },
+  "targeting_by_case_type": {
+    "search": {
+      "total": 43,
+      "pass": 42,
+      "fail": 1,
+      "cannot_determine": 0,
+      "accuracy": 0.9767441860465116
+    },
+    "edit": {
+      "total": 17,
+      "pass": 14,
+      "fail": 3,
+      "cannot_determine": 0,
+      "accuracy": 0.8235294117647058
+    }
+  },
+  "strict_by_case_type": {
+    "search": {
+      "total": 43,
+      "pass": 42,
+      "fail": 1,
+      "cannot_determine": 0,
+      "accuracy": 0.9767441860465116
+    },
+    "edit": {
+      "total": 17,
+      "pass": 14,
+      "fail": 3,
+      "cannot_determine": 0,
+      "accuracy": 0.8235294117647058
+    }
+  },
+  "latency_ms": {
+    "count": 60,
+    "average": 16438.24,
+    "median": 15389.39,
+    "p95": 25314.93,
+    "sample_standard_deviation": 5227.14,
+    "sample_variance": 27322966.14
+  },
+  "total_api_reported_operations_charged": 38,
+  "simplified_failure_taxonomy_counts": {
+    "Wrong target": 2,
+    "Should have clarified": 1,
+    "Unsupported target": 1,
+    "Right target, wrong result": 0
+  },
+  "budget": {
+    "cap_operations": 60,
+    "actual_api_reported_operations": 38,
+    "within_budget": true,
+    "dollar_spend_usd": null,
+    "dollar_spend_note": "Dollar spend was not exposed by the stored API responses."
+  },
+  "expected_behavior_counts": {
+    "should_clarify": {
+      "total": 5,
+      "pass": 4,
+      "fail": 1
+    },
+    "no_target": {
+      "total": 5,
+      "pass": 4,
+      "fail": 1
+    }
+  },
+  "secondary_experiments": {
+    "applied_edit_verification": {
+      "verified": 15,
+      "landed_in_intended_section": 13,
+      "did_not_land_correctly": 0,
+      "cannot_determine": 2,
+      "unrelated_changes_detected": 0
+    },
+    "guided_recovery": {
+      "cases_attempted": 2,
+      "cases_recovered": 2,
+      "cases_not_recovered": 0,
+      "cannot_determine": 0,
+      "awaiting_evaluation": 0,
+      "recovery_rate": 1.0,
+      "additional_api_operations": 0,
+      "dollar_spend_usd": null
+    },
+    "note": "Secondary experiments do not change the official first-attempt verdicts."
+  },
+  "dollar_spend_usd": null,
+  "dollar_spend_note": "Dollar spend was not exposed by the stored API responses."
+}

@@ -1,0 +1,23 @@
+{
+  "document_changes": [],
+  "case_count_before": 42,
+  "case_count_after": 42,
+  "changed_cases": [
+    {
+      "case_id": "D01-C03",
+      "change": "Reworded the question from 'When is the readiness review?' to 'When is the current client timeline milestone?' and updated the adjudication rationale.",
+      "reason": "Only Northstar has a readiness review in the final document, so the prior wording was not genuinely ambiguous. Both Northstar Health > Timeline and Harbor Retail > Timeline contain distinct current client milestones, and the revised wording deliberately omits the client."
+    },
+    {
+      "case_id": "D05-C03",
+      "change": "Replaced the workspace-manager question with an administrator-scope question; changed the candidate paths to 3.1 Role Assignment and 3.2 User Lifecycle; updated capability, likely failure category, and rationale.",
+      "reason": "The final appendix explicitly normalizes 'workspace manager' to Team Administrator, while the former candidate sections were complementary descriptions rather than genuinely competing interpretations. The revised case is genuinely ambiguous between central-administrator powers and Team Administrator powers."
+    },
+    {
+      "case_id": "D07-C02",
+      "change": "Added the explicit phrase 'In the Pipeline section' and updated the rationale.",
+      "reason": "The numeric clue identifies Europe, but the requested ownership note could otherwise plausibly belong in Europe > Actions, which already discusses the public-sector deals. The revised wording preserves the numeric semantic reference and body-text distractor while making Europe > Pipeline the unique edit scope."
+    }
+  ],
+  "unchanged_cases": 39
+}

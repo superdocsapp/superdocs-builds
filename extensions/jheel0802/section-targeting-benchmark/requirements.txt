@@ -1,0 +1,5 @@
+fastapi==0.101.1
+uvicorn==0.23.2
+httpx==0.24.1
+pytest==8.3.5
+python-docx==1.2.0

@@ -1,0 +1,740 @@
+{
+  "status": "PASS",
+  "corpus_version": "1.1.0",
+  "fixture_version": "1.0.1",
+  "frozen": true,
+  "documents": [
+    {
+      "document_id": "D01",
+      "filename": "D01_Multi_Client_Account_Status_Report.docx",
+      "word_count": 362,
+      "heading_paths": 14,
+      "sha256": "ad0d2693203c378f79a4964713659cfda503ab6baa463648e652d0e88df5c579"
+    },
+    {
+      "document_id": "D02",
+      "filename": "D02_Software_Release_Plan.docx",
+      "word_count": 329,
+      "heading_paths": 17,
+      "sha256": "5f2d5be70e80ec2a4be5c30120b5ffbb7561d355862ac47ae6da738b363e3b27"
+    },
+    {
+      "document_id": "D03",
+      "filename": "D03_Vendor_Evaluation_Report.docx",
+      "word_count": 311,
+      "heading_paths": 17,
+      "sha256": "6f0092fa89eaa007b099cc8dca61aeafe0f00d8a342a49801c9a11fcab1e4da1"
+    },
+    {
+      "document_id": "D04",
+      "filename": "D04_IT_Incident_Post_Mortem.docx",
+      "word_count": 319,
+      "heading_paths": 17,
+      "sha256": "31a5f3caea8102fe87e40c7aa5569547c546ee8ff9f5002f0a1875c0ff68f5f6"
+    },
+    {
+      "document_id": "D05",
+      "filename": "D05_Product_Requirements_Document.docx",
+      "word_count": 437,
+      "heading_paths": 24,
+      "sha256": "86db3fe94a94c491f3d34b6602194aba3b141856681f0e2a609b1671d815f32f"
+    },
+    {
+      "document_id": "D06",
+      "filename": "D06_Operating_Procedure_Manual.docx",
+      "word_count": 395,
+      "heading_paths": 19,
+      "sha256": "8e9a158cb891b90c57e1c32bacbd82479939156b5cb30c83527f270a7476a0b2"
+    },
+    {
+      "document_id": "D07",
+      "filename": "D07_Regional_Sales_Performance_Report.docx",
+      "word_count": 284,
+      "heading_paths": 18,
+      "sha256": "3cdf3a4faf381fd95e1b82ab97b235ffbb7618ccc7cad3847401d0558cb5c07c"
+    },
+    {
+      "document_id": "D08",
+      "filename": "D08_Multi_Phase_Implementation_Plan.docx",
+      "word_count": 363,
+      "heading_paths": 23,
+      "sha256": "93092be44166bbdc581b2971f0f3ea2217b5cd44a3ddd78e70dbb379af5750bf"
+    },
+    {
+      "document_id": "D09",
+      "filename": "D09_HR_Employment_Policy_Manual.docx",
+      "word_count": 383,
+      "heading_paths": 20,
+      "sha256": "c7e7f3265668345fcb6c09deffaf4d97493a5acf05c1e0f02d026f416fdfdf63"
+    },
+    {
+      "document_id": "D10",
+      "filename": "D10_Technical_Architecture_Specification.docx",
+      "word_count": 518,
+      "heading_paths": 35,
+      "sha256": "69bc14adaeb829b83fc45eea62c93e952d51ae04d44595911a194b6604deb3dc"
+    },
+    {
+      "document_id": "D11",
+      "filename": "D11_Weekly_Project_Status_Report.docx",
+      "word_count": 271,
+      "heading_paths": 17,
+      "sha256": "439044a342454726ce18bedbc2fb59906129110822ff22a04f19ecbaaeb92f5e"
+    },
+    {
+      "document_id": "D12",
+      "filename": "D12_Compliance_Audit_Report.docx",
+      "word_count": 554,
+      "heading_paths": 38,
+      "sha256": "9e9d8d12a11342a32ece5772fd474e20e56b85cbeff835a6bfd19a8ee42acbba"
+    },
+    {
+      "document_id": "D13",
+      "filename": "D13_Steering_Committee_Meeting_Summary.docx",
+      "word_count": 284,
+      "heading_paths": 17,
+      "sha256": "2db17ff18f7ab4a2fc0350ea8eba60670028508bc9f343af9e47edcba34ffa8f"
+    },
+    {
+      "document_id": "D14",
+      "filename": "D14_Multi_Product_Technical_Release_Notes.docx",
+      "word_count": 344,
+      "heading_paths": 24,
+      "sha256": "b0f8f29058d8a936d9ebb553ea72f003431d55fd7baf6a48b4794c6c356fa3a9"
+    }
+  ],
+  "document_count": 14,
+  "case_count": 60,
+  "cases_per_document": {
+    "D01": 4,
+    "D02": 5,
+    "D03": 5,
+    "D04": 4,
+    "D05": 5,
+    "D06": 3,
+    "D07": 5,
+    "D08": 4,
+    "D09": 4,
+    "D10": 4,
+    "D11": 4,
+    "D12": 5,
+    "D13": 4,
+    "D14": 4
+  },
+  "case_type_distribution": {
+    "search": 43,
+    "edit": 17
+  },
+  "difficulty_distribution": {
+    "hard": 25,
+    "medium": 17,
+    "adversarial": 9,
+    "easy": 9
+  },
+  "expected_behavior_distribution": {
+    "unique_target": 50,
+    "should_clarify": 5,
+    "no_target": 5
+  },
+  "taxonomy_coverage": {
+    "appendix_confusion": 5,
+    "body_text_confusion": 7,
+    "correct_section_wrong_answer": 3,
+    "cross_reference_confusion": 2,
+    "failed_to_clarify": 5,
+    "historical_current_confusion": 5,
+    "instruction_scoping_failure": 2,
+    "no_target_but_modified": 5,
+    "ordinal_reference_error": 1,
+    "parent_context_ignored": 3,
+    "relative_position_error": 3,
+    "semantic_reference_miss": 5,
+    "wrong_duplicate": 14
+  },
+  "case_audits": [
+    {
+      "case_id": "D01-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist",
+        "repeated heading count 2"
+      ]
+    },
+    {
+      "case_id": "D01-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "1 distractor paths exist",
+        "repeated heading count 2"
+      ]
+    },
+    {
+      "case_id": "D01-C03",
+      "status": "PASS",
+      "checks": [
+        "2 acceptable paths exist",
+        "genuine ambiguity: omitted scope with distinct candidates"
+      ]
+    },
+    {
+      "case_id": "D02-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D02-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D02-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 89%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D03-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D03-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D03-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D04-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D04-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "1 distractor paths exist",
+        "relative sibling order"
+      ]
+    },
+    {
+      "case_id": "D04-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C03",
+      "status": "PASS",
+      "checks": [
+        "2 acceptable paths exist",
+        "genuine ambiguity: omitted scope with distinct candidates"
+      ]
+    },
+    {
+      "case_id": "D06-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D06-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D07-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 67%",
+        "3 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D07-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D07-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D08-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D08-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D09-C01",
+      "status": "PASS",
+      "checks": [
+        "2 acceptable paths exist",
+        "1 distractor paths exist",
+        "genuine ambiguity: omitted scope with distinct candidates"
+      ]
+    },
+    {
+      "case_id": "D09-C02",
+      "status": "PASS",
+      "checks": [
+        "2 acceptable paths exist",
+        "1 distractor paths exist",
+        "genuine ambiguity: omitted scope with distinct candidates"
+      ]
+    },
+    {
+      "case_id": "D09-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D10-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D10-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D10-C03",
+      "status": "PASS",
+      "checks": [
+        "1 distractor paths exist",
+        "requested specific concept absent"
+      ]
+    },
+    {
+      "case_id": "D11-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D11-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D11-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 91%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D12-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D12-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D12-C03",
+      "status": "PASS",
+      "checks": [
+        "1 distractor paths exist",
+        "requested specific concept absent"
+      ]
+    },
+    {
+      "case_id": "D13-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D13-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist",
+        "repeated heading count 3",
+        "relative sibling order"
+      ]
+    },
+    {
+      "case_id": "D13-C03",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 67%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D14-C01",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D14-C02",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist",
+        "repeated heading count 3",
+        "ordinal occurrence 3"
+      ]
+    },
+    {
+      "case_id": "D14-C03",
+      "status": "PASS",
+      "checks": [
+        "1 distractor paths exist",
+        "requested specific concept absent"
+      ]
+    },
+    {
+      "case_id": "D01-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D02-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D02-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D03-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D03-C05",
+      "status": "PASS",
+      "checks": [
+        "3 distractor paths exist",
+        "requested specific concept absent",
+        "Beacon sections contain no overall numerical score"
+      ]
+    },
+    {
+      "case_id": "D04-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 86%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D05-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 57%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D06-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D07-C04",
+      "status": "PASS",
+      "checks": [
+        "3 acceptable paths exist",
+        "genuine ambiguity: omitted scope with distinct candidates"
+      ]
+    },
+    {
+      "case_id": "D07-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D08-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist",
+        "repeated heading count 4"
+      ]
+    },
+    {
+      "case_id": "D08-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 67%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D09-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 67%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D10-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 100%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D11-C04",
+      "status": "PASS",
+      "checks": [
+        "1 distractor paths exist",
+        "requested specific concept absent",
+        "decision due date exists without an owner"
+      ]
+    },
+    {
+      "case_id": "D12-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 60%",
+        "1 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D12-C05",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "answer evidence 71%",
+        "2 distractor paths exist"
+      ]
+    },
+    {
+      "case_id": "D13-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "2 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    },
+    {
+      "case_id": "D14-C04",
+      "status": "PASS",
+      "checks": [
+        "target path exists",
+        "target content exists",
+        "3 distractor paths exist",
+        "repeated heading count 3"
+      ]
+    }
+  ],
+  "errors": [],
+  "warnings": []
+}
