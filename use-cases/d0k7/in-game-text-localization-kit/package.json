@@ -1,0 +1,25 @@
+{
+  "name": "in-game-text-localization-kit",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env server.mjs --dev",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "serve": "node --env-file-if-exists=.env server.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest"
+  }
+}
