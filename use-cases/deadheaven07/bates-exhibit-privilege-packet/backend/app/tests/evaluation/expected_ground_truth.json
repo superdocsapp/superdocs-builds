@@ -1,0 +1,151 @@
+{
+  "version": "1.0",
+  "corpus": [
+    {
+      "id": "doc_pii_primary",
+      "filename": "primary_pii_statement.pdf",
+      "description_ground_truth": "Medical billing statement for patient Jane Smith with account and diagnosis details.",
+      "must_contain_content_concepts": [
+        "patient",
+        "account",
+        "Jane Smith"
+      ],
+      "must_not_be_filename_derived": true,
+      "expected_pages": 1,
+      "is_searchable": true,
+      "expected_pii": [
+        {
+          "text": "123-45-6789",
+          "category": "ssn",
+          "page": 1
+        },
+        {
+          "text": "jane.public@example.com",
+          "category": "email",
+          "page": 1
+        },
+        {
+          "text": "(212) 555-0199",
+          "category": "phone",
+          "page": 1
+        },
+        {
+          "text": "Jane Smith",
+          "category": "name",
+          "page": 1
+        },
+        {
+          "text": "8821-4433-2211-9900",
+          "category": "account_number",
+          "page": 1
+        }
+      ],
+      "expected_privileged": false,
+      "expected_privilege_category": null,
+      "expected_redaction_count_min": 4,
+      "sha256": "be7dc8fb1661ce094cc94ef5d8c43517c1170ac69510261c338bc8c5c49ce24a",
+      "page_count": 1
+    },
+    {
+      "id": "doc_multipage_pii",
+      "filename": "financial_records_multipage.pdf",
+      "description_ground_truth": "Multi-page financial records with sensitive data isolated on a specific page.",
+      "must_contain_content_concepts": [
+        "financial",
+        "records"
+      ],
+      "must_not_be_filename_derived": true,
+      "expected_pages": 3,
+      "is_searchable": true,
+      "expected_pii": [
+        {
+          "text": "987-65-4321",
+          "category": "ssn",
+          "page": 2
+        },
+        {
+          "text": "bob.wilson@example.com",
+          "category": "email",
+          "page": 2
+        }
+      ],
+      "expected_privileged": false,
+      "expected_privilege_category": null,
+      "expected_redaction_count_min": 2,
+      "sha256": "4d741c0f9b1026145190821317b2eb3ae209a5e810026f17dfb6d01a0ec447be",
+      "page_count": 3
+    },
+    {
+      "id": "doc_privileged",
+      "filename": "internal_strategy_memo.pdf",
+      "description_ground_truth": "Attorney work product containing legal strategy and litigation memo.",
+      "must_contain_content_concepts": [
+        "strategy",
+        "litigation"
+      ],
+      "must_not_be_filename_derived": true,
+      "expected_pages": 1,
+      "is_searchable": true,
+      "expected_pii": [],
+      "expected_privileged": true,
+      "expected_privilege_category": "work_product",
+      "expected_privilege_reason_keywords": [
+        "strategy",
+        "litigation"
+      ],
+      "expected_redaction_count_min": 0,
+      "sha256": "4791e02eef221c708e4e86a7e0c1f895a1446c904c3bf367917445aac66cfb90",
+      "page_count": 1
+    },
+    {
+      "id": "doc_edge_cases",
+      "filename": "invoice_and_dates.pdf",
+      "description_ground_truth": "Business correspondence with invoice references and calendar dates.",
+      "must_contain_content_concepts": [
+        "invoice",
+        "correspondence"
+      ],
+      "must_not_be_filename_derived": true,
+      "expected_pages": 1,
+      "is_searchable": true,
+      "expected_pii": [],
+      "expected_false_positive_rejects": [
+        "INV-2026-001",
+        "2026-08-14"
+      ],
+      "expected_privileged": false,
+      "expected_privilege_category": null,
+      "expected_redaction_count_min": 0,
+      "sha256": "19e900f6847a547f9357d4a75ee4fdf85f026c6c36de19585a4fb013d6db3544",
+      "page_count": 1
+    },
+    {
+      "id": "doc_misleading_filename",
+      "filename": "01_NOT_privileged_CONTRACT.pdf",
+      "description_ground_truth": "Contract agreement between parties with standard commercial terms.",
+      "must_contain_content_concepts": [
+        "agreement"
+      ],
+      "must_not_be_filename_derived": true,
+      "expected_pages": 1,
+      "is_searchable": true,
+      "expected_pii": [],
+      "expected_privileged": false,
+      "expected_privilege_category": null,
+      "expected_redaction_count_min": 0,
+      "sha256": "468ab6c5b151cae792742aeaddf963d3611de126b74fefa790d73601bd5456d4",
+      "page_count": 1
+    }
+  ],
+  "hard_invariants": {
+    "bates_duplicates": 0,
+    "bates_missing": 0,
+    "bates_continuity": 1.0,
+    "unapproved_applied_redactions": 0,
+    "redaction_residue": 0,
+    "privilege_decisions_match_log": true,
+    "packet_page_reconciliation": true,
+    "artifact_missing_count": 0,
+    "manifest_mismatch_count": 0
+  }
+}

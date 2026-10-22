@@ -1,0 +1,23 @@
+# Node
+node_modules/
+dist/
+playwright-results.json
+test-results/
+playwright-report/
+*.tsbuildinfo
+
+# Storage / artifacts
+storage/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db

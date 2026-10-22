@@ -1,0 +1,75 @@
+documents:
+- filename: test_document_ssn_email.pdf
+  description: 'Primary PII document: SSN, email, phone, account, name, medical terms.'
+  sha256: df7fbdcf9fe9e18c546f86cb2810fecc42dfc04ab1713cc06e3ec35192542685
+  page_count: 1
+  expected_pii:
+  - text: Jane Smith
+    category: name
+    page_number: 1
+  - text: 123-45-6789
+    category: ssn
+    page_number: 1
+  - text: jane.public@example.com
+    category: email
+    page_number: 1
+  - text: (212) 555-0199
+    category: phone
+    page_number: 1
+  - text: ACC-8821-4433
+    category: account_number
+    page_number: 1
+  - text: 8821-4433-2211-9900
+    category: account_number
+    page_number: 1
+  - text: diagnosis
+    category: medical_term
+    page_number: 1
+  - text: cancer
+    category: medical_term
+    page_number: 1
+  expected_false_positive_rejects: []
+- filename: test_document_edge_cases.pdf
+  description: 'False-positive guards: invoices, dates, Bates labels, dockets.'
+  sha256: f9766b755ac2b6c755440619fb819915f9d2bff61ef3e065cd1e55349e61bba6
+  page_count: 1
+  expected_pii: []
+  expected_false_positive_rejects:
+  - text: INV-2026-001
+    reason: invoice reference number
+  - text: '2026-08-14'
+    reason: calendar date
+  - text: FQ-0500
+    reason: Bates-like exhibit label
+  - text: QA-1000
+    reason: Bates stamp
+  - text: Page One
+    reason: document scaffolding
+  - text: 1:23-cv-04567
+    reason: docket number
+- filename: test_document_multipage.pdf
+  description: 5-page document with PII isolated on page 3.
+  sha256: fe1cd266bf8304b0cb1531eb343c27995908b336542afa4991b2e02aa1b6a08c
+  page_count: 5
+  expected_pii:
+  - text: 987-65-4321
+    category: ssn
+    page_number: 3
+  - text: bob.wilson@example.com
+    category: email
+    page_number: 3
+  expected_false_positive_rejects: []
+- filename: test_document_privilege.pdf
+  description: Privilege markers must never be flagged as PII.
+  sha256: 3f682397b8306400fa4234b6615d3044be5d46dc7cf80c6a3a5b6d2288e2a5e2
+  page_count: 1
+  expected_pii: []
+  expected_false_positive_rejects:
+  - text: attorney-client
+    reason: privilege marker
+  - text: confidential
+    reason: privilege marker
+  - text: privilege
+    reason: privilege marker
+  - text: litigation
+    reason: privilege marker

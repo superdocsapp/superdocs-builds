@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bates-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bates_packet
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bates-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/bates_packet
+      SUPERDOCS_API_KEY: ${SUPERDOCS_API_KEY:-your-key-here}
+      SUPERDOCS_PRIMARY: "true"
+      BATES_PREFIX: "CASE-"
+      BATES_START_NUMBER: "1"
+      BATES_PADDING: "6"
+      APP_HOST: "0.0.0.0"
+      APP_PORT: "8000"
+      DEBUG: "false"
+      LOG_LEVEL: "INFO"
+    ports:
+      - "8000:8000"
+    volumes:
+      - backend_storage:/app/storage
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bates-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  backend_storage:
