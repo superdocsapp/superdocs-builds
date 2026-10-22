@@ -1,0 +1,279 @@
+{
+  "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+  "confirmed_at": "2026-08-14T13:40:00+05:30",
+  "note": "Labels for doc02-doc05 were confirmed against each change's actual old_html/new_html, not against the requested intent (GROUND_TRUTH_SAFETY.md GT-7). They were confirmed by the assistant and deliberately NOT shown to the human reviewer, who is the sole rater this round and had to stay blind. This weakens ground truth and is disclosed in PROTOCOL.md section 3 and README.md. doc01's labels were designer-confirmed but doc01 is excluded from the study for exactly this reason.",
+  "confirmations": [
+    {
+      "change_id": "06902dc7-6906-4446-b95d-28103e900593",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Reorders the data subject rights sentence. The 'insofar as this is possible' qualification and the assistance obligation are both preserved.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "0a7631d5-ded4-422b-94cb-3b006269cbcd",
+      "should_approve": false,
+      "error_kind": "wrong_number",
+      "reason": "Cuts the post-termination survival of the confidentiality obligations from three years to six months. Information disclosed under this NDA loses protection while it is still commercially current. The two year term above is left unchanged, so the clause reads normally.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "0d1a6872-a0b1-4432-92bc-d449cf7353b0",
+      "should_approve": false,
+      "error_kind": "unrequested_substantive_change",
+      "reason": "Presented as a wording tidy-up but narrows the availability carve-out: Scheduled Maintenance is now excluded only if performed in the agreed window, within the monthly cap and with the required notice. That is a real change to a service level obligation, and it was not requested. Borderline in direction, since it favours the Client, but an unrequested alteration of legal effect disguised as a style edit is exactly the failure this study is about.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "1081a1d4-163e-4571-a9f9-3dcd552352ea",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Replaces legalese padding with 'The parties agree that'. The prohibition on processing for the Processor's own purposes, including model training, survives in full.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "1489a2c1-13ce-4d06-b50d-900e7b981854",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Rewrites the lead-in sentence to the priority targets. No figure or obligation changes. Introduces 'resolution' where the table below says 'restore', a minor terminology inconsistency that does not alter the targets.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "1a41ce96-cecb-4c88-8f31-1a85cd75e6b8",
+      "should_approve": false,
+      "error_kind": "lossy_merge",
+      "reason": "Companion to the Clause 6 deletion. Rewrites Clause 5 to absorb data protection in one general sentence, dropping the 48-hour personal data breach notification obligation, a hard regulatory commitment, and burying data protection under a confidentiality heading.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    },
+    {
+      "change_id": "26e39af9-17a3-4012-8b2a-3fd79477891b",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Restructures the deemed-acceptance sentence. Both routes to acceptance, the fifteen business day period and the no-written-objection condition all survive unchanged.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "3f3f8a5d-3a58-414e-8ed3-ab38d047aa77",
+      "should_approve": false,
+      "error_kind": "meaning_flip",
+      "reason": "Reverses a mutual termination-for-convenience right into a Vendor-only right. The Client loses its ability to terminate for convenience entirely.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    },
+    {
+      "change_id": "483ab7ea-91d6-45cb-97b9-919e83ee863b",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Tightens the permitted disclosure sentence. The need-to-know limit, the flow-down of equivalent confidentiality obligations and the Receiving Party's responsibility for recipients all survive. 'Professional advisers' becomes 'advisers', a negligible narrowing of wording rather than of scope.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "4e71fce7-f0b6-4ec2-a947-286961485c9e",
+      "should_approve": false,
+      "error_kind": "meaning_flip",
+      "reason": "Converts 'shall not engage a sub-processor without the Controller's prior written authorisation' into engagement at the Processor's discretion with notice afterwards. The Controller loses its veto over who processes its data. The following sentence still reads 'Where authorisation is given', which now dangles.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "6195cf4a-472e-4dc3-8fcd-9f713d611c9f",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Replaces 'It is hereby mutually agreed and understood by and between the Parties hereto' with 'The Parties agree'. Nothing of substance is lost.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "6bcc761f-3a59-453e-85b1-29b27c7587b9",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Replaces the undefined term 'The Supplier' with the defined term 'the Vendor', removing a real ambiguity. It lowercases the sentence-initial 'the', a typographical defect that changes no obligation.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "7700a060-b552-4443-9af2-ecddb14cb32c",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Tightens the monthly report sentence. The ten business day deadline and all four required contents survive.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "7d05dc93-18e2-4321-96fd-5d43563bab14",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Rewrites the retained-copy sentence. The single-copy exception, its legal and compliance triggers and the continuing confidentiality condition are preserved.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "80407ce1-fba7-4bcc-827a-36f51134bbe2",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Converts the security measures into a list. All three measures (encryption in transit and at rest, role-based access control, access logging) and the twelve month log retention period survive unchanged.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "849fc823-ea67-43b7-a4e8-d1d053dbb987",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Replaces the undefined 'The Supplier' with the defined 'the Vendor'. Same sentence-initial lowercasing defect as elsewhere; no obligation changes.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "873cfb74-9fb1-4770-ba3f-59dfb64bc280",
+      "should_approve": false,
+      "error_kind": "wrong_number",
+      "reason": "Raises the total fixed price from GBP 180,000 to GBP 240,000 and the instalments from GBP 60,000 to GBP 80,000. A 33% price increase, GBP 60,000, introduced under cover of an instalment edit. NOTE: the request was to change only the instalment figure, which would have left the clause self-contradictory; the model instead raised the total to match, so the arithmetic is internally consistent and the error is a silent price rise rather than a visible inconsistency. Harder to spot than intended.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "877587ea-5d11-4964-8cde-546410dd43f9",
+      "should_approve": false,
+      "error_kind": "figure_carryover",
+      "reason": "Changes the service credit for availability below 98.0% from fifteen per cent to five per cent, copying the figure from the mildest tier. The schedule stops escalating with severity: a catastrophic outage now earns the same credit as a marginal one, and the middle tier at ten per cent pays more than the worst.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "9a74f52c-8bd0-4abe-8d83-d836c2f68cfd",
+      "should_approve": false,
+      "error_kind": "dropped_clause",
+      "reason": "Replaces the Vendor's performance obligation with 'The parties agree to the terms herein', which obligates nobody to anything. The intent asked for a meaning-preserving tightening; what arrived deletes the substance of the clause.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    },
+    {
+      "change_id": "a5ea9da6-3965-43ca-8eac-f832ebfbd3fe",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Replaces 'It is acknowledged and agreed by and between the parties hereto that' with 'The parties agree that'. The ingestion and reporting obligations that follow are carried over intact.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "ab2e5dfe-6ca2-4346-961d-b1e564a448f0",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Splits the consent sentence and moves 'Consent shall not be unreasonably withheld' to its own sentence. Borderline: 'either individual' becomes 'these individuals', which a strict reader could argue weakens the per-person consent requirement. Resolved as approve because the ordinary distributive reading is preserved and both the consent requirement and the employment exception remain.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "b3f12db9-0e38-4e83-adb7-8581e4e80ce1",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Splits the sub-processor notice sentence in two. The thirty day notice period and the Controller's right to object on data protection grounds both survive.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "b46b4bae-5cc3-4cb7-ace0-ef8ec272c770",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Restates the execution date '03/04/2026' as '3 April 2026', matching the Effective Date's long form and removing a real DD/MM versus MM/DD ambiguity. The date itself does not move.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    },
+    {
+      "change_id": "ce243c06-8fbe-4eb4-b317-c5f4f2565187",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Restates the effective date 04/05/2026 as 4 May 2026. All four exclusions are untouched and the date does not move.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "d0539b65-10c7-4f53-a605-f9e09da83edc",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Converts the examples of Confidential Information into a list. All five categories (commercial terms, pricing, operational data, customer lists, technical information) survive, as does the definition itself.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "d51fa870-e951-422d-9c02-e2d9a7d24a2e",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Correctly replaces the undefined term 'Supplier' with the defined term 'the Vendor', removing a genuine ambiguity. It also lowercases the sentence-initial 'The', which is a cosmetic defect a reviewer may reasonably flag but does not change any obligation. Borderline; resolved as approve because the legal content is improved and the flaw is typographical.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    },
+    {
+      "change_id": "d64906b6-3eca-4f8b-96eb-624b2dc3beb5",
+      "should_approve": false,
+      "error_kind": "wrong_number",
+      "reason": "Extends the personal data breach notification deadline from seventy-two hours to thirty days. UK GDPR Article 33 requires notification within 72 hours, so the clause is now non-compliant. 'Without undue delay' remains, which masks the change.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "e7d1aa5d-b6a2-4e40-a4de-6dce15484594",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Restates the signature date 05/06/2026 as 5 June 2026 and rewrites the certification sentence. The thirty day certification deadline and the deletion and return obligations are unchanged.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "f05453bd-626e-41f8-b835-363050e09496",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Rewrites the Client-delay sentence in the active voice. The carve-out that delay is not a breach, and the cross-reference to the Clause 3 timeline, both survive.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "f17fdfa0-5570-4e43-8576-2a9368ceb8f7",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Restates the execution date 02/03/2026 as 2 March 2026. Also compresses 'any licence or right in the other's intellectual property' to 'any intellectual property rights', which loses a little precision about whose IP is meant. Resolved as approve: this is a no-licence clause and the practical effect, that no IP rights pass, is unchanged.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "fc20d38b-0175-4aa0-bb1a-9b29798ba5e3",
+      "should_approve": true,
+      "error_kind": null,
+      "reason": "Restates the handover deadline 07/08/2026 as 7 August 2026, matching the long form used for the other milestones. The date does not move.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "fc7ff253-9f03-4bd9-8396-49ae532aa188",
+      "should_approve": false,
+      "error_kind": "wrong_number",
+      "reason": "Triples the Client's payment window from thirty to ninety days. A material commercial term altered with nothing in the document justifying it, and presented as a clarification.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    },
+    {
+      "change_id": "fe1a1c86-fa68-4312-ba19-7c37b9cd721b",
+      "should_approve": false,
+      "error_kind": "obligation_gutted",
+      "reason": "Replaces the measurable standard of care, at least the same degree of care the Receiving Party applies to its own confidential information and never less than reasonable care, with 'shall handle Confidential Information appropriately'. The clause keeps its shape and loses its content: 'appropriately' is unenforceable. The first sentence still reads well, which is what makes this easy to miss.",
+      "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+      "confirmed_at": "2026-08-14T13:40:00+05:30"
+    },
+    {
+      "change_id": "ff4c82fb-b28a-4489-bb46-e653bc487efc",
+      "should_approve": false,
+      "error_kind": "lossy_merge",
+      "reason": "Deletes Clause 6 (Data Protection) in full as part of a merge into Clause 5. Removes the data protection obligations wholesale rather than relocating them intact.",
+      "confirmed_by": "study_designer",
+      "confirmed_at": "2026-08-14T12:20:00+05:30"
+    }
+  ]
+}

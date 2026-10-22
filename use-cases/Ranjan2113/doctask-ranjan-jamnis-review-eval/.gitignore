@@ -1,0 +1,14 @@
+.env
+.pdftext.txt
+__pycache__/
+*.pyc
+.pytest_cache/
+node_modules/
+.tmp/
+
+# Checkpoints are raw API payloads: local processing state, regenerable only
+# by re-spending operations. Kept out of git, never deleted casually.
+study_data/checkpoints/
+
+# Published deliberately (see README): study_data/batches.json,
+# study_data/ops_ledger.jsonl, analysis/raw_timings.csv

@@ -1,0 +1,101 @@
+{
+  "document_id": "doc04",
+  "generated_at": "2026-08-14T19:39:02+0530",
+  "instructions": "Read old_text vs new_text for each entry and fill in should_approve, error_kind, reason, confirmed_by and confirmed_at. The proposed_* fields are intent-derived starting points and may be wrong -- that is why this file exists. Entries left unconfirmed are excluded from the study.",
+  "noops_excluded": [
+    "56f9a4b5-900f-49de-a9b8-c3fe6a6d61aa",
+    "38e620da-08e2-4287-83a0-9394be57c1e5"
+  ],
+  "confirmations": [
+    {
+      "change_id": "0d1a6872-a0b1-4432-92bc-d449cf7353b0",
+      "operation": "edit",
+      "old_text": "The Vendor shall make the reporting platform available not less than 99.5% of the time, measured monthly, excluding Scheduled Maintenance. It is agreed and understood by and between the parties hereto that availability shall be measured by the Vendor's monitoring system at five (5) minute intervals from at least two independent geographic locations.",
+      "new_text": "The Vendor shall make the reporting platform available not less than 99.5% of the time, measured monthly, excluding Scheduled Maintenance that is performed within the agreed maintenance window, provided it does not exceed the monthly cap and is subject to the required prior notice. The parties agree that availability shall be measured by the Vendor's monitoring system at five (5) minute intervals from at least two independent geographic locations.",
+      "matched_intent": "g_wordiness",
+      "proposed_should_approve": true,
+      "proposed_error_kind": null,
+      "proposed_reason": "Removes legalese padding. No obligation is altered.",
+      "should_approve": null,
+      "error_kind": null,
+      "reason": "",
+      "confirmed_by": "",
+      "confirmed_at": ""
+    },
+    {
+      "change_id": "1489a2c1-13ce-4d06-b50d-900e7b981854",
+      "operation": "edit",
+      "old_text": "The Vendor shall respond to support requests within the following target times, measured from receipt of the request during Business Hours:",
+      "new_text": "The Vendor shall address support requests based on the following priority targets, with response and resolution times calculated from the moment of receipt during Business Hours:",
+      "matched_intent": null,
+      "proposed_should_approve": null,
+      "proposed_error_kind": null,
+      "proposed_reason": "",
+      "should_approve": null,
+      "error_kind": null,
+      "reason": "",
+      "confirmed_by": "",
+      "confirmed_at": ""
+    },
+    {
+      "change_id": "877587ea-5d11-4964-8cde-546410dd43f9",
+      "operation": "edit",
+      "old_text": "Where the Vendor fails to meet the availability target in any calendar month, the Client shall be entitled to a service credit calculated as a percentage of the monthly charges for that month: availability of 99.0% to 99.49% attracts a credit of five per cent (5%); availability of 98.0% to 98.99% attracts a credit of ten per cent (10%); availability below 98.0% attracts a credit of fifteen per cent (15%).",
+      "new_text": "Where the Vendor fails to meet the availability target in any calendar month, the Client shall be entitled to a service credit calculated as a percentage of the monthly charges for that month: availability of 99.0% to 99.49% attracts a credit of five per cent (5%); availability of 98.0% to 98.99% attracts a credit of ten per cent (10%); availability below 98.0% attracts a credit of five per cent (5%).",
+      "matched_intent": "b_credit_tier",
+      "proposed_should_approve": false,
+      "proposed_error_kind": "figure_carryover",
+      "proposed_reason": "Carries the 5% figure from the mildest tier into the most severe one. The credit schedule stops increasing with severity: a catastrophic outage now earns the same credit as a marginal one, removing the escalation the tiers exist to create.",
+      "should_approve": null,
+      "error_kind": null,
+      "reason": "",
+      "confirmed_by": "",
+      "confirmed_at": ""
+    },
+    {
+      "change_id": "7700a060-b552-4443-9af2-ecddb14cb32c",
+      "operation": "edit",
+      "old_text": "The Vendor shall provide the Client with a written service report within ten (10) business days of the end of each calendar month, setting out measured availability, the number of support requests by priority, response and restoration times achieved, and any service credits due.",
+      "new_text": "Within ten (10) business days of each month's end, the Vendor shall provide a written report detailing measured availability, support requests by priority, achieved response and restoration times, and any applicable service credits.",
+      "matched_intent": "g_reporting",
+      "proposed_should_approve": true,
+      "proposed_error_kind": null,
+      "proposed_reason": "Style only. The deadline and required contents are unchanged.",
+      "should_approve": null,
+      "error_kind": null,
+      "reason": "",
+      "confirmed_by": "",
+      "confirmed_at": ""
+    },
+    {
+      "change_id": "849fc823-ea67-43b7-a4e8-d1d053dbb987",
+      "operation": "edit",
+      "old_text": "The parties shall meet quarterly to review service performance against these service levels. The Supplier shall present a summary of any recurring faults, their root causes, and the remedial actions taken or planned. The service levels in this Schedule may be revised by written agreement between the parties following any such review.",
+      "new_text": "The parties shall meet quarterly to review service performance against these service levels. the Vendor shall present a summary of any recurring faults, their root causes, and the remedial actions taken or planned. The service levels in this Schedule may be revised by written agreement between the parties following any such review.",
+      "matched_intent": "g_defined_term",
+      "proposed_should_approve": true,
+      "proposed_error_kind": null,
+      "proposed_reason": "Fixes an undefined term. 'Supplier' is never defined, so the correction removes a genuine ambiguity without altering scope.",
+      "should_approve": null,
+      "error_kind": null,
+      "reason": "",
+      "confirmed_by": "",
+      "confirmed_at": ""
+    },
+    {
+      "change_id": "ce243c06-8fbe-4eb4-b317-c5f4f2565187",
+      "operation": "edit",
+      "old_text": "The Vendor shall not be responsible for a failure to meet a service level to the extent that the failure arises from: Scheduled Maintenance; a fault in the Client's own systems or network; the Client's failure to provide access or information reasonably requested by the Vendor; or an event beyond the Vendor's reasonable control. This Schedule takes effect on 04/05/2026.",
+      "new_text": "The Vendor shall not be responsible for a failure to meet a service level to the extent that the failure arises from: Scheduled Maintenance; a fault in the Client's own systems or network; the Client's failure to provide access or information reasonably requested by the Vendor; or an event beyond the Vendor's reasonable control. This Schedule takes effect on 4 May 2026.",
+      "matched_intent": "g_date_format",
+      "proposed_should_approve": true,
+      "proposed_error_kind": null,
+      "proposed_reason": "Removes a real DD/MM versus MM/DD ambiguity by restating the same date unambiguously. The date itself does not move.",
+      "should_approve": null,
+      "error_kind": null,
+      "reason": "",
+      "confirmed_by": "",
+      "confirmed_at": ""
+    }
+  ]
+}

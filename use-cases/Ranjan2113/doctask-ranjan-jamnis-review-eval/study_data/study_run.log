@@ -1,0 +1,130 @@
+[labels] loaded 7 confirmed label(s) from confirmations.json
+=== corpus_builder: mode=study docs=4 cap=15 ops ===
+[ops] prior spend on record: 3 operation(s)
+[auth] key accepted
+[warmup] sending one throwaway instruction (failure here is expected/ok)
+[ops] warmup: ops_charged=0  billable=False  monthly_used=2/500  | run total 3/15
+[warmup] backend responded; proceeding
+[doc02] requesting 8 edit(s) in one call (corpus:doc02)
+[doc02] job job-redacted-05; polling
+[ops] corpus:doc02: ops_charged=1  | run total 4/15
+[checkpoint] saved raw job for doc02 -> study_data\checkpoints\doc02.job.json
+[doc02] SuperDocs proposed 8 change(s) across 1 call(s)
+[doc02] dropped 1 no-op change(s) (new text identical to old); they would be meaningless trials
+
+ERROR building doc02: [doc02] 7 confirmation(s) reference change_ids that do not exist in any checkpoint: ['1a41ce96-cecb-4c88-8f31-1a85cd75e6b8', '3f3f8a5d-3a58-414e-8ed3-ab38d047aa77', '9a74f52c-8bd0-4abe-8d83-d836c2f68cfd', 'b46b4bae-5cc3-4cb7-ace0-ef8ec272c770', 'd51fa870-e951-422d-9c02-e2d9a7d24a2e', 'fc7ff253-9f03-4bd9-8396-49ae532aa188', 'ff4c82fb-b28a-4489-bb46-e653bc487efc']. Fix the ids in the confirmations file rather than letting the labels go missing.
+
+No batches written yet. [ops] TOTAL SPENT THIS RUN: 4/15
+[labels] loaded 7 confirmed label(s) from confirmations.json
+=== corpus_builder: mode=study docs=4 cap=15 ops ===
+[ops] prior spend on record: 4 operation(s)
+[auth] key accepted
+[doc02] reusing 1 checkpoint(s); no operation spent
+[doc02] SuperDocs proposed 8 change(s) across 1 call(s)
+[doc02] dropped 1 no-op change(s) (new text identical to old); they would be meaningless trials
+[doc02] matched 7/8 intents; 0 unmatched change(s)
+[doc02]   MISSING intent (not performed): g_deliverables
+
+[doc02] captured, labels not yet confirmed:
+  batch 'batch_doc02': 7 label(s) never confirmed against the change they label: ['a5ea9da6-3965-43ca-8eac-f832ebfbd3fe', '26e39af9-17a3-4012-8b2a-3fd79477891b', 'fc20d38b-0175-4aa0-bb1a-9b29798ba5e3', '873cfb74-9fb1-4770-ba3f-59dfb64bc280', 'f05453bd-626e-41f8-b835-363050e09496', '6bcc761f-3a59-453e-85b1-29b27c7587b9', 'ab2e5dfe-6ca2-4346-961d-b1e564a448f0']. Run `corpus_builder.py --propose-labels`, review the diffs, and confirm before pre-registering.
+[doc03] requesting 8 edit(s) in one call (corpus:doc03)
+[doc03] job job-redacted-04; polling
+[ops] corpus:doc03: ops_charged=1  | run total 5/15
+[checkpoint] saved raw job for doc03 -> study_data\checkpoints\doc03.job.json
+[doc03] SuperDocs proposed 7 change(s) across 1 call(s)
+[doc03] matched 7/8 intents; 0 unmatched change(s)
+[doc03]   MISSING intent (not performed): g_deletion_certificate
+
+[doc03] captured, labels not yet confirmed:
+  batch 'batch_doc03': 7 label(s) never confirmed against the change they label: ['1081a1d4-163e-4571-a9f9-3dcd552352ea', '80407ce1-fba7-4bcc-827a-36f51134bbe2', '4e71fce7-f0b6-4ec2-a947-286961485c9e', 'b3f12db9-0e38-4e83-adb7-8581e4e80ce1', '06902dc7-6906-4446-b95d-28103e900593', 'd64906b6-3eca-4f8b-96eb-624b2dc3beb5', 'e7d1aa5d-b6a2-4e40-a4de-6dce15484594']. Run `corpus_builder.py --propose-labels`, review the diffs, and confirm before pre-registering.
+[doc04] requesting 8 edit(s) in one call (corpus:doc04)
+[doc04] job job-redacted-10; polling
+[ops] corpus:doc04: ops_charged=1  | run total 6/15
+[checkpoint] saved raw job for doc04 -> study_data\checkpoints\doc04.job.json
+[doc04] SuperDocs proposed 1 change(s) across 1 call(s)
+[doc04] dropped 1 no-op change(s) (new text identical to old); they would be meaningless trials
+
+ERROR building doc04: [doc04] job returned no pending changes (status='awaiting_approval'). Nothing to label.
+
+=== 2 document(s) awaiting label confirmation: doc02, doc03 ===
+Next: python corpus_builder.py --mode study --propose-labels  (0 operations)
+
+No batches written yet. [ops] TOTAL SPENT THIS RUN: 6/15
+[labels] loaded 7 confirmed label(s) from confirmations.json
+=== corpus_builder: mode=study docs=1 cap=15 ops ===
+[ops] prior spend on record: 6 operation(s)
+[auth] key accepted
+[doc05] requesting 8 edit(s) in one call (corpus:doc05)
+[doc05] job job-redacted-03; polling
+[ops] corpus:doc05: ops_charged=1  | run total 7/15
+[checkpoint] saved raw job for doc05 -> study_data\checkpoints\doc05.job.json
+[doc05] SuperDocs proposed 7 change(s) across 1 call(s)
+[doc05] matched 6/8 intents; 1 unmatched change(s)
+[doc05]   MISSING intent (not performed): g_exclusions
+[doc05]   MISSING intent (not performed): g_no_licence
+[doc05]   UNMATCHED change d0539b65-10c7-4f53-a605-f9e09da83edc -> no confirmed label, excluded from the answer key
+
+[doc05] captured, labels not yet confirmed:
+  batch 'batch_doc05': 6 label(s) never confirmed against the change they label: ['6195cf4a-472e-4dc3-8fcd-9f713d611c9f', 'fe1a1c86-fa68-4312-ba19-7c37b9cd721b', '483ab7ea-91d6-45cb-97b9-919e83ee863b', '0a7631d5-ded4-422b-94cb-3b006269cbcd', '7d05dc93-18e2-4321-96fd-5d43563bab14', 'f17fdfa0-5570-4e43-8576-2a9368ceb8f7']. Run `corpus_builder.py --propose-labels`, review the diffs, and confirm before pre-registering.
+
+=== 1 document(s) awaiting label confirmation: doc05 ===
+Next: python corpus_builder.py --mode study --propose-labels  (0 operations)
+
+No batches written yet. [ops] TOTAL SPENT THIS RUN: 7/15
+[labels] loaded 7 confirmed label(s) from confirmations.json
+=== corpus_builder: mode=study docs=1 cap=15 ops ===
+[ops] prior spend on record: 7 operation(s)
+[auth] key accepted
+[doc04] following up on 8 skipped intent(s): g_wordiness, g_defined_term, g_date_format, g_priority_table, g_exclusions, g_reporting, g_maintenance_window, b_credit_tier
+[doc04] requesting 8 edit(s) in one call (corpus:doc04_b)
+[doc04] job job-redacted-02; polling
+[ops] corpus:doc04_b: ops_charged=1  | run total 8/15
+[checkpoint] saved raw job for doc04 -> study_data\checkpoints\doc04_b.job.json
+[doc04] reusing 2 checkpoint(s); no operation spent
+[doc04] SuperDocs proposed 2 change(s) across 2 call(s)
+[doc04] dropped 2 no-op change(s) (new text identical to old); they would be meaningless trials
+
+ERROR building doc04: [doc04] job returned no pending changes (status='awaiting_approval'). Nothing to label.
+
+=== 1 document(s) FAILED: doc04 ===
+Retry one with: --only <doc_id> --fill-missing
+
+No batches written yet. [ops] TOTAL SPENT THIS RUN: 8/15
+[labels] loaded 7 confirmed label(s) from confirmations.json
+=== corpus_builder: mode=study docs=1 cap=15 ops ===
+[ops] prior spend on record: 8 operation(s)
+[auth] key accepted
+[doc04] following up on 8 skipped intent(s) (slot b): g_wordiness, g_defined_term, g_date_format, g_priority_table, g_exclusions, g_reporting, g_maintenance_window, b_credit_tier
+[doc04] requesting 8 edit(s) in one call (corpus:doc04_b)
+
+ERROR building doc04: chat_async failed: HTTP 409 at /v1/chat/async: {"detail":{"error_code":"session_busy","message":"The AI is still working on a previous request in this conversation. Wait for it to finish or stop it, then send your message again.","suggested_action":"Poll get_job/list_jobs for the active job (pending, in_progress, or awaiting_approval), cancel it
+
+=== 1 document(s) FAILED: doc04 ===
+Retry one with: --only <doc_id> --fill-missing
+
+No batches written yet. [ops] TOTAL SPENT THIS RUN: 8/15
+[labels] loaded 7 confirmed label(s) from confirmations.json
+=== corpus_builder: mode=study docs=1 cap=15 ops ===
+[ops] prior spend on record: 8 operation(s)
+[auth] key accepted
+[doc04] following up on 8 skipped intent(s) (slot c): g_wordiness, g_defined_term, g_date_format, g_priority_table, g_exclusions, g_reporting, g_maintenance_window, b_credit_tier
+[doc04] requesting 8 edit(s) in one call (corpus:doc04_c)
+[doc04] job job-redacted-06; polling
+[ops] corpus:doc04_c: ops_charged=1  | run total 9/15
+[checkpoint] saved raw job for doc04 -> study_data\checkpoints\doc04_c.job.json
+[doc04] reusing 3 checkpoint(s); no operation spent
+[doc04] SuperDocs proposed 8 change(s) across 3 call(s)
+[doc04] dropped 2 no-op change(s) (new text identical to old); they would be meaningless trials
+[doc04] matched 5/8 intents; 1 unmatched change(s)
+[doc04]   MISSING intent (not performed): g_priority_table
+[doc04]   MISSING intent (not performed): g_exclusions
+[doc04]   MISSING intent (not performed): g_maintenance_window
+[doc04]   UNMATCHED change 1489a2c1-13ce-4d06-b50d-900e7b981854 -> no confirmed label, excluded from the answer key
+
+[doc04] captured, labels not yet confirmed:
+  batch 'batch_doc04': 5 label(s) never confirmed against the change they label: ['0d1a6872-a0b1-4432-92bc-d449cf7353b0', '877587ea-5d11-4964-8cde-546410dd43f9', '7700a060-b552-4443-9af2-ecddb14cb32c', '849fc823-ea67-43b7-a4e8-d1d053dbb987', 'ce243c06-8fbe-4eb4-b317-c5f4f2565187']. Run `corpus_builder.py --propose-labels`, review the diffs, and confirm before pre-registering.
+
+=== 1 document(s) awaiting label confirmation: doc04 ===
+Next: python corpus_builder.py --mode study --propose-labels  (0 operations)
+
+No batches written yet. [ops] TOTAL SPENT THIS RUN: 9/15

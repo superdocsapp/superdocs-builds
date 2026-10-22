@@ -1,0 +1,106 @@
+{
+  "job_id": "job_fixture_doc01",
+  "session_id": "corpus_doc01",
+  "job_type": "chat",
+  "status": "awaiting_approval",
+  "created_at": "2026-08-14T09:00:00+00:00",
+  "updated_at": "2026-08-14T09:00:412+00:00",
+  "progress": 100,
+  "result": {
+    "response": "I have prepared 8 changes for your review.",
+    "session_id": "corpus_doc01",
+    "document_changes": {
+      "requires_approval": true,
+      "changes_summary": "8 proposed edits across clauses 1, 3, 5-9.",
+      "pending_changes": []
+    },
+    "usage": {
+      "monthly_used": 1,
+      "monthly_limit": 500,
+      "monthly_remaining": 499,
+      "was_billable": true,
+      "ops_charged": 1,
+      "quota_exhausted": false,
+      "subscription_tier": "free"
+    }
+  },
+  "error": null,
+  "metadata": {
+    "message": "Awaiting approval on 8 changes.",
+    "document_html_provided": true,
+    "pending_changes": [
+      {
+        "change_id": "chg_01_scope_concise",
+        "operation": "replace",
+        "chunk_id": "chunk_0007",
+        "document_id": "doc01",
+        "old_html": "<p>The Vendor shall provide to the Client the data analytics and reporting services described in Schedule A (the &ldquo;Services&rdquo;). It is hereby agreed and understood by and between the parties hereto that the Vendor shall be responsible for the performance and delivery of all of the Services in accordance with the standards set out herein.</p>",
+        "new_html": "<p>The Vendor shall provide to the Client the data analytics and reporting services described in Schedule A (the &ldquo;Services&rdquo;). The Vendor is responsible for performing and delivering all of the Services in accordance with the standards set out herein.</p>",
+        "ai_explanation": "Replaced legalese padding with a plain-English sentence carrying the same obligation."
+      },
+      {
+        "change_id": "chg_02_typo_receive",
+        "operation": "replace",
+        "chunk_id": "chunk_0014",
+        "document_id": "doc01",
+        "old_html": "<p>Any sum not paid when due shall bear interest at the rate of four per cent (4%) per annum above the base rate of the Bank of England from time to time, accruing daily from the due date until the date the Client shall recieve confirmation of settlement in full.</p>",
+        "new_html": "<p>Any sum not paid when due shall bear interest at the rate of four per cent (4%) per annum above the base rate of the Bank of England from time to time, accruing daily from the due date until the date the Client shall receive confirmation of settlement in full.</p>",
+        "ai_explanation": "Corrected the spelling of 'recieve' to 'receive'."
+      },
+      {
+        "change_id": "chg_03_defined_term",
+        "operation": "replace",
+        "chunk_id": "chunk_0009",
+        "document_id": "doc01",
+        "old_html": "<p>The Supplier shall not subcontract any material portion of the Services without the prior written consent of the Client, such consent not to be unreasonably withheld or delayed.</p>",
+        "new_html": "<p>The Vendor shall not subcontract any material portion of the Services without the prior written consent of the Client, such consent not to be unreasonably withheld or delayed.</p>",
+        "ai_explanation": "Aligned the reference with the defined term 'the Vendor'."
+      },
+      {
+        "change_id": "chg_04_date_format",
+        "operation": "replace",
+        "chunk_id": "chunk_0031",
+        "document_id": "doc01",
+        "old_html": "<p>This Agreement and any dispute or claim arising out of or in connection with it shall be governed by and construed in accordance with the law of England and Wales, and the parties irrevocably submit to the exclusive jurisdiction of the courts of England and Wales. Executed by the duly authorised representatives of the parties on 03/04/2026.</p>",
+        "new_html": "<p>This Agreement and any dispute or claim arising out of or in connection with it shall be governed by and construed in accordance with the law of England and Wales, and the parties irrevocably submit to the exclusive jurisdiction of the courts of England and Wales. Executed by the duly authorised representatives of the parties on 3 April 2026.</p>",
+        "ai_explanation": "Restated the execution date in the same long form as the Effective Date to remove DD/MM ambiguity."
+      },
+      {
+        "change_id": "chg_05_payment_terms",
+        "operation": "replace",
+        "chunk_id": "chunk_0013",
+        "document_id": "doc01",
+        "old_html": "<p>In consideration of the Services, the Client shall pay the Vendor the fees set out in Schedule B. The Vendor shall invoice the Client monthly in arrears. The Client shall pay each correctly rendered invoice within thirty (30) days of the date of receipt of such invoice.</p>",
+        "new_html": "<p>In consideration of the Services, the Client shall pay the Vendor the fees set out in Schedule B. The Vendor shall invoice the Client monthly in arrears. The Client shall pay each correctly rendered invoice within ninety (90) days of the date of receipt of such invoice.</p>",
+        "ai_explanation": "Clarified the payment window to align with standard commercial terms."
+      },
+      {
+        "change_id": "chg_06_liability_cap",
+        "operation": "delete",
+        "chunk_id": "chunk_0028",
+        "document_id": "doc01",
+        "old_html": "<p>Subject to the foregoing, the total aggregate liability of the Vendor arising out of or in connection with this Agreement, whether in contract, tort (including negligence) or otherwise, shall not exceed an amount equal to one hundred and fifty per cent (150%) of the total fees paid by the Client under this Agreement in the twelve (12) month period immediately preceding the event giving rise to the claim.</p>",
+        "new_html": null,
+        "ai_explanation": "Removed a redundant paragraph to streamline the liability clause."
+      },
+      {
+        "change_id": "chg_07_termination",
+        "operation": "replace",
+        "chunk_id": "chunk_0024",
+        "document_id": "doc01",
+        "old_html": "<p>Either party may terminate this Agreement for convenience by giving not less than ninety (90) days&rsquo; written notice to the other party. The Client may terminate this Agreement immediately by written notice if the Vendor commits a material breach of this Agreement which is not remedied within thirty (30) days of written notice requiring it to be remedied.</p>",
+        "new_html": "<p>The Vendor may terminate this Agreement for convenience by giving not less than ninety (90) days&rsquo; written notice to the Client. The Client may terminate this Agreement immediately by written notice if the Vendor commits a material breach of this Agreement which is not remedied within thirty (30) days of written notice requiring it to be remedied.</p>",
+        "ai_explanation": "Tightened the termination clause and clarified which party gives notice."
+      },
+      {
+        "change_id": "chg_08_merge_dp",
+        "operation": "replace",
+        "chunk_id": "chunk_0020",
+        "document_id": "doc01",
+        "old_html": "<h2>6. Data Protection</h2><p>Each party shall comply with all applicable data protection legislation in respect of any personal data processed in connection with this Agreement. Where the Vendor processes personal data on behalf of the Client, the Vendor shall act only on the documented instructions of the Client and shall implement appropriate technical and organisational measures to protect such personal data. The Vendor shall notify the Client without undue delay, and in any event within 48 hours, upon becoming aware of any personal data breach.</p>",
+        "new_html": "<p>Each party shall also comply with all applicable data protection legislation in respect of any personal data processed in connection with this Agreement, and shall implement appropriate technical and organisational measures to protect such personal data.</p>",
+        "ai_explanation": "Merged data protection into the confidentiality clause to reduce section count."
+      }
+    ]
+  }
+}

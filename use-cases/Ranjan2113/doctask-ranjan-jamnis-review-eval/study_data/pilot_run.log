@@ -1,0 +1,37 @@
+=== corpus_builder: mode=pilot docs=1 cap=5 ops ===
+[auth] key accepted
+[warmup] sending one throwaway instruction (failure here is expected/ok)
+[ops] warmup: ops_charged=0  billable=False  monthly_used=0/500  | run total 0/5
+[warmup] backend responded; proceeding
+[doc01] requesting 8 edits in one call
+[doc01] job job-redacted-01; polling
+[checkpoint] saved raw job for doc01 -> study_data\checkpoints\doc01.job.json
+[doc01] SuperDocs proposed 5 change(s)
+[doc01] matched 5/8 intents; 0 unmatched change(s)
+[doc01]   MISSING intent (not performed): g_typo
+[doc01]   MISSING intent (not performed): b_delete_liability_cap
+[doc01]   MISSING intent (not performed): b_merge_dp
+
+=== wrote study_data\batches.json ===
+  batch_doc01: 5 changes (2 seeded-bad), matched 5/8 intents
+[ops] TOTAL SPENT THIS RUN: 0/5
+=== corpus_builder: mode=pilot docs=1 cap=5 ops ===
+[ops] prior spend on record: 1 operation(s)
+[auth] key accepted
+[doc01] following up on 3 skipped intent(s): g_typo, b_delete_liability_cap, b_merge_dp
+[doc01] requesting 3 edit(s) in one call (corpus:doc01_b)
+[doc01] job job-redacted-09; polling
+[ops] corpus:doc01_b: ops_charged=1  | run total 2/5
+[checkpoint] saved raw job for doc01 -> study_data\checkpoints\doc01_b.job.json
+[doc01] reusing 2 checkpoint(s); no operation spent
+[doc01] SuperDocs proposed 9 change(s) across 2 call(s)
+[doc01] matched 6/8 intents; 3 unmatched change(s)
+[doc01]   MISSING intent (not performed): g_typo
+[doc01]   MISSING intent (not performed): b_delete_liability_cap
+[doc01]   UNMATCHED change ed91ccb6-7651-4062-a7b6-80e0b2485864 -> needs manual labelling, excluded from the answer key
+[doc01]   UNMATCHED change 1a41ce96-cecb-4c88-8f31-1a85cd75e6b8 -> needs manual labelling, excluded from the answer key
+[doc01]   UNMATCHED change efdd9ae8-afb8-4122-85a4-73285ab8b840 -> needs manual labelling, excluded from the answer key
+
+=== wrote study_data\batches.json ===
+  batch_doc01: 6 changes (3 seeded-bad), matched 6/8 intents
+[ops] TOTAL SPENT THIS RUN: 2/5

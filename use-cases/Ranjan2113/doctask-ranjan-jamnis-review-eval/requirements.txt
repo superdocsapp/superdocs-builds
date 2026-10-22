@@ -1,0 +1,7 @@
+requests>=2.31
+pytest>=8.0
+
+# Backend (step 3)
+fastapi>=0.110
+uvicorn[standard]>=0.29
+httpx>=0.27

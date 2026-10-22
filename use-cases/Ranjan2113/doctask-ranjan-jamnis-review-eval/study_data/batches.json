@@ -1,0 +1,793 @@
+{
+  "generated_at": "2026-08-14T19:42:58+0530",
+  "mode": "full",
+  "ops_cap": 15,
+  "ops_spent": 9,
+  "batches": [
+    {
+      "batch_id": "batch_doc01",
+      "document_id": "doc01",
+      "document_title": "Master Services Agreement (Cobalt Freight / Northwind Analytics)",
+      "document_html": "<h1>Master Services Agreement</h1>\n<p>This Master Services Agreement (the &ldquo;Agreement&rdquo;) is entered into as of 14 March 2026 (the &ldquo;Effective Date&rdquo;) by and between <strong>Cobalt Freight Systems Ltd</strong>, a company registered in England and Wales with company number 09182736, having its registered office at 44 Harbour Road, Bristol BS1 5TY (the &ldquo;Client&rdquo;), and <strong>Northwind Analytics Ltd</strong>, a company registered in England and Wales with company number 11223344, having its registered office at 8 Fenwick Street, Manchester M2 3QQ (the &ldquo;Vendor&rdquo;).</p>\n\n<h2>1. Scope of Services</h2>\n<p>The Vendor shall provide to the Client the data analytics and reporting services described in Schedule A (the &ldquo;Services&rdquo;). It is hereby agreed and understood by and between the parties hereto that the Vendor shall be responsible for the performance and delivery of all of the Services in accordance with the standards set out herein. The Vendor shall assign a named account lead who shall serve as the primary point of contact for the Client throughout the Term.</p>\n<p>The Supplier shall not subcontract any material portion of the Services without the prior written consent of the Client, such consent not to be unreasonably withheld or delayed.</p>\n\n<h2>2. Term</h2>\n<p>This Agreement shall commence on the Effective Date and shall continue for an initial period of twenty-four (24) months (the &ldquo;Initial Term&rdquo;), unless terminated earlier in accordance with Clause 7. Following the Initial Term, this Agreement shall automatically renew for successive periods of twelve (12) months each, unless either party gives written notice of non-renewal not less than sixty (60) days prior to the end of the then-current term.</p>\n\n<h2>3. Fees and Payment</h2>\n<p>In consideration of the Services, the Client shall pay the Vendor the fees set out in Schedule B. The Vendor shall invoice the Client monthly in arrears. The Client shall pay each correctly rendered invoice within thirty (30) days of the date of receipt of such invoice.</p>\n<p>Any sum not paid when due shall bear interest at the rate of four per cent (4%) per annum above the base rate of the Bank of England from time to time, accruing daily from the due date until the date the Client shall recieve confirmation of settlement in full.</p>\n<p>All fees stated are exclusive of value added tax, which shall be added to each invoice at the prevailing rate.</p>\n\n<h2>4. Service Levels</h2>\n<p>The Vendor shall meet the service levels set out in Schedule C. Where the Vendor fails to meet a service level in any calendar month, the Client shall be entitled to the service credits specified in Schedule C as its sole financial remedy for such failure. Service credits shall be applied against the next invoice issued following the month in which the failure occurred.</p>\n\n<h2>5. Confidentiality</h2>\n<p>Each party shall keep confidential all Confidential Information of the other party disclosed to it under or in connection with this Agreement, and shall not use such Confidential Information other than for the purpose of performing its obligations under this Agreement. This obligation shall survive termination of this Agreement for a period of five (5) years.</p>\n\n<h2>6. Data Protection</h2>\n<p>Each party shall comply with all applicable data protection legislation in respect of any personal data processed in connection with this Agreement. Where the Vendor processes personal data on behalf of the Client, the Vendor shall act only on the documented instructions of the Client and shall implement appropriate technical and organisational measures to protect such personal data. The Vendor shall notify the Client without undue delay, and in any event within 48 hours, upon becoming aware of any personal data breach.</p>\n\n<h2>7. Termination</h2>\n<p>Either party may terminate this Agreement for convenience by giving not less than ninety (90) days&rsquo; written notice to the other party. The Client may terminate this Agreement immediately by written notice if the Vendor commits a material breach of this Agreement which is not remedied within thirty (30) days of written notice requiring it to be remedied.</p>\n<p>On termination of this Agreement for any reason, the Vendor shall promptly return or securely destroy all Confidential Information of the Client in its possession, and shall provide the Client with a written certificate confirming it has done so.</p>\n\n<h2>8. Limitation of Liability</h2>\n<p>Nothing in this Agreement shall limit or exclude either party&rsquo;s liability for death or personal injury caused by its negligence, for fraud or fraudulent misrepresentation, or for any other liability which cannot lawfully be limited or excluded.</p>\n<p>Subject to the foregoing, the total aggregate liability of the Vendor arising out of or in connection with this Agreement, whether in contract, tort (including negligence) or otherwise, shall not exceed an amount equal to one hundred and fifty per cent (150%) of the total fees paid by the Client under this Agreement in the twelve (12) month period immediately preceding the event giving rise to the claim.</p>\n<p>Neither party shall be liable to the other for any indirect or consequential loss, or for any loss of profit, loss of revenue, or loss of anticipated savings, in each case whether arising in contract, tort or otherwise.</p>\n\n<h2>9. Governing Law</h2>\n<p>This Agreement and any dispute or claim arising out of or in connection with it shall be governed by and construed in accordance with the law of England and Wales, and the parties irrevocably submit to the exclusive jurisdiction of the courts of England and Wales. Executed by the duly authorised representatives of the parties on 03/04/2026.</p>\n",
+      "seed": 20260814,
+      "changes": [
+        {
+          "id": "7f94b01fa6ce",
+          "source_change_id": "1a41ce96-cecb-4c88-8f31-1a85cd75e6b8",
+          "operation": "edit",
+          "chunk_id": "281e9efa-c58c-446a-97bb-8d644bed90ec",
+          "old_html": "<p data-chunk-id=\"281e9efa-c58c-446a-97bb-8d644bed90ec\">Each party shall keep confidential all Confidential Information of the other party disclosed to it under or in connection with this Agreement, and shall not use such Confidential Information other than for the purpose of performing its obligations under this Agreement. This obligation shall survive termination of this Agreement for a period of five (5) years.</p>",
+          "new_html": "<p data-chunk-id=\"281e9efa-c58c-446a-97bb-8d644bed90ec\">Each party shall keep confidential all Confidential Information of the other party, using it solely to perform its obligations under this Agreement, and shall comply with all applicable data protection legislation regarding personal data. These obligations shall survive termination of this Agreement for five (5) years.</p>",
+          "ai_explanation": "Parallel edit: Perform these specific edits as instructed."
+        },
+        {
+          "id": "b172367a2784",
+          "source_change_id": "3f3f8a5d-3a58-414e-8ed3-ab38d047aa77",
+          "operation": "edit",
+          "chunk_id": "a8f86777-cf1a-4c68-b290-fa9f841a87a3",
+          "old_html": "<p data-chunk-id=\"a8f86777-cf1a-4c68-b290-fa9f841a87a3\">Either party may terminate this Agreement for convenience by giving not less than ninety (90) days\u2019 written notice to the other party. The Client may terminate this Agreement immediately by written notice if the Vendor commits a material breach of this Agreement which is not remedied within thirty (30) days of written notice requiring it to be remedied.</p>",
+          "new_html": "<p data-chunk-id=\"a8f86777-cf1a-4c68-b290-fa9f841a87a3\">The Vendor may terminate this Agreement for convenience by giving not less than ninety (90) days\u2019 written notice to the Client. The Client may terminate this Agreement immediately by written notice if the Vendor commits a material breach of this Agreement which is not remedied within thirty (30) days of written notice requiring it to be remedied.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified below. Preserve all other content\u2026"
+        },
+        {
+          "id": "bc3dddde6178",
+          "source_change_id": "d51fa870-e951-422d-9c02-e2d9a7d24a2e",
+          "operation": "edit",
+          "chunk_id": "49bea3ef-7303-4c93-ad9c-0563c6c1e26f",
+          "old_html": "<p data-chunk-id=\"49bea3ef-7303-4c93-ad9c-0563c6c1e26f\">The Supplier shall not subcontract any material portion of the Services without the prior written consent of the Client, such consent not to be unreasonably withheld or delayed.</p>",
+          "new_html": "<p data-chunk-id=\"49bea3ef-7303-4c93-ad9c-0563c6c1e26f\">the Vendor shall not subcontract any material portion of the Services without the prior written consent of the Client, such consent not to be unreasonably withheld or delayed.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified below. Preserve all other content\u2026"
+        },
+        {
+          "id": "26cb2d1c2562",
+          "source_change_id": "9a74f52c-8bd0-4abe-8d83-d836c2f68cfd",
+          "operation": "edit",
+          "chunk_id": "6adbe5c3-eee6-4ec3-9a96-a49cb14047ab",
+          "old_html": "<p data-chunk-id=\"6adbe5c3-eee6-4ec3-9a96-a49cb14047ab\">The Vendor shall provide to the Client the data analytics and reporting services described in Schedule A (the \u201cServices\u201d). It is hereby agreed and understood by and between the parties hereto that the Vendor shall be responsible for the performance and delivery of all of the Services in accordance with the standards set out herein. The Vendor shall assign a named account lead who shall serve as the primary point of contact for the Client throughout the Term.</p>",
+          "new_html": "<p data-chunk-id=\"6adbe5c3-eee6-4ec3-9a96-a49cb14047ab\">The Vendor shall provide to the Client the data analytics and reporting services described in Schedule A (the \u201cServices\u201d). The parties agree to the terms herein. The Vendor shall assign a named account lead who shall serve as the primary point of contact for the Client throughout the Term.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified below. Preserve all other content\u2026"
+        },
+        {
+          "id": "54afbbd2fc66",
+          "source_change_id": "b46b4bae-5cc3-4cb7-ace0-ef8ec272c770",
+          "operation": "edit",
+          "chunk_id": "d8423155-6cfe-4192-aac9-e8f08dd71c47",
+          "old_html": "<p data-chunk-id=\"d8423155-6cfe-4192-aac9-e8f08dd71c47\">This Agreement and any dispute or claim arising out of or in connection with it shall be governed by and construed in accordance with the law of England and Wales, and the parties irrevocably submit to the exclusive jurisdiction of the courts of England and Wales. Executed by the duly authorised representatives of the parties on 03/04/2026.</p>",
+          "new_html": "<p data-chunk-id=\"d8423155-6cfe-4192-aac9-e8f08dd71c47\">This Agreement and any dispute or claim arising out of or in connection with it shall be governed by and construed in accordance with the law of England and Wales, and the parties irrevocably submit to the exclusive jurisdiction of the courts of England and Wales. Executed by the duly authorised representatives of the parties on 3 April 2026.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified below. Preserve all other content\u2026"
+        },
+        {
+          "id": "b6dfa1cf42ed",
+          "source_change_id": "fc7ff253-9f03-4bd9-8396-49ae532aa188",
+          "operation": "edit",
+          "chunk_id": "e98995d1-e01c-421b-856a-d338c98d428b",
+          "old_html": "<p data-chunk-id=\"e98995d1-e01c-421b-856a-d338c98d428b\">In consideration of the Services, the Client shall pay the Vendor the fees set out in Schedule B. The Vendor shall invoice the Client monthly in arrears. The Client shall pay each correctly rendered invoice within thirty (30) days of the date of receipt of such invoice.</p>",
+          "new_html": "<p data-chunk-id=\"e98995d1-e01c-421b-856a-d338c98d428b\">In consideration of the Services, the Client shall pay the Vendor the fees set out in Schedule B. The Vendor shall invoice the Client monthly in arrears. The Client shall pay each correctly rendered invoice within ninety (90) days of the date of receipt of such invoice.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified below. Preserve all other content\u2026"
+        },
+        {
+          "id": "d821f777bf73",
+          "source_change_id": "ff4c82fb-b28a-4489-bb46-e653bc487efc",
+          "operation": "delete",
+          "chunk_id": "f9dc828d-a1f8-4df2-b46d-72ef25b0bd7f",
+          "old_html": "<h2 data-chunk-id=\"f9dc828d-a1f8-4df2-b46d-72ef25b0bd7f\">6. Data Protection</h2>\n<p data-chunk-id=\"84560089-a48c-4d6c-b05a-bc3a56883c9d\">Each party shall comply with all applicable data protection legislation in respect of any personal data processed in connection with this Agreement. Where the Vendor processes personal data on behalf of the Client, the Vendor shall act only on the documented instructions of the Client and shall implement appropriate technical and organisational measures to protect such personal data. The Vendor shall notify the Client without undue delay, and in any event within 48 hours, upon becoming aware of any personal data breach.</p>",
+          "new_html": null,
+          "ai_explanation": "\u2705 I have corrected the spelling of 'receive' in Clause 3, removed the 150% liability cap in Clause 8, and merged Clause 6 (Data Protection) into Clause 5 (Confidentiality) with a condensed structure."
+        }
+      ],
+      "ground_truth": [
+        {
+          "change_id": "1a41ce96-cecb-4c88-8f31-1a85cd75e6b8",
+          "should_approve": false,
+          "reason": "Companion to the Clause 6 deletion. Rewrites Clause 5 to absorb data protection in one general sentence, dropping the 48-hour personal data breach notification obligation, a hard regulatory commitment, and burying data protection under a confidentiality heading.",
+          "error_kind": "lossy_merge",
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "3f3f8a5d-3a58-414e-8ed3-ab38d047aa77",
+          "should_approve": false,
+          "reason": "Reverses a mutual termination-for-convenience right into a Vendor-only right. The Client loses its ability to terminate for convenience entirely.",
+          "error_kind": "meaning_flip",
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "9a74f52c-8bd0-4abe-8d83-d836c2f68cfd",
+          "should_approve": false,
+          "reason": "Replaces the Vendor's performance obligation with 'The parties agree to the terms herein', which obligates nobody to anything. The intent asked for a meaning-preserving tightening; what arrived deletes the substance of the clause.",
+          "error_kind": "dropped_clause",
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": true
+        },
+        {
+          "change_id": "b46b4bae-5cc3-4cb7-ace0-ef8ec272c770",
+          "should_approve": true,
+          "reason": "Restates the execution date '03/04/2026' as '3 April 2026', matching the Effective Date's long form and removing a real DD/MM versus MM/DD ambiguity. The date itself does not move.",
+          "error_kind": null,
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "d51fa870-e951-422d-9c02-e2d9a7d24a2e",
+          "should_approve": true,
+          "reason": "Correctly replaces the undefined term 'Supplier' with the defined term 'the Vendor', removing a genuine ambiguity. It also lowercases the sentence-initial 'The', which is a cosmetic defect a reviewer may reasonably flag but does not change any obligation. Borderline; resolved as approve because the legal content is improved and the flaw is typographical.",
+          "error_kind": null,
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "fc7ff253-9f03-4bd9-8396-49ae532aa188",
+          "should_approve": false,
+          "reason": "Triples the Client's payment window from thirty to ninety days. A material commercial term altered with nothing in the document justifying it, and presented as a clarification.",
+          "error_kind": "wrong_number",
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "ff4c82fb-b28a-4489-bb46-e653bc487efc",
+          "should_approve": false,
+          "reason": "Deletes Clause 6 (Data Protection) in full as part of a merge into Clause 5. Removes the data protection obligations wholesale rather than relocating them intact.",
+          "error_kind": "lossy_merge",
+          "confirmed_by": "study_designer",
+          "confirmed_at": "2026-08-14T12:20:00+05:30",
+          "overrode_intent": false
+        }
+      ],
+      "pre_registered_at": "2026-08-14T14:12:58.943909+00:00",
+      "ground_truth_sha256": "b71b12eb451e304cdb28188e4d7b495bf4a8e9bf45f457813650629900fd5a3a",
+      "exclude_from_study": true,
+      "build_report": {
+        "intents_requested": 8,
+        "intents_matched": 6,
+        "missing_intents": [
+          "g_typo",
+          "b_delete_liability_cap"
+        ],
+        "unmatched_changes": [
+          "1a41ce96-cecb-4c88-8f31-1a85cd75e6b8"
+        ],
+        "adopted_unmatched": [
+          "1a41ce96-cecb-4c88-8f31-1a85cd75e6b8"
+        ],
+        "noops_dropped": 2,
+        "labels_overriding_intent": [
+          "9a74f52c-8bd0-4abe-8d83-d836c2f68cfd"
+        ],
+        "job_status": "awaiting_approval",
+        "job_ids": [
+          "job-redacted-01",
+          "job-redacted-09"
+        ],
+        "calls_made": 2
+      }
+    },
+    {
+      "batch_id": "batch_doc02",
+      "document_id": "doc02",
+      "document_title": "Statement of Work SOW-2026-014 (freight utilisation platform)",
+      "document_html": "<h1>Statement of Work &mdash; SOW-2026-014</h1>\n<p>This Statement of Work is issued under and governed by the Master Services Agreement dated 14 March 2026 between <strong>Cobalt Freight Systems Ltd</strong> (the &ldquo;Client&rdquo;) and <strong>Northwind Analytics Ltd</strong> (the &ldquo;Vendor&rdquo;). Capitalised terms not defined here have the meaning given to them in the Master Services Agreement.</p>\n\n<h2>1. Project Description</h2>\n<p>The Vendor shall design, build and deliver a freight utilisation reporting platform for the Client's UK depot network. It is acknowledged and agreed by and between the parties hereto that the platform shall ingest telematics data from the Client's existing fleet management system and shall produce daily utilisation reporting at depot, region and national level.</p>\n\n<h2>2. Deliverables</h2>\n<p>The Vendor shall deliver: (a) a data ingestion pipeline covering all twelve (12) UK depots; (b) a reporting dashboard accessible to up to fifty (50) named Client users; (c) a written handover document describing the architecture and operational runbook; and (d) two half-day training sessions for Client staff.</p>\n<p>Each deliverable shall be deemed accepted when the Client confirms in writing that it meets the acceptance criteria in Schedule 1, or fifteen (15) business days after delivery if the Client has raised no written objection.</p>\n\n<h2>3. Timeline</h2>\n<p>Work shall commence on 6 April 2026. The Vendor shall deliver the ingestion pipeline by 29 May 2026, the reporting dashboard by 10 July 2026, and shall complete handover and training by 07/08/2026.</p>\n<p>The parties acknowledge that the timeline assumes the Client provides access to the fleet management system's API within ten (10) business days of commencement. Delay in providing such access shall extend each subsequent milestone by an equivalent period.</p>\n\n<h2>4. Charges</h2>\n<p>The total fixed price for the Services described in this Statement of Work is one hundred and eighty thousand pounds (&pound;180,000), exclusive of VAT. This sum shall be invoiced in three equal instalments of sixty thousand pounds (&pound;60,000) on commencement, on acceptance of the reporting dashboard, and on completion of handover respectively.</p>\n<p>Expenses shall be reimbursed at cost where agreed in advance in writing by the Client, and shall not exceed five per cent (5%) of the total fixed price without the Client's prior written approval.</p>\n\n<h2>5. Client Responsibilities</h2>\n<p>The Client shall make available a nominated project sponsor, provide timely access to the systems and data described in Schedule 2, and respond to written requests for decisions within five (5) business days. The Client's failure to do so shall not constitute a breach of this Statement of Work but may affect the timeline as described in Clause 3.</p>\n\n<h2>6. Change Control</h2>\n<p>Any change to the scope, deliverables, timeline or charges set out in this Statement of Work shall be documented in a written change request signed by an authorised representative of each party. No change shall take effect until so signed. The Supplier shall provide an impact assessment covering cost and timeline within five (5) business days of receiving a change request.</p>\n\n<h2>7. Key Personnel</h2>\n<p>The Vendor shall assign Dr Amara Okafor as technical lead and Jonas Petrelli as delivery manager for the duration of this Statement of Work. The Vendor shall not replace either individual without the Client's prior written consent, such consent not to be unreasonably withheld, except where the individual leaves the Vendor's employment.</p>\n",
+      "seed": 20260802,
+      "changes": [
+        {
+          "id": "b32308f6d2a3",
+          "source_change_id": "6bcc761f-3a59-453e-85b1-29b27c7587b9",
+          "operation": "edit",
+          "chunk_id": "07af18e0-edfc-463f-bc41-3684aaeb6a3f",
+          "old_html": "<p data-chunk-id=\"07af18e0-edfc-463f-bc41-3684aaeb6a3f\">Any change to the scope, deliverables, timeline or charges set out in this Statement of Work shall be documented in a written change request signed by an authorised representative of each party. No change shall take effect until so signed. The Supplier shall provide an impact assessment covering cost and timeline within five (5) business days of receiving a change request.</p>",
+          "new_html": "<p data-chunk-id=\"07af18e0-edfc-463f-bc41-3684aaeb6a3f\">Any change to the scope, deliverables, timeline or charges set out in this Statement of Work shall be documented in a written change request signed by an authorised representative of each party. No change shall take effect until so signed. the Vendor shall provide an impact assessment covering cost and timeline within five (5) business days of receiving a change request.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        },
+        {
+          "id": "07a40b3ba3fd",
+          "source_change_id": "fc20d38b-0175-4aa0-bb1a-9b29798ba5e3",
+          "operation": "edit",
+          "chunk_id": "93778509-9c3d-4bb5-b0f7-aaf0ed9da22a",
+          "old_html": "<p data-chunk-id=\"93778509-9c3d-4bb5-b0f7-aaf0ed9da22a\">Work shall commence on 6 April 2026. The Vendor shall deliver the ingestion pipeline by 29 May 2026, the reporting dashboard by 10 July 2026, and shall complete handover and training by 07/08/2026.</p>",
+          "new_html": "<p data-chunk-id=\"93778509-9c3d-4bb5-b0f7-aaf0ed9da22a\">Work shall commence on 6 April 2026. The Vendor shall deliver the ingestion pipeline by 29 May 2026, the reporting dashboard by 10 July 2026, and shall complete handover and training by 7 August 2026.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        },
+        {
+          "id": "367cbe76d5cd",
+          "source_change_id": "873cfb74-9fb1-4770-ba3f-59dfb64bc280",
+          "operation": "edit",
+          "chunk_id": "3234bae5-f49e-4c54-9691-55b35a3ef944",
+          "old_html": "<p data-chunk-id=\"3234bae5-f49e-4c54-9691-55b35a3ef944\">The total fixed price for the Services described in this Statement of Work is one hundred and eighty thousand pounds (\u00a3180,000), exclusive of VAT. This sum shall be invoiced in three equal instalments of sixty thousand pounds (\u00a360,000) on commencement, on acceptance of the reporting dashboard, and on completion of handover respectively.</p>",
+          "new_html": "<p data-chunk-id=\"3234bae5-f49e-4c54-9691-55b35a3ef944\">The total fixed price for the Services described in this Statement of Work is two hundred and forty thousand pounds (\u00a3240,000), exclusive of VAT. This sum shall be invoiced in three equal instalments of eighty thousand pounds (\u00a380,000) on commencement, on acceptance of the reporting dashboard, and on completion of handover respectively.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        },
+        {
+          "id": "e239b2eb317f",
+          "source_change_id": "a5ea9da6-3965-43ca-8eac-f832ebfbd3fe",
+          "operation": "edit",
+          "chunk_id": "370f14f7-6b4b-4818-a9c9-b6f24a007148",
+          "old_html": "<p data-chunk-id=\"370f14f7-6b4b-4818-a9c9-b6f24a007148\">The Vendor shall design, build and deliver a freight utilisation reporting platform for the Client's UK depot network. It is acknowledged and agreed by and between the parties hereto that the platform shall ingest telematics data from the Client's existing fleet management system and shall produce daily utilisation reporting at depot, region and national level.</p>",
+          "new_html": "<p data-chunk-id=\"370f14f7-6b4b-4818-a9c9-b6f24a007148\">The Vendor shall design, build and deliver a freight utilisation reporting platform for the Client's UK depot network. The parties agree that the platform shall ingest telematics data from the Client's existing fleet management system and shall produce daily utilisation reporting at depot, region and national level.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        },
+        {
+          "id": "5a711e145110",
+          "source_change_id": "f05453bd-626e-41f8-b835-363050e09496",
+          "operation": "edit",
+          "chunk_id": "b63e1429-98c4-43ec-9183-210819f878c6",
+          "old_html": "<p data-chunk-id=\"b63e1429-98c4-43ec-9183-210819f878c6\">The Client shall make available a nominated project sponsor, provide timely access to the systems and data described in Schedule 2, and respond to written requests for decisions within five (5) business days. The Client's failure to do so shall not constitute a breach of this Statement of Work but may affect the timeline as described in Clause 3.</p>",
+          "new_html": "<p data-chunk-id=\"b63e1429-98c4-43ec-9183-210819f878c6\">The Client shall make available a nominated project sponsor, provide timely access to the systems and data described in Schedule 2, and respond to written requests for decisions within five (5) business days. If the Client fails to do so, such failure does not constitute a breach of this Statement of Work, though it may delay the timeline as specified in Clause 3.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        },
+        {
+          "id": "d468754104c5",
+          "source_change_id": "26e39af9-17a3-4012-8b2a-3fd79477891b",
+          "operation": "edit",
+          "chunk_id": "dbede3cd-ab8e-4bd6-99fb-e0fc007b449a",
+          "old_html": "<p data-chunk-id=\"dbede3cd-ab8e-4bd6-99fb-e0fc007b449a\">Each deliverable shall be deemed accepted when the Client confirms in writing that it meets the acceptance criteria in Schedule 1, or fifteen (15) business days after delivery if the Client has raised no written objection.</p>",
+          "new_html": "<p data-chunk-id=\"dbede3cd-ab8e-4bd6-99fb-e0fc007b449a\">Each deliverable shall be deemed accepted if the Client provides written confirmation of acceptance or if the Client raises no written objection within fifteen (15) business days after delivery.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        },
+        {
+          "id": "4e4d10923a48",
+          "source_change_id": "ab2e5dfe-6ca2-4346-961d-b1e564a448f0",
+          "operation": "edit",
+          "chunk_id": "ac863353-d92b-4aa6-967f-bca42ca03683",
+          "old_html": "<p data-chunk-id=\"ac863353-d92b-4aa6-967f-bca42ca03683\">The Vendor shall assign Dr Amara Okafor as technical lead and Jonas Petrelli as delivery manager for the duration of this Statement of Work. The Vendor shall not replace either individual without the Client's prior written consent, such consent not to be unreasonably withheld, except where the individual leaves the Vendor's employment.</p>",
+          "new_html": "<p data-chunk-id=\"ac863353-d92b-4aa6-967f-bca42ca03683\">The Vendor shall assign Dr Amara Okafor as technical lead and Jonas Petrelli as delivery manager for the duration of this Statement of Work. The Vendor shall not replace these individuals without the Client's prior written consent, except if the individual leaves the Vendor's employment. Consent shall not be unreasonably withheld.</p>",
+          "ai_explanation": "Parallel edit: Ensure all requested edits are performed while preserving existing HTML\u2026"
+        }
+      ],
+      "ground_truth": [
+        {
+          "change_id": "26e39af9-17a3-4012-8b2a-3fd79477891b",
+          "should_approve": true,
+          "reason": "Restructures the deemed-acceptance sentence. Both routes to acceptance, the fifteen business day period and the no-written-objection condition all survive unchanged.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "6bcc761f-3a59-453e-85b1-29b27c7587b9",
+          "should_approve": true,
+          "reason": "Replaces the undefined term 'The Supplier' with the defined term 'the Vendor', removing a real ambiguity. It lowercases the sentence-initial 'the', a typographical defect that changes no obligation.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "873cfb74-9fb1-4770-ba3f-59dfb64bc280",
+          "should_approve": false,
+          "reason": "Raises the total fixed price from GBP 180,000 to GBP 240,000 and the instalments from GBP 60,000 to GBP 80,000. A 33% price increase, GBP 60,000, introduced under cover of an instalment edit. NOTE: the request was to change only the instalment figure, which would have left the clause self-contradictory; the model instead raised the total to match, so the arithmetic is internally consistent and the error is a silent price rise rather than a visible inconsistency. Harder to spot than intended.",
+          "error_kind": "wrong_number",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "a5ea9da6-3965-43ca-8eac-f832ebfbd3fe",
+          "should_approve": true,
+          "reason": "Replaces 'It is acknowledged and agreed by and between the parties hereto that' with 'The parties agree that'. The ingestion and reporting obligations that follow are carried over intact.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "ab2e5dfe-6ca2-4346-961d-b1e564a448f0",
+          "should_approve": true,
+          "reason": "Splits the consent sentence and moves 'Consent shall not be unreasonably withheld' to its own sentence. Borderline: 'either individual' becomes 'these individuals', which a strict reader could argue weakens the per-person consent requirement. Resolved as approve because the ordinary distributive reading is preserved and both the consent requirement and the employment exception remain.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "f05453bd-626e-41f8-b835-363050e09496",
+          "should_approve": true,
+          "reason": "Rewrites the Client-delay sentence in the active voice. The carve-out that delay is not a breach, and the cross-reference to the Clause 3 timeline, both survive.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "fc20d38b-0175-4aa0-bb1a-9b29798ba5e3",
+          "should_approve": true,
+          "reason": "Restates the handover deadline 07/08/2026 as 7 August 2026, matching the long form used for the other milestones. The date does not move.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        }
+      ],
+      "pre_registered_at": "2026-08-14T14:12:58.946491+00:00",
+      "ground_truth_sha256": "00f22a643cb7db824fed1ebc9c03ddbca4d69c63a4b54e23c6354f638f58f1cc",
+      "exclude_from_study": false,
+      "build_report": {
+        "intents_requested": 8,
+        "intents_matched": 7,
+        "missing_intents": [
+          "g_deliverables"
+        ],
+        "unmatched_changes": [],
+        "adopted_unmatched": [],
+        "noops_dropped": 1,
+        "labels_overriding_intent": [],
+        "job_status": "awaiting_approval",
+        "job_ids": [
+          "job-redacted-05"
+        ],
+        "calls_made": 1
+      }
+    },
+    {
+      "batch_id": "batch_doc03",
+      "document_id": "doc03",
+      "document_title": "Data Processing Agreement (Cobalt Freight / Northwind Analytics)",
+      "document_html": "<h1>Data Processing Agreement</h1>\n<p>This Data Processing Agreement (the &ldquo;DPA&rdquo;) forms part of the Master Services Agreement dated 14 March 2026 between <strong>Cobalt Freight Systems Ltd</strong> (the &ldquo;Controller&rdquo;) and <strong>Northwind Analytics Ltd</strong> (the &ldquo;Processor&rdquo;), and applies to the processing of personal data carried out by the Processor on behalf of the Controller.</p>\n\n<h2>1. Scope of Processing</h2>\n<p>The Processor shall process personal data only for the purpose of providing the Services and only on the documented instructions of the Controller. It is hereby expressly acknowledged and agreed between the parties that the Processor shall not process personal data for its own purposes, including for the training of machine learning models, without the separate written consent of the Controller.</p>\n<p>The categories of data subject, the categories of personal data, and the nature and duration of the processing are set out in Annex A.</p>\n\n<h2>2. Confidentiality of Personnel</h2>\n<p>The Processor shall ensure that each person authorised to process the personal data is subject to a duty of confidentiality, whether contractual or statutory, and has received appropriate training on the handling of personal data. The Processor shall maintain a record of authorised personnel and shall make that record available to the Controller on request.</p>\n\n<h2>3. Security Measures</h2>\n<p>The Processor shall implement appropriate technical and organisational measures to protect personal data against accidental or unlawful destruction, loss, alteration, unauthorised disclosure or access. Such measures shall include encryption of personal data in transit and at rest, role-based access control, and logging of access to production systems retained for not less than twelve (12) months.</p>\n\n<h2>4. Sub-processing</h2>\n<p>The Processor shall not engage a sub-processor without the Controller's prior written authorisation. Where authorisation is given, the Processor shall impose on the sub-processor data protection obligations no less protective than those set out in this DPA, and shall remain fully liable to the Controller for the performance of that sub-processor's obligations.</p>\n<p>The Processor shall give the Controller not less than thirty (30) days' written notice of any intended addition or replacement of a sub-processor, during which period the Controller may object on reasonable data protection grounds.</p>\n\n<h2>5. Data Subject Rights</h2>\n<p>Taking into account the nature of the processing, the Processor shall assist the Controller by appropriate technical and organisational measures, insofar as this is possible, in fulfilling the Controller's obligation to respond to requests from data subjects exercising their rights. The Processor shall notify the Controller without undue delay if it receives such a request directly, and shall not respond to that request itself unless instructed to do so by the Controller.</p>\n\n<h2>6. Personal Data Breach</h2>\n<p>The Processor shall notify the Controller without undue delay, and in any event within seventy-two (72) hours, after becoming aware of a personal data breach affecting personal data processed under this DPA. The notification shall describe the nature of the breach, the categories and approximate number of data subjects affected, the likely consequences, and the measures taken or proposed to address it.</p>\n\n<h2>7. Deletion and Return</h2>\n<p>On termination of the Services, the Processor shall, at the Controller's election, delete or return all personal data processed on the Controller's behalf, and shall delete existing copies unless retention is required by applicable law. The Processor shall certify deletion in writing within thirty (30) days of the Controller's request. Signed on behalf of the parties on 05/06/2026.</p>\n",
+      "seed": 20260803,
+      "changes": [
+        {
+          "id": "46db8f869997",
+          "source_change_id": "b3f12db9-0e38-4e83-adb7-8581e4e80ce1",
+          "operation": "edit",
+          "chunk_id": "52ca4cf7-1587-429a-899f-621c303a7a1c",
+          "old_html": "<p data-chunk-id=\"52ca4cf7-1587-429a-899f-621c303a7a1c\">The Processor shall give the Controller not less than thirty (30) days' written notice of any intended addition or replacement of a sub-processor, during which period the Controller may object on reasonable data protection grounds.</p>",
+          "new_html": "<p data-chunk-id=\"52ca4cf7-1587-429a-899f-621c303a7a1c\">The Processor shall provide the Controller with at least thirty (30) days\u2019 written notice of any intended addition or replacement of a sub-processor. During this period, the Controller may object on reasonable data protection grounds.</p>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        },
+        {
+          "id": "0a16232cee7d",
+          "source_change_id": "06902dc7-6906-4446-b95d-28103e900593",
+          "operation": "edit",
+          "chunk_id": "cfafbf04-e022-41f8-9586-b8d0efcef9ff",
+          "old_html": "<p data-chunk-id=\"cfafbf04-e022-41f8-9586-b8d0efcef9ff\">Taking into account the nature of the processing, the Processor shall assist the Controller by appropriate technical and organisational measures, insofar as this is possible, in fulfilling the Controller's obligation to respond to requests from data subjects exercising their rights. The Processor shall notify the Controller without undue delay if it receives such a request directly, and shall not respond to that request itself unless instructed to do so by the Controller.</p>",
+          "new_html": "<p data-chunk-id=\"cfafbf04-e022-41f8-9586-b8d0efcef9ff\">Considering the nature of the processing, the Processor shall, insofar as this is possible, assist the Controller through appropriate technical and organisational measures in fulfilling the Controller\u2019s obligation to respond to data subject rights requests. The Processor shall notify the Controller without undue delay if it receives such a request directly, and shall not respond to that request itself unless instructed to do so by the Controller.</p>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        },
+        {
+          "id": "9b07c2606ade",
+          "source_change_id": "1081a1d4-163e-4571-a9f9-3dcd552352ea",
+          "operation": "edit",
+          "chunk_id": "9c36789f-22fa-43fd-a323-7575e7a7ec94",
+          "old_html": "<p data-chunk-id=\"9c36789f-22fa-43fd-a323-7575e7a7ec94\">The Processor shall process personal data only for the purpose of providing the Services and only on the documented instructions of the Controller. It is hereby expressly acknowledged and agreed between the parties that the Processor shall not process personal data for its own purposes, including for the training of machine learning models, without the separate written consent of the Controller.</p>",
+          "new_html": "<p data-chunk-id=\"9c36789f-22fa-43fd-a323-7575e7a7ec94\">The Processor shall process personal data only for the purpose of providing the Services and only on the documented instructions of the Controller. The parties agree that the Processor shall not process personal data for its own purposes, including for the training of machine learning models, without the separate written consent of the Controller.</p>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        },
+        {
+          "id": "597c5ebc40bc",
+          "source_change_id": "4e71fce7-f0b6-4ec2-a947-286961485c9e",
+          "operation": "edit",
+          "chunk_id": "b84e0143-cb72-4ea5-a39c-4d4743051a62",
+          "old_html": "<p data-chunk-id=\"b84e0143-cb72-4ea5-a39c-4d4743051a62\">The Processor shall not engage a sub-processor without the Controller's prior written authorisation. Where authorisation is given, the Processor shall impose on the sub-processor data protection obligations no less protective than those set out in this DPA, and shall remain fully liable to the Controller for the performance of that sub-processor's obligations.</p>",
+          "new_html": "<p data-chunk-id=\"b84e0143-cb72-4ea5-a39c-4d4743051a62\">The Processor may engage sub-processors at its discretion, provided it notifies the Controller afterwards. Where authorisation is given, the Processor shall impose on the sub-processor data protection obligations no less protective than those set out in this DPA, and shall remain fully liable to the Controller for the performance of that sub-processor's obligations.</p>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        },
+        {
+          "id": "f78f12f74a70",
+          "source_change_id": "d64906b6-3eca-4f8b-96eb-624b2dc3beb5",
+          "operation": "edit",
+          "chunk_id": "1eabcf24-ade4-4882-b375-433bed04d27b",
+          "old_html": "<p data-chunk-id=\"1eabcf24-ade4-4882-b375-433bed04d27b\">The Processor shall notify the Controller without undue delay, and in any event within seventy-two (72) hours, after becoming aware of a personal data breach affecting personal data processed under this DPA. The notification shall describe the nature of the breach, the categories and approximate number of data subjects affected, the likely consequences, and the measures taken or proposed to address it.</p>",
+          "new_html": "<p data-chunk-id=\"1eabcf24-ade4-4882-b375-433bed04d27b\">The Processor shall notify the Controller without undue delay, and in any event within thirty (30) days, after becoming aware of a personal data breach affecting personal data processed under this DPA. The notification shall describe the nature of the breach, the categories and approximate number of data subjects affected, the likely consequences, and the measures taken or proposed to address it.</p>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        },
+        {
+          "id": "3d53d00490c5",
+          "source_change_id": "80407ce1-fba7-4bcc-827a-36f51134bbe2",
+          "operation": "edit",
+          "chunk_id": "e598e778-fc63-484f-b10f-818ef3bb4bda",
+          "old_html": "<p data-chunk-id=\"e598e778-fc63-484f-b10f-818ef3bb4bda\">The Processor shall implement appropriate technical and organisational measures to protect personal data against accidental or unlawful destruction, loss, alteration, unauthorised disclosure or access. Such measures shall include encryption of personal data in transit and at rest, role-based access control, and logging of access to production systems retained for not less than twelve (12) months.</p>",
+          "new_html": "<p data-chunk-id=\"e598e778-fc63-484f-b10f-818ef3bb4bda\">The Processor shall implement appropriate technical and organisational measures to protect personal data against accidental or unlawful destruction, loss, alteration, unauthorised disclosure or access. Such measures shall include:</p><ul><li>encryption of personal data in transit and at rest</li><li>role-based access control</li><li>logging of access to production systems retained for not less than twelve (12) months</li></ul>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        },
+        {
+          "id": "cc920177add6",
+          "source_change_id": "e7d1aa5d-b6a2-4e40-a4de-6dce15484594",
+          "operation": "edit",
+          "chunk_id": "e0b0d2c6-51c3-453d-9b72-2649527a9915",
+          "old_html": "<p data-chunk-id=\"e0b0d2c6-51c3-453d-9b72-2649527a9915\">On termination of the Services, the Processor shall, at the Controller's election, delete or return all personal data processed on the Controller's behalf, and shall delete existing copies unless retention is required by applicable law. The Processor shall certify deletion in writing within thirty (30) days of the Controller's request. Signed on behalf of the parties on 05/06/2026.</p>",
+          "new_html": "<p data-chunk-id=\"e0b0d2c6-51c3-453d-9b72-2649527a9915\">On termination of the Services, the Processor shall, at the Controller's election, delete or return all personal data processed on the Controller's behalf, and shall delete existing copies unless retention is required by applicable law. The Processor must provide written certification of deletion within thirty (30) days of the Controller's request. Signed on behalf of the parties on 5 June 2026.</p>",
+          "ai_explanation": "Parallel edit: Please apply the specific edit requested for this section while preserving all\u2026"
+        }
+      ],
+      "ground_truth": [
+        {
+          "change_id": "06902dc7-6906-4446-b95d-28103e900593",
+          "should_approve": true,
+          "reason": "Reorders the data subject rights sentence. The 'insofar as this is possible' qualification and the assistance obligation are both preserved.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "1081a1d4-163e-4571-a9f9-3dcd552352ea",
+          "should_approve": true,
+          "reason": "Replaces legalese padding with 'The parties agree that'. The prohibition on processing for the Processor's own purposes, including model training, survives in full.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "4e71fce7-f0b6-4ec2-a947-286961485c9e",
+          "should_approve": false,
+          "reason": "Converts 'shall not engage a sub-processor without the Controller's prior written authorisation' into engagement at the Processor's discretion with notice afterwards. The Controller loses its veto over who processes its data. The following sentence still reads 'Where authorisation is given', which now dangles.",
+          "error_kind": "meaning_flip",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "80407ce1-fba7-4bcc-827a-36f51134bbe2",
+          "should_approve": true,
+          "reason": "Converts the security measures into a list. All three measures (encryption in transit and at rest, role-based access control, access logging) and the twelve month log retention period survive unchanged.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "b3f12db9-0e38-4e83-adb7-8581e4e80ce1",
+          "should_approve": true,
+          "reason": "Splits the sub-processor notice sentence in two. The thirty day notice period and the Controller's right to object on data protection grounds both survive.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "d64906b6-3eca-4f8b-96eb-624b2dc3beb5",
+          "should_approve": false,
+          "reason": "Extends the personal data breach notification deadline from seventy-two hours to thirty days. UK GDPR Article 33 requires notification within 72 hours, so the clause is now non-compliant. 'Without undue delay' remains, which masks the change.",
+          "error_kind": "wrong_number",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "e7d1aa5d-b6a2-4e40-a4de-6dce15484594",
+          "should_approve": true,
+          "reason": "Restates the signature date 05/06/2026 as 5 June 2026 and rewrites the certification sentence. The thirty day certification deadline and the deletion and return obligations are unchanged.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        }
+      ],
+      "pre_registered_at": "2026-08-14T14:12:58.948861+00:00",
+      "ground_truth_sha256": "032ec68314e495d71b4b0b4577077c3a71e95f59e7b6acc98a1ca38534ea925d",
+      "exclude_from_study": false,
+      "build_report": {
+        "intents_requested": 8,
+        "intents_matched": 7,
+        "missing_intents": [
+          "g_deletion_certificate"
+        ],
+        "unmatched_changes": [],
+        "adopted_unmatched": [],
+        "noops_dropped": 0,
+        "labels_overriding_intent": [],
+        "job_status": "awaiting_approval",
+        "job_ids": [
+          "job-redacted-04"
+        ],
+        "calls_made": 1
+      }
+    },
+    {
+      "batch_id": "batch_doc04",
+      "document_id": "doc04",
+      "document_title": "Service Level Agreement Schedule C (reporting platform)",
+      "document_html": "<h1>Service Level Agreement &mdash; Schedule C</h1>\n<p>This Schedule C sets out the service levels applicable to the Services provided by <strong>Northwind Analytics Ltd</strong> (the &ldquo;Vendor&rdquo;) to <strong>Cobalt Freight Systems Ltd</strong> (the &ldquo;Client&rdquo;) under the Master Services Agreement dated 14 March 2026.</p>\n\n<h2>1. Service Availability</h2>\n<p>The Vendor shall make the reporting platform available not less than 99.5% of the time, measured monthly, excluding Scheduled Maintenance. It is agreed and understood by and between the parties hereto that availability shall be measured by the Vendor's monitoring system at five (5) minute intervals from at least two independent geographic locations.</p>\n<p>Scheduled Maintenance shall not exceed four (4) hours in any calendar month and shall be carried out between 22:00 and 06:00 UK time on a Saturday or Sunday, with not less than five (5) business days' notice to the Client.</p>\n\n<h2>2. Support Response Times</h2>\n<p>The Vendor shall respond to support requests within the following target times, measured from receipt of the request during Business Hours:</p>\n<p><strong>Priority 1 (service unavailable):</strong> respond within one (1) hour, restore within four (4) hours. <strong>Priority 2 (major function impaired):</strong> respond within four (4) hours, restore within one (1) business day. <strong>Priority 3 (minor fault or query):</strong> respond within one (1) business day, restore within five (5) business days.</p>\n<p>Business Hours means 08:00 to 18:00 UK time on business days. Priority 1 requests shall be accepted outside Business Hours via the emergency contact number set out in Annex B.</p>\n\n<h2>3. Data Freshness</h2>\n<p>Telematics data ingested from the Client's fleet management system shall be reflected in the reporting dashboard within thirty (30) minutes of receipt. Where the Vendor's ingestion pipeline is unable to process data within that period, the Vendor shall notify the Client's nominated contact and provide an estimated time to resolution.</p>\n\n<h2>4. Service Credits</h2>\n<p>Where the Vendor fails to meet the availability target in any calendar month, the Client shall be entitled to a service credit calculated as a percentage of the monthly charges for that month: availability of 99.0% to 99.49% attracts a credit of five per cent (5%); availability of 98.0% to 98.99% attracts a credit of ten per cent (10%); availability below 98.0% attracts a credit of fifteen per cent (15%).</p>\n<p>Service credits shall be applied against the next invoice issued after the month in which the failure occurred, and are the Client's sole financial remedy for a failure to meet a service level.</p>\n\n<h2>5. Reporting</h2>\n<p>The Vendor shall provide the Client with a written service report within ten (10) business days of the end of each calendar month, setting out measured availability, the number of support requests by priority, response and restoration times achieved, and any service credits due.</p>\n\n<h2>6. Continuous Improvement</h2>\n<p>The parties shall meet quarterly to review service performance against these service levels. The Supplier shall present a summary of any recurring faults, their root causes, and the remedial actions taken or planned. The service levels in this Schedule may be revised by written agreement between the parties following any such review.</p>\n\n<h2>7. Exclusions</h2>\n<p>The Vendor shall not be responsible for a failure to meet a service level to the extent that the failure arises from: Scheduled Maintenance; a fault in the Client's own systems or network; the Client's failure to provide access or information reasonably requested by the Vendor; or an event beyond the Vendor's reasonable control. This Schedule takes effect on 04/05/2026.</p>\n",
+      "seed": 20260804,
+      "changes": [
+        {
+          "id": "f52367abaf1a",
+          "source_change_id": "ce243c06-8fbe-4eb4-b317-c5f4f2565187",
+          "operation": "edit",
+          "chunk_id": "c12e6fd6-16df-4192-84b8-42880e31b5c2",
+          "old_html": "<p data-chunk-id=\"c12e6fd6-16df-4192-84b8-42880e31b5c2\">The Vendor shall not be responsible for a failure to meet a service level to the extent that the failure arises from: Scheduled Maintenance; a fault in the Client's own systems or network; the Client's failure to provide access or information reasonably requested by the Vendor; or an event beyond the Vendor's reasonable control. This Schedule takes effect on 04/05/2026.</p>",
+          "new_html": "<p data-chunk-id=\"c12e6fd6-16df-4192-84b8-42880e31b5c2\">The Vendor shall not be responsible for a failure to meet a service level to the extent that the failure arises from:\n<ul>\n<li>Scheduled Maintenance;</li>\n<li>a fault in the Client's own systems or network;</li>\n<li>the Client's failure to provide access or information reasonably requested by the Vendor; or</li>\n<li>an event beyond the Vendor's reasonable control.</li>\n</ul>\nThis Schedule takes effect on 4 May 2026.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified in the overrides for this chunk\u2026"
+        },
+        {
+          "id": "1b239f02f432",
+          "source_change_id": "849fc823-ea67-43b7-a4e8-d1d053dbb987",
+          "operation": "edit",
+          "chunk_id": "4dac7ed6-f329-4042-bbc4-7649c5d236bd",
+          "old_html": "<p data-chunk-id=\"4dac7ed6-f329-4042-bbc4-7649c5d236bd\">The parties shall meet quarterly to review service performance against these service levels. The Supplier shall present a summary of any recurring faults, their root causes, and the remedial actions taken or planned. The service levels in this Schedule may be revised by written agreement between the parties following any such review.</p>",
+          "new_html": "<p data-chunk-id=\"4dac7ed6-f329-4042-bbc4-7649c5d236bd\">The parties shall meet quarterly to review service performance against these service levels. the Vendor shall present a summary of any recurring faults, their root causes, and the remedial actions taken or planned. The service levels in this Schedule may be revised by written agreement between the parties following any such review.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified in the overrides for this chunk\u2026"
+        },
+        {
+          "id": "207f55c3bb1b",
+          "source_change_id": "0d1a6872-a0b1-4432-92bc-d449cf7353b0",
+          "operation": "edit",
+          "chunk_id": "7565c679-29d0-4da9-8dbc-5e71472a0fc0",
+          "old_html": "<p data-chunk-id=\"7565c679-29d0-4da9-8dbc-5e71472a0fc0\">The Vendor shall make the reporting platform available not less than 99.5% of the time, measured monthly, excluding Scheduled Maintenance. It is agreed and understood by and between the parties hereto that availability shall be measured by the Vendor's monitoring system at five (5) minute intervals from at least two independent geographic locations.</p>",
+          "new_html": "<p data-chunk-id=\"7565c679-29d0-4da9-8dbc-5e71472a0fc0\">The Vendor shall make the reporting platform available not less than 99.5% of the time, measured monthly, excluding Scheduled Maintenance that is performed within the agreed maintenance window, provided it does not exceed the monthly cap and is subject to the required prior notice. The parties agree that availability shall be measured by the Vendor's monitoring system at five (5) minute intervals from at least two independent geographic locations.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified in the overrides for this chunk\u2026"
+        },
+        {
+          "id": "1515f1f5ac1d",
+          "source_change_id": "7700a060-b552-4443-9af2-ecddb14cb32c",
+          "operation": "edit",
+          "chunk_id": "ae166568-317f-4e40-be95-1a5424ceb922",
+          "old_html": "<p data-chunk-id=\"ae166568-317f-4e40-be95-1a5424ceb922\">The Vendor shall provide the Client with a written service report within ten (10) business days of the end of each calendar month, setting out measured availability, the number of support requests by priority, response and restoration times achieved, and any service credits due.</p>",
+          "new_html": "<p data-chunk-id=\"ae166568-317f-4e40-be95-1a5424ceb922\">Within ten (10) business days of each month's end, the Vendor shall provide a written report detailing measured availability, support requests by priority, achieved response and restoration times, and any applicable service credits.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified in the overrides for this chunk\u2026"
+        },
+        {
+          "id": "cd9b4fb6314a",
+          "source_change_id": "1489a2c1-13ce-4d06-b50d-900e7b981854",
+          "operation": "edit",
+          "chunk_id": "329509b2-76f9-413a-a11e-cfccab6d6813",
+          "old_html": "<p data-chunk-id=\"329509b2-76f9-413a-a11e-cfccab6d6813\">The Vendor shall respond to support requests within the following target times, measured from receipt of the request during Business Hours:</p>",
+          "new_html": "<p data-chunk-id=\"329509b2-76f9-413a-a11e-cfccab6d6813\">The Vendor shall address support requests based on the following priority targets, with response and resolution times calculated from the moment of receipt during Business Hours:</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified in the overrides for this chunk\u2026"
+        },
+        {
+          "id": "c8bac8e0b970",
+          "source_change_id": "877587ea-5d11-4964-8cde-546410dd43f9",
+          "operation": "edit",
+          "chunk_id": "0b46414e-20e4-4c95-9138-1bb1bc988115",
+          "old_html": "<p data-chunk-id=\"0b46414e-20e4-4c95-9138-1bb1bc988115\">Where the Vendor fails to meet the availability target in any calendar month, the Client shall be entitled to a service credit calculated as a percentage of the monthly charges for that month: availability of 99.0% to 99.49% attracts a credit of five per cent (5%); availability of 98.0% to 98.99% attracts a credit of ten per cent (10%); availability below 98.0% attracts a credit of fifteen per cent (15%).</p>",
+          "new_html": "<p data-chunk-id=\"0b46414e-20e4-4c95-9138-1bb1bc988115\">Where the Vendor fails to meet the availability target in any calendar month, the Client shall be entitled to a service credit calculated as a percentage of the monthly charges for that month: availability of 99.0% to 99.49% attracts a credit of five per cent (5%); availability of 98.0% to 98.99% attracts a credit of ten per cent (10%); availability below 98.0% attracts a credit of five per cent (5%).</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits as specified in the overrides for this chunk\u2026"
+        }
+      ],
+      "ground_truth": [
+        {
+          "change_id": "0d1a6872-a0b1-4432-92bc-d449cf7353b0",
+          "should_approve": false,
+          "reason": "Presented as a wording tidy-up but narrows the availability carve-out: Scheduled Maintenance is now excluded only if performed in the agreed window, within the monthly cap and with the required notice. That is a real change to a service level obligation, and it was not requested. Borderline in direction, since it favours the Client, but an unrequested alteration of legal effect disguised as a style edit is exactly the failure this study is about.",
+          "error_kind": "unrequested_substantive_change",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": true
+        },
+        {
+          "change_id": "1489a2c1-13ce-4d06-b50d-900e7b981854",
+          "should_approve": true,
+          "reason": "Rewrites the lead-in sentence to the priority targets. No figure or obligation changes. Introduces 'resolution' where the table below says 'restore', a minor terminology inconsistency that does not alter the targets.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "7700a060-b552-4443-9af2-ecddb14cb32c",
+          "should_approve": true,
+          "reason": "Tightens the monthly report sentence. The ten business day deadline and all four required contents survive.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "849fc823-ea67-43b7-a4e8-d1d053dbb987",
+          "should_approve": true,
+          "reason": "Replaces the undefined 'The Supplier' with the defined 'the Vendor'. Same sentence-initial lowercasing defect as elsewhere; no obligation changes.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "877587ea-5d11-4964-8cde-546410dd43f9",
+          "should_approve": false,
+          "reason": "Changes the service credit for availability below 98.0% from fifteen per cent to five per cent, copying the figure from the mildest tier. The schedule stops escalating with severity: a catastrophic outage now earns the same credit as a marginal one, and the middle tier at ten per cent pays more than the worst.",
+          "error_kind": "figure_carryover",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "ce243c06-8fbe-4eb4-b317-c5f4f2565187",
+          "should_approve": true,
+          "reason": "Restates the effective date 04/05/2026 as 4 May 2026. All four exclusions are untouched and the date does not move.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        }
+      ],
+      "pre_registered_at": "2026-08-14T14:12:58.953003+00:00",
+      "ground_truth_sha256": "6344ffac8f6f6b3f60654e507da29168d57dbf70bfc0576d95b6bccad337ff08",
+      "exclude_from_study": false,
+      "build_report": {
+        "intents_requested": 8,
+        "intents_matched": 5,
+        "missing_intents": [
+          "g_priority_table",
+          "g_exclusions",
+          "g_maintenance_window"
+        ],
+        "unmatched_changes": [
+          "1489a2c1-13ce-4d06-b50d-900e7b981854"
+        ],
+        "adopted_unmatched": [
+          "1489a2c1-13ce-4d06-b50d-900e7b981854"
+        ],
+        "noops_dropped": 2,
+        "labels_overriding_intent": [
+          "0d1a6872-a0b1-4432-92bc-d449cf7353b0"
+        ],
+        "job_status": "awaiting_approval",
+        "job_ids": [
+          "job-redacted-10",
+          "job-redacted-02",
+          "job-redacted-06"
+        ],
+        "calls_made": 3
+      }
+    },
+    {
+      "batch_id": "batch_doc05",
+      "document_id": "doc05",
+      "document_title": "Mutual Non-Disclosure Agreement (Cobalt Freight / Meridian Port)",
+      "document_html": "<h1>Mutual Non-Disclosure Agreement</h1>\n<p>This Mutual Non-Disclosure Agreement (the &ldquo;Agreement&rdquo;) is made on 20 February 2026 between <strong>Cobalt Freight Systems Ltd</strong>, a company registered in England and Wales with company number 09182736 (&ldquo;Cobalt&rdquo;), and <strong>Meridian Port Holdings Ltd</strong>, a company registered in England and Wales with company number 07654321 (&ldquo;Meridian&rdquo;), each a &ldquo;Party&rdquo; and together the &ldquo;Parties&rdquo;.</p>\n\n<h2>1. Purpose</h2>\n<p>The Parties wish to explore a potential commercial arrangement concerning shared use of port-side logistics capacity (the &ldquo;Purpose&rdquo;). In connection with the Purpose, each Party may disclose Confidential Information to the other. It is hereby mutually agreed and understood by and between the Parties hereto that this Agreement governs the treatment of such information.</p>\n\n<h2>2. Definition of Confidential Information</h2>\n<p>&ldquo;Confidential Information&rdquo; means any information disclosed by one Party (the &ldquo;Disclosing Party&rdquo;) to the other (the &ldquo;Receiving Party&rdquo;), whether orally, in writing or in any other form, that is designated as confidential or that would reasonably be understood to be confidential given its nature or the circumstances of disclosure. It includes commercial terms, pricing, operational data, customer lists, and technical information.</p>\n<p>Confidential Information does not include information that: is or becomes public other than through breach of this Agreement; was lawfully known to the Receiving Party before disclosure; is lawfully obtained from a third party without restriction; or is independently developed without use of the Disclosing Party's Confidential Information.</p>\n\n<h2>3. Obligations</h2>\n<p>The Receiving Party shall keep the Disclosing Party's Confidential Information confidential, shall use it solely for the Purpose, and shall not disclose it to any third party without the Disclosing Party's prior written consent. The Receiving Party shall protect the Confidential Information using at least the same degree of care it applies to its own confidential information, and in no event less than a reasonable degree of care.</p>\n\n<h2>4. Permitted Disclosures</h2>\n<p>The Receiving Party may disclose Confidential Information to its employees, officers and professional advisers who need to know it for the Purpose, provided that each such recipient is bound by obligations of confidentiality no less protective than those in this Agreement. The Receiving Party remains responsible for any breach by such recipients.</p>\n<p>The Receiving Party may also disclose Confidential Information to the extent required by law, regulation or court order, provided that, where lawfully permitted, it gives the Disclosing Party prompt written notice so that the Disclosing Party may seek protective relief.</p>\n\n<h2>5. Term and Survival</h2>\n<p>This Agreement commences on the date first written above and continues for two (2) years, unless terminated earlier by either Party on thirty (30) days' written notice. The obligations of confidentiality in Clause 3 shall survive expiry or termination and continue for a further three (3) years.</p>\n\n<h2>6. Return of Materials</h2>\n<p>On written request by the Disclosing Party, the Receiving Party shall promptly return or destroy all materials containing Confidential Information, and shall confirm in writing that it has done so. The Receiving Party may retain one copy to the extent required by law or its internal compliance policies, subject to continuing confidentiality obligations.</p>\n\n<h2>7. No Licence and No Obligation</h2>\n<p>Nothing in this Agreement grants either Party any licence or right in the other's intellectual property, and nothing obliges either Party to proceed with any transaction. Each Party bears its own costs in connection with the Purpose. Executed by the duly authorised representatives of the Parties on 02/03/2026.</p>\n",
+      "seed": 20260805,
+      "changes": [
+        {
+          "id": "e874661bfb6f",
+          "source_change_id": "6195cf4a-472e-4dc3-8fcd-9f713d611c9f",
+          "operation": "edit",
+          "chunk_id": "bce4eed5-fe32-4dd0-8e09-f2c928d6b689",
+          "old_html": "<p data-chunk-id=\"bce4eed5-fe32-4dd0-8e09-f2c928d6b689\">The Parties wish to explore a potential commercial arrangement concerning shared use of port-side logistics capacity (the \u201cPurpose\u201d). In connection with the Purpose, each Party may disclose Confidential Information to the other. It is hereby mutually agreed and understood by and between the Parties hereto that this Agreement governs the treatment of such information.</p>",
+          "new_html": "<p data-chunk-id=\"bce4eed5-fe32-4dd0-8e09-f2c928d6b689\">The Parties wish to explore a potential commercial arrangement concerning shared use of port-side logistics capacity (the \u201cPurpose\u201d). In connection with the Purpose, each Party may disclose Confidential Information to the other. The Parties agree that this Agreement governs the treatment of such information.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        },
+        {
+          "id": "02375dd0c577",
+          "source_change_id": "0a7631d5-ded4-422b-94cb-3b006269cbcd",
+          "operation": "edit",
+          "chunk_id": "57c4ac40-78fb-442c-99e8-5f7195bac2ce",
+          "old_html": "<p data-chunk-id=\"57c4ac40-78fb-442c-99e8-5f7195bac2ce\">This Agreement commences on the date first written above and continues for two (2) years, unless terminated earlier by either Party on thirty (30) days' written notice. The obligations of confidentiality in Clause 3 shall survive expiry or termination and continue for a further three (3) years.</p>",
+          "new_html": "<p data-chunk-id=\"57c4ac40-78fb-442c-99e8-5f7195bac2ce\">This Agreement commences on the date first written above and continues for two (2) years, unless terminated earlier by either Party on thirty (30) days' written notice. The obligations of confidentiality in Clause 3 shall survive expiry or termination and continue for a further six (6) months.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        },
+        {
+          "id": "da13ac461a99",
+          "source_change_id": "483ab7ea-91d6-45cb-97b9-919e83ee863b",
+          "operation": "edit",
+          "chunk_id": "3c1fcd07-5fec-484e-afa4-9716cb2f8f6c",
+          "old_html": "<p data-chunk-id=\"3c1fcd07-5fec-484e-afa4-9716cb2f8f6c\">The Receiving Party may disclose Confidential Information to its employees, officers and professional advisers who need to know it for the Purpose, provided that each such recipient is bound by obligations of confidentiality no less protective than those in this Agreement. The Receiving Party remains responsible for any breach by such recipients.</p>",
+          "new_html": "<p data-chunk-id=\"3c1fcd07-5fec-484e-afa4-9716cb2f8f6c\">The Receiving Party may disclose Confidential Information to its employees, officers, and advisers on a need-to-know basis for the Purpose, provided they are bound by equivalent confidentiality obligations. The Receiving Party remains responsible for any breach by such recipients.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        },
+        {
+          "id": "3650c3993daf",
+          "source_change_id": "d0539b65-10c7-4f53-a605-f9e09da83edc",
+          "operation": "edit",
+          "chunk_id": "c20593cd-4dcf-4cde-b0ae-4d1c1c4f6d5d",
+          "old_html": "<p data-chunk-id=\"c20593cd-4dcf-4cde-b0ae-4d1c1c4f6d5d\">\u201cConfidential Information\u201d means any information disclosed by one Party (the \u201cDisclosing Party\u201d) to the other (the \u201cReceiving Party\u201d), whether orally, in writing or in any other form, that is designated as confidential or that would reasonably be understood to be confidential given its nature or the circumstances of disclosure. It includes commercial terms, pricing, operational data, customer lists, and technical information.</p>",
+          "new_html": "<p data-chunk-id=\"c20593cd-4dcf-4cde-b0ae-4d1c1c4f6d5d\">\u201cConfidential Information\u201d means any information disclosed by one Party (the \u201cDisclosing Party\u201d) to the other (the \u201cReceiving Party\u201d), whether orally, in writing or in any other form, that is designated as confidential or that would reasonably be understood to be confidential given its nature or the circumstances of disclosure. It includes:</p>\n<ul>\n  <li>commercial terms</li>\n  <li>pricing</li>\n  <li>operational data</li>\n  <li>customer lists</li>\n  <li>technical information</li>\n</ul>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        },
+        {
+          "id": "4824bdc39f25",
+          "source_change_id": "fe1a1c86-fa68-4312-ba19-7c37b9cd721b",
+          "operation": "edit",
+          "chunk_id": "ea676d26-9031-4c51-a0de-8968b64d12ed",
+          "old_html": "<p data-chunk-id=\"ea676d26-9031-4c51-a0de-8968b64d12ed\">The Receiving Party shall keep the Disclosing Party's Confidential Information confidential, shall use it solely for the Purpose, and shall not disclose it to any third party without the Disclosing Party's prior written consent. The Receiving Party shall protect the Confidential Information using at least the same degree of care it applies to its own confidential information, and in no event less than a reasonable degree of care.</p>",
+          "new_html": "<p data-chunk-id=\"ea676d26-9031-4c51-a0de-8968b64d12ed\">The Receiving Party shall keep the Disclosing Party's Confidential Information confidential, shall use it solely for the Purpose, and shall not disclose it to any third party without the Disclosing Party's prior written consent. The Receiving Party shall handle Confidential Information appropriately.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        },
+        {
+          "id": "6dae1652639d",
+          "source_change_id": "f17fdfa0-5570-4e43-8576-2a9368ceb8f7",
+          "operation": "edit",
+          "chunk_id": "6e2cf027-46d1-40c5-b31f-fbdc097cdce4",
+          "old_html": "<p data-chunk-id=\"6e2cf027-46d1-40c5-b31f-fbdc097cdce4\">Nothing in this Agreement grants either Party any licence or right in the other's intellectual property, and nothing obliges either Party to proceed with any transaction. Each Party bears its own costs in connection with the Purpose. Executed by the duly authorised representatives of the Parties on 02/03/2026.</p>",
+          "new_html": "<p data-chunk-id=\"6e2cf027-46d1-40c5-b31f-fbdc097cdce4\">Nothing in this Agreement grants either Party any intellectual property rights, nor does it oblige either Party to proceed with any transaction. Each Party bears its own costs in connection with the Purpose. Executed by the duly authorised representatives of the Parties on 2 March 2026.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        },
+        {
+          "id": "90193968d6de",
+          "source_change_id": "7d05dc93-18e2-4321-96fd-5d43563bab14",
+          "operation": "edit",
+          "chunk_id": "e2525c32-0e36-4be2-a40b-d6d9f558b8fb",
+          "old_html": "<p data-chunk-id=\"e2525c32-0e36-4be2-a40b-d6d9f558b8fb\">On written request by the Disclosing Party, the Receiving Party shall promptly return or destroy all materials containing Confidential Information, and shall confirm in writing that it has done so. The Receiving Party may retain one copy to the extent required by law or its internal compliance policies, subject to continuing confidentiality obligations.</p>",
+          "new_html": "<p data-chunk-id=\"e2525c32-0e36-4be2-a40b-d6d9f558b8fb\">On written request by the Disclosing Party, the Receiving Party shall promptly return or destroy all materials containing Confidential Information, and shall confirm in writing that it has done so. The Receiving Party may retain one copy of Confidential Information if required by law or its internal compliance policies, provided it remains subject to the continuing confidentiality obligations set out in this Agreement.</p>",
+          "ai_explanation": "Parallel edit: Perform the requested edits while preserving all other content, formatting\u2026"
+        }
+      ],
+      "ground_truth": [
+        {
+          "change_id": "0a7631d5-ded4-422b-94cb-3b006269cbcd",
+          "should_approve": false,
+          "reason": "Cuts the post-termination survival of the confidentiality obligations from three years to six months. Information disclosed under this NDA loses protection while it is still commercially current. The two year term above is left unchanged, so the clause reads normally.",
+          "error_kind": "wrong_number",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "483ab7ea-91d6-45cb-97b9-919e83ee863b",
+          "should_approve": true,
+          "reason": "Tightens the permitted disclosure sentence. The need-to-know limit, the flow-down of equivalent confidentiality obligations and the Receiving Party's responsibility for recipients all survive. 'Professional advisers' becomes 'advisers', a negligible narrowing of wording rather than of scope.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "6195cf4a-472e-4dc3-8fcd-9f713d611c9f",
+          "should_approve": true,
+          "reason": "Replaces 'It is hereby mutually agreed and understood by and between the Parties hereto' with 'The Parties agree'. Nothing of substance is lost.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "7d05dc93-18e2-4321-96fd-5d43563bab14",
+          "should_approve": true,
+          "reason": "Rewrites the retained-copy sentence. The single-copy exception, its legal and compliance triggers and the continuing confidentiality condition are preserved.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "d0539b65-10c7-4f53-a605-f9e09da83edc",
+          "should_approve": true,
+          "reason": "Converts the examples of Confidential Information into a list. All five categories (commercial terms, pricing, operational data, customer lists, technical information) survive, as does the definition itself.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "f17fdfa0-5570-4e43-8576-2a9368ceb8f7",
+          "should_approve": true,
+          "reason": "Restates the execution date 02/03/2026 as 2 March 2026. Also compresses 'any licence or right in the other's intellectual property' to 'any intellectual property rights', which loses a little precision about whose IP is meant. Resolved as approve: this is a no-licence clause and the practical effect, that no IP rights pass, is unchanged.",
+          "error_kind": null,
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        },
+        {
+          "change_id": "fe1a1c86-fa68-4312-ba19-7c37b9cd721b",
+          "should_approve": false,
+          "reason": "Replaces the measurable standard of care, at least the same degree of care the Receiving Party applies to its own confidential information and never less than reasonable care, with 'shall handle Confidential Information appropriately'. The clause keeps its shape and loses its content: 'appropriately' is unenforceable. The first sentence still reads well, which is what makes this easy to miss.",
+          "error_kind": "obligation_gutted",
+          "confirmed_by": "assistant (designer role; human reviewer kept blind)",
+          "confirmed_at": "2026-08-14T13:40:00+05:30",
+          "overrode_intent": false
+        }
+      ],
+      "pre_registered_at": "2026-08-14T14:12:58.955622+00:00",
+      "ground_truth_sha256": "aa0460788855b1191dcf843f1ddcd29b90e0491768a590646b9bac3606f1273e",
+      "exclude_from_study": false,
+      "build_report": {
+        "intents_requested": 8,
+        "intents_matched": 6,
+        "missing_intents": [
+          "g_exclusions",
+          "g_no_licence"
+        ],
+        "unmatched_changes": [
+          "d0539b65-10c7-4f53-a605-f9e09da83edc"
+        ],
+        "adopted_unmatched": [
+          "d0539b65-10c7-4f53-a605-f9e09da83edc"
+        ],
+        "noops_dropped": 0,
+        "labels_overriding_intent": [],
+        "job_status": "awaiting_approval",
+        "job_ids": [
+          "job-redacted-03"
+        ],
+        "calls_made": 1
+      }
+    }
+  ]
+}

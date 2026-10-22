@@ -1,0 +1,33 @@
+{
+  "conditions": [
+    "batch_section",
+    "batch_whole",
+    "sequential_section",
+    "sequential_whole"
+  ],
+  "reviewers": {
+    "R2": [
+      {
+        "position": 0,
+        "condition": "batch_section",
+        "batch_id": "batch_doc02"
+      },
+      {
+        "position": 1,
+        "condition": "batch_whole",
+        "batch_id": "batch_doc03"
+      },
+      {
+        "position": 2,
+        "condition": "sequential_section",
+        "batch_id": "batch_doc04"
+      },
+      {
+        "position": 3,
+        "condition": "sequential_whole",
+        "batch_id": "batch_doc05"
+      }
+    ]
+  },
+  "generated_at": "2026-08-14T16:35:37.190585+00:00"
+}
