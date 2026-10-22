@@ -1,0 +1,318 @@
+[
+  {
+    "id": "art-001",
+    "title": "API Rate Limits and Quotas",
+    "content": "# API Rate Limits\n\nSuperDocs provides developer APIs for document synchronization. On the Pro plan, users are allocated 10,000 API calls per month. Once this threshold is reached, requests return HTTP 429.",
+    "version": 1,
+    "metadata": { "category": "API", "product_area": "Developer Platform", "tags": ["api", "limits", "pro-tier"] },
+    "screenshots": [],
+    "last_updated": "2026-06-01T10:00:00Z"
+  },
+  {
+    "id": "art-002",
+    "title": "Configuring Webhooks and REST Endpoints",
+    "content": "# Webhook Setup\n\nTo ensure uninterrupted delivery, monitor your quota. The Pro plan allows 10,000 API calls per month across all endpoints. Ensure your client handles rate-limiting headers.",
+    "version": 2,
+    "metadata": { "category": "API", "product_area": "Developer Platform", "tags": ["webhooks", "developer"] },
+    "screenshots": [],
+    "last_updated": "2026-06-15T12:00:00Z"
+  },
+  {
+    "id": "art-003",
+    "title": "Managing Your Subscription and Payment Methods",
+    "content": "# Subscription Management\n\nTo update credit cards or upgrade tiers, go to Settings > Billing > Plans and select your desired option. Invoices are generated on the first of every month.",
+    "version": 3,
+    "metadata": { "category": "Billing", "product_area": "Account Settings", "tags": ["billing", "plans"] },
+    "screenshots": [
+      {
+        "id": "ss-003-1",
+        "url": "https://assets.superdocs.app/screenshots/billing-plans.png",
+        "caption": "The Plans screen under Billing settings",
+        "ocr_labels": ["Settings", "Billing", "Plans", "Upgrade", "Credit Card"]
+      }
+    ],
+    "last_updated": "2026-05-10T14:00:00Z"
+  },
+  {
+    "id": "art-004",
+    "title": "Upgrading and Downgrading Workspace Accounts",
+    "content": "# Workspace Tier Adjustments\n\nAccount administrators can change tiers anytime. Navigate to the Plans section inside Billing settings to review tier comparisons.",
+    "version": 1,
+    "metadata": { "category": "Billing", "product_area": "Account Settings", "tags": ["account", "upgrade"] },
+    "screenshots": [],
+    "last_updated": "2026-05-20T09:30:00Z"
+  },
+  {
+    "id": "art-005",
+    "title": "Legacy Tier Support and SLA Details",
+    "content": "# Legacy Account Features\n\nCustomers enrolled in Legacy Pro retain full audit logging capabilities. Priority support tickets are responded to within four hours during business days.",
+    "version": 4,
+    "metadata": { "category": "Plans", "product_area": "Licensing", "tags": ["legacy", "sla", "support"] },
+    "screenshots": [
+      {
+        "id": "ss-005-1",
+        "url": "https://assets.superdocs.app/screenshots/legacy-pro-badge.png",
+        "caption": "Legacy Pro tier badge shown on account header",
+        "ocr_labels": ["Legacy Pro", "Tier Status: Active", "Priority Support"]
+      }
+    ],
+    "last_updated": "2026-04-12T11:00:00Z"
+  },
+  {
+    "id": "art-006",
+    "title": "Audit Logging Configuration",
+    "content": "# Audit Log Export\n\nAudit trails capture all user edits and document exports. This feature requires Legacy Pro or Enterprise tier subscription.",
+    "version": 2,
+    "metadata": { "category": "Security", "product_area": "Audit", "tags": ["security", "audit"] },
+    "screenshots": [],
+    "last_updated": "2026-05-01T16:00:00Z"
+  },
+  {
+    "id": "art-007",
+    "title": "Exporting Workspace Data to CSV",
+    "content": "# Bulk Data Export\n\nTo export historical records, administrators must run export script and download row by row from the server console. This generates discrete CSV summaries.",
+    "version": 1,
+    "metadata": { "category": "Data Management", "product_area": "Export", "tags": ["export", "csv"] },
+    "screenshots": [],
+    "last_updated": "2026-03-15T08:00:00Z"
+  },
+  {
+    "id": "art-008",
+    "title": "Archiving Inactive Projects",
+    "content": "# Project Archival\n\nBefore archiving a project, perform a manual batch export of all attached assets. Ensure all team members have completed their pending reviews.",
+    "version": 2,
+    "metadata": { "category": "Projects", "product_area": "Archival", "tags": ["projects", "archive"] },
+    "screenshots": [],
+    "last_updated": "2026-04-20T15:00:00Z"
+  },
+  {
+    "id": "art-009",
+    "title": "Attaching Files to Documents",
+    "content": "# File Attachments\n\nSuperDocs supports PDF and image attachments in markdown documents. Each individual file upload size is capped at 5 MB maximum.",
+    "version": 1,
+    "metadata": { "category": "Editor", "product_area": "Documents", "tags": ["attachments", "uploads", "limits"] },
+    "screenshots": [],
+    "last_updated": "2026-06-10T13:45:00Z"
+  },
+  {
+    "id": "art-010",
+    "title": "Collaborative Asset Storage",
+    "content": "# Asset Storage Quotas\n\nUploaded media files are stored securely in cloud storage. Please ensure files do not exceed the 5 MB limit per document attachment.",
+    "version": 2,
+    "metadata": { "category": "Editor", "product_area": "Media", "tags": ["media", "storage"] },
+    "screenshots": [],
+    "last_updated": "2026-06-18T10:15:00Z"
+  },
+  {
+    "id": "art-011",
+    "title": "API SDK Integration Guide",
+    "content": "# SDK Integration\n\nInitialize the client with your secret API key. Under the standard Pro tier, your application can execute 10,000 API calls per month before throttling occurs.",
+    "version": 1,
+    "metadata": { "category": "API", "product_area": "SDK", "tags": ["sdk", "integration"] },
+    "screenshots": [],
+    "last_updated": "2026-06-25T17:00:00Z"
+  },
+  {
+    "id": "art-012",
+    "title": "Annual Billing and Invoice History",
+    "content": "# Invoice Retrieval\n\nTo view past receipts, navigate to Settings > Billing > Plans. You can download PDF statements for tax filing purposes.",
+    "version": 3,
+    "metadata": { "category": "Billing", "product_area": "Invoicing", "tags": ["invoices", "billing"] },
+    "screenshots": [
+      {
+        "id": "ss-012-1",
+        "url": "https://assets.superdocs.app/screenshots/invoice-history.png",
+        "caption": "Download receipts in Billing navigation tab",
+        "ocr_labels": ["Settings", "Billing", "Plans", "Invoices", "Receipts PDF"]
+      }
+    ],
+    "last_updated": "2026-05-18T11:20:00Z"
+  },
+  {
+    "id": "art-013",
+    "title": "Feature Matrix Across Membership Tiers",
+    "content": "# Feature Matrix\n\nReview available features across account tiers. Automated webhook dispatch and custom SAML SSO are supported on Legacy Pro accounts.",
+    "version": 5,
+    "metadata": { "category": "Plans", "product_area": "Tiers", "tags": ["tiers", "matrix"] },
+    "screenshots": [],
+    "last_updated": "2026-04-30T14:10:00Z"
+  },
+  {
+    "id": "art-014",
+    "title": "Batch Reporting Workflows",
+    "content": "# Batch Report Generation\n\nTo export weekly analytics logs, administrators must execute manual batch export procedures across individual department views.",
+    "version": 2,
+    "metadata": { "category": "Analytics", "product_area": "Reporting", "tags": ["reports", "analytics"] },
+    "screenshots": [],
+    "last_updated": "2026-05-05T09:00:00Z"
+  },
+  {
+    "id": "art-015",
+    "title": "Embedding Image Diagrams in Technical Specs",
+    "content": "# Architecture Diagrams\n\nArchitects can embed high-resolution PNG schematics into markdown specs. Keep in mind that 5 MB is the maximum upload size allowed.",
+    "version": 1,
+    "metadata": { "category": "Editor", "product_area": "Diagrams", "tags": ["images", "specs"] },
+    "screenshots": [],
+    "last_updated": "2026-06-20T16:40:00Z"
+  },
+  {
+    "id": "art-016",
+    "title": "Markdown Keyboard Shortcuts",
+    "content": "# Keyboard Shortcuts\n\nSpeed up editing with standard keybindings. Press Cmd+B for bold, Cmd+I for italics, and Cmd+K to insert hyperlinks.",
+    "version": 1,
+    "metadata": { "category": "Editor", "product_area": "Shortcuts", "tags": ["shortcuts", "productivity"] },
+    "screenshots": [],
+    "last_updated": "2026-07-01T12:00:00Z"
+  },
+  {
+    "id": "art-017",
+    "title": "Inviting Team Members to Workspaces",
+    "content": "# Workspace Collaboration\n\nInvite team members by email address. You can assign Viewer, Editor, or Admin roles to manage permissions effectively.",
+    "version": 2,
+    "metadata": { "category": "Collaboration", "product_area": "Team", "tags": ["invites", "roles"] },
+    "screenshots": [],
+    "last_updated": "2026-07-05T14:30:00Z"
+  },
+  {
+    "id": "art-018",
+    "title": "Two-Factor Authentication Setup",
+    "content": "# Two-Factor Authentication\n\nEnhance account security by enabling TOTP-based 2FA. Scan the QR code using Google Authenticator or 1Password.",
+    "version": 3,
+    "metadata": { "category": "Security", "product_area": "Authentication", "tags": ["2fa", "security"] },
+    "screenshots": [],
+    "last_updated": "2026-07-10T10:00:00Z"
+  },
+  {
+    "id": "art-019",
+    "title": "Custom Domain Configuration",
+    "content": "# Custom Domains\n\nPoint your CNAME record to domains.superdocs.app. SSL certificates are provisioned automatically via Let's Encrypt within 15 minutes.",
+    "version": 1,
+    "metadata": { "category": "Domains", "product_area": "Hosting", "tags": ["cname", "dns"] },
+    "screenshots": [],
+    "last_updated": "2026-07-12T09:00:00Z"
+  },
+  {
+    "id": "art-020",
+    "title": "Document Version History and Rollback",
+    "content": "# Version History\n\nSuperDocs tracks every keystroke with timestamped revisions. You can preview past versions and restore previous drafts with one click.",
+    "version": 4,
+    "metadata": { "category": "Editor", "product_area": "History", "tags": ["history", "rollback"] },
+    "screenshots": [],
+    "last_updated": "2026-07-15T11:00:00Z"
+  },
+  {
+    "id": "art-021",
+    "title": "Syntax Highlighting for Code Blocks",
+    "content": "# Code Highlighting\n\nCode blocks support syntax highlighting for over 40 programming languages including TypeScript, Python, Rust, and Go.",
+    "version": 1,
+    "metadata": { "category": "Editor", "product_area": "Code", "tags": ["code", "syntax"] },
+    "screenshots": [],
+    "last_updated": "2026-07-18T15:20:00Z"
+  },
+  {
+    "id": "art-022",
+    "title": "Dark Mode and Custom Theme Preferences",
+    "content": "# Theme Preferences\n\nSwitch between light, dark, and system theme modes in user preferences. Themes use high-contrast HSL color palettes.",
+    "version": 2,
+    "metadata": { "category": "UI", "product_area": "Appearance", "tags": ["theme", "dark-mode"] },
+    "screenshots": [],
+    "last_updated": "2026-07-20T16:00:00Z"
+  },
+  {
+    "id": "art-023",
+    "title": "Accelerating Team Revenue Growth",
+    "content": "# Revenue Growth Strategy\n\nDriving sustained growth requires cross-functional alignment. Focus on user onboarding metrics and time-to-first-document to accelerate customer satisfaction.",
+    "version": 1,
+    "metadata": { "category": "Best Practices", "product_area": "Strategy", "tags": ["growth", "strategy"] },
+    "screenshots": [],
+    "last_updated": "2026-07-22T13:00:00Z"
+  },
+  {
+    "id": "art-024",
+    "title": "Browser Memory Limits and Performance Tuning",
+    "content": "# Browser Memory Considerations\n\nWhen editing huge documents containing hundreds of tables, client memory limit constraints in Chrome may impact responsiveness. Split large books into chapters.",
+    "version": 2,
+    "metadata": { "category": "Performance", "product_area": "Client", "tags": ["performance", "memory"] },
+    "screenshots": [],
+    "last_updated": "2026-07-25T10:30:00Z"
+  },
+  {
+    "id": "art-025",
+    "title": "Subscribing to Release Notes and Email Digests",
+    "content": "# Email Newsletter\n\nStay informed on weekly updates by subscribing to our product newsletter. You can unsubscribe anytime via the link in the footer.",
+    "version": 1,
+    "metadata": { "category": "Community", "product_area": "Newsletter", "tags": ["newsletter", "updates"] },
+    "screenshots": [],
+    "last_updated": "2026-07-26T14:15:00Z"
+  },
+  {
+    "id": "art-026",
+    "title": "Structuring Organization Hierarchies",
+    "content": "# Organization Structure\n\nDesign your workspace departments to reflect real company structure. Sub-teams allow departmental autonomy without cluttering root navigation.",
+    "version": 1,
+    "metadata": { "category": "Admin", "product_area": "Organization", "tags": ["org", "teams"] },
+    "screenshots": [],
+    "last_updated": "2026-07-28T09:45:00Z"
+  },
+  {
+    "id": "art-027",
+    "title": "Custom Enterprise Contract Provisions",
+    "content": "# Enterprise Custom Terms\n\nFor enterprise customers, pricing is subject to change based on custom MSA negotiation. Contact sales for tier details and customized service level agreements.",
+    "version": 2,
+    "metadata": { "category": "Enterprise", "product_area": "Contracts", "tags": ["enterprise", "contracts"] },
+    "screenshots": [],
+    "last_updated": "2026-06-05T11:00:00Z"
+  },
+  {
+    "id": "art-028",
+    "title": "Experimental Beta Features Rollout",
+    "content": "# Experimental Workflows\n\nThis article outlines an experimental beta feature for real-time document sync. Instructions and screens may vary depending on rollout phase across regions.",
+    "version": 1,
+    "metadata": { "category": "Beta", "product_area": "Experimental", "tags": ["beta", "rollout"] },
+    "screenshots": [],
+    "last_updated": "2026-06-08T15:30:00Z"
+  },
+  {
+    "id": "art-029",
+    "title": "General Export Quota Policies",
+    "content": "# Export Quotas Overview\n\nExport operations consume system resources and are governed by general export limit policies. Consult your account dashboard for current quota metrics.",
+    "version": 1,
+    "metadata": { "category": "Data", "product_area": "Export", "tags": ["quota", "overview"] },
+    "screenshots": [],
+    "last_updated": "2026-06-12T09:15:00Z"
+  },
+  {
+    "id": "art-030",
+    "title": "Pending Draft: Next-Gen Editor Migration",
+    "content": "# Editor Migration Guide (Draft)\n\nThis draft outlines migration steps for the upcoming editor overhaul. Verification is pending engineering signoff.",
+    "version": 1,
+    "metadata": { "category": "Unverified Draft", "product_area": "Migration", "tags": ["draft", "ambiguous-scope"] },
+    "screenshots": [],
+    "last_updated": "2026-06-14T16:00:00Z"
+  },
+  {
+    "id": "art-031",
+    "title": "Legacy Protocol Support (Under Review)",
+    "content": "# Legacy Protocols\n\nSupport for older synchronization protocols is under review. Custom terms apply to legacy accounts requesting prolonged protocol uptime.",
+    "version": 1,
+    "metadata": { "category": "Protocols", "product_area": "Sync", "tags": ["protocols", "review"] },
+    "screenshots": [],
+    "last_updated": "2026-06-16T13:20:00Z"
+  },
+  {
+    "id": "art-032",
+    "title": "Screenshot Without OCR Metadata",
+    "content": "# Visual Interface Walkthrough\n\nRefer to the diagram below for a visual overview of account preferences.",
+    "version": 1,
+    "metadata": { "category": "UI", "product_area": "Overview", "tags": ["ui", "diagram"] },
+    "screenshots": [
+      {
+        "id": "ss-032-1",
+        "url": "https://assets.superdocs.app/screenshots/unlabeled-mockup.png",
+        "caption": "",
+        "ocr_labels": []
+      }
+    ],
+    "last_updated": "2026-06-18T10:00:00Z"
+  }
+]

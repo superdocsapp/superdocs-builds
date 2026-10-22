@@ -1,0 +1,84 @@
+[
+  {
+    "id": "change-001",
+    "type": "CHANGED_LIMIT",
+    "title": "Pro Plan Monthly API Rate Limit Increase",
+    "description": "Pro plan monthly API rate limit increased from 10,000 to 25,000 requests per month.",
+    "before_state": {
+      "entity_name": "Pro Plan",
+      "value": 10000,
+      "details": "10,000 API calls per month"
+    },
+    "after_state": {
+      "entity_name": "Pro Plan",
+      "value": 25000,
+      "details": "25,000 API calls per month"
+    },
+    "effective_date": "2026-08-01",
+    "source": "Release Notes v4.12"
+  },
+  {
+    "id": "change-002",
+    "type": "RENAMED_SCREEN",
+    "title": "Billing Tab Renamed to Subscriptions",
+    "description": "The 'Plans' navigation tab in Billing settings has been renamed to 'Subscriptions'.",
+    "before_state": {
+      "ui_label": "Plans",
+      "path": "Settings > Billing > Plans"
+    },
+    "after_state": {
+      "ui_label": "Subscriptions",
+      "path": "Settings > Billing > Subscriptions"
+    },
+    "effective_date": "2026-08-10",
+    "source": "UI Modernization Update"
+  },
+  {
+    "id": "change-003",
+    "type": "RETIRED_PLAN",
+    "title": "Retirement of Legacy Pro Tier",
+    "description": "The Legacy Pro tier has been discontinued and replaced with Growth Plan.",
+    "before_state": {
+      "entity_name": "Legacy Pro",
+      "details": "Legacy Pro tier deprecated"
+    },
+    "after_state": {
+      "entity_name": "Growth Plan",
+      "details": "All features migrated to Growth Plan"
+    },
+    "effective_date": "2026-08-15",
+    "source": "Pricing Policy Update"
+  },
+  {
+    "id": "change-004",
+    "type": "CHANGED_WORKFLOW",
+    "title": "One-Click Bulk CSV Export",
+    "description": "Manual row-by-row batch export script is replaced with a single 'Export All CSV' button in the dashboard toolbar.",
+    "before_state": {
+      "workflow_steps": ["run export script", "download row by row", "manual batch export"],
+      "details": "Users previously had to run export script and download row by row"
+    },
+    "after_state": {
+      "workflow_steps": ["click Export All CSV button in toolbar"],
+      "details": "Direct bulk export via dashboard toolbar"
+    },
+    "effective_date": "2026-08-20",
+    "source": "Product Feature Drop"
+  },
+  {
+    "id": "change-005",
+    "type": "CHANGED_LIMIT",
+    "title": "Attachment File Size Cap Expansion",
+    "description": "Individual attachment file upload size increased from 5 MB to 25 MB.",
+    "before_state": {
+      "value": "5 MB",
+      "details": "5 MB maximum file upload size"
+    },
+    "after_state": {
+      "value": "25 MB",
+      "details": "25 MB maximum file upload size"
+    },
+    "effective_date": "2026-08-22",
+    "source": "Infrastructure Upgrade"
+  }
+]

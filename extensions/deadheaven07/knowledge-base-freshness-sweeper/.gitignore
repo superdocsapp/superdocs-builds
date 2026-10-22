@@ -1,0 +1,9 @@
+node_modules
+dist
+.env
+*.log
+coverage
+test-results
+playwright-report
+playwright-results.json
+.DS_Store

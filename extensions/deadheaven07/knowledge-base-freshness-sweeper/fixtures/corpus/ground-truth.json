@@ -1,0 +1,290 @@
+[
+  {
+    "article_id": "art-001",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-001"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Stale Limits (Direct)",
+    "rationale": "Directly quotes 10,000 API calls per month limit on Pro plan."
+  },
+  {
+    "article_id": "art-002",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-001"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Stale Limits (Direct)",
+    "rationale": "References old 10,000 API calls rate quota for webhooks."
+  },
+  {
+    "article_id": "art-003",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-002"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": true,
+    "category": "Renamed UI Navigation & Screenshot",
+    "rationale": "Text directs users to Settings > Billing > Plans, and embedded screenshot contains 'Plans' label."
+  },
+  {
+    "article_id": "art-004",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-002"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Renamed UI Navigation",
+    "rationale": "Directs users to the Plans section under Billing settings."
+  },
+  {
+    "article_id": "art-005",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-003"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": true,
+    "category": "Retired Plan & Screenshot",
+    "rationale": "Describes Legacy Pro tier features, and screenshot shows Legacy Pro badge."
+  },
+  {
+    "article_id": "art-006",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-003"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Retired Plan",
+    "rationale": "Lists Legacy Pro as an active tier requirement for audit logs."
+  },
+  {
+    "article_id": "art-007",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-004"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Indirect Stale Workflow",
+    "rationale": "Instructs users to run export script and download row by row, which is now replaced by 1-click export."
+  },
+  {
+    "article_id": "art-008",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-004"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Indirect Stale Workflow",
+    "rationale": "Instructs users on manual batch export procedure superseded by toolbar export."
+  },
+  {
+    "article_id": "art-009",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-005"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Stale File Size Limit",
+    "rationale": "Quotes old 5 MB attachment limit."
+  },
+  {
+    "article_id": "art-010",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-005"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Stale File Size Limit",
+    "rationale": "Instructs users not to exceed 5 MB limit per document attachment."
+  },
+  {
+    "article_id": "art-011",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-001"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Stale Limits (Direct)",
+    "rationale": "SDK documentation states 10,000 API calls limit on Pro tier."
+  },
+  {
+    "article_id": "art-012",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-002"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": true,
+    "category": "Renamed UI Navigation & Screenshot",
+    "rationale": "Directs user to Settings > Billing > Plans, with screenshot showing Plans tab."
+  },
+  {
+    "article_id": "art-013",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-003"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Retired Plan",
+    "rationale": "Feature matrix references Legacy Pro tier."
+  },
+  {
+    "article_id": "art-014",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-004"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Indirect Stale Workflow",
+    "rationale": "Instructs execution of manual batch export procedures."
+  },
+  {
+    "article_id": "art-015",
+    "expected_status": "AFFECTED",
+    "expected_change_ids": ["change-005"],
+    "expected_affected_sentences": [1],
+    "expected_screenshot_replacement": false,
+    "category": "Stale File Size Limit",
+    "rationale": "Mentions 5 MB maximum image diagram upload size."
+  },
+  {
+    "article_id": "art-016",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "Keyboard shortcuts are unchanged by any product changes."
+  },
+  {
+    "article_id": "art-017",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "Workspace collaboration invitations are unchanged."
+  },
+  {
+    "article_id": "art-018",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "2FA setup instructions remain completely current."
+  },
+  {
+    "article_id": "art-019",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "Custom domain CNAME instructions are unaffected."
+  },
+  {
+    "article_id": "art-020",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "Version history rollback features remain unaffected."
+  },
+  {
+    "article_id": "art-021",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "Syntax highlighting languages are unaffected."
+  },
+  {
+    "article_id": "art-022",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unchanged Healthy Article",
+    "rationale": "Dark mode theme preferences remain current."
+  },
+  {
+    "article_id": "art-023",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Adversarial False-Positive Trap",
+    "rationale": "Uses word 'growth' in context of business revenue, not Growth Plan."
+  },
+  {
+    "article_id": "art-024",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Adversarial False-Positive Trap",
+    "rationale": "Uses word 'limit' in context of browser memory, not API/upload quotas."
+  },
+  {
+    "article_id": "art-025",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Adversarial False-Positive Trap",
+    "rationale": "Uses word 'subscribing' for email newsletter, not billing subscriptions."
+  },
+  {
+    "article_id": "art-026",
+    "expected_status": "NOT_AFFECTED",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Adversarial False-Positive Trap",
+    "rationale": "Uses 'organization' in context of company hierarchy, not Settings path."
+  },
+  {
+    "article_id": "art-027",
+    "expected_status": "COULD_NOT_ASSESS",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Ambiguous / Under-Specified Context",
+    "rationale": "Defers limits to custom variable contract negotiation; cannot determine if standard changes apply."
+  },
+  {
+    "article_id": "art-028",
+    "expected_status": "COULD_NOT_ASSESS",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Ambiguous Beta Workflow",
+    "rationale": "Explicitly notes workflow varies across rollout phases."
+  },
+  {
+    "article_id": "art-029",
+    "expected_status": "COULD_NOT_ASSESS",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Ambiguous Quotas Without Numbers",
+    "rationale": "Mentions generic export quotas without quoting numerical threshold or specific tier."
+  },
+  {
+    "article_id": "art-030",
+    "expected_status": "COULD_NOT_ASSESS",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Unverified Draft",
+    "rationale": "Tagged as unverified draft pending engineering signoff."
+  },
+  {
+    "article_id": "art-031",
+    "expected_status": "COULD_NOT_ASSESS",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Under Review Policy",
+    "rationale": "Policy is marked as under review with custom legacy terms."
+  },
+  {
+    "article_id": "art-032",
+    "expected_status": "COULD_NOT_ASSESS",
+    "expected_change_ids": [],
+    "expected_affected_sentences": [],
+    "expected_screenshot_replacement": false,
+    "category": "Missing OCR Visual Metadata",
+    "rationale": "Embedded screenshot has empty OCR labels and missing caption; cannot honestly verify visual content."
+  }
+]
