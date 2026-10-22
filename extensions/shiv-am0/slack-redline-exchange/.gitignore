@@ -1,0 +1,15 @@
+.env
+*.db
+# SQLite writes these alongside the database in WAL mode; they are not source.
+*.db-wal
+*.db-shm
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+demo/output/*
+!demo/output/.gitkeep
