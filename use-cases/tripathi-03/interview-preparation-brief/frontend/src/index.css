@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 204 40% 98%;
+  --foreground: 215 28% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 28% 12%;
+  --primary: 199 78% 32%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 200 24% 94%;
+  --secondary-foreground: 215 28% 16%;
+  --muted: 210 16% 93%;
+  --muted-foreground: 215 12% 40%;
+  --accent: 166 42% 92%;
+  --accent-foreground: 175 55% 22%;
+  --destructive: 0 72% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 55% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 45%;
+  --warning-foreground: 0 0% 100%;
+  --border: 214 18% 86%;
+  --input: 214 18% 86%;
+  --ring: 199 78% 32%;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 216 28% 8%;
+  --foreground: 210 20% 96%;
+  --card: 216 24% 11%;
+  --card-foreground: 210 20% 96%;
+  --primary: 191 70% 48%;
+  --primary-foreground: 216 28% 8%;
+  --secondary: 215 20% 18%;
+  --secondary-foreground: 210 20% 96%;
+  --muted: 215 18% 16%;
+  --muted-foreground: 215 12% 65%;
+  --accent: 175 30% 16%;
+  --accent-foreground: 166 50% 78%;
+  --destructive: 0 62% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 45% 42%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 85% 48%;
+  --warning-foreground: 0 0% 10%;
+  --border: 215 16% 22%;
+  --input: 215 16% 22%;
+  --ring: 191 70% 48%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 8% -10%, hsl(var(--primary) / 0.12), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 0%, hsl(166 40% 50% / 0.08), transparent);
+    min-height: 100vh;
+  }
+
+  .dark body,
+  .dark {
+    background-image:
+      radial-gradient(ellipse 70% 45% at 10% -5%, hsl(var(--primary) / 0.18), transparent),
+      radial-gradient(ellipse 50% 35% at 95% 0%, hsl(166 40% 40% / 0.1), transparent);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
