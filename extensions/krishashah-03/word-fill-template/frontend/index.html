@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/icons/icon-32.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Document Filler</title>
+    <!--
+      Office.js has no bundler-friendly entry point (the @microsoft/office-js
+      npm package ships raw dist scripts with no "main"/"exports" field), and
+      Microsoft's own deprecation notice for that package recommends loading
+      it from the CDN instead. This classic script runs before the deferred
+      module script below, so `Office` is defined by the time main.jsx runs.
+    -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

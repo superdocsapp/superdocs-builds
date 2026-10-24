@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #1C1E26;
+  --color-paper: #FAF9F6;
+  --color-redline: #B23A3A;
+  --color-slate: #5B6472;
+  --color-approve: #3F6B4A;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.font-doc {
+  font-family: Georgia, "Times New Roman", serif;
+}

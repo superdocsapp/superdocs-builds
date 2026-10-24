@@ -1,0 +1,7 @@
+{
+  "port": 3000,
+  "https": true,
+  "cert": "C:\\Users\\Krisha Shah\\.office-addin-dev-certs\\localhost.crt",
+  "key": "C:\\Users\\Krisha Shah\\.office-addin-dev-certs\\localhost.key",
+  "directory": "."
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Legal DMS - SuperDocs</title>
+  <link rel="stylesheet" href="taskpane.css" />
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head>
+<body>
+  <h1>Legal DMS</h1>
+
+  <section id="setup-section">
+    <label>Matter ID</label>
+    <input id="matterIdInput" type="text" value="matter-acme-nda" />
+    <label>Document ID</label>
+    <input id="documentIdInput" type="text" value="doc-1" />
+    <label>User ID</label>
+    <input id="userIdInput" type="text" value="attorney-priya" />
+    <button id="checkoutBtn">Check Out</button>
+    <p id="statusLine"></p>
+  </section>
+
+  <section id="edit-section" style="display:none;">
+    <label>Describe the edit</label>
+    <textarea id="instructionInput" rows="3" placeholder="e.g. Add a paragraph capping liability at $50,000"></textarea>
+    <button id="proposeBtn">Propose Edit</button>
+  </section>
+
+  <section id="changes-section">
+    <div id="changesList"></div>
+  </section>
+
+  <section id="checkin-section" style="display:none;">
+    <label>Version comment</label>
+    <input id="versionCommentInput" type="text" placeholder="e.g. Added liability cap clause" />
+    <button id="checkinBtn">Check In</button>
+  </section>
+
+  <section id="versions-section">
+    <h3>Version history</h3>
+    <div id="versionsList"></div>
+  </section>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>

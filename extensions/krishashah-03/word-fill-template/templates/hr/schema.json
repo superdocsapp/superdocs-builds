@@ -1,0 +1,44 @@
+{
+  "template_id": "salary_structure_v1",
+  "name": "Employee Salary Structure",
+  "category": "HR",
+  "description": "Employee salary structure letter with a conditional remote-work clause.",
+  "fields": {
+    "employee.name": {
+      "type": "string",
+      "required": true
+    },
+    "employee.designation": {
+      "type": "string",
+      "required": true
+    },
+    "employee.joining_date": {
+      "type": "date",
+      "required": true
+    },
+    "employee.ctc": {
+      "type": "number",
+      "required": true
+    },
+    "employee.notice_period": {
+      "type": "number",
+      "required": true
+    },
+    "employee.location": {
+      "type": "string",
+      "required": false
+    },
+    "employee.remote": {
+      "type": "boolean",
+      "required": false
+    }
+  },
+  "conditions": [
+    {
+      "condition_key": "employee.remote",
+      "operator": "==",
+      "expected_value": true,
+      "action": "include"
+    }
+  ]
+}
