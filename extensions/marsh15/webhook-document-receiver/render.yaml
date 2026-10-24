@@ -1,0 +1,36 @@
+databases:
+  - name: webhook-receiver-db
+    plan: basic-256mb
+    postgresMajorVersion: "18"
+    ipAllowList: []
+
+services:
+  - type: web
+    name: webhook-document-receiver
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health/ready
+    preDeployCommand: python scripts/predeploy.py
+    envVars: &receiver-env
+      - key: SUPERDOCS_API_KEY
+        sync: false
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: GITHUB_WEBHOOK_SECRET
+        generateValue: true
+      - key: MANAGEMENT_TOKEN
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: webhook-receiver-db
+          property: connectionString
+
+  - type: worker
+    name: webhook-document-worker
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker
+    maxShutdownDelaySeconds: 60
+    envVars: *receiver-env
