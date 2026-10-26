@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: drift_detector
+      POSTGRES_PASSWORD: drift_detector
+      POSTGRES_DB: drift_detector
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Whole directory, applied in filename order. initdb only runs on a
+      # freshly created volume; existing databases get later migrations from
+      # core.migrate at service startup.
+      - ../migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U drift_detector"]
+      interval: 2s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+node_modules/
+dist/
+.vite/
+*.egg-info/
+.pytest_cache/
+watched/
+.venv/
+*.tsbuildinfo
+backend/samples/
