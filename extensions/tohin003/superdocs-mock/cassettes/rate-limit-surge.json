@@ -1,0 +1,44 @@
+{
+  "covers": [
+    "B-066",
+    "B-067"
+  ],
+  "description": "A platform-level throttle: a plain-text 429 with no Retry-After, which a client must treat as transient rather than as a quota problem.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 0,
+      "id": "i-001",
+      "note": "non-JSON 429 with no Retry-After: transient, retry with exponential backoff plus jitter (B-066)",
+      "request": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "message": "Tighten the record-keeping clause.",
+          "session_id": "sdmock-ratelimit-002"
+        },
+        "method": "POST",
+        "path": "/v1/chat"
+      },
+      "response": {
+        "headers": {
+          "content-type": "text/plain"
+        },
+        "status": 429,
+        "text_body": "Rate exceeded"
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "n/a"
+  },
+  "recorded_at": "2026-08-10T00:00:00+00:00",
+  "scenario": "rate-limit-surge",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "Reconstructed from /errors/rate-limits. This response is emitted by the platform edge under load and cannot be induced by a single caller; attempting to would mean deliberately loading a live production service.",
+  "synthesised": true
+}

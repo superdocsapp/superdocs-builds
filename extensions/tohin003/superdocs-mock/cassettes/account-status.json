@@ -1,0 +1,107 @@
+{
+  "covers": [
+    "B-005",
+    "B-092",
+    "B-093"
+  ],
+  "description": "Account and quota calls: whoami (what an agent budgets from), the promotions balance it omits, and the documented 401 from the web-app-only usage endpoint.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 389,
+      "id": "i-001",
+      "note": "the call agents are told to budget from -- tier bucket only (F-001)",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/agents/whoami",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "account_id": "[REDACTED]",
+          "adopted": null,
+          "hint": null,
+          "is_agent_account": false,
+          "quota": {
+            "monthly_limit": 500,
+            "remaining": 500,
+            "resets_at": "2026-09-01T00:00:00+00:00",
+            "tier": "free",
+            "used": 0
+          },
+          "tier": "free"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 420,
+      "id": "i-002",
+      "note": "the promo balance whoami leaves out",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/users/me/promotions",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "active": [
+            {
+              "expires_at": "2026-09-09T11:10:46.361426",
+              "name": "Round 2 Builders - August 2026",
+              "ops_granted": 10000,
+              "ops_remaining": 9973,
+              "redeemed_at": "2026-08-10T11:10:46.361426",
+              "redemption_id": "[REDACTED]"
+            }
+          ],
+          "history": []
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 366,
+      "id": "i-003",
+      "note": "web-app-only: rejects sk_ keys with a clear 401 (B-005)",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/users/me/usage",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "detail": "This endpoint requires a signed-in user session; API keys (sk_/lce_) are not accepted here."
+        },
+        "status": 401
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "SuperDocs 3.4.0"
+  },
+  "recorded_at": "2026-08-10T17:37:52+00:00",
+  "scenario": "account-status",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "",
+  "synthesised": false
+}

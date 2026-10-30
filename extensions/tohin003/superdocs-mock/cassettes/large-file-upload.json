@@ -1,0 +1,105 @@
+{
+  "covers": [
+    "B-077",
+    "B-078",
+    "B-080",
+    "B-085",
+    "B-086",
+    "B-089",
+    "B-099"
+  ],
+  "description": "The pre-signed upload flow: request a URL, PUT the bytes straight to storage, then parse by upload_id. Keeps large documents out of the request body, and returns the only response on the surface that declares ProcessDocumentResponse.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 578,
+      "id": "i-001",
+      "note": "request a pre-signed PUT URL (valid 5 minutes, B-086)",
+      "request": {
+        "headers": {},
+        "json_body": {
+          "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+          "filename": "master-services-agreement.docx",
+          "purpose": "document",
+          "size_bytes": 42337
+        },
+        "method": "POST",
+        "path": "/v1/uploads",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "curl_example": "curl -X PUT --data-binary @master-services-agreement.docx -H 'Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document' 'https://storage.googleapis.com/superdocs-user-uploads/ffaf112f-40fa-4887-8a0c-5c1c3d4f14c2/a729f573263f4dd4b0b64b71a3025295/master-services-agreement.docx?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260810%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260810T173744Z&X-Goog-Expires=300&X-Goog-SignedHeaders=content-type%3Bhost&X-Goog-Signature=253597fc59fe727f5a312cf409d2c64216d9212b84539c79b5423acfdb61abb6ce3852142eccf7f61f86384853006cded54e92454e765abd1c81a5740db5dbb460ce7800375484c9fc99e9c20ffe86f1bbd8be18579dea0aaec14280697664581073400dc96b49ecdf3f10d9c79c829fde021b3389a576598a38ed4155f2581631b70e60ebd60eb6e2c6b684c331a69bfe8b24f12f125a438cc2afd4d9a2efb6e420580a3bfbbfe09c49682fe11804c3163ec3ed351bd32859d74105e0cb0f9feb4ba3f9b4ead874569f305bac3668c7efc1d92f727bf473e7848ff1d2ef0e5abe69a9bd42cc517445612f8012360a63b363267fe6269e559a5240d6c3785533'",
+          "expires_at": "2026-08-10T17:42:44.657232+00:00",
+          "expires_in_seconds": 300,
+          "max_size_bytes": 104857600,
+          "upload_id": "a729f573263f4dd4b0b64b71a3025295",
+          "upload_url": "https://storage.googleapis.com/superdocs-user-uploads/ffaf112f-40fa-4887-8a0c-5c1c3d4f14c2/a729f573263f4dd4b0b64b71a3025295/master-services-agreement.docx?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=622060333790-compute%40developer.gserviceaccount.com%2F20260810%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260810T173744Z&X-Goog-Expires=300&X-Goog-SignedHeaders=content-type%3Bhost&X-Goog-Signature=253597fc59fe727f5a312cf409d2c64216d9212b84539c79b5423acfdb61abb6ce3852142eccf7f61f86384853006cded54e92454e765abd1c81a5740db5dbb460ce7800375484c9fc99e9c20ffe86f1bbd8be18579dea0aaec14280697664581073400dc96b49ecdf3f10d9c79c829fde021b3389a576598a38ed4155f2581631b70e60ebd60eb6e2c6b684c331a69bfe8b24f12f125a438cc2afd4d9a2efb6e420580a3bfbbfe09c49682fe11804c3163ec3ed351bd32859d74105e0cb0f9feb4ba3f9b4ead874569f305bac3668c7efc1d92f727bf473e7848ff1d2ef0e5abe69a9bd42cc517445612f8012360a63b363267fe6269e559a5240d6c3785533"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 5080,
+      "id": "i-002",
+      "note": "parse by upload_id -> ProcessDocumentResponse",
+      "request": {
+        "headers": {},
+        "json_body": {
+          "filename": "master-services-agreement.docx",
+          "parse_mode": "document",
+          "session_id": "sdmock-process-001",
+          "upload_id": "a729f573263f4dd4b0b64b71a3025295"
+        },
+        "method": "POST",
+        "path": "/v1/uploads/a729f573263f4dd4b0b64b71a3025295/process",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "chunks_count": 84,
+          "filename": "master-services-agreement.docx",
+          "html": null,
+          "job_id": null,
+          "page_setup": {
+            "height_in": 11.6903,
+            "margin_in": {
+              "bottom": 1.0,
+              "left": 1.0,
+              "right": 1.0,
+              "top": 1.0
+            },
+            "orientation": "portrait",
+            "source": "docx",
+            "width_in": 8.2701
+          },
+          "parse_mode": "document",
+          "session_id": "sdmock-process-001",
+          "status": "completed",
+          "version_id": "7c7e49cf-fff4-4537-868d-e2b26c297dc8",
+          "warnings": null
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "SuperDocs 3.4.0"
+  },
+  "recorded_at": "2026-08-10T17:37:44+00:00",
+  "scenario": "large-file-upload",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "",
+  "synthesised": false
+}

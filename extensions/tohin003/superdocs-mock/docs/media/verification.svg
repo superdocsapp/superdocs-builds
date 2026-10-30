@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="746" height="696" viewBox="0 0 746 696" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="12.5">
+  <rect width="746" height="696" rx="10" fill="#1b1f27"/>
+  <rect width="746" height="30" rx="10" fill="#252a34"/><rect y="20" width="746" height="10" fill="#252a34"/>
+  <circle cx="20" cy="15" r="5" fill="#e06c75"/><circle cx="38" cy="15" r="5" fill="#e5c07b"/><circle cx="56" cy="15" r="5" fill="#98c379"/>
+  <text x="373" y="19" fill="#8b93a1" font-size="11" text-anchor="middle">sdmock — no API key, no network, nothing spent</text>
+  <text x="22" y="44" fill="#7fd1b9" font-weight="600">$ pytest -q</text>
+  <text x="22" y="62" fill="#8fa3bf" font-weight="400">............................ssss........................................ [ 44%]</text>
+  <text x="22" y="80" fill="#8fa3bf" font-weight="400">......................................................ssss.............. [ 88%]</text>
+  <text x="22" y="98" fill="#8fa3bf" font-weight="400">...........ssssssss                                                      [100%]</text>
+  <text x="22" y="116" fill="#d7dae0" font-weight="400"></text>
+  <text x="22" y="134" fill="#7fd1b9" font-weight="600">$ python scripts/run_kill_matrix.py --check</text>
+  <text x="22" y="152" fill="#d7dae0" font-weight="400">baseline (no mutant) ... green (5.6s)</text>
+  <text x="22" y="170" fill="#a3d977" font-weight="400">  M1   rest killed by 1 test(s)          proposed_change_batch.content arrives already parsed</text>
+  <text x="22" y="188" fill="#a3d977" font-weight="400">  M2   rest killed by 1 test(s)          metadata.pending_changes renamed to metadata.changes</text>
+  <text x="22" y="206" fill="#a3d977" font-weight="400">  M3   rest killed by 1 test(s)          awaiting_kind omitted from a continue pause</text>
+  <text x="22" y="224" fill="#a3d977" font-weight="400">  M4   rest killed by 2 test(s)          approve accepts a batch body with no top-level `appr</text>
+  <text x="22" y="242" fill="#a3d977" font-weight="400">  M5   rest killed by 1 test(s)          approve on a continue pause returns 200 instead of 4</text>
+  <text x="22" y="260" fill="#a3d977" font-weight="400">  M6   rest killed by 2 test(s)          Retry-After dropped from the application 429</text>
+  <text x="22" y="278" fill="#a3d977" font-weight="400">  M7   rest killed by 1 test(s)          the infrastructure 429 served as JSON</text>
+  <text x="22" y="296" fill="#a3d977" font-weight="400">  M8   rest killed by 1 test(s)          the 413 flattened to a bare string detail</text>
+  <text x="22" y="314" fill="#a3d977" font-weight="400">  M9   rest killed by 1 test(s)          limit_expandable flipped to false</text>
+  <text x="22" y="332" fill="#a3d977" font-weight="400">  M10  rest killed by 1 test(s)          SSE sequence numbers emitted out of order</text>
+  <text x="22" y="350" fill="#a3d977" font-weight="400">  M11  rest killed by 3 test(s)          last_sequence ignored, full history replayed</text>
+  <text x="22" y="368" fill="#a3d977" font-weight="400">  M12  rest killed by 1 test(s)          legacy .doc upload returns the documented 415 rather</text>
+  <text x="22" y="386" fill="#a3d977" font-weight="400">  M13  mcp  killed by 4 test(s)          a tool dropped from the advertised MCP surface</text>
+  <text x="22" y="404" fill="#a3d977" font-weight="400">  M14  mcp  killed by 1 test(s)          a tool&#x27;s input argument renamed in its schema</text>
+  <text x="22" y="422" fill="#a3d977" font-weight="400">  M15  rest killed by 1 test(s)          compact response mode returns the full document anyw</text>
+  <text x="22" y="440" fill="#a3d977" font-weight="400">  M16  mcp  killed by 2 test(s)          an MCP tool error reported with isError false</text>
+  <text x="22" y="458" fill="#a3d977" font-weight="400">  M17  rest killed by 1 test(s)          export returns JSON, as the spec wrongly declares</text>
+  <text x="22" y="476" fill="#a3d977" font-weight="400">  M18  rest killed by 1 test(s)          exporting from an empty session returns an empty doc</text>
+  <text x="22" y="494" fill="#f5c451" font-weight="400">18/18 mutants killed</text>
+  <text x="22" y="512" fill="#d7dae0" font-weight="400"></text>
+  <text x="22" y="530" fill="#7fd1b9" font-weight="600">$ python scripts/check_ledger_coverage.py</text>
+  <text x="22" y="548" fill="#d7dae0" font-weight="400">ledger rows             : 111</text>
+  <text x="22" y="566" fill="#d7dae0" font-weight="400">  asserted by a test    : 69</text>
+  <text x="22" y="584" fill="#d7dae0" font-weight="400">  exercised by a fixture: 22   (recorded and schema-checked, but not pinned by an assertion)</text>
+  <text x="22" y="602" fill="#d7dae0" font-weight="400">  excused in writing    : 21</text>
+  <text x="22" y="620" fill="#f5c451" font-weight="400">  uncovered             : 0</text>
+  <text x="22" y="638" fill="#d7dae0" font-weight="400"></text>
+  <text x="22" y="656" fill="#a3d977" font-weight="400">ledger and suite agree</text>
+</svg>

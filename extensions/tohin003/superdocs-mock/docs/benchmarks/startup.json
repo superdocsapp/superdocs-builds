@@ -1,0 +1,37 @@
+{
+  "generated": "2026-08-10",
+  "import_cost_ms": {
+    "fastapi": 195.2,
+    "starlette.applications": 74.6
+  },
+  "note": "Measured on the author's machine. Raw per-run samples are in startup.csv so the numbers can be re-derived or disputed.",
+  "platform": "Darwin 25.3.0 arm64",
+  "python": "3.14.5",
+  "runs": 20,
+  "summaries": [
+    {
+      "max_ms": 233.5,
+      "measurement": "process start -> socket accepts",
+      "median_ms": 156.2,
+      "min_ms": 135.3,
+      "n": 20,
+      "p95_ms": 185.1
+    },
+    {
+      "max_ms": 240.0,
+      "measurement": "process start -> HTTP 200 /health",
+      "median_ms": 157.2,
+      "min_ms": 136.2,
+      "n": 20,
+      "p95_ms": 185.9
+    },
+    {
+      "max_ms": 241.7,
+      "measurement": "process start -> MCP tools/list",
+      "median_ms": 160.5,
+      "min_ms": 138.0,
+      "n": 20,
+      "p95_ms": 187.7
+    }
+  ]
+}

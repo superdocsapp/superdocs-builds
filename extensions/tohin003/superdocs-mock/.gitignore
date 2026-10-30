@@ -1,0 +1,26 @@
+# Never, under any circumstance
+*.key
+.env
+.env.*
+!.env.example
+**/api-key
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+
+# Local scratch
+.DS_Store
+tmp/
+scratch/
+
+# Cassettes ARE committed — they are the deliverable. Raw pre-scrub captures are not.
+cassettes/**/*.raw.json

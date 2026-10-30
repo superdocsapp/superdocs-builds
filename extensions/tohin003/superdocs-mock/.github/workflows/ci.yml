@@ -1,0 +1,106 @@
+# Everything that can be checked without an API key, on every push.
+#
+# The default posture of this project is that verification costs nothing: no key, no
+# network, no quota. Anything that spends money lives in live.yml behind a manual trigger.
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  suite:
+    name: contract suite (no key)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        transport: [rest, mcp]
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e '.[test]'
+      - name: pytest --transport ${{ matrix.transport }}
+        run: pytest contract/ -q --transport ${{ matrix.transport }}
+
+  teeth:
+    name: kill matrix (does the suite catch anything?)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e '.[test]'
+      # --check fails if any mutant survives. A survivor is a documented behaviour that
+      # nothing asserts, and the fix is the missing test, never a smaller mutant.
+      - run: python scripts/run_kill_matrix.py --check
+      - name: the committed matrix must match this run
+        run: git diff --exit-code docs/kill-matrix.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kill-matrix
+          path: docs/kill-matrix.md
+
+  generated-docs:
+    name: generated docs are not stale
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e '.[test]'
+      - run: python scripts/generate_catalogue.py --check
+      - run: python scripts/check_ledger_coverage.py
+      - run: python scripts/rescrub_cassettes.py --check
+
+  secrets:
+    name: no secrets, anywhere
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }   # gitleaks needs history, not just the tip
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install -e '.[test]'
+      # The fixture audit is deliberately separate from gitleaks: it knows about the
+      # shapes specific to this API, including identifiers nested inside JSON strings.
+      - run: pytest contract/test_fixtures_are_clean.py contract/test_scrubber_has_teeth.py -q
+
+  stranger:
+    name: clone to working
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: ./scripts/fresh_clone.sh
+
+  container:
+    name: container builds and serves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t sdmock:ci .
+      - name: it answers on both transports
+        run: |
+          docker run -d --name sdmock -p 8080:8080 sdmock:ci
+          for _ in $(seq 1 60); do curl -sf localhost:8080/health && break; sleep 0.5; done
+          curl -sf -o /dev/null -H "Authorization: Bearer sk_test" \
+               -H "X-Mock-Scenario: styled-document" \
+               -X POST localhost:8080/v1/documents/upload
+          curl -sf -o /dev/null -X POST -H "Authorization: Bearer sk_test" \
+               -H "Content-Type: application/json" \
+               -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' \
+               localhost:8080/mcp/
+          docker rm -f sdmock

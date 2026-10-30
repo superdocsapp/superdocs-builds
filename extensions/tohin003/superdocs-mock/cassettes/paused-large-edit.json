@@ -1,0 +1,119 @@
+{
+  "covers": [
+    "B-033",
+    "B-034",
+    "B-035",
+    "B-036",
+    "B-037",
+    "B-038",
+    "B-039",
+    "B-059"
+  ],
+  "description": "A very large edit that applies what it can, keeps that work, and pauses with awaiting_kind continue_prompt to ask whether to carry on -- plus the 409 that rejects /approve on a pause that needs /continue.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 0,
+      "id": "i-001",
+      "note": "the pause: awaiting_kind is continue_prompt and there are NO pending_changes (B-034)",
+      "request": {
+        "headers": {
+          "accept": "application/json"
+        },
+        "method": "GET",
+        "path": "/v1/jobs/550e8400-e29b-41d4-a716-446655440000"
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T00:00:00Z",
+          "job_id": "550e8400-e29b-41d4-a716-446655440000",
+          "job_type": "chat",
+          "metadata": {
+            "awaiting_kind": "continue_prompt",
+            "continue_prompt": {
+              "done": 500,
+              "message": "I've updated 500 of 864 sections so far. 364 remain. Want me to continue with the rest?",
+              "remaining": 364,
+              "total": 864
+            }
+          },
+          "progress": 58,
+          "session_id": "sdmock-continue-001",
+          "status": "awaiting_approval",
+          "updated_at": "2026-08-10T00:04:12Z"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 0,
+      "id": "i-002",
+      "note": "approve on a continue pause -> 409; branch on awaiting_kind first (B-036)",
+      "request": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "approved": true,
+          "job_id": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "method": "POST",
+        "path": "/v1/chat/sdmock-continue-001/approve"
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "detail": "This job is paused on a continue prompt, not a change review. Resume it with POST /v1/chat/{session_id}/continue instead."
+        },
+        "status": 409
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 0,
+      "id": "i-003",
+      "note": "continue: true resumes; the job may pause again for the next segment (B-038)",
+      "request": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "continue": true,
+          "job_id": "550e8400-e29b-41d4-a716-446655440000"
+        },
+        "method": "POST",
+        "path": "/v1/chat/sdmock-continue-001/continue"
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "job_id": "550e8400-e29b-41d4-a716-446655440000",
+          "message": "Resuming with a fresh budget.",
+          "status": "in_progress"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "n/a"
+  },
+  "recorded_at": "2026-08-10T00:00:00+00:00",
+  "scenario": "paused-large-edit",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "Reconstructed from /guides/async-jobs and /guides/streaming. A real 400-section whole-document edit was recorded first (16 operations) and completed without pausing, so the pause itself could not be observed inside the recording budget. The real large edit is recorded separately as large-multi-section-edit; this cassette carries only the pause.",
+  "synthesised": true
+}

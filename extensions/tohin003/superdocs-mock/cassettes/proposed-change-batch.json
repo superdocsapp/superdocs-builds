@@ -1,0 +1,1361 @@
+{
+  "covers": [
+    "B-023",
+    "B-024",
+    "B-025",
+    "B-026",
+    "B-040",
+    "B-041",
+    "B-042",
+    "B-044",
+    "B-045",
+    "B-046",
+    "B-051",
+    "B-052",
+    "B-053",
+    "B-055",
+    "B-058",
+    "B-060"
+  ],
+  "description": "A review-mode edit: chat_async with approval_mode ask_every_time, the SSE stream carrying proposed_change_batch with its double-encoded content, the job sitting in awaiting_approval, and a mixed approve/deny decision.",
+  "interactions": [
+    {
+      "billable": false,
+      "elapsed_ms": 1845,
+      "id": "i-001",
+      "note": "start a review-mode edit",
+      "request": {
+        "headers": {},
+        "json_body": {
+          "approval_mode": "ask_every_time",
+          "document_html": "<h1>Supplier Code of Conduct</h1><p>Suppliers shall comply with all applicable laws.</p><p>Suppliers shall maintain accurate records for three years.</p><p>Suppliers shall not engage in forced labour of any kind.</p><p>Suppliers shall report breaches within ten days.</p>",
+          "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+          "model_tier": "core",
+          "session_id": "sdmock-review-001"
+        },
+        "method": "POST",
+        "path": "/v1/chat/async",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "message": "Chat request queued for processing",
+          "session_id": "sdmock-review-001",
+          "status": "pending"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 8716,
+      "id": "i-002",
+      "note": "SSE for the review turn, up to the proposal",
+      "request": {
+        "headers": {
+          "accept": "text/event-stream"
+        },
+        "method": "GET",
+        "path": "/v1/chat/sdmock-review-001/stream",
+        "query": {
+          "api_key": "[REDACTED]",
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a"
+        }
+      },
+      "response": {
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "text/event-stream; charset=utf-8"
+        },
+        "sse": [
+          {
+            "data": "{\"type\": \"document_sync\", \"content\": \"<h1 data-chunk-id=\\\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\\\">Supplier Code of Conduct</h1>\\n<p data-chunk-id=\\\"14d85d47-c32b-4c00-89f5-9208f889699d\\\">Suppliers shall comply with all applicable laws.</p>\\n<p data-chunk-id=\\\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\\\">Suppliers shall maintain accurate records for three years.</p>\\n<p data-chunk-id=\\\"03560467-3af5-4654-b2a8-b007fd859131\\\">Suppliers shall not engage in forced labour of any kind.</p>\\n<p data-chunk-id=\\\"d1888726-36b6-4424-af9d-6d08d242f953\\\">Suppliers shall report breaches within ten days.</p>\", \"context\": \"pre_agent_chunk_sync\", \"sequence\": 1, \"timestamp\": \"2026-08-10T17:38:28.452296+00:00\", \"focused_document_id\": \"doc_primary\"}",
+            "event": "document_sync",
+            "offset_ms": 921,
+            "sequence": 1
+          },
+          {
+            "data": "{\"type\": \"user_facing\", \"content\": \"I've prepared a change for your review.\", \"context\": \"supervisor_decision_hitl\", \"sequence\": 2, \"timestamp\": \"2026-08-10T17:38:35.600462+00:00\"}",
+            "event": "intermediate",
+            "offset_ms": 8077,
+            "sequence": 2
+          },
+          {
+            "data": "{\"type\": \"user_facing\", \"content\": \"\\ud83d\\udd04 Processing 2 sections in parallel...\", \"context\": \"parallel_chunk_start\", \"sequence\": 3, \"timestamp\": \"2026-08-10T17:38:35.612899+00:00\"}",
+            "event": "intermediate",
+            "offset_ms": 8077,
+            "sequence": 3
+          },
+          {
+            "data": "{\"type\": \"proposed_change_batch\", \"content\": \"{\\\"type\\\": \\\"batch_approval\\\", \\\"batch_id\\\": \\\"55c8ba0f-c6e4-4878-969b-c70a00748d3b\\\", \\\"batch_total\\\": 2, \\\"changes\\\": [{\\\"change_id\\\": \\\"55c8ba0f-c6e4-4878-969b-c70a00748d3b\\\", \\\"operation\\\": \\\"edit\\\", \\\"chunk_id\\\": \\\"49764d19-8af8-41d0-9673-313c5555d54f\\\", \\\"old_html\\\": \\\"<p data-chunk-id=\\\\\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\\\\\">Suppliers must retain records for three years.</p>\\\", \\\"new_html\\\": \\\"<p data-chunk-id=\\\\\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\\\\\">Suppliers shall retain records for three years.</p>\\\", \\\"ai_explanation\\\": \\\"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\\\u2026\\\", \\\"insert_after_chunk_id\\\": null, \\\"document_id\\\": \\\"doc_primary\\\"}, {\\\"change_id\\\": \\\"7837d3f3-29fb-434c-8377-2e35ed484e80\\\", \\\"operation\\\": \\\"edit\\\", \\\"chunk_id\\\": \\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\", \\\"old_html\\\": \\\"<p data-chunk-id=\\\\\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\\\\\">Suppliers must report breaches within ten days.</p>\\\", \\\"new_html\\\": \\\"<p data-chunk-id=\\\\\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\\\\\">Suppliers shall report breaches within ten days.</p>\\\", \\\"ai_explanation\\\": \\\"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\\\u2026\\\", \\\"insert_after_chunk_id\\\": null, \\\"document_id\\\": \\\"doc_primary\\\"}]}\", \"context\": null, \"sequence\": 4, \"timestamp\": \"2026-08-10T17:38:36.251454+00:00\"}",
+            "event": "proposed_change_batch",
+            "offset_ms": 8715,
+            "sequence": 4
+          }
+        ],
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 620,
+      "id": "i-003",
+      "note": "poll for review state",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 82241,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:36.251478+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": [
+              {
+                "ai_explanation": "Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original…",
+                "change_id": "55c8ba0f-c6e4-4878-969b-c70a00748d3b",
+                "chunk_id": "49764d19-8af8-41d0-9673-313c5555d54f",
+                "document_id": "doc_primary",
+                "new_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers shall retain records for three years.</p>",
+                "old_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers must retain records for three years.</p>",
+                "operation": "edit"
+              },
+              {
+                "ai_explanation": "Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original…",
+                "change_id": "7837d3f3-29fb-434c-8377-2e35ed484e80",
+                "chunk_id": "ffef2ac4-4037-4ab4-8218-e0d07465f87d",
+                "document_id": "doc_primary",
+                "new_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Suppliers shall report breaches within ten days.</p>",
+                "old_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Suppliers must report breaches within ten days.</p>",
+                "operation": "edit"
+              }
+            ],
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 88,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "awaiting_approval",
+          "updated_at": "2026-08-10T17:38:36.379161",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 601,
+      "id": "i-004",
+      "note": "batch without top-level approved -> documented 422",
+      "request": {
+        "headers": {},
+        "json_body": {
+          "changes": [
+            {
+              "change_id": "55c8ba0f-c6e4-4878-969b-c70a00748d3b"
+            }
+          ],
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a"
+        },
+        "method": "POST",
+        "path": "/v1/chat/sdmock-review-001/approve",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "detail": [
+            {
+              "input": {
+                "changes": [
+                  {
+                    "change_id": "55c8ba0f-c6e4-4878-969b-c70a00748d3b"
+                  }
+                ],
+                "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a"
+              },
+              "loc": [
+                "body",
+                "approved"
+              ],
+              "msg": "Field required",
+              "type": "missing"
+            }
+          ]
+        },
+        "status": 422
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 479,
+      "id": "i-005",
+      "note": "decision round 1 (one approved, one denied with feedback)",
+      "request": {
+        "headers": {},
+        "json_body": {
+          "approved": true,
+          "changes": [
+            {
+              "approved": true,
+              "change_id": "55c8ba0f-c6e4-4878-969b-c70a00748d3b"
+            },
+            {
+              "approved": false,
+              "change_id": "7837d3f3-29fb-434c-8377-2e35ed484e80",
+              "feedback": "Keep the original ten-day wording."
+            }
+          ],
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a"
+        },
+        "method": "POST",
+        "path": "/v1/chat/sdmock-review-001/approve",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "batch_complete": true,
+          "message": "Approval processed",
+          "status": "ok"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 433,
+      "id": "i-006",
+      "note": "poll after decision round 1",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 82241,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:38.717688+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 91,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "in_progress",
+          "updated_at": "2026-08-10T17:38:38.720140",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 655,
+      "id": "i-007",
+      "note": "poll after decision round 1",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 82241,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:38.717688+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 91,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "in_progress",
+          "updated_at": "2026-08-10T17:38:38.720140",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 433,
+      "id": "i-008",
+      "note": "poll after decision round 1",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 82241,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:38.717688+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 91,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "in_progress",
+          "updated_at": "2026-08-10T17:38:38.720140",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 412,
+      "id": "i-009",
+      "note": "poll after decision round 1",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 82241,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:38.717688+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 91,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "in_progress",
+          "updated_at": "2026-08-10T17:38:38.720140",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 404,
+      "id": "i-010",
+      "note": "poll after decision round 1",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 82241,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:38.717688+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 91,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "in_progress",
+          "updated_at": "2026-08-10T17:38:38.720140",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 585,
+      "id": "i-011",
+      "note": "poll after decision round 1",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 85824,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 7,
+                "timestamp": "2026-08-10T17:38:52.857947+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 8,
+                "timestamp": "2026-08-10T17:38:52.871176+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 9,
+                "timestamp": "2026-08-10T17:38:54.454687+00:00",
+                "type": "proposed_change_batch"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:54.454697+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": [
+              {
+                "ai_explanation": "Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.",
+                "change_id": "5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6",
+                "chunk_id": "49764d19-8af8-41d0-9673-313c5555d54f",
+                "document_id": "doc_primary",
+                "new_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers must retain records for three years.</p>",
+                "old_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers shall retain records for three years.</p>",
+                "operation": "edit"
+              },
+              {
+                "ai_explanation": "Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.",
+                "change_id": "7e022001-2244-4c5d-a7f0-a37d5f3eb51e",
+                "chunk_id": "ffef2ac4-4037-4ab4-8218-e0d07465f87d",
+                "document_id": "doc_primary",
+                "new_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Report breaches within ten days.</p>",
+                "old_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Suppliers must report breaches within ten days.</p>",
+                "operation": "edit"
+              }
+            ],
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 94,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "awaiting_approval",
+          "updated_at": "2026-08-10T17:38:54.583411",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 413,
+      "id": "i-012",
+      "note": "decision round 2",
+      "request": {
+        "headers": {},
+        "json_body": {
+          "approved": true,
+          "changes": [
+            {
+              "approved": true,
+              "change_id": "5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6"
+            },
+            {
+              "approved": true,
+              "change_id": "7e022001-2244-4c5d-a7f0-a37d5f3eb51e"
+            }
+          ],
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a"
+        },
+        "method": "POST",
+        "path": "/v1/chat/sdmock-review-001/approve",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "batch_complete": true,
+          "message": "Approval processed",
+          "status": "ok"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 761,
+      "id": "i-013",
+      "note": "poll after decision round 2",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 85824,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 7,
+                "timestamp": "2026-08-10T17:38:52.857947+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 8,
+                "timestamp": "2026-08-10T17:38:52.871176+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 9,
+                "timestamp": "2026-08-10T17:38:54.454687+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 10,
+                "timestamp": "2026-08-10T17:38:56.860445+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "✅ Successfully updated all 2 sections.",
+                "context": null,
+                "sequence": 11,
+                "timestamp": "2026-08-10T17:38:57.084134+00:00",
+                "type": "user_facing"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:57.084143+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 96,
+          "result": null,
+          "session_id": "sdmock-review-001",
+          "status": "in_progress",
+          "updated_at": "2026-08-10T17:38:57.087254",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": true,
+      "elapsed_ms": 466,
+      "id": "i-014",
+      "note": "poll after decision round 2",
+      "request": {
+        "headers": {},
+        "method": "GET",
+        "path": "/v1/jobs/f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+        "query": {}
+      },
+      "response": {
+        "headers": {
+          "content-type": "application/json"
+        },
+        "json_body": {
+          "created_at": "2026-08-10T17:38:28.001359",
+          "error": null,
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a",
+          "job_type": "chat",
+          "metadata": {
+            "content_type": null,
+            "cumulative_tokens": 85824,
+            "document_html_provided": true,
+            "file_size": null,
+            "filename": null,
+            "initial_doc_version": "36a873e7-9014-4f26-9881-b1c5b3083361",
+            "intermediate_responses": [
+              {
+                "content": "<h1 data-chunk-id=\"8faafc08-895f-48a7-b0fa-6d2929c6a78c\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"14d85d47-c32b-4c00-89f5-9208f889699d\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"71d4eb06-2575-4ec5-bef0-119f4b3b3f58\">Suppliers shall maintain accurate records for three years.</p>\n<p data-chunk-id=\"03560467-3af5-4654-b2a8-b007fd859131\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"d1888726-36b6-4424-af9d-6d08d242f953\">Suppliers shall report breaches within ten days.</p>",
+                "context": "pre_agent_chunk_sync",
+                "focused_document_id": "doc_primary",
+                "sequence": 1,
+                "timestamp": "2026-08-10T17:38:28.452296+00:00",
+                "type": "document_sync"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 2,
+                "timestamp": "2026-08-10T17:38:35.600462+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 3,
+                "timestamp": "2026-08-10T17:38:35.612899+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 4,
+                "timestamp": "2026-08-10T17:38:36.251454+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 5,
+                "timestamp": "2026-08-10T17:38:38.450225+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "Revising based on your feedback...",
+                "context": null,
+                "sequence": 6,
+                "timestamp": "2026-08-10T17:38:38.717679+00:00",
+                "type": "intermediate"
+              },
+              {
+                "content": "I've prepared a change for your review.",
+                "context": "supervisor_decision_hitl",
+                "sequence": 7,
+                "timestamp": "2026-08-10T17:38:52.857947+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "🔄 Processing 2 sections in parallel...",
+                "context": "parallel_chunk_start",
+                "sequence": 8,
+                "timestamp": "2026-08-10T17:38:52.871176+00:00",
+                "type": "user_facing"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 9,
+                "timestamp": "2026-08-10T17:38:54.454687+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "{\"type\": \"batch_approval\", \"batch_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"batch_total\": 2, \"changes\": [{\"change_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"operation\": \"edit\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}, {\"change_id\": \"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\", \"operation\": \"edit\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"insert_after_chunk_id\": null, \"document_id\": \"doc_primary\"}]}",
+                "context": null,
+                "sequence": 10,
+                "timestamp": "2026-08-10T17:38:56.860445+00:00",
+                "type": "proposed_change_batch"
+              },
+              {
+                "content": "✅ Successfully updated all 2 sections.",
+                "context": null,
+                "sequence": 11,
+                "timestamp": "2026-08-10T17:38:57.084134+00:00",
+                "type": "user_facing"
+              }
+            ],
+            "last_real_progress_ts": "2026-08-10T17:38:57.605508+00:00",
+            "message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "model_tier": "core",
+            "pending_changes": null,
+            "request_message": "Tighten the wording of the record-keeping clause and the breach-reporting clause. Change nothing else.",
+            "response_mode": "full",
+            "session_id": "sdmock-review-001",
+            "thinking_depth": null,
+            "user_id": null,
+            "user_turn_index_pre_inserted": 4
+          },
+          "organization_id": null,
+          "progress": 100,
+          "result": {
+            "attachment_id": null,
+            "document_changes": {
+              "changes": [
+                {
+                  "ai_explanation": "Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original…",
+                  "change_id": "7837d3f3-29fb-434c-8377-2e35ed484e80",
+                  "chunk_id": "ffef2ac4-4037-4ab4-8218-e0d07465f87d",
+                  "document_id": "doc_primary",
+                  "feedback": "Keep the original ten-day wording.",
+                  "new_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Suppliers shall report breaches within ten days.</p>",
+                  "new_plain_text": "Suppliers shall report breaches within ten days.",
+                  "old_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Suppliers must report breaches within ten days.</p>",
+                  "operation": "edit",
+                  "status": "denied"
+                },
+                {
+                  "ai_explanation": "Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original…",
+                  "change_id": "55c8ba0f-c6e4-4878-969b-c70a00748d3b",
+                  "chunk_id": "49764d19-8af8-41d0-9673-313c5555d54f",
+                  "document_id": "doc_primary",
+                  "new_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers shall retain records for three years.</p>",
+                  "new_plain_text": "Suppliers shall retain records for three years.",
+                  "old_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers must retain records for three years.</p>",
+                  "operation": "edit",
+                  "status": "approved"
+                },
+                {
+                  "ai_explanation": "Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.",
+                  "change_id": "5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6",
+                  "chunk_id": "49764d19-8af8-41d0-9673-313c5555d54f",
+                  "document_id": "doc_primary",
+                  "new_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers must retain records for three years.</p>",
+                  "new_plain_text": "Suppliers must retain records for three years.",
+                  "old_html": "<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers shall retain records for three years.</p>",
+                  "operation": "edit",
+                  "status": "approved"
+                },
+                {
+                  "ai_explanation": "Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.",
+                  "change_id": "7e022001-2244-4c5d-a7f0-a37d5f3eb51e",
+                  "chunk_id": "ffef2ac4-4037-4ab4-8218-e0d07465f87d",
+                  "document_id": "doc_primary",
+                  "new_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Report breaches within ten days.</p>",
+                  "new_plain_text": "Report breaches within ten days.",
+                  "old_html": "<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Suppliers must report breaches within ten days.</p>",
+                  "operation": "edit",
+                  "status": "approved"
+                }
+              ],
+              "changes_summary": "2 sections edited, rest untouched",
+              "chunk_diffs": null,
+              "concurrent_merges": null,
+              "focused_document_id": "doc_primary",
+              "pending_changes": null,
+              "requires_approval": null,
+              "updated_html": "<h1 data-chunk-id=\"f13d88b4-2a20-451b-8839-bc993f536418\">Supplier Code of Conduct</h1>\n<p data-chunk-id=\"0b4a0e5c-6455-47e9-8d39-ee27a2cf61c4\">Suppliers shall comply with all applicable laws.</p>\n<p data-chunk-id=\"49764d19-8af8-41d0-9673-313c5555d54f\">Suppliers must retain records for three years.</p>\n<p data-chunk-id=\"3751b028-1771-46d9-8bfc-dd7a6c97338c\">Suppliers shall not engage in forced labour of any kind.</p>\n<p data-chunk-id=\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\">Report breaches within ten days.</p>",
+              "version_id": "cf07d0f0-4628-4da4-b0a5-236f2499a89a"
+            },
+            "response": "✅ Successfully updated all 2 sections.\n- edit: Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original…\n- edit: Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\n- edit: Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.",
+            "session_id": "sdmock-review-001",
+            "usage": {
+              "agent_handoff_hint": null,
+              "bucket_used": "promo",
+              "monthly_limit": 500,
+              "monthly_remaining": 500,
+              "monthly_used": 0,
+              "ops_charged": 1,
+              "promotions": [
+                {
+                  "expires_at": "2026-09-09T11:10:46.361426",
+                  "name": "Round 2 Builders - August 2026",
+                  "ops_granted": 10000,
+                  "ops_remaining": 9972,
+                  "redemption_id": "[REDACTED]"
+                }
+              ],
+              "quota_exhausted": false,
+              "redemption_id": "[REDACTED]",
+              "subscription_tier": "free",
+              "was_billable": true
+            }
+          },
+          "session_id": "sdmock-review-001",
+          "status": "completed",
+          "updated_at": "2026-08-10T17:38:57.607675",
+          "user_id": "[REDACTED]"
+        },
+        "status": 200
+      },
+      "transport": "rest"
+    },
+    {
+      "billable": false,
+      "elapsed_ms": 430,
+      "id": "i-015",
+      "note": "stream resumed from last_sequence=4 (B-056)",
+      "request": {
+        "headers": {
+          "accept": "text/event-stream"
+        },
+        "method": "GET",
+        "path": "/v1/chat/sdmock-review-001/stream",
+        "query": {
+          "api_key": "[REDACTED]",
+          "job_id": "f0b52f02-aa87-45bc-9f0c-8fc5a902157a"
+        }
+      },
+      "response": {
+        "headers": {
+          "cache-control": "no-store",
+          "content-type": "text/event-stream; charset=utf-8"
+        },
+        "sse": [
+          {
+            "data": "{\"type\": \"proposed_change_batch\", \"content\": \"{\\\"type\\\": \\\"batch_approval\\\", \\\"batch_id\\\": \\\"55c8ba0f-c6e4-4878-969b-c70a00748d3b\\\", \\\"batch_total\\\": 2, \\\"changes\\\": [{\\\"change_id\\\": \\\"55c8ba0f-c6e4-4878-969b-c70a00748d3b\\\", \\\"operation\\\": \\\"edit\\\", \\\"chunk_id\\\": \\\"49764d19-8af8-41d0-9673-313c5555d54f\\\", \\\"old_html\\\": \\\"<p data-chunk-id=\\\\\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\\\\\">Suppliers must retain records for three years.</p>\\\", \\\"new_html\\\": \\\"<p data-chunk-id=\\\\\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\\\\\">Suppliers shall retain records for three years.</p>\\\", \\\"ai_explanation\\\": \\\"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\\\u2026\\\", \\\"insert_after_chunk_id\\\": null, \\\"document_id\\\": \\\"doc_primary\\\"}, {\\\"change_id\\\": \\\"7837d3f3-29fb-434c-8377-2e35ed484e80\\\", \\\"operation\\\": \\\"edit\\\", \\\"chunk_id\\\": \\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\", \\\"old_html\\\": \\\"<p data-chunk-id=\\\\\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\\\\\">Suppliers must report breaches within ten days.</p>\\\", \\\"new_html\\\": \\\"<p data-chunk-id=\\\\\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\\\\\">Suppliers shall report breaches within ten days.</p>\\\", \\\"ai_explanation\\\": \\\"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\\\u2026\\\", \\\"insert_after_chunk_id\\\": null, \\\"document_id\\\": \\\"doc_primary\\\"}]}\", \"context\": null, \"sequence\": 5, \"timestamp\": \"2026-08-10T17:38:38.450225+00:00\"}",
+            "event": "proposed_change_batch",
+            "offset_ms": 418,
+            "sequence": 5
+          },
+          {
+            "data": "{\"type\": \"intermediate\", \"content\": \"Revising based on your feedback...\", \"context\": null, \"sequence\": 6, \"timestamp\": \"2026-08-10T17:38:38.717679+00:00\"}",
+            "event": "intermediate",
+            "offset_ms": 418,
+            "sequence": 6
+          },
+          {
+            "data": "{\"type\": \"user_facing\", \"content\": \"I've prepared a change for your review.\", \"context\": \"supervisor_decision_hitl\", \"sequence\": 7, \"timestamp\": \"2026-08-10T17:38:52.857947+00:00\"}",
+            "event": "intermediate",
+            "offset_ms": 418,
+            "sequence": 7
+          },
+          {
+            "data": "{\"type\": \"user_facing\", \"content\": \"\\ud83d\\udd04 Processing 2 sections in parallel...\", \"context\": \"parallel_chunk_start\", \"sequence\": 8, \"timestamp\": \"2026-08-10T17:38:52.871176+00:00\"}",
+            "event": "intermediate",
+            "offset_ms": 418,
+            "sequence": 8
+          },
+          {
+            "data": "{\"type\": \"proposed_change_batch\", \"content\": \"{\\\"type\\\": \\\"batch_approval\\\", \\\"batch_id\\\": \\\"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\\\", \\\"batch_total\\\": 2, \\\"changes\\\": [{\\\"change_id\\\": \\\"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\\\", \\\"operation\\\": \\\"edit\\\", \\\"chunk_id\\\": \\\"49764d19-8af8-41d0-9673-313c5555d54f\\\", \\\"old_html\\\": \\\"<p data-chunk-id=\\\\\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\\\\\">Suppliers shall retain records for three years.</p>\\\", \\\"new_html\\\": \\\"<p data-chunk-id=\\\\\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\\\\\">Suppliers must retain records for three years.</p>\\\", \\\"ai_explanation\\\": \\\"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\\\", \\\"insert_after_chunk_id\\\": null, \\\"document_id\\\": \\\"doc_primary\\\"}, {\\\"change_id\\\": \\\"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\\\", \\\"operation\\\": \\\"edit\\\", \\\"chunk_id\\\": \\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\", \\\"old_html\\\": \\\"<p data-chunk-id=\\\\\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\\\\\">Suppliers must report breaches within ten days.</p>\\\", \\\"new_html\\\": \\\"<p data-chunk-id=\\\\\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\\\\\">Report breaches within ten days.</p>\\\", \\\"ai_explanation\\\": \\\"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\\\", \\\"insert_after_chunk_id\\\": null, \\\"document_id\\\": \\\"doc_primary\\\"}]}\", \"context\": null, \"sequence\": 9, \"timestamp\": \"2026-08-10T17:38:54.454687+00:00\"}",
+            "event": "proposed_change_batch",
+            "offset_ms": 426,
+            "sequence": 9
+          },
+          {
+            "data": "{\"type\": \"user_facing\", \"content\": \"\\u2705 Successfully updated all 2 sections.\", \"context\": null, \"sequence\": 11, \"timestamp\": \"2026-08-10T17:38:57.084134+00:00\"}",
+            "event": "intermediate",
+            "offset_ms": 426,
+            "sequence": 11
+          },
+          {
+            "data": "{\"content\": \"\\u2705 Successfully updated all 2 sections.\\n- edit: Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\\n- edit: Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\\n- edit: Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"result\": {\"usage\": {\"promotions\": [{\"name\": \"Round 2 Builders - August 2026\", \"expires_at\": \"2026-09-09T11:10:46.361426\", \"ops_granted\": 10000, \"ops_remaining\": 9972, \"redemption_id\": \"[REDACTED]\"}], \"bucket_used\": \"promo\", \"ops_charged\": 1, \"monthly_used\": 0, \"was_billable\": true, \"monthly_limit\": 500, \"redemption_id\": \"[REDACTED]\", \"quota_exhausted\": false, \"monthly_remaining\": 500, \"subscription_tier\": \"free\", \"agent_handoff_hint\": null}, \"response\": \"\\u2705 Successfully updated all 2 sections.\\n- edit: Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\\n- edit: Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\\n- edit: Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"session_id\": \"sdmock-review-001\", \"document_changes\": {\"changes\": [{\"status\": \"denied\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"feedback\": \"Keep the original ten-day wording.\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers shall report breaches within ten days.</p>\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"change_id\": \"7837d3f3-29fb-434c-8377-2e35ed484e80\", \"operation\": \"edit\", \"document_id\": \"doc_primary\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"new_plain_text\": \"Suppliers shall report breaches within ten days.\"}, {\"status\": \"approved\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"change_id\": \"55c8ba0f-c6e4-4878-969b-c70a00748d3b\", \"operation\": \"edit\", \"document_id\": \"doc_primary\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause for conciseness. Preserve all original\\u2026\", \"new_plain_text\": \"Suppliers shall retain records for three years.\"}, {\"status\": \"approved\", \"chunk_id\": \"49764d19-8af8-41d0-9673-313c5555d54f\", \"new_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\", \"old_html\": \"<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers shall retain records for three years.</p>\", \"change_id\": \"5e4926fa-7617-4e6e-a7bb-cd4a8c6362d6\", \"operation\": \"edit\", \"document_id\": \"doc_primary\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"new_plain_text\": \"Suppliers must retain records for three years.\"}, {\"status\": \"approved\", \"chunk_id\": \"ffef2ac4-4037-4ab4-8218-e0d07465f87d\", \"new_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"old_html\": \"<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Suppliers must report breaches within ten days.</p>\", \"change_id\": \"7e022001-2244-4c5d-a7f0-a37d5f3eb51e\", \"operation\": \"edit\", \"document_id\": \"doc_primary\", \"ai_explanation\": \"Parallel edit: Tighten the wording of this clause to be more concise. Change nothing else.\", \"new_plain_text\": \"Report breaches within ten days.\"}], \"version_id\": \"cf07d0f0-4628-4da4-b0a5-236f2499a89a\", \"updated_html\": \"<h1 data-chunk-id=\\\"f13d88b4-2a20-451b-8839-bc993f536418\\\">Supplier Code of Conduct</h1>\\n<p data-chunk-id=\\\"0b4a0e5c-6455-47e9-8d39-ee27a2cf61c4\\\">Suppliers shall comply with all applicable laws.</p>\\n<p data-chunk-id=\\\"49764d19-8af8-41d0-9673-313c5555d54f\\\">Suppliers must retain records for three years.</p>\\n<p data-chunk-id=\\\"3751b028-1771-46d9-8bfc-dd7a6c97338c\\\">Suppliers shall not engage in forced labour of any kind.</p>\\n<p data-chunk-id=\\\"ffef2ac4-4037-4ab4-8218-e0d07465f87d\\\">Report breaches within ten days.</p>\", \"changes_summary\": \"2 sections edited, rest untouched\", \"focused_document_id\": \"doc_primary\"}}, \"sequence\": 11}",
+            "event": "final",
+            "offset_ms": 430,
+            "sequence": 11
+          }
+        ],
+        "status": 200
+      },
+      "transport": "rest"
+    }
+  ],
+  "recorded_against": {
+    "base_url": "https://api.superdocs.app",
+    "server": "SuperDocs 3.4.0"
+  },
+  "recorded_at": "2026-08-10T17:38:26+00:00",
+  "scenario": "proposed-change-batch",
+  "schema": "sdmock/cassette@1",
+  "spec_pin": "ac0d44c3d031fd0e338e7e78839162904ee69e79",
+  "synthesis_note": "",
+  "synthesised": false
+}
