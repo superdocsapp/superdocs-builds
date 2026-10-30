@@ -1,0 +1,24 @@
+HOSPITAL OF THE UNIVERSITY MEDICAL CENTER
+CLINICAL LABORATORY & DIAGNOSTIC REPORT
+PATIENT: Eleanor Vance | MRN: 883921 | DATE: 2026-08-15 06:30 EST
+
+1. COMPLETE BLOOD COUNT (CBC):
+   - WBC: 9.4 x10^3/uL (Normal, down from 18.2 on admission)
+   - Hemoglobin: 11.8 g/dL (Stable)
+   - Hematocrit: 35.4%
+   - Platelets: 245 x10^3/uL (Normal)
+
+2. BASIC METABOLIC PANEL (BMP):
+   - Sodium: 138 mEq/L
+   - Potassium: 4.1 mEq/L
+   - Chloride: 102 mEq/L
+   - CO2 (Bicarbonate): 28 mEq/L (Compensated respiratory acidosis)
+   - BUN: 18 mg/dL
+   - Creatinine: 0.88 mg/dL (Normal eGFR >60 mL/min)
+   - Blood Glucose: 134 mg/dL (Controlled)
+
+3. COAGULATION / SPECIAL STUDIES:
+   - Anti-Factor Xa (Unfractionated Heparin): 0.44 IU/mL (Therapeutic range 0.30 - 0.70)
+   - Arterial Blood Gas (2L NC): pH 7.38, pCO2 48, pO2 86, HCO3 28, SaO2 96%
+   - Blood Cultures x2: No growth at 72 hours.
+   - Sputum Gram Stain & Culture: Moderate Gram-positive diplococci (Streptococcus pneumoniae) sensitive to Ceftriaxone.

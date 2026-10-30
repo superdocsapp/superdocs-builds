@@ -1,0 +1,44 @@
+HOSPITAL OF THE UNIVERSITY MEDICAL CENTER
+ELECTRONIC MEDICATION ADMINISTRATION RECORD (eMAR)
+PATIENT: Eleanor Vance | MRN: 883921 | GENERATED: 2026-08-15 09:30 EST
+
+ACTIVE MEDICATION ORDERS & INFUSIONS:
+
+1. HEPARIN SODIUM INFUSION [HIGH-ALERT MEDICATION: ANTICOAGULANT]
+   - Dose/Rate: 18 units/kg/hr IV Continuous Infusion (Current Rate: 1,250 units/hr)
+   - Indication: Acute DVT Prophylaxis in high-risk ICU bedrest
+   - Route: Intravenous Continuous
+   - Last Dose Verified: 2026-08-15 08:00 EST (Anti-Xa Therapeutic: 0.42 IU/mL)
+   - Nursing Protocol: Dual-RN independent double check mandatory for rate titration and bag change.
+
+2. INSULIN GLARGINE (LANTUS) [HIGH-ALERT MEDICATION: INSULIN ANALOGUE]
+   - Dose: 20 units SubQ
+   - Schedule: Nightly at 21:00 EST
+   - Indication: Basal management of Type 2 Diabetes Mellitus
+   - Route: Subcutaneous
+   - Last Dose Given: 2026-08-14 21:00 EST
+
+3. CEFTRIAXONE SODIUM
+   - Dose: 1,000 mg (1 g) IV Piggyback
+   - Schedule: Every 24 hours
+   - Indication: Community-Acquired Lobar Pneumonia (Completed 4 days of 7-day course)
+   - Route: Intravenous Piggyback in 50 mL D5W over 30 minutes
+   - Last Dose Administered: 2026-08-15 06:00 EST
+
+4. CEFPODOXIME PROXETIL [THERAPEUTIC DUPLICATION WARNING]
+   - Dose: 200 mg Oral Tablet
+   - Schedule: Every 12 hours
+   - Indication: Step-Down Oral Antibiotic Transition order written by floor resident
+   - Route: Oral
+   - Status: Ordered / Scheduled for 2026-08-15 12:00 EST
+   - Clinical Safety Alert: Concurrent administration with IV Ceftriaxone represents dual-cephalosporin therapeutic duplication.
+
+5. IPRATROPIUM-ALBUTEROL (DUONEB)
+   - Dose: 0.5 mg / 2.5 mg in 3 mL Inhalation Solution
+   - Schedule: Every 6 hours via nebulizer
+   - Indication: COPD bronchodilation
+
+6. LISINOPRIL
+   - Dose: 10 mg Oral Tablet
+   - Schedule: Daily at 09:00 EST
+   - Indication: Essential Hypertension

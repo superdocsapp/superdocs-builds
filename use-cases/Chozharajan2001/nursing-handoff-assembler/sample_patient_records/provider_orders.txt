@@ -1,0 +1,13 @@
+HOSPITAL OF THE UNIVERSITY MEDICAL CENTER
+PHYSICIAN TRANSFER & STEP-DOWN ORDERS
+PATIENT: Eleanor Vance | MRN: 883921 | ORDER DATE: 2026-08-15 09:00 EST | ORDERING PROVIDER: Dr. Robert Chen, MD
+
+TRANSFER DIRECTIVES:
+1. Transfer patient from Medical ICU to Step-Down Intermediate Care Unit (Bed 202).
+2. Code Status: FULL CODE (Confirmed).
+3. Activity: Assist of 1 with walker for all transfers and ambulation (Morse Fall Risk: 55).
+4. Diet: Diabetic Regular Diet (1,800 kcal/day).
+5. Respiratory: Continuous pulse oximetry. Titrate nasal cannula O2 to maintain SpO2 92-96%.
+6. Antibiotic Plan: Complete 48 hours of IV Ceftriaxone, then transition to Oral Cefpodoxime 200mg BID to complete a 10-day total course. Do NOT administer both concurrently.
+7. Anticoagulation: Continue IV Heparin infusion per protocol; transition to SubQ enoxaparin once ambulating >100 feet.
+8. Follow-up Labs: Morning BMP, CBC with diff, and Repeat Chest X-Ray in 48 hours.

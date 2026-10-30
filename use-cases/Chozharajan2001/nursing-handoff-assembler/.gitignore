@@ -1,0 +1,20 @@
+# Python & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest & Test Artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local Environment & Secrets
+.env
+.venv/
+env/
+venv/
+*.log
+
+# Local Runtime State
+clinical_gate_state.db
+clinical_gate_state.db-*

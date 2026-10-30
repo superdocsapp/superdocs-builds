@@ -1,0 +1,20 @@
+HOSPITAL OF THE UNIVERSITY MEDICAL CENTER
+MICU DAILY CRITICAL CARE PROGRESS NOTE (DAY 5)
+PATIENT: Eleanor Vance | MRN: 883921 | DATE: 2026-08-15 08:00 EST | UNIT: MICU Bed 14
+
+SUBJECTIVE / 24-HOUR EVENTS:
+Patient is now Hospital Day 5, Post-Extubation Day 2. Patient was successfully extubated 48 hours ago following a 3-day course of mechanical ventilation. She has tolerated weaning without stridor, respiratory fatigue, or significant tachypnea. Slept well overnight. Mild productive cough with clear secretions. Denies chest pain or palpitations.
+
+OBJECTIVE / PHYSICAL EXAM:
+- Vitals: T 98.4 F (Afebrile), HR 78 bpm regular, BP 128/74 mmHg, RR 18/min, SpO2 96% on 2L nasal cannula.
+- General: Alert, oriented x 4, sitting upright in bed in no acute distress.
+- Lungs: Clear to auscultation bilaterally with faint bibasilar crackles; no wheezing or rhonchi. Good respiratory effort.
+- Cardiovascular: RRR, S1/S2 present, no murmurs, gallops, or friction rubs. 2+ peripheral pulses.
+- Abdomen: Soft, non-distended, non-tender, active bowel sounds.
+- Extremities: Warm, dry. Mild trace pedal edema bilaterally. Calf non-tender.
+- Neuro: Cranial nerves II-XII grossly intact. Strength 4/5 in lower extremities bilaterally secondary to ICU deconditioning.
+- Morse Fall Risk Assessment: Score 55 (High Risk: IV access, history of bedrest, secondary diagnosis).
+- Isolation Precautions: Standard Precautions (Droplet precautions discontinued following 3 negative viral PCR panels).
+
+ASSESSMENT & CLINICAL TRAJECTORY:
+68yo female with acute hypoxemic respiratory failure secondary to severe community-acquired pneumonia on COPD background. Significant clinical improvement following IV antibiotic regimen and ventilatory support. Currently stable on low-flow oxygen. Hemodynamically stable off all vasopressor support. Suitable for transfer to Step-Down Unit Bed 202.

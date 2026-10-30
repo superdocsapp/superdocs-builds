@@ -1,0 +1,23 @@
+HOSPITAL OF THE UNIVERSITY MEDICAL CENTER
+ADMISSION HISTORY & PHYSICAL (H&P)
+PATIENT: Eleanor Vance | MRN: 883921 | DOB: 1958-04-12 | AGE: 68 | GENDER: F
+ADMISSION DATE: 2026-08-10 03:45 EST | ATTENDING: Dr. Robert Chen, MD | UNIT: Medical ICU Bed 14
+
+CHIEF COMPLAINT:
+Acute respiratory failure, shortness of breath, high fevers.
+
+HISTORY OF PRESENT ILLNESS:
+68-year-old female with a history of severe COPD (GOLD Stage III), Type 2 Diabetes Mellitus, and Hypertension who presented to the Emergency Department with a 4-day history of productive cough, pleuritic chest pain, and worsening dyspnea. In the ED, patient was in severe respiratory distress with SpO2 81% on room air, RR 34/min, and arterial blood gas showing acute hypoxemic and hypercapnic respiratory failure (pH 7.24, pCO2 64, pO2 52). Chest X-ray demonstrated dense right middle and lower lobe consolidation consistent with severe community-acquired pneumonia. Patient was intubated in the ED and transferred directly to the Medical Intensive Care Unit (MICU).
+
+PAST MEDICAL HISTORY:
+1. Chronic Obstructive Pulmonary Disease (COPD) - on home tiotropium and albuterol PRN
+2. Type 2 Diabetes Mellitus - on insulin glargine
+3. Essential Hypertension
+4. Osteoarthritis
+
+ALLERGIES:
+1. PENICILLIN - SEVERE ANAPHYLAXIS (Laryngeal edema, hives, hypotension in 2018)
+2. SULFA DRUGS - RASH / URTICARIA
+
+CODE STATUS:
+FULL CODE (Confirmed with patient and healthcare proxy daughter, Sarah Vance).
