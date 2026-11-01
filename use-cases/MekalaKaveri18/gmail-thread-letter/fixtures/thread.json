@@ -1,0 +1,22 @@
+{
+  "thread_id": "msg-fictional-northwind",
+  "subject": "Re: MSA turn — redlines",
+  "exported_at": "2026-08-24T16:40:00Z",
+  "messages": [
+    {
+      "from": "Samira Chen <samira@acmevendor.example>",
+      "date": "Mon 24 Aug 2026 09:12",
+      "body": "Sounds good, we'll try to get this done soon. Maybe we can also look at pricing next month if bandwidth."
+    },
+    {
+      "from": "Dev Patel <dev@northwind.example>",
+      "date": "Mon 24 Aug 2026 11:04",
+      "body": "Please confirm a date. We cannot plan closing on 'soon'."
+    },
+    {
+      "from": "Samira Chen <samira@acmevendor.example>",
+      "date": "Mon 24 Aug 2026 14:22",
+      "body": "Confirmed: I will send the redlined MSA to Northwind by Thursday 28 August 2026. Limitation of liability stays as-is until then. Pricing is not committed."
+    }
+  ]
+}

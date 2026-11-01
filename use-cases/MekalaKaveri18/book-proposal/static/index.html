@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book proposal</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="nav">
+        <div class="brand">Proposal studio</div>
+        <span class="pill">Built on SuperDocs · search, templates, export</span>
+      </header>
+      <section class="hero">
+        <p class="eyebrow">For non-fiction authors</p>
+        <h1>A proposal whose comps are <em>real books</em>.</h1>
+        <p class="lede">Search a catalog of specific titles, fill a SuperDocs template, review every edit, export.</p>
+      </section>
+      <main class="grid">
+        <section class="panel">
+          <div class="kicker">Brief</div>
+          <label>Working title <input id="title" value="Attention is a Practice" /></label>
+          <label>Author <input id="author" value="Mira Ellison" /></label>
+          <label>Audience / search <input id="audience" value="productivity knowledge workers" /></label>
+          <label>Overview
+            <textarea id="overview">A research-backed book on how knowledge workers rebuild attention without productivity theater.</textarea>
+          </label>
+          <label>Chapters (one per line)
+            <textarea id="chapters">The myth of more hours
+Attention as a skill
+The workplace that steals it
+A 30-day practice
+What organizations can change</textarea>
+          </label>
+          <label class="check"><input type="checkbox" id="review" checked /> Review mode (approve or reject each section; register tracks both)</label>
+          <div class="row">
+            <button class="primary" id="search">Search comps</button>
+            <button class="primary" id="run">Assemble proposal</button>
+          </div>
+          <p class="cite" id="status"></p>
+          <ul id="comps"></ul>
+        </section>
+        <section class="panel">
+          <div class="kicker">Document</div>
+          <div id="changes"></div>
+          <article class="doc" id="doc"></article>
+          <a id="export" class="btn hidden" href="#">Export</a>
+        </section>
+      </main>
+    </div>
+    <script src="/static/app.js"></script>
+  </body>
+</html>

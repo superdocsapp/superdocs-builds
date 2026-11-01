@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
+
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT.parent / "_lib"))
+sys.path.insert(0, str(ROOT))
+
+from jobs import export_job, refresh, review, start_job  # noqa: E402
+from letter import TEMPLATE, draft_letter, instruction, load_thread  # noqa: E402
+from superdocs import SuperDocs, load_dotenv  # noqa: E402
+
+load_dotenv(ROOT.parent / ".env")
+app = FastAPI(title="Gmail thread → formal letter")
+app.mount("/static", StaticFiles(directory=ROOT / "static"), name="static")
+JOBS: dict = {}
+
+
+class StartIn(BaseModel):
+    review_mode: bool = True
+    sample: bool = False
+
+
+class DecisionIn(BaseModel):
+    decisions: dict[str, bool] = Field(default_factory=dict)
+
+
+@app.get("/")
+def index():
+    return HTMLResponse((ROOT / "static" / "index.html").read_text(encoding="utf-8"))
+
+
+@app.get("/health")
+def health():
+    return {"ok": True, "superdocs": SuperDocs().enabled()}
+
+
+@app.get("/fixture")
+def fixture():
+    return load_thread()
+
+
+@app.post("/jobs")
+def start(body: StartIn):
+    payload = load_thread()
+    html = draft_letter(payload)
+    return start_job(
+        html=html,
+        message=instruction(payload),
+        template_name="commitment-letter.html",
+        template_bytes=TEMPLATE.encode("utf-8"),
+        prefix="gmail-letter",
+        extra={},
+        review_mode=body.review_mode,
+        force_offline=body.sample,
+        jobs=JOBS,
+    )
+
+
+@app.get("/jobs/{job_id}")
+def get_job(job_id: str):
+    return refresh(JOBS, job_id)
+
+
+@app.post("/jobs/{job_id}/review")
+def decide(job_id: str, body: DecisionIn):
+    return review(JOBS, job_id, body.decisions)
+
+
+@app.get("/jobs/{job_id}/export")
+def export(job_id: str):
+    return export_job(JOBS, job_id, "commitment-letter", ROOT / "exports")

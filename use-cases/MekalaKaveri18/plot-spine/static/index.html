@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Plot spine</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="nav">
+        <div>Plot spine</div>
+        <span class="pill">Long-book continuity · SuperDocs targeted repair</span>
+      </header>
+      <section class="hero">
+        <p class="eyebrow">Fiction editors & indie novelists</p>
+        <h1>A thousand pages. <em>One bible.</em></h1>
+        <p class="lede">Users: acquiring editors (Tor-like lists) and Reedsy indie authors. Dead characters stay dead. Untouched chapters keep their hash.</p>
+      </section>
+      <main class="grid">
+        <section class="panel">
+          <div class="kicker">Breaks</div>
+          <div id="breaks"></div>
+          <div class="row"><button id="run">Repair chapter 12</button></div>
+          <p class="cite" id="status"></p>
+        </section>
+        <section class="panel">
+          <div class="kicker">Manuscript</div>
+          <article class="doc" id="doc"></article>
+          <a id="export" class="btn hidden" href="#">Export</a>
+        </section>
+      </main>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      fetch("/breaks", { method: "POST" }).then((r) => r.json()).then((j) => {
+        $("breaks").innerHTML = (j.breaks || []).map((b) => `<div class="card">${b.kind}: ${b.evidence}</div>`).join("");
+      });
+      $("run").onclick = async () => {
+        $("status").textContent = "Working…";
+        const r = await fetch("/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+        const j = await r.json();
+        $("status").textContent = JSON.stringify(j.unchanged || j.status);
+        $("doc").innerHTML = j.html || "";
+        if (j.id) { $("export").classList.remove("hidden"); $("export").href = "/jobs/" + j.id + "/export"; }
+      };
+    </script>
+  </body>
+</html>

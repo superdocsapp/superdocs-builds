@@ -1,0 +1,12 @@
+.env
+_probe_live.py
+_probe*.py
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+exports/
+*.docx
+*.pdf
+!templates/**

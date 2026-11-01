@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hashlock</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <p class="eyebrow">Extra credit · SuperDocs proof, not a clone</p>
+      <h1>Hashlock</h1>
+      <p class="lede">
+        SuperDocs may rewrite the unlocked service paragraph. Locked clauses must stay
+        byte-identical. The receipt is SHA-256. A FAIL is the product working.
+      </p>
+      <div class="row">
+        <button id="pass">Tighten (should PASS)</button>
+        <button id="fail" class="ghost">Tamper a lock (should FAIL)</button>
+      </div>
+      <pre id="receipt" class="receipt">Load a run to print a receipt.</pre>
+      <article id="doc" class="doc"></article>
+      <a id="export" class="hidden" href="#">Export</a>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const printReceipt = (p) => {
+        if (!p) return "no receipt";
+        const lines = [
+          "HASHLOCK RECEIPT",
+          "================",
+          "verdict: " + p.verdict,
+          "document_changed: " + p.document_changed,
+          "all_locks_held: " + p.all_locks_held,
+          "",
+        ];
+        (p.locks || []).forEach((row) => {
+          lines.push((row.held ? "HELD " : "BROKE") + "  " + row.id);
+          lines.push("  " + (row.before || "").slice(0, 16) + "…");
+        });
+        return lines.join("\n");
+      };
+      const run = async (tamper) => {
+        $("receipt").textContent = "printing…";
+        const r = await fetch("/jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sample: true, tamper }),
+        });
+        const j = await r.json();
+        $("receipt").textContent = printReceipt(j.receipt);
+        $("doc").innerHTML = j.html || "";
+        if (j.id) {
+          $("export").classList.remove("hidden");
+          $("export").href = "/jobs/" + j.id + "/export";
+        }
+      };
+      $("pass").onclick = () => run(false);
+      $("fail").onclick = () => run(true);
+      fetch("/source")
+        .then((r) => r.json())
+        .then((j) => {
+          $("doc").innerHTML = j.html || "";
+        });
+    </script>
+  </body>
+</html>
