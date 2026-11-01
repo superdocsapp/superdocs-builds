@@ -1,0 +1,6 @@
+id: tsc-availability
+name: Trust Services Criteria — Availability (data-only)
+controls:
+  - { id: A1.1, name: Current processing capacity and usage }
+  - { id: A1.2, name: Environmental protections and recovery }
+  - { id: A1.3, name: Recovery plan testing }

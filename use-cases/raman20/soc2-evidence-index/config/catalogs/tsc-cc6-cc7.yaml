@@ -1,0 +1,16 @@
+id: tsc-cc6-cc7
+name: Trust Services Criteria — CC6 + CC7 (live sample)
+controls:
+  - { id: CC6.1, name: Logical access security software }
+  - { id: CC6.2, name: User registration and authorization }
+  - { id: CC6.3, name: Role-based access }
+  - { id: CC6.4, name: Restriction of access to authorized users }
+  - { id: CC6.5, name: Physical access }
+  - { id: CC6.6, name: Encryption and transmission }
+  - { id: CC6.7, name: Credentials and secrets }
+  - { id: CC6.8, name: Prevention of unauthorized software }
+  - { id: CC7.1, name: Detection of configuration changes and vulnerabilities }
+  - { id: CC7.2, name: Monitor system components }
+  - { id: CC7.3, name: Evaluate security events }
+  - { id: CC7.4, name: Incident response }
+  - { id: CC7.5, name: Recovery and restore }

@@ -1,0 +1,5 @@
+id: tsc-confidentiality
+name: Trust Services Criteria — Confidentiality (data-only)
+controls:
+  - { id: C1.1, name: Identify confidential information }
+  - { id: C1.2, name: Dispose of confidential information }

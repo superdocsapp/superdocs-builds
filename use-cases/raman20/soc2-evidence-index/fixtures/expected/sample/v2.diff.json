@@ -1,0 +1,22 @@
+{
+  "added": ["CC7.2::present::ops/MON-2025-04.md"],
+  "removed": ["CC7.2::gap::none"],
+  "changed_ids": [
+    "CC6.1::present::access/ACC-REV-2025-Q1.md",
+    "CC6.2::present::access/ACC-REV-2025-Q1.md",
+    "CC6.3::present::access/ACC-REV-2025-Q1.md"
+  ],
+  "changed_fields": ["date", "evidence_title", "sha256"],
+  "unchanged": [
+    "CC6.5::present::access/PHYS-2025-01.md",
+    "CC7.4::present::ops/INC-220.md",
+    "CC7.5::present::ops/BAK-LOG-2025-03.md",
+    "CC6.4::gap::none",
+    "CC6.6::gap::none",
+    "CC6.7::gap::none",
+    "CC6.8::gap::none",
+    "CC7.1::gap::none",
+    "CC7.3::gap::none"
+  ],
+  "summary": {"added": 1, "removed": 1, "changed": 3, "renamed": 0, "unchanged": 9}
+}
