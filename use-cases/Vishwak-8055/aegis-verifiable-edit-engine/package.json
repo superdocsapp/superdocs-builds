@@ -1,0 +1,39 @@
+{
+  "name": "aegis",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Verifiable edit engine for SuperDoc: proves that an AI document edit stayed in scope and preserved protected invariants.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch bin/demo.ts",
+    "demo": "tsx bin/demo.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src bin benchmark test --max-warnings=0",
+    "test": "vitest run test/unit test/property",
+    "test:watch": "vitest",
+    "integration-test": "vitest run test/integration test/adversarial",
+    "test:all": "vitest run",
+    "benchmark": "tsx benchmark/run-benchmark.ts",
+    "ui-test": "node ui/smoke-test.mjs",
+    "coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "diff": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@typescript-eslint/eslint-plugin": "^8.19.1",
+    "@typescript-eslint/parser": "^8.19.1",
+    "@vitest/coverage-v8": "^2.1.8",
+    "axe-core": "^4.10.2",
+    "eslint": "^9.18.0",
+    "jsdom": "^25.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

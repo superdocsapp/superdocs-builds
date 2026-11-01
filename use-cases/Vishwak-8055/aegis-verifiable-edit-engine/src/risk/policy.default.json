@@ -1,0 +1,62 @@
+{
+  "_rationale": "Severity encodes how bad it is for this finding to be WRONG (i.e. for Aegis to have silently let it through). Recoverable encodes whether a bounded, fully re-verified retry is a sensible next step versus something that should go straight to a human. Protected-value and the most dangerous semantic mutations are marked non-recoverable on purpose: retrying a legally/financially meaningful mutation without a human in the loop is a product risk even if the retry logic itself is sound. See docs/ARCHITECTURE.md 'Risk model rationale' for the full writeup and section 11 of the brief for the four examples this table was built to match exactly (formatting-only=LOW, unexpected paragraph change=MEDIUM, date/currency mutation=HIGH, obligation-to-permission and unauthorized scope change=CRITICAL).",
+  "defaultSeverity": "MEDIUM",
+  "defaultRecoverable": true,
+  "decisionThresholds": {
+    "CRITICAL": "BLOCKED",
+    "HIGH": "REQUIRES_REVIEW",
+    "MEDIUM": "VERIFIED_WITH_WARNINGS",
+    "LOW": "VERIFIED",
+    "INFO": "VERIFIED"
+  },
+  "findings": {
+    "STRUCTURAL_BLOCK_INSERTED": { "severity": "MEDIUM", "recoverable": true },
+    "STRUCTURAL_BLOCK_DELETED": { "severity": "HIGH", "recoverable": true },
+    "STRUCTURAL_TYPE_CHANGED": { "severity": "MEDIUM", "recoverable": true },
+    "STRUCTURAL_HEADING_LEVEL_CHANGED": { "severity": "LOW", "recoverable": true },
+    "STRUCTURAL_TABLE_DIMENSION_CHANGED": { "severity": "HIGH", "recoverable": true },
+    "STRUCTURAL_LINK_REMOVED": { "severity": "HIGH", "recoverable": true },
+    "STRUCTURAL_LINK_URL_CHANGED": { "severity": "HIGH", "recoverable": true },
+    "STRUCTURAL_LINK_ADDED": { "severity": "MEDIUM", "recoverable": true },
+
+    "PROTECTED_VALUE_REQUESTED_CHANGE": { "severity": "INFO", "recoverable": true },
+    "PROTECTED_VALUE_CHANGE_UNENFORCED": { "severity": "INFO", "recoverable": true },
+    "PROTECTED_VALUE_CURRENCY_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_DATE_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_DURATION_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_PERCENTAGE_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_TIME_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_URL_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_IDENTIFIER_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_INTEGER_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_DECIMAL_CHANGED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_REMOVED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_INSERTED": { "severity": "HIGH", "recoverable": false },
+    "PROTECTED_VALUE_LOST_WITH_BLOCK": { "severity": "HIGH", "recoverable": true },
+
+    "SEMANTIC_OBLIGATION_TO_PERMISSION": { "severity": "CRITICAL", "recoverable": false },
+    "SEMANTIC_MODALITY_INVERTED": { "severity": "CRITICAL", "recoverable": false },
+    "SEMANTIC_CONDITION_OR_EXCEPTION_REMOVED": { "severity": "CRITICAL", "recoverable": false },
+    "SEMANTIC_MODALITY_TIGHTENED": { "severity": "HIGH", "recoverable": true },
+    "SEMANTIC_MODALITY_CHANGED": { "severity": "LOW", "recoverable": true },
+    "SEMANTIC_ACTOR_CHANGED": { "severity": "HIGH", "recoverable": true },
+
+    "SCOPE_TARGET_NOT_FOUND": { "severity": "MEDIUM", "recoverable": false },
+    "UNINTENDED_SCOPE_CHANGE": { "severity": "CRITICAL", "recoverable": true },
+
+    "FORMATTING_ONLY_CHANGE": { "severity": "LOW", "recoverable": true },
+    "FORMATTING_MARKER_UNBALANCED": { "severity": "MEDIUM", "recoverable": true },
+
+    "DRIFT_TEXTUAL_EXCESSIVE": { "severity": "MEDIUM", "recoverable": true },
+    "DRIFT_NUMERIC_SUMMARY": { "severity": "INFO", "recoverable": true }
+  },
+  "nonDowngradable": [
+    "SEMANTIC_OBLIGATION_TO_PERMISSION",
+    "SEMANTIC_MODALITY_INVERTED",
+    "SEMANTIC_CONDITION_OR_EXCEPTION_REMOVED",
+    "UNINTENDED_SCOPE_CHANGE",
+    "PROTECTED_VALUE_CURRENCY_CHANGED",
+    "PROTECTED_VALUE_DATE_CHANGED",
+    "PROTECTED_VALUE_DURATION_CHANGED"
+  ]
+}
