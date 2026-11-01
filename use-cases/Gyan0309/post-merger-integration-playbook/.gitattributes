@@ -1,0 +1,7 @@
+# Line endings are normalised to LF in the repository.
+#
+# This build was authored on Windows, where git's default core.autocrlf=true would
+# otherwise store every text file with CRLF. Landing that in a pull request makes the
+# diff show whole-file rewrites instead of clean additions, which buries the actual
+# change under noise for whoever reviews it.
+* text=auto eol=lf

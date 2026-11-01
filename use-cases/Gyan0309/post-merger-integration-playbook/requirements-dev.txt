@@ -1,0 +1,4 @@
+-r requirements.txt
+
+# The test suite needs no API key and no network — see tests/.
+pytest==9.1.1

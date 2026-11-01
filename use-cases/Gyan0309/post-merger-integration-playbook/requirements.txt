@@ -1,0 +1,4 @@
+# Deliberately small. Detection and rendering need only PyYAML; httpx is for the
+# SuperDocs half. Pins are exact so a clone builds what was tested.
+httpx==0.28.1
+PyYAML==6.0.3

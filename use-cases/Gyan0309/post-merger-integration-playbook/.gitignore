@@ -1,0 +1,22 @@
+# Secrets — a key in a repository is disqualifying.
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Generated output. A fresh `--offline` run reproduces build/*.md byte-for-byte, so
+# committing the rendered documents would only put stale copies next to the code that
+# produces them.
+build/*
+
+# ...but build/exported/ came back through SuperDocs and cannot be regenerated without
+# an API key and ops spend. It is the evidence the round trip actually happened, so it
+# ships. The rendered originals are one command away for anyone who wants to diff them.
+!build/exported/

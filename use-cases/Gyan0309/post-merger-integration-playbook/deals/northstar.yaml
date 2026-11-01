@@ -1,0 +1,157 @@
+# Project Northstar — a synthetic post-merger integration.
+#
+# Fictional companies, fabricated numbers. The brief expects exactly this.
+#
+# The conflicts below are planted on purpose, one per comparator, because a detector
+# that has never been observed to fire is not known to work:
+#
+#   duplicate_synergy       finance SYN-F2 and technology SYN-T1 are the same saving
+#   contested_dependency    DEP-CRM is owned by both commercial and technology
+#   synergy_over_commitment claims total $5.15M against a $4.6M target
+#   unmet_day_one           DAY-HR-2 needs DEP-PAY, which lands in month 2
+#
+# A clean deal to contrast against lives in northstar-clean.yaml.
+
+deal:
+  code_name: Northstar
+  acquirer: Meridian Retail Group
+  target: Northwind Analytics LLC
+  announced: 2026-01-15
+  expected_close: 2026-03-01
+  integration_horizon_months: 12
+  deal_value_usd: 48000000
+  synergy_target_usd: 4600000
+  rationale: >
+    Meridian is acquiring Northwind to bring demand forecasting in-house. Northwind's
+    modelling team and its forecasting platform replace three external analytics
+    vendors Meridian currently retains, and the combined customer data set is expected
+    to improve markdown accuracy across Meridian's seasonal ranges.
+
+target_profile:
+  headcount: 140
+  locations:
+    - Stockholm
+    - Manchester
+  systems:
+    - name: Salesforce
+      function: commercial
+      disposition: migrate to acquirer instance
+    - name: Workday
+      function: hr
+      disposition: retire, migrate to acquirer HRIS
+    - name: Snowflake
+      function: technology
+      disposition: retain, consolidate accounts
+    - name: NetSuite
+      function: finance
+      disposition: retire, migrate to acquirer ERP
+  notes: >
+    Northwind runs a four-day week in Stockholm. Two of the three analytics vendors
+    being replaced are on contracts with 90-day termination notice.
+
+workstreams:
+  - key: finance
+    name: Finance & Accounting
+    lead: A. Lindqvist
+    scope: >
+      Chart of accounts, ERP migration, statutory reporting, vendor contract
+      rationalisation and the synergy tracker itself.
+    synergies:
+      - id: SYN-F1
+        description: Retire NetSuite licences and consolidate onto acquirer ERP
+        annual_value_usd: 620000
+        realisation_month: 8
+      - id: SYN-F2
+        description: Terminate external analytics vendor contracts
+        annual_value_usd: 1800000
+        realisation_month: 6
+    dependencies:
+      - id: DEP-COA
+        description: Single chart of accounts agreed and loaded
+        needed_by_month: 3
+        needed_by: [commercial, technology]
+    day_one:
+      - id: DAY-FIN-1
+        description: Opening balance sheet signed off by both CFOs
+        status: in_progress
+      - id: DAY-FIN-2
+        description: Payment runs for Northwind suppliers confirmed for week one
+
+  - key: people
+    name: People & Organisation
+    lead: R. Osei
+    scope: >
+      Employment transfer, payroll, benefits harmonisation, retention of the
+      modelling team, and the Stockholm four-day-week question.
+    synergies:
+      - id: SYN-P1
+        description: Remove duplicate HR tooling after Workday retirement
+        annual_value_usd: 310000
+        realisation_month: 9
+    dependencies:
+      - id: DEP-PAY
+        description: Payroll cutover from Workday to acquirer HRIS
+        needed_by_month: 2
+        needed_by: [finance]
+    day_one:
+      - id: DAY-HR-1
+        description: Every Northwind employee has a signed transfer letter
+        status: in_progress
+      # Planted: this is a day-one item resting on DEP-PAY, which is month 2.
+      - id: DAY-HR-2
+        description: All staff paid correctly from the acquirer payroll system
+        depends_on: [DEP-PAY]
+
+  - key: commercial
+    name: Commercial & Customer
+    lead: M. Duarte
+    scope: >
+      Customer communications, contract novation, CRM migration, and protecting
+      revenue through the transition.
+    synergies:
+      - id: SYN-C1
+        description: Cross-sell forecasting module to existing Meridian accounts
+        annual_value_usd: 900000
+        realisation_month: 12
+    dependencies:
+      # Planted: technology owns a near-identical dependency below.
+      - id: DEP-CRM
+        description: Migrate Northwind CRM records into the acquirer Salesforce instance
+        needed_by_month: 4
+        needed_by: [people]
+    day_one:
+      - id: DAY-COM-1
+        description: Top 20 customers have received a named-contact letter
+        status: in_progress
+      - id: DAY-COM-2
+        description: No customer contract lapses in the first 30 days
+
+  - key: technology
+    name: Technology & Data
+    lead: S. Bhattacharya
+    scope: >
+      Platform integration, Snowflake consolidation, access management, and
+      decommissioning the retired systems.
+    synergies:
+      # Planted: this is SYN-F2 under another name, claimed by a second workstream.
+      - id: SYN-T1
+        description: Terminate the external analytics vendor contracts and platforms
+        annual_value_usd: 1520000
+        realisation_month: 7
+    dependencies:
+      # Planted: same work as DEP-CRM above, owned by a second workstream.
+      - id: DEP-CRM-MIGRATION
+        description: Migrate CRM records from Northwind into acquirer Salesforce
+        needed_by_month: 4
+        needed_by: [commercial]
+      - id: DEP-SSO
+        description: Single sign-on extended to all Northwind staff
+        needed_by_month: 1
+        needed_by: [people, commercial]
+    day_one:
+      - id: DAY-TEC-1
+        description: All Northwind staff can authenticate against acquirer SSO
+        depends_on: [DEP-SSO]
+      - id: DAY-TEC-2
+        description: Forecasting platform reachable from Meridian networks
+        status: in_progress
