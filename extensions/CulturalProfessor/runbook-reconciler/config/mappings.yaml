@@ -1,0 +1,47 @@
+# Entity resolution that the catalog cannot supply.
+#
+# Backstage `catalog-info.yaml` solves this properly where it exists — a
+# component's `former-names` annotation is how a runbook written two years ago
+# is matched to the service it describes today. This file is the fallback for
+# estates without a catalog, which is most of them, and it is deliberately data:
+# adding a mapping must never be a code change.
+#
+# Nothing here is fuzzy. Every entry is an exact phrase as it appears in a
+# runbook, mapped to an exact entity name.
+
+# A phrase as written in a document -> the catalog component it means.
+aliases:
+  # "the payments service" in prose, `payments-api` in the estate.
+  the payments service: payments-api
+  payments service: payments-api
+  label printer: label-printer
+
+# Names a service used to have, where no catalog annotation records them.
+# The corpus does not need this — tracking-ingest declares its own former name —
+# and it is left populated with one entry so the path is exercised rather than
+# theoretical.
+former_names:
+  notification-gateway: notify-gateway
+
+# Subjects nobody wants checked. The escape hatch that keeps this installable:
+# a team that decides one claim is not worth verifying says so here instead of
+# turning the checker off.
+ignore_subjects: []
+
+# Extra spellings of "put your own value here", added to the built-in
+# conventions rather than replacing them.
+#
+# Recognised without configuration: `<your-namespace>`, `{{ namespace }}`,
+# `$NAMESPACE` / `${NAMESPACE}`, and `YOUR_THING` / `THING_HERE`. Deliberately
+# NOT recognised: a bare capitalised word like `NAMESPACE`, because that could
+# be a real resource, and a placeholder convention that swallows real names is a
+# checker that reports every estate as drift-free.
+#
+# So this list is for house styles the built-ins do not cover. An entry is a
+# regular expression; one that does not compile is ignored rather than taking
+# the checker down with it.
+#
+#   placeholder_patterns:
+#     - 'PLACEHOLDER_\w+'
+#     - '«[^»]+»'
+placeholder_patterns: []

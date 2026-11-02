@@ -1,0 +1,10 @@
+<h2>When this fires</h2>
+<p>The <strong>PaymentsApiHighLatency</strong> alert fires when p99 request latency stays above 1200ms over a 5-minute window, and only after it has held for 10 minutes.</p>
+<p>Everything on this page is correct. It is written in milliseconds because that is what the payments team thinks in; the alerting rule stores the same number in seconds.</p>
+<h2>Triage</h2>
+<p>The deployment is <code>payments-api</code> in namespace <code>payments</code>, and it runs 6 replicas.</p>
+<p>Start at the <a href="https://meridian.grafana.net/d/abc123/payments-overview">Payments overview</a> dashboard and look at the p99 panel before touching anything.</p>
+<h2>Mitigation</h2>
+<p>If a bad release is the cause, run the <code>manual-rollback</code> job in the deploy workflow. It reverts production to the previous image.</p>
+<h2>Escalation</h2>
+<p>Page the <strong>Payments Core</strong> rota. The head of platform picks it up after 30 minutes.</p>

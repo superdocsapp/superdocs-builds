@@ -1,0 +1,9 @@
+{
+  "id": "2001",
+  "status": "current",
+  "title": "Runbook: payments-api latency (milliseconds throughout)",
+  "spaceKey": "RUN",
+  "version": { "number": 1, "createdAt": "2026-06-01T07:45:00.000Z", "authorId": "557058:4d7e" },
+  "labels": ["runbook", "payments"],
+  "_links": { "webui": "/spaces/RUN/pages/2001" }
+}

@@ -1,0 +1,10 @@
+<h2>When this fires</h2>
+<p>The <strong>ManifestWorkerStalled</strong> alert fires when no batch has completed for 30 minutes.</p>
+<h2>Triage</h2>
+<p>The deployment is <code>manifest-worker</code> in namespace <code>fulfilment</code> and runs 2 replicas.</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="3c6f8a12-1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n fulfilment logs deploy/manifest-worker --tail=200]]></ac:plain-text-body></ac:structured-macro>
+<p>A stalled worker is nearly always the broker's endpoint rejecting a malformed consignment. The batch stops rather than skipping, on purpose.</p>
+<h2>Mitigation</h2>
+<p>Fix or remove the offending consignment, then run the <code>replay-failed-batch</code> job in the deploy workflow.</p>
+<h2>Escalation</h2>
+<p>Page the <strong>Fulfilment</strong> rota, then the head of operations after 20 minutes.</p>

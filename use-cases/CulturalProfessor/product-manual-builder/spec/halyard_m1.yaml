@@ -1,0 +1,341 @@
+# The product spec. This file is the single source of truth.
+#
+# The manual and the quick-start card are two *projections* of it. Neither is
+# authored, so neither can drift from the other: there is no copy of the torque
+# figure or the wavelength living in a second document waiting to go stale.
+#
+# The parts graph is a graph and not a list because the diagrams are rendered
+# from it. `mounts_to` is what places a part in the exploded view, and the
+# renderer walks it. Nothing draws a diagram by hand and no model ever draws one.
+#
+# Everything here is fabricated. There is no Halyard M1.
+
+product:
+  name: Halyard M1
+  tagline: Benchtop diode laser engraver
+  model_number: HAL-M1-450
+  revision: C
+  languages_available: [en, de]
+
+specifications:
+  - key: work_area
+    label: Work area
+    value: 400 × 400 mm
+  - key: laser_source
+    label: Laser source
+    value: 450 nm diode, 10 W optical
+  - key: enclosure_class
+    label: Enclosure class
+    value: Class 1 when the lid interlock is engaged
+  - key: max_feed
+    label: Maximum feed rate
+    value: 6 000 mm/min
+  - key: input_power
+    label: Input power
+    value: 24 V DC, 5 A (supply included)
+  - key: connectivity
+    label: Connectivity
+    value: USB-C, microSD
+  - key: mass
+    label: Mass, assembled
+    value: 8.4 kg
+  - key: extraction
+    label: Extraction requirement
+    value: 60 mm duct, 90 m³/h minimum
+
+# The parts graph. `id` is stable and is what a diagram references; changing a
+# label never invalidates a drawing.
+parts:
+  - id: base
+    label: Base frame
+    quantity: 1
+    mounts_to: null
+    note: Ships assembled. The four rubber feet are captive.
+
+  - id: rail_y_left
+    label: Y rail, left
+    quantity: 1
+    mounts_to: base
+
+  - id: rail_y_right
+    label: Y rail, right
+    quantity: 1
+    mounts_to: base
+
+  - id: gantry
+    label: X gantry
+    quantity: 1
+    mounts_to: rail_y_left
+    note: Spans both Y rails; seats on the left rail first.
+
+  - id: carriage
+    label: Laser carriage
+    quantity: 1
+    mounts_to: gantry
+
+  - id: laser_module
+    label: Laser module, 10 W
+    quantity: 1
+    mounts_to: carriage
+    note: Handle by the heatsink. The lens is not user-serviceable.
+
+  - id: lens_cap
+    label: Protective lens cap
+    quantity: 1
+    mounts_to: laser_module
+
+  - id: controller
+    label: Controller board
+    quantity: 1
+    mounts_to: base
+
+  - id: lid
+    label: Enclosure lid
+    quantity: 1
+    mounts_to: base
+    note: Carries the interlock magnet. The machine will not fire with it open.
+
+  - id: duct
+    label: Exhaust duct, 60 mm
+    quantity: 1
+    mounts_to: base
+
+  - id: psu
+    label: Power supply, 24 V
+    quantity: 1
+    mounts_to: null
+
+  - id: hex_keys
+    label: Hex key set, 2.5 / 3 / 4 mm
+    quantity: 1
+    mounts_to: null
+
+# Setup steps, in order. `parts` names which parts each step involves, and the
+# per-step diagram is rendered by highlighting exactly those in the graph -- so a
+# step's illustration cannot show a part the step does not mention.
+setup_steps:
+  - id: unpack
+    title: Unpack and check the shipment
+    body: >
+      Lift the machine out by the base frame, not by the gantry. Check the
+      packing list against the parts in the box before discarding any packaging;
+      the hex keys sit in the foam under the base.
+    parts: [base, hex_keys]
+
+  - id: rails
+    title: Fit the Y rails
+    body: >
+      Seat each Y rail into its channel on the base frame and drive the four
+      M4 screws finger-tight, then to 1.2 N·m with the 2.5 mm key. Do not
+      tighten one rail fully before the other is seated, or the frame will pull
+      out of square.
+    parts: [base, rail_y_left, rail_y_right, hex_keys]
+    warnings: [square_frame]
+
+  - id: gantry
+    title: Mount the X gantry
+    body: >
+      Lower the gantry onto the left Y rail first, then swing the right end
+      down until both end blocks are flush. Drive the two M4 screws each side to
+      1.2 N·m.
+    parts: [gantry, rail_y_left, rail_y_right]
+
+  - id: laser
+    title: Fit the laser module
+    body: >
+      Slide the carriage onto the gantry, then mount the laser module to the
+      carriage with the two captive screws. Leave the protective lens cap on
+      until the machine is fully assembled and the lid is fitted.
+    parts: [carriage, laser_module, lens_cap]
+    warnings: [eye_protection, no_lens_touch]
+
+  - id: extraction
+    title: Connect extraction
+    body: >
+      Push the 60 mm duct onto the rear spigot until the bead seats, and run it
+      to an outside vent or a filter rated for the material you cut. Engraving
+      without extraction deposits resin on the lens and fills the room with
+      whatever the workpiece gives off.
+    parts: [duct, base]
+    warnings: [ventilation]
+
+  - id: power
+    title: Power up and home
+    body: >
+      Fit the lid, connect the 24 V supply, then USB-C. The machine homes to
+      front-left on power-up; keep hands clear of the gantry while it does. A
+      steady green LED on the controller means it is ready.
+    parts: [psu, controller, lid]
+    warnings: [interlock]
+
+  - id: first_burn
+    title: Run the test pattern
+    body: >
+      Place the supplied scrap card on the bed, load TEST.GC from the microSD
+      card, and run it. The pattern takes about ninety seconds. Stay with the
+      machine while it runs.
+    parts: [lid, laser_module]
+    warnings: [fire_watch, never_unattended]
+
+# Warnings are declared once and referenced by id from the steps that need them.
+# Both projections pull from here, so a warning cannot be worded one way in the
+# manual and another on the card.
+warnings:
+  - id: eye_protection
+    severity: danger
+    title: Laser radiation
+    body: >
+      Never operate the module outside the closed enclosure. Direct or reflected
+      450 nm light causes permanent retinal injury faster than the blink reflex.
+      The supplied goggles are for incidental protection during setup, not a
+      substitute for the enclosure.
+
+  - id: fire_watch
+    severity: danger
+    title: Fire risk
+    body: >
+      Cutting and engraving produce open flame conditions. Keep a class ABC
+      extinguisher within reach of the machine.
+
+  - id: never_unattended
+    severity: danger
+    title: Never leave a running job
+    body: >
+      Do not leave the machine unattended while a job is running, including
+      long jobs and repeat jobs you have run before.
+
+  - id: ventilation
+    severity: warning
+    title: Extraction required
+    body: >
+      Engraving releases fine particulate and, depending on the material,
+      irritant or toxic gases. Never cut PVC or any chlorinated plastic: it
+      produces hydrogen chloride, which will injure you and destroy the machine.
+
+  - id: interlock
+    severity: warning
+    title: Do not defeat the interlock
+    body: >
+      The lid interlock is what makes this a Class 1 product. Bypassing it makes
+      the machine a Class 4 laser and voids both the warranty and the CE
+      declaration.
+
+  - id: no_lens_touch
+    severity: caution
+    title: Handle the module by the heatsink
+    body: >
+      Skin oil on the lens burns in on first use and permanently scatters the
+      beam. The lens is not user-serviceable.
+
+  - id: square_frame
+    severity: caution
+    title: Tighten the rails evenly
+    body: >
+      Fully tightening one rail before the other is seated pulls the frame out
+      of square, and every engraving after that is a parallelogram.
+
+# The troubleshooting table. `step` and `parts` are references, not prose: a row
+# that points at a step is refused if that step is renamed out of the manual,
+# which is how this section normally goes stale.
+troubleshooting:
+  - id: no_fire
+    symptom: The gantry moves and the job runs, but nothing is engraved.
+    cause: >
+      The lid is open, or the interlock magnet is not seated against its sensor.
+      The controller runs the whole job with the diode disabled rather than
+      refusing to start.
+    fix: >
+      Close the lid fully and confirm the interlock LED on the controller is
+      lit. If it stays dark with the lid closed, the magnet has shifted in its
+      recess; press it flush and re-run.
+    step: power
+    parts: [lid, controller]
+
+  - id: out_of_square
+    symptom: Squares come out as parallelograms, and the error grows across the bed.
+    cause: One Y rail was fully tightened before the other was seated.
+    fix: >
+      Loosen all eight rail screws, push the gantry to the front stop so the
+      frame pulls itself square, then re-torque the rails alternately to
+      1.2 N·m.
+    step: rails
+    parts: [rail_y_left, rail_y_right, base]
+
+  - id: faint_engraving
+    symptom: Engraving is faint or uneven, and worse on the right of the bed.
+    cause: >
+      Resin on the lens, from running without extraction. It scatters more of
+      the beam the further the carriage travels from the exhaust.
+    fix: >
+      Stop, let the module cool, and inspect the lens with the machine
+      unpowered. Resin needs a lens replacement, not cleaning: the lens is not
+      user-serviceable. Fix the extraction before running again.
+    step: extraction
+    parts: [laser_module, duct]
+
+  - id: no_home
+    symptom: On power-up the gantry drives into the end stop and stalls.
+    cause: A Y rail is seated in the wrong channel, so the home switch never closes.
+    fix: >
+      Power down at the supply. Check that each rail sits in its own channel and
+      the end blocks are flush before powering up again.
+    step: power
+    parts: [rail_y_left, rail_y_right, psu]
+
+  - id: no_power
+    symptom: No LED on the controller, and the machine does not respond to USB.
+    cause: The 24 V supply is not seated, or USB-C was connected before power.
+    fix: >
+      Disconnect USB-C, seat the 24 V barrel connector until it clicks, wait for
+      the green LED, then reconnect USB-C. The controller enumerates on power,
+      not on the data connection.
+    step: power
+    parts: [psu, controller]
+
+  - id: smoke_smell
+    symptom: The room smells of smoke during a job even with extraction running.
+    cause: The duct has come off the rear spigot, or the vent run is blocked.
+    fix: >
+      Stop the job. Check the duct is seated past the bead at both ends and that
+      the outside vent is clear. Do not continue a job to see whether it
+      improves.
+    step: extraction
+    parts: [duct]
+
+# Statements that ship with the product. Worded once here, rendered into every
+# language from the same ids, and `spec.py` refuses a spec that has no warranty
+# or no disposal statement.
+statements:
+  - id: warranty
+    title: Warranty
+    body: >
+      Halyard warrants this machine against defects in materials and workmanship
+      for 24 months from the date of purchase. The laser module is a consumable
+      and is warranted for 12 months or 500 operating hours, whichever comes
+      first. The warranty does not cover damage from operating the machine with
+      the interlock bypassed, from cutting chlorinated plastics, or from lens
+      contamination. Warranty service is arranged through the reseller who sold
+      the machine; keep the proof of purchase. This statement does not affect
+      your statutory rights.
+
+  - id: disposal
+    title: Disposal and recycling
+    body: >
+      Do not put this machine in household waste. It is electrical equipment
+      under the WEEE Directive and is marked with the crossed-out wheeled bin.
+      Return it to a municipal collection point or to the reseller when you buy
+      an equivalent replacement. Remove the laser module before disposal and
+      hand it in separately: it contains a diode assembly that is recovered
+      rather than shredded. The packaging is corrugated board and moulded pulp,
+      and both go in paper recycling.
+
+# What goes on the quick-start card, and nothing else. The card is not a
+# shortened manual -- it is a different projection with a different job, so the
+# spec says which steps it carries, which warnings ride along, and which of the
+# troubleshooting rows are worth the space on a folded card.
+quick_start:
+  steps: [rails, gantry, laser, extraction, power, first_burn]
+  warnings: [eye_protection, ventilation, never_unattended]
+  troubleshooting: [no_fire, no_power, out_of_square]
+  footer: >
+    Full manual, troubleshooting and material settings: halyard.example/m1

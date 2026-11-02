@@ -1,0 +1,8 @@
+<h2>Objectives</h2>
+<p>These are the committed objectives for <code>payments-api</code>. The alerting rules are derived from them, so the two are supposed to move together.</p>
+<h2>Latency</h2>
+<p>p99 request latency stays below <strong>800ms</strong>. The paging alert is <strong>PaymentsApiHighLatency</strong> and fires after 10 minutes above the objective.</p>
+<h2>Availability</h2>
+<p>The 5xx rate stays below <strong>5%</strong> over any 30 minute window. Sustained burn above that is the <strong>PaymentsApiErrorBudgetBurn</strong> alert.</p>
+<h2>Ownership</h2>
+<p>Owned by <strong>team-payments</strong>. Tier 1: this service is on the critical path for every shipment booked.</p>

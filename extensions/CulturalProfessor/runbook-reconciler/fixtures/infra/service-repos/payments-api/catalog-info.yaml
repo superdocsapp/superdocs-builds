@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payments-api
+  description: Card and direct-debit capture for Meridian Freight shipping accounts
+  annotations:
+    meridian.io/kubernetes-deployment: payments-api
+    meridian.io/kubernetes-namespace: payments
+    pagerduty.com/escalation-policy: payments-core-oncall
+    grafana/dashboard-uid: abc123
+spec:
+  type: service
+  lifecycle: production
+  owner: team-payments
+  tier: 1

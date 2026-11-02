@@ -1,0 +1,24 @@
+groups:
+  - name: fulfilment
+    rules:
+      - alert: LabelPrinterQueueDepth
+        expr: sum(label_printer_queue_depth) > 500
+        for: 10m
+        labels:
+          severity: warning
+          team: team-fulfilment
+        annotations:
+          summary: label printer queue above 500 jobs
+          runbook_url: https://meridian.atlassian.net/wiki/spaces/RUN/pages/1004
+
+      # A runbook for this exists (page 1008) but the alert does not point at
+      # it, so the responder never finds it. Coverage has to be measured in both
+      # directions to see this one.
+      - alert: ManifestWorkerStalled
+        expr: time() - max(manifest_worker_last_success_timestamp_seconds) > 1800
+        for: 5m
+        labels:
+          severity: critical
+          team: team-fulfilment
+        annotations:
+          summary: manifest worker has not completed a batch in 30 minutes

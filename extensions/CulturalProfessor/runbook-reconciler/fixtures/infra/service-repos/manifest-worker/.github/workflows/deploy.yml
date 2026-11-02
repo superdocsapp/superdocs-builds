@@ -1,0 +1,25 @@
+name: deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: make build
+
+  deploy-production:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: make deploy ENV=production
+
+  replay-failed-batch:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - run: make replay-batch

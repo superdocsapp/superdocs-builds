@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# Staged proof, cheapest first.
+#
+# The order is deliberate: everything that can be established for free is
+# established before anything that costs, and every stage that spends says so
+# and is opt-in. A proof script that quietly charges somebody for running it is
+# not a proof script.
+#
+#     ./selftest                 the free stages, end to end
+#     RR_LIVE_CONFLUENCE=1       adds a live read against the configured site
+#     RR_LIVE_SUPERDOCS=1        adds ONE paid operation against the real API
+#
+# The other rule: **a stage that cannot run says so and fails loudly rather
+# than passing silently.** A skipped live stage printing "ok" is how a build
+# gets shipped believing it was verified against a service it never called.
+set -uo pipefail
+cd "$(dirname "$0")"
+
+PASS=0
+FAIL=0
+SKIP=0
+
+green() { printf '\033[32m%s\033[0m\n' "$1"; }
+red()   { printf '\033[31m%s\033[0m\n' "$1"; }
+grey()  { printf '\033[90m%s\033[0m\n' "$1"; }
+
+stage() {
+    printf '\n\033[1m── %s\033[0m\n' "$1"
+}
+
+ok()      { PASS=$((PASS + 1)); green "   PASS  $1"; }
+bad()     { FAIL=$((FAIL + 1)); red   "   FAIL  $1"; }
+skipped() { SKIP=$((SKIP + 1)); grey  "   SKIP  $1"; }
+
+check() {
+    # check "<name>" <command...>
+    local name="$1"; shift
+    if "$@" >/tmp/rr-selftest.$$ 2>&1; then
+        ok "$name"
+    else
+        bad "$name"
+        sed 's/^/         /' /tmp/rr-selftest.$$ | tail -20
+    fi
+    rm -f /tmp/rr-selftest.$$
+}
+
+# The register these stages write to is a scratch file. Running the proof must
+# not overwrite the register whose numbers the README quotes.
+export RR_REGISTER="${TMPDIR:-/tmp}/rr-selftest-register.db"
+rm -f "$RR_REGISTER"
+# The free stages read the corpus whatever credentials happen to be configured,
+# so "offline" is a fact rather than a hope.
+export RR_SOURCE=corpus
+
+# ---------------------------------------------------------------- stage 1 --
+stage "1. it is installed and the entry point works"
+check "rr version"          ./rr version
+check "rr --help lists the commands" bash -c './rr --help | grep -q "check"'
+
+# ---------------------------------------------------------------- stage 2 --
+stage "2. lint and format (check-only -- a proof that rewrites proves nothing)"
+check "ruff"  .venv/bin/ruff check .
+check "black" .venv/bin/black --check .
+
+# ---------------------------------------------------------------- stage 3 --
+stage "3. the test suite"
+check "pytest" .venv/bin/python -m pytest -q
+
+# ---------------------------------------------------------------- stage 4 --
+stage "4. the deterministic checker, offline, against the bundled corpus"
+if ./rr check > "${TMPDIR:-/tmp}/rr-check.out" 2>&1; then
+    bad "rr check should exit non-zero on an estate with planted drift"
+else
+    ok "rr check exits non-zero when it finds drift (so CI can gate on it)"
+fi
+check "it found the planted drift"  grep -q "13 findings" "${TMPDIR:-/tmp}/rr-check.out"
+check "it reports coverage"         grep -q "alerts" "${TMPDIR:-/tmp}/rr-check.out"
+check "it counted what it could not check" \
+      grep -q "could not be checked" "${TMPDIR:-/tmp}/rr-check.out"
+check "it spent nothing"            grep -q "operations spent: 0" "${TMPDIR:-/tmp}/rr-check.out"
+
+# ---------------------------------------------------------------- stage 5 --
+stage "5. measurement against the key written before the checker existed"
+check "precision 1.000" bash -c './rr measure | grep -q "precision 1.000"'
+check "recall 1.000"    bash -c './rr measure | grep -q "recall 1.000"'
+check "raw data committed" test -f docs/measurement.json
+
+# ---------------------------------------------------------------- stage 6 --
+stage "6. zero spend, asserted rather than claimed"
+check "a sweep with no drift spends nothing" \
+      .venv/bin/python -m pytest -q tests/test_must_never.py -k spend
+check "rr propose prices and does not spend" \
+      bash -c './rr propose | grep -q "nothing spent"'
+
+# ---------------------------------------------------------------- stage 7 --
+stage "7. half two: the readiness pack"
+PACKDIR="${TMPDIR:-/tmp}/rr-selftest-pack"
+rm -rf "$PACKDIR"
+check "rr pack builds both documents" ./rr pack --out "$PACKDIR"
+check "the readiness report exists"   test -s "$PACKDIR/on-call-readiness.html"
+check "the DR evidence exists"        test -s "$PACKDIR/dr-evidence.html"
+check "neither claims a certification" \
+      bash -c '! grep -riE "soc ?2|iso 27001|certified|compliant" '"$PACKDIR"'/*.html'
+
+# ---------------------------------------------------------------- stage 8 --
+stage "8. the machine interface"
+check "mcp lists exactly the four tools" bash -c '
+    printf "%s\n" "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}" \
+    | ./rr mcp | grep -q "\"analyze\""'
+
+# ---------------------------------------------------------------- stage 9 --
+stage "9. no secret anywhere in the committed tree"
+check "no key-shaped string is committed" \
+      .venv/bin/python -m pytest -q tests/test_must_never.py -k rule_9
+
+# --------------------------------------------------------------- stage 10 --
+stage "10. live Confluence (reads only)"
+if [ "${RR_LIVE_CONFLUENCE:-}" = "1" ]; then
+    # preflight reads: it resolves cloudId, probes the three auth combinations
+    # and fetches one page's storage format. It writes nothing.
+    check "preflight authenticates and reads a page" python3 preflight.py
+    grey "         the live WRITE round-trip is a separate opt-in:"
+    grey "         RR_LIVE_CONFLUENCE_TESTS=1 RR_LIVE_PAGE_ID=<id> ./rr test -k live"
+else
+    skipped "live Confluence -- set RR_LIVE_CONFLUENCE=1 to include it"
+    grey "         (reads only; no page is written by this stage)"
+fi
+
+# --------------------------------------------------------------- stage 11 --
+stage "11. live SuperDocs -- THIS SPENDS ONE PAID OPERATION"
+if [ "${RR_LIVE_SUPERDOCS:-}" = "1" ]; then
+    red "   about to spend 1 paid operation against the real API"
+    check "one page, one operation, wording comes back" \
+          .venv/bin/python -m pytest -q tests/test_edit_live.py
+else
+    skipped "live SuperDocs -- set RR_LIVE_SUPERDOCS=1 to spend one operation"
+    grey "         (everything above this line was free)"
+fi
+
+# ------------------------------------------------------------------ result --
+printf '\n\033[1m%s\033[0m\n' "──────────────────────────────────────────"
+printf '%d passed · %d failed · %d skipped\n' "$PASS" "$FAIL" "$SKIP"
+if [ "$SKIP" -gt 0 ]; then
+    grey "skipped stages proved nothing. They are not passes."
+fi
+[ "$FAIL" -eq 0 ] || exit 1

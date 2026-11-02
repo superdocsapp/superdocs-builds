@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+# Everything this project can be asked to prove, in one command.
+#
+# Cheapest first, and nothing here spends quota by default: the offline checks
+# need no key at all, and the two live ones read the published documents back --
+# exports are free. A stranger with no key gets the offline half and is told the
+# rest was skipped rather than being told it passed.
+#
+# One stage is the exception, and it stays off unless asked for twice: with a
+# key present AND SUPERDOCS_LIVE_REENTRY_TESTS=1 set, this also runs a test that
+# spends one real operation to park a batch on api.superdocs.app and prove a
+# second turn is really refused with 409 session_busy, not just refused by a
+# mock of one. A key alone does not turn it on.
+#
+# Exits non-zero if any stage failed, so CI can run it.
+set -uo pipefail
+cd "$(dirname "$0")"
+
+passed=0
+failed=0
+skipped=0
+declare -a broken=()
+
+stage() {
+    local title="$1"; shift
+    printf '\n\033[1m==> %s\033[0m\n' "$title"
+    if "$@"; then
+        printf '    \033[32mPASS\033[0m  %s\n' "$title"
+        passed=$((passed + 1))
+    else
+        printf '    \033[31mFAIL\033[0m  %s\n' "$title"
+        failed=$((failed + 1))
+        broken+=("$title")
+    fi
+}
+
+skip() {
+    printf '\n\033[1m==> %s\033[0m\n    \033[33mSKIP\033[0m  %s\n' "$1" "$2"
+    skipped=$((skipped + 1))
+}
+
+# A key in the environment or in .env. Checked with grep -q so nothing is
+# printed: this script is meant to be run on a shared screen.
+have_key() {
+    [ -n "${SUPERDOCS_API_KEY:-}" ] && return 0
+    [ -f .env ] && grep -q '^SUPERDOCS_API_KEY=.' .env && return 0
+    return 1
+}
+
+echo "Product Manual and Quick-Start Builder -- self test"
+echo "no quota is spent by anything below."
+
+# On a fresh clone there is no virtualenv yet. `mb` builds one on first use, so
+# this both bootstraps and proves the entry point runs -- quietly, because its
+# output here would be the argparse help and nobody asked for that.
+./mb --help >/dev/null
+
+# ------------------------------------------------------------- offline --
+
+stage "lint: ruff check, black --check" \
+    bash -c ".venv/bin/ruff check . && .venv/bin/black --check ."
+stage "unit tests (no network, no key)" \
+    .venv/bin/python -m pytest -q
+stage "check: the spec, the pair, and every locale's pagination" \
+    ./mb check
+stage "build: diagrams and documents rendered to out/" \
+    ./mb build
+
+# ---------------------------------------------------------------- live --
+
+if have_key; then
+    stage "status: what is published, and what is blocking an edit" \
+        ./mb status
+    stage "verify: the live documents are what publish recorded" \
+        ./mb verify
+else
+    skip "status" "no SUPERDOCS_API_KEY in the environment or .env"
+    skip "verify" "no SUPERDOCS_API_KEY in the environment or .env"
+fi
+
+# `SUPERDOCS_LIVE_REENTRY_TESTS=1` is a second, separate switch from having a
+# key -- this is the one stage in this script that spends a real operation
+# (tests/test_live_reentry.py parks a real batch on api.superdocs.app to prove
+# a second turn really is refused with 409 session_busy, then denies it for
+# free). Everything above this line, key or no key, spends nothing.
+if have_key && [ "${SUPERDOCS_LIVE_REENTRY_TESTS:-}" = "1" ]; then
+    stage "live re-entry: a real 409 is caught and really cleared (spends ~1 operation)" \
+        .venv/bin/python -m pytest -q tests/test_live_reentry.py
+elif have_key; then
+    skip "live re-entry test" \
+        "spends a real operation, so it is opt-in: SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest"
+else
+    skip "live re-entry test" "needs SUPERDOCS_API_KEY and SUPERDOCS_LIVE_REENTRY_TESTS=1"
+fi
+
+# -------------------------------------------------------------- report --
+
+printf '\n\033[1m%s\033[0m\n' "-----------------------------------------------"
+printf '%d passed, %d failed' "$passed" "$failed"
+[ "$skipped" -gt 0 ] && printf ', %d skipped' "$skipped"
+printf '\n'
+
+if [ "$failed" -gt 0 ]; then
+    printf '\nwhat is not working:\n'
+    for name in "${broken[@]}"; do printf '  - %s\n' "$name"; done
+    exit 1
+fi
+
+if ! have_key; then
+    printf '\nEverything checkable without a key passes. Put a key in .env and\n'
+    printf 'run this again to check the published documents themselves.\n'
+elif [ "${SUPERDOCS_LIVE_REENTRY_TESTS:-}" != "1" ]; then
+    printf '\nEverything passes, including the documents on the service. Not run: the\n'
+    printf 'live re-entry test, which spends a real operation --\n'
+    printf 'SUPERDOCS_LIVE_REENTRY_TESTS=1 ./selftest also runs that.\n'
+else
+    printf '\nEverything passes, including the documents on the service and a real\n'
+    printf '409 session_busy caught and cleared on it.\n'
+fi

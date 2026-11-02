@@ -1,0 +1,14 @@
+<h2>Scope</h2>
+<p>Recovery of the payments datastore, <code>meridian-payments-prod</code>, in region <code>eu-west-1</code>. The instance is multi-AZ, so a single availability zone failure is not a disaster recovery event.</p>
+<h2>Objectives and retention</h2>
+<table data-layout="default"><colgroup><col /><col /></colgroup><tbody><tr><th><p>Measure</p></th><th><p>Committed value</p></th></tr><tr><td><p>RPO</p></td><td><p>15 minutes</p></td></tr><tr><td><p>RTO</p></td><td><p>4 hours</p></td></tr><tr><td><p>Automated backup retention</p></td><td><p>7 days</p></td></tr><tr><td><p>Snapshot window</p></td><td><p>03:00 UTC daily</p></td></tr></tbody></table>
+<h2>Restore procedure</h2>
+<p>Restore from the most recent automated backup into a new instance, then repoint the application. Never restore over the running instance.</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="8d0e4b77-1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[aws rds restore-db-instance-to-point-in-time \
+  --source-db-instance-identifier meridian-payments-prod \
+  --target-db-instance-identifier meridian-payments-restore \
+  --use-latest-restorable-time]]></ac:plain-text-body></ac:structured-macro>
+<h2>Archived manifests</h2>
+<p>Consignment manifests are archived to <code>meridian-manifest-archive</code> and expire after 90 days. Anything older than that is not recoverable and the customs broker's own copy is the record.</p>
+<h2>Escalation</h2>
+<p>Declare through the <strong>Payments Core</strong> rota. The head of platform owns the decision to fail over.</p>

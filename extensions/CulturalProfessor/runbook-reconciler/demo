@@ -1,0 +1,233 @@
+#!/usr/bin/env bash
+# A narrated, paced walkthrough of this project, run for real.
+#
+# This is not `selftest`. `selftest` is unattended and cheapest-first, and its
+# whole point is a pass/fail proof nobody has to watch. This is the opposite:
+# every stage runs one at a time, its real output stays on screen, and nothing
+# moves on until a person says so -- built for the moment the task document
+# describes, "a direct conversation ... where we look at your build together
+# and modify it live."
+#
+# The order is the argument. Stages 1 and 2 are free, offline and deterministic,
+# and they are where the findings come from. Only stage 6 spends anything, and
+# only after stage 5 has printed exactly what it will cost. Stage 10 is the one
+# that matters most: an estate with nothing wrong produces no findings and
+# spends nothing, which is the difference between this and a tool that bills you
+# for a rebase.
+#
+#     ./demo              the whole thing, against the live site
+#     ./demo --offline    stops before anything touches Confluence or SuperDocs
+#
+# Enter continues; Esc stops exactly where you are. The demo page is created in
+# your own space; stage 12 tries to remove it and, on a scoped API token, cannot
+# -- `delete:page:confluence` is not grantable, so it prints what to click
+# instead of pretending it cleaned up.
+set -uo pipefail
+cd "$(dirname "$0")"
+
+OFFLINE=0
+[ "${1:-}" = "--offline" ] && OFFLINE=1
+
+# Two registers, and the split is not tidiness.
+#
+# The offline stages sweep the bundled corpus; the live stages sweep a real
+# Confluence space. Sharing one register between them means the corpus's
+# findings — for pages 1001-1007, which exist only in fixtures/ — are still
+# sitting there when the live half runs, so `rr propose` prices eight pages
+# instead of one and `rr review` tries to write to Confluence pages that do not
+# exist. That is exactly what happened the first time this script was run end to
+# end, and it is the register behaving correctly: it holds findings from every
+# sweep until somebody decides on them, and two sweeps of two different estates
+# are two different sets of findings.
+#
+# Neither is the project's own register, because a walkthrough that overwrites
+# the register the README quotes its measurements from costs you your numbers.
+DEMO_OFFLINE_REGISTER="${TMPDIR:-/tmp}/rr-demo-offline.db"
+DEMO_LIVE_REGISTER="${TMPDIR:-/tmp}/rr-demo-live.db"
+rm -f "$DEMO_OFFLINE_REGISTER" "$DEMO_LIVE_REGISTER"
+export RR_REGISTER="$DEMO_OFFLINE_REGISTER"
+
+have() {
+    [ -n "${!1:-}" ] && return 0
+    [ -f .env ] && grep -q "^$1=." .env && return 0
+    return 1
+}
+
+# Bootstraps the virtualenv on a fresh clone, quietly -- its output here would
+# be the argparse help and nobody asked for that.
+./rr --help >/dev/null
+
+pause() {
+    printf '\n-- press Enter to continue, or Esc to stop -- '
+    local key
+    while true; do
+        IFS= read -rsn1 key
+        if [ -z "$key" ]; then
+            printf '\n'
+            return 0
+        elif [ "$key" = $'\e' ]; then
+            # A bare Esc is one byte. An arrow or function key also starts with
+            # that byte and sends more behind it; this drains whatever follows
+            # within 10ms so it cannot leak into the next read.
+            read -rsn10 -t 0.01 _ 2>/dev/null || true
+            printf '\n'
+            echo "stopped here."
+            [ "$SEEDED" = "1" ] && echo "the demo page is still in your space: .venv/bin/python seed.py delete"
+            exit 0
+        fi
+    done
+}
+
+declare -a failed=()
+SEEDED=0
+
+# Two passes, and the second one is the point rather than a fudge.
+#
+# The deterministic half of this project is deterministic. The wording half is
+# not: the same batch of five passages has come back with 1, then 4, then 4
+# usable replacements. `rr propose` skips findings that already carry wording,
+# so a second pass retries only the ones that failed and costs one operation per
+# page that still needs one -- and a finding that never gets usable wording
+# escalates to a human rather than being written wrongly.
+#
+# Showing this is more honest than hiding it behind a single lucky pass, and it
+# is the reason the register records wording per finding instead of per run.
+propose_twice() {
+    ./rr propose --yes || return $?
+    echo
+    echo "-- second pass: retries only what still has no wording --"
+    ./rr propose --yes
+}
+
+stage() {
+    local title="$1" cost="$2"; shift 2
+    printf '\n\033[1m==> %s\033[0m\n' "$title"
+    printf '    \033[2m%s\033[0m\n\n' "$cost"
+    printf '\033[2m%s\033[0m\n\n' "$*"
+    "$@"
+    local code=$?
+    # `rr check` exits non-zero when it finds drift, which is the point of it --
+    # so a stage that is *supposed* to find something is not a failed stage.
+    if [ "$code" -ne 0 ] && [ "${ALLOW_NONZERO:-0}" != "1" ]; then
+        printf '\n\033[31mstage exited %d -- read above for why.\033[0m\n' "$code"
+        failed+=("$title")
+    fi
+    ALLOW_NONZERO=0
+    pause
+}
+
+echo "Runbook Reconciler -- a paced walkthrough"
+echo "infrastructure config is ground truth; runbooks are checked against it;"
+echo "findings go to a human; approved fixes land as surgical edits."
+
+# ----------------------------------------------------------------- offline --
+
+ALLOW_NONZERO=1 stage \
+    "1. the deterministic checker, against the bundled corpus" \
+    "free -- no model, no network, no key. This is where findings come from." \
+    ./rr check --corpus
+
+stage \
+    "2. how good those findings are, against a key written before the checker" \
+    "free. fixtures/expected.yaml was written at stage 1 of the build, before any checking code existed." \
+    ./rr measure
+
+stage \
+    "3. half two: the readiness report and the DR evidence document" \
+    "free -- built from the same register the findings came from. Without this, the project is a linter." \
+    ./rr pack --corpus --out "${TMPDIR:-/tmp}/rr-demo-pack"
+
+if [ "$OFFLINE" = "1" ]; then
+    echo
+    echo "--offline: stopping here. Everything above needed no credentials at all."
+    exit 0
+fi
+
+if ! have CONFLUENCE_API_TOKEN; then
+    echo
+    echo "no CONFLUENCE_API_TOKEN in the environment or .env -- the live half needs one."
+    echo "run ./demo --offline for the part that does not, or see .env.example."
+    exit 1
+fi
+
+# -------------------------------------------------------------------- live --
+
+# A clean register for the live half. See the note at the top.
+export RR_REGISTER="$DEMO_LIVE_REGISTER"
+
+stage \
+    "4. plant a runbook with known drift in a real Confluence space" \
+    "free -- creating and labelling a page is not a paid operation. One page, in your own space, deleted again at stage 12." \
+    .venv/bin/python seed.py create
+SEEDED=1
+
+ALLOW_NONZERO=1 stage \
+    "5. sweep the live space" \
+    "free. Reads Confluence and the infra repos; no model, no spend." \
+    ./rr check
+
+stage \
+    "6. price the wording before buying it" \
+    "free -- this is the same command as the next stage without --yes. It spends nothing and says exactly what it would cost." \
+    ./rr propose
+
+stage \
+    "7. buy it" \
+    "ONE PAID OPERATION per page, per pass -- every finding on a page is batched into one request. Two passes, because the wording layer is not deterministic and the second retries only what the first left unworded." \
+    propose_twice
+
+stage \
+    "8. the human gate" \
+    "free. a=approve r=reject s=skip q=quit, one finding at a time. Rejecting one leaves the rest. Nothing is written to any document without a decision here." \
+    ./rr review
+
+stage \
+    "9. what actually changed on the page, byte by byte" \
+    "free. Compared against the bytes that were seeded, not against the page's own last version -- so an unapproved change anywhere in the body would show up here." \
+    .venv/bin/python seed.py diff
+
+# ------------------------------------------------------- the honest endings --
+
+ALLOW_NONZERO=1 stage \
+    "10. sweep again, with the drift fixed" \
+    "free. The claims that were wrong now agree. This is the beat most demos skip." \
+    ./rr check
+
+stage \
+    "11. and the same page needs no wording, so nothing is spent" \
+    "free, and the number to watch is zero. A tool that bills you when it found nothing gets uninstalled in week two." \
+    ./rr propose
+
+# Not `stage`, because this one is allowed to fail in a way that is worth
+# reading rather than counting: a scoped API token cannot delete a page, so on
+# most tokens this prints instructions instead of cleaning up. Announcing "every
+# stage passed" over a page still sitting in somebody's space is the failure
+# this project is about.
+printf '\n\033[1m==> %s\033[0m\n' "12. put the space back"
+printf '    \033[2m%s\033[0m\n\n' "free -- and it may not be possible; see below."
+printf '\033[2m%s\033[0m\n\n' ".venv/bin/python seed.py delete"
+if .venv/bin/python seed.py delete; then
+    SEEDED=0
+else
+    printf '\n\033[33mthe demo page is still in your space -- read above.\033[0m\n'
+fi
+pause
+
+echo
+if [ "${#failed[@]}" -eq 0 ]; then
+    echo "walkthrough complete, and every stage passed."
+else
+    printf '\033[31mwalkthrough complete, but %d stage(s) failed:\033[0m\n' "${#failed[@]}"
+    for name in "${failed[@]}"; do printf '  - %s\n' "$name"; done
+    echo
+    echo "that is real information about what happened, not the demo malfunctioning"
+    echo "-- read what each failed stage printed."
+fi
+echo
+if [ "$SEEDED" = "1" ]; then
+    echo "NOTE: the demo page was not deleted -- see stage 12. Delete it by hand."
+fi
+echo "the readiness pack is in ${TMPDIR:-/tmp}/rr-demo-pack/."
+echo "registers used: $DEMO_OFFLINE_REGISTER (corpus) and $DEMO_LIVE_REGISTER (live),"
+echo "both separate from the project's own."
+[ "${#failed[@]}" -eq 0 ]

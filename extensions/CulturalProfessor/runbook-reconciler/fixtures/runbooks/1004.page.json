@@ -1,0 +1,9 @@
+{
+  "id": "1004",
+  "status": "current",
+  "title": "Runbook: label-printer queue depth",
+  "spaceKey": "RUN",
+  "version": { "number": 5, "createdAt": "2026-01-22T08:20:00.000Z", "authorId": "557058:4d7e" },
+  "labels": ["runbook", "fulfilment"],
+  "_links": { "webui": "/spaces/RUN/pages/1004" }
+}

@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: tracking-ingest
+  description: Consumes carrier scan events and writes them to the tracking store
+  # The old name is kept here deliberately. This is how entity resolution finds
+  # "tracking-api" in a runbook written two years ago and knows which service it
+  # means -- without it the renamed deployment reads as a service that never
+  # existed, and the finding comes out as "unverifiable" instead of "renamed".
+  annotations:
+    meridian.io/kubernetes-deployment: tracking-ingest
+    meridian.io/kubernetes-namespace: tracking
+    meridian.io/former-names: tracking-api
+    pagerduty.com/escalation-policy: tracking-oncall
+spec:
+  type: service
+  lifecycle: production
+  owner: team-tracking
+  tier: 2

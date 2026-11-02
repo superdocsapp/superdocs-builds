@@ -1,0 +1,9 @@
+{
+  "id": "1008",
+  "status": "current",
+  "title": "Runbook: manifest-worker stalled",
+  "spaceKey": "RUN",
+  "version": { "number": 2, "createdAt": "2026-06-01T07:45:00.000Z", "authorId": "557058:4d7e" },
+  "labels": ["runbook", "fulfilment"],
+  "_links": { "webui": "/spaces/RUN/pages/1008" }
+}

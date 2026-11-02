@@ -1,0 +1,183 @@
+# What a runbook sentence has to look like for this tool to treat it as a claim.
+#
+# Every entry is data. Teaching the reconciler about a document convention it
+# has not seen — a house style that writes "threshold: 1.2s" in a definition
+# list, a team that spells escalation targets differently — is an entry here,
+# not a change to any Python file.
+#
+# ------------------------------------------------------------------ shape ---
+#
+#   id       stable name; it ends up on every claim as the rule that found it
+#   kind     threshold | command | resource | link | escalation | version |
+#            directive
+#   source   text (default) | code | links | table_rows
+#   context  optional regex over the WHOLE block; its groups bind for every
+#            match below. This is how a value in one sentence is attached to
+#            the alert named in the sentence before it.
+#   pattern  regex whose named groups supply values
+#   emits    one claim per entry; `group` names the capture whose SPAN anchors
+#            the claim, so an edit targets `800ms` rather than the paragraph
+#
+# --------------------------------------------------------------- the rule ---
+#
+# A pattern that is not sure should not match. A missed claim costs one line in
+# the unverifiable column of a report; a wrong claim costs an engineer's trust
+# at three in the morning, and they only spend that once.
+
+version: 1
+
+patterns:
+  # An alert name is CamelCase with at least three parts, which is the
+  # convention every Prometheus estate follows and no prose does. Requiring
+  # three is what keeps "Payments Core" and "DEPOT IMPACT" out.
+  #
+  # The captured value is the number and any unit *attached* to it -- `800ms`,
+  # `5%` -- and never a unit that is a separate word. `<strong>300</strong>
+  # jobs` reads as "300 jobs" and spans a closing tag, so anchoring on the
+  # whole phrase would mean an edit that rewrites markup. The word is matched
+  # so the pattern keeps working; it is outside the group so the anchor stays
+  # inside one run of text.
+  - id: alert-threshold
+    kind: threshold
+    context: '\b(?P<alert>[A-Z][a-z]+(?:[A-Z][a-z0-9]+){2,})\b'
+    pattern: >-
+      (?:stays\s+above|stays\s+below|rises\s+above|falls\s+below|exceeds?|holds\s+more\s+than|more\s+than|above|below)
+      \s+(?P<value>\d[\d.,]*(?:ms|s|%)?)
+      (?:\s*(?:jobs|messages|times|seconds|minutes|hours))?
+      (?:\s+(?:for|after)\s+(?P<duration>\d+\s+(?:seconds?|minutes?|hours?)))?
+    emits:
+      - subject: 'alert:{alert}:threshold'
+        group: value
+      # Only when it trails the threshold in the same sentence. A `for` phrase
+      # anywhere else in a paragraph usually belongs to something other than the
+      # alert's own duration -- "no batch has completed for 30 minutes" is a
+      # threshold, not a `for:` clause, and reading it as one is a false
+      # positive on a page that is entirely correct.
+      - subject: 'alert:{alert}:for'
+        group: duration
+        require: duration
+
+  # Staleness alerts: the threshold is an elapsed time, phrased as an absence.
+  - id: alert-elapsed-threshold
+    kind: threshold
+    context: '\b(?P<alert>[A-Z][a-z]+(?:[A-Z][a-z0-9]+){2,})\b'
+    pattern: >-
+      (?:no|not|nothing)\s+\S+(?:\s+\S+){0,4}?\s+(?:completed|succeeded|finished|run|ran)
+      \s+(?:for|in)\s+(?P<value>\d+\s+(?:seconds?|minutes?|hours?))
+    emits:
+      - subject: 'alert:{alert}:threshold'
+        group: value
+
+  # The query range, not the `for` duration. Deliberately one tight phrasing:
+  # "in an hour" and "over the last day" are also windows and are deliberately
+  # not matched, because a loose pattern here starts reading rate windows as
+  # alert durations.
+  - id: alert-window
+    kind: threshold
+    context: '\b(?P<alert>[A-Z][a-z]+(?:[A-Z][a-z0-9]+){2,})\b'
+    pattern: 'over\s+(?:a|any|the)\s+(?P<value>\d+[ -]minute)\s+window'
+    emits:
+      - subject: 'alert:{alert}:window'
+        group: value
+
+  # "The deployment is X in namespace Y ... runs N replicas" -- one sentence,
+  # three claims, because the deployment name is what gives the other two
+  # meaning and re-finding it from a second pattern would be guesswork.
+  - id: deployment-sentence
+    kind: resource
+    pattern: >-
+      deployment\s+is\s+(?P<deployment>[\w-]+)\s+in\s+namespace\s+(?P<namespace>[\w-]+)
+      (?:.{0,80}?(?:runs|running)\s+(?P<replicas>\d+)\s+replicas)?
+    emits:
+      - subject: 'workload:{deployment}:name'
+        group: deployment
+      - subject: 'workload:{deployment}:namespace'
+        group: namespace
+      - subject: 'workload:{deployment}:replicas'
+        group: replicas
+        require: replicas
+
+  # Commands, from the plain-text body of a code macro. `-n <namespace>` is
+  # claimed on its own so that a placeholder namespace is recorded as a claim
+  # nobody can check, rather than as no claim at all.
+  - id: kubectl-target
+    kind: command
+    pattern: >-
+      kubectl\s+(?:-n|--namespace)\s+(?P<namespace>\S+)
+      (?:[^\n]*?\bdeploy(?:ment)?/(?P<deployment>[\w-]+))?
+    emits:
+      - subject: 'namespace:{namespace}'
+        group: namespace
+      - subject: 'workload:{deployment}:name'
+        group: deployment
+        require: deployment
+
+  - id: ci-job-reference
+    kind: command
+    pattern: '(?i)(?:re-run|rerun|run|trigger)\s+the\s+(?P<job>[\w-]+)\s+job'
+    emits:
+      - subject: 'job:{job}'
+        group: job
+
+  - id: escalation-target
+    kind: escalation
+    pattern: >-
+      (?:Page|Escalate\s+to|Declare\s+through|Notify)\s+the\s+
+      (?P<rota>[A-Z][A-Za-z]*(?:\s+[A-Z][A-Za-z]*)*)\s+rota
+    emits:
+      - subject: 'escalation:{rota}'
+        group: rota
+
+  - id: dashboard-link
+    kind: link
+    source: links
+    pattern: '/d/(?P<uid>[A-Za-z0-9_-]+)'
+    emits:
+      - subject: 'dashboard:{uid}'
+        group: uid
+
+  - id: cloud-region
+    kind: resource
+    pattern: 'in\s+region\s+(?P<region>[a-z]{2}-[a-z]+-\d)'
+    emits:
+      - subject: 'region:{region}'
+        group: region
+
+  # A code-wrapped token of three or more hyphenated segments is a resource
+  # identifier by convention -- bucket names, RDS identifiers, CI job names.
+  # Two segments is not enough: `payments-api` is one, and so is half the
+  # English in a runbook.
+  - id: resource-identifier
+    kind: resource
+    source: code
+    pattern: '(?P<name>[a-z][a-z0-9]*(?:-[a-z0-9]+){2,})'
+    emits:
+      - subject: 'entity:{name}'
+        group: name
+
+  - id: table-measure
+    kind: threshold
+    source: table_rows
+    note: >-
+      Label from the first cell, value from the second. What makes RPO and RTO
+      land in the unverifiable bucket rather than being invisible: they are
+      recorded as claims, and nothing in a declared configuration settles them.
+    emits:
+      - subject: 'measure:{label}'
+        group: value
+
+  # Text addressed to the tooling reading the page. A lexical detector, and the
+  # weaker half of the defence -- the real one is that page text is never used
+  # as an instruction to anything. This exists so a human is told the text is
+  # there, which is what the rule actually asks for.
+  - id: instructions-to-automation
+    kind: directive
+    pattern: >-
+      (?i)(?P<directive>ignore\s+(?:any\s+|all\s+)?(?:earlier|previous|prior)\s+instructions
+      |disregard\s+(?:any\s+|all\s+)?(?:earlier|previous|prior)\s+instructions
+      |approve\s+all\s+pending\s+changes
+      |mark\s+every\s+claim[^.]{0,40}verified
+      |do\s+not\s+report\s+findings)
+    emits:
+      - subject: 'page:{page_id}:instructions-to-automation'
+        group: directive

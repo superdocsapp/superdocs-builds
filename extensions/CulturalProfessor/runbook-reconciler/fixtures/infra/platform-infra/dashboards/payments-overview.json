@@ -1,0 +1,10 @@
+{
+  "uid": "abc123",
+  "title": "Payments overview",
+  "tags": ["payments", "tier-1"],
+  "panels": [
+    { "title": "p99 latency", "type": "timeseries" },
+    { "title": "error rate", "type": "timeseries" },
+    { "title": "DLQ depth", "type": "stat" }
+  ]
+}

@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# A nudge, not a gate.
+#
+# Install:
+#     ln -s ../../extensions/CulturalProfessor/runbook-reconciler/hooks/pre-commit \
+#           .git/hooks/pre-commit
+#
+# ## Why this always exits zero
+#
+# A pre-commit hook that blocks is a pre-commit hook that gets uninstalled. The
+# first time it costs somebody thirty seconds on a commit they were sure about,
+# they pass `--no-verify`; the second time, they delete it. Then the tool is
+# gone from the one moment it had the engineer's attention.
+#
+# So this reports and gets out of the way. The gate lives in CI, where blocking
+# is somebody else's decision and the branch is already pushed.
+#
+# It also runs only the free layer: no model, no SuperDocs key, no spend, no
+# network unless Confluence is configured. `--corpus` is not forced, because an
+# engineer with credentials wants their own runbooks checked -- but if the check
+# is slow enough to notice, `RR_SOURCE=corpus` or a `--timeout` is the fix, not
+# blocking the commit.
+set -u
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RR="$HERE/../rr"
+
+if [ ! -x "$RR" ]; then
+    exit 0
+fi
+
+# Nothing staged that could change the estate? Then there is nothing to say.
+if ! git diff --cached --name-only | grep -qE '\.(tf|tfvars|ya?ml|hcl|json)$'; then
+    exit 0
+fi
+
+# `timeout` keeps the promise concrete: a hook is allowed ten seconds of an
+# engineer's time and not a second more. Missing on some systems, hence the
+# fallback to running it plain.
+if command -v timeout >/dev/null 2>&1; then
+    OUTPUT="$(timeout 10 "$RR" check --exit-zero 2>&1)"
+else
+    OUTPUT="$("$RR" check --exit-zero 2>&1)"
+fi
+
+# Only speak up when there is drift. A hook that prints on every commit is
+# noise, and noise is how the useful line gets scrolled past.
+if printf '%s' "$OUTPUT" | grep -qE '^[1-9][0-9]* findings'; then
+    printf '\n  runbook drift, noticed but not blocking:\n\n'
+    printf '%s\n' "$OUTPUT" | grep -E '^\s+\[page|^[0-9]+ findings' | head -12 | sed 's/^/    /'
+    printf '\n    `rr check` for the detail. This commit is going through either way.\n\n'
+fi
+
+exit 0

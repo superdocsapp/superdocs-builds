@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+# A narrated, paced walkthrough of every subcommand this project has, run for
+# real against api.superdocs.app.
+#
+# This is not `selftest`. `selftest` is unattended and cheapest-first, and its
+# whole point is a pass/fail proof nobody has to watch. This is the opposite:
+# every stage runs one at a time, its real output stays on screen, and nothing
+# moves on to the next stage until a person says so -- built for the moment
+# this project's own task document describes, "a direct conversation ... where
+# we look at your build together and modify it live."
+#
+# Real operations are spent here -- publish, ask, edit and sync all touch the
+# live service, and each stage says up front whether it costs anything before
+# it runs. Enter continues; anything else stops exactly where you are.
+set -uo pipefail
+cd "$(dirname "$0")"
+
+have_key() {
+    [ -n "${SUPERDOCS_API_KEY:-}" ] && return 0
+    [ -f .env ] && grep -q '^SUPERDOCS_API_KEY=.' .env && return 0
+    return 1
+}
+
+if ! have_key; then
+    echo "no SUPERDOCS_API_KEY in the environment or .env." >&2
+    echo "almost every stage below needs one -- put yours in .env (see .env.example) and run this again." >&2
+    exit 1
+fi
+
+# Bootstraps the virtualenv on a fresh clone, quietly -- its output here would
+# be the argparse help and nobody asked for that.
+./mb --help >/dev/null
+
+# One key, not a line: `read -n1` stops as soon as it has a character, so
+# Enter needs no typing before it and Esc needs no Enter after it. Anything
+# else is not a decision this prompt asked for, so it is ignored and the
+# read happens again rather than being guessed at either way.
+pause() {
+    printf '\n-- press Enter to continue, or Esc to stop -- '
+    local key
+    while true; do
+        IFS= read -rsn1 key
+        if [ -z "$key" ]; then
+            printf '\n'
+            return 0
+        elif [ "$key" = $'\e' ]; then
+            # A bare Esc is one byte. An arrow or function key also starts
+            # with that byte and sends more behind it; this drains whatever
+            # follows within 10ms so it cannot leak into the next read this
+            # script does, rather than assuming a lone Esc is all that came.
+            read -rsn10 -t 0.01 _ 2>/dev/null || true
+            printf '\n'
+            echo "stopped here. out/published.json still names the pair, so ./mb status"
+            echo "or ./demo again (a fresh pair) both still work."
+            exit 0
+        fi
+    done
+}
+
+# The command as a person would actually type it -- plain, double-quoting only
+# the arguments that need it -- not `%q`'s backslash-escaped form, which is
+# exact but reads as noise on a multi-word instruction.
+_shown() {
+    local out="./mb" arg
+    for arg in "$@"; do
+        case "$arg" in
+            *' '*) out="$out \"$arg\"" ;;
+            *) out="$out $arg" ;;
+        esac
+    done
+    printf '%s' "$out"
+}
+
+declare -a failed=()
+
+stage() {
+    local title="$1" cost="$2"; shift 2
+    printf '\n\033[1m==> %s\033[0m\n' "$title"
+    printf '    \033[2m%s\033[0m\n\n' "$cost"
+    printf '\033[2m%s\033[0m\n\n' "$(_shown "$@")"
+    ./mb "$@"
+    local code=$?
+    if [ "$code" -ne 0 ]; then
+        printf '\n\033[31mstage exited %d -- read above for why.\033[0m\n' "$code"
+        failed+=("$title")
+    fi
+    pause
+}
+
+echo "Product Manual and Quick-Start Builder -- a paced walkthrough"
+echo "every stage below is a real ./mb command, run for real against the service."
+
+stage "check: the spec, the pair, and every locale's pagination" \
+    "free, offline" \
+    check
+
+stage "build: diagrams and documents rendered to out/" \
+    "free, offline" \
+    build
+
+stage "publish: both documents uploaded, with their diagrams" \
+    "free -- uploads aren't billed. Makes a fresh pair; this run does not reuse whatever was published before" \
+    publish
+
+stage "ask: a read-only question against the manual" \
+    "about 1 operation" \
+    ask "what is the rated laser wavelength, and what torque does the rail step call for?"
+
+stage "edit: one instruction, both documents, nothing applied yet" \
+    "about 1-2 operations" \
+    edit "raise the rail torque to 1.6 N·m"
+
+stage "approve: apply what the last step proposed" \
+    "free -- the operation was already spent proposing it. Waits for the service to serve what it applied (BUGS #22), then compares the pair passage by passage and spends one operation only if one document was left behind (BUGS #23)" \
+    approve
+
+stage "verify: read both documents back and check the pair still agrees" \
+    "free" \
+    verify
+
+stage "sync: every diagram re-rendered from the parts graph and swapped in" \
+    "free to re-render and re-upload; proposing the swap costs roughly one operation per figure the pair holds (9, here)" \
+    sync
+
+stage "approve: apply the diagram swap" \
+    "free -- and, again, does not return until the nine new drawings are the ones being served" \
+    approve
+
+stage "verify: prove the pair still agrees, pointing at the new diagrams" \
+    "free" \
+    verify
+
+stage "export: the finished pair, rendered to out/export/" \
+    "free" \
+    export --format html
+
+stage "status: what is published now, and that nothing is left parked" \
+    "free" \
+    status
+
+echo
+if [ "${#failed[@]}" -eq 0 ]; then
+    echo "walkthrough complete, and every stage passed."
+else
+    printf '\033[31mwalkthrough complete, but %d stage(s) failed:\033[0m\n' "${#failed[@]}"
+    for name in "${failed[@]}"; do printf '  - %s\n' "$name"; done
+    echo
+    echo "that is real information about the pair now published, not the demo"
+    echo "malfunctioning -- read what each failed stage printed for what it means."
+fi
+echo "out/export/ holds what got built; out/published.json still names the pair,"
+echo "for anything you want to run again by hand."
+[ "${#failed[@]}" -eq 0 ]

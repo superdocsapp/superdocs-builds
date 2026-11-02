@@ -1,0 +1,10 @@
+<h2>When this fires</h2>
+<p>The <strong>TrackingIngestPodRestarts</strong> alert fires when pods in the <code>tracking</code> namespace restart more than 3 times in an hour.</p>
+<h2>Triage</h2>
+<p>The deployment is <code>tracking-api</code> in namespace <code>tracking</code>, running 4 replicas behind the carrier event queue.</p>
+<p>Restarts are almost always the memory limit. Check current usage against the limit before anything else:</p>
+<ac:structured-macro ac:name="code" ac:schema-version="1" ac:macro-id="9e4b2f1c-1"><ac:parameter ac:name="language">bash</ac:parameter><ac:plain-text-body><![CDATA[kubectl -n <your-namespace> top pods
+kubectl -n tracking get events --sort-by=.lastTimestamp | tail -20]]></ac:plain-text-body></ac:structured-macro>
+<p>If the pods are being OOM-killed, the limit is 1Gi and raising it is a platform change, not an incident action.</p>
+<h2>Escalation</h2>
+<p>Page the <strong>Tracking</strong> rota. There is no secondary; it goes to the head of platform after 20 minutes.</p>

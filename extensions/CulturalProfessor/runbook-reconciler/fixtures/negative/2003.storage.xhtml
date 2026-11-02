@@ -1,0 +1,15 @@
+<h2>Scope</h2>
+<p>Disaster recovery posture for the payments database, stated as a table because that is how the auditors asked for it.</p>
+<table>
+  <tbody>
+    <tr><th>Measure</th><th>Value</th></tr>
+    <tr><td>Automated backup retention</td><td>14 days</td></tr>
+    <tr><td>Snapshot window</td><td>03:00 UTC daily</td></tr>
+    <tr><td>Primary region</td><td>eu-west-1</td></tr>
+    <tr><td>Recovery point objective</td><td>15 minutes</td></tr>
+    <tr><td>Recovery time objective</td><td>4 hours</td></tr>
+  </tbody>
+</table>
+<p>The first three rows are settled by <code>terraform</code>. The last two are commitments about people and process; nothing in a configuration file settles them, and they are expected to come back unchecked rather than confirmed.</p>
+<h2>Escalation</h2>
+<p>Page the <strong>Payments Core</strong> rota.</p>

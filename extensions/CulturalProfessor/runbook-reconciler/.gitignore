@@ -1,0 +1,22 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+.venv/
+venv/
+*.egg-info/
+out/
+
+# The claim register is state, not source. It is rebuilt from the corpus by
+# `rr check`, and a committed one would make every clone start with somebody
+# else's findings already applied.
+register.db
+register.db-journal
+register.db-wal
+register.db-shm
+
+# The build plan is a working document, not part of the deliverable.
+PLAN.md
