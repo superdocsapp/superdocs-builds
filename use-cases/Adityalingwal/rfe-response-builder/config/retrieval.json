@@ -1,0 +1,25 @@
+{
+  "strong_threshold": 0.3,
+  "weak_threshold": 0.12,
+  "report_threshold": 0.05,
+  "min_shared_stems_for_answered": 5,
+  "max_matches_per_request": 5,
+  "stopwords": [
+    "the", "and", "for", "that", "this", "with", "will", "are", "not",
+    "was", "were", "been", "being", "has", "have", "had", "its", "his",
+    "her", "their", "our", "your", "you", "who", "whom", "which", "what",
+    "when", "where", "why", "how", "such", "than", "then", "them", "they",
+    "there", "these", "those", "does", "did", "doing", "done", "can",
+    "could", "should", "would", "may", "might", "must", "shall", "into",
+    "onto", "upon", "from", "about", "above", "below", "between", "each",
+    "every", "all", "any", "some", "more", "most", "other", "another",
+    "also", "but", "nor", "either", "neither", "because", "while",
+    "record", "submit", "evidence", "petition", "petitioner", "beneficiary",
+    "copies", "copy", "enclosed", "including", "include", "described",
+    "establish", "establishes",
+    "request", "requests", "requested", "form", "forms", "approval",
+    "current", "united", "states", "citizenship", "immigration", "services",
+    "officer", "notice", "classification", "sought", "dear", "respectfully",
+    "sincerely", "fictional", "sample"
+  ]
+}

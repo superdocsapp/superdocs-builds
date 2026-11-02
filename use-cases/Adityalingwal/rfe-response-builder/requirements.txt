@@ -1,0 +1,8 @@
+# Runtime
+pypdf==6.14.2
+python-docx==1.2.0
+mcp==2.0.0
+
+# Tests (offline suite + fixture generation)
+pytest==9.1.1
+reportlab==5.0.0
