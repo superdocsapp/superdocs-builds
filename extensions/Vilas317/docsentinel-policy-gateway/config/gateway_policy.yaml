@@ -1,0 +1,34 @@
+﻿version: 1
+
+gateway:
+  tools:
+    allowed:
+      - upload
+      - chat
+      - approve
+      - export
+
+  sensitive_content:
+    enabled: true
+    action: block
+
+  quotas:
+    default:
+      limit: 100
+
+  audit:
+    enabled: true
+    include_cost: true
+    store_document_content: false
+
+    costs:
+      currency: USD
+      operations:
+        upload: 0.001
+        chat: 0.010
+        approve: 0.005
+        export: 0.002
+
+    persistence:
+      enabled: true
+      path: storage/audit.jsonl
