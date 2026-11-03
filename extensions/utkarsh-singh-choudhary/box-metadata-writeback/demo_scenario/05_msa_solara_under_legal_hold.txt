@@ -1,0 +1,15 @@
+SERVICES AGREEMENT
+Counterparty: Solara Vaccine Distribution Corp
+Effective Date: 2018-06-01
+Expiration Date: 2019-06-01
+Value: $94,000
+
+This Master Services Agreement governs temperature-controlled freight
+brokerage services between Meridian Cold Chain Logistics and Solara
+Vaccine Distribution Corp. This file is currently subject to a legal
+hold pending an active shipment-damage dispute and must not be modified,
+disposed, or have its governance metadata altered by any automated
+process while the hold remains in place.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo.
+Not a real agreement; no real company data.

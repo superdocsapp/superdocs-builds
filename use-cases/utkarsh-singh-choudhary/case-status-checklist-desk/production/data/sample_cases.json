@@ -1,0 +1,33 @@
+[
+  {
+    "case_id": "CASE-1001",
+    "client_name": "Priya Raman",
+    "case_type": "employment-based petition",
+    "stage": "documents_pending",
+    "language": "en",
+    "required_documents": [
+      {"name": "Employment Verification Letter", "form_type": "signed original on employer letterhead", "received": true},
+      {"name": "Degree Certificate", "form_type": "certified copy", "received": false},
+      {"name": "Recent Pay Stubs", "form_type": "last 3 months", "received": false, "due_date": "2026-08-20"}
+    ]
+  },
+  {
+    "case_id": "CASE-1002",
+    "client_name": "Marco Alvarez",
+    "case_type": "family-based petition",
+    "stage": "rfe_received",
+    "language": "en",
+    "required_documents": [
+      {"name": "Marriage Certificate", "form_type": "certified copy with translation", "received": false, "due_date": "2026-09-01"},
+      {"name": "Joint Bank Statements", "form_type": "last 6 months", "received": true}
+    ]
+  },
+  {
+    "case_id": "CASE-1003",
+    "client_name": "Wei Chen",
+    "case_type": "employment-based petition",
+    "stage": "filed",
+    "language": "en",
+    "required_documents": []
+  }
+]

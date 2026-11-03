@@ -1,0 +1,20 @@
+{
+  "case_id": "CASE-2002",
+  "arguments": [
+    {
+      "topic_id": "bona_fide_relationship",
+      "text": "The petition submitted six months of joint bank statements showing shared household expenses, demonstrating the couple commingles finances as evidence of a bona fide marital relationship.",
+      "source_ref": "Petition Cover Letter, p. 3"
+    },
+    {
+      "topic_id": "marriage_certificate",
+      "text": "A copy of the civil marriage certificate issued by the local registrar was included as Exhibit C.",
+      "source_ref": "Exhibit C, Marriage Certificate"
+    },
+    {
+      "topic_id": "financial_support",
+      "text": "The petitioner's employment verification letter states an annual salary of $58,000, which was cited as evidence of ability to financially support the beneficiary.",
+      "source_ref": "Exhibit E, Employment Verification Letter"
+    }
+  ]
+}

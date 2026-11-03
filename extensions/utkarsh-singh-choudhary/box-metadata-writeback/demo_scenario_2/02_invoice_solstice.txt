@@ -1,0 +1,11 @@
+INVOICE #SFU-2021-1104
+Counterparty: Solstice Freight Underwriters Inc.
+Effective Date: 2021-11-04
+Value: $8,750
+Amount Due: $8,750
+
+Underwriting premium for Q4 2021 cargo-insurance coverage per the Master
+Services Agreement dated 2021-06-15.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo,
+second batch. Not a real invoice; no real company data.

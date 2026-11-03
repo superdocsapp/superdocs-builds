@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h3>Drafting your response…</h3>
+  {% if status == "pending" %}
+    <p class="hint">Queued — waiting for a worker to pick this up.</p>
+  {% elif status == "running" %}
+    {% if items_completed is not none and items_total %}
+      <p class="hint">✓ Drafted {{ items_completed }} of {{ items_total }} item(s){% if current_item_label %} — currently drafting: {{ current_item_label }}{% endif %}</p>
+      <div style="background:var(--border); border-radius:4px; height:8px; overflow:hidden; margin:8px 0;">
+        <div style="background:var(--ok); height:100%; width:{{ (items_completed / items_total * 100)|round|int }}%;"></div>
+      </div>
+    {% else %}
+      <p class="hint">In progress — this can take a minute or two for a real filing (one drafting turn per RFE item, plus review setup).</p>
+    {% endif %}
+  {% endif %}
+  <p class="status-pill">Job {{ job_id }} · status: {{ status }}</p>
+  <meta http-equiv="refresh" content="2">
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+AMENDMENT NO. 1 TO SERVICES AGREEMENT
+Counterparty: Northbridge Pharma Distribution LLC
+Effective Date: 2020-03-01
+Value: $268,500
+
+This Amendment No. 1 extends and modifies the Master Services Agreement
+dated 2019-03-01 between Meridian Cold Chain Logistics and Northbridge
+Pharma Distribution LLC, increasing the annual freight volume commitment
+and revising the per-shipment rate schedule. All other terms of the
+original agreement remain in effect.
+
+Note: this amendment does not restate an expiration date -- on purpose,
+to exercise the "left empty rather than guessed" path for a real field a
+document genuinely omits, the same way an actual amendment might extend
+"until further amended" without a fixed end date.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo.
+Not a real agreement; no real company data.

@@ -1,0 +1,13 @@
+COLD CHAIN COMPLIANCE POLICY
+
+This policy establishes Meridian Cold Chain Logistics' internal
+standards for temperature monitoring, chain-of-custody documentation,
+and excursion reporting for pharmaceutical shipments handled on behalf
+of client partners including Northbridge Pharma Distribution LLC.
+
+This is an internal governance document, not a client-facing agreement,
+and is not expected to generate a companion document or carry a
+counterparty/effective-date/value the way a contract does.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo.
+Not a real policy; no real company data.

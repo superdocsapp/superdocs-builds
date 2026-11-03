@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="status-pill">Dry run for {{ case_id }} — {{ items|length }} RFE item(s) parsed, no SuperDocs calls made.</p>
+
+{% if firm_template %}
+<p class="hint">Firm template applied: {{ firm_template.firm_name }}</p>
+{% endif %}
+
+{% if injection_flags %}
+<div class="card">
+  <p class="status-pill" style="color:var(--bad);">⚠ Possible prompt-injection phrasing detected in uploaded material (heuristic check — review the flagged source before relying on this):</p>
+  <ul>
+  {% for source, result in injection_flags %}
+    <li>{{ source }}: {{ result.matched_labels|join(", ") }}</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if deadline.found %}
+<div class="card">
+  <p class="status-pill">⚠ Response deadline detected: {{ deadline.days }} days
+    (matched: "{{ deadline.matched_sentence }}") — verify the exact date against the notice.</p>
+  {% if deadline.due_date %}
+  <p class="status-pill">Notice date {{ deadline.notice_date }} → calculated due date:
+    <strong>{{ deadline.due_date }}</strong> — this is a calculation from the detected notice date,
+    not a substitute for verifying the exact date on the notice itself.</p>
+  {% else %}
+  <p class="hint">No labeled "Notice Date" was found in the notice text, so a concrete due date
+    could not be calculated automatically -- check the notice by hand for the issuance date.</p>
+  {% endif %}
+</div>
+{% else %}
+<div class="card">
+  <p class="hint">⚠ No response deadline phrase was detected automatically — check the notice by hand for the response window.</p>
+</div>
+{% endif %}
+
+{% if classification.category.value != "unknown" %}
+<div class="card">
+  <p class="status-pill">Detected filing type: {{ profile.display_name }}
+    (heuristic keyword match, score={{ classification.score }} — verify before relying on this)</p>
+  <p class="hint">Matched signals: {{ classification.matched_signals|join(", ") }}</p>
+  <p class="hint">{{ profile.legal_framework_note }}</p>
+</div>
+{% endif %}
+
+{% for it in items %}
+<div class="item">
+  <h3>Item {{ it.request_id }}</h3>
+  <pre>{{ it.instruction }}</pre>
+  {% if it.extra_prior_matches %}
+    <p class="hint">Additional prior-petition matches not cited above: {{ it.extra_prior_matches|join(", ") }}</p>
+  {% endif %}
+  {% if it.fuzzy_suggestions %}
+    <p class="hint">No exact prior-petition match. Possible related argument (UNVERIFIED, {{ "stemmed-keyword" if it.fuzzy_suggestions[0].tier == "fuzzy" else "semantic-similarity-only" }}, not cited in the draft — confirm before relying on it):
+      {% for s in it.fuzzy_suggestions %}{{ s.source_ref }} ({{ (s.confidence * 100)|round|int }}%){% if not loop.last %}, {% endif %}{% endfor %}
+    </p>
+  {% endif %}
+</div>
+{% endfor %}
+
+<div class="card">
+  <h3 style="margin-top:0;">Exhibit list</h3>
+  {% if exhibits %}
+    {% for ex in exhibits %}
+      <div class="exhibit"><strong>Exhibit {{ ex.number }}</strong> ({{ ex.label }}): {{ ex.description }}
+        <span class="hint">[supports item(s): {{ ex.request_ids|join(", ") }}]</span>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="hint">None identified from the supplied evidence catalog.</p>
+  {% endif %}
+</div>
+
+<a class="back" href="{{ url_for('index') }}">&larr; Run another</a>
+{% endblock %}

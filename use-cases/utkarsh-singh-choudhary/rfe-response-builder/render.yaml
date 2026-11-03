@@ -1,0 +1,71 @@
+services:
+  - type: web
+    name: rfe-response-builder
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r webapp/requirements.txt"
+    # workers=2/threads=4: with REVIEW_STORE_URL/DATABASE_URL set to a
+    # managed Postgres instance (see the `rfe-review-db` entry below),
+    # review-session state is shared across every worker AND every
+    # Render instance -- not just workers on one instance the way the
+    # SQLite-only version was. Without a Postgres URL configured, this
+    # falls back to local SQLite (single-instance only, as before).
+    # timeout=120 covers a real (non-dry-run) draft pass, which makes one
+    # SuperDocs turn per RFE item plus header/checklist/exhibit/export
+    # turns -- gunicorn's 30s default would kill that request mid-draft.
+    startCommand: "gunicorn --chdir webapp --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120 app:app"
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: FLASK_SECRET_KEY
+        generateValue: true
+      - key: SUPERDOCS_API_KEY
+        sync: false
+      - key: MAX_UPLOAD_MB
+        value: "5"
+      - key: GENERATE_RATE_LIMIT
+        value: "10 per hour"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: JSON_LOGS
+        value: "1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: rfe-review-db
+          property: connectionString
+      - key: AUDIT_LOG_PATH
+        value: /tmp/rfe_audit_log.jsonl  # local-disk fallback; point at a
+        # mounted/shared volume or ship this file to a log aggregator for
+        # a durable, multi-instance audit trail in production
+      - key: PROGRESS_DIR
+        value: /tmp/rfe_progress
+      - key: VERSION_TTL_S
+        value: "2592000"  # 30 days -- see versioning.py's VersionStore. Draft
+        # version history is pruned on write past this age, same
+        # "prune on write, no separate scheduler" pattern as the review
+        # session store and job store.
+      - key: JOB_WORKERS
+        value: "2"  # max concurrent background drafting jobs (see webapp/jobs.py) --
+        # each holds a long-lived SuperDocs conversation, so this bounds
+        # concurrent real runs on one instance independent of gunicorn's
+        # own --workers/--threads.
+      # EMBEDDINGS_API_KEY is intentionally NOT set here (sync: false and
+      # commented out, not a placeholder value) -- the semantic matching
+      # tier defaults to zero-cost, zero-network TF-IDF (see embeddings.py)
+      # unless this is explicitly configured. Uncomment and set via the
+      # Render dashboard to opt into real embeddings-based semantic
+      # matching:
+      # - key: EMBEDDINGS_API_KEY
+      #   sync: false
+      # QUALITY_GATE_ENABLED is also intentionally NOT set here -- see
+      # judge.py's module docstring. It's a second model call per
+      # substantively-drafted item (real cost/latency), so it's opt-in:
+      # - key: QUALITY_GATE_ENABLED
+      #   value: "1"
+
+databases:
+  - name: rfe-review-db
+    plan: free
+    databaseName: rfe_review
+    user: rfe_review_user

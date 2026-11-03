@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: case-status-checklist-desk
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn case_status_desk.app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: SUPERDOCS_API_KEY
+        sync: false  # set manually in the Render dashboard -- never commit this
+      - key: STAFF_API_KEYS
+        sync: false  # comma-separated key:name pairs, set manually
+      - key: DATABASE_URL
+        fromDatabase:
+          name: case-status-checklist-desk-db
+          property: connectionString
+      - key: LOG_LEVEL
+        value: INFO
+
+databases:
+  - name: case-status-checklist-desk-db
+    plan: starter
+    databaseName: case_status_desk
+    user: case_status_desk

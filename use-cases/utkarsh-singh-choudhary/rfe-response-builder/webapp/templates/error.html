@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h3 style="margin-top:0;">{{ title }}</h3>
+  <p class="hint">{{ message }}</p>
+</div>
+<a class="back" href="{{ url_for('index') }}">&larr; Back to form</a>
+{% endblock %}

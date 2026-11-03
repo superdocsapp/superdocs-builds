@@ -1,0 +1,13 @@
+SERVICES AGREEMENT
+Counterparty: Northbridge Pharma Distribution LLC
+Effective Date: 2019-03-01
+Expiration Date: 2020-03-01
+Value: $212,000
+
+This Master Services Agreement governs temperature-controlled freight
+brokerage services provided by Meridian Cold Chain Logistics to
+Northbridge Pharma Distribution LLC for the transport of pharmaceutical
+cold-chain shipments between Northbridge's regional distribution centers.
+
+Synthetic document created for the SuperDocs Round 2 engineer task demo.
+Not a real agreement; no real company data.

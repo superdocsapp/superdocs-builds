@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="status-pill">Review for {{ session.case_id }} — {{ session.items|length }} RFE item(s) drafted. Nothing is exported until you approve below.</p>
+
+{% if session.firm_name %}
+<p class="hint">Firm template applied: {{ session.firm_name }}</p>
+{% endif %}
+
+{% if session.consistency_flags %}
+<div class="card">
+  <p class="status-pill" style="color:var(--bad);">⚠ Possible cross-item inconsistency detected (heuristic check — verify against the record):</p>
+  <ul>
+  {% for flag in session.consistency_flags %}
+    <li>Items {{ flag.request_id_a }} and {{ flag.request_id_b }} both mention "{{ flag.shared_entity }}" but state different details: {{ flag.facts_a|join(", ") }} vs {{ flag.facts_b|join(", ") }}</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if session.injection_flags %}
+<div class="card">
+  <p class="status-pill" style="color:var(--bad);">⚠ Possible prompt-injection phrasing detected in uploaded material (heuristic check — review the flagged source before relying on this draft):</p>
+  <ul>
+  {% for source, result in session.injection_flags %}
+    <li>{{ source }}: {{ result.matched_labels|join(", ") }}</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+{% if session.deadline_days %}
+<div class="card">
+  <p class="status-pill">⚠ Response deadline detected: {{ session.deadline_days }} days
+    (matched: "{{ session.deadline_matched_sentence }}") — verify the exact date against the notice.</p>
+  {% if session.deadline_due_date %}
+  <p class="status-pill">Notice date {{ session.deadline_notice_date }} → calculated due date:
+    <strong>{{ session.deadline_due_date }}</strong> — this is a calculation from the detected notice
+    date, not a substitute for verifying the exact date on the notice itself.</p>
+  {% else %}
+  <p class="hint">No labeled "Notice Date" was found in the notice text, so a concrete due date
+    could not be calculated automatically -- check the notice by hand for the issuance date.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if session.classification_category != "unknown" %}
+<div class="card">
+  <p class="status-pill">Detected filing type: {{ session.classification_display_name }} (heuristic — verify before relying on this)</p>
+  <p class="hint">{{ session.classification_note }}</p>
+</div>
+{% endif %}
+
+{# Empty, out-of-line <form> tags for each item's redraft action -- HTML
+   doesn't allow nesting a <form> inside the big approve-form below, so
+   the redraft feedback input and button (rendered inline per item,
+   inside the approve-form) reference these via the form="..." attribute
+   instead of being physically nested. #}
+{% for item in session.items %}
+<form id="redraft-form-{{ item.request_id }}" action="{{ url_for('redraft_review_item', review_id=review_id, request_id=item.request_id) }}" method="post"></form>
+{% endfor %}
+
+<form action="{{ url_for('approve_review', review_id=review_id) }}" method="post">
+  {% if csrf_token %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
+
+  {% for item in session.items %}
+  <div class="item">
+    <h3>Item {{ item.request_id }} — {{ item.response_section }}</h3>
+    <p class="hint">Officer's request: {{ item.request_text }}</p>
+    {% if item.status == "failed" %}
+      <p class="hint" style="color:var(--bad);">Drafting failed for this item — it cannot be answered. {{ item.reply_text }}</p>
+    {% else %}
+      <pre>{{ item.reply_text }}</pre>
+      {% if version_info.get(item.request_id) %}
+        <details>
+          <summary class="hint">Version {{ version_info[item.request_id].count }} — see what changed from the previous version</summary>
+          <pre class="diff">{% for line in version_info[item.request_id].diff %}{% if line.startswith("+") and not line.startswith("+++") %}<span class="diff-add">{{ line }}</span>
+{% elif line.startswith("-") and not line.startswith("---") %}<span class="diff-del">{{ line }}</span>
+{% else %}{{ line }}
+{% endif %}{% endfor %}</pre>
+        </details>
+      {% endif %}
+      {% if item.quality_verdict == "weak" %}
+        <p class="hint" style="color:var(--bad);">⚠ Quality gate flagged this draft as possibly NOT directly addressing the officer's concern: {{ item.quality_reasoning }} (heuristic model judgment — verify before approving)</p>
+      {% endif %}
+      {% if item.ungrounded_facts %}
+        <p class="hint" style="color:var(--bad);">⚠ Possibly-unsupported detail(s) in this draft — not found in the officer's request, matched prior argument, or matched evidence (heuristic check, verify before approving): {{ item.ungrounded_facts|join(", ") }}</p>
+      {% endif %}
+      {% if item.status == "no_pending_change" %}
+        <p class="hint">Note: SuperDocs did not hold this as a pending change (status: completed) — approving here still requires the text to pass the substantive-answer check before it counts.</p>
+      {% endif %}
+      <div class="checkbox-row">
+        <input type="checkbox" id="approve_{{ item.request_id }}" name="approve_{{ item.request_id }}">
+        <label for="approve_{{ item.request_id }}">Approve this section</label>
+      </div>
+      <label>Feedback (optional, sent back to SuperDocs if you reject)</label>
+      <input type="text" name="feedback_{{ item.request_id }}" placeholder="e.g. needs a more specific date range">
+
+      <label>Or, request a redraft with specific feedback (does not affect the approve/reject decision above)</label>
+      <input type="text" name="redraft_feedback" placeholder="e.g. add more detail on the applicant's job duties"
+             form="redraft-form-{{ item.request_id }}">
+      <button type="submit" form="redraft-form-{{ item.request_id }}">Redraft this section</button>
+    {% endif %}
+    {% if item.prior_source_refs %}
+      <p class="hint">Prior petition: {{ item.prior_source_refs|join(", ") }}</p>
+    {% elif item.fuzzy_suggestions %}
+      <p class="hint">No exact prior-petition match. Possible related argument (UNVERIFIED, {{ "stemmed-keyword" if item.suggestion_tier == "fuzzy" else "semantic-similarity-only" }}, not cited in the draft):
+        {% for ref, conf in item.fuzzy_suggestions %}{{ ref }} ({{ (conf * 100)|round|int }}%){% if not loop.last %}, {% endif %}{% endfor %}
+      </p>
+    {% endif %}
+    {% if item.new_evidence %}
+      <p class="hint">New evidence referenced: {{ item.new_evidence|join("; ") }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="card">
+    <h3 style="margin-top:0;">Exhibit list</h3>
+    {% if session.exhibits %}
+      {% for ex in session.exhibits %}
+        <div class="exhibit"><strong>Exhibit {{ ex.number }}</strong> ({{ ex.label }}): {{ ex.description }}
+          <span class="hint">[supports item(s): {{ ex.request_ids|join(", ") }}]</span>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="hint">None identified from the supplied evidence catalog.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <label>
+      <input type="checkbox" name="allow_export_with_failures">
+      Export anyway even if an RFE item ends up unanswered
+    </label>
+    <p class="hint">Leave this unchecked normally. If any item is left unanswered (unapproved,
+      rejected, or drafting failed), export is blocked by default so an unanswered item can't
+      silently go out -- check this box only if you've reviewed that and want to export anyway.</p>
+  </div>
+
+  <button type="submit">Approve selected &amp; generate document</button>
+</form>
+<a class="back" href="{{ url_for('index') }}">&larr; Start over</a>
+{% endblock %}
