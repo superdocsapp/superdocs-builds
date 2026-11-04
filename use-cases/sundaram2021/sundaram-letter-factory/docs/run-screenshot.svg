@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1122" height="1319" viewBox="0 0 1122 1319" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="15">
+<rect width="100%" height="100%" fill="#0d1117"/>
+<rect width="100%" height="40" fill="#161b22"/>
+<circle cx="32" cy="21" r="6.5" fill="#ff5f57"/>
+<circle cx="54" cy="21" r="6.5" fill="#febc2e"/>
+<circle cx="76" cy="21" r="6.5" fill="#28c840"/>
+<text x="116" y="26" fill="#8b949e">letter factory, full run</text>
+<text x="26" y="69" fill="#79c0ff" font-weight="bold" xml:space="preserve">$ export SUPERDOCS_API_KEY=... &amp;&amp; python3 run.py --format docx</text>
+<text x="26" y="90" fill="#c9d1d9" xml:space="preserve">Letter factory run</text>
+<text x="26" y="111" fill="#8b949e" xml:space="preserve">  data: 30 customer records, 10 approved wording blocks, 3 jurisdictions</text>
+<text x="26" y="153" fill="#c9d1d9" xml:space="preserve">Validation: 22 records passed, 8 held back</text>
+<text x="26" y="195" fill="#c9d1d9" xml:space="preserve">SuperDocs stage: 22 letters in 11 batch(es), one chat operation per batch unless a batch needs a follow up turn</text>
+<text x="26" y="216" fill="#c9d1d9" xml:space="preserve">Batch 1 of 11: 2 letters</text>
+<text x="26" y="237" fill="#8b949e" xml:space="preserve">  upload: sending batch-1-template.html (3053 bytes of html)</text>
+<text x="26" y="258" fill="#8b949e" xml:space="preserve">  upload: 18 sections registered for 2 letters</text>
+<text x="26" y="279" fill="#8b949e" xml:space="preserve">  chat: job 88e979d1-cf2a-482c-8edd-7437619794c3 queued, waiting for proposed changes</text>
+<text x="26" y="300" fill="#8b949e" xml:space="preserve">  chat: job status pending</text>
+<text x="26" y="321" fill="#8b949e" xml:space="preserve">  chat: job status in_progress</text>
+<text x="26" y="342" fill="#8b949e" xml:space="preserve">  chat: job status awaiting_approval</text>
+<text x="26" y="363" fill="#8b949e" xml:space="preserve">  chat: verifying 10 proposed change(s)</text>
+<text x="26" y="384" fill="#8b949e" xml:space="preserve">  chat: job status in_progress</text>
+<text x="26" y="405" fill="#8b949e" xml:space="preserve">  ... batches 2 to 11 ...</text>
+<text x="26" y="426" fill="#c9d1d9" xml:space="preserve">==============================================================================</text>
+<text x="26" y="447" fill="#c9d1d9" xml:space="preserve">RUN REPORT</text>
+<text x="26" y="468" fill="#c9d1d9" xml:space="preserve">==============================================================================</text>
+<text x="26" y="510" fill="#c9d1d9" xml:space="preserve">Counts by variant (sent):</text>
+<text x="26" y="531" fill="#3fb950" xml:space="preserve">  california_final_notice_en: 3 sent</text>
+<text x="26" y="552" fill="#3fb950" xml:space="preserve">  california_final_notice_es: 2 sent</text>
+<text x="26" y="573" fill="#3fb950" xml:space="preserve">  california_first_notice_en: 4 sent</text>
+<text x="26" y="594" fill="#3fb950" xml:space="preserve">  california_first_notice_es: 3 sent</text>
+<text x="26" y="615" fill="#3fb950" xml:space="preserve">  new_york_final_notice_en: 1 sent</text>
+<text x="26" y="636" fill="#3fb950" xml:space="preserve">  new_york_final_notice_es: 1 sent</text>
+<text x="26" y="657" fill="#3fb950" xml:space="preserve">  new_york_first_notice_en: 1 sent</text>
+<text x="26" y="678" fill="#3fb950" xml:space="preserve">  new_york_first_notice_es: 1 sent</text>
+<text x="26" y="699" fill="#3fb950" xml:space="preserve">  texas_final_notice_en: 3 sent</text>
+<text x="26" y="720" fill="#3fb950" xml:space="preserve">  texas_first_notice_en: 3 sent</text>
+<text x="26" y="762" fill="#ffffff" font-weight="bold" xml:space="preserve">Total sent: 22    held back: 8    operations used: 12</text>
+<text x="26" y="804" fill="#c9d1d9" xml:space="preserve">Held back records (8):</text>
+<text x="26" y="825" fill="#e6edf3" xml:space="preserve">  CUS-2001 (Silas Grantham, california_first_notice_en)</text>
+<text x="26" y="846" fill="#d29922" xml:space="preserve">      reason: Overcharge amount is -$320.00, but a remediation letter may only be sent for an overcharge greater than</text>
+<text x="26" y="867" fill="#d29922" xml:space="preserve">          zero.</text>
+<text x="26" y="888" fill="#e6edf3" xml:space="preserve">  CUS-2002 (Tamsin Okoro, texas_first_notice_en)</text>
+<text x="26" y="909" fill="#d29922" xml:space="preserve">      reason: Required date field 'notice_date' is missing, so the interest accrual period cannot be determined.</text>
+<text x="26" y="930" fill="#e6edf3" xml:space="preserve">  CUS-2003 (Ulises Barrientos, california_final_notice_es)</text>
+<text x="26" y="951" fill="#d29922" xml:space="preserve">      reason: Upstream stated refund of $950.00 does not match the figure the formula produces, $799.64, a difference</text>
+<text x="26" y="972" fill="#d29922" xml:space="preserve">          of $150.36.</text>
+<text x="26" y="993" fill="#e6edf3" xml:space="preserve">  CUS-2004 (Vanessa Kirkbride, nevada_first_notice_en)</text>
+<text x="26" y="1014" fill="#d29922" xml:space="preserve">      reason: Jurisdiction 'nevada' is not configured in rules.json, so no statutory interest rate or response window</text>
+<text x="26" y="1035" fill="#d29922" xml:space="preserve">          is defined for it.</text>
+<text x="26" y="1056" fill="#e6edf3" xml:space="preserve">  CUS-2005 (Wendell Achebe, california_pre_litigation_en)</text>
+<text x="26" y="1077" fill="#d29922" xml:space="preserve">      reason: No approved wording block exists for jurisdiction 'california', stage 'pre_litigation', language 'en'.</text>
+<text x="26" y="1098" fill="#e6edf3" xml:space="preserve">  CUS-2006 (Ximena Robledo, california_first_notice_fr)</text>
+<text x="26" y="1119" fill="#d29922" xml:space="preserve">      reason: No approved wording block exists for jurisdiction 'california', stage 'first_notice', language 'fr'.</text>
+<text x="26" y="1140" fill="#e6edf3" xml:space="preserve">  CUS-2007 (Yusuf Adeyemi, texas_final_notice_en)</text>
+<text x="26" y="1161" fill="#d29922" xml:space="preserve">      reason: Overcharge start date 2026-11-05 falls after the notice date 2026-08-17, so the accrual period is</text>
+<text x="26" y="1182" fill="#d29922" xml:space="preserve">          negative.</text>
+<text x="26" y="1203" fill="#e6edf3" xml:space="preserve">  CUS-2008 (Zoe Lindqvist, california_first_notice_en)</text>
+<text x="26" y="1224" fill="#d29922" xml:space="preserve">      reason: Computed refund of $69,122.19 is above the $50,000.00 automated ceiling and needs a manual signer.</text>
+<text x="26" y="1266" fill="#c9d1d9" xml:space="preserve">Full report with the calculation trail for every letter: out/run-report.json</text>
+</svg>

@@ -1,0 +1,188 @@
+{
+  "currency": {
+    "code": "USD",
+    "symbol": "$"
+  },
+  "jurisdictions": {
+    "california": {
+      "display_name": "California",
+      "interest_rate_bps": 1000,
+      "day_basis": 365,
+      "response_window_days": 30,
+      "regulator": "California Department of Financial Protection and Innovation"
+    },
+    "texas": {
+      "display_name": "Texas",
+      "interest_rate_bps": 600,
+      "day_basis": 365,
+      "response_window_days": 45,
+      "regulator": "Office of Consumer Credit Commissioner"
+    },
+    "new_york": {
+      "display_name": "New York",
+      "interest_rate_bps": 900,
+      "day_basis": 365,
+      "response_window_days": 20,
+      "regulator": "New York State Department of Financial Services"
+    }
+  },
+  "formula": {
+    "id": "refund_with_simple_interest",
+    "description": "Refund equals the overcharge plus simple interest on the overcharge, accrued from the first overcharged billing date to the notice date at the jurisdiction statutory rate, on the jurisdiction day basis.",
+    "output": "refund_cents",
+    "steps": [
+      {
+        "name": "overcharge_cents",
+        "kind": "field",
+        "field": "overcharge_cents",
+        "label": "overcharge on file"
+      },
+      {
+        "name": "accrual_days",
+        "kind": "days_between",
+        "from_field": "overcharge_start_date",
+        "to_field": "notice_date",
+        "label": "days of accrual"
+      },
+      {
+        "name": "annual_rate_bps",
+        "kind": "jurisdiction_param",
+        "param": "interest_rate_bps",
+        "label": "statutory annual rate in basis points"
+      },
+      {
+        "name": "day_basis",
+        "kind": "jurisdiction_param",
+        "param": "day_basis",
+        "label": "day count basis"
+      },
+      {
+        "name": "interest_cents",
+        "kind": "arithmetic",
+        "expression": "overcharge_cents * annual_rate_bps / 10000 * accrual_days / day_basis",
+        "round": "half_up_to_cent",
+        "label": "simple interest"
+      },
+      {
+        "name": "refund_cents",
+        "kind": "arithmetic",
+        "expression": "overcharge_cents + interest_cents",
+        "round": "half_up_to_cent",
+        "label": "total refund due"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "id": "jurisdiction_known",
+      "kind": "in_config",
+      "field": "jurisdiction",
+      "config": "jurisdictions",
+      "stage": "pre_calculation",
+      "reason": "Jurisdiction '{jurisdiction}' is not configured in rules.json, so no statutory interest rate or response window is defined for it."
+    },
+    {
+      "id": "notice_date_present",
+      "kind": "required",
+      "field": "notice_date",
+      "stage": "pre_calculation",
+      "reason": "Required date field 'notice_date' is missing, so the interest accrual period cannot be determined."
+    },
+    {
+      "id": "overcharge_start_date_present",
+      "kind": "required",
+      "field": "overcharge_start_date",
+      "stage": "pre_calculation",
+      "reason": "Required date field 'overcharge_start_date' is missing, so the interest accrual period cannot be determined."
+    },
+    {
+      "id": "account_number_present",
+      "kind": "required",
+      "field": "account_number",
+      "stage": "pre_calculation",
+      "reason": "Required field 'account_number' is missing, and every letter must quote the customer account number."
+    },
+    {
+      "id": "overcharge_positive",
+      "kind": "compare",
+      "left": "overcharge_cents",
+      "op": ">",
+      "right": 0,
+      "stage": "pre_calculation",
+      "reason": "Overcharge amount is {overcharge_cents_money}, but a remediation letter may only be sent for an overcharge greater than zero."
+    },
+    {
+      "id": "accrual_period_not_reversed",
+      "kind": "date_order",
+      "earlier_field": "overcharge_start_date",
+      "later_field": "notice_date",
+      "stage": "pre_calculation",
+      "reason": "Overcharge start date {overcharge_start_date} falls after the notice date {notice_date}, so the accrual period is negative."
+    },
+    {
+      "id": "stated_refund_matches_formula",
+      "kind": "formula_match",
+      "field": "stated_refund_cents",
+      "computed": "refund_cents",
+      "stage": "post_calculation",
+      "reason": "Upstream stated refund of {stated_refund_cents_money} does not match the figure the formula produces, {refund_cents_money}, a difference of {formula_difference_money}."
+    },
+    {
+      "id": "refund_within_manual_review_ceiling",
+      "kind": "compare",
+      "left": "refund_cents",
+      "op": "<=",
+      "right": 5000000,
+      "stage": "post_calculation",
+      "reason": "Computed refund of {refund_cents_money} is above the {right_money} automated ceiling and needs a manual signer."
+    },
+    {
+      "id": "wording_block_exists",
+      "kind": "wording_block_exists",
+      "stage": "post_calculation",
+      "reason": "No approved wording block exists for jurisdiction '{jurisdiction}', stage '{stage}', language '{language}'."
+    }
+  ],
+  "formats": {
+    "en": {
+      "money": "{symbol}{grouped}",
+      "date": "{month_name} {day}, {year}",
+      "months": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "thousands_separator": ",",
+      "decimal_separator": "."
+    },
+    "es": {
+      "money": "{symbol}{grouped}",
+      "date": "{day} de {month_name} de {year}",
+      "months": [
+        "enero",
+        "febrero",
+        "marzo",
+        "abril",
+        "mayo",
+        "junio",
+        "julio",
+        "agosto",
+        "septiembre",
+        "octubre",
+        "noviembre",
+        "diciembre"
+      ],
+      "thousands_separator": ",",
+      "decimal_separator": "."
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "mode": "superdocs",
+  "sample": 3,
+  "records_considered": 3,
+  "letters_sent": 3,
+  "records_held": 0,
+  "operations_used": 2,
+  "counts_by_variant": {
+    "california_first_notice_en": 2,
+    "california_first_notice_es": 1
+  },
+  "held_records": [],
+  "sent_records": [
+    {
+      "customer_id": "CUS-1001",
+      "variant": "california_first_notice_en",
+      "session_id": "letter-factory-20260819-184923-batch-1"
+    },
+    {
+      "customer_id": "CUS-1002",
+      "variant": "california_first_notice_en",
+      "session_id": "letter-factory-20260819-184923-batch-1"
+    },
+    {
+      "customer_id": "CUS-1003",
+      "variant": "california_first_notice_es",
+      "session_id": "letter-factory-20260819-184923-batch-2"
+    }
+  ],
+  "exports": [
+    "/workspaces/superdocs-builds/use-cases/sundaram2021/sundaram-letter-factory/out/batch-1.docx",
+    "/workspaces/superdocs-builds/use-cases/sundaram2021/sundaram-letter-factory/out/batch-2.docx"
+  ],
+  "letters_directory": "/workspaces/superdocs-builds/use-cases/sundaram2021/sundaram-letter-factory/out/letters",
+  "calculations": [
+    {
+      "customer_id": "CUS-1001",
+      "variant": "california_first_notice_en",
+      "wording_block": "california_first_notice_en_v1",
+      "figures": {
+        "overcharge_cents": "42500",
+        "accrual_days": "214",
+        "annual_rate_bps": "1000",
+        "day_basis": "365",
+        "interest_cents": "2492",
+        "refund_cents": "44992"
+      },
+      "trail": [
+        "overcharge_cents = 42500 cents, taken from record field 'overcharge_cents' (overcharge on file)",
+        "accrual_days = 214 (2026-01-15 to 2026-08-17, days of accrual)",
+        "annual_rate_bps = 1000, from jurisdiction 'california' (statutory annual rate in basis points)",
+        "day_basis = 365, from jurisdiction 'california' (day count basis)",
+        "interest_cents = overcharge_cents * annual_rate_bps / 10000 * accrual_days / day_basis = 42500 * 1000 / 10000 * 214 / 365 = 2492 cents (simple interest)",
+        "refund_cents = overcharge_cents + interest_cents = 42500 + 2492 = 44992 cents (total refund due)"
+      ]
+    },
+    {
+      "customer_id": "CUS-1002",
+      "variant": "california_first_notice_en",
+      "wording_block": "california_first_notice_en_v1",
+      "figures": {
+        "overcharge_cents": "118075",
+        "accrual_days": "349",
+        "annual_rate_bps": "1000",
+        "day_basis": "365",
+        "interest_cents": "11290",
+        "refund_cents": "129365"
+      },
+      "trail": [
+        "overcharge_cents = 118075 cents, taken from record field 'overcharge_cents' (overcharge on file)",
+        "accrual_days = 349 (2025-09-02 to 2026-08-17, days of accrual)",
+        "annual_rate_bps = 1000, from jurisdiction 'california' (statutory annual rate in basis points)",
+        "day_basis = 365, from jurisdiction 'california' (day count basis)",
+        "interest_cents = overcharge_cents * annual_rate_bps / 10000 * accrual_days / day_basis = 118075 * 1000 / 10000 * 349 / 365 = 11290 cents (simple interest)",
+        "refund_cents = overcharge_cents + interest_cents = 118075 + 11290 = 129365 cents (total refund due)"
+      ]
+    },
+    {
+      "customer_id": "CUS-1003",
+      "variant": "california_first_notice_es",
+      "wording_block": "california_first_notice_es_v1",
+      "figures": {
+        "overcharge_cents": "67340",
+        "accrual_days": "270",
+        "annual_rate_bps": "1000",
+        "day_basis": "365",
+        "interest_cents": "4981",
+        "refund_cents": "72321"
+      },
+      "trail": [
+        "overcharge_cents = 67340 cents, taken from record field 'overcharge_cents' (overcharge on file)",
+        "accrual_days = 270 (2025-11-20 to 2026-08-17, days of accrual)",
+        "annual_rate_bps = 1000, from jurisdiction 'california' (statutory annual rate in basis points)",
+        "day_basis = 365, from jurisdiction 'california' (day count basis)",
+        "interest_cents = overcharge_cents * annual_rate_bps / 10000 * accrual_days / day_basis = 67340 * 1000 / 10000 * 270 / 365 = 4981 cents (simple interest)",
+        "refund_cents = overcharge_cents + interest_cents = 67340 + 4981 = 72321 cents (total refund due)"
+      ]
+    }
+  ]
+}

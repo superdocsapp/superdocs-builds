@@ -1,0 +1,16 @@
+# Ignore everything inside out/, then re-admit only the committed evidence
+out/*
+!out/run-report.json
+!out/batch-1.docx
+!out/batch-1.pdf
+
+# out/letters/ has to be re-admitted as a directory before its files can be
+!out/letters/
+out/letters/*
+!out/letters/CUS-1001.html
+!out/letters/CUS-1002.html
+!out/letters/CUS-1003.html
+
+__pycache__/
+*.pyc
+.env
