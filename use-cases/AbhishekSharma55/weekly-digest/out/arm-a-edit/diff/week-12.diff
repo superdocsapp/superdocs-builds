@@ -1,0 +1,45 @@
+--- week-11
++++ week-12
+@@ -1,5 +1,5 @@
+ # Nebula Drift - Weekly Production Digest
+ 
+-**Week 11 · 2026-03-16 to 2026-03-22 · Phase: Vertical Slice**
++**Week 12 · 2026-03-23 to 2026-03-29 · Phase: Vertical Slice**
+ 
+ Vantage Nine Studios · internal · standing document, edited in place every Monday
+@@ -7,8 +7,8 @@
+ ## What changed
+ 
+-* Combat prototype merged to main behind a feature flag
+-* Enemy AI flocking behaviour landed for Scrapper swarms
+-* First playtest with eight external players (avg session 41 min)
+ * Audio middleware spike finished; Wwise selected over FMOD
++* Grapple cooldown retuned from 8s to 5s after playtest data
++* Cinematic camera rig handed to the animation team
++* Localisation pipeline stubbed for 6 languages
+ 
+ ## What is at risk
+@@ -16,13 +16,12 @@
+ | Risk | Owner | Area | Severity | Trend |
+ | --- | --- | --- | --- | --- |
+-| Crash rate above the cert threshold | Dev H. | QA | Medium | steady |
+-| Publisher marketing beats not aligned with content lock | Marcus O. | Production | Medium | worsening |
+-| Streaming budget overrun on the Drift Belt | Yuki T. | Engineering | High | steady |
++| Crash rate above the cert threshold | Dev H. | QA | Low | improving |
++| Publisher marketing beats not aligned with content lock | Marcus O. | Production | Medium | steady |
++| Matchmaking backend untested above 5k CCU | Yuki T. | Backend | High | steady |
+ 
+ ## What is next
+ 
+-* Instrument the traversal funnel
+-* Close the audio licence
+ * Get the slice in front of the publisher
++* Second external playtest, 20 players
+ 
+ ## Archive
+@@ -34,4 +33,5 @@
+ | Week | Dates | Shipped | Risks carried |
+ | --- | --- | --- | --- |
++| Week 11 | 2026-03-16 to 2026-03-22 | Combat prototype merged; Enemy AI flocking landed; eight-player external playtest; audio spike finished; Wwise selected over FMOD | Crash rate above cert threshold; publisher marketing beats not aligned; Drift Belt streaming budget overrun |
+ | Week 10 | 2026-03-09 to 2026-03-15 | Cinematic camera rig handed off, localisation pipeline stubbed for 6 languages, and the vertical slice was playable. | Crash threshold, marketing beats, and streaming budget remain risky. |
+ | Week 9 | 2026-03-02 to 2026-03-08 | First playtest with eight external players; audio middleware chose Wwise over FMOD; grapple cooldown retuned. | Crash threshold, subtitle sign-off, marketing alignment, and streaming budget remain risky. |

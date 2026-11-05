@@ -1,0 +1,47 @@
+--- week-06
++++ week-07
+@@ -1,5 +1,5 @@
+ # Nebula Drift - Weekly Production Digest
+ 
+-**Week 6 · 2026-02-09 to 2026-02-15 · Phase: Pre-production**
++**Week 7 · 2026-02-16 to 2026-02-22 · Phase: Vertical Slice**
+ 
+ Vantage Nine Studios · internal · standing document, edited in place every Monday
+@@ -7,8 +7,8 @@
+ ## What changed
+ 
+-* Engine upgrade to 5.4 merged; build times down 31%
+-* Art style exploration narrowed to two directions
+-* Nav-mesh generation for the Drift Belt sector
+-* First pass on the Salvage economy spreadsheet
++* Grapple cooldown retuned from 8s to 5s after playtest data
++* Cinematic camera rig handed to the animation team
++* Localisation pipeline stubbed for 6 languages
++* Vertical slice level greyboxed and playable start to finish
+ 
+ ## What is at risk
+@@ -16,12 +16,13 @@
+ | Risk | Owner | Area | Severity | Trend |
+ | --- | --- | --- | --- | --- |
+-| Boss encounter difficulty untuned for controller | Ana F. | Design | Low | steady |
+-| Save-game format still unversioned | Dev H. | Engineering | Low | steady |
++| Save-game format still unversioned | Dev H. | Engineering | Medium | improving |
++| Matchmaking backend untested above 5k CCU | Yuki T. | Backend | High | steady |
++| Second combat designer starts late | Marcus O. | Production | Medium | steady |
+ 
+ ## What is next
+ 
+-* Lock the art direction to one of the two candidates
+-* Scope the vertical slice level list
+-* Stand up the automated build farm
++* Instrument the traversal funnel
++* Close the audio licence
++* Get the slice in front of the publisher
+ 
+ ## Archive
+@@ -33,4 +34,5 @@
+ | Week | Dates | Shipped | Risks carried |
+ | --- | --- | --- | --- |
++| Week 6 | 2026-02-09 to 2026-02-15 | Engine 5.4 merged; build times down 31%; art style narrowed to two directions; Drift Belt nav-mesh; Salvage spreadsheet first pass. | Boss difficulty untuned for controller; save-game format still unversioned. |
+ | Week 5 | 2026-02-02 to 2026-02-08 | Audio depot migrated to Git LFS; Grapple traversal prototype playable end to end on test level | Boss encounter difficulty untuned for controller; outsourced character art slipping two weeks. |
+ | Week 4 | 2026-01-26 to 2026-02-01 | Drift Belt nav-mesh and Salvage economy spreadsheet first pass. Nav-mesh generation for the Drift Belt sector; First pass on the Salvage economy spreadsheet | Boss encounter difficulty and outsourced character art slipping. Boss encounter difficulty untuned for controller; Outsourced character art slipping two weeks |

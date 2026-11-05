@@ -1,0 +1,23 @@
+{
+  "key": "POST /v1/documents/upload-base64 71b5f4799fe2f707",
+  "method": "POST",
+  "path": "/v1/documents/upload-base64",
+  "request": {
+    "filename": "grapple-rework.html",
+    "file_base64": "PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PG1ldGEgY2hhcnNldD0idXRmLTgiPjx0aXRsZT5OZWJ1bGEgRHJpZnQgLSBHcmFwcGxlIFJld29yayAoZGVzaWduIHNwaWtlKTwvdGl0bGU+PC9oZWFkPjxib2R5IHN0eWxlPSJmb250LWZhbWlseTpJbnRlcixDYWxpYnJpLEFyaWFsLHNhbnMtc2VyaWY7Y29sb3I6IzIxMjEyMSI+PGgxIHN0eWxlPSJjb2xvcjojMGQ0N2ExO2JvcmRlci1ib3R0b206M3B4IHNvbGlkICMwZDQ3YTE7cGFkZGluZy1ib3R0b206NnB4Ij5OZWJ1bGEgRHJpZnQgLSBHcmFwcGxlIFJld29yayAoZGVzaWduIHNwaWtlKTwvaDE+PHAgc3R5bGU9ImJhY2tncm91bmQtY29sb3I6I2UzZjJmZDtib3JkZXItbGVmdDo0cHggc29saWQgIzE1NjVjMDtwYWRkaW5nOjhweCAxMHB4O2ZvbnQtc2l6ZTo5cHQiPlZhbnRhZ2UgTmluZSBTdHVkaW9zIC0gaW50ZXJuYWwgLSBsaW5rZWQgc3ViLWRvY3VtZW50IG9mIHRoZSBOZWJ1bGEgRHJpZnQgR0RELCBzZWN0aW9uICJUcmF2ZXJzYWwgLSBHcmFwcGxlIFJld29yayIuPC9wPjxoMiBzdHlsZT0iY29sb3I6IzBkNDdhMSI+UHJvYmxlbTwvaDI+PHA+VG8gYmUgd3JpdHRlbi48L3A+PGgyIHN0eWxlPSJjb2xvcjojMGQ0N2ExIj5Qcm9wb3NlZCBjaGFuZ2U8L2gyPjxwPlRvIGJlIHdyaXR0ZW4uPC9wPjxoMiBzdHlsZT0iY29sb3I6IzBkNDdhMSI+UGFyYW1ldGVyczwvaDI+PHA+VG8gYmUgd3JpdHRlbi48L3A+PGgyIHN0eWxlPSJjb2xvcjojMGQ0N2ExIj5SaXNrczwvaDI+PHA+VG8gYmUgd3JpdHRlbi48L3A+PC9ib2R5PjwvaHRtbD4=",
+    "session_id": "nebula-gdd-9c9b432e56-grapple-rework",
+    "return_html": true
+  },
+  "status": 200,
+  "response": {
+    "html": "<h1 data-chunk-id=\"d76cc582-ba26-4321-8e14-4d7010dc8ca0\" style=\"color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px\">Nebula Drift - Grapple Rework (design spike)</h1>\n<p data-chunk-id=\"cf4e2c75-5a8f-41dd-920c-b18e30366609\" style=\"background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt\">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section \"Traversal - Grapple Rework\".</p>\n<h2 data-chunk-id=\"6bb327a2-fd08-4bbc-9d37-a1efa69ac821\" style=\"color:#0d47a1\">Problem</h2>\n<p data-chunk-id=\"da22ca94-0142-452a-86c1-5275cf32ac18\">To be written.</p>\n<h2 data-chunk-id=\"15dee67b-007e-486b-9ffc-615f23a0b52d\" style=\"color:#0d47a1\">Proposed change</h2>\n<p data-chunk-id=\"01e23afe-2931-45a1-be15-2a202163f78d\">To be written.</p>\n<h2 data-chunk-id=\"178008c3-c428-4280-b97b-7d4367781ac0\" style=\"color:#0d47a1\">Parameters</h2>\n<p data-chunk-id=\"d6dca87b-f7f3-47e0-a904-2b218d6c2eef\">To be written.</p>\n<h2 data-chunk-id=\"202dfb36-37ff-4920-832f-32fed0d46afa\" style=\"color:#0d47a1\">Risks</h2>\n<p data-chunk-id=\"4d02ecc4-8780-4714-adb6-e4fa654d0318\">To be written.</p>",
+    "session_id": "nebula-gdd-9c9b432e56-grapple-rework",
+    "filename": "grapple-rework.html",
+    "chunks_count": 10,
+    "version_id": "c5817b87-d5a3-4db5-b41c-7bd56fe2161c",
+    "page_setup": null,
+    "persisted": true
+  },
+  "elapsed_s": 0.838,
+  "content_type": "application/json"
+}

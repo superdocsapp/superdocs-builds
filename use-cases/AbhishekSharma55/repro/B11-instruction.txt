@@ -1,0 +1,31 @@
+Update this standing weekly production digest to Week 3. This is the same document every week - edit it in place. Make exactly the changes below and nothing else.
+
+STEP 1 - ARCHIVE THE OUTGOING WEEK. Read the bullets currently under 'What changed' and the rows currently in the 'What is at risk' table. Summarise them into ONE new row inserted as the FIRST data row of the 'Archive' table (directly under its header row), with these four cells:
+  Week: 'Week 2'
+  Dates: '2026-01-12 to 2026-01-18'
+  Shipped: your own summary of the current 'What changed' bullets, at most 20 words
+  Risks carried: your own summary of the risks currently in the risk table, at most 15 words
+Match the formatting of the existing archive rows, including the alternating row shading.
+
+STEP 2 - STATUS LINE. The bold status line directly under the document title must read exactly:
+  Week 3 · 2026-01-19 to 2026-01-25 · Phase: Pre-production
+Leave the smaller grey line beneath it unchanged.
+
+STEP 3 - 'What changed'. Replace ALL bullets in that section with exactly these 4 bullets, verbatim, in this order:
+  - Core loop pitch deck signed off by the publisher
+  - Engine upgrade to 5.4 merged; build times down 31%
+  - Art style exploration narrowed to two directions
+  - Nav-mesh generation for the Drift Belt sector
+
+STEP 4 - 'What is at risk' table. The data rows must end up being exactly these 2 rows, in this order. Update, add or delete rows as needed; keep the header row and the table styling untouched.
+  | Risk | Owner | Area | Severity | Trend |
+  | Boss encounter difficulty untuned for controller | Ana F. | Design | Low | steady |
+  | Outsourced character art slipping two weeks | Priya N. | Art | Medium | steady |
+ Risks closed this week and therefore absent from the list above: Save-game format still unversioned.
+
+STEP 5 - 'What is next'. Replace ALL bullets in that section with exactly these 3 bullets, verbatim, in this order:
+  - Stand up the automated build farm
+  - Decide Wwise vs FMOD
+  - Lock the art direction to one of the two candidates
+
+Preserve all existing formatting exactly: the document title, every section heading, table borders, header-row shading, alternating row colours, fonts, font sizes and colours. Do not restyle anything. Do not add, remove or rename any heading. Do not reorder the sections.

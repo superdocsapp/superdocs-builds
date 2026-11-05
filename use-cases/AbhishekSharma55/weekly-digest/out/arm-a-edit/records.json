@@ -1,0 +1,564 @@
+[
+  {
+    "week": 1,
+    "ops": 0,
+    "seconds": 0.0,
+    "api_changed_chunks": [],
+    "measured_changed_chunks": [],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 0,
+    "doc_bytes": 5081,
+    "doc_sha": "160ab3272db8aa1b",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "seed upload",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 2,
+    "ops": 1,
+    "seconds": 132.81,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 5403,
+    "doc_sha": "89f8a8fdef320c80",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 3,
+    "ops": 1,
+    "seconds": 287.13,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 5557,
+    "doc_sha": "037331a910c5fb5d",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 4,
+    "ops": 1,
+    "seconds": 155.76,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 5983,
+    "doc_sha": "a5ed76cccf13a757",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 5,
+    "ops": 3,
+    "seconds": 210.17,
+    "api_changed_chunks": [
+      "ac23d3ca-77db-4eb0-a524-c858241312b9"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 6773,
+    "doc_sha": "59339146fe1e3d64",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "1 section edited, rest untouched",
+    "attempts": 2,
+    "repaired": true,
+    "rolled_back": false,
+    "first_attempt_failures": [
+      "'What is next' bullets are verbatim"
+    ]
+  },
+  {
+    "week": 6,
+    "ops": 1,
+    "seconds": 363.06,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 7465,
+    "doc_sha": "a6f26f4b20cef47c",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 7,
+    "ops": 1,
+    "seconds": 126.64,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 8482,
+    "doc_sha": "026cf5f7247bb7cc",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 8,
+    "ops": 1,
+    "seconds": 142.93,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 8445,
+    "doc_sha": "20ad2070105d7b38",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 9,
+    "ops": 1,
+    "seconds": 177.24,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 10080,
+    "doc_sha": "186f70f30b59884d",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 10,
+    "ops": 1,
+    "seconds": 102.59,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 8131,
+    "doc_sha": "519956c3a672c7a4",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 11,
+    "ops": 1,
+    "seconds": 194.99,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 8713,
+    "doc_sha": "19846225bb3aad1a",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 12,
+    "ops": 1,
+    "seconds": 135.18,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 9250,
+    "doc_sha": "ab51b1bede559cd2",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 13,
+    "ops": 1,
+    "seconds": 132.41,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 9796,
+    "doc_sha": "80a81c860942f351",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 14,
+    "ops": 3,
+    "seconds": 459.05,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 8762,
+    "doc_sha": "4f358ade443f4faa",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "4 sections edited, rest untouched",
+    "attempts": 2,
+    "repaired": true,
+    "rolled_back": false,
+    "first_attempt_failures": [
+      "status line matches the week",
+      "'What changed' bullets are verbatim",
+      "'What is next' bullets are verbatim",
+      "risk table rows match the week exactly",
+      "archive covers every past week exactly once",
+      "archive stays bounded (growth policy)"
+    ]
+  },
+  {
+    "week": 15,
+    "ops": 1,
+    "seconds": 202.06,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 9348,
+    "doc_sha": "d049fdfcf2edcfaf",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 16,
+    "ops": 1,
+    "seconds": 162.95,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 10503,
+    "doc_sha": "be72e44bb333fd13",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 17,
+    "ops": 1,
+    "seconds": 130.29,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 10493,
+    "doc_sha": "2ee8750c85cfa1a4",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 18,
+    "ops": 1,
+    "seconds": 135.38,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 9418,
+    "doc_sha": "ecfa99be9dd0a86a",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  },
+  {
+    "week": 19,
+    "ops": 1,
+    "seconds": 118.91,
+    "api_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "measured_changed_chunks": [
+      "1e130270-f056-4031-a25b-6e3017a8e404",
+      "7ab8e833-e236-4f1e-a491-45e8dde7e5a7",
+      "ac23d3ca-77db-4eb0-a524-c858241312b9",
+      "d29499c6-dfa9-4d8d-898c-183ea1e53576",
+      "f5462e3d-85b3-41ad-a993-9134730eda27"
+    ],
+    "unintended_chunks": [],
+    "byte_identical_chunks": 6,
+    "doc_bytes": 9937,
+    "doc_sha": "8d0b7a9fb600d91f",
+    "invariants_ok": true,
+    "invariant_failures": [],
+    "api_summary": "5 sections edited, rest untouched",
+    "attempts": 1,
+    "repaired": false,
+    "rolled_back": false,
+    "first_attempt_failures": []
+  }
+]

@@ -1,0 +1,45 @@
+--- week-12
++++ week-13
+@@ -1,5 +1,5 @@
+ # Nebula Drift - Weekly Production Digest
+ 
+-**Week 12 · 2026-03-23 to 2026-03-29 · Phase: Vertical Slice**
++**Week 13 · 2026-03-30 to 2026-04-05 · Phase: Vertical Slice**
+ 
+ Vantage Nine Studios · internal · standing document, edited in place every Monday
+@@ -7,8 +7,8 @@
+ ## What changed
+ 
+-* Audio middleware spike finished; Wwise selected over FMOD
+-* Grapple cooldown retuned from 8s to 5s after playtest data
+-* Cinematic camera rig handed to the animation team
+ * Localisation pipeline stubbed for 6 languages
++* Vertical slice level greyboxed and playable start to finish
++* Combat prototype merged to main behind a feature flag
++* Enemy AI flocking behaviour landed for Scrapper swarms
+ 
+ ## What is at risk
+@@ -16,12 +16,12 @@
+ | Risk | Owner | Area | Severity | Trend |
+ | --- | --- | --- | --- | --- |
+-| Crash rate above the cert threshold | Dev H. | QA | Low | improving |
+-| Publisher marketing beats not aligned with content lock | Marcus O. | Production | Medium | steady |
+-| Matchmaking backend untested above 5k CCU | Yuki T. | Backend | High | steady |
++| Crash rate above the cert threshold | Dev H. | QA | Medium | worsening |
++| Publisher marketing beats not aligned with content lock | Marcus O. | Production | Low | worsening |
++| Matchmaking backend untested above 5k CCU | Yuki T. | Backend | Critical | worsening |
+ 
+ ## What is next
+ 
+-* Get the slice in front of the publisher
+-* Second external playtest, 20 players
++* Instrument the traversal funnel
++* Close the audio licence
+ 
+ ## Archive
+@@ -33,4 +33,5 @@
+ | Week | Dates | Shipped | Risks carried |
+ | --- | --- | --- | --- |
++| Week 12 | 2026-03-23 to 2026-03-29 | Audio spike finished; Wwise selected; grapple cooldown retuned; camera rig handed off; localisation stubbed | Crash rate above threshold; publisher marketing beats misaligned; matchmaking backend untested |
+ | Week 11 | 2026-03-16 to 2026-03-22 | Combat prototype merged; Enemy AI flocking landed; eight-player external playtest; audio spike finished; Wwise selected over FMOD | Crash rate above cert threshold; publisher marketing beats not aligned; Drift Belt streaming budget overrun |
+ | Week 10 | 2026-03-09 to 2026-03-15 | Cinematic camera rig handed off, localisation pipeline stubbed for 6 languages, and the vertical slice was playable. | Crash threshold, marketing beats, and streaming budget remain risky. |

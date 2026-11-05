@@ -1,0 +1,39 @@
+{
+  "key": "POST /v1/chat 5b023f8e98e3364a",
+  "method": "POST",
+  "path": "/v1/chat",
+  "request": {
+    "session_id": "nebula-digest-v1-regen-w07-cbdc2a65",
+    "message": "Produce the complete Week 7 production digest for Nebula Drift (Vantage Nine Studios) as the whole document, replacing whatever is there. Use exactly this structure and content.\n\nTITLE (Heading 1): Nebula Drift - Weekly Production Digest\nSTATUS LINE (bold, directly under the title): Week 7 · 2026-02-16 to 2026-02-22 · Phase: Vertical Slice\nBelow it, smaller grey text: Vantage Nine Studios · internal · standing document, edited in place every Monday\n\nSECTION 'What changed' (Heading 2), as bullets, verbatim:\n  - Grapple cooldown retuned from 8s to 5s after playtest data\n  - Cinematic camera rig handed to the animation team\n  - Localisation pipeline stubbed for 6 languages\n  - Vertical slice level greyboxed and playable start to finish\n\nSECTION 'What is at risk' (Heading 2), as a bordered table with a shaded header row and alternating row shading, columns Risk / Owner / Area / Severity / Trend:\n  | Save-game format still unversioned | Dev H. | Engineering | Medium | improving |\n  | Matchmaking backend untested above 5k CCU | Yuki T. | Backend | High | steady |\n  | Second combat designer starts late | Marcus O. | Production | Medium | steady |\n\nSECTION 'What is next' (Heading 2), as bullets, verbatim:\n  - Instrument the traversal funnel\n  - Close the audio licence\n  - Get the slice in front of the publisher\n\nSECTION 'Archive' (Heading 2), a bordered table with a shaded header row, columns Week / Dates / Shipped / Risks carried, newest first:\n  | Week 6 | 2026-02-09 to 2026-02-15 | Engine upgrade to 5.4 merged; build times down 31%; Art style exploration narrowed to two directions; Nav-mesh generatio | Boss encounter difficulty untuned for controller; Save-game format still unversioned |\n  | Week 5 | 2026-02-02 to 2026-02-08 | Perforce to Git LFS migration completed for the audio depot; Grapple traversal prototype playable end to end on the test | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 4 | 2026-01-26 to 2026-02-01 | Nav-mesh generation for the Drift Belt sector; First pass on the Salvage economy spreadsheet | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 3 | 2026-01-19 to 2026-01-25 | Core loop pitch deck signed off by the publisher; Engine upgrade to 5.4 merged; build times down 31%; Art style explorat | Boss encounter difficulty untuned for controller; Outsourced character art slipping two we |\n  | Week 2 | 2026-01-12 to 2026-01-18 | Hired a second combat designer (starts week 9); Perforce to Git LFS migration completed for the audio depot; Grapple tra | Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs |\n  | Week 1 | 2026-01-05 to 2026-01-11 | Art style exploration narrowed to two directions; Nav-mesh generation for the Drift Belt sector | Save-game format still unversioned; Boss encounter difficulty untuned for controller; Outs |\n\nUse the same visual style throughout: dark blue headings, a bordered table with a dark shaded header row and alternating light row shading.",
+    "response_mode": "full",
+    "model_tier": "pro",
+    "thinking_depth": "deep"
+  },
+  "status": 200,
+  "response": {
+    "response": "I had trouble processing your request about \"Produce the complete Week 7 production digest for Nebula Drift (Vantage Nine…\". Could you try rephrasing it, or break it into a simpler step?",
+    "session_id": "nebula-digest-v1-regen-w07-cbdc2a65",
+    "document_changes": null,
+    "usage": {
+      "monthly_used": 202,
+      "monthly_limit": 500,
+      "monthly_remaining": 298,
+      "was_billable": false,
+      "ops_charged": 0,
+      "quota_exhausted": false,
+      "subscription_tier": "free",
+      "bucket_used": null,
+      "redemption_id": null,
+      "promotions": [],
+      "agent_handoff_hint": null
+    },
+    "hint": {
+      "hint_code": "prefer_chat_async_for_large_generations",
+      "message": "This request took 453s synchronously. Requests over ~300s hit the platform gateway timeout (504) with no result returned.",
+      "suggested_action": "Submit document-scale generations via POST /v1/chat/async (chat_async): it returns a job_id immediately, has no gateway ceiling, and reports progress via get_job.",
+      "elapsed_seconds": 453.3
+    }
+  },
+  "elapsed_s": 453.768,
+  "content_type": "application/json"
+}

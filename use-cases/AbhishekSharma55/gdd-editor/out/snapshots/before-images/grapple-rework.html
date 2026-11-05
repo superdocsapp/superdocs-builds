@@ -1,0 +1,36 @@
+<h1 data-chunk-id="d76cc582-ba26-4321-8e14-4d7010dc8ca0" style="color:#0d47a1;border-bottom:3px solid #0d47a1;padding-bottom:6px">Nebula Drift - Grapple Rework (design spike)</h1>
+<p data-chunk-id="cf4e2c75-5a8f-41dd-920c-b18e30366609" style="background-color:#e3f2fd;border-left:4px solid #1565c0;padding:8px 10px;font-size:9pt">Vantage Nine Studios - internal - linked sub-document of the Nebula Drift GDD, section "Traversal - Grapple Rework".</p>
+<h2 data-chunk-id="6bb327a2-fd08-4bbc-9d37-a1efa69ac821" style="color:#0d47a1">Problem</h2>
+<p data-chunk-id="da22ca94-0142-452a-86c1-5275cf32ac18">The 8 s grapple cooldown is the longest in the game, and playtests show players stop moving while they wait for it. That pause makes traversal feel sluggish compared with the rest of the kit.</p>
+<h2 data-chunk-id="15dee67b-007e-486b-9ffc-615f23a0b52d" style="color:#0d47a1">Proposed change</h2>
+<p data-chunk-id="01e23afe-2931-45a1-be15-2a202163f78d">Drop the cooldown and move the recovery into the animation instead, so the ability becomes available sooner while the end of the move still carries some commitment. This keeps the feel of recovery without forcing a long dead stop after each grapple.</p>
+<h2 data-chunk-id="178008c3-c428-4280-b97b-7d4367781ac0" style="color:#0d47a1">Parameters</h2>
+<table border="1" data-chunk-id="d6dca87b-f7f3-47e0-a904-2b218d6c2eef" style="border-collapse: collapse; width: 100%;">
+<thead>
+<tr style="background-color: #f2f2f2;">
+<th style="padding: 8px; border: 1px solid #000;">Parameter</th>
+<th style="padding: 8px; border: 1px solid #000;">Current</th>
+<th style="padding: 8px; border: 1px solid #000;">Proposed</th>
+<th style="padding: 8px; border: 1px solid #000;">Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 8px; border: 1px solid #000;">Cooldown</td>
+<td style="padding: 8px; border: 1px solid #000;">8 s</td>
+<td style="padding: 8px; border: 1px solid #000;">5 s</td>
+<td style="padding: 8px; border: 1px solid #000;">Shortens the longest cooldown in the game to keep movement flowing</td>
+</tr>
+<tr>
+<td style="padding: 8px; border: 1px solid #000;">Recovery animation</td>
+<td style="padding: 8px; border: 1px solid #000;">0.2 s</td>
+<td style="padding: 8px; border: 1px solid #000;">0.5 s</td>
+<td style="padding: 8px; border: 1px solid #000;">Moves the recovery beat into the animation instead of the post-use wait</td>
+</tr>
+</tbody>
+</table>
+<h2 data-chunk-id="202dfb36-37ff-4920-832f-32fed0d46afa" style="color:#0d47a1">Risks</h2>
+<ul data-chunk-id="4d02ecc4-8780-4714-adb6-e4fa654d0318">
+<li>Level design is optimized for an 8-second pacing cadence.</li>
+<li>This 8-second interval ensures consistent player engagement throughout the stage.</li>
+</ul>

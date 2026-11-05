@@ -1,0 +1,28 @@
+{
+  "key": "POST /v1/chat/nebula-gdd-9c9b432e56-mechanics/approve 0e1794e9a326fb10",
+  "method": "POST",
+  "path": "/v1/chat/nebula-gdd-9c9b432e56-mechanics/approve",
+  "request": {
+    "job_id": "241b583c-f3a3-44cc-b1e4-df2c5c11ba7c",
+    "changes": [
+      {
+        "change_id": "5141530f-7639-4ab5-9465-7193dceb5b91",
+        "approved": true
+      },
+      {
+        "change_id": "0c2d2baa-0e45-403c-8b64-dbbc55df485c",
+        "approved": false
+      }
+    ],
+    "approved": true,
+    "feedback": "the second change targeted the wrong section"
+  },
+  "status": 200,
+  "response": {
+    "status": "ok",
+    "message": "Approval processed",
+    "batch_complete": true
+  },
+  "elapsed_s": 0.394,
+  "content_type": "application/json"
+}

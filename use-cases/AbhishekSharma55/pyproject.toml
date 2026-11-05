@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "superdocs-builds-abhisheksharma55"
+version = "1.0.0"
+description = "Two builds on SuperDocs: a weekly digest that is edited (never regenerated), and a chat-driven multi-document GDD editor."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Abhishek Sharma" }]
+dependencies = ["httpx>=0.27"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+digest = "weekly_digest.cli:main"
+gdd = "gdd_editor.cli:main"
+
+[tool.setuptools]
+packages = ["superdocs_kit", "weekly_digest", "gdd_editor"]
+
+[tool.setuptools.package-dir]
+superdocs_kit = "superdocs_kit"
+weekly_digest = "weekly-digest/weekly_digest"
+gdd_editor = "gdd-editor/gdd_editor"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

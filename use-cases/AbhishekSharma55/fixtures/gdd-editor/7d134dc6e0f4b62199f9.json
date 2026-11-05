@@ -1,0 +1,17 @@
+{
+  "key": "POST /v1/documents/export 443a76e9ea6dad11",
+  "method": "POST",
+  "path": "/v1/documents/export",
+  "request": {
+    "format": "markdown",
+    "session_id": "nebula-gdd-9c9b432e56-narrative",
+    "options": {
+      "filename": "Nebula Drift - Narrative"
+    }
+  },
+  "status": 200,
+  "response": null,
+  "elapsed_s": 0.44,
+  "content_type": "text/markdown; charset=utf-8",
+  "response_text": "# Nebula Drift - Narrative\n\nVantage Nine Studios - internal - sub-document of the Nebula Drift GDD.\n\n## Premise\n\nThe Drift Belt was a shipyard until it was not. Nobody agrees on what\nhappened and the only person still transmitting has a reason to lie.\n\n## Act I - Salvage\n\nThe player learns to move. Vex, on the channel, is helpful and slightly too\nwell informed about a place she claims never to have visited.\n\n## Act II - The Cartographer\n\nThe wreck has been mapped before. The player starts finding the map, and it\nis annotated in Vex's hand.\n\n## Act III - Drift\n\nThe player can leave or finish the map. Both endings are short; neither is\nthe \"good\" one.\n\n## Characters\n\n| Character | Role | Voice |\n| --- | --- | --- |\n| The Salvager | Player | Silent. Reads as competent, not heroic. |\n| Vex | Voice on the channel | Warm, funny, unreliable. |\n| The Cartographer | Antagonist, absent | Never speaks. Only annotations. |\n"
+}
