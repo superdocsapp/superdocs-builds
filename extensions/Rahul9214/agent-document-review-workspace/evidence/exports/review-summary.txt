@@ -1,0 +1,21 @@
+SuperDocs Agent Review Workspace
+
+Clause 8.2 · Renewal notice | APPROVED | VERIFIED
+Agent: Cursor Agent
+Claim: Updated the renewal notice from 30 days to 45 days.
+Actual: The document now states 45 days written notice in Clause 8.2.
+
+Support escalation | APPROVED | VERIFIED
+Agent: Cursor Agent
+Claim: Made the support escalation paragraph more concise without changing meaning.
+Actual: Only the support escalation paragraph changed; the escalation owner remains the same.
+
+Payment terms | REJECTED | MISMATCH
+Agent: Cursor Agent
+Claim: No unrelated clauses were changed.
+Actual: Payment terms changed from Net 30 to Net 45 even though the request did not mention payments.
+
+Current status | REJECTED | MISMATCH
+Agent: Claude Code
+Claim: Updated the current status to note that security review is complete.
+Actual: No corresponding document change was found.

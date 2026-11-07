@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-08-27T07:47:39.732Z",
+  "product": "SuperDocs Agent Review Workspace",
+  "documents": [
+    {
+      "id": "vendor-agreement",
+      "name": "vendor-agreement.docx",
+      "owner": "Legal Ops"
+    },
+    {
+      "id": "implementation-plan",
+      "name": "implementation-plan.docx",
+      "owner": "Delivery"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "chg-1",
+      "documentId": "vendor-agreement",
+      "agent": "Cursor Agent",
+      "turn": 18,
+      "section": "Clause 8.2 · Renewal notice",
+      "claim": "Updated the renewal notice from 30 days to 45 days.",
+      "actual": "The document now states 45 days written notice in Clause 8.2.",
+      "verification": "verified",
+      "reviewerDecision": "approved",
+      "status": "approved",
+      "artifactState": "Either party may terminate the agreement with 45 days written notice.",
+      "revertedState": null
+    },
+    {
+      "id": "chg-2",
+      "documentId": "vendor-agreement",
+      "agent": "Cursor Agent",
+      "turn": 18,
+      "section": "Support escalation",
+      "claim": "Made the support escalation paragraph more concise without changing meaning.",
+      "actual": "Only the support escalation paragraph changed; the escalation owner remains the same.",
+      "verification": "verified",
+      "reviewerDecision": "approved",
+      "status": "approved",
+      "artifactState": "Urgent support requests route through the designated account contact for coordinated escalation.",
+      "revertedState": null
+    },
+    {
+      "id": "chg-3",
+      "documentId": "vendor-agreement",
+      "agent": "Cursor Agent",
+      "turn": 18,
+      "section": "Payment terms",
+      "claim": "No unrelated clauses were changed.",
+      "actual": "Payment terms changed from Net 30 to Net 45 even though the request did not mention payments.",
+      "verification": "mismatch",
+      "reviewerDecision": "rejected",
+      "status": "rejected",
+      "artifactState": "Invoices are payable Net 30 from receipt.",
+      "revertedState": null
+    },
+    {
+      "id": "chg-4",
+      "documentId": "implementation-plan",
+      "agent": "Claude Code",
+      "turn": 7,
+      "section": "Current status",
+      "claim": "Updated the current status to note that security review is complete.",
+      "actual": "No corresponding document change was found.",
+      "verification": "mismatch",
+      "reviewerDecision": "rejected",
+      "status": "rejected",
+      "artifactState": "Pilot deployment starts after security review.",
+      "revertedState": null
+    }
+  ]
+}

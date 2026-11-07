@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.vsix
+.DS_Store
+reviewed-*.docx
+superdocs-review-evidence.json
+!evidence/exports/superdocs-review-evidence.json

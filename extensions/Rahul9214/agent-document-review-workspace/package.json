@@ -1,0 +1,28 @@
+{
+  "name": "superdocs-agent-review-workspace",
+  "displayName": "SuperDocs Agent Review Workspace",
+  "description": "Human review surface for agent-driven document changes.",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {"vscode": "^1.90.0"},
+  "main": "./dist/extension.js",
+  "activationEvents": ["onCommand:superdocsAgentReview.open"],
+  "contributes": {
+    "commands": [
+      {"command": "superdocsAgentReview.open", "title": "SuperDocs: Open Agent Review Workspace"}
+    ]
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -w -p tsconfig.json",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "docx": "^9.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/vscode": "^1.90.0",
+    "typescript": "^5.7.2"
+  }
+}
