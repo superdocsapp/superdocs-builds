@@ -1,0 +1,429 @@
+/* =========================
+   Global
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(79, 70, 229, 0.08),
+      transparent 35%
+    ),
+    #f5f7fb;
+  color: #172033;
+}
+
+/* =========================
+   Main Layout
+========================= */
+
+#root {
+  min-height: 100vh;
+}
+
+main {
+  min-height: 100vh;
+  padding: 60px 20px;
+}
+
+section {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+/* =========================
+   Header
+========================= */
+
+.header {
+  margin-bottom: 34px;
+  padding: 10px 2px;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  margin: 0;
+  max-width: 800px;
+  font-size: 42px;
+  line-height: 1.12;
+  letter-spacing: -1px;
+  color: #101828;
+}
+
+.header p {
+  max-width: 650px;
+  margin: 14px 0 0;
+  color: #667085;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* =========================
+   Cards
+========================= */
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 16px;
+  padding: 26px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 25px rgba(16, 24, 40, 0.05);
+}
+
+.card h2 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 22px;
+}
+
+.card > p {
+  color: #667085;
+}
+
+/* =========================
+Form
+========================= */
+
+form {
+  display: grid;
+  gap: 18px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d0d5dd;
+  border-radius: 9px;
+  font-size: 15px;
+  background: #ffffff;
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: #667085;
+  box-shadow: 0 0 0 3px rgba(102, 112, 133, 0.12);
+}
+
+/* =========================
+   Buttons
+========================= */
+
+button {
+  border: none;
+  border-radius: 9px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+form button {
+  width: fit-content;
+  padding: 12px 22px;
+}
+
+/* =========================
+   Messages
+========================= */
+
+.success {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #ecfdf3;
+  color: #067647;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.error {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: #fef3f2;
+  color: #b42318;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================
+   Projects Header
+========================= */
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.projects-header h2 {
+  margin-bottom: 5px;
+}
+
+.projects-header p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+}
+
+.refresh {
+  background: #f2f4f7;
+  color: #344054;
+}
+
+.refresh:hover:not(:disabled) {
+  background: #e4e7ec;
+}
+
+/* =========================
+   Project List
+========================= */
+
+.project-list {
+  display: grid;
+  gap: 14px;
+}
+
+.project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 24px;
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.project-item:hover {
+  border-color: #cfd4dc;
+  box-shadow: 0 8px 20px rgba(16, 24, 40, 0.06);
+  transform: translateY(-1px);
+}
+
+.project-item h3 {
+  margin: 0 0 7px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #101828;
+}
+
+.project-item p {
+  margin: 0;
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* =========================
+   Badges
+========================= */
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badges span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* =========================
+   Project Buttons
+========================= */
+
+.generate-button {
+  background: #172033;
+  color: #ffffff;
+  padding: 12px 18px;
+  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.12);
+}
+
+.generate-button:hover:not(:disabled) {
+  background: #344054;
+  box-shadow: 0 4px 10px rgba(16, 24, 40, 0.15);
+}
+
+.delete-button {
+  background: #ffffff;
+  color: #b42318;
+  border: 1px solid #fecdca;
+  padding: 12px 18px;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #fef3f2;
+  border-color: #fda29b;
+}
+
+.delete-button:hover:not(:disabled) {
+  background: #fef3f2;
+}
+
+.download-all-button {
+  background: #ffffff;
+  color: #344054;
+  border: 1px solid #d0d5dd;
+  padding: 12px 18px;
+}
+
+.download-all-button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #98a2b3;
+}
+
+.download-button {
+  background: #172033;
+  color: #ffffff;
+}
+
+/* =========================
+   Project Actions
+========================= */
+
+.project-item {
+  flex-wrap: wrap;
+}
+
+.project-item > div:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   Generated Documents
+========================= */
+
+.document-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.document-item {
+  padding: 20px;
+  border: 1px solid #e4e7ec;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.document-item h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.document-item pre {
+  margin: 15px 0 0;
+  padding: 16px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #101828;
+  color: #f9fafb;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+/* =========================
+   Empty State
+========================= */
+
+.empty {
+  padding: 35px 20px;
+  text-align: center;
+  border: 1px dashed #d0d5dd;
+  border-radius: 12px;
+  color: #667085;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 768px) {
+  main {
+    padding: 30px 15px;
+  }
+
+  .header h1 {
+    font-size: 30px;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .projects-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .project-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .badges {
+    width: 100%;
+  }
+
+  .project-item > div:last-child {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .project-item button {
+    flex: 1;
+  }
+}
