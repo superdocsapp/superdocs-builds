@@ -1,0 +1,13 @@
+{
+  "resolutions": [
+    {
+      "concept": "2025 Annual Revenue",
+      "status": "ACTION_REQUIRED",
+      "authoritative_document": "Financial Statements",
+      "document_to_review": "Business Review",
+      "current_value": "£125 million",
+      "proposed_value": "£120 million",
+      "reason": "The Financial Statements document serves as the authoritative source for reported annual revenue; the Business Review currently reflects an inconsistent higher value (£125 million) and requires correction to match the authoritative reports."
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "report_title": "Annual Report 2026",
+  "session_id": "annual-report-multidoc-test",
+  "documents": [
+    {
+      "document": "Chair Statement",
+      "filename": "chair-statement.html",
+      "status": "REVIEWED",
+      "response": {
+        "response": "✅ I have reviewed the 'Chair Statement' document. It already complies with the specified house style rules, so no changes were required.\n\n<!DOCTYPE html>\n<html><head><meta charset=\"UTF-8\"><title>Chair Statement</title></head>\n<body>\n<h1>Chair Statement</h1>\n<h2>Performance</h2>\n<p>2025 was a year of continued progress for the company. Revenue reached <strong>£120 million</strong>, reflecting continued demand across our core markets.</p>\n<p>At year end, the company employed <strong>4,500 people</strong> across its operations.</p>\n<h2>Outlook</h2>\n<p>We remain focused on sustainable growth, operational discipline, and delivering long-term value for our stakeholders.</p>\n</body></html>",
+        "session_id": "annual-report-multidoc-test",
+        "document_changes": null,
+        "usage": {
+          "monthly_used": 0,
+          "monthly_limit": 500,
+          "monthly_remaining": 500,
+          "was_billable": false,
+          "ops_charged": 0,
+          "quota_exhausted": false,
+          "subscription_tier": "free",
+          "bucket_used": null,
+          "redemption_id": null,
+          "promotions": [
+            {
+              "redemption_id": "b9673707-840b-406c-a344-8ebd76585464",
+              "name": "Round 2 Builders - August 2026",
+              "ops_remaining": 9992,
+              "ops_granted": 10000,
+              "expires_at": "2026-09-17T05:20:50.595477"
+            }
+          ],
+          "agent_handoff_hint": null
+        },
+        "hint": null
+      }
+    },
+    {
+      "document": "Strategy",
+      "filename": "strategy.html",
+      "status": "REVIEWED",
+      "response": {
+        "response": "The 'Strategy' document already complies with all house style rules. No changes were necessary.",
+        "session_id": "annual-report-multidoc-test",
+        "document_changes": null,
+        "usage": {
+          "monthly_used": 0,
+          "monthly_limit": 500,
+          "monthly_remaining": 500,
+          "was_billable": false,
+          "ops_charged": 0,
+          "quota_exhausted": false,
+          "subscription_tier": "free",
+          "bucket_used": null,
+          "redemption_id": null,
+          "promotions": [
+            {
+              "redemption_id": "b9673707-840b-406c-a344-8ebd76585464",
+              "name": "Round 2 Builders - August 2026",
+              "ops_remaining": 9992,
+              "ops_granted": 10000,
+              "expires_at": "2026-09-17T05:20:50.595477"
+            }
+          ],
+          "agent_handoff_hint": null
+        },
+        "hint": null
+      }
+    },
+    {
+      "document": "Business Review",
+      "filename": "business-review.html",
+      "status": "REVIEWED",
+      "response": {
+        "response": "✅ The 'Business Review' document already complies with all house style rules. No changes were necessary.",
+        "session_id": "annual-report-multidoc-test",
+        "document_changes": null,
+        "usage": {
+          "monthly_used": 0,
+          "monthly_limit": 500,
+          "monthly_remaining": 500,
+          "was_billable": false,
+          "ops_charged": 0,
+          "quota_exhausted": false,
+          "subscription_tier": "free",
+          "bucket_used": null,
+          "redemption_id": null,
+          "promotions": [
+            {
+              "redemption_id": "b9673707-840b-406c-a344-8ebd76585464",
+              "name": "Round 2 Builders - August 2026",
+              "ops_remaining": 9992,
+              "ops_granted": 10000,
+              "expires_at": "2026-09-17T05:20:50.595477"
+            }
+          ],
+          "agent_handoff_hint": null
+        },
+        "hint": null
+      }
+    },
+    {
+      "document": "Governance",
+      "filename": "governance.html",
+      "status": "REVIEWED",
+      "response": {
+        "response": "✅ I have reviewed the 'Governance' document against the annual-report house style rules. The document already complies with all requirements, so no changes were made.",
+        "session_id": "annual-report-multidoc-test",
+        "document_changes": null,
+        "usage": {
+          "monthly_used": 0,
+          "monthly_limit": 500,
+          "monthly_remaining": 500,
+          "was_billable": false,
+          "ops_charged": 0,
+          "quota_exhausted": false,
+          "subscription_tier": "free",
+          "bucket_used": null,
+          "redemption_id": null,
+          "promotions": [
+            {
+              "redemption_id": "b9673707-840b-406c-a344-8ebd76585464",
+              "name": "Round 2 Builders - August 2026",
+              "ops_remaining": 9992,
+              "ops_granted": 10000,
+              "expires_at": "2026-09-17T05:20:50.595477"
+            }
+          ],
+          "agent_handoff_hint": null
+        },
+        "hint": null
+      }
+    },
+    {
+      "document": "Financial Statements",
+      "filename": "financial-statements.html",
+      "status": "REVIEWED",
+      "response": {
+        "response": "✅ I have reviewed the 'Financial Statements' document against the house style rules. The document is fully compliant with all specified requirements, including currency formatting, percentages, employee counts, and heading structure. No changes were necessary.",
+        "session_id": "annual-report-multidoc-test",
+        "document_changes": null,
+        "usage": {
+          "monthly_used": 0,
+          "monthly_limit": 500,
+          "monthly_remaining": 500,
+          "was_billable": false,
+          "ops_charged": 0,
+          "quota_exhausted": false,
+          "subscription_tier": "free",
+          "bucket_used": null,
+          "redemption_id": null,
+          "promotions": [
+            {
+              "redemption_id": "b9673707-840b-406c-a344-8ebd76585464",
+              "name": "Round 2 Builders - August 2026",
+              "ops_remaining": 9992,
+              "ops_granted": 10000,
+              "expires_at": "2026-09-17T05:20:50.595477"
+            }
+          ],
+          "agent_handoff_hint": null
+        },
+        "hint": null
+      }
+    }
+  ]
+}

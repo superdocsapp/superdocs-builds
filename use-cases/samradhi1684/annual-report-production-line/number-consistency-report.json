@@ -1,0 +1,31 @@
+{
+  "findings": [
+    {
+      "concept": "2025 Annual Revenue",
+      "status": "MATCH",
+      "left_document": "Chair Statement",
+      "left_value": "£120 million",
+      "right_document": "Financial Statements",
+      "right_value": "£120 million",
+      "explanation": "All documents consistently report the same revenue of £120 million for 2025."
+    },
+    {
+      "concept": "2025 Employee Count",
+      "status": "MATCH",
+      "left_document": "Strategy",
+      "left_value": "4,500",
+      "right_document": "Financial Statements",
+      "right_value": "4,500",
+      "explanation": "All documents consistently report 4,500 employees at year end or reporting date."
+    },
+    {
+      "concept": "2025 Carbon Emissions Reduction",
+      "status": "MATCH",
+      "left_document": "Strategy",
+      "left_value": "32%",
+      "right_document": "Business Review",
+      "right_value": "32%",
+      "explanation": "All documents consistently report a 32% reduction in carbon emissions."
+    }
+  ]
+}
