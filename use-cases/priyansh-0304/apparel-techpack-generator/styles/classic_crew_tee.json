@@ -1,0 +1,30 @@
+{
+  "style_id": "TEE-001",
+  "style_name": "Classic Crew Neck Tee",
+  "base_size": "M",
+  "size_range": ["XS", "S", "M", "L", "XL", "XXL"],
+  "unit": "inches",
+  "measurement_points": [
+    {"point_name": "Chest Width", "measured_at": "1 in below armhole, laid flat", "base_value": 20.0, "grade_rule": 1.0, "tolerance": 0.5},
+    {"point_name": "Body Length", "measured_at": "HPS to hem", "base_value": 28.0, "grade_rule": 0.75, "tolerance": 0.5},
+    {"point_name": "Shoulder Width", "measured_at": "seam to seam", "base_value": 18.0, "grade_rule": 0.5, "tolerance": 0.25},
+    {"point_name": "Sleeve Length", "measured_at": "shoulder seam to cuff", "base_value": 8.5, "grade_rule": 0.375, "tolerance": 0.25},
+    {"point_name": "Armhole Depth", "measured_at": "straight, shoulder to underarm", "base_value": 9.5, "grade_rule": 0.375, "tolerance": 0.25},
+    {"point_name": "Neck Width", "measured_at": "seam to seam", "base_value": 7.0, "grade_rule": 0.125, "tolerance": 0.125},
+    {"point_name": "Sleeve Opening", "measured_at": "flat, hemmed edge", "base_value": 7.0, "grade_rule": 0.25, "tolerance": 0.125},
+    {"point_name": "Hem Width", "measured_at": "flat, bottom edge", "base_value": 20.0, "grade_rule": 1.0, "tolerance": 0.5}
+  ],
+  "materials": [
+    {"component": "Main fabric", "spec": "100% combed cotton, single jersey knit, 180 GSM", "placement": "Body panels, sleeves"},
+    {"component": "Neck ribbing", "spec": "1x1 ribbed cotton, self-fabric, 2cm finished height", "placement": "Neckline"},
+    {"component": "Main label", "spec": "Woven polyester, 3x4cm", "placement": "Center back neck"},
+    {"component": "Thread", "spec": "100% polyester, tex 27, color-matched", "placement": "All seams"}
+  ],
+  "construction_notes": [
+    "Side-seam construction, not tubular",
+    "Shoulder seams taped to prevent stretch-out",
+    "Neckband: 1x1 self-fabric rib, 3-thread overlock attach, 2-needle coverstitch topstitch",
+    "Hem: double-needle coverstitch, 1cm width",
+    "Stitch density: 10-12 SPI on main seams"
+  ]
+}
